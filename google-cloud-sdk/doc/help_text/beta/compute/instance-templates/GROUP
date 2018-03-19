@@ -1,0 +1,45 @@
+NAME
+    gcloud beta compute instance-templates - read and manipulate Google Compute
+        Engine instances templates
+
+SYNOPSIS
+    gcloud beta compute instance-templates COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Lists, creates, deletes, and modifies Compute Engine instance
+    templates.
+
+    More information on Compute Engine instance templates can be found here:
+    https://cloud.google.com/compute/docs/instance-templates
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a Compute Engine virtual machine instance template.
+
+     create-with-container
+        (BETA) Creates Google Compute Engine virtual machine instance template
+        running Docker images.
+
+     delete
+        (BETA) Delete Google Compute Engine virtual machine instance templates.
+
+     describe
+        (BETA) Describe a virtual machine instance template.
+
+     list
+        (BETA) List Google Compute Engine instance templates.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute instance-templates
+        $ gcloud alpha compute instance-templates
+

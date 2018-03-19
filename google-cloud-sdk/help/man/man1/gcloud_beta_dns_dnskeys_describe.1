@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_BETA_DNS_DNSKEYS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dns dnskeys describe \- get a DnsKey
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dns dnskeys describe\fR \fIKEY\-ID\fR \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command displays the details of a single DnsKey.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIKEY\-ID\fR
+The DNS key identifier.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
+The name of the managed\-zone the DnsKey belongs to
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To get a DnsKey from a managed\-zone, run:
+
+.RS 2m
+$ gcloud beta dns dnskeys describe my_zone \-\-key_id my_key
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

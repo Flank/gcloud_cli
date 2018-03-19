@@ -1,0 +1,57 @@
+NAME
+    gcloud alpha compute networks subnets - list, describe, and delete Google
+        Compute Engine subnetworks
+
+SYNOPSIS
+    gcloud alpha compute networks subnets COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) List, describe, and delete Google Compute Engine subnetworks.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Define a subnet for a network in custom subnet mode.
+
+     delete
+        (ALPHA) Delete Google Compute Engine subnetworks.
+
+     describe
+        (ALPHA) Describe a Google Compute Engine subnetwork.
+
+     expand-ip-range
+        (ALPHA) Expand the IP range of a Google Compute Engine subnetwork.
+
+     get-iam-policy
+        (ALPHA) Get the IAM Policy for a Google Compute Engine subnetwork.
+
+     list
+        (ALPHA) List Google Compute Engine subnetworks.
+
+     list-usable
+        (ALPHA) List Google Compute Engine subnetworks in a project that the
+        user has permission to use.
+
+     set-iam-policy
+        (ALPHA) Set the IAM Policy for a Google Compute Engine subnetwork.
+
+     update
+        (ALPHA) Updates properties of an existing Google Compute Engine
+        subnetwork.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute networks subnets
+        $ gcloud beta compute networks subnets
+

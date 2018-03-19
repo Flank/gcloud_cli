@@ -1,0 +1,70 @@
+NAME
+    gcloud alpha compute snapshots update - update a Google Compute Engine
+        snapshot
+
+SYNOPSIS
+    gcloud alpha compute snapshots update SNAPSHOT_NAME
+        [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute snapshots update updates labels for a Google
+    Compute snapshot. For example:
+
+        $ gcloud alpha compute snapshots update example-snapshot \
+          --update-labels=k0=value1,k1=value2 --remove-labels=k3
+
+    will add/update labels k0 and k1 and remove labels with key k3.
+
+    Labels can be used to identify the snapshot and to filter them as in
+
+        $ gcloud alpha compute snapshots list --filter='labels.k1:value2'
+
+    To list existing labels
+
+        $ gcloud alpha compute snapshots describe example-snapshot \
+            --format='default(labels)'
+
+POSITIONAL ARGUMENTS
+     SNAPSHOT_NAME
+        The name of the snapshot to update.
+
+FLAGS
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud alpha compute snapshots update --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud alpha compute snapshots update --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute snapshots update
+        $ gcloud beta compute snapshots update
+

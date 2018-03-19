@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha functions call - trigger execution of a Google Cloud Function
+
+SYNOPSIS
+    gcloud alpha functions call NAME [--data=DATA] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Trigger execution of a Google Cloud Function.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the function to execute.
+
+FLAGS
+     --data=DATA
+        JSON string with data that will be passed to the function.
+
+     --region=REGION
+        The region of the function to execute. Overrides the default
+        functions/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To call a function giving it hello world in message field of its event
+    argument (depending on your environment you might need to escape characters
+    in --data flag value differently):
+
+    $ {command} helloWorld --data '{"message":"Hello World!"}'
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta functions call
+

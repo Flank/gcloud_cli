@@ -1,0 +1,66 @@
+NAME
+    gcloud meta generate-help-docs - generate all DevSite and man page help
+        docs
+
+SYNOPSIS
+    gcloud meta generate-help-docs [COMMAND/GROUP ...]
+        [--devsite-dir=DIRECTORY] [--help-text-dir=DIRECTORY] [--hidden]
+        [--html-dir=DIRECTORY] [--manpage-dir=DIRECTORY] [--test]
+        [--update-help-text-dir=DIRECTORY] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The DevSite docs are generated in the --devsite-dir directory with
+    pathnames in the reference directory hierarchy. The manpage docs are
+    generated in the --manpage-dir directory with pathnames in the manN/
+    directory hierarchy.
+
+POSITIONAL ARGUMENTS
+     [COMMAND/GROUP ...]
+        Restrict document generation to these dotted command paths. For
+        example: gcloud.alpha gcloud.beta.test
+
+FLAGS
+     --devsite-dir=DIRECTORY
+        The directory where the generated DevSite reference document subtree
+        will be written. If not specified then DevSite documents will not be
+        generated.
+
+     --help-text-dir=DIRECTORY
+        The directory where the generated help text reference document subtree
+        will be written. If not specified then help text documents will not be
+        generated.
+
+     --hidden
+        Include documents for hidden commands and groups.
+
+     --html-dir=DIRECTORY
+        The directory where the standalone manpage HTML files will be
+        generated. index.html contains manpage tree navigation in the left
+        pane. The active command branch and its immediate children are visible
+        and clickable. Hover to navigate the tree. Run python -m
+        SimpleHTTPServer 8888 & in DIRECTORY and point your browser at
+        http://localhost:8888 to view the manpage tree. If not specified then
+        the HTML manpage site will not be generated.
+
+     --manpage-dir=DIRECTORY
+        The directory where the generated manpage document subtree will be
+        written. If not specified then manpage documents will not be generated.
+
+     --test
+        Show but do not apply --update-help-text-dir actions. Exit with
+        non-zero exit status if any help text file must be updated.
+
+     --update-help-text-dir=DIRECTORY
+        Update DIRECTORY help text files to match the current CLI. Use this
+        flag to update the help text golden files after the help_text_test test
+        fails.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

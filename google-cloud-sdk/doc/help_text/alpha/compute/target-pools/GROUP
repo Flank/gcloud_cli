@@ -1,0 +1,58 @@
+NAME
+    gcloud alpha compute target-pools - control Compute Engine target pools for
+        network load balancing
+
+SYNOPSIS
+    gcloud alpha compute target-pools COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Control Compute Engine target pools for network load balancing.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-health-checks
+        (ALPHA) Add an HTTP health check to a target pool.
+
+     add-instances
+        (ALPHA) Add instances to a target pool.
+
+     create
+        (ALPHA) Define a load-balanced pool of virtual machine instances.
+
+     delete
+        (ALPHA) Delete target pools.
+
+     describe
+        (ALPHA) Describe a Google Compute Engine target pool.
+
+     get-health
+        (ALPHA) Get the health of instances in a target pool.
+
+     list
+        (ALPHA) List Google Compute Engine target pools.
+
+     remove-health-checks
+        (ALPHA) Remove an HTTP health check from a target pool.
+
+     remove-instances
+        (ALPHA) Remove instances from a target pool.
+
+     set-backup
+        (ALPHA) Set a backup pool for a target pool.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute target-pools
+        $ gcloud beta compute target-pools
+

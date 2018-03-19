@@ -1,0 +1,28 @@
+NAME
+    gcloud meta apis discovery - inspect the Google Cloud Platform APIs through
+        the discovery service
+
+SYNOPSIS
+    gcloud meta apis discovery COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Inspect the Google Cloud Platform APIs through the discovery service.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        Describe the details of an API in discovery service.
+
+     list
+        List the APIs available via discovery service.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

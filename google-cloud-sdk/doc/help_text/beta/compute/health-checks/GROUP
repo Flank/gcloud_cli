@@ -1,0 +1,43 @@
+NAME
+    gcloud beta compute health-checks - read and manipulate health checks for
+        load balanced instances
+
+SYNOPSIS
+    gcloud beta compute health-checks GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate health checks for load balanced instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     create
+        (BETA) Create health checks for load balanced instances.
+
+     update
+        (BETA) Update health checks for load balanced instances.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (BETA) Delete health checks.
+
+     describe
+        (BETA) Display detailed information about a health check.
+
+     list
+        (BETA) List Google Compute Engine health checks.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute health-checks
+        $ gcloud alpha compute health-checks
+

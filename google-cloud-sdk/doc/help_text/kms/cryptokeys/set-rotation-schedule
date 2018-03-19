@@ -1,0 +1,65 @@
+NAME
+    gcloud kms cryptokeys set-rotation-schedule - update the rotation schedule
+        for a CryptoKey
+
+SYNOPSIS
+    gcloud kms cryptokeys set-rotation-schedule KEY [--keyring=KEYRING]
+        [--location=LOCATION] [--next-rotation-time=NEXT_ROTATION_TIME]
+        [--rotation-period=ROTATION_PERIOD] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (REMOVED) Update the rotation schedule for a CryptoKey.
+
+    The command group cryptokeys is deprecated, please use the keys command
+    group.
+
+    Updates the rotation schedule for the given CryptoKey. The schedule
+    automatically creates a new primary CryptoKeyVersion for the CryptoKey
+    according to the --next-rotation-time and --rotation-period flags.
+
+    The flag --next-rotation-time must be in ISO or RFC3339 format, and
+    --rotation-period must be in the form INTEGER[UNIT], where units can be one
+    of seconds (s), minutes (m), hours (h) or days (d).
+
+    Key rotations performed manually via update-primary-version and the
+    CryptoKeyVersion create do not affect the stored --next-rotation-time.
+
+POSITIONAL ARGUMENTS
+     KEY
+        Name of the key to update the schedule of.
+
+FLAGS
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+     --next-rotation-time=NEXT_ROTATION_TIME
+        Next automatic rotation time of the key. See $ gcloud topic datetimes
+        for information on time formats.
+
+     --rotation-period=ROTATION_PERIOD
+        Automatic rotation period of the key. See $ gcloud topic datetimes for
+        information on duration formats.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command sets a 30 day rotation period for the CryptoKey named
+    frodo within the KeyRing fellowship and location global starting at the
+    specified time:
+
+        $ gcloud kms cryptokeys set-rotation-schedule frodo \
+            --location global \
+            --keyring fellowship \
+            --rotation-period 30d \
+            --next-rotation-time 2017-10-12T12:34:56.1234Z
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

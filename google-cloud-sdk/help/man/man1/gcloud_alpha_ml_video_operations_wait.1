@@ -1,0 +1,65 @@
+
+.TH "GCLOUD_ALPHA_ML_VIDEO_OPERATIONS_WAIT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml video operations wait \- poll long\-running video analysis operation until it completes
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml video operations wait\fR \fIOPERATION_ID\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Poll a long\-running video analysis operation until it completes.
+When the operation is complete, this command will display the results of the
+analysis.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIOPERATION_ID\fR
+ID for the operation to poll until complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBvideointelligence/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/video\-intelligence/docs/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud ml video operations wait
+$ gcloud beta ml video operations wait
+.RE
+

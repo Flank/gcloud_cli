@@ -1,0 +1,629 @@
+NAME
+    gcloud beta container clusters create - create a cluster for running
+        containers
+
+SYNOPSIS
+    gcloud beta container clusters create NAME
+        [--accelerator=[type=TYPE,[count=COUNT],...]] [--allow-route-overlap]
+        [--async] [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
+        [--cluster-secondary-range-name=NAME]
+        [--cluster-version=CLUSTER_VERSION]
+        [--create-subnetwork=[KEY=VALUE,...]] [--disk-size=DISK_SIZE]
+        [--enable-autorepair] [--enable-autoupgrade]
+        [--no-enable-cloud-logging] [--no-enable-cloud-monitoring]
+        [--enable-ip-alias] [--enable-kubernetes-alpha]
+        [--enable-legacy-authorization] [--enable-network-policy]
+        [--enable-pod-security-policy] [--image-type=IMAGE_TYPE]
+        [--no-issue-client-certificate] [--labels=[KEY=VALUE,...]]
+        [--local-ssd-count=LOCAL_SSD_COUNT]
+        [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
+        [--maintenance-window=MAINTENANCE_WINDOW]
+        [--max-nodes-per-pool=MAX_NODES_PER_POOL] [--min-cpu-platform=PLATFORM]
+        [--network=NETWORK] [--node-labels=[NODE_LABEL,...]]
+        [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
+        [--num-nodes=NUM_NODES; default=3] [--preemptible]
+        [--services-ipv4-cidr=CIDR] [--services-secondary-range-name=NAME]
+        [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
+        [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
+        [--additional-zones=ZONE,[ZONE,...] | --node-locations=ZONE,[ZONE,...]]
+        [--addons=[ADDON,...] | --disable-addons=[DISABLE_ADDON,...]]
+        [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
+        [--enable-master-authorized-networks
+          --master-authorized-networks=NETWORK,[NETWORK,...]]
+        [--master-ipv4-cidr=MASTER_IPV4_CIDR --private-cluster]
+        [--password=PASSWORD --no-enable-basic-auth
+          | --username=USERNAME, -u USERNAME; default="admin"]
+        [--region=REGION | --zone=ZONE, -z ZONE]
+        [--service-account=SERVICE_ACCOUNT | --no-enable-cloud-endpoints
+          --scopes=[SCOPE,...]; default="gke-default"] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create a cluster for running containers.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of this cluster.
+
+FLAGS
+     --accelerator=[type=TYPE,[count=COUNT],...]
+        Attaches accelerators (e.g. GPUs) to all nodes.
+
+         type
+            (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia
+            Tesla K80) of accelerator to attach to the instances. Use gcloud
+            compute accelerator-types list to learn about all available
+            accelerator types.
+
+         count
+            (Optional) The number of accelerators to attach to the instances.
+            The default value is 1.
+
+     --allow-route-overlap
+        Allows the provided cluster CIDRs to overlap with existing routes that
+        are less specific and do not terminate at a VM.
+
+        When enabled, --cluster-ipv4-cidr must be fully specified (e.g.
+        10.96.0.0/14 , but not /14). If --enable-ip-alias is also specified,
+        both --cluster-ipv4-cidr and --services-ipv4-cidr must be fully
+        specified.
+
+     --async
+        Don't wait for the operation to complete.
+
+     --cluster-ipv4-cidr=CLUSTER_IPV4_CIDR
+        The IP address range for the pods in this cluster in CIDR notation
+        (e.g. 10.0.0.0/14). Prior to Kubernetes version 1.7.0 this must be a
+        subset of 10.0.0.0/8; however, starting with version 1.7.0 can be any
+        RFC 1918 IP range.
+
+     --cluster-secondary-range-name=NAME
+        Set the secondary range to be used as the source for pod IPs. Alias
+        ranges will be allocated from this secondary range. NAME must be the
+        name of an existing secondary range in the cluster subnetwork.
+
+        Must be used in conjunction with '--enable-ip-alias'. Cannot be used
+        with --create-subnetwork.
+
+     --cluster-version=CLUSTER_VERSION
+        The Kubernetes version to use for the master and nodes. Defaults to
+        server-specified.
+
+        The default Kubernetes version is available using the following
+        command.
+
+            $ gcloud container get-server-config
+
+     --create-subnetwork=[KEY=VALUE,...]
+        Create a new subnetwork for the cluster. The name and range of the
+        subnetwork can be customized via optional 'name' and 'range' key-value
+        pairs.
+
+        'name' specifies the name of the subnetwork to be created.
+
+        'range' specifies the IP range for the new subnetwork. This can either
+        be a netmask size (e.g. '/20') or a CIDR range (e.g. '10.0.0.0/20'). If
+        a netmask size is specified, the IP is automatically taken from the
+        free space in the cluster's network.
+
+        Examples:
+
+        Create a new subnetwork with a default name and size.
+
+            $ gcloud beta container clusters create --create-subnetwork ""
+
+        Create a new subnetwork named "my-subnet" with netmask of size 21.
+
+            $ gcloud beta container clusters create \
+            --create-subnetwork name=my-subnet,range=/21
+
+        Create a new subnetwork with a default name with the primary range of
+        10.100.0.0/16.
+
+            $ gcloud beta container clusters create \
+            --create-subnetwork range=10.100.0.0/16
+
+        Create a new subnetwork with the name "my-subnet" with a default range.
+
+            $ gcloud beta container clusters create \
+            --create-subnetwork name=my-subnet
+
+        Can not be specified unless '--enable-ip-alias' is also specified. Can
+        not be used in conjunction with the '--subnetwork' option.
+
+     --disk-size=DISK_SIZE
+        Size in GB for node VM boot disks. Defaults to 100GB.
+
+     --enable-autorepair
+        Sets autorepair feature for a cluster's default node-pool(s).
+
+            $ gcloud beta container clusters create example-cluster \
+                --enable-autorepair
+
+        See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
+        for more info.
+
+     --enable-autoupgrade
+        Sets autoupgrade feature for a cluster's default node-pool(s).
+
+            $ gcloud beta container clusters create example-cluster \
+                --enable-autoupgrade
+
+        See https://cloud.google.com/kubernetes-engine/docs/node-managament for
+        more info.
+
+     --enable-cloud-logging
+        Automatically send logs from the cluster to the Google Cloud Logging
+        API. Enabled by default, use --no-enable-cloud-logging to disable.
+
+     --enable-cloud-monitoring
+        Automatically send metrics from pods in the cluster to the Google Cloud
+        Monitoring API. VM metrics will be collected by Google Compute Engine
+        regardless of this setting. Enabled by default, use
+        --no-enable-cloud-monitoring to disable.
+
+     --enable-ip-alias
+        Enable use of alias IPs
+        (https://cloud.google.com/compute/docs/alias-ip/) for pod IPs. This
+        will create two new subnetworks, one for the instance and pod IPs, and
+        another to reserve space for the services range.
+
+     --enable-kubernetes-alpha
+        Enable Kubernetes alpha features on this cluster. Selecting this option
+        will result in the cluster having all Kubernetes alpha API groups and
+        features turned on. Cluster upgrades (both manual and automatic) will
+        be disabled and the cluster will be automatically deleted after 30
+        days.
+
+        Alpha clusters are not covered by the Kubernetes Engine SLA and should
+        not be used for production workloads.
+
+     --enable-legacy-authorization
+        Enables the legacy ABAC authentication for the cluster. User rights are
+        granted through the use of policies which combine attributes together.
+        For a detailed look at these properties and related formats, see
+        https://kubernetes.io/docs/admin/authorization/abac/. To use RBAC
+        permissions instead, create or update your cluster with the option
+        --no-enable-legacy-authorization.
+
+     --enable-network-policy
+        Enable network policy enforcement for this cluster. If you are enabling
+        network policy on an existing cluster the network policy addon must
+        first be enabled on the master by using
+        --update-addons=NetworkPolicy=ENABLED flag.
+
+     --enable-pod-security-policy
+        Enables the pod security policy admission controller for the cluster.
+        The pod security policy admission controller adds fine-grained pod
+        create and update authorization controls through the PodSecurityPolicy
+        API objects. For more information, see
+        https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies.
+
+     --image-type=IMAGE_TYPE
+        The image type to use for the cluster. Defaults to server-specified.
+
+        Image Type specifies the base OS that the nodes in the cluster will run
+        on. If an image type is specified, that will be assigned to the cluster
+        and all future upgrades will use the specified image type. If it is not
+        specified the server will pick the default image type.
+
+        The default image type and the list of valid image types are available
+        using the following command.
+
+            $ gcloud container get-server-config
+
+     --issue-client-certificate
+        Issue a TLS client certificate with admin permissions.
+
+        When enabled, the certificate and private key pair will be present in
+        MasterAuth field of the Cluster object.
+
+        Enabled by default, use --no-issue-client-certificate to disable.
+
+     --labels=[KEY=VALUE,...]
+        Labels to apply to the Google Cloud resources in use by the Kubernetes
+        Engine cluster. These are unrelated to Kubernetes labels. Example:
+
+            $ gcloud beta container clusters create example-cluster \
+                --labels=label_a=value1,label_b=,label_c=value3
+
+     --local-ssd-count=LOCAL_SSD_COUNT
+        The number of local SSD disks to provision on each node.
+
+        Local SSDs have a fixed 375 GB capacity per device. The number of disks
+        that can be attached to an instance is limited by the maximum number of
+        disks available on a machine, which differs by compute zone. See
+        https://cloud.google.com/compute/docs/disks/local-ssd for more
+        information.
+
+     --machine-type=MACHINE_TYPE, -m MACHINE_TYPE
+        The type of machine to use for nodes. Defaults to n1-standard-1.
+
+     --maintenance-window=MAINTENANCE_WINDOW
+        Set a time of day when you prefer maintenance to start on this cluster.
+        For example:
+
+            $ gcloud beta container clusters create example-cluster \
+                --maintenance-window=12:43
+
+        The time corresponds to the UTC time zone, and must be in HH:MM format.
+
+     --max-nodes-per-pool=MAX_NODES_PER_POOL
+        The maximum number of nodes to allocate per default initial node pool.
+        Kubernetes Engine will automatically create enough nodes pools such
+        that each node pool contains less than --max-nodes-per-pool nodes.
+        Defaults to 1000 nodes, but can be set as low as 100 nodes per pool on
+        initial create.
+
+     --min-cpu-platform=PLATFORM
+        When specified, the nodes for the new cluster's default node pool will
+        be scheduled on host with specified CPU architecture or a newer one.
+
+        Examples: $ gcloud beta container clusters create example-cluster \
+        --min-cpu-platform=PLATFORM
+
+        To list available CPU platforms in given zone, run:
+
+            $ gcloud beta compute zones describe ZONE \
+                --format="value(availableCpuPlatforms)"
+
+        CPU platform selection is available only in selected zones.
+
+     --network=NETWORK
+        The Compute Engine Network that the cluster will connect to. Google
+        Kubernetes Engine will use this network when creating routes and
+        firewalls for the clusters. Defaults to the 'default' network.
+
+     --node-labels=[NODE_LABEL,...]
+        Applies the given kubernetes labels on all nodes in the new node-pool.
+        Example:
+
+            $ gcloud beta container clusters create example-cluster \
+                --node-labels=label-a=value1,label-2=value2
+
+        New nodes, including ones created by resize or recreate, will have
+        these labels on the kubernetes API node object and can be used in
+        nodeSelectors. See http://kubernetes.io/docs/user-guide/node-selection/
+        for examples.
+
+     --node-taints=[NODE_TAINT,...]
+        Applies the given kubernetes taints on all nodes in default
+        node-pool(s) in new cluster, which can be used with tolerations for pod
+        scheduling. Example:
+
+            $ gcloud beta container clusters create example-cluster \
+                --node-taints=key1=val1:NoSchedule,key2=val2:PreferNoSchedule
+
+        Note, this feature uses gcloud beta commands. To use gcloud beta
+        commands, you must configure gcloud to use the v1beta1 API as described
+        here:
+        https://cloud.google.com/kubernetes-engine/docs/reference/api-organization#beta.
+        To read more about node-taints, see
+        https://cloud.google.com/kubernetes-engine/docs/node-taints.
+
+     --node-version=NODE_VERSION
+        The Kubernetes version to use for nodes. Defaults to server-specified.
+
+        The default Kubernetes version is available using the following
+        command.
+
+            $ gcloud container get-server-config
+
+     --num-nodes=NUM_NODES; default=3
+        The number of nodes to be created in each of the cluster's zones.
+
+     --preemptible
+        Create nodes using preemptible VM instances in the new cluster.
+
+            $ gcloud beta container clusters create example-cluster --preemptible
+
+        New nodes, including ones created by resize or recreate, will use
+        preemptible VM instances. See
+        https://cloud.google.com/kubernetes-engine/docs/preemptible-vm for more
+        information on how to use Preemptible VMs with Kubernetes Engine.
+
+     --services-ipv4-cidr=CIDR
+        Set the IP range for the services IPs.
+
+        Can be specified as a netmask size (e.g. '/20') or as in CIDR notion
+        (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
+        be chosen automatically from the available space in the network.
+
+        If unspecified, the services CIDR range will use automatic defaults.
+
+        Can not be specified unless '--enable-ip-alias' is also specified.
+
+     --services-secondary-range-name=NAME
+        Set the secondary range to be used for services (e.g. ClusterIPs). NAME
+        must be the name of an existing secondary range in the cluster
+        subnetwork.
+
+        Must be used in conjunction with '--enable-ip-alias'. Cannot be used
+        with --create-subnetwork.
+
+     --subnetwork=SUBNETWORK
+        The Google Compute Engine subnetwork
+        (https://cloud.google.com/compute/docs/subnetworks) to which the
+        cluster is connected. The subnetwork must belong to the network
+        specified by --network.
+
+        Cannot be used with the "--create-subnetwork" option.
+
+     --tags=TAG,[TAG,...]
+        Applies the given Compute Engine tags (comma separated) on all nodes in
+        the new node-pool. Example:
+
+            $ gcloud beta container clusters create example-cluster \
+                --tags=tag1,tag2
+
+        New nodes, including ones created by resize or recreate, will have
+        these tags on the Compute Engine API instance object and can be used in
+        firewall rules. See
+        https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create
+        for examples.
+
+     --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
+        Sets the node metadata option for workload metadata configuration. This
+        feature is scheduled to be deprecated in the future and later removed.
+        WORKLOAD_METADATA_FROM_NODE must be one of:
+
+         EXPOSED
+            Exposes all VM metadata to workloads.
+         SECURE
+            Prevents workloads not in hostNetwork from accessing certain VM
+            metadata, specifically kube-env, which contains Kubelet
+            credentials, and the instance identity token. This is a temporary
+            security solution available while the bootstrapping process for
+            cluster nodes is being redesigned with significant security
+            improvements.
+         UNSPECIFIED
+            Chooses the default.
+
+     At most one of these may be specified:
+
+       --additional-zones=ZONE,[ZONE,...]
+          (DEPRECATED) The set of additional zones in which the specified node
+          footprint should be replicated. All zones must be in the same region
+          as the cluster's primary zone. If additional-zones is not specified,
+          all nodes will be in the cluster's primary zone.
+
+          Note that NUM_NODES nodes will be created in each zone, such that if
+          you specify --num-nodes=4 and choose one additional zone, 8 nodes
+          will be created.
+
+          Multiple locations can be specified, separated by commas. For
+          example:
+
+              $ gcloud beta container clusters create example-cluster \
+                  --zone us-central1-a \
+                  --additional-zones us-central1-b,us-central1-c
+
+          This flag is deprecated. Use --node-locations=PRIMARY_ZONE,[ZONE,...]
+          instead.
+
+       --node-locations=ZONE,[ZONE,...]
+          The set of zones in which the specified node footprint should be
+          replicated. All zones must be in the same region as the cluster's
+          primary zone, specified by the --zone flag. --node-locations must
+          contain the primary zone. If node-locations is not specified, all
+          nodes will be in the primary zone.
+
+          Note that NUM_NODES nodes will be created in each zone, such that if
+          you specify --num-nodes=4 and choose two locations, 8 nodes will be
+          created.
+
+          Multiple locations can be specified, separated by commas. For
+          example:
+
+              $ gcloud beta container clusters create example-cluster \
+                  --zone us-central1-a \
+                  --node-locations us-central1-a,us-central1-b
+
+     At most one of these may be specified:
+
+       --addons=[ADDON,...]
+          Default set of addons includes HttpLoadBalancing,
+          HorizontalPodAutoscaling. Addons
+          (https://cloud.google.com/kubernetes-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
+          are additional Kubernetes cluster components. Addons specified by
+          this flag will be enabled. The others will be disabled. ADDON must be
+          one of: HttpLoadBalancing, HorizontalPodAutoscaling,
+          KubernetesDashboard, Istio.
+
+       --disable-addons=[DISABLE_ADDON,...]
+          (REMOVED) List of cluster addons to disable. Options are
+          HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
+          Istio
+
+          Flag disable-addons has been removed. DISABLE_ADDON must be one of:
+          HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
+          Istio.
+
+     Cluster autoscaling
+
+       --enable-autoscaling
+          Enables autoscaling for a node pool.
+
+          Enables autoscaling in the node pool specified by --node-pool or the
+          default node pool if --node-pool is not provided.
+
+       --max-nodes=MAX_NODES
+          Maximum number of nodes in the node pool.
+
+          Maximum number of nodes to which the node pool specified by
+          --node-pool (or default node pool if unspecified) can scale. Ignored
+          unless --enable-autoscaling is also specified.
+
+       --min-nodes=MIN_NODES
+          Minimum number of nodes in the node pool.
+
+          Minimum number of nodes to which the node pool specified by
+          --node-pool (or default node pool if unspecified) can scale. Ignored
+          unless --enable-autoscaling is also specified.
+
+     Master Authorized Networks
+
+       --enable-master-authorized-networks
+          Allow only Authorized Networks (specified by the
+          --master-authorized-networks flag) and Google Compute Engine Public
+          IPs to connect to Kubernetes master through HTTPS. By default public
+          internet (0.0.0.0/0) is allowed to connect to Kubernetes master
+          through HTTPS.
+
+       --master-authorized-networks=NETWORK,[NETWORK,...]
+          The list of external networks (up to 10) that are allowed to connect
+          to Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
+          1.2.3.4/30). Can not be specified unless
+          --enable-master-authorized-networks is also specified.
+
+     Private Clusters
+
+       --master-ipv4-cidr=MASTER_IPV4_CIDR
+          IPv4 CIDR range to use for the master network. This should be a /28
+          and should be used in conjunction with the --private-cluster flag.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
+
+       --private-cluster
+          Cluster is created with no public IP addresses on the cluster nodes.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
+
+     Basic auth
+
+       --password=PASSWORD
+          The password to use for cluster auth. Defaults to a server-specified
+          randomly-generated string.
+
+       Options to specify the username. At most one of these may be specified:
+
+         --enable-basic-auth
+            Enable basic (username/password) auth for the cluster.
+            --enable-basic-auth is an alias for --username=admin;
+            --no-enable-basic-auth is an alias for --username="". Use
+            --password to specify a password; if not, the server will randomly
+            generate one. Enabled by default, use --no-enable-basic-auth to
+            disable.
+
+         --username=USERNAME, -u USERNAME; default="admin"
+            The user name to use for basic auth for the cluster. Use --password
+            to specify a password; if not, the server will randomly generate
+            one.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
+
+     Options to specify the node identity. At most one of these may be
+     specified:
+
+       --service-account=SERVICE_ACCOUNT
+          The Google Cloud Platform Service Account to be used by the node VMs.
+          If a service account is specified, the cloud-platform scope is used.
+          If no Service Account is specified, the project default service
+          account is used.
+
+       Scopes options.
+
+         --enable-cloud-endpoints
+            (REMOVED) Automatically enable Google Cloud Endpoints to take
+            advantage of API management features by adding service-control and
+            service-management scopes.
+
+            If --no-enable-cloud-endpoints is set, remove service-control and
+            service-management scopes, even if they are implicitly (via
+            default) or explicitly set via --scopes.
+
+            --[no-]enable-cloud-endpoints is not allowed if
+            container/new_scopes_behavior property is set to true.
+
+            Flag --[no-]enable-cloud-endpoints has been removed.
+
+            Enabled by default, use --no-enable-cloud-endpoints to disable.
+
+         --scopes=[SCOPE,...]; default="gke-default"
+            Specifies scopes for the node instances. The project's default
+            service account is used. Examples:
+
+                $ gcloud beta container clusters create example-cluster \
+                  --scopes=https://www.googleapis.com/auth/devstorage.read_only
+
+                $ gcloud beta container clusters create example-cluster \
+                  --scopes=bigquery,storage-rw,compute-ro
+
+            Multiple SCOPEs can specified, separated by commas. logging-write
+            and/or monitoring are added unless Cloud Logging and/or Cloud
+            Monitoring are disabled (see --enable-cloud-logging and
+            --enable-cloud-monitoring for more info).
+
+            Unless container/new_scopes_behavior property is true, compute-rw
+            and storage-ro are always added, even if not explicitly specified,
+            and --enable-cloud-endpoints (by default) adds service-control and
+            service-management scopes.
+
+            If container/new_scopes_behavior property is true, none of the
+            above scopes are added (though storage-ro, service-control, and
+            service-management are all included in the default scopes. In a
+            future release, this will be the default behavior.
+
+            SCOPE can be either the full URI of the scope or an alias.
+            Available aliases are:
+
+              Alias                 URI
+              bigquery              https://www.googleapis.com/auth/bigquery
+              cloud-platform        https://www.googleapis.com/auth/cloud-platform
+              cloud-source-repos    https://www.googleapis.com/auth/source.full_control
+              cloud-source-repos-ro https://www.googleapis.com/auth/source.read_only
+              compute-ro            https://www.googleapis.com/auth/compute.readonly
+              compute-rw            https://www.googleapis.com/auth/compute
+              datastore             https://www.googleapis.com/auth/datastore
+              default               https://www.googleapis.com/auth/devstorage.read_only
+                                    https://www.googleapis.com/auth/logging.write
+                                    https://www.googleapis.com/auth/monitoring.write
+                                    https://www.googleapis.com/auth/pubsub
+                                    https://www.googleapis.com/auth/service.management.readonly
+                                    https://www.googleapis.com/auth/servicecontrol
+                                    https://www.googleapis.com/auth/trace.append
+              gke-default           https://www.googleapis.com/auth/devstorage.read_only
+                                    https://www.googleapis.com/auth/logging.write
+                                    https://www.googleapis.com/auth/monitoring
+                                    https://www.googleapis.com/auth/service.management.readonly
+                                    https://www.googleapis.com/auth/servicecontrol
+                                    https://www.googleapis.com/auth/trace.append
+              logging-write         https://www.googleapis.com/auth/logging.write
+              monitoring            https://www.googleapis.com/auth/monitoring
+              monitoring-write      https://www.googleapis.com/auth/monitoring.write
+              pubsub                https://www.googleapis.com/auth/pubsub
+              service-control       https://www.googleapis.com/auth/servicecontrol
+              service-management    https://www.googleapis.com/auth/service.management.readonly
+              sql                   https://www.googleapis.com/auth/sqlservice
+              sql-admin             https://www.googleapis.com/auth/sqlservice.admin
+              storage-full          https://www.googleapis.com/auth/devstorage.full_control
+              storage-ro            https://www.googleapis.com/auth/devstorage.read_only
+              storage-rw            https://www.googleapis.com/auth/devstorage.read_write
+              taskqueue             https://www.googleapis.com/auth/taskqueue
+              trace                 https://www.googleapis.com/auth/trace.append
+              userinfo-email        https://www.googleapis.com/auth/userinfo.email
+
+            DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice'
+            account scope and sql alias do not provide SQL instance management
+            capabilities and have been deprecated. Please, use
+            'https://www.googleapis.com/auth/sqlservice.admin' or sql-admin to
+            manage your Google SQL Service instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud container clusters create
+        $ gcloud alpha container clusters create
+

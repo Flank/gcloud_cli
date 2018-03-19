@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha genomics readgroupsets - commands for Genomics read group sets
+
+SYNOPSIS
+    gcloud alpha genomics readgroupsets COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands to delete, describe, import, update, and list read group
+    sets.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Deletes a read group set.
+
+     describe
+        (ALPHA) Returns details about a read group set.
+
+     export
+        (ALPHA) Exports a read group set to a BAM file in cloud storage.
+
+     import
+        (ALPHA) Imports read group sets into a dataset.
+
+     list
+        (ALPHA) List genomics read group sets in a dataset.
+
+     update
+        (ALPHA) Updates a readgroupset name and/or referenceSetId.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

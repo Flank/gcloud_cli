@@ -1,0 +1,31 @@
+NAME
+    gcloud beta auth git-helper - a git credential helper to provide access to
+        Google git repositories
+
+SYNOPSIS
+    gcloud beta auth git-helper METHOD [--ignore-unknown]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) A git credential helper to provide access to Google git
+    repositories.
+
+POSITIONAL ARGUMENTS
+     METHOD
+        The git credential helper method.
+
+FLAGS
+     --ignore-unknown
+        Produce no output and exit with 0 when given an unknown method (e.g.
+        store) or host.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

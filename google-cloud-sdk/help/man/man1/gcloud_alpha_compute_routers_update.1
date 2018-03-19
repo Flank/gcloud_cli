@@ -1,0 +1,181 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_ROUTERS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute routers update \- update a Google Compute Engine router
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute routers update\fR \fINAME\fR [\fB\-\-advertisement\-mode\fR=\fIMODE\fR] [\fB\-\-async\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-set\-advertisement\-groups\fR=[\fIGROUP\fR,...]] [\fB\-\-set\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]] [\fB\-\-add\-advertisement\-groups\fR=[\fIGROUP\fR,...]\ |\ \fB\-\-add\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]\ |\ \fB\-\-remove\-advertisement\-groups\fR=[\fIGROUP\fR,...]\ |\ \fB\-\-remove\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute routers update\fR is used to update a
+Google Compute Engine router.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the router to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-advertisement\-mode\fR=\fIMODE\fR
+The new advertisement mode for this router. \fIMODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBCUSTOM\fR
+Custom (user\-configured) BGP advertisements.
+.TP 2m
+\fBDEFAULT\fR
+Default (Google\-managed) BGP advertisements.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the router to update. If not specified, you will be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-set\-advertisement\-groups\fR=[\fIGROUP\fR,...]
+The list of pre\-defined groups of IP ranges to dynamically advertise on this
+router. This list can only be specified in custom advertisement mode.
+
+\fIGROUP\fR must be (currently only one value is supported):
+
+.RS 2m
+.TP 2m
+\fBALL_SUBNETS\fR
+Automatically advertise all available subnets.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-set\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]
+The list of individual IP ranges, in CIDR format, to dynamically advertise on
+this router. Each IP range can (optionally) be given a text description DESC.
+For example, to advertise a specific range, use
+\f5\-\-set\-advertisement\-ranges=192.168.10.0/24\fR. To store a description
+with the range, use
+\f5\-\-set\-advertisement\-ranges=192.168.10.0/24=my\-networks\fR. This list can
+only be specified in custom advertisement mode.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-advertisement\-groups\fR=[\fIGROUP\fR,...]
+A list of pre\-defined groups of IP ranges to dynamically advertise on this
+router. This list is appended to any existing advertisements. This field can
+only be specified in custom advertisement mode.
+
+\fIGROUP\fR must be (currently only one value is supported):
+
+.TP 2m
+\fBALL_SUBNETS\fR
+Automatically advertise all available subnets.
+
+.TP 2m
+\fB\-\-add\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]
+A list of individual IP ranges, in CIDR format, to dynamically advertise on this
+router. This list is appended to any existing advertisements. Each IP range can
+(optionally) be given a text description DESC. For example, to advertise a
+specific range, use \f5\-\-advertisement\-ranges=192.168.10.0/24\fR. To store a
+description with the range, use
+\f5\-\-advertisement\-ranges=192.168.10.0/24=my\-networks\fR. This list can only
+be specified in custom advertisement mode.
+
+.TP 2m
+\fB\-\-remove\-advertisement\-groups\fR=[\fIGROUP\fR,...]
+A list of pre\-defined groups of IP ranges to remove from dynamic advertisement
+on this router. Each group in the list must exist in the current set of custom
+advertisements. This field can only be specified in custom advertisement mode.
+
+\fIGROUP\fR must be (currently only one value is supported):
+
+.TP 2m
+\fBALL_SUBNETS\fR
+Automatically advertise all available subnets.
+
+.TP 2m
+\fB\-\-remove\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR,...]
+A list of individual IP ranges, in CIDR format, to remove from dynamic
+advertisement on this router. Each IP range in the list must exist in the
+current set of custom advertisements. This field can only be specified in custom
+advertisement mode.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute routers update
+$ gcloud beta compute routers update
+.RE
+

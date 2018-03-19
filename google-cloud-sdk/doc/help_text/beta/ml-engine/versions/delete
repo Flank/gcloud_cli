@@ -1,0 +1,31 @@
+NAME
+    gcloud beta ml-engine versions delete - delete an existing Cloud ML Engine
+        version
+
+SYNOPSIS
+    gcloud beta ml-engine versions delete VERSION --model=MODEL
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Delete an existing Cloud ML Engine version.
+
+POSITIONAL ARGUMENTS
+     VERSION
+        Name of the model version.
+
+REQUIRED FLAGS
+     --model=MODEL
+        Name of the model.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ml-engine versions delete
+        $ gcloud alpha ml-engine versions delete
+

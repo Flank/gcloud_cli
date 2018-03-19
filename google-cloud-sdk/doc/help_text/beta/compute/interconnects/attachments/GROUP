@@ -1,0 +1,38 @@
+NAME
+    gcloud beta compute interconnects attachments - read and manipulate Google
+        Compute Engine interconnect attachments
+
+SYNOPSIS
+    gcloud beta compute interconnects attachments COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate Google Compute Engine interconnect attachments.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a Google Compute Engine interconnect attachment.
+
+     delete
+        (BETA) Delete interconnects.
+
+     describe
+        (BETA) Describe a Google Compute Engine interconnect attachment.
+
+     list
+        (BETA) List Google Compute Engine interconnect attachments.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute interconnects attachments
+        $ gcloud alpha compute interconnects attachments
+

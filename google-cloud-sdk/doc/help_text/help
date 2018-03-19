@@ -1,0 +1,18 @@
+NAME
+    gcloud help - prints detailed help messages for the specified commands
+
+SYNOPSIS
+    gcloud help [COMMAND ...] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command prints a detailed help message for the commands specified
+    after the help operand.
+
+POSITIONAL ARGUMENTS
+     [COMMAND ...]
+        A sequence of group and command names with no flags.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.

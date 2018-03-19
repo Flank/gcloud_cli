@@ -1,0 +1,74 @@
+NAME
+    gcloud beta iam roles update - update an IAM custom role
+
+SYNOPSIS
+    gcloud beta iam roles update ROLE_ID [--file=FILE]
+        [--organization=ORGANIZATION]
+        [--add-permissions=ADD_PERMISSIONS --description=DESCRIPTION
+          --permissions=PERMISSIONS
+          --remove-permissions=REMOVE_PERMISSIONS --stage=STAGE --title=TITLE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This command updates an IAM custom role.
+
+POSITIONAL ARGUMENTS
+     ROLE_ID
+        The id of the custom role to update. For example: CustomRole. You must
+        also specify the --organization or --project flag.
+
+FLAGS
+     --file=FILE
+        The Yaml file you want to use to update a role. Can not be specified
+        with other flags except role-id.
+
+     --organization=ORGANIZATION
+        The organization of the role you want to update.
+
+     The following flags determine the fields need to be updated. You can
+     update a role by specifying the following flags, or you can update a role
+     from a Yaml file by specifying the file flag.
+
+       --add-permissions=ADD_PERMISSIONS
+          The permissions you want to add to the role. Use commas to separate
+          them.
+
+       --description=DESCRIPTION
+          The description of the role you want to update.
+
+       --permissions=PERMISSIONS
+          The permissions of the role you want to set. Use commas to separate
+          them.
+
+       --remove-permissions=REMOVE_PERMISSIONS
+          The permissions you want to remove from the role. Use commas to
+          separate them.
+
+       --stage=STAGE
+          The state of the role you want to update.
+
+       --title=TITLE
+          The title of the role you want to update.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To update a role from a Yaml file, run:
+
+        $ gcloud beta iam roles update viewer --organization 123 \
+            --file role_file_path
+
+    To update a role with flags, run:
+
+        $ gcloud beta iam roles update viewer --project myproject \
+            --permissions permission1,permission2
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud iam roles update
+

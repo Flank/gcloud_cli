@@ -1,0 +1,42 @@
+NAME
+    gcloud beta pubsub subscriptions ack - acknowledges one or more messages on
+        the specified subscription
+
+SYNOPSIS
+    gcloud beta pubsub subscriptions ack SUBSCRIPTION [ACK_ID ...]
+        [--ack-ids=[ACK_ID,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Acknowledges one or more messages as having been successfully
+    received. If a delivered message is not acknowledged within the
+    Subscription's ack deadline, Cloud Pub/Sub will attempt to deliver it
+    again.
+
+    To automatically acknowledge messages when pulling from a Subscription, you
+    can use the --auto-ack flag on gcloud pubsub subscriptions pull.
+
+POSITIONAL ARGUMENTS
+     SUBSCRIPTION
+        Name of the subscription to ACK messages on.
+
+     [ACK_ID ...]
+        (DEPRECATED) One or more ACK_ID to acknowledge.
+
+        Positional argument ACK_ID is deprecated. Please use --ack-ids instead.
+
+FLAGS
+     --ack-ids=[ACK_ID,...]
+        One or more ACK_ID to acknowledge.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud pubsub subscriptions ack
+        $ gcloud alpha pubsub subscriptions ack
+

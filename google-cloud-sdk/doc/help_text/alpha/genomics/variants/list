@@ -1,0 +1,80 @@
+NAME
+    gcloud alpha genomics variants list - lists variants that match the search
+        criteria
+
+SYNOPSIS
+    gcloud alpha genomics variants list --reference-name=REFERENCE_NAME
+        [--call-set-ids=CALL_SET_IDS,[CALL_SET_IDS,...]] [--end=END]
+        [--limit-calls=LIMIT_CALLS] [--start=START]
+        [--variant-set-id=VARIANT_SET_ID] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE; default=512] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Lists variants that match the search criteria.
+
+REQUIRED FLAGS
+     --reference-name=REFERENCE_NAME
+        Only return variants in this reference sequence.
+
+FLAGS
+     --call-set-ids=CALL_SET_IDS,[CALL_SET_IDS,...]
+        Restrict the list to variants which have calls from the listed call
+        sets. If omitted, a --variant-set-id must be specified.
+
+     --end=END
+        The end of the window (0-based exclusive) for which variants should be
+        returned. If unspecified or 0, defaults to the length of the reference.
+
+     --limit-calls=LIMIT_CALLS
+        The maximum number of calls to return.At least one variant will be
+        returned even if it exceeds this limit.
+
+     --start=START
+        The beginning of the window (0-based inclusive) for which overlapping
+        variants should be returned. If unspecified, defaults to 0.
+
+     --variant-set-id=VARIANT_SET_ID
+        Restrict the list to variants in this variant set. If omitted, a call
+        set id must be included in the request.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True then that item is listed. For more
+        details and examples of filter expressions run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        The maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE; default=512
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is 512.
+        Paging may be applied before or after --filter and --limit depending on
+        the service.
+
+     --sort-by=[FIELD,...]
+        A comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+     --uri
+        Print a list of resource URIs instead of the default output.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

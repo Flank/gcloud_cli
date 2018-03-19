@@ -1,0 +1,87 @@
+
+.TH "GCLOUD_BETA_LOGGING_METRICS_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta logging metrics list \- displays all logs\-based metrics
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta logging metrics list\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Lists all logs\-based metrics.
+
+
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates True then that item is listed. For more details and
+examples of filter expressions run $ gcloud topic filters. This flag interacts
+with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+A comma\-separated list of resource field key names to sort by. The default
+order is ascending. Prefix a field with ``~'' for descending order on that
+field. This flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list up to 10 logs\-based metrics, run:
+
+.RS 2m
+$ gcloud beta logging metrics list \-\-limit=10
+.RE
+
+To view as a simple table with just the name, description, and filter fields,
+run:
+
+.RS 2m
+$ gcloud beta logging metrics list \e
+    \-\-format="table(name, description, filter)"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud logging metrics list
+.RE
+

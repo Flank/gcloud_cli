@@ -1,0 +1,38 @@
+NAME
+    gcloud container builds - create and manage container builds
+
+SYNOPSIS
+    gcloud container builds COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create and manage container builds.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        Cancel an ongoing build.
+
+     describe
+        Get information about a particular build.
+
+     list
+        List builds.
+
+     log
+        Stream the logs for a build.
+
+     submit
+        Submit a build using the Google Container Builder service.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha container builds
+        $ gcloud beta container builds
+

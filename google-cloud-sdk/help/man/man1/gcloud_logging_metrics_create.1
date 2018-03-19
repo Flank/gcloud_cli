@@ -1,0 +1,84 @@
+
+.TH "GCLOUD_LOGGING_METRICS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud logging metrics create \- creates a logs\-based metric
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud logging metrics create\fR \fIMETRIC_NAME\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-log\-filter\fR=\fILOG_FILTER\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Creates a logs\-based metric to count the number of log entries that match a
+filter expression. When creating a metric, the filter expression must not be
+empty.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIMETRIC_NAME\fR
+The name of the new metric.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+The metric's description.
+
+.TP 2m
+\fB\-\-log\-filter\fR=\fILOG_FILTER\fR
+The metric's filter expression. The filter must be for a V2 LogEntry.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a metric that counts the number of log entries with a severity level
+higher than WARNING, run:
+
+.RS 2m
+$ gcloud logging metrics create high_severity_count \e
+    \-\-description="Number of high severity log entries" \e
+    \-\-log\-filter="severity > WARNING"
+.RE
+
+Detailed information about filters can be found at:
+https://cloud.google.com/logging/docs/view/advanced_filters
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta logging metrics create
+.RE
+

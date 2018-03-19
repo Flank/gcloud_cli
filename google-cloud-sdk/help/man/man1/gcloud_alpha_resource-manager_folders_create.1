@@ -1,0 +1,71 @@
+
+.TH "GCLOUD_ALPHA_RESOURCE\-MANAGER_FOLDERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha resource\-manager folders create \- create a new folder
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha resource\-manager folders create\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR [\fB\-\-async\fR] [\fB\-\-folder\fR=\fIFOLDER_ID\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Creates a new folder in the given parent folder or organization.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Friendly display name to use for the new folder
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Whether to return an asynchronous long\-running operation immediately instead of
+waiting for the operation to finish
+
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+ID for the folder to use as a parent
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+ID for the organization to use as a parent
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

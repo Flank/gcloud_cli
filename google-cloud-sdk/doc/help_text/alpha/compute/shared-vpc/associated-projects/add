@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha compute shared-vpc associated-projects add - associate the
+        given project with a given shared VPC host project
+
+SYNOPSIS
+    gcloud alpha compute shared-vpc associated-projects add PROJECT_ID
+        --host-project=HOST_PROJECT [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Associate the given project with a given shared VPC host project.
+
+POSITIONAL ARGUMENTS
+     PROJECT_ID
+        ID for the project to add to the host project
+
+REQUIRED FLAGS
+     --host-project=HOST_PROJECT
+        The XPN host to add an associated project to
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To add the project service-project as an associated service project of the
+    shared VPC host project host-project, run:
+
+        $ gcloud alpha compute shared-vpc associated-projects add \
+            --host-project=host-project service-project
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute shared-vpc associated-projects add
+        $ gcloud beta compute shared-vpc associated-projects add
+

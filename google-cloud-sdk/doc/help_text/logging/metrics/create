@@ -1,0 +1,44 @@
+NAME
+    gcloud logging metrics create - creates a logs-based metric
+
+SYNOPSIS
+    gcloud logging metrics create METRIC_NAME --description=DESCRIPTION
+        --log-filter=LOG_FILTER [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Creates a logs-based metric to count the number of log entries that match a
+    filter expression. When creating a metric, the filter expression must not
+    be empty.
+
+POSITIONAL ARGUMENTS
+     METRIC_NAME
+        The name of the new metric.
+
+REQUIRED FLAGS
+     --description=DESCRIPTION
+        The metric's description.
+
+     --log-filter=LOG_FILTER
+        The metric's filter expression. The filter must be for a V2 LogEntry.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a metric that counts the number of log entries with a severity
+    level higher than WARNING, run:
+
+        $ gcloud logging metrics create high_severity_count \
+            --description="Number of high severity log entries" \
+            --log-filter="severity > WARNING"
+
+    Detailed information about filters can be found at:
+    https://cloud.google.com/logging/docs/view/advanced_filters
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta logging metrics create
+

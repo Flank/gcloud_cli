@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SECURITY\-POLICIES_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute security\-policies import \- import security policy configs into your project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute security\-policies import\fR \fINAME\fR \fB\-\-file\-name\fR=\fIFILE_NAME\fR [\fB\-\-file\-format\fR=\fIFILE_FORMAT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Import security policy configs into your project.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the security policy to import.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-file\-name\fR=\fIFILE_NAME\fR
+The name of the JSON or YAML file to import the security policy config from.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-file\-format\fR=\fIFILE_FORMAT\fR
+The format of the file to import the security policy config from. Specify either
+yaml or json. Defaults to yaml if not specified. \fIFILE_FORMAT\fR must be one
+of: \fBjson\fR, \fByaml\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute security\-policies import
+.RE
+

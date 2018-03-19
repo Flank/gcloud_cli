@@ -1,0 +1,85 @@
+
+.TH "GCLOUD_BETA_RESOURCE\-MANAGER_ORG\-POLICIES_ALLOW" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta resource\-manager org\-policies allow \- add values to an Organization Policy allowed_values list policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta resource\-manager org\-policies allow\fR \fIORG_POLICY_ID\fR \fIALLOWED_VALUE\fR [\fIALLOWED_VALUE\fR\ ...] [\fB\-\-folder\fR=\fIFOLDER_ID\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Adds one or more values to the specified Organization Policy
+allowed_values list policy associated with the specified resource.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIORG_POLICY_ID\fR
+The Org Policy constraint name.
+
+.TP 2m
+\fIALLOWED_VALUE\fR [\fIALLOWED_VALUE\fR ...]
+The values to add to the allowed_values list policy.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+Folder ID for Org Policies.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+Organization ID for Org Policies.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command adds \f5devEnv\fR and \f5prodEnv\fR to an Organization
+Policy allowed_values list policy for constraint \f5serviceuser.services\fR on
+project \f5foo\-project\fR:
+
+.RS 2m
+$ gcloud beta resource\-manager org\-policies allow \e
+    serviceuser.services \-\-project=foo\-project devEnv prodEnv
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha resource\-manager org\-policies allow
+.RE
+

@@ -1,0 +1,69 @@
+---
+args:
+  command: iam service-accounts keys create some_key_file
+  specified_args:
+    --iam-account: test-account@fake-project.iam.gserviceaccount.com
+---
+state: {}
+---
+properties:
+  component_manager:
+    disable_update_check: 'True'
+  core:
+    disable_color: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: '{"privateKeyType": "TYPE_GOOGLE_CREDENTIALS_FILE"}'
+  headers:
+    accept: application/json
+    accept-encoding: gzip, deflate
+    content-length: '50'
+    content-type: application/json
+  method: POST
+  uri: https://iam.googleapis.com/v1/projects/-/serviceAccounts/test-account@fake-project.iam.gserviceaccount.com/keys?alt=json
+---
+response:
+  content:
+  - json:
+      keyAlgorithm: KEY_ALG_RSA_2048
+      name: projects/fake-project/serviceAccounts/test-account@fake-project.iam.gserviceaccount.com/keys/ba708b556b50d4f3b081164aca2c56a8ee232069
+      privateKeyData: ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAiZmFrZS1wcm9qZWN0IiwKICAicHJpdmF0ZV9rZXlfaWQiOiAiM2NiYmJlMzFhMmZjOGQ2OGRkN2RiMDg2NTI0ZTIxZjBjMmYwY2JhOSIsCiAgInByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS0tLVxuTUlJRXZnSUJBREFOQmdrcWhraUc5dzBCQVFFRkFBU0NCS2d3Z2dTa0FnRUFBb0lCQVFDZ25yVVJtd2YzdjJTT1xucDhzRHZVVkFtcHc2NjczMHd6UU1iUC9JRGJSZmgyTDN3b01oaENDdGRGOG5mRDhTWWZQaU1VRVRZTUE4a1FYY1xuVkNEVWp3dk1ISkRXcHdmTGlFc3BRL05hM1FjSkNmaU15VzRHbGFhclN1c3pKSElmR3pyNWZld3RxM2U4cFBPZVxualdmMU9WbXF0OHkxLzZoSnRjU2lZTEhVLzl1YWJyYnBJdVR6L2w5Ukdtd2tEcHJvZHBxdGR5OE4xc0J1R28rZ1xuR3VQWDRMUXRTZEJSRW5VWW9hSXpoNW1uVnJFanQ5bXRseUJiUFFhM3JQMERRQTR5WGVDa2xaRHloR1ZBQ0lVUVxuSWVKMDdNK2hCNk1iSkNUVTZIdnhVSEU1bm5GVE5Id2g4Yi9ENGhxc1dkWkxjM1pCOHYrS3czbzVIeHgvcWJJbVxuVzRGdTJtTURBZ01CQUFFQ2dnRUFGdU1XaFFnMHhmSXhSM3lVV3BlTk55dnd5QnFRYWtDb2VYN01vYnFHTWJpT1xuZXlSdDRBZytTY2tUeUFJVjBLNUJmTUVzOXpCcHBCZThJSTJpVWZlQ0pGY0xzbktCazFoNzhVamI4OTRiNHdkWFxuTWVSLzk1TTZlUjBIVDdYSlJ6SnZvRjUzbVhoZDZ2VU1POU1GZGJWeTEvY3h4ZHRFcFNBd0FUMUxDY0ZkanU4dVxuOTlNOVgwVkNSQnBvbU02T2s0Um45bjlJTVFsRXk5RjVsN3U0TjI1K0h1TjlONGFELzd6bWZZWlV4anZzVWJvOFxuMXBtdEI3bUcwSzRoWnFPZTZCNFpudTVXc3Y2S1I3NmRCeEtCOGJNbmFwK3lQb1BYaXJqWE9YWXJwZkRDVTdGblxua0pIODVJczBXcTNXM0RYNmtSUmRXdUFoem9QWk9hQWpTVllJSW9oaVRRS0JnUURPV2hwOG1qRUdQZzRpd2lRNVxuM1MwSDVWdXZTVjE4ZjU1VVBMK0JxUVF3VE5jMEdZQVpZc0xuelhvMFlGM2Y0UFpYRGpHdFYyMFhkSTFMdFZLSVxuTHJ6TmJEeE1uY1F1QVAwa3lIbEdoQnRIa2lNdGsySFpOS212d3JqaEIrZDVTQ1VoTGpyNFFBSUJEM2hDVDJXR1xuZnhFcXRNYjlZN3h1ZWdkdXFvWjFlRE0wbFFLQmdRREhROUdJeDlKOHFTaXg5V3c5VW9rSk1remFDM1kybnJmMFxuV3JNUkVBc0J2NlVCd1lKeHNHUGVaUHp6L1ZXS3NjNVdnVlpNdjU2dmM2eW1hZlVhSDBvRWJnTHp5QWdFaGcvUFxuUWdtMCtpWnA4MTNFV2d0MTBEeFU4KzRsUE4vZ1J2QXQzeEg4RjltcEk0dE9tWk9Ec2pCMGJocURsaitIZXI5a1xuaTRTRlN4ejdOd0tCZ1FDa2RtblB6M0N0UWY0d003MTlwTXNFRlFnSzM1VXo2ZDY5MHFEcmJWTGFVQlBoQVVYNFxuZFo5VDhvK29lUG00dW1wN25lTjMvVXNFTzY5MW5MR0h1b0JkMVJzR0VXUFBLcGlYblhRVEFLMWhVSmJhOXpFd1xuVldtOG5KeVBOYWFHSWpyOWhBUVo0YUgzU0dZWHE0SUdQUFhvcktaQVJDSmxocnF2dUJkc1BuM0pOUUtCZ0dQR1xuNGJUTDJlbnlDaDZSOVpEL012OFg0TU9OMmJPZjVoekZEY1VOYzNWOHNQTWdJbUVySWRiS1dwOFJ5ek9YdE9vN1xuK1NxVkNMQnlDNUdJbk9KbnFIaHZYYXNVRG0rMWNWVW1qQlhDN0ZsQk0wS09sQTU2SnJ1aktTd2NQejNlUjRXd1xublNET0VIOVEvUUJ1aGg3N3FxZWlPa1NKaDJZZllKYklCYU40NlJvaEFvR0JBTHN6cy85RVVlSWozMkwvR2FZYlxuRVNtRkdYalpsSENSUHk0eXlmM2xmWTRQN2g3aURYQld3NVA2ZVlBNXpxY1p2K0tlVGNyVzdBUG02TUVqMGkzdlxuMVJLRk5vWDNxT0dsWkprcmJMLzFyUmhWT2xvS2RSRUNEdTFZdjQxVnZ5cUJQaitRaW00VlRTUnIzdGc2azB5UVxuRDJTMmZkcUFiVjlURlVHN2VHZm16UkJaXG4tLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tXG4iLAogICJjbGllbnRfZW1haWwiOiAidGVzdC1hY2NvdW50QGZha2UtcHJvamVjdC5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsCiAgImNsaWVudF9pZCI6ICIxMDYzNzA5MDMzOTA1MzIzMTk0NzAiLAogICJhdXRoX3VyaSI6ICJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20vby9vYXV0aDIvYXV0aCIsCiAgInRva2VuX3VyaSI6ICJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20vby9vYXV0aDIvdG9rZW4iLAogICJhdXRoX3Byb3ZpZGVyX3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vb2F1dGgyL3YxL2NlcnRzIiwKICAiY2xpZW50X3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vcm9ib3QvdjEvbWV0YWRhdGEveDUwOS90ZXN0LWFjY291bnQlNDBmYWtlLXByb2plY3QuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iCn0K
+      privateKeyType: TYPE_GOOGLE_CREDENTIALS_FILE
+      validAfterTime: '2017-08-10T21:15:11Z'
+      validBeforeTime: '2027-08-08T21:15:11Z'
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,35"
+    cache-control: private
+    content-length: '3449'
+    content-type: application/json; charset=UTF-8
+    date: Thu, 10 Aug 2017 21:15:11 GMT
+    server: ESF
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  private_files:
+  - content: |
+      {
+        "type": "service_account",
+        "project_id": "fake-project",
+        "private_key_id": "3cbbbe31a2fc8d68dd7db086524e21f0c2f0cba9",
+        "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCgnrURmwf3v2SO\np8sDvUVAmpw66730wzQMbP/IDbRfh2L3woMhhCCtdF8nfD8SYfPiMUETYMA8kQXc\nVCDUjwvMHJDWpwfLiEspQ/Na3QcJCfiMyW4GlaarSuszJHIfGzr5fewtq3e8pPOe\njWf1OVmqt8y1/6hJtcSiYLHU/9uabrbpIuTz/l9RGmwkDprodpqtdy8N1sBuGo+g\nGuPX4LQtSdBREnUYoaIzh5mnVrEjt9mtlyBbPQa3rP0DQA4yXeCklZDyhGVACIUQ\nIeJ07M+hB6MbJCTU6HvxUHE5nnFTNHwh8b/D4hqsWdZLc3ZB8v+Kw3o5Hxx/qbIm\nW4Fu2mMDAgMBAAECggEAFuMWhQg0xfIxR3yUWpeNNyvwyBqQakCoeX7MobqGMbiO\neyRt4Ag+SckTyAIV0K5BfMEs9zBppBe8II2iUfeCJFcLsnKBk1h78Ujb894b4wdX\nMeR/95M6eR0HT7XJRzJvoF53mXhd6vUMO9MFdbVy1/cxxdtEpSAwAT1LCcFdju8u\n99M9X0VCRBpomM6Ok4Rn9n9IMQlEy9F5l7u4N25+HuN9N4aD/7zmfYZUxjvsUbo8\n1pmtB7mG0K4hZqOe6B4Znu5Wsv6KR76dBxKB8bMnap+yPoPXirjXOXYrpfDCU7Fn\nkJH85Is0Wq3W3DX6kRRdWuAhzoPZOaAjSVYIIohiTQKBgQDOWhp8mjEGPg4iwiQ5\n3S0H5VuvSV18f55UPL+BqQQwTNc0GYAZYsLnzXo0YF3f4PZXDjGtV20XdI1LtVKI\nLrzNbDxMncQuAP0kyHlGhBtHkiMtk2HZNKmvwrjhB+d5SCUhLjr4QAIBD3hCT2WG\nfxEqtMb9Y7xuegduqoZ1eDM0lQKBgQDHQ9GIx9J8qSix9Ww9UokJMkzaC3Y2nrf0\nWrMREAsBv6UBwYJxsGPeZPzz/VWKsc5WgVZMv56vc6ymafUaH0oEbgLzyAgEhg/P\nQgm0+iZp813EWgt10DxU8+4lPN/gRvAt3xH8F9mpI4tOmZODsjB0bhqDlj+Her9k\ni4SFSxz7NwKBgQCkdmnPz3CtQf4wM719pMsEFQgK35Uz6d690qDrbVLaUBPhAUX4\ndZ9T8o+oePm4ump7neN3/UsEO691nLGHuoBd1RsGEWPPKpiXnXQTAK1hUJba9zEw\nVWm8nJyPNaaGIjr9hAQZ4aH3SGYXq4IGPPXorKZARCJlhrqvuBdsPn3JNQKBgGPG\n4bTL2enyCh6R9ZD/Mv8X4MON2bOf5hzFDcUNc3V8sPMgImErIdbKWp8RyzOXtOo7\n+SqVCLByC5GInOJnqHhvXasUDm+1cVUmjBXC7FlBM0KOlA56JrujKSwcPz3eR4Ww\nnSDOEH9Q/QBuhh77qqeiOkSJh2YfYJbIBaN46RohAoGBALszs/9EUeIj32L/GaYb\nESmFGXjZlHCRPy4yyf3lfY4P7h7iDXBWw5P6eYA5zqcZv+KeTcrW7APm6MEj0i3v\n1RKFNoX3qOGlZJkrbL/1rRhVOloKdRECDu1Yv41VvyqBPj+Qim4VTSRr3tg6k0yQ\nD2S2fdqAbV9TFUG7eGfmzRBZ\n-----END PRIVATE KEY-----\n",
+        "client_email": "test-account@fake-project.iam.gserviceaccount.com",
+        "client_id": "106370903390532319470",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/test-account%40fake-project.iam.gserviceaccount.com"
+      }
+    name: some_key_file
+  stderr: |
+    created key [ba708b556b50d4f3b081164aca2c56a8ee232069] of type [json] as [some_key_file] for [test-account@fake-project.iam.gserviceaccount.com]

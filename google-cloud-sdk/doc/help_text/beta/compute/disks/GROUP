@@ -1,0 +1,54 @@
+NAME
+    gcloud beta compute disks - read and manipulate Google Compute Engine disks
+
+SYNOPSIS
+    gcloud beta compute disks COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate Google Compute Engine disks.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-labels
+        (BETA) Add labels to Google Compute Engine persistent disks.
+
+     create
+        (BETA) Create Google Compute Engine persistent disks.
+
+     delete
+        (BETA) Delete Google Compute Engine persistent disks.
+
+     describe
+        (BETA) Describe a Google Compute Engine disk.
+
+     list
+        (BETA) List Google Compute Engine disks.
+
+     move
+        (BETA) Move a disk between zones.
+
+     remove-labels
+        (BETA) Remove labels from Google Compute Engine persistent disks.
+
+     resize
+        (BETA) Resize a disk or disks.
+
+     snapshot
+        (BETA) Create snapshots of Google Compute Engine persistent disks.
+
+     update
+        (BETA) Update a Google Compute Engine persistent disk.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute disks
+        $ gcloud alpha compute disks
+

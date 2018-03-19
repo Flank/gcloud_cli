@@ -1,0 +1,66 @@
+NAME
+    gcloud auth - manage oauth2 credentials for the Google Cloud SDK
+
+SYNOPSIS
+    gcloud auth GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The gcloud auth command group lets you grant and revoke authorization to
+    Cloud SDK (gcloud) to access Google Cloud Platform. Typically, when
+    scripting Cloud SDK tools for use on multiple machines, using gcloud auth
+    activate-service-account is recommended.
+
+    For more information on authorization and credential types, see:
+    https://cloud.google.com/sdk/docs/authorizing.
+
+    While running gcloud auth commands, the --account flag can be specified to
+    any command to use that account without activation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     application-default
+        Manage your active Application Default Credentials.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     activate-service-account
+        Authorize gcloud to access Cloud Platform with a Google service
+        account.
+
+     list
+        Lists credentialed accounts.
+
+     login
+        Authorize gcloud to access the Cloud Platform with Google user
+        credentials.
+
+     revoke
+        Revoke access credentials for an account.
+
+EXAMPLES
+    To authenticate a user account with gcloud and minimal user output, run:
+
+        $ gcloud auth login --brief
+
+    To list all credentialed accounts and identify the current active account,
+    run:
+
+        $ gcloud auth list
+
+    To revoke credentials for a user account (like logging out), run:
+
+        $ gcloud auth revoke test@gmail.com
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha auth
+        $ gcloud beta auth
+

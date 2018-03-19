@@ -1,0 +1,109 @@
+
+.TH "GCLOUD_BETA_PUBSUB_TOPICS_REMOVE\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub topics remove\-iam\-policy\-binding \- remove IAM policy binding for a topic
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub topics remove\-iam\-policy\-binding\fR \fITOPIC\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Removes an IAM policy binding for a Cloud Pub/Sub Topic.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fITOPIC\fR
+Name of the topic to remove an IAM policy binding from.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to remove the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com\fR, or
+\f5domain:example.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- anyone who is on the internet, with or without a Google
+account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
+or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+The role to remove the member from.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will remove an IAM policy binding for the role of
+\'roles/editor' for the user 'test\-user@gmail.com' on topic with identifier
+\'my\-topic'
+
+.RS 2m
+$ gcloud beta pubsub topics remove\-iam\-policy\-binding my\-topic \e
+    \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
+.RE
+
+The following command will remove an IAM policy binding for the role of
+\'roles/editor' from all authenticated users on topic 'my\-topic':
+
+.RS 2m
+$ gcloud beta pubsub topics remove\-iam\-policy\-binding my\-topic \e
+    \-\-member='allAuthenticatedUsers' \-\-role='roles/editor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha pubsub topics remove\-iam\-policy\-binding
+.RE
+

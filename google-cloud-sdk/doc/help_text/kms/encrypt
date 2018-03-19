@@ -1,0 +1,70 @@
+NAME
+    gcloud kms encrypt - encrypt a plaintext file using a key
+
+SYNOPSIS
+    gcloud kms encrypt --ciphertext-file=CIPHERTEXT_FILE
+        --plaintext-file=PLAINTEXT_FILE
+        [--additional-authenticated-data-file=ADDITIONAL_AUTHENTICATED_DATA_FILE]
+        [--key=KEY] [--keyring=KEYRING] [--location=LOCATION]
+        [--version=VERSION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Encrypts the given plaintext file using the given CryptoKey and writes the
+    result to the named ciphertext file. The plaintext file must not be larger
+    than 64KiB.
+
+    If an additional authenticated data file is provided, its contents must
+    also be provided during decryption. The file must not be larger than 64KiB.
+
+    The flag --version indicates the version of the key to use for encryption.
+    By default, the primary version is used.
+
+    If --plaintext-file or --additional-authenticated-data-file is set to '-',
+    that file is read from stdin. Similarly, if --ciphertext-file is set to
+    '-', the ciphertext is written to stdout.
+
+REQUIRED FLAGS
+     --ciphertext-file=CIPHERTEXT_FILE
+        Path to the ciphertext file to output.
+
+     --plaintext-file=PLAINTEXT_FILE
+        Path to the plaintext file to encrypt.
+
+OPTIONAL FLAGS
+     --additional-authenticated-data-file=ADDITIONAL_AUTHENTICATED_DATA_FILE
+        Path to the optional file containing the additional authenticated data.
+
+     --key=KEY
+        The key to use for encryption.
+
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+     --version=VERSION
+        The version to use for encryption.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will read the file 'path/to/plaintext', encrypt it
+    using the CryptoKey frodo with the KeyRing fellowship and Location global,
+    and write the ciphertext to 'path/to/ciphertext'.
+
+        $ gcloud kms encrypt \
+            --key frodo \
+            --keyring fellowship \
+            --location global \
+            --plaintext-file path/to/input/plaintext \
+            --ciphertext-file path/to/output/ciphertext
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta kms encrypt
+

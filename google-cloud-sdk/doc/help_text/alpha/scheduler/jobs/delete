@@ -1,0 +1,29 @@
+NAME
+    gcloud alpha scheduler jobs delete - delete a job
+
+SYNOPSIS
+    gcloud alpha scheduler jobs delete JOB [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Delete a job.
+
+POSITIONAL ARGUMENTS
+     JOB
+        The job you want to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudscheduler/v1alpha1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/cloud-scheduler/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

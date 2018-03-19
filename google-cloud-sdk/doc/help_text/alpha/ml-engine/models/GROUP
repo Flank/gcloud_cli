@@ -1,0 +1,61 @@
+NAME
+    gcloud alpha ml-engine models - cloud ML Engine Models commands
+
+SYNOPSIS
+    gcloud alpha ml-engine models COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A Cloud ML Engine model is a container representing an ML
+    application or service. A model may contain multiple versions which act as
+    the implementation of the service. See also:
+
+        $ gcloud alpha ml-engine versions --help.
+
+    For more information, please see
+    https://cloud.google.com/ml/docs/concepts/technical-overview#model
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding to a model.
+
+     create
+        (ALPHA) Create a new Cloud ML Engine model.
+
+     delete
+        (ALPHA) Delete an existing Cloud ML Engine model.
+
+     describe
+        (ALPHA) Describe an existing Cloud ML Engine model.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a model.
+
+     list
+        (ALPHA) List existing Cloud ML Engine models.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove a policy binding from a model.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a model.
+
+     update
+        (ALPHA) Update an existing Cloud ML Engine model.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml-engine models
+        $ gcloud beta ml-engine models
+

@@ -1,0 +1,116 @@
+
+.TH "GCLOUD_BETA_EMULATORS_PUBSUB" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta emulators pubsub \- manage your local pubsub emulator
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta emulators pubsub\fR \fICOMMAND\fR [\fB\-\-data\-dir\fR=\fIDATA_DIR\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This set of commands allows you to start and use a local Pub/Sub
+emulator to produce a local emulation of your production Google Pub/Sub
+environment. In addition to having Java JRE (of version 7 or higher) installed
+and an application built with Google Cloud Client libraries, you must have your
+emulator configured (have it started with environment variables set) for it to
+run successfully. The underlying commands help to set up this configuration.
+
+To stop the emulator, press Ctrl+C.
+
+For a more comprehensive overview of Pub/Sub, see
+https://cloud.google.com/pubsub/docs/overview. For Pub/Sub emulator specific
+documentation, see https://cloud.google.com/pubsub/docs/emulator
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-data\-dir\fR=\fIDATA_DIR\fR
+The directory to be used to store/retrieve data/config for an emulator run. The
+default value is \f5<USER_CONFIG_DIR>/emulators/pubsub\fR. The value of
+USER_CONFIG_DIR can be found by running:
+
+.RS 2m
+$ gcloud info \-\-format='get(config.paths.global_config_dir)'
+.RE
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBenv\-init\fR
+\fB(BETA)\fR Print the commands required to export pubsub emulator's env
+variables.
+
+.TP 2m
+\fBstart\fR
+\fB(BETA)\fR Start a local pubsub emulator.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To start a local pubsub emulator with the default directory for configuration
+data, run:
+
+.RS 2m
+$ gcloud beta emulators pubsub start
+.RE
+
+After starting the emulator, if your application and emulator run on the same
+machine, set environment variables automatically by running:
+
+.RS 2m
+$ gcloud beta emulators pubsub env\-init
+.RE
+
+If you're running your emulator on a different machine, run the above command
+and use its resulting output to set the environment variables on the machine
+that runs your application. This might look like:
+
+.RS 2m
+$ export PUBSUB_EMULATOR_HOST=localhost:8538
+$ export PUBSUB_PROJECT_ID=my\-project\-id
+.RE
+
+Your emulator is now ready for use.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha emulators pubsub
+.RE
+

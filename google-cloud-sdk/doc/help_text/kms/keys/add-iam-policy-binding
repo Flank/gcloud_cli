@@ -1,0 +1,63 @@
+NAME
+    gcloud kms keys add-iam-policy-binding - add IAM policy binding to a key
+
+SYNOPSIS
+    gcloud kms keys add-iam-policy-binding KEY --member=MEMBER --role=ROLE
+        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Adds IAM policy binding to the given key.
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+POSITIONAL ARGUMENTS
+     KEY
+        Name of the key whose IAM policy to modify.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to add the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        Define the role of the member.
+
+OPTIONAL FLAGS
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will add an IAM policy binding for the role of
+    'roles/editor' for the user 'test-user@gmail.com' on the key frodo with the
+    keyring fellowship and location global:
+
+        $ gcloud kms keys add-iam-policy-binding frodo \
+            --keyring fellowship \
+            --location global \
+            --member='user:test-user@gmail.com' \
+            --role='roles/editor'
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta kms keys add-iam-policy-binding
+

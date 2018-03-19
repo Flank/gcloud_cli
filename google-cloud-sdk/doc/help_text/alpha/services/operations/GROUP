@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha services operations - manage Operation for various services
+
+SYNOPSIS
+    gcloud alpha services operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Operation for various services.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describes an operation resource for a given operation name.
+
+     list
+        (ALPHA) List operations for a project.
+
+     wait
+        (ALPHA) Waits for an operation to complete.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud services operations
+        $ gcloud beta services operations
+

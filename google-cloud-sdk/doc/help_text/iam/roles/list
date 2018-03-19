@@ -1,0 +1,61 @@
+NAME
+    gcloud iam roles list - list the roles defined at a parent organization or
+        a project
+
+SYNOPSIS
+    gcloud iam roles list [--organization=ORGANIZATION] [--show-deleted]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--sort-by=[FIELD,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command lists the roles with given parent organization or project.
+
+FLAGS
+     --organization=ORGANIZATION
+        The organization of the role you want to list.
+
+     --show-deleted
+        Show deleted roles by specifying this flag.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True then that item is listed. For more
+        details and examples of filter expressions run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        The maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --sort-by=[FIELD,...]
+        A comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To list the roles for an organization, run:
+
+        $ gcloud iam roles list --organization 12345
+
+    To list the roles for a project, run:
+
+        $ gcloud iam roles list --project myproject
+
+    To list the curated roles, run:
+
+        $ gcloud iam roles list
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta iam roles list
+

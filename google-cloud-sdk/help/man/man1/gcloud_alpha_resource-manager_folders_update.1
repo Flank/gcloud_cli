@@ -1,0 +1,85 @@
+
+.TH "GCLOUD_ALPHA_RESOURCE\-MANAGER_FOLDERS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha resource\-manager folders update \- update the display name of a folder
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha resource\-manager folders update\fR \fIFOLDER_ID\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Updates the given folder with new folder name.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+There is no folder with the given ID.
+.IP "\(bu" 2m
+The active account does not have permission to update the given folder.
+.IP "\(bu" 2m
+The new display name is taken by another folder under this folder's parent.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIFOLDER_ID\fR
+ID for the folder you want to update.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+New display name for the folder (unique under the same parent).
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command updates a folder with the ID \f5123456789\fR to have the
+name "Foo Bar and Grill":
+
+.RS 2m
+$ gcloud alpha resource\-manager folders update 123456789 \e
+    \-\-display_name="Foo Bar and Grill"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

@@ -1,0 +1,60 @@
+
+.TH "GCLOUD_ALPHA_EMULATORS_START" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha emulators start \- start a number of emulators behind a proxy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha emulators start\fR [\fB\-\-emulators\fR=[\fIEMULATORS\fR,...]] [\fB\-\-proxy\-port\fR=\fIPROXY_PORT\fR] [\fB\-\-route\-to\-public\fR=\fIROUTE_TO_PUBLIC\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Start a number of emulators behind a proxy.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-emulators\fR=[\fIEMULATORS\fR,...]
+list of local emulators to start. 'all' will attempt to start all of the
+emulators. Valid options: datastore,pubsub
+
+.TP 2m
+\fB\-\-proxy\-port\fR=\fIPROXY_PORT\fR
+port the proxy will be bound to
+
+.TP 2m
+\fB\-\-route\-to\-public\fR=\fIROUTE_TO_PUBLIC\fR
+If set, will route traffic for APIs not being emulated to prod
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

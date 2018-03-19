@@ -1,0 +1,43 @@
+NAME
+    gcloud logging - manage Stackdriver Logging
+
+SYNOPSIS
+    gcloud logging GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Stackdriver Logging.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     logs
+        Manages your project's logs.
+
+     metrics
+        Manages logs-based metrics.
+
+     resource-descriptors
+        Get information about resource descriptors.
+
+     sinks
+        Manages sinks used to export logs.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     read
+        Reads log entries.
+
+     write
+        Writes a log entry.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta logging
+

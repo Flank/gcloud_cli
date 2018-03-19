@@ -1,0 +1,77 @@
+NAME
+    gcloud alpha pubsub subscriptions - manage Cloud Pubsub subscriptions
+
+SYNOPSIS
+    gcloud alpha pubsub subscriptions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud Pubsub subscriptions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     ack
+        (ALPHA) Acknowledges one or more messages on the specified
+        subscription.
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding for a subscription.
+
+     create
+        (ALPHA) Creates one or more Cloud Pub/Sub subscriptions.
+
+     delete
+        (ALPHA) Deletes one or more Cloud Pub/Sub subscriptions.
+
+     describe
+        (ALPHA) Describes a Cloud Pub/Sub subscription.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a Cloud Pub/Sub Subscription.
+
+     list
+        (ALPHA) Lists Cloud Pub/Sub subscriptions.
+
+     modify-ack-deadline
+        (ALPHA) (DEPRECATED) Modifies the ACK deadline for a specific Cloud
+        Pub/Sub message.
+
+     modify-message-ack-deadline
+        (ALPHA) Modifies the ACK deadline for a specific Cloud Pub/Sub message.
+
+     modify-push-config
+        (ALPHA) Modifies the push configuration of a Cloud Pub/Sub
+        subscription.
+
+     pull
+        (ALPHA) Pulls one or more Cloud Pub/Sub messages from a subscription.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding for a subscription.
+
+     seek
+        (ALPHA) This feature is part of an invite-only release of the Cloud
+        Pub/Sub API.
+
+     set-iam-policy
+        (ALPHA) Set IAM policy for a subscription.
+
+     update
+        (ALPHA) This feature is part of an invite-only release of the Cloud
+        Pub/Sub API.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud pubsub subscriptions
+        $ gcloud beta pubsub subscriptions
+

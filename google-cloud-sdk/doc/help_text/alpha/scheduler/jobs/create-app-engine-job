@@ -1,0 +1,99 @@
+NAME
+    gcloud alpha scheduler jobs create-app-engine-job - create a Cloud
+        Scheduler job with an App Engine target
+
+SYNOPSIS
+    gcloud alpha scheduler jobs create-app-engine-job --schedule=SCHEDULE
+        [--header=HEADER] [--http-method=HTTP_METHOD; default="post"]
+        [--max-attempts=MAX_ATTEMPTS] [--max-backoff=MAX_BACKOFF; default="1h"]
+        [--max-doublings=MAX_DOUBLINGS; default=16]
+        [--max-retry-duration=MAX_RETRY_DURATION]
+        [--min-backoff=MIN_BACKOFF; default="0.1s"]
+        [--relative-url=RELATIVE_URL; default="/"] [--service=SERVICE]
+        [--timezone=TIMEZONE; default="Etc/UTC"] [--version=VERSION]
+        [--payload=PAYLOAD | --payload-from-file=PAYLOAD_FROM_FILE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a Cloud Scheduler job with an App Engine target.
+
+REQUIRED FLAGS
+     --schedule=SCHEDULE
+        String, English-like description of the schedule at which the job
+        should be run. See
+        https://cloud.google.com/appengine/docs/standard/python/config/cronref#schedule_format
+        for details.
+
+OPTIONAL FLAGS
+     --header=HEADER
+        "KEY: VALUE" pair, HTTP header to include in the request. May be
+        repeated. Example: --header 'User-Agent: Browser' --header 'Accept:
+        text/plain'
+
+     --http-method=HTTP_METHOD; default="post"
+        HTTP method to use for the request. HTTP_METHOD must be one of: delete,
+        get, head, post, put.
+
+     --max-attempts=MAX_ATTEMPTS
+        Int, the number of times to retry the request if it fails or times out.
+        Must be in range 0-5 inclusive.
+
+     --max-backoff=MAX_BACKOFF; default="1h"
+        Duration, the maximum amount of time to wait before retrying a task
+        after it fails. Ex. 10s (default is 1h).
+
+     --max-doublings=MAX_DOUBLINGS; default=16
+        Int, the maximum number of times that the interval between failed job
+        retries will be doubled before the increase becomes constant.
+
+     --max-retry-duration=MAX_RETRY_DURATION
+        The time limit for retrying a failed task, measured from when the task
+        was first run. If specified with --max-attempts, the task will be
+        retried until both limits are reached. Default is 0 (which means
+        unlimited)
+
+     --min-backoff=MIN_BACKOFF; default="0.1s"
+        Duration, the minimum amount of time to wait before retrying a task
+        after it fails. Ex. 10s (default is 0.1s).
+
+     --relative-url=RELATIVE_URL; default="/"
+        String, relative URL to use for the request (beginning with "/").
+
+     --service=SERVICE
+        String, ID of the App Engine service to which to send the request.
+
+     --timezone=TIMEZONE; default="Etc/UTC"
+        String, a time zone name from the tz database
+        (http://en.wikipedia.org/wiki/Tz_database).
+
+     --version=VERSION
+        String, ID of the App Engine version to which to send the request.
+
+     At most one of these may be specified:
+
+       --payload=PAYLOAD
+          String, a data payload to be included as the body of the HTTP
+          request. May only be given with compatible HTTP methods (PUT or
+          POST).
+
+       --payload-from-file=PAYLOAD_FROM_FILE
+          String, a data payload to be included as the body of the HTTP
+          request. May only be given with compatible HTTP methods (PUT or
+          POST).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudscheduler/v1alpha1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/cloud-scheduler/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

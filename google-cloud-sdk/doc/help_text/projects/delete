@@ -1,0 +1,38 @@
+NAME
+    gcloud projects delete - delete a project
+
+SYNOPSIS
+    gcloud projects delete PROJECT_ID [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Deletes the project with the given project ID.
+
+    This command can fail for the following reasons:
+      o The project specified does not exist.
+      o The active account does not have Owner permissions for the given
+        project.
+
+POSITIONAL ARGUMENTS
+     PROJECT_ID
+        ID for the project you want to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command deletes the project with the ID example-foo-bar-1:
+
+        $ gcloud projects delete example-foo-bar-1
+
+SEE ALSO
+    See https://support.google.com/cloud/answer/6251787 for information on
+    creating or deleting projects from the Google Cloud Platform Console.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha projects delete
+        $ gcloud beta projects delete
+

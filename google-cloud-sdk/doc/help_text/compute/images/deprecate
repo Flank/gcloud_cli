@@ -1,0 +1,103 @@
+NAME
+    gcloud compute images deprecate - manage deprecation status of Google
+        Compute Engine images
+
+SYNOPSIS
+    gcloud compute images deprecate IMAGE_NAME --state=STATE
+        [--replacement=REPLACEMENT]
+        [--delete-in=DELETE_IN | --delete-on=DELETE_ON]
+        [--obsolete-in=OBSOLETE_IN | --obsolete-on=OBSOLETE_ON]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute images deprecate is used to deprecate images.
+
+POSITIONAL ARGUMENTS
+     IMAGE_NAME
+        The name of the disk image to operate on.
+
+REQUIRED FLAGS
+     --state=STATE
+        The deprecation state to set on the image. STATE must be one of:
+
+         ACTIVE
+            The image is currently supported.
+         DELETED
+            New uses result in an error. Setting this state will not
+            automatically delete the image. You must still make a request to
+            delete the image to remove it from the image list.
+         DEPRECATED
+            Operations which create a new DEPRECATED resource return
+            successfully, but with a warning indicating that the image is
+            deprecated and recommending its replacement.
+         OBSOLETE
+            New uses result in an error.
+
+OPTIONAL FLAGS
+     --replacement=REPLACEMENT
+        Specifies a Compute Engine image as a replacement for the image being
+        phased out. Users of the deprecated image will be advised to switch to
+        this replacement. For example, --replacement example-image or
+        --replacement projects/google/global/images/example-image.
+
+     At most one of these may be specified:
+
+       --delete-in=DELETE_IN
+          Specifies the amount of time until the image will be marked as
+          DELETED. Note: The image will not actually be deleted - this field is
+          only for informational purposes (see below). For instance, specifying
+          30d will mark the image as DELETED in 30 days from the current system
+          time. See $ gcloud topic datetimes for information on duration
+          formats.
+
+          Note that the image will not be deleted automatically. The image will
+          only be marked as deleted. An explicit request to delete the image
+          must be made in order to remove it from the image list. This flag is
+          mutually exclusive with --delete-on.
+
+       --delete-on=DELETE_ON
+          Similar to --delete-in, but specifies an absolute time when the image
+          will be marked as DELETED. Note: The image will not actually be
+          deleted - this field is for informational purposes (see the
+          description of --delete-in for more details). The date and time
+          specified must be valid RFC 3339 full-date or date-time. For times in
+          UTC, this looks like YYYY-MM-DDTHH:MM:SSZ. For example:
+          2020-01-02T00:00:00Z for midnight on January 2, 2020 in UTC. This
+          flag is mutually exclusive with --delete-in.
+
+     At most one of these may be specified:
+
+       --obsolete-in=OBSOLETE_IN
+          Specifies time (in the same format as --delete-in) until the image
+          will be marked OBSOLETE. State will not be changed - it is only for
+          informational purposes. This flag is mutually exclusive with
+          --obsolete-on.
+
+       --obsolete-on=OBSOLETE_ON
+          Specifies time (in the same format as --delete-on) when this image
+          will be marked as OBSOLETE. State will not be changed - it has only
+          informational purpose. This flag is mutually exclusive with
+          --obsolete-in.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To deprecate an image called 'IMAGE' immediately, mark it as obsolete in
+    one day, and mark it as deleted in two days, use:
+
+        $ gcloud compute images deprecate IMAGE --state DEPRECATED \
+            --obsolete-in 1d --delete-in 2d
+
+    To un-deprecate an image called 'IMAGE', use:
+
+        $ gcloud compute images deprecate IMAGE --state ACTIVE
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute images deprecate
+        $ gcloud beta compute images deprecate
+

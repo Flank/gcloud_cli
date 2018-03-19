@@ -1,0 +1,100 @@
+
+.TH "GCLOUD_BETA_EMULATORS_DATASTORE_START" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta emulators datastore start \- start a local datastore emulator
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta emulators datastore start\fR [\fB\-\-consistency\fR=\fICONSISTENCY\fR;\ default=0.9] [\fB\-\-data\-dir\fR=\fIDATA_DIR\fR] [\fB\-\-host\-port\fR=\fIHOST_PORT\fR] [\fB\-\-legacy\fR] [\fB\-\-no\-store\-on\-disk\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command starts a local datastore emulator.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-consistency\fR=\fICONSISTENCY\fR; default=0.9
+Fraction of eventually consistent operations that should succeed immediately.
+Setting to 1.0 can be useful for unit tests, but may mask incorrect assumptions
+about non\-ancestor queries which are eventually consistent.
+
+.TP 2m
+\fB\-\-data\-dir\fR=\fIDATA_DIR\fR
+The directory to be used to store/retrieve data/config for an emulator run. The
+default value is \f5<USER_CONFIG_DIR>/emulators/datastore\fR. The value of
+USER_CONFIG_DIR can be found by running:
+
+.RS 2m
+$ gcloud info \-\-format='get(config.paths.global_config_dir)'
+.RE
+
+.TP 2m
+\fB\-\-host\-port\fR=\fIHOST_PORT\fR
+The host:port to which the emulator should be bound. Can take the form of a
+single address (hostname, IPv4, or IPv6) and port:
+
+.RS 2m
+ADDRESS[:PORT]
+.RE
+
+In this format you must enclose IPv6 addresses in square brackets: e.g.
+
+.RS 2m
+[2001:db8:0:0:0:ff00:42:8329]:8080
+.RE
+
+The default value is localhost:8081.
+
+.TP 2m
+\fB\-\-legacy\fR
+Set to use the legacy emulator which supports Cloud Datastore API v1beta2.
+
+.TP 2m
+\fB\-\-store\-on\-disk\fR
+Whether data should be persisted to disk. Enabled by default, use
+\fB\-\-no\-store\-on\-disk\fR to disable.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To start a local datastore emulator, run:
+
+.RS 2m
+$ gcloud beta emulators datastore start \-\-data\-dir DATA\-DIR
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha emulators datastore start
+.RE
+

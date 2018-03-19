@@ -1,0 +1,126 @@
+---
+args:
+  command: compute instances start a1 a2
+  specified_args:
+    --async: true
+    --zone: us-east1-b
+---
+state:
+  interactive_console: true
+  random_seed: -7249425357038503680
+---
+properties:
+  app:
+    runtime_root: /tmp/tmpZbDhat/runtimes
+  component_manager:
+    disable_update_check: 'True'
+  compute:
+    zone: us-east1-b
+  core:
+    disable_color: 'True'
+    disable_usage_reporting: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: |-
+    --===============9187131197303816112==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <36b89542-7a90-4400-8cf4-1aa0367d3f55+1>
+
+    POST /compute/v1/projects/fake-project/zones/us-east1-b/instances/a2/start?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    accept-encoding: gzip, deflate
+    content-length: 0
+    Host: www.googleapis.com
+
+
+    --===============9187131197303816112==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <36b89542-7a90-4400-8cf4-1aa0367d3f55+0>
+
+    POST /compute/v1/projects/fake-project/zones/us-east1-b/instances/a1/start?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    accept-encoding: gzip, deflate
+    content-length: 0
+    Host: www.googleapis.com
+
+
+    --===============9187131197303816112==--
+  headers:
+    content-type: multipart/mixed; boundary="===============9187131197303816112=="
+  method: POST
+  uri: http://www.googleapis.come/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_yp9NoiqTO84_AAPwYs81OO8\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-36b89542-7a90-4400-8cf4-1aa0367d3f55+1>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"9-5NfnC1jwDHrZ87A_AuCkdDc60/T2Zwz-23S7XiyL8mOlIK7ZwsvsE\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Tue, 31 Oct 2017 18:38:13 GMT\r\nExpires:\
+    \ Tue, 31 Oct 2017 18:38:13 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 823\r\n\r\n"
+  - json:
+      endTime: '2017-10-31T11:38:12.989-07:00'
+      id: '3271292797098229243'
+      insertTime: '2017-10-31T11:38:12.984-07:00'
+      kind: compute#operation
+      name: operation-1509475092449-55cdc0eaec6e8-48ac5ed2-5e7656aa
+      operationType: start
+      progress: 100
+      selfLink: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509475092449-55cdc0eaec6e8-48ac5ed2-5e7656aa
+      startTime: '2017-10-31T11:38:12.989-07:00'
+      status: DONE
+      targetId: '2363104829734455276'
+      targetLink: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a2
+      zone: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
+  - "\n\r\n--batch_yp9NoiqTO84_AAPwYs81OO8\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-36b89542-7a90-4400-8cf4-1aa0367d3f55+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"9-5NfnC1jwDHrZ87A_AuCkdDc60/ucK1PDaXe6wqJJPQD0HRM9r_voc\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Tue, 31 Oct 2017 18:38:13 GMT\r\nExpires:\
+    \ Tue, 31 Oct 2017 18:38:13 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 823\r\n\r\n"
+  - json:
+      endTime: '2017-10-31T11:38:12.986-07:00'
+      id: '8774626172342730235'
+      insertTime: '2017-10-31T11:38:12.981-07:00'
+      kind: compute#operation
+      name: operation-1509475092450-55cdc0eaecad0-19caaf45-7e87eb42
+      operationType: start
+      progress: 100
+      selfLink: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509475092450-55cdc0eaecad0-19caaf45-7e87eb42
+      startTime: '2017-10-31T11:38:12.986-07:00'
+      status: DONE
+      targetId: '1226287828989968909'
+      targetLink: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/instances/a1
+      zone: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
+  - "\n\r\n--batch_yp9NoiqTO84_AAPwYs81OO8--\r\n"
+  response:
+    cache-control: private, max-age=0
+    content-type: multipart/mixed; boundary=batch_yp9NoiqTO84_AAPwYs81OO8
+    date: Tue, 31 Oct 2017 18:38:13 GMT
+    expires: Tue, 31 Oct 2017 18:38:13 GMT
+    server: GSE
+    status: '200'
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  private_files:
+  stderr: |
+    Start instance in progress for [http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509475092450-55cdc0eaecad0-19caaf45-7e87eb42].
+    Start instance in progress for [http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/operations/operation-1509475092449-55cdc0eaec6e8-48ac5ed2-5e7656aa].
+    Use [gcloud compute operations describe URI] command to check the status of the operation(s).

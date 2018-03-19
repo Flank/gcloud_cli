@@ -1,0 +1,168 @@
+
+.TH "GCLOUD_BETA_IOT_DEVICES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta iot devices create \- create a new device
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta iot devices create\fR (\fIDEVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR\ \fB\-\-registry\fR=\fIREGISTRY\fR) [\fB\-\-blocked\fR] [\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=[\fIKEY\fR=\fIPATH\fR,...]] [\fB\-\-public\-key\fR=[\fIpath\fR=\fIPATH\fR,\fItype\fR=\fITYPE\fR,[\fIexpiration\-time\fR=\fIEXPIRATION\-TIME\fR],...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a new device.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+DEVICE \- The device to create. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: Set the property [core/project] or provide the flag [\-\-project] on
+the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDEVICE\fR
+The ID of the device or a fully qualified identifier for the device. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The Cloud region for the device.
+
+.TP 2m
+\fB\-\-registry\fR=\fIREGISTRY\fR
+The device registry for the device.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-blocked\fR
+If blocked, connections from this device will fail.
+
+Can be used to temporarily prevent the device from connecting if, for example,
+the sensor is generating bad data and needs maintenance.
+
+
+
+Connections to device is not blocked by default.
+
+.TP 2m
+\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+The metadata key/value pairs assigned to devices. This metadata is not
+interpreted or indexed by Cloud IoT Core. It can be used to add contextual
+information for the device.
+
+Keys should only contain the following characters \f5[a\-zA\-Z0\-9\-_]\fR and be
+fewer than 128 bytes in length. Values are free\-form strings. Each value must
+be fewer than or equal to 32 KB in size.
+
+The total size of all keys and values must be less than 256 KB, and the maximum
+number of key\-value pairs is 500.
+
+.TP 2m
+\fB\-\-metadata\-from\-file\fR=[\fIKEY\fR=\fIPATH\fR,...]
+Same as \-\-metadata, but the metadata values will be read from the file
+specified by path.
+
+.TP 2m
+\fB\-\-public\-key\fR=[\fIpath\fR=\fIPATH\fR,\fItype\fR=\fITYPE\fR,[\fIexpiration\-time\fR=\fIEXPIRATION\-TIME\fR],...]
+Specify a public key.
+
+Supports four key types:
+
+.RS 2m
+.IP "\(em" 2m
+\f5rsa\-x509\-pem\fR: As RSA_PEM, but wrapped in an X.509v3 certificate (RFC5280
+(https://www.ietf.org/rfc/rfc5280.txt)), encoded in base64, and wrapped by
+\f5\-\-\-\-\-BEGIN CERTIFICATE\-\-\-\-\-\fR and \f5\-\-\-\-\-END
+CERTIFICATE\-\-\-\-\-\fR.
+.IP "\(em" 2m
+\f5rsa\-pem\fR: An RSA public key encoded in base64, and wrapped by
+\f5\-\-\-\-\-BEGIN PUBLIC KEY\-\-\-\-\-\fR and \f5\-\-\-\-\-END PUBLIC
+KEY\-\-\-\-\-\fR. This can be used to verify \f5RS256\fR signatures in JWT
+tokens (RFC7518 (https://www.ietf.org/rfc/rfc7518.txt)).
+.IP "\(em" 2m
+\f5rs256\fR: Deprecated name for \f5rsa\-x509\-pem\fR
+.IP "\(em" 2m
+\f5es256\-x509\-pem\fR: (As ES256_PEM, but wrapped in an X.509v3 certificate
+([RFC5280]( https://www.ietf.org/rfc/rfc5280.txt)), encoded in base64, and
+wrapped by \f5\-\-\-\-\-BEGIN CERTIFICATE\-\-\-\-\-\fR and \f5\-\-\-\-\-END
+CERTIFICATE\-\-\-\-\-\fR.
+.IP "\(em" 2m
+\f5es256\-pem\fR: Public key for the ECDSA algorithm using P\-256 and SHA\-256,
+encoded in base64, and wrapped by \f5\-\-\-\-\-BEGIN PUBLIC KEY\-\-\-\-\-\fR and
+\f5\-\-\-\-\-END PUBLIC KEY\-\-\-\-\-\fR. This can be used to verify JWT tokens
+with the \f5ES256\fR algorithm (RFC7518 (https://www.ietf.org/rfc/rfc7518.txt)).
+This curve is defined in OpenSSL (https://www.openssl.org/) as the
+\f5prime256v1\fR curve.
+.IP "\(em" 2m
+\f5es256\fR: Deprecated nmame for \f5es256\-pem\fR
+
+.RE
+.RE
+.sp
+The key specification is given via the following sub\-arguments:
+
+.RS 2m
+.IP "\(bu" 2m
+\fBpath\fR: Required. The path on disk to the file containing the key.
+.IP "\(bu" 2m
+\fBtype\fR: Required. One of [\f5es256\fR, \f5es256\-pem\fR,
+\f5es256\-x509\-pem\fR, \f5rs256\fR, \f5rsa\-pem\fR, \f5rsa\-x509\-pem\fR]. The
+type of the key.
+.IP "\(bu" 2m
+\fBexpiration\-time\fR: Optional. The expiration time for the key. See $ gcloud
+topic datetimes for information on time formats.
+
+.RE
+.sp
+For example:
+
+.RS 2m
+\-\-public\-key \e
+    path=/path/to/id_rsa.pem,type=RSA_PEM,expiration\-time=2017\-01\-01T00:00\-05
+.RE
+
+This flag may be provide multiple times to provide multiple keys (maximum 3).
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud iot devices create
+$ gcloud alpha iot devices create
+.RE
+

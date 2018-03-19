@@ -1,0 +1,96 @@
+
+.TH "GCLOUD_ALPHA_BILLING_PROJECTS_LINK" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha billing projects link \- link a project with a billing account
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha billing projects link\fR \fIPROJECT_ID\fR (\fB\-\-account\-id\fR=\fIACCOUNT_ID\fR\ |\ \fB\-\-billing\-account\fR=\fIACCOUNT_ID\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command links a billing account to a project.
+
+If the specified billing account is open, this enables billing on the project.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+Specify a project id.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-account\-id\fR=\fIACCOUNT_ID\fR
+(DEPRECATED) Specify a billing account ID. Billing account IDs are of the form
+\f50X0X0X\-0X0X0X\-0X0X0X\fR. To see available IDs, run \f5$ gcloud alpha
+billing accounts list\fR.
+
+The \f5\-\-account\-id\fR flag has been renamed \f5\-\-billing\-account\fR.
+
+.TP 2m
+\fB\-\-billing\-account\fR=\fIACCOUNT_ID\fR
+Specify a billing account ID. Billing account IDs are of the form
+\f50X0X0X\-0X0X0X\-0X0X0X\fR. To see available IDs, run \f5$ gcloud alpha
+billing accounts list\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To link a billing account \f50X0X0X\-0X0X0X\-0X0X0X\fR with a project
+\f5my\-project\fR, run:
+
+.RS 2m
+$ gcloud alpha billing projects link my\-project \e
+    \-\-billing\-account 0X0X0X\-0X0X0X\-0X0X0X
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta billing projects link
+.RE
+

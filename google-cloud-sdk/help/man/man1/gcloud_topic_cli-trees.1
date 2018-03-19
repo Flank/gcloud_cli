@@ -1,0 +1,86 @@
+
+.TH "GCLOUD_TOPIC_CLI\-TREES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud topic cli\-trees \- CLI trees supplementary help
+
+
+
+.SH "DESCRIPTION"
+
+CLI trees are static nested dictionaries that describe all of the groups,
+commands, flags, positionals, help text, and completer module paths for a CLI. A
+CLI tree is often much faster to load and access than one generated at runtime
+from an active CLI. It is also a more compact representation. A properly formed
+CLI tree can be used to reproduce the help documentation for an entire CLI.
+
+
+.SH "CLI Tree Data Files"
+
+A CLI tree is a dictionary in a JSON file. By convention, the file base name is
+the corresponding CLI name. For example, the CLI tree file name for \fBgcloud\fR
+is \fBgcloud.json\fR.
+
+CLI trees associated with Cloud SDK modules are installed in the \fBdata/cli\fR
+subdirectory of the Cloud SDK installation root:
+
+.RS 2m
+$(gcloud info \-\-format="value(installation.sdk_root)")/data/cli
+.RE
+
+This includes tree data for \fBgcloud\fR (core component), \fBbq\fR,
+\fBgsutil\fR, and \fBkubectl\fR. Note that the tree data is installed with the
+component. If the component is not installed then neither is its CLI tree. An
+installed component does not require its CLI tree to run. Only the \fBgcloud\fR
+CLI tree is required by \f5$ gcloud alpha interactive\fR.
+
+By default, CLI trees for other commands are JSON files generated on demand from
+their \fBman\fR(1) or \fBman7.org\fR man pages. They are cached in the \fBcli\fR
+subdirectory of the global config directory:
+
+.RS 2m
+$(gcloud info \-\-format="value(config.paths.global_config_dir)")/cli
+.RE
+
+
+.SH "The gcloud CLI Tree"
+
+The \fBgcloud\fR CLI tree is used for static TAB completion, the corpus for \f5$
+gcloud alpha help\-search\fR, and the data source for \f5$ gcloud alpha
+interactive\fR completions and help text generation.
+
+
+.SH "Other CLI Trees"
+
+\f5$ gcloud alpha interactive\fR uses CLI tree data files for typeahead, command
+line completion and active help. A few CLI trees are installed with their
+respective Cloud SDK components: \fBgcloud\fR (core component), \fBbq\fR,
+\fBgsutil\fR, and \fBkubectl\fR.
+
+The generated trees are a close approximation. You can construct your own,
+especially for hierarchical CLIs like \fBgit\fR(1) that are hard to extract from
+man pages.
+
+
+.SH "CLI Tree Schema"
+
+TBD (\f5gcloud interactive\fR is still in ALPHA).
+
+
+
+.SH "EXAMPLES"
+
+To list the CLI trees in your project:
+
+.RS 2m
+$ gcloud meta cli\-trees list
+.RE
+
+To update the non\-READONLY CLI trees in your project:
+
+.RS 2m
+$ gcloud meta cli\-trees update
+.RE

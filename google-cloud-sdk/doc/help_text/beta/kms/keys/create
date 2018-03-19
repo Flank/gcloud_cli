@@ -1,0 +1,88 @@
+NAME
+    gcloud beta kms keys create - create a new key
+
+SYNOPSIS
+    gcloud beta kms keys create KEY --purpose=PURPOSE [--keyring=KEYRING]
+        [--labels=[KEY=VALUE,...]] [--location=LOCATION]
+        [--next-rotation-time=NEXT_ROTATION_TIME]
+        [--rotation-period=ROTATION_PERIOD] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Creates a new key within the given keyring.
+
+    The optional flags --rotation-period and --next-rotation-time define a
+    rotation schedule for the key. A schedule can also be defined by the
+    create-rotation-schedule command.
+
+    The flag --next-rotation-time must be in ISO or RFC3339 format, and
+    --rotation-period must be in the form INTEGER[UNIT], where units can be one
+    of seconds (s), minutes (m), hours (h) or days (d).
+
+    The optional flag '--labels' defines a user specified key/value pair for
+    the given crypto_key.
+
+POSITIONAL ARGUMENTS
+     KEY
+        Name of the key to create.
+
+REQUIRED FLAGS
+     --purpose=PURPOSE
+        The "purpose" of the key. PURPOSE must be (currently only one value is
+        supported): encryption.
+
+OPTIONAL FLAGS
+     --keyring=KEYRING
+        The containing keyring.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+     --next-rotation-time=NEXT_ROTATION_TIME
+        Next automatic rotation time of the key. See $ gcloud topic datetimes
+        for information on time formats.
+
+     --rotation-period=ROTATION_PERIOD
+        Automatic rotation period of the key. See $ gcloud topic datetimes for
+        information on duration formats.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command creates a key named frodo within the keyring
+    fellowship and location us-east1:
+
+        $ gcloud beta kms keys create frodo \
+            --location us-east1 \
+            --keyring fellowship \
+            --purpose encryption
+
+    The following command creates a key named strider within the keyring
+    rangers and location global with a specified rotation schedule:
+
+        $ gcloud beta kms keys create strider \
+            --location global --keyring rangers \
+            --purpose encryption \
+            --rotation-period 30d \
+            --next-rotation-time 2017-10-12T12:34:56.1234Z
+
+    The following command creates a key named foo within the keyring fellowship
+    and location us-east1 with two specified labels:
+
+        $ gcloud beta kms keys create foo \
+            --location us-east1 \
+            --keyring fellowship \
+            --purpose encryption \
+            --labels env=prod,team=kms
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud kms keys create
+

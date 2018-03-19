@@ -1,0 +1,76 @@
+
+.TH "GCLOUD_BETA_PUBSUB_SUBSCRIPTIONS_ACK" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub subscriptions ack \- acknowledges one or more messages on the specified subscription
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub subscriptions ack\fR \fISUBSCRIPTION\fR [\fIACK_ID\fR\ ...] [\fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Acknowledges one or more messages as having been successfully
+received. If a delivered message is not acknowledged within the Subscription's
+ack deadline, Cloud Pub/Sub will attempt to deliver it again.
+
+To automatically acknowledge messages when pulling from a Subscription, you can
+use the \f5\-\-auto\-ack\fR flag on \f5gcloud pubsub subscriptions pull\fR.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISUBSCRIPTION\fR
+Name of the subscription to ACK messages on.
+
+.TP 2m
+[\fIACK_ID\fR ...]
+(DEPRECATED) One or more ACK_ID to acknowledge.
+
+Positional argument \f5ACK_ID\fR is deprecated. Please use \f5\-\-ack\-ids\fR
+instead.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]
+One or more ACK_ID to acknowledge.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud pubsub subscriptions ack
+$ gcloud alpha pubsub subscriptions ack
+.RE
+

@@ -1,0 +1,55 @@
+NAME
+    gcloud alpha ml products catalogs import - import a Cloud Product Search
+        Catalog
+
+SYNOPSIS
+    gcloud alpha ml products catalogs import SOURCE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command imports a Cloud Product Search Catalog from a CSV file
+    URI.
+
+    URI should point to a CSV file in Google Cloud Storage bucket and start
+    with: gs://
+
+    The file itself must contain one ReferenceImage record per row with the
+    following format:
+
+      o catalog_name - The catalog ID to be created.
+      o image_uri - The Google Cloud Storage location of the image. The URI
+        must start with gs://.
+      o product_id - A user-defined ID for the product identified by the
+        reference image. A product ID can be associated with multiple reference
+        images. Restricted to 255 characters including letters, numbers,
+        underscore ( _ ) and hyphen (-).
+      o product_category - String specifing the product category for the
+        image.
+      o bounding_poly - A set of vertices defining the bounding polygon
+        around the area of interest in the image. Should be a list of an even
+        number of integers separated by commas (e.g.
+        "p1_x,p1_y,p2_x,p2_y,...,pn_x,pn_y") specifying, the vertices in
+        clockwise order. Defaults to full image if empty.
+
+POSITIONAL ARGUMENTS
+     SOURCE
+        The Google Cloud Storage URI of the input CSV file for the catalog. The
+        URI must start with gs://.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To import a product search catalog, run:
+
+        $ gcloud alpha ml products catalogs import \
+            gs://my-bucket/my-catalog.csv
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

@@ -1,0 +1,25 @@
+NAME
+    gcloud beta auth print-refresh-token - a command that prints the access
+        token for the current account
+
+SYNOPSIS
+    gcloud beta auth print-refresh-token [ACCOUNT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) A command that prints the access token for the current account.
+
+POSITIONAL ARGUMENTS
+     [ACCOUNT]
+        The account to get the access token for. Leave empty for the active
+        account.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

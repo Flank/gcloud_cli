@@ -1,0 +1,40 @@
+NAME
+    gcloud container node-pools rollback - rollback a node-pool upgrade
+
+SYNOPSIS
+    gcloud container node-pools rollback NAME [--async] [--cluster=CLUSTER]
+        [--zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Rollback a node-pool upgrade.
+
+    Rollback is a method used after a canceled or failed node-pool upgrade. It
+    makes a best-effort attempt to revert the pool back to its original state.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the node pool to rollback.
+
+FLAGS
+     --async
+        Don't wait for the operation to complete.
+
+     --cluster=CLUSTER
+        The cluster from which to rollback the node pool. Overrides the default
+        container/cluster property value for this command invocation.
+
+     --zone=ZONE, -z ZONE
+        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+        default compute/zone property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha container node-pools rollback
+        $ gcloud beta container node-pools rollback
+

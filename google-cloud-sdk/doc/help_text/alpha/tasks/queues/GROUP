@@ -1,0 +1,68 @@
+NAME
+    gcloud alpha tasks queues - manage Cloud Tasks queues
+
+SYNOPSIS
+    gcloud alpha tasks queues COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for managing Google Cloud Tasks queues. For more
+    information about the different queue target types, see:
+    https://cloud.google.com/cloud-tasks/docs/queue-types
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding for a queue.
+
+     create-app-engine-queue
+        (ALPHA) Create an App Engine queue.
+
+     create-pull-queue
+        (ALPHA) Create a pull queue.
+
+     delete
+        (ALPHA) Delete a queue.
+
+     describe
+        (ALPHA) Show details about a queue.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a queue.
+
+     list
+        (ALPHA) List all queues.
+
+     pause
+        (ALPHA) Pause a queue.
+
+     purge
+        (ALPHA) Purge a queue by deleting all of its tasks.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding for a queue.
+
+     resume
+        (ALPHA) Request to resume a paused or disabled queue.
+
+     set-iam-policy
+        (ALPHA) Set IAM policy for a queue.
+
+     update-app-engine-queue
+        (ALPHA) Update an App Engine queue.
+
+     update-pull-queue
+        (ALPHA) Update a pull queue.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

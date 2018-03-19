@@ -1,0 +1,65 @@
+NAME
+    gcloud container node-pools update - updates a node pool in a running
+        cluster
+
+SYNOPSIS
+    gcloud container node-pools update NAME
+        (--enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
+        [--zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud container node-pools update updates a node pool in a Google
+    Kubernetes Engine cluster.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the node pool.
+
+REQUIRED FLAGS
+     Node management At least one of these must be specified:
+
+       --enable-autorepair
+          Sets autorepair feature for a node-pool.
+
+              $ gcloud container node-pools update node-pool-1 \
+                  --cluster=example-cluster --enable-autorepair
+
+          See https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
+          for more info.
+
+       --enable-autoupgrade
+          Sets autoupgrade feature for a node-pool.
+
+              $ gcloud container node-pools update node-pool-1 \
+                  --cluster=example-cluster --enable-autoupgrade
+
+          See https://cloud.google.com/kubernetes-engine/docs/node-managament
+          for more info.
+
+OPTIONAL FLAGS
+     --cluster=CLUSTER
+        The name of the cluster. Overrides the default container/cluster
+        property value for this command invocation.
+
+     --zone=ZONE, -z ZONE
+        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+        default compute/zone property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To turn on node auto repair in "node-pool-1" in the cluster
+    "sample-cluster", run:
+
+        $ gcloud container node-pools update node-pool-1 \
+            --cluster=example-cluster --enable-autoupgrade
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha container node-pools update
+        $ gcloud beta container node-pools update
+

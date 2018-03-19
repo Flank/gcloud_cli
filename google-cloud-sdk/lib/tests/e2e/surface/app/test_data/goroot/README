@@ -1,0 +1,1 @@
+Fake GOROOT, in order to not depend on an actual installation of Go.

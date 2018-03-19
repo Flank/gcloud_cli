@@ -1,0 +1,96 @@
+
+.TH "GCLOUD_BETA_APP_FIREWALL\-RULES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta app firewall\-rules create \- creates a firewall rule
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta app firewall\-rules create\fR \fIPRIORITY\fR \fB\-\-action\fR=\fIACTION\fR \fB\-\-source\-range\fR=\fISOURCE_RANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Creates a firewall rule.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPRIORITY\fR
+An integer between 1 and 2^32\-1 which indicates the evaluation order of rules.
+Lowest priority rules are evaluated first. The handle \f5default\fR may also be
+used to refer to the final rule at priority 2^32\-1 which is always present in a
+set of rules.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-action\fR=\fIACTION\fR
+Allow or deny matched traffic. \fIACTION\fR must be one of: \fBALLOW\fR,
+\fBDENY\fR.
+
+.TP 2m
+\fB\-\-source\-range\fR=\fISOURCE_RANGE\fR
+An IP address or range in CIDR notation or the \f5*\fR wildcard to match all
+traffic.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A text description of the rule.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a new App Engine firewall rule, run:
+
+.RS 2m
+$ gcloud beta app firewall\-rules create 1234
+  \-\-source\-range='2001:db8::/32'
+  \-\-action=deny
+  \-\-description='block traffic from the example range.'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud app firewall\-rules create
+.RE
+

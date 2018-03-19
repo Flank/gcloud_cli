@@ -1,0 +1,41 @@
+NAME
+    gcloud beta sql users create - creates a user in a given instance
+
+SYNOPSIS
+    gcloud beta sql users create USERNAME HOST --instance=INSTANCE, -i INSTANCE
+        [--async] [--password=PASSWORD] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Creates a user in a given instance with specified username, host,
+    and password.
+
+POSITIONAL ARGUMENTS
+     USERNAME
+        Cloud SQL username.
+
+     HOST
+        Cloud SQL user's host.
+
+REQUIRED FLAGS
+     --instance=INSTANCE, -i INSTANCE
+        Cloud SQL instance ID.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --password=PASSWORD
+        Cloud SQL user's password.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud sql users create
+

@@ -1,0 +1,40 @@
+NAME
+    gcloud beta compute target-vpn-gateways - read and manipulate Google
+        Compute Engine VPN Gateways
+
+SYNOPSIS
+    gcloud beta compute target-vpn-gateways COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate Google Compute Engine VPN Gateways.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a target VPN Gateway.
+
+     delete
+        (BETA) Delete target vpn gateways.
+
+     describe
+        (BETA) Describe a Google Compute Engine target vpn gateway.
+
+     list
+        (BETA) List Google Compute Engine target VPN gateways.
+
+     update
+        (BETA) Update a Google Compute Engine target VPN gateway.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute target-vpn-gateways
+        $ gcloud alpha compute target-vpn-gateways
+

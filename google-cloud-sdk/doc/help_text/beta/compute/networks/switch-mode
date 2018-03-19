@@ -1,0 +1,40 @@
+NAME
+    gcloud beta compute networks switch-mode - switch the mode of a Google
+        Compute Engine network
+
+SYNOPSIS
+    gcloud beta compute networks switch-mode NAME --mode=MODE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) (DEPRECATED) switch-mode is deprecated. Please use
+    --switch-to-custom-subnet-mode with gcloud compute networks update instead.
+
+    gcloud beta compute networks switch-mode is used to change the mode of a
+    network. Currently, only changing from auto to custom mode is supported.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the network for which to switch mode.
+
+REQUIRED FLAGS
+     --mode=MODE
+        The target mode of the network. Only support "custom" now.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To switch NETWORK to custom subnet mode, run:
+
+        $ gcloud beta compute networks switch-mode NETWORK --mode custom
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute networks switch-mode
+        $ gcloud alpha compute networks switch-mode
+

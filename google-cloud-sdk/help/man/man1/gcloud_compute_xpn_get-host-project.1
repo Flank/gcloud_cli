@@ -1,0 +1,65 @@
+
+.TH "GCLOUD_COMPUTE_XPN_GET\-HOST\-PROJECT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute xpn get\-host\-project \- get the shared VPC host project that the given project is associated with
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute xpn get\-host\-project\fR \fIPROJECT_ID\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Get the shared VPC host project that the given project is associated with.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+ID for the project to get the host project for
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+If \f5service\-project1\fR and \f5service\-project2\fR are associated service
+projects of the shared VPC host project \f5host\-project\fR,
+
+.RS 2m
+$ gcloud compute xpn get\-host\-project service\-project1
+.RE
+
+will show the \f5host\-project\fR project.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute xpn get\-host\-project
+$ gcloud beta compute xpn get\-host\-project
+.RE
+

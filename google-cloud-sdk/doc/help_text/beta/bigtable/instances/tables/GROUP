@@ -1,0 +1,25 @@
+NAME
+    gcloud beta bigtable instances tables - query Cloud Bigtable tables
+
+SYNOPSIS
+    gcloud beta bigtable instances tables COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Query Cloud Bigtable tables.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list
+        (BETA) List existing Bigtable instance tables.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

@@ -1,0 +1,60 @@
+NAME
+    gcloud alpha compute instances describe - describe a virtual machine
+        instance
+
+SYNOPSIS
+    gcloud alpha compute instances describe INSTANCE_NAME
+        [--guest-attributes=[GUEST_ATTRIBUTE_KEY,...]] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instances describe displays all data
+    associated with a Google Compute Engine virtual machine instance.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        The name of the instance to describe.
+
+FLAGS
+     --guest-attributes=[GUEST_ATTRIBUTE_KEY,...]
+        Instead of instance resource display guest attributes of the instance
+        stored with the given keys.
+
+     --zone=ZONE
+        The zone of the instance to describe. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute instances describe
+        $ gcloud beta compute instances describe
+

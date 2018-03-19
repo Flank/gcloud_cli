@@ -1,0 +1,88 @@
+
+.TH "GCLOUD_BETA_SQL_EXPORT_CSV" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta sql export csv \- exports data from a Cloud SQL instance to a CSV file
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta sql export csv\fR \fIINSTANCE\fR \fIURI\fR \fB\-\-query\fR=\fIQUERY\fR [\fB\-\-async\fR] [\fB\-\-database\fR=\fIDATABASE\fR,[\fIDATABASE\fR,...],\ \fB\-d\fR\ \fIDATABASE\fR,[\fIDATABASE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Exports data from a Cloud SQL instance to a Google Cloud Storage
+bucket as a plain text file with one line per row and comma\-separated fields.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+Cloud SQL instance ID.
+
+.TP 2m
+\fIURI\fR
+The path to the file in Google Cloud Storage where the export will be stored.
+The URI is in the form gs://bucketName/fileName. If the file already exists, the
+operation fails. If the filename ends with .gz, the contents are compressed.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-query\fR=\fIQUERY\fR
+A SQL SELECT query (e.g., SELECT * FROM table) that specifies the data to
+export.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-database\fR=\fIDATABASE\fR,[\fIDATABASE\fR,...], \fB\-d\fR \fIDATABASE\fR,[\fIDATABASE\fR,...]
+Database (for example, guestbook) from which the export is made. If unspecified,
+all databases are exported.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud sql export csv
+.RE
+

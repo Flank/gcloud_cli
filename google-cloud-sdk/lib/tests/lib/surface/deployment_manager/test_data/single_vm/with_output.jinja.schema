@@ -1,0 +1,13 @@
+info:
+  title: sth
+
+
+properties:
+  zone:
+    type: string
+    description: GCP zone
+
+outputs:
+  databaseIp:
+    type: string
+    description: Internal IP address for load balancer.

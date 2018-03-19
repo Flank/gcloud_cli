@@ -1,0 +1,63 @@
+NAME
+    gcloud compute instance-groups managed delete-instances - delete instances
+        managed by managed instance group
+
+SYNOPSIS
+    gcloud compute instance-groups managed delete-instances NAME
+        --instances=INSTANCE,[INSTANCE,...] [--region=REGION | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute instance-groups managed delete-instances is used to delete
+    one or more instances from a managed instance group. Once the instances are
+    deleted, the size of the group is automatically reduced to reflect the
+    changes.
+
+    If you would like to keep the underlying virtual machines but still remove
+    them from the managed instance group, use the abandon-instances command
+    instead.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the managed instance group to operate on.
+
+REQUIRED FLAGS
+     --instances=INSTANCE,[INSTANCE,...]
+        Names of instances to delete.
+
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to operate on. If not
+          specified, you will be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          The zone of the managed instance group to operate on. If not
+          specified, you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute instance-groups managed delete-instances
+        $ gcloud beta compute instance-groups managed delete-instances
+

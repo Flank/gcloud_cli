@@ -1,0 +1,29 @@
+NAME
+    gcloud pubsub - manage Cloud Pub/Sub topics and subscriptions
+
+SYNOPSIS
+    gcloud pubsub GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Cloud Pub/Sub topics and subscriptions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     subscriptions
+        Manage Cloud Pubsub subscriptions.
+
+     topics
+        Manage Cloud Pubsub topics.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha pubsub
+        $ gcloud beta pubsub
+

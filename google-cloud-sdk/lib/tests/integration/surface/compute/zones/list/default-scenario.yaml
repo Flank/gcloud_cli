@@ -1,0 +1,354 @@
+---
+args:
+  command: compute zones list
+  specified_args: {}
+---
+state: {}
+---
+properties:
+  component_manager:
+    disable_update_check: 'True'
+  core:
+    disable_color: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: |
+    --===============3365353794003393958==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <c5a712e6-a1b2-410d-9b2d-0f7415e539f0+0>
+
+    GET /compute/v1/projects/fake-project/zones?alt=json&maxResults=500 HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    content-length: 0
+    accept-encoding: gzip, deflate
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============3365353794003393958==--
+  headers:
+    content-length: '481'
+    content-type: multipart/mixed; boundary="===============3365353794003393958=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_GT0SyRTrrB4_AAIvCCJtvZ8\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-c5a712e6-a1b2-410d-9b2d-0f7415e539f0+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"AhMNZHfgI8vVha8d7DAAA2BB2rY/g8DYXL687kIOEIP7N1N1pB0aNy8\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Mon, 24 Jul 2017 22:18:18 GMT\r\nExpires:\
+    \ Mon, 24 Jul 2017 22:18:18 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 12194\r\n\r\n"
+  - json:
+      id: projects/fake-project/zones
+      items:
+      - creationTimestamp: '2014-07-15T10:44:08.663-07:00'
+        description: asia-east1-c
+        id: '2222'
+        kind: compute#zone
+        name: asia-east1-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/asia-east1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/asia-east1-c
+        status: UP
+      - creationTimestamp: '2016-06-14T17:29:18.761-07:00'
+        description: asia-east1-a
+        id: '2220'
+        kind: compute#zone
+        name: asia-east1-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/asia-east1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/asia-east1-a
+        status: UP
+      - creationTimestamp: '2016-06-14T17:29:18.761-07:00'
+        description: asia-east1-b
+        id: '2221'
+        kind: compute#zone
+        name: asia-east1-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/asia-east1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/asia-east1-b
+        status: UP
+      - creationTimestamp: '2016-08-15T17:05:00.316-07:00'
+        description: asia-northeast1-c
+        id: '2252'
+        kind: compute#zone
+        name: asia-northeast1-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/asia-northeast1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/asia-northeast1-c
+        status: UP
+      - creationTimestamp: '2016-08-15T17:05:00.315-07:00'
+        description: asia-northeast1-b
+        id: '2251'
+        kind: compute#zone
+        name: asia-northeast1-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/asia-northeast1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/asia-northeast1-b
+        status: UP
+      - creationTimestamp: '2016-08-15T17:05:00.313-07:00'
+        description: asia-northeast1-a
+        id: '2250'
+        kind: compute#zone
+        name: asia-northeast1-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/asia-northeast1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/asia-northeast1-a
+        status: UP
+      - creationTimestamp: '2017-02-07T04:53:31.630-08:00'
+        description: asia-southeast1-b
+        id: '2261'
+        kind: compute#zone
+        name: asia-southeast1-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/asia-southeast1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/asia-southeast1-b
+        status: UP
+      - creationTimestamp: '2017-02-07T04:53:31.627-08:00'
+        description: asia-southeast1-a
+        id: '2260'
+        kind: compute#zone
+        name: asia-southeast1-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/asia-southeast1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/asia-southeast1-a
+        status: UP
+      - creationTimestamp: '2017-04-04T07:53:44.445-07:00'
+        description: australia-southeast1-c
+        id: '2280'
+        kind: compute#zone
+        name: australia-southeast1-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/australia-southeast1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/australia-southeast1-c
+        status: UP
+      - creationTimestamp: '2017-04-18T06:18:01.025-07:00'
+        description: australia-southeast1-b
+        id: '2282'
+        kind: compute#zone
+        name: australia-southeast1-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/australia-southeast1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/australia-southeast1-b
+        status: UP
+      - creationTimestamp: '2017-04-04T07:53:44.445-07:00'
+        description: australia-southeast1-a
+        id: '2281'
+        kind: compute#zone
+        name: australia-southeast1-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/australia-southeast1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/australia-southeast1-a
+        status: UP
+      - creationTimestamp: '2014-09-02T15:52:35.238-07:00'
+        description: europe-west1-c
+        id: '2103'
+        kind: compute#zone
+        name: europe-west1-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/europe-west1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west1-c
+        status: UP
+      - creationTimestamp: '2016-06-14T17:29:18.761-07:00'
+        description: europe-west1-b
+        id: '2101'
+        kind: compute#zone
+        name: europe-west1-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/europe-west1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west1-b
+        status: UP
+      - creationTimestamp: '2014-12-15T13:42:35.748-08:00'
+        description: europe-west1-d
+        id: '2104'
+        kind: compute#zone
+        name: europe-west1-d
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/europe-west1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west1-d
+        status: UP
+      - creationTimestamp: '2017-03-14T04:48:48.304-07:00'
+        description: europe-west2-c
+        id: '2292'
+        kind: compute#zone
+        name: europe-west2-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/europe-west2
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west2-c
+        status: UP
+      - creationTimestamp: '2017-03-14T04:48:48.304-07:00'
+        description: europe-west2-b
+        id: '2291'
+        kind: compute#zone
+        name: europe-west2-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/europe-west2
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west2-b
+        status: UP
+      - creationTimestamp: '2017-03-14T04:48:48.302-07:00'
+        description: europe-west2-a
+        id: '2290'
+        kind: compute#zone
+        name: europe-west2-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/europe-west2
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west2-a
+        status: UP
+      - creationTimestamp: '2014-10-29T11:20:06.229-07:00'
+        description: us-central1-c
+        id: '2002'
+        kind: compute#zone
+        name: us-central1-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-c
+        status: UP
+      - creationTimestamp: '2016-06-14T17:29:18.761-07:00'
+        description: us-central1-a
+        id: '2000'
+        kind: compute#zone
+        name: us-central1-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a
+        status: UP
+      - creationTimestamp: '2016-06-14T17:29:18.761-07:00'
+        description: us-central1-f
+        id: '2004'
+        kind: compute#zone
+        name: us-central1-f
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f
+        status: UP
+      - creationTimestamp: '2016-06-14T17:29:18.761-07:00'
+        description: us-central1-b
+        id: '2001'
+        kind: compute#zone
+        name: us-central1-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-b
+        status: UP
+      - creationTimestamp: '2016-11-29T14:44:31.408-08:00'
+        description: us-central2-a
+        id: '2051'
+        kind: compute#zone
+        name: us-central2-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central2
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central2-a
+        status: UP
+      - creationTimestamp: '2015-09-08T10:59:59.040-07:00'
+        description: us-east1-c
+        id: '2233'
+        kind: compute#zone
+        name: us-east1-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-east1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-c
+        status: UP
+      - creationTimestamp: '2015-09-08T16:57:06.746-07:00'
+        description: us-east1-b
+        id: '2231'
+        kind: compute#zone
+        name: us-east1-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-east1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
+        status: UP
+      - creationTimestamp: '2015-09-03T15:15:02.330-07:00'
+        description: us-east1-d
+        id: '2234'
+        kind: compute#zone
+        name: us-east1-d
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-east1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-d
+        status: UP
+      - creationTimestamp: '2017-02-14T06:05:24.188-08:00'
+        description: us-east4-b
+        id: '2271'
+        kind: compute#zone
+        name: us-east4-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-east4
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east4-b
+        status: UP
+      - creationTimestamp: '2017-02-14T06:05:24.188-08:00'
+        description: us-east4-c
+        id: '2272'
+        kind: compute#zone
+        name: us-east4-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-east4
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east4-c
+        status: UP
+      - creationTimestamp: '2017-02-14T06:05:24.188-08:00'
+        description: us-east4-a
+        id: '2270'
+        kind: compute#zone
+        name: us-east4-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-east4
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east4-a
+        status: UP
+      - creationTimestamp: '2016-06-10T09:30:55.189-07:00'
+        description: us-west1-a
+        id: '2210'
+        kind: compute#zone
+        name: us-west1-a
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-west1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-west1-a
+        status: UP
+      - creationTimestamp: '2016-06-10T09:30:55.192-07:00'
+        description: us-west1-b
+        id: '2211'
+        kind: compute#zone
+        name: us-west1-b
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-west1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-west1-b
+        status: UP
+      - creationTimestamp: '2017-03-14T04:48:48.314-07:00'
+        description: us-west1-c
+        id: '2212'
+        kind: compute#zone
+        name: us-west1-c
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-west1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-west1-c
+        status: UP
+      kind: compute#zoneList
+      selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones
+  - "\n\r\n--batch_GT0SyRTrrB4_AAIvCCJtvZ8--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,36,35"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    content-length: '12627'
+    content-type: multipart/mixed; boundary=batch_GT0SyRTrrB4_AAIvCCJtvZ8
+    date: Mon, 24 Jul 2017 22:18:18 GMT
+    expires: Mon, 01 Jan 1990 00:00:00 GMT
+    pragma: no-cache
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  stdout: |
+    NAME                    REGION                STATUS  NEXT_MAINTENANCE  TURNDOWN_DATE
+    asia-east1-c            asia-east1            UP
+    asia-east1-a            asia-east1            UP
+    asia-east1-b            asia-east1            UP
+    asia-northeast1-c       asia-northeast1       UP
+    asia-northeast1-b       asia-northeast1       UP
+    asia-northeast1-a       asia-northeast1       UP
+    asia-southeast1-b       asia-southeast1       UP
+    asia-southeast1-a       asia-southeast1       UP
+    australia-southeast1-c  australia-southeast1  UP
+    australia-southeast1-b  australia-southeast1  UP
+    australia-southeast1-a  australia-southeast1  UP
+    europe-west1-c          europe-west1          UP
+    europe-west1-b          europe-west1          UP
+    europe-west1-d          europe-west1          UP
+    europe-west2-c          europe-west2          UP
+    europe-west2-b          europe-west2          UP
+    europe-west2-a          europe-west2          UP
+    us-central1-c           us-central1           UP
+    us-central1-a           us-central1           UP
+    us-central1-f           us-central1           UP
+    us-central1-b           us-central1           UP
+    us-central2-a           us-central2           UP
+    us-east1-c              us-east1              UP
+    us-east1-b              us-east1              UP
+    us-east1-d              us-east1              UP
+    us-east4-b              us-east4              UP
+    us-east4-c              us-east4              UP
+    us-east4-a              us-east4              UP
+    us-west1-a              us-west1              UP
+    us-west1-b              us-west1              UP
+    us-west1-c              us-west1              UP

@@ -1,0 +1,49 @@
+NAME
+    gcloud alpha compute forwarding-rules - read and manipulate traffic
+        forwarding rules to network load balancers
+
+SYNOPSIS
+    gcloud alpha compute forwarding-rules COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read and manipulate traffic forwarding rules to network load
+    balancers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a forwarding rule to direct network traffic to a load
+        balancer.
+
+     delete
+        (ALPHA) Delete forwarding rules.
+
+     describe
+        (ALPHA) Display detailed information about a forwarding rule.
+
+     list
+        (ALPHA) List Google Compute Engine forwarding rules.
+
+     set-target
+        (ALPHA) Modify a forwarding rule to direct network traffic to a new
+        target.
+
+     update
+        (ALPHA) Update a Google Compute Engine forwarding rule.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute forwarding-rules
+        $ gcloud beta compute forwarding-rules
+

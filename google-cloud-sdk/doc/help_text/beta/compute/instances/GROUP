@@ -1,0 +1,127 @@
+NAME
+    gcloud beta compute instances - read and manipulate Google Compute Engine
+        virtual machine instances
+
+SYNOPSIS
+    gcloud beta compute instances GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate Google Compute Engine virtual machine instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     network-interfaces
+        (BETA) Read and manipulate Google Compute Engine instance network
+        interfaces.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-access-config
+        (BETA) Create a Google Compute Engine virtual machine access
+        configuration.
+
+     add-labels
+        (BETA) Add labels to Google Compute Engine virtual machine instances.
+
+     add-metadata
+        (BETA) Add or update instance metadata.
+
+     add-tags
+        (BETA) Add tags to Google Compute Engine virtual machine instances.
+
+     attach-disk
+        (BETA) Attach a disk to an instance.
+
+     create
+        (BETA) Create Google Compute Engine virtual machine instances.
+
+     create-with-container
+        (BETA) Creates Google Compute engine virtual machine instances running
+        container images.
+
+     delete
+        (BETA) Delete Google Compute Engine virtual machine instances.
+
+     delete-access-config
+        (BETA) Delete an access configuration from a virtual machine network
+        interface.
+
+     describe
+        (BETA) Describe a virtual machine instance.
+
+     detach-disk
+        (BETA) Detach disks from Compute Engine virtual machine instances.
+
+     get-serial-port-output
+        (BETA) Read output from a virtual machine instance's serial port.
+
+     list
+        (BETA) List Google Compute Engine instances.
+
+     move
+        (BETA) Move an instance and its attached persistent disks between
+        zones.
+
+     remove-labels
+        (BETA) Remove labels from Google Compute Engine virtual machine
+        instances.
+
+     remove-metadata
+        (BETA) Remove instance metadata.
+
+     remove-tags
+        (BETA) Remove tags from Google Compute Engine virtual machine
+        instances.
+
+     reset
+        (BETA) Reset a virtual machine instance.
+
+     set-disk-auto-delete
+        (BETA) Set auto-delete behavior for disks.
+
+     set-machine-type
+        (BETA) Set machine type for Google Compute Engine virtual machines.
+
+     set-scheduling
+        (BETA) Set scheduling options for Google Compute Engine virtual
+        machines.
+
+     set-scopes
+        (BETA) Set scopes and service account for a Google Compute Engine
+        instance.
+
+     start
+        (BETA) Start a stopped virtual machine instance.
+
+     stop
+        (BETA) Stop a virtual machine instance.
+
+     tail-serial-port-output
+        (BETA) Periodically fetch new output from a virtual machine instance's
+        serial port and display it as it becomes available.
+
+     update
+        (BETA) Update a Google Compute Engine virtual machine.
+
+     update-access-config
+        (BETA) Update a Google Compute Engine virtual machine access
+        configuration.
+
+     update-container
+        (BETA) Updates Google Compute engine virtual machine instances running
+        container images.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute instances
+        $ gcloud alpha compute instances
+

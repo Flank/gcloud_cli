@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha pubsub topics - manage Cloud Pubsub topics
+
+SYNOPSIS
+    gcloud alpha pubsub topics COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud Pubsub topics.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding for a topic.
+
+     create
+        (ALPHA) Creates one or more Cloud Pub/Sub topics.
+
+     delete
+        (ALPHA) Deletes one or more Cloud Pub/Sub topics.
+
+     describe
+        (ALPHA) Describes a Cloud Pub/Sub topic.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a Cloud Pub/Sub Topic.
+
+     list
+        (ALPHA) Lists Cloud Pub/Sub topics within a project.
+
+     list-snapshots
+        (ALPHA) Lists Cloud Pub/Sub snapshots from a given topic.
+
+     list-subscriptions
+        (ALPHA) Lists Cloud Pub/Sub subscriptions from a given topic.
+
+     publish
+        (ALPHA) Publishes a message to the specified topic.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding for a topic.
+
+     set-iam-policy
+        (ALPHA) Set IAM policy for a topic.
+
+     update
+        (ALPHA) This feature is part of an invite-only release of the Cloud
+        Pub/Sub API.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud pubsub topics
+        $ gcloud beta pubsub topics
+

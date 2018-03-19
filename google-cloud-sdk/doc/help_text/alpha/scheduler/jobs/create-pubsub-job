@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha scheduler jobs create-pubsub-job - create a Cloud Scheduler
+        job with a Pub/Sub target
+
+SYNOPSIS
+    gcloud alpha scheduler jobs create-pubsub-job --message-body=MESSAGE_BODY
+        --schedule=SCHEDULE --topic=TOPIC [--attributes=ATTRIBUTES]
+        [--timezone=TIMEZONE; default="Etc/UTC"] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a Cloud Scheduler job with a Pub/Sub target.
+
+REQUIRED FLAGS
+     --message-body=MESSAGE_BODY
+        The body of the message to publish to the given topic name. Information
+        on message formatting and size limits can be found at:
+        https://cloud.google.com/pubsub/docs/publisher#publish
+
+     --schedule=SCHEDULE
+        String, English-like description of the schedule at which the job
+        should be run. See
+        https://cloud.google.com/appengine/docs/standard/python/config/cronref#schedule_format
+        for details.
+
+     --topic=TOPIC
+        The name of the Google Cloud Pub/Sub topic to publish to when the job
+        runs.
+
+OPTIONAL FLAGS
+     --attributes=ATTRIBUTES
+        Comma-separated list of attributes. Each attribute has the form
+        "NAME=VALUE". You can specify up to 100 attributes.
+
+     --timezone=TIMEZONE; default="Etc/UTC"
+        String, a time zone name from the tz database
+        (http://en.wikipedia.org/wiki/Tz_database).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudscheduler/v1alpha1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/cloud-scheduler/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

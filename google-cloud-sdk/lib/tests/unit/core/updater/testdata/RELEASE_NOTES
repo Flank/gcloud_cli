@@ -1,0 +1,85 @@
+# Google Cloud SDK - Release Notes
+
+Copyright 2014-2015 Google Inc. All rights reserved.
+
+## 0.9.78 (2015/09/16)
+
+### Breaking changes
+
+*   Something here
+
+### Other changes
+
+*   GAE components updated to 1.9.26. Please visit
+    <https://code.google.com/p/googleappengine/wiki/SdkReleaseNotes> for details.
+*   Increase the default boot disk size for remote build VMs in
+    `gcloud preview app deploy`.
+*   The `--instance` flag to the `gcloud preview app modules set-managed-by`
+    command now takes an instance name instead of an index.
+*   The V1Beta4 API for sqladmin can now be accessed through the
+    `gcloud beta sql` surface.
+*   Usability enhancements for `gcloud beta init` and named configurations.
+
+## 0.9.77 (2015/09/09)
+
+*   gcloud preview logging is now gcloud beta logging.
+*   Update kubectl to version 1.0.5
+*   Windows Cloud SDK installer improvements:
+    *   Now allows changing the installation mode. You can choose between a
+        "current user" installation and an "all users" installation.
+    *   Now has an uninstaller and writes "Add/Remove Programs" uninstall
+        entries.
+*   Removal of unsupported --env-vars argument from gcloud preview app deploy.
+*   gcloud compute instance groups: Allow --named-ports flag to be empty and
+    clean named ports in set-named-ports commands.
+*   Change in gcloud compute backend-services: introduce new flag
+    --instance-group which takes advantage of new Instance Groups API.
+
+## 0.9.76 (2015/09/02)
+
+*   Update gsutil component to 4.14.
+*   Resource views commands have moved from preview to alpha. Please use `gcloud
+    alpha compute resource-views` in place of `gcloud preview resource-views`.
+*   Replica pool commands have moved from preview to alpha. Please use `gcloud
+    alpha compute replica-pools` in place of `gcloud preview replica-pools`.
+*   `gcloud beta source repo` was renamed to `gcloud beta source repos`
+*   Created google-cloud-sdk-announce@googlegroups.com
+    <https://groups.google.com/d/forum/google-cloud-sdk-announce> email group to
+    announce new releases and other important information.
+*   'gcloud alpha init' command is now also in beta.
+*   Add target size of managed instance group for "compute instance-groups
+    managed list" command.
+*   Fixed the removal of platform-specific components when running `gcloud
+    components remove`.
+    ## trying to throw off the parser
+*   Fixed a bug related to checking for SDK updates when the SDK is installed as
+    root (like on Debian GCE images).
+    *   Affected users should now see less frequent update messages and overall
+        improved gcloud performance
+*   `gcloud preview app deploy` won't update local images automatically anymore.
+    ## trying to throw off the parser
+
+## 0.9.75 (2015/08/26)
+
+*   Container Engine
+    *   Container Engine GA commands available under `gcloud container`.
+    *   `gcloud beta container get-credentials` now takes cluster name as argument
+        instead of `--cluster` flag for consistency with other commands.
+    *   Added `gcloud alpha container clusters update <cluster>
+        --cloud-monitoring=<val>` command.
+*   New release notes are printed on upgrade. (This won't take effect until
+    an upgrade from this version to a later version.)
+*   New `gcloud alpha genomics variantsets export` command.
+*   Commands promoted from `gcloud alpha` to `gcloud beta`:
+    *    `gcloud beta config configurations ...`
+    *    `gcloud beta sources clone`
+*   Improvements in error reporting and default output formatting.
+
+
+## 0.9.74 (2015/08/19)
+
+*   New list and import commands under `gcloud alpha genomics variants`.
+*   Removed `--remote` flag. Instead, please use the `--docker-build=remote`
+    flag (or use `--docker-build=local` to force a local build).
+*   In this release, Docker builds are hosted by default. To opt-in to the old
+    behavior, please use the `--docker-build=local` flag.

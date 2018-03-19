@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha organizations set-iam-policy - set IAM policy for an
+        organization
+
+SYNOPSIS
+    gcloud alpha organizations set-iam-policy ORGANIZATION_ID POLICY_FILE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Given an organization ID and a file encoded in JSON or YAML that
+    contains the IAM policy, this command will set the IAM policy for that
+    organization.
+
+POSITIONAL ARGUMENTS
+     ORGANIZATION_ID
+        ID for the organization whose IAM policy you want to set.
+
+     POLICY_FILE
+        JSON or YAML file containing the IAM policy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command reads an IAM policy defined in a JSON file
+    policy.json and sets it for an organization with the ID 123456789:
+
+        $ gcloud alpha organizations set-iam-policy 123456789 policy.json
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud organizations set-iam-policy
+        $ gcloud beta organizations set-iam-policy
+

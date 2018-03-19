@@ -1,0 +1,57 @@
+NAME
+    gcloud alpha compute sole-tenancy hosts create - create Google Compute
+        Engine sole-tenancy hosts
+
+SYNOPSIS
+    gcloud alpha compute sole-tenancy hosts create NAME [NAME ...]
+        [--description=DESCRIPTION] [--host-type=HOST_TYPE] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create Google Compute Engine sole-tenancy hosts.
+
+POSITIONAL ARGUMENTS
+     NAME [NAME ...]
+        The names of the hosts to create.
+
+FLAGS
+     --description=DESCRIPTION
+        Specifies a textual description of the hosts.
+
+     --host-type=HOST_TYPE
+        Specifies a type of the hosts. Type of a host determines resources
+        available to instances running on it.
+
+     --zone=ZONE
+        The zone of the hosts to create. If not specified and the compute/zone
+        property isn't set, you will be prompted to select a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

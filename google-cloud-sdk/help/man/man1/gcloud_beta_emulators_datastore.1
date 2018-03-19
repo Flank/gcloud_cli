@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_BETA_EMULATORS_DATASTORE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta emulators datastore \- manage your local datastore emulator
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta emulators datastore\fR \fICOMMAND\fR [\fB\-\-data\-dir\fR=\fIDATA_DIR\fR] [\fB\-\-legacy\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This set of commands allows you to start and use a local datastore
+emulator.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-data\-dir\fR=\fIDATA_DIR\fR
+The directory to be used to store/retrieve data/config for an emulator run. The
+default value is \f5<USER_CONFIG_DIR>/emulators/datastore\fR. The value of
+USER_CONFIG_DIR can be found by running:
+
+.RS 2m
+$ gcloud info \-\-format='get(config.paths.global_config_dir)'
+.RE
+
+.TP 2m
+\fB\-\-legacy\fR
+Set to use the legacy emulator which supports Cloud Datastore API v1beta2.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBenv\-init\fR
+\fB(BETA)\fR Print the commands required to export env variables of a datastore.
+
+.TP 2m
+\fBenv\-unset\fR
+\fB(BETA)\fR Print the commands required to unset a datastore emulators env
+variables.
+
+.TP 2m
+\fBstart\fR
+\fB(BETA)\fR Start a local datastore emulator.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To start a local datastore emulator, run:
+
+.RS 2m
+$ gcloud beta emulators datastore start
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha emulators datastore
+.RE
+

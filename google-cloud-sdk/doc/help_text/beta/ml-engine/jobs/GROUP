@@ -1,0 +1,45 @@
+NAME
+    gcloud beta ml-engine jobs - cloud ML Engine Jobs commands
+
+SYNOPSIS
+    gcloud beta ml-engine jobs GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Cloud ML Engine Jobs commands.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     submit
+        (BETA) Cloud ML Engine Jobs submit commands.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        (BETA) Cancel a running Cloud ML Engine job.
+
+     describe
+        (BETA) Describe a Cloud ML Engine job.
+
+     list
+        (BETA) List existing Cloud ML Engine jobs.
+
+     stream-logs
+        (BETA) Show logs from a running Cloud ML Engine job.
+
+     update
+        (BETA) Update a Cloud ML Engine jobs.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ml-engine jobs
+        $ gcloud alpha ml-engine jobs
+

@@ -1,0 +1,29 @@
+NAME
+    gcloud beta sql export - provide commands to export Cloud SQL instances
+
+SYNOPSIS
+    gcloud beta sql export COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Provide commands to export Cloud SQL instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     csv
+        (BETA) Exports data from a Cloud SQL instance to a CSV file.
+
+     sql
+        (BETA) Exports data from a Cloud SQL instance to a SQL file.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud sql export
+

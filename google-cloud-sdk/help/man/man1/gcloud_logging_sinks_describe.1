@@ -1,0 +1,76 @@
+
+.TH "GCLOUD_LOGGING_SINKS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud logging sinks describe \- displays information about a sink
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud logging sinks describe\fR \fISINK_NAME\fR [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Displays information about a sink.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISINK_NAME\fR
+The name of the sink to describe.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR
+Describe a sink associated with this billing account.
+
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+Describe a sink associated with this folder.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+Describe a sink associated with this organization.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta logging sinks describe
+.RE
+

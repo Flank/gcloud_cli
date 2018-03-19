@@ -1,0 +1,102 @@
+
+.TH "GCLOUD_BETA_SOURCE_REPOS_CLONE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta source repos clone \- clone a cloud source repository
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta source repos clone\fR \fIREPOSITORY_NAME\fR [\fIDIRECTORY_NAME\fR] [\fB\-\-dry\-run\fR] [\fB\-\-use\-full\-gcloud\-path\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command clones a git repository from the currently active
+Google Cloud project into the specified directory or into the current directory
+if no target directory is specified.
+
+Each Google Cloud project can have zero or more git repositories associated with
+it. To see the available repositories, run:
+
+.RS 2m
+$ gcloud beta source repos list
+.RE
+
+The clone operation configures the local clone to use your gcloud credentials to
+authenticate future git operations. This command emits a warning if the cloud
+source repository is a mirror.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIREPOSITORY_NAME\fR
+Name of the repository.
+
+.TP 2m
+[\fIDIRECTORY_NAME\fR]
+Directory name for the cloned repo. Defaults to the repository name.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-dry\-run\fR
+If provided, prints the command that would be run to standard out instead of
+executing it.
+
+.TP 2m
+\fB\-\-use\-full\-gcloud\-path\fR
+If provided, use the full gcloud path for the git credential.helper. Using the
+full path means that gcloud does not need to be in the path for future git
+operations on the repository.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The example commands below show a sample workflow.
+
+.RS 2m
+$ gcloud init
+$ gcloud beta source repos clone REPOSITORY_NAME DIRECTORY_NAME
+$ cd DIRECTORY_NAME
+... create/edit files and create one or more commits ...
+$ git push origin master
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud source repos clone
+$ gcloud alpha source repos clone
+.RE
+

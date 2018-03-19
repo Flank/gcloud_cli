@@ -1,0 +1,26 @@
+NAME
+    gcloud beta compute os-login remove-profile - remove the posix account
+        information for the current user
+
+SYNOPSIS
+    gcloud beta compute os-login remove-profile [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute os-login remove-profile removes the posix
+    account information for the current user where the account ID field is set
+    to the current project ID. Posix account entries for G Suite users do not
+    set the account ID field and can only be modified by a domain
+    administrator.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute os-login remove-profile
+        $ gcloud alpha compute os-login remove-profile
+

@@ -1,0 +1,36 @@
+NAME
+    gcloud beta dataproc workflow-templates remove-job - remove a job from
+        workflow template
+
+SYNOPSIS
+    gcloud beta dataproc workflow-templates remove-job TEMPLATE
+        [--region=REGION] [--step-id=STEP_ID] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Remove a job from workflow template.
+
+POSITIONAL ARGUMENTS
+     TEMPLATE
+        The ID of the workflow template to remove job.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+     --step-id=STEP_ID
+        The step ID of the job in the workflow template to remove.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

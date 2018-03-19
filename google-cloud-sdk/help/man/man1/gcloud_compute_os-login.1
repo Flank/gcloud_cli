@@ -1,0 +1,74 @@
+
+.TH "GCLOUD_COMPUTE_OS\-LOGIN" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute os\-login \- create and manipulate Google Compute Engine OS Login resources
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute os\-login\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+The gcloud oslogin command group lets you manage your Google OS Login profile.
+OS Login profiles can be used to store infomation such as Posix account
+information and SSH keys used for other Google Cloud Platform products such as
+Google Compute Engine.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBssh\-keys\fR
+List, add, update, and remove OS Login SSH Keys.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdescribe\-profile\fR
+Describe the OS Login profile for the current user.
+
+.TP 2m
+\fBremove\-profile\fR
+Remove the posix account information for the current user.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute os\-login
+$ gcloud beta compute os\-login
+.RE
+

@@ -1,0 +1,34 @@
+NAME
+    gcloud alpha emulators start - start a number of emulators behind a proxy
+
+SYNOPSIS
+    gcloud alpha emulators start [--emulators=[EMULATORS,...]]
+        [--proxy-port=PROXY_PORT] [--route-to-public=ROUTE_TO_PUBLIC]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Start a number of emulators behind a proxy.
+
+FLAGS
+     --emulators=[EMULATORS,...]
+        list of local emulators to start. 'all' will attempt to start all of
+        the emulators. Valid options: datastore,pubsub
+
+     --proxy-port=PROXY_PORT
+        port the proxy will be bound to
+
+     --route-to-public=ROUTE_TO_PUBLIC
+        If set, will route traffic for APIs not being emulated to prod
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

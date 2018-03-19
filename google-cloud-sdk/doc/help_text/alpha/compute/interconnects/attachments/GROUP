@@ -1,0 +1,47 @@
+NAME
+    gcloud alpha compute interconnects attachments - read and manipulate Google
+        Compute Engine interconnect attachments
+
+SYNOPSIS
+    gcloud alpha compute interconnects attachments GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read and manipulate Google Compute Engine interconnect attachments.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     dedicated
+        (ALPHA) Create or manipulate dedicated interconnect attachments.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Google Compute Engine interconnect attachment.
+
+     delete
+        (ALPHA) Delete interconnects.
+
+     describe
+        (ALPHA) Describe a Google Compute Engine interconnect attachment.
+
+     list
+        (ALPHA) List Google Compute Engine interconnect attachments.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute interconnects attachments
+        $ gcloud beta compute interconnects attachments
+

@@ -1,0 +1,27 @@
+NAME
+    gcloud beta emulators bigtable env-init - print the commands required to
+        export Bigtable emulator's env variables
+
+SYNOPSIS
+    gcloud beta emulators bigtable env-init [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Print the commands required to export Bigtable emulator's env
+    variables.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To print the env variables exports for a Bigtable emulator, run:
+
+        $ gcloud beta emulators bigtable env-init
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha emulators bigtable env-init
+

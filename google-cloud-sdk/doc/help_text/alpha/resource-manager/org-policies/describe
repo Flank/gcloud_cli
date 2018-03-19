@@ -1,0 +1,54 @@
+NAME
+    gcloud alpha resource-manager org-policies describe - describe an
+        Organization Policy
+
+SYNOPSIS
+    gcloud alpha resource-manager org-policies describe ORG_POLICY_ID
+        [--effective] [--folder=FOLDER_ID] [--organization=ORGANIZATION_ID]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describes an Organization Policy associated with the specified
+    resource.
+
+POSITIONAL ARGUMENTS
+     ORG_POLICY_ID
+        The Org Policy constraint name.
+
+FLAGS
+     --effective
+        Show the effective policy.
+
+     --folder=FOLDER_ID
+        Folder ID for Org Policies.
+
+     --organization=ORGANIZATION_ID
+        Organization ID for Org Policies.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command retrieves an Organization Policy for constraint
+    serviceuser.services on project foo-project:
+
+        $ gcloud alpha resource-manager org-policies describe \
+            serviceuser.services --project=foo-project
+
+    The following command retrieves the effective Organization Policy for
+    constraint serviceuser.services on project foo-project:
+
+        $ gcloud alpha resource-manager org-policies describe \
+            serviceuser.services --project=foo-project --effective
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta resource-manager org-policies describe
+

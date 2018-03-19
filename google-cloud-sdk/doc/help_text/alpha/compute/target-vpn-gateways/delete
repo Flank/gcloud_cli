@@ -1,0 +1,52 @@
+NAME
+    gcloud alpha compute target-vpn-gateways delete - delete target vpn
+        gateways
+
+SYNOPSIS
+    gcloud alpha compute target-vpn-gateways delete NAME [NAME ...]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute target-vpn-gateways delete deletes one or more
+    Google Compute Engine target vpn gateways.
+
+POSITIONAL ARGUMENTS
+     NAME [NAME ...]
+        The names of the Target VPN Gateways to delete.
+
+FLAGS
+     --region=REGION
+        The region of the Target VPN Gateways to delete. If not specified, you
+        will be prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute target-vpn-gateways delete
+        $ gcloud beta compute target-vpn-gateways delete
+

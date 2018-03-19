@@ -1,0 +1,55 @@
+NAME
+    gcloud alpha genomics - manage Genomics resources using version 1 of the
+        API
+
+SYNOPSIS
+    gcloud alpha genomics GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Genomics resources using version 1 of the API.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     callsets
+        (ALPHA) Commands for Genomics callsets.
+
+     datasets
+        (ALPHA) Commands for Genomics datasets.
+
+     operations
+        (ALPHA) Commands for Genomics operations.
+
+     pipelines
+        (ALPHA) Commands for Genomics pipelines.
+
+     readgroupsets
+        (ALPHA) Commands for Genomics read group sets.
+
+     reads
+        (ALPHA) Commands for Genomics reads.
+
+     references
+        (ALPHA) Commands for Genomics references.
+
+     referencesets
+        (ALPHA) Commands for Genomics reference sets.
+
+     variants
+        (ALPHA) Commands for Genomics variants.
+
+     variantsets
+        (ALPHA) Commands for Genomics variant sets.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

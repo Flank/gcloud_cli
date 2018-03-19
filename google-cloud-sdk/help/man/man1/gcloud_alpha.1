@@ -1,0 +1,268 @@
+
+.TH "GCLOUD_ALPHA" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha \- alpha versions of gcloud commands
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Alpha versions of gcloud commands.
+
+
+
+.SH "GLOBAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-account\fR=\fIACCOUNT\fR
+Google Cloud Platform user account to use for invocation. Overrides the default
+\fBcore/account\fR property value for this command invocation.
+
+.TP 2m
+\fB\-\-configuration\fR=\fICONFIGURATION\fR
+The configuration to use for this command invocation. For more information on
+how to use configurations, run: \f5gcloud topic configurations\fR. You can also
+use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment variable to set the equivalent
+of this flag for a terminal session.
+
+.TP 2m
+\fB\-\-flatten\fR=[\fIKEY\fR,...]
+Flatten \fIname\fR[] output resource slices in \fIKEY\fR into separate records
+for each item in each slice. Multiple keys and slices may be specified. This
+also flattens keys for \fB\-\-format\fR and \fB\-\-filter\fR. For example,
+\fB\-\-flatten=abc.def\fR flattens \fBabc.def[].ghi\fR references to
+\fBabc.def.ghi\fR. A resource record containing \fBabc.def[]\fR with N elements
+will expand to N records in the flattened output. This flag interacts with other
+flags that are applied in this order: \fB\-\-flatten\fR, \fB\-\-sort\-by\fR,
+\fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-format\fR=\fIFORMAT\fR
+Sets the format for printing command output resources. The default is a
+command\-specific human\-friendly output format. The supported formats are:
+\f5config\fR, \f5csv\fR, \f5default\fR, \f5diff\fR, \f5disable\fR,
+\f5flattened\fR, \f5get\fR, \f5json\fR, \f5list\fR, \f5multi\fR, \f5none\fR,
+\f5object\fR, \f5table\fR, \f5text\fR, \f5value\fR, \f5yaml\fR. For more details
+run $ gcloud topic formats.
+
+.TP 2m
+\fB\-\-help\fR
+Display detailed help.
+
+.TP 2m
+\fB\-\-project\fR=\fIPROJECT_ID\fR
+The Google Cloud Platform project name to use for this invocation. If omitted,
+then the current project is assumed; the current project can be listed using
+\f5gcloud config list \-\-format='text(core.project)'\fR and can be set using
+\f5gcloud config set project PROJECTID\fR. Overrides the default
+\fBcore/project\fR property value for this command invocation.
+
+.TP 2m
+\fB\-\-quiet\fR, \fB\-q\fR
+Disable all interactive prompts when running gcloud commands. If input is
+required, defaults will be used, or an error will be raised. Overrides the
+default core/disable_prompts property value for this command invocation. Must be
+used at the beginning of commands. This is equivalent to setting the environment
+variable \f5CLOUDSDK_CORE_DISABLE_PROMPTS\fR to 1.
+
+.TP 2m
+\fB\-\-verbosity\fR=\fIVERBOSITY\fR; default="warning"
+Override the default verbosity for this command with any of the supported
+standard verbosity levels: \f5debug\fR, \f5info\fR, \f5warning\fR, \f5error\fR,
+and \f5none\fR. Overrides the default \fBcore/verbosity\fR property value for
+this command invocation.
+
+.TP 2m
+\fB\-\-version\fR, \fB\-v\fR
+Print version information and exit. This flag is only available at the global
+level.
+
+.TP 2m
+\fB\-h\fR
+Print a summary help and exit.
+
+
+.RE
+.sp
+
+.SH "OTHER FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-log\-http\fR
+Log all HTTP server requests and responses to stderr. Overrides the default
+\fBcore/log_http\fR property value for this command invocation.
+
+.TP 2m
+\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR
+Token used to route traces of service requests for investigation of issues.
+Overrides the default \fBcore/trace_token\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-user\-output\-enabled\fR
+Print user intended output to the console. Overrides the default
+\fBcore/user_output_enabled\fR property value for this command invocation. Use
+\fB\-\-no\-user\-output\-enabled\fR to disable.
+
+
+.RE
+.sp
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBapp\fR
+\fB(ALPHA)\fR Manage your App Engine deployments.
+
+.TP 2m
+\fBauth\fR
+\fB(ALPHA)\fR Manage oauth2 credentials for the Google Cloud SDK.
+
+.TP 2m
+\fBbilling\fR
+\fB(ALPHA)\fR Manage billing accounts and associate them with projects.
+
+.TP 2m
+\fBcloud\-shell\fR
+\fB(ALPHA)\fR Manage Google Cloud Shell.
+
+.TP 2m
+\fBcompute\fR
+\fB(ALPHA)\fR Create and manipulate Google Compute Engine resources.
+
+.TP 2m
+\fBconfig\fR
+\fB(ALPHA)\fR View and edit Cloud SDK properties.
+
+.TP 2m
+\fBcontainer\fR
+\fB(ALPHA)\fR Deploy and manage clusters of machines for running containers.
+
+.TP 2m
+\fBdataflow\fR
+\fB(ALPHA)\fR Read and manipulate Google Dataflow resources.
+
+.TP 2m
+\fBdeployment\-manager\fR
+\fB(ALPHA)\fR Manage deployments of cloud resources.
+
+.TP 2m
+\fBemulators\fR
+\fB(ALPHA)\fR Set up your local development environment using emulators.
+
+.TP 2m
+\fBendpoints\fR
+\fB(ALPHA)\fR Create, enable and manage API services.
+
+.TP 2m
+\fBfirebase\fR
+\fB(ALPHA)\fR Work with Google Firebase.
+
+.TP 2m
+\fBfunctions\fR
+\fB(ALPHA)\fR Manage Google Cloud Functions.
+
+.TP 2m
+\fBgenomics\fR
+\fB(ALPHA)\fR Manage Genomics resources using version 1 of the API.
+
+.TP 2m
+\fBiot\fR
+\fB(ALPHA)\fR Manage Cloud IoT resources.
+
+.TP 2m
+\fBml\fR
+\fB(ALPHA)\fR Use Google Cloud machine learning capabilities.
+
+.TP 2m
+\fBml\-engine\fR
+\fB(ALPHA)\fR Manage Cloud ML Engine jobs and models.
+
+.TP 2m
+\fBorganizations\fR
+\fB(ALPHA)\fR Create and manage Google Cloud Platform Organizations.
+
+.TP 2m
+\fBprojects\fR
+\fB(ALPHA)\fR Create and manage project access policies.
+
+.TP 2m
+\fBpubsub\fR
+\fB(ALPHA)\fR Manage Cloud Pub/Sub topics and subscriptions.
+
+.TP 2m
+\fBresource\-manager\fR
+\fB(ALPHA)\fR Manage Cloud Resources.
+
+.TP 2m
+\fBresources\fR
+\fB(ALPHA)\fR List and search resources accessible from your account.
+
+.TP 2m
+\fBscheduler\fR
+\fB(ALPHA)\fR Manage Cloud Scheduler jobs and schedules.
+
+.TP 2m
+\fBservices\fR
+\fB(ALPHA)\fR List, enable and disable APIs and services.
+
+.TP 2m
+\fBsource\fR
+\fB(ALPHA)\fR Cloud git repository commands.
+
+.TP 2m
+\fBspanner\fR
+\fB(ALPHA)\fR Command groups for Cloud Spanner.
+
+.TP 2m
+\fBtasks\fR
+\fB(ALPHA)\fR Manage Cloud Tasks queues and tasks.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBinit\fR
+\fB(ALPHA)\fR Initialize or reinitialize gcloud.
+
+.TP 2m
+\fBinteractive\fR
+\fB(ALPHA)\fR Start the gcloud interactive shell.
+
+.TP 2m
+\fBsearch\-help\fR
+\fB(ALPHA)\fR Search the help text of gcloud commands.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

@@ -1,0 +1,9 @@
+imports:
+- path: https://www.google.com/shared_helper.jinja
+  name: shared_helper.jinja
+- path: https://www.google.com/sub_directory/shared.jinja
+  name: shared.jinja
+
+resources:
+- type: blah
+  name: blah-name

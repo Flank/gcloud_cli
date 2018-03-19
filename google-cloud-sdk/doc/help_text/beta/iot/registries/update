@@ -1,0 +1,74 @@
+NAME
+    gcloud beta iot registries update - update a device registry
+
+SYNOPSIS
+    gcloud beta iot registries update (REGISTRY : --region=REGION)
+        [--enable-http-config] [--enable-mqtt-config]
+        [--state-pubsub-topic=STATE_PUBSUB_TOPIC]
+        [--event-notification-config=[subfolder=SUBFOLDER],[topic=TOPIC]
+          | --event-pubsub-topic=EVENT_PUBSUB_TOPIC] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update a device registry.
+
+POSITIONAL ARGUMENTS
+     REGISTRY - The device registry to update. The arguments in this group can
+     be used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
+
+       REGISTRY
+          The ID of the registry or a fully qualified identifier for the
+          registry. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --region=REGION
+          The Cloud region for the registry.
+
+FLAGS
+     --enable-http-config
+        Whether to allow device connections to the HTTP bridge.
+
+     --enable-mqtt-config
+        Whether to allow MQTT connections to this device registry.
+
+     --state-pubsub-topic=STATE_PUBSUB_TOPIC
+        A Google Cloud Pub/Sub topic name for state notifications.
+
+     At most one of these may be specified:
+
+       --event-notification-config=[subfolder=SUBFOLDER],[topic=TOPIC]
+          The configuration for notification of telemetry events received from
+          the device. This flag can be specified multiple times to add multiple
+          configs to the device registry. Configs are added to the registry in
+          the order the flags are specified. Only one config with an empty
+          subfolder field is allowed and must be specified last.
+
+           topic
+              A Google Cloud Pub/Sub topic name for event notifications
+
+           subfolder
+              If the subfolder name matches this string exactly, this
+              configuration will be used to publish telemetry events. If empty
+              all strings are matched.
+
+       --event-pubsub-topic=EVENT_PUBSUB_TOPIC
+          (DEPRECATED) A Google Cloud Pub/Sub topic name for event
+          notifications
+
+          Flag --event-pubsub-topic is deprecated. Use
+          --event-notification-config instead.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud iot registries update
+        $ gcloud alpha iot registries update
+

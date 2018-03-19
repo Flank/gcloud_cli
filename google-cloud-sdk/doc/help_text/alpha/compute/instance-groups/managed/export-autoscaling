@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha compute instance-groups managed export-autoscaling - export
+        autoscaling parameters of a managed instance group
+
+SYNOPSIS
+    gcloud alpha compute instance-groups managed export-autoscaling NAME
+        --autoscaling-file=PATH [--region=REGION | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instance-groups managed export-autoscaling
+    exports the autoscaling parameters of the specified managed instance group.
+
+    Autoscalers can use one or more of the policies listed below. Information
+    on using multiple policies can be found here:
+    https://cloud.google.com/compute/docs/autoscaler/multiple-policies
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the managed instance group to operate on.
+
+REQUIRED FLAGS
+     --autoscaling-file=PATH
+        Path of the file to which autoscaling configuration will be written.
+
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to operate on. If not
+          specified, you will be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          The zone of the managed instance group to operate on. If not
+          specified, you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta compute instance-groups managed export-autoscaling
+

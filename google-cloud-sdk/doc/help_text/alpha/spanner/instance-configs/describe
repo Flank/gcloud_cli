@@ -1,0 +1,30 @@
+NAME
+    gcloud alpha spanner instance-configs describe - describe a Cloud Spanner
+        instance config
+
+SYNOPSIS
+    gcloud alpha spanner instance-configs describe INSTANCE_CONFIG
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describe a Cloud Spanner instance config.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_CONFIG
+        Cloud Spanner instance config.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud spanner instance-configs describe
+        $ gcloud beta spanner instance-configs describe
+

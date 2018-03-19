@@ -1,0 +1,4 @@
+- release_tracks: [GA, BETA]
+  description: This is the GA/BETA track
+- release_tracks: [ALPHA]
+  description: This is the ALPHA track

@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha pubsub - manage Cloud Pub/Sub topics and subscriptions
+
+SYNOPSIS
+    gcloud alpha pubsub GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud Pub/Sub topics and subscriptions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     snapshots
+        (ALPHA) These features are part of an invite-only release of the Cloud
+        Pub/Sub API.
+
+     subscriptions
+        (ALPHA) Manage Cloud Pubsub subscriptions.
+
+     topics
+        (ALPHA) Manage Cloud Pubsub topics.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud pubsub
+        $ gcloud beta pubsub
+

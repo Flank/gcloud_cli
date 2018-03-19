@@ -1,0 +1,64 @@
+
+.TH "GCLOUD_APP_FIREWALL\-RULES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud app firewall\-rules delete \- deletes a specified firewall rule
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud app firewall\-rules delete\fR \fIPRIORITY\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Deletes a specified firewall rule.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPRIORITY\fR
+An integer between 1 and 2^32\-1 which indicates the evaluation order of rules.
+Lowest priority rules are evaluated first. The handle \f5default\fR may also be
+used to refer to the final rule at priority 2^32\-1 which is always present in a
+set of rules.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete an App Engine firewall rule, run:
+
+.RS 2m
+$ gcloud app firewall\-rules delete 1234
+.RE
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta app firewall\-rules delete
+.RE
+

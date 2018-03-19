@@ -1,0 +1,88 @@
+
+.TH "GCLOUD_ALPHA_PUBSUB_SUBSCRIPTIONS_MODIFY\-MESSAGE\-ACK\-DEADLINE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha pubsub subscriptions modify\-message\-ack\-deadline \- modifies the ACK deadline for a specific Cloud Pub/Sub message
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha pubsub subscriptions modify\-message\-ack\-deadline\fR \fISUBSCRIPTION\fR [\fIACK_ID\fR\ ...] \fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR [\fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This method is useful to indicate that more time is needed to
+process a message by the subscriber, or to make the message available for
+redelivery if the processing was interrupted.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISUBSCRIPTION\fR
+Name of the subscription messages belong to.
+
+.TP 2m
+[\fIACK_ID\fR ...]
+(DEPRECATED) One or more ACK_ID to modify the deadline for.
+
+Positional argument \f5ACK_ID\fR is deprecated. Please use \f5\-\-ack\-ids\fR
+instead.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR
+The number of seconds the system will wait for a subscriber to acknowledge
+receiving a message before re\-attempting delivery.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]
+One or more ACK_ID to modify the deadline for.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud pubsub subscriptions modify\-message\-ack\-deadline
+$ gcloud beta pubsub subscriptions modify\-message\-ack\-deadline
+.RE
+

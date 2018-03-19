@@ -1,0 +1,253 @@
+NAME
+    gcloud beta container clusters update - update cluster settings for an
+        existing container cluster
+
+SYNOPSIS
+    gcloud beta container clusters update NAME
+        (--complete-ip-rotation | --enable-autoscaling
+          | --enable-legacy-authorization | --enable-master-authorized-networks
+          | --enable-network-policy | --enable-pod-security-policy
+          | --generate-password | --logging-service=LOGGING_SERVICE
+          | --maintenance-window=MAINTENANCE_WINDOW
+          | --monitoring-service=MONITORING_SERVICE | --remove-labels=[KEY,...]
+          | --set-password | --start-ip-rotation
+          | --update-addons=[ADDON=ENABLED|DISABLED,...]
+          | --update-labels=[KEY=VALUE,...] | --additional-zones=[ZONE,...]
+          | --node-locations=ZONE,[ZONE,...]
+          | --password=PASSWORD --enable-basic-auth
+          | --username=USERNAME, -u USERNAME) [--async]
+        [--master-authorized-networks=NETWORK,[NETWORK,...]]
+        [--node-pool=NODE_POOL] [--max-nodes=MAX_NODES --min-nodes=MIN_NODES]
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update cluster settings for an existing container cluster.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the cluster to update.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --complete-ip-rotation
+          Complete the IP rotation for this cluster. For example:
+
+              $ gcloud beta container clusters update example-cluster \
+                  --complete-ip-rotation
+
+          This causes the cluster to stop serving its old IP, and return to a
+          single IP state.
+
+       --enable-autoscaling
+          Enables autoscaling for a node pool.
+
+          Enables autoscaling in the node pool specified by --node-pool or the
+          default node pool if --node-pool is not provided.
+
+       --enable-legacy-authorization
+          Enables the legacy ABAC authentication for the cluster. User rights
+          are granted through the use of policies which combine attributes
+          together. For a detailed look at these properties and related
+          formats, see https://kubernetes.io/docs/admin/authorization/abac/. To
+          use RBAC permissions instead, create or update your cluster with the
+          option --no-enable-legacy-authorization.
+
+       --enable-master-authorized-networks
+          Allow only Authorized Networks (specified by the
+          --master-authorized-networks flag) and Google Compute Engine Public
+          IPs to connect to Kubernetes master through HTTPS. By default public
+          internet (0.0.0.0/0) is allowed to connect to Kubernetes master
+          through HTTPS.
+
+       --enable-network-policy
+          Enable network policy enforcement for this cluster. If you are
+          enabling network policy on an existing cluster the network policy
+          addon must first be enabled on the master by using
+          --update-addons=NetworkPolicy=ENABLED flag.
+
+       --enable-pod-security-policy
+          Enables the pod security policy admission controller for the cluster.
+          The pod security policy admission controller adds fine-grained pod
+          create and update authorization controls through the
+          PodSecurityPolicy API objects. For more information, see
+          https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies.
+
+       --generate-password
+          Ask the server to generate a secure password and use that as the
+          basic auth password, keeping the existing username.
+
+       --logging-service=LOGGING_SERVICE
+          The logging service to use for the cluster. Options are:
+          "logging.googleapis.com" (the Google Cloud Logging service), "none"
+          (logs will not be exported from the cluster)
+
+       --maintenance-window=MAINTENANCE_WINDOW
+          Set a time of day when you prefer maintenance to start on this
+          cluster. For example:
+
+              $ gcloud beta container clusters update example-cluster \
+                  --maintenance-window=12:43
+
+          The time corresponds to the UTC time zone, and must be in HH:MM
+          format. To remove an existing maintenance window from the cluster,
+          use '--maintenance-window=None'
+
+       --monitoring-service=MONITORING_SERVICE
+          The monitoring service to use for the cluster. Options are:
+          "monitoring.googleapis.com" (the Google Cloud Monitoring service),
+          "none" (no metrics will be exported from the cluster)
+
+       --remove-labels=[KEY,...]
+          Labels to remove from the Google Cloud resources in use by the
+          Kubernetes Engine cluster. These are unrelated to Kubernetes labels.
+          Example:
+
+              $ gcloud beta container clusters update example-cluster \
+                  --remove-labels=label_a,label_b
+
+       --set-password
+          Set the basic auth password to the specified value, keeping the
+          existing username.
+
+       --start-ip-rotation
+          Start the rotation of this cluster to a new IP. For example:
+
+              $ gcloud beta container clusters update example-cluster \
+                  --start-ip-rotation
+
+          This causes the cluster to serve on two IPs, and will initiate a node
+          upgrade to point to the new IP.
+
+       --update-addons=[ADDON=ENABLED|DISABLED,...]
+          Cluster addons to enable or disable. Options are
+          HorizontalPodAutoscaling=ENABLED|DISABLED
+          HttpLoadBalancing=ENABLED|DISABLED
+          KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
+          NetworkPolicy=ENABLED|DISABLED
+
+       --update-labels=[KEY=VALUE,...]
+          Labels to apply to the Google Cloud resources in use by the
+          Kubernetes Engine cluster. These are unrelated to Kubernetes labels.
+          Example:
+
+              $ gcloud beta container clusters update example-cluster \
+                  --update-labels=label_a=value1,label_b=value2
+
+       At most one of these may be specified:
+
+         --additional-zones=[ZONE,...]
+            (DEPRECATED) The set of additional zones in which the cluster's
+            node footprint should be replicated. All zones must be in the same
+            region as the cluster's primary zone.
+
+            Note that the exact same footprint will be replicated in all zones,
+            such that if you created a cluster with 4 nodes in a single zone
+            and then use this option to spread across 2 more zones, 8
+            additional nodes will be created.
+
+            Multiple locations can be specified, separated by commas. For
+            example:
+
+                $ gcloud beta container clusters update example-cluster \
+                    --zone us-central1-a \
+                    --additional-zones us-central1-b,us-central1-c
+
+            To remove all zones other than the cluster's primary zone, pass the
+            empty string to the flag. For example:
+
+                $ gcloud beta container clusters update example-cluster \
+                    --zone us-central1-a --additional-zones ""
+
+            This flag is deprecated. Use
+            --node-locations=PRIMARY_ZONE,[ZONE,...] instead.
+
+         --node-locations=ZONE,[ZONE,...]
+            The set of zones in which the specified node footprint should be
+            replicated. All zones must be in the same region as the cluster's
+            primary zone, specified by the --zone flag. --node-locations must
+            contain the primary zone. If node-locations is not specified, all
+            nodes will be in the primary zone.
+
+            Note that NUM_NODES nodes will be created in each zone, such that
+            if you specify --num-nodes=4 and choose two locations, 8 nodes will
+            be created.
+
+            Multiple locations can be specified, separated by commas. For
+            example:
+
+                $ gcloud beta container clusters update example-cluster \
+                    --zone us-central1-a \
+                    --node-locations us-central1-a,us-central1-b
+
+       Basic auth
+
+         --password=PASSWORD
+            The password to use for cluster auth. Defaults to a
+            server-specified randomly-generated string.
+
+         Options to specify the username. At most one of these may be
+         specified:
+
+           --enable-basic-auth
+              Enable basic (username/password) auth for the cluster.
+              --enable-basic-auth is an alias for --username=admin;
+              --no-enable-basic-auth is an alias for --username="". Use
+              --password to specify a password; if not, the server will
+              randomly generate one.
+
+           --username=USERNAME, -u USERNAME
+              The user name to use for basic auth for the cluster. Use
+              --password to specify a password; if not, the server will
+              randomly generate one.
+
+OPTIONAL FLAGS
+     --async
+        Don't wait for the operation to complete.
+
+     --master-authorized-networks=NETWORK,[NETWORK,...]
+        The list of external networks (up to 10) that are allowed to connect to
+        Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
+        1.2.3.4/30). Can not be specified unless
+        --enable-master-authorized-networks is also specified.
+
+     --node-pool=NODE_POOL
+        Node pool to be updated.
+
+     Cluster autoscaling
+
+       --max-nodes=MAX_NODES
+          Maximum number of nodes in the node pool.
+
+          Maximum number of nodes to which the node pool specified by
+          --node-pool (or default node pool if unspecified) can scale. Ignored
+          unless --enable-autoscaling is also specified.
+
+       --min-nodes=MIN_NODES
+          Minimum number of nodes in the node pool.
+
+          Minimum number of nodes to which the node pool specified by
+          --node-pool (or default node pool if unspecified) can scale. Ignored
+          unless --enable-autoscaling is also specified.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud container clusters update
+        $ gcloud alpha container clusters update
+

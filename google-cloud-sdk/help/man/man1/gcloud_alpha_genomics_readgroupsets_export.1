@@ -1,0 +1,78 @@
+
+.TH "GCLOUD_ALPHA_GENOMICS_READGROUPSETS_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha genomics readgroupsets export \- exports a read group set to a BAM file in cloud storage
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha genomics readgroupsets export\fR \fIREAD_GROUP_SET_ID\fR \fB\-\-export\-uri\fR=\fIEXPORT_URI\fR [\fB\-\-reference\-names\fR=[\fIREFERENCE_NAMES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Exports a read group set, optionally restricted by reference name,
+to a BAM file in a provided Google Cloud Storage object. This command yields an
+asynchronous Operation resource which tracks the completion of this task. See
+[](https://cloud.google.com/genomics/managing\-reads for more details)
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIREAD_GROUP_SET_ID\fR
+The ID of the read group set to export.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-export\-uri\fR=\fIEXPORT_URI\fR
+Google Cloud Storage URI to which the BAM file
+(https://samtools.github.io/hts\-specs/SAMv1.pdf) should be exported.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-reference\-names\fR=[\fIREFERENCE_NAMES\fR,...]
+Comma separated list of reference names to be exported from the given read group
+set. Provide * to export unmapped reads. By default, all reads are exported.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

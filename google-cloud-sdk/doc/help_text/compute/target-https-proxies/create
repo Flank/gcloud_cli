@@ -1,0 +1,49 @@
+NAME
+    gcloud compute target-https-proxies create - create a target HTTPS proxy
+
+SYNOPSIS
+    gcloud compute target-https-proxies create NAME
+        --ssl-certificates=SSL_CERTIFICATE,[SSL_CERTIFICATE,...]
+        --url-map=URL_MAP [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute target-https-proxies create is used to create target HTTPS
+    proxies. A target HTTPS proxy is referenced by one or more forwarding rules
+    which define which packets the proxy is responsible for routing. The target
+    HTTPS proxy points to a URL map that defines the rules for routing the
+    requests. The URL map's job is to map URLs to backend services which handle
+    the actual requests. The target HTTPS proxy also points to at most 10 SSL
+    certificates used for server-side authentication.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the target HTTPS proxy to create.
+
+REQUIRED FLAGS
+     --ssl-certificates=SSL_CERTIFICATE,[SSL_CERTIFICATE,...]
+        References to at most 10 SSL certificate resources that are used for
+        server-side authentication. The first SSL certificate in this list is
+        considered the primary SSL certificate associated with the load
+        balancer. The SSL certificate must exist and cannot be deleted while
+        referenced by a target HTTPS proxy.
+
+     --url-map=URL_MAP
+        A reference to a URL map resource that defines the mapping of URLs to
+        backend services. The URL map must exist and cannot be deleted while
+        referenced by a target HTTPS proxy.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional, textual description for the target HTTPS proxy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute target-https-proxies create
+        $ gcloud beta compute target-https-proxies create
+

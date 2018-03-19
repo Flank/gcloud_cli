@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha resource-manager folders set-iam-policy - set IAM policy for a
+        folder
+
+SYNOPSIS
+    gcloud alpha resource-manager folders set-iam-policy FOLDER_ID POLICY_FILE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Sets the IAM policy for a folder, given a folder ID and a file
+    encoded in JSON or YAML that contains the IAM policy.
+
+POSITIONAL ARGUMENTS
+     FOLDER_ID
+        ID for the folder whose policy you want to set.
+
+     POLICY_FILE
+        JSON or YAML file with the IAM policy
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command reads an IAM policy defined in a JSON file
+    policy.json and sets it for a folder with the ID 3589215982:
+
+        $ gcloud alpha resource-manager folders set-iam-policy 3589215982 \
+            policy.json
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

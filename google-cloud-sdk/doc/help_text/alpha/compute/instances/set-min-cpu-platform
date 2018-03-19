@@ -1,0 +1,93 @@
+NAME
+    gcloud alpha compute instances set-min-cpu-platform - set minimum CPU
+        platform for Google Compute Engine virtual machines
+
+SYNOPSIS
+    gcloud alpha compute instances set-min-cpu-platform INSTANCE_NAME
+        --min-cpu-platform=PLATFORM [--async] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (DEPRECATED) This command is deprecated. Use $ gcloud alpha compute
+    instances update --set-min-cpu-platform instead.
+
+    gcloud alpha compute instances set-min-cpu-platform changes the minimum CPU
+    platform of a virtual machine with the TERMINATED status (a virtual machine
+    instance that has been stopped).
+
+    For example, running the command on example-instance virtual machine which
+    has a status of TERMINATED
+
+        $ gcloud alpha compute instances set-min-cpu-platform \
+            example-instance --zone us-central1-a        \
+            --min-cpu-platform "Intel Broadwell"
+
+    will set the minimum CPU platform to Intel Broadwell. When you start
+    example-instance later, it will be provisioned using at least Intel
+    Broadwell CPU platform.
+
+    To get a list of available CPU platforms in us-central1-a zone, run:
+
+        $ gcloud alpha compute zones describe us-central1-a        \
+            --format="value(availableCpuPlatforms)"
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        The name of the instance to operate on.
+
+REQUIRED FLAGS
+     --min-cpu-platform=PLATFORM
+        When specified, the VM will be scheduled on host with specified CPU
+        architecture or a newer one. To list available CPU platforms in given
+        zone, run:
+
+            $ gcloud alpha compute zones describe ZONE \
+              --format="value(availableCpuPlatforms)"
+
+        Default setting is "AUTOMATIC".
+
+        CPU platform selection is available only in selected zones.
+
+        You can find more information on-line:
+        https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --zone=ZONE
+        The zone of the instance to operate on. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

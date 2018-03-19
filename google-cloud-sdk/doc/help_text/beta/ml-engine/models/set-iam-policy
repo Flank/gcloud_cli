@@ -1,0 +1,40 @@
+NAME
+    gcloud beta ml-engine models set-iam-policy - set the IAM policy for a
+        model
+
+SYNOPSIS
+    gcloud beta ml-engine models set-iam-policy MODEL POLICY_FILE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Sets the IAM policy for the given model as defined in a JSON or YAML
+    file.
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
+
+POSITIONAL ARGUMENTS
+     MODEL
+        Name of the model.
+
+     POLICY_FILE
+        JSON or YAML file with the IAM policy
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will read am IAM policy defined in a JSON file
+    'policy.json' and set it for the model my_model:
+
+        $ gcloud beta ml-engine models set-iam-policy my_model policy.json
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ml-engine models set-iam-policy
+        $ gcloud alpha ml-engine models set-iam-policy
+

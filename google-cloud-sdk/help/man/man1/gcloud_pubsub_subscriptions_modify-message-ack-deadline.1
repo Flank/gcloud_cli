@@ -1,0 +1,77 @@
+
+.TH "GCLOUD_PUBSUB_SUBSCRIPTIONS_MODIFY\-MESSAGE\-ACK\-DEADLINE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud pubsub subscriptions modify\-message\-ack\-deadline \- modifies the ACK deadline for a specific Cloud Pub/Sub message
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud pubsub subscriptions modify\-message\-ack\-deadline\fR \fISUBSCRIPTION\fR \fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR [\fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+This method is useful to indicate that more time is needed to process a message
+by the subscriber, or to make the message available for redelivery if the
+processing was interrupted.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISUBSCRIPTION\fR
+Name of the subscription messages belong to.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR
+The number of seconds the system will wait for a subscriber to acknowledge
+receiving a message before re\-attempting delivery.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]
+One or more ACK_ID to modify the deadline for.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha pubsub subscriptions modify\-message\-ack\-deadline
+$ gcloud beta pubsub subscriptions modify\-message\-ack\-deadline
+.RE
+

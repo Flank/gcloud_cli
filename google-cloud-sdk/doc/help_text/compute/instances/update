@@ -1,0 +1,110 @@
+NAME
+    gcloud compute instances update - update a Google Compute Engine virtual
+        machine
+
+SYNOPSIS
+    gcloud compute instances update INSTANCE_NAME [--[no-]deletion-protection]
+        [--min-cpu-platform=PLATFORM] [--update-labels=[KEY=VALUE,...]]
+        [--zone=ZONE] [--clear-labels | --remove-labels=[KEY,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute instances update updates labels and requested CPU Platform
+    for a Google Compute Engine virtual machine. For example:
+
+        $ gcloud compute instances update example-instance \
+            --zone us-central1-a --update-labels=k0=value1,k1=value2 \
+            --remove-labels=k3
+
+    will add/update labels k0 and k1 and remove labels with key k3.
+
+    Labels can be used to identify the instance and to filter them as in
+
+        $ gcloud compute instances list --filter='labels.k1:value2'
+
+    To list existing labels
+
+        $ gcloud compute instances describe example-instance \
+            --format='default(labels)'
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        The name of the instance to update.
+
+FLAGS
+     --[no-]deletion-protection
+        Enables deletion protection for the instance. Use --deletion-protection
+        to enable and --no-deletion-protection to disable.
+
+     --min-cpu-platform=PLATFORM
+        When specified, the VM will be scheduled on host with specified CPU
+        architecture or a newer one. To list available CPU platforms in given
+        zone, run:
+
+            $ gcloud compute zones describe ZONE \
+              --format="value(availableCpuPlatforms)"
+
+        Default setting is "AUTOMATIC".
+
+        CPU platform selection is available only in selected zones.
+
+        You can find more information on-line:
+        https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
+
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+     --zone=ZONE
+        The zone of the instance to update. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud compute instances update --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud compute instances update --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute instances update
+        $ gcloud beta compute instances update
+

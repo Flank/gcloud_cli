@@ -1,0 +1,93 @@
+
+.TH "GCLOUD_LOGGING_SINKS_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud logging sinks list \- lists the defined sinks
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud logging sinks list\fR [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Lists the defined sinks.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR
+List sinks associated with this billing account.
+
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+List sinks associated with this folder.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+List sinks associated with this organization.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates True then that item is listed. For more details and
+examples of filter expressions run $ gcloud topic filters. This flag interacts
+with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+A comma\-separated list of resource field key names to sort by. The default
+order is ascending. Prefix a field with ``~'' for descending order on that
+field. This flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta logging sinks list
+.RE
+

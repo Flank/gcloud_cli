@@ -1,0 +1,90 @@
+NAME
+    gcloud dataproc jobs submit - submit Google Cloud Dataproc jobs to execute
+        on a cluster
+
+SYNOPSIS
+    gcloud dataproc jobs submit COMMAND [--async] [--bucket=BUCKET]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Submit Google Cloud Dataproc jobs to execute on a cluster.
+
+FLAGS
+     --async
+        Does not wait for the job to run.
+
+     --bucket=BUCKET
+        The Cloud Storage bucket to stage files in. Defaults to the cluster's
+        configured bucket.
+
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     hadoop
+        Submit a Hadoop job to a cluster.
+
+     hive
+        Submit a Hive job to a cluster.
+
+     pig
+        Submit a Pig job to a cluster.
+
+     pyspark
+        Submit a PySpark job to a cluster.
+
+     spark
+        Submit a Spark job to a cluster.
+
+     spark-sql
+        Submit a Spark SQL job to a cluster.
+
+EXAMPLES
+    To submit a Hadoop MapReduce job, run:
+
+        $ gcloud dataproc jobs submit hadoop --cluster my_cluster \
+            --jar my_jar.jar arg1 arg2
+
+    To submit a Spark Scala or Java job, run:
+
+        $ gcloud dataproc jobs submit spark --cluster my_cluster \
+            --jar my_jar.jar arg1 arg2
+
+    To submit a PySpark job, run:
+
+        $ gcloud dataproc jobs submit pyspark --cluster my_cluster \
+            my_script.py arg1 arg2
+
+    To submit a Spark SQL job, run:
+
+        $ gcloud dataproc jobs submit spark-sql --cluster my_cluster \
+            --file my_queries.q
+
+    To submit a Pig job, run:
+
+        $ gcloud dataproc jobs submit pig --cluster my_cluster \
+            --file my_script.pig
+
+    To submit a Hive job, run:
+
+        $ gcloud dataproc jobs submit hive --cluster my_cluster \
+            --file my_queries.q
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dataproc jobs submit
+

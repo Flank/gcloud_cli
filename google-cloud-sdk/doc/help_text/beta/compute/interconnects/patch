@@ -1,0 +1,72 @@
+NAME
+    gcloud beta compute interconnects patch - patch a Google Compute Engine
+        interconnect
+
+SYNOPSIS
+    gcloud beta compute interconnects patch NAME [--admin-enabled]
+        [--description=DESCRIPTION] [--noc-contact-email=NOC_CONTACT_EMAIL]
+        [--requested-link-count=REQUESTED_LINK_COUNT]
+        [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute interconnects patch is used to patch
+    interconnects. An interconnect represents a single specific connection
+    between Google and the customer
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the interconnect to patch.
+
+FLAGS
+     --admin-enabled
+        Administrative status of the interconnect. When this is enabled, the
+        interconnect is operational and will carry traffic across any
+        functioning linked interconnect attachments. Use --no-admin-enabled to
+        disable it.
+
+     --description=DESCRIPTION
+        An optional, textual description for the interconnect.
+
+     --noc-contact-email=NOC_CONTACT_EMAIL
+        Email address to contact the customer NOC for operations and
+        maintenance notifications regarding this interconnect.
+
+     --requested-link-count=REQUESTED_LINK_COUNT
+        Target number of physical links in the link bundle.
+
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud beta compute interconnects patch --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud beta compute interconnects patch --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute interconnects patch
+        $ gcloud alpha compute interconnects patch
+

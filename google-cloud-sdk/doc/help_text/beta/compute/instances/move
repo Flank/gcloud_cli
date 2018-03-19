@@ -1,0 +1,71 @@
+NAME
+    gcloud beta compute instances move - move an instance and its attached
+        persistent disks between zones
+
+SYNOPSIS
+    gcloud beta compute instances move INSTANCE_NAME
+        --destination-zone=DESTINATION_ZONE [--async] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute instances move facilitates moving a Google
+    Compute Engine virtual machine from one zone to another. Moving a virtual
+    machine may incur downtime if the guest OS must be shutdown in order to
+    quiesce disk volumes prior to snapshotting.
+
+    For example, running:
+
+        $ gcloud compute instances move example-instance-1 \
+           --zone us-central1-b --destination-zone us-central1-f
+
+    will move the instance called example-instance-1 with its all attached
+    persistent disks, currently running in us-central1-b, to us-central1-f.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        The name of the instance to operate on.
+
+REQUIRED FLAGS
+     --destination-zone=DESTINATION_ZONE
+        The zone to move the instance to.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --zone=ZONE
+        The zone of the instance to operate on. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute instances move
+        $ gcloud alpha compute instances move
+

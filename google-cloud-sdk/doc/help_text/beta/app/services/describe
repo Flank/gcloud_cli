@@ -1,0 +1,30 @@
+NAME
+    gcloud beta app services describe - display all data about an existing
+        service
+
+SYNOPSIS
+    gcloud beta app services describe SERVICE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Display all data about an existing service.
+
+POSITIONAL ARGUMENTS
+     SERVICE
+        The service to describe.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To show all the data about service s1, run
+
+        $ gcloud beta app services describe s1
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud app services describe
+

@@ -1,0 +1,51 @@
+NAME
+    gcloud alpha ml-engine versions - cloud ML Engine Versions commands
+
+SYNOPSIS
+    gcloud alpha ml-engine versions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A version is an implementation of a model, represented as a
+    serialized TensorFlow graph with trained parameters.
+
+    When you communicate with Cloud ML Engine services, you use the combination
+    of the model, version, and current project to identify a specific model
+    implementation that is deployed in the cloud.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a new Cloud ML Engine version.
+
+     delete
+        (ALPHA) Delete an existing Cloud ML Engine version.
+
+     describe
+        (ALPHA) Describe an existing Cloud ML Engine version.
+
+     list
+        (ALPHA) List existing Cloud ML Engine versions.
+
+     set-default
+        (ALPHA) Sets an existing Cloud ML Engine version as the default for its
+        model.
+
+     update
+        (ALPHA) Update a Cloud ML Engine model.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml-engine versions
+        $ gcloud beta ml-engine versions
+

@@ -1,0 +1,45 @@
+NAME
+    gcloud alpha firebase test android versions - explore Android versions
+        available for testing
+
+SYNOPSIS
+    gcloud alpha firebase test android versions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Explore Android versions available for testing.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe an Android OS version.
+
+     list
+        (ALPHA) List all Android OS versions available for testing.
+
+EXAMPLES
+    To list information about all versions of the Android OS available for
+    running tests, including details such as OS code name and release date,
+    run:
+
+        $ gcloud alpha firebase test android versions list
+
+    To view information about a specific Android OS version, run:
+
+        $ gcloud alpha firebase test android versions describe VERSION_ID
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud firebase test android versions
+        $ gcloud beta firebase test android versions
+

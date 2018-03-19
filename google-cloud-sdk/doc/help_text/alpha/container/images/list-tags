@@ -1,0 +1,85 @@
+NAME
+    gcloud alpha container images list-tags - list tags and digests for the
+        specified image
+
+SYNOPSIS
+    gcloud alpha container images list-tags IMAGE_NAME
+        [--occurrence-filter=OCCURRENCE_FILTER;
+          default='kind = "BUILD_DETAILS" OR kind = "IMAGE_BASIS"']
+        [--show-occurrences]
+        [--show-occurrences-from=SHOW_OCCURRENCES_FROM; default=10]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]; default="~timestamp"] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The container images list-tags command of gcloud lists metadata
+    about tags and digests for the specified container image. Images must be
+    hosted by the Google Container Registry.
+
+POSITIONAL ARGUMENTS
+     IMAGE_NAME
+        The name of the image to list tags for. The name format should be
+        *.gcr.io/PROJECT_ID/IMAGE_PATH[:TAG|@sha256:DIGEST].
+
+FLAGS
+     --occurrence-filter=OCCURRENCE_FILTER; default='kind = "BUILD_DETAILS" OR kind = "IMAGE_BASIS"'
+        A filter for the Occurrences which will be summarized.
+
+     --show-occurrences
+        Whether to show summaries of the various Occurrence types.
+
+     --show-occurrences-from=SHOW_OCCURRENCES_FROM; default=10
+        How many of the most recent images for which to summarize Occurences.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True then that item is listed. For more
+        details and examples of filter expressions run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        The maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
+
+     --sort-by=[FIELD,...]; default="~timestamp"
+        A comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit. The
+        default is ~timestamp.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    List the tags in a specified image:
+
+        $ gcloud alpha container images list-tags gcr.io/myproject/myimage
+
+    To receive the full, JSON-formatted output (with untruncated digests):
+
+        $ gcloud alpha container images list-tags gcr.io/myproject/myimage \
+            --format=json
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud container images list-tags
+        $ gcloud beta container images list-tags
+

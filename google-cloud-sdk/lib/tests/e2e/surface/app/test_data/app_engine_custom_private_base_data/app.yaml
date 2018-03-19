@@ -1,0 +1,5 @@
+runtime: custom
+api_version: 1
+env: flex
+manual_scaling:
+  instances: 1

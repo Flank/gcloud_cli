@@ -1,0 +1,73 @@
+NAME
+    gcloud alpha tasks queues add-iam-policy-binding - add IAM policy binding
+        for a queue
+
+SYNOPSIS
+    gcloud alpha tasks queues add-iam-policy-binding QUEUE --member=MEMBER
+        --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Add an IAM policy binding to a queue's access policy.
+
+POSITIONAL ARGUMENTS
+     QUEUE
+        The queue to add the IAM policy binding to.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to add the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        Define the role of the member.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will add an IAM policy binding for the role of
+    'roles/cloudtasks.queueAdmin' for the user 'test-user@gmail.com' on a queue
+    with identifier 'my-queue'
+
+        $ gcloud alpha tasks queues add-iam-policy-binding my-queue \
+            --member='user:test-user@gmail.com' \
+            --role='roles/cloudtasks.queueAdmin'
+
+    For a service account 'my-sa' linked to project 'test-123', the following
+    command will add an IAM policy binding for the role of
+    'roles/cloudtasks.queueAdmin' to the given service account:
+
+        $ gcloud alpha tasks queues add-iam-policy-binding test-123 \
+            --member='serviceAccount:my-sa@test-123.iam.gserviceaccount.com'\
+         --role='roles/cloudtasks.queueAdmin'
+
+    The following command will add an IAM policy binding for the role of
+    'roles/cloudtasks.queueAdmin' for all authenticated users on a queue with
+    identifier 'my-queue':
+
+        $ gcloud alpha tasks queues add-iam-policy-binding my-queue \
+            --member='allAuthenticatedUsers' \
+            --role='roles/cloudtasks.queueAdmin'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

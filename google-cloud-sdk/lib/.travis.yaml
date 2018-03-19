@@ -1,0 +1,9 @@
+language: python
+sudo: false
+
+install:
+  - pip install --upgrade pip
+  - pip install --upgrade tox
+
+script:
+  - tox -e py27

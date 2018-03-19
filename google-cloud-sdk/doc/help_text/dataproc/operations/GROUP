@@ -1,0 +1,62 @@
+NAME
+    gcloud dataproc operations - view and manage Google Cloud Dataproc
+        operations
+
+SYNOPSIS
+    gcloud dataproc operations COMMAND [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    View and manage Google Cloud Dataproc operations.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        Cancel an active operation.
+
+     delete
+        Delete the record of an inactive operation.
+
+     describe
+        View the details of an operation.
+
+     list
+        View the list of all operations.
+
+EXAMPLES
+    To cancel an active operation, run:
+
+        $ gcloud dataproc operations cancel operation_id
+
+    To view the details of an operation, run:
+
+        $ gcloud dataproc operations describe operation_id
+
+    To see the list of all operations, run:
+
+        $ gcloud dataproc operations list
+
+    To delete the record of an inactive operation, run:
+
+        $ gcloud dataproc operations delete operation_id
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dataproc operations
+

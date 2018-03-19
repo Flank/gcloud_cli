@@ -1,0 +1,67 @@
+# Valid int args
+
+max-depth-1:
+  max-depth: 1
+
+large-steps:
+  max-steps: 1234567890
+
+scenario1:
+  scenario-numbers: 2000
+
+scenario4:
+  scenario-numbers:
+    - 1
+    - 3
+    - 13
+    - 77
+
+
+# Invalid int args
+
+int-string:
+  max-depth: '2'  # can't be in string format
+
+not-positive:
+  max-depth: 0  # Zero is not a positive number
+
+delay-neg1:
+  max-steps: -1  # -1 is not a non-negative number
+
+max-depth-10x:
+  max-depth: 10x   # Contains non-numeric chars
+
+comma-steps:
+  max-steps: 123,456  # Integer contains invalid comma
+
+float-steps:
+  max-steps: 12.34  # Integer contains invalid decimal
+
+list-steps:
+  max-steps: [1234]
+
+
+# Invalid int lists
+
+scenario-zero:
+  scenario-numbers: 0  # scenario #s start at 1
+
+scenario-neg:
+  scenario-numbers: -1024  # scenario #s start at 1
+
+scenario-neg-in-list:
+  scenario-numbers: [3, -1, 5]
+
+scenario-float:
+  scenario-numbers: [1, 3.14]
+
+scenario-str:
+  scenario-numbers: 1a
+
+scenario-str-list:
+  scenario-numbers: ['1', '3', '5', '7']
+
+scenario-dict:
+  scenario-numbers:
+    foo: 2
+    bar: 4

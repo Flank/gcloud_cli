@@ -1,0 +1,119 @@
+
+.TH "GCLOUD_ALPHA_GENOMICS_DATASETS_ADD\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha genomics datasets add\-iam\-policy\-binding \- add IAM policy binding for a dataset
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha genomics datasets add\-iam\-policy\-binding\fR \fIID\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command adds a policy binding to the IAM policy of a dataset,
+given a dataset ID and the binding.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIID\fR
+The ID of the dataset.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to add the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com\fR, or
+\f5domain:example.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- anyone who is on the internet, with or without a Google
+account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
+or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will add an IAM policy binding for the role of
+\'roles/editor' for the user 'test\-user@gmail.com' on a dataset with identifier
+\'1000'
+
+.RS 2m
+$ gcloud alpha genomics datasets add\-iam\-policy\-binding 1000 \e
+    \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
+.RE
+
+For a service account 'my\-sa' linked to project 'test\-123', the following
+command will add an IAM policy binding for the role of 'roles/editor' to the
+given service account:
+
+.RS 2m
+$ gcloud alpha genomics datasets add\-iam\-policy\-binding test\-123 \e
+    \-\-member='serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com'\e
+ \-\-role='roles/editor'
+.RE
+
+The following command will add an IAM policy binding for the role of
+\'roles/editor' for all authenticated users on a dataset with identifier '1000':
+
+.RS 2m
+$ gcloud alpha genomics datasets add\-iam\-policy\-binding 1000 \e
+    \-\-member='allAuthenticatedUsers' \-\-role='roles/editor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

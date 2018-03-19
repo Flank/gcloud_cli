@@ -1,0 +1,57 @@
+NAME
+    gcloud alpha compute target-http-proxies create - create a target HTTP
+        proxy
+
+SYNOPSIS
+    gcloud alpha compute target-http-proxies create NAME --url-map=URL_MAP
+        [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute target-http-proxies create is used to create
+    target HTTP proxies. A target HTTP proxy is referenced by one or more
+    forwarding rules which define which packets the proxy is responsible for
+    routing. The target HTTP proxy points to a URL map that defines the rules
+    for routing the requests. The URL map's job is to map URLs to backend
+    services which handle the actual requests.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the target HTTP proxy to create.
+
+REQUIRED FLAGS
+     --url-map=URL_MAP
+        A reference to a URL map resource that defines the mapping of URLs to
+        backend services. The URL map must exist and cannot be deleted while
+        referenced by a target HTTP proxy.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional, textual description for the target HTTP proxy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    If there is an already-created URL map with the name URL_MAP, create a
+    target HTTP proxy pointing to this map by running:
+
+        $ gcloud alpha compute target-http-proxies create PROXY_NAME \
+            --url-map URL_MAP
+
+    To create a proxy with a textual description, run:
+
+        $ gcloud alpha compute target-http-proxies create PROXY_NAME \
+            --url-map URL_MAP --description "default proxy"
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute target-http-proxies create
+        $ gcloud beta compute target-http-proxies create
+

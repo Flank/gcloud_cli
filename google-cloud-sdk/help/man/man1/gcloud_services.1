@@ -1,0 +1,98 @@
+
+.TH "GCLOUD_SERVICES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud services \- list, enable and disable APIs and services
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud services\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+The gcloud services command group lets you manage your project's access to
+services provided by Google and third parties.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBoperations\fR
+Manage Operation for various services.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdisable\fR
+Disable a service for consumption for a project.
+
+.TP 2m
+\fBenable\fR
+Enables a service for consumption for a project.
+
+.TP 2m
+\fBlist\fR
+List services for a project.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To see how to enable a service, run:
+
+.RS 2m
+$ gcloud services enable \-\-help
+.RE
+
+To see how to list services, run:
+
+.RS 2m
+$ gcloud services list \-\-help
+.RE
+
+To see how to disable a service, run:
+
+.RS 2m
+$ gcloud services disable \-\-help
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha services
+$ gcloud beta services
+.RE
+

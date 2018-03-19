@@ -1,0 +1,43 @@
+NAME
+    gcloud beta compute snapshots - list, describe, and delete Google Compute
+        Engine snapshots
+
+SYNOPSIS
+    gcloud beta compute snapshots COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) List, describe, and delete Google Compute Engine snapshots.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-labels
+        (BETA) Add labels to Google Compute Engine snapshots.
+
+     delete
+        (BETA) Delete Google Compute Engine snapshots.
+
+     describe
+        (BETA) Describe a Google Compute Engine snapshot.
+
+     list
+        (BETA) List Google Compute Engine snapshots.
+
+     remove-labels
+        (BETA) Remove labels from Google Compute Engine snapshots.
+
+     update
+        (BETA) Update a Google Compute Engine snapshot.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute snapshots
+        $ gcloud alpha compute snapshots
+

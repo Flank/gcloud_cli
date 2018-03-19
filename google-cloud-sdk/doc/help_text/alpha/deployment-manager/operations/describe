@@ -1,0 +1,35 @@
+NAME
+    gcloud alpha deployment-manager operations describe - provide information
+        about an operation
+
+SYNOPSIS
+    gcloud alpha deployment-manager operations describe OPERATION_NAME
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command prints out all available details about an operation.
+
+POSITIONAL ARGUMENTS
+     OPERATION_NAME
+        Operation name.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To display information about an operation, run:
+
+        $ gcloud alpha deployment-manager operations describe operation-name
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud deployment-manager operations describe
+        $ gcloud beta deployment-manager operations describe
+

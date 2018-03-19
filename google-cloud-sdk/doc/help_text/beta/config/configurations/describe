@@ -1,0 +1,44 @@
+NAME
+    gcloud beta config configurations describe - describes a named
+        configuration by listing its properties
+
+SYNOPSIS
+    gcloud beta config configurations describe CONFIGURATION_NAME [--all]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Describes a named configuration by listing its properties.
+
+    See gcloud topic configurations for an overview of named configurations.
+
+POSITIONAL ARGUMENTS
+     CONFIGURATION_NAME
+        Name of the configuration to describe
+
+FLAGS
+     --all
+        Include unset properties in output.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To describe existing named configuration, run:
+
+        $ gcloud beta config configurations describe my_config
+
+    This is similar to:
+
+        $ gcloud config configurations activate my_config
+
+        $ gcloud config list
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud config configurations describe
+        $ gcloud alpha config configurations describe
+

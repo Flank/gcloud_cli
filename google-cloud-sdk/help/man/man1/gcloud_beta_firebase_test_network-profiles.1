@@ -1,0 +1,97 @@
+
+.TH "GCLOUD_BETA_FIREBASE_TEST_NETWORK\-PROFILES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta firebase test network\-profiles \- explore network profiles available for testing
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta firebase test network\-profiles\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR A network traffic profile consists of a set of parameters to
+emulate network conditions when running a test. This feature only works on
+physical devices. The network shaping parameters are:
+
+.RS 2m
+.IP "\(bu" 2m
+\fBRULE\fR: Where to apply traffic shaping. The UP rule shapes the connection
+from the device to the internet. The DOWN rule shapes the connection from the
+internet to the device.
+.IP "\(bu" 2m
+\fBDELAY\fR: The delay in packet transmission, in ms.
+.IP "\(bu" 2m
+\fBLOSS_RATIO\fR: The ratio of packets dropped during transmission.
+.IP "\(bu" 2m
+\fBDUPLICATION_RATIO\fR: The ratio of packets duplicated during transmission.
+.IP "\(bu" 2m
+\fBBANDWIDTH\fR: The average packet transmission rate in kbits/s, as defined by
+the token bucket algorithm.
+.IP "\(bu" 2m
+\fBBURST\fR: The total size, in kbits, by which packets can exceed the
+bandwidth, as defined by the token bucket algorithm.
+.RE
+.sp
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdescribe\fR
+\fB(BETA)\fR Describe a network profile.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List all network profiles available for testing.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To list all network profiles which can be used for testing, run:
+
+.RS 2m
+$ gcloud beta firebase test network\-profiles list
+.RE
+
+To view information about a specific network profile, run:
+
+.RS 2m
+$ gcloud beta firebase test network\-profiles describe PROFILE_ID
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud firebase test network\-profiles
+$ gcloud alpha firebase test network\-profiles
+.RE
+

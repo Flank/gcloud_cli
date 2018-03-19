@@ -1,0 +1,75 @@
+NAME
+    gcloud alpha ml products reference-images add - add a Cloud Product Search
+        ReferenceImage to a Catalog
+
+SYNOPSIS
+    gcloud alpha ml products reference-images add IMAGE_PATH --catalog=CATALOG
+        --product-id=PRODUCT_ID
+        [--bounds=x:y,x:y,x:y,[x:y,...] --category=CATEGORY]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command creates a Cloud Product Search ReferenceImage and adds
+    it to the provided catalog.
+
+POSITIONAL ARGUMENTS
+     IMAGE_PATH
+        The Google Cloud Storage URI of the input image file. The URI must
+        start with gs://.
+
+REQUIRED FLAGS
+     --catalog=CATALOG
+        The catalog to add ReferenceImages to.
+
+     --product-id=PRODUCT_ID
+        The product ID to associate this ReferenceImage to. Product Id is
+        restricted to 255 characters including letters, numbers, underscore ( _
+        ) and hyphen (-).
+
+OPTIONAL FLAGS
+     Both --category and --bounds should be specified if either is provided.
+
+       --bounds=x:y,x:y,x:y,[x:y,...]
+          A set of vertices defining the bounding polygon aroundthe area of
+          interest in the image. Should be a list of integer pairs, separated
+          by commas specifying the vertices (e.g. [x1:y2,
+          x2:y2,x3:y3...xn:yn]). Defaults to full image if empty.
+
+       --category=CATEGORY
+          String specifying the product category to associate this
+          ReferenceImage to.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a reference image, using default bounds and no category, run:
+
+        $ gcloud alpha ml products reference-images add \
+        gs:\\my-bucket\myimage.jpg
+        --catalog=101
+        --product-id=my-product-123
+
+    To add a reference image, using custom bounds and category, run:
+
+        $ gcloud alpha ml products reference-images add \
+        gs:\\my-bucket\myimage.jpg
+        --catalog=101
+        --product-id=my-product-123
+        --category=mens_shoes
+        --bounds=200:200,200:400,400:200,400:400
+
+    Note: For alpha, only catalogs with associated ReferenceImages will be
+    displayed by the list command. Please be sure to note the catalog name at
+    creation time so that it can be used by ml products catalogs
+    reference-image commands.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

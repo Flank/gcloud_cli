@@ -1,0 +1,351 @@
+---
+args:
+  command: compute disks snapshot foo
+  specified_args: {}
+---
+state:
+  interactive_console: true
+  random_seed: -8378806577888430639
+  term_size:
+  - 139
+  - 74
+---
+properties:
+  component_manager:
+    disable_update_check: 'True'
+  core:
+    disable_color: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: |
+    --===============2189441858476494182==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <646e97d4-8d7d-4b04-b294-7f1819a67705+0>
+
+    GET /compute/v1/projects/fake-project/zones?alt=json&maxResults=500 HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    content-length: 0
+    accept-encoding: gzip, deflate
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============2189441858476494182==--
+  headers:
+    content-length: '481'
+    content-type: multipart/mixed; boundary="===============2189441858476494182=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_PK_MPM5pN_g_AAojkcskF7E\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-646e97d4-8d7d-4b04-b294-7f1819a67705+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"bLDqvZhEK7DjeDYD2ltG-Y3FhhY/xUc7uCYVZ-WzzfBTegl_J897ELM\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Wed, 30 Aug 2017 21:21:04 GMT\r\nExpires:\
+    \ Wed, 30 Aug 2017 21:21:04 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 13361\r\n\r\n"
+  - json:
+      id: projects/fake-project/zones
+      items:
+      - creationTimestamp: '2016-06-14T17:29:18.761-07:00'
+        description: us-central1-f
+        id: '2004'
+        kind: compute#zone
+        name: us-central1-f
+        region: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f
+        status: UP
+      kind: compute#zoneList
+      selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones
+  - "\n\r\n--batch_PK_MPM5pN_g_AAojkcskF7E--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,35"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    content-length: '13794'
+    content-type: multipart/mixed; boundary=batch_PK_MPM5pN_g_AAojkcskF7E
+    date: Wed, 30 Aug 2017 21:21:04 GMT
+    expires: Mon, 01 Jan 1990 00:00:00 GMT
+    pragma: no-cache
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: |
+    --===============8372879639270141858==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <b39e6718-40d1-4110-910b-89244e6d351f+0>
+
+    POST /compute/v1/projects/fake-project/zones/us-central1-f/disks/foo/createSnapshot?alt=json&guestFlush=False HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    content-length: 24
+    accept-encoding: gzip, deflate
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+    {"name": "t8noiqdm038v"}
+    --===============8372879639270141858==--
+  headers:
+    content-length: '531'
+    content-type: multipart/mixed; boundary="===============8372879639270141858=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_kxrrOPXHK5I_AAccp1Zo4HE\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-b39e6718-40d1-4110-910b-89244e6d351f+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"bLDqvZhEK7DjeDYD2ltG-Y3FhhY/VGcBNNaJPSScepdwhqB_49LZ8SA\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Wed, 30 Aug 2017 21:21:07 GMT\r\nExpires:\
+    \ Wed, 30 Aug 2017 21:21:07 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 686\r\n\r\n"
+  - json:
+      id: '2266218107062882988'
+      insertTime: '2017-08-30T14:21:07.296-07:00'
+      kind: compute#operation
+      name: operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248
+      operationType: createSnapshot
+      progress: 0
+      selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/operations/operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248
+      status: PENDING
+      targetId: '2603466420963290811'
+      targetLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/disks/foo
+      user: nmakeenkov@google.com
+      zone: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f
+  - "\n\r\n--batch_kxrrOPXHK5I_AAccp1Zo4HE--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,35"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    content-length: '1117'
+    content-type: multipart/mixed; boundary=batch_kxrrOPXHK5I_AAccp1Zo4HE
+    date: Wed, 30 Aug 2017 21:21:07 GMT
+    expires: Mon, 01 Jan 1990 00:00:00 GMT
+    pragma: no-cache
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: |
+    --===============8879415203321869789==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <d614fb96-41bb-45a8-9c99-521aa9f71a8b+0>
+
+    GET /compute/v1/projects/fake-project/zones/us-central1-f/operations/operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    content-length: 0
+    accept-encoding: gzip, deflate
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============8879415203321869789==--
+  headers:
+    content-length: '547'
+    content-type: multipart/mixed; boundary="===============8879415203321869789=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_fKpzCH4Rp8U_AAkzzZI13_w\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-d614fb96-41bb-45a8-9c99-521aa9f71a8b+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"bLDqvZhEK7DjeDYD2ltG-Y3FhhY/tmEUyw8OCgmUGgE050MDt48NoMQ\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Wed, 30 Aug 2017 21:21:08 GMT\r\nExpires:\
+    \ Wed, 30 Aug 2017 21:21:08 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 733\r\n\r\n"
+  - json:
+      id: '2266218107062882988'
+      insertTime: '2017-08-30T14:21:07.296-07:00'
+      kind: compute#operation
+      name: operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248
+      operationType: createSnapshot
+      progress: 0
+      selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/operations/operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248
+      startTime: '2017-08-30T14:21:07.599-07:00'
+      status: RUNNING
+      targetId: '2603466420963290811'
+      targetLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/disks/foo
+      user: nmakeenkov@google.com
+      zone: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f
+  - "\n\r\n--batch_fKpzCH4Rp8U_AAkzzZI13_w--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,35"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    content-length: '1164'
+    content-type: multipart/mixed; boundary=batch_fKpzCH4Rp8U_AAkzzZI13_w
+    date: Wed, 30 Aug 2017 21:21:08 GMT
+    expires: Mon, 01 Jan 1990 00:00:00 GMT
+    pragma: no-cache
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: |
+    --===============1783198159824286673==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <f926bec9-5bbf-4029-a4ec-18ee4b73bb2b+0>
+
+    GET /compute/v1/projects/fake-project/zones/us-central1-f/operations/operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    content-length: 0
+    accept-encoding: gzip, deflate
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============1783198159824286673==--
+  headers:
+    content-length: '547'
+    content-type: multipart/mixed; boundary="===============1783198159824286673=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_JY5QUIuSmEI_AAJqjNNhVhY\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-9e55bbd7-5842-4efa-9262-a9a58370e37e+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"bLDqvZhEK7DjeDYD2ltG-Y3FhhY/gROpjJ6roeMUlLc6p4BGAJiiv1s\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Wed, 30 Aug 2017 21:21:19 GMT\r\nExpires:\
+    \ Wed, 30 Aug 2017 21:21:19 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 777\r\n\r\n"
+  - json:
+      endTime: '2017-08-30T14:21:15.876-07:00'
+      id: '2266218107062882988'
+      insertTime: '2017-08-30T14:21:07.296-07:00'
+      kind: compute#operation
+      name: operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248
+      operationType: createSnapshot
+      progress: 100
+      selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/operations/operation-1504128066944-557ff1b207c01-8ca9a533-2a7b6248
+      startTime: '2017-08-30T14:21:07.599-07:00'
+      status: DONE
+      targetId: '2603466420963290811'
+      targetLink: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/disks/foo
+      user: nmakeenkov@google.com
+      zone: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f
+  - "\n\r\n--batch_JY5QUIuSmEI_AAJqjNNhVhY--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,35"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    content-length: '1208'
+    content-type: multipart/mixed; boundary=batch_JY5QUIuSmEI_AAJqjNNhVhY
+    date: Wed, 30 Aug 2017 21:21:19 GMT
+    expires: Mon, 01 Jan 1990 00:00:00 GMT
+    pragma: no-cache
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: |
+    --===============1559413014427451972==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <265b5e11-b53a-416e-bd14-c43d5fc46875+0>
+
+    GET /compute/v1/projects/fake-project/global/snapshots/t8noiqdm038v?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    content-length: 0
+    accept-encoding: gzip, deflate
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============1559413014427451972==--
+  headers:
+    content-length: '490'
+    content-type: multipart/mixed; boundary="===============1559413014427451972=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_J_rqcHNnKPw_AAeRVZr7kQ4\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-265b5e11-b53a-416e-bd14-c43d5fc46875+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"bLDqvZhEK7DjeDYD2ltG-Y3FhhY/F-JNIFQcZtpK8qMXbYhcvpdhBRM\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Wed, 30 Aug 2017 21:21:19 GMT\r\nExpires:\
+    \ Wed, 30 Aug 2017 21:21:19 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 654\r\n\r\n"
+  - json:
+      creationTimestamp: '2017-08-30T14:21:07.637-07:00'
+      diskSizeGb: '10'
+      id: '6174441104344781484'
+      kind: compute#snapshot
+      labelFingerprint: 42WmSpB8rSM=
+      licenses:
+      - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-8-jessie
+      name: t8noiqdm038v
+      selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/global/snapshots/t8noiqdm038v
+      sourceDisk: https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f/disks/foo
+      sourceDiskId: '2603466420963290811'
+      status: READY
+      storageBytes: '3807121'
+      storageBytesStatus: UP_TO_DATE
+  - "\n\r\n--batch_J_rqcHNnKPw_AAeRVZr7kQ4--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,35"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    content-length: '1085'
+    content-type: multipart/mixed; boundary=batch_J_rqcHNnKPw_AAeRVZr7kQ4
+    date: Wed, 30 Aug 2017 21:21:19 GMT
+    expires: Mon, 01 Jan 1990 00:00:00 GMT
+    pragma: no-cache
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  stderr: |
+    No zone specified. Using zone [us-central1-f] for disk: [foo].
+    <START PROGRESS TRACKER>Creating snapshot(s) t8noiqdm038v
+    <END PROGRESS TRACKER>SUCCESS

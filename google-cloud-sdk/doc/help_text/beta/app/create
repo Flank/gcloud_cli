@@ -1,0 +1,35 @@
+NAME
+    gcloud beta app create - create an App Engine app within the current Google
+        Cloud Project
+
+SYNOPSIS
+    gcloud beta app create [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create an App Engine app within the current Google Cloud Project.
+
+FLAGS
+     --region=REGION
+        The region to create the app within. Use gcloud app regions list to
+        list available regions. If not provided, select region interactively.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create an app with region chosen interactively, run:
+
+        $ gcloud beta app create
+
+    To create an app in the us-central region, run:
+
+        $ gcloud beta app create --region=us-central
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud app create
+

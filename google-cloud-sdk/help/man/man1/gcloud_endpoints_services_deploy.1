@@ -1,0 +1,113 @@
+
+.TH "GCLOUD_ENDPOINTS_SERVICES_DEPLOY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud endpoints services deploy \- deploys a service configuration for the given service name
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud endpoints services deploy\fR \fISERVICE_CONFIG_FILE\fR [\fISERVICE_CONFIG_FILE\fR\ ...] [\fB\-\-async\fR] [\fB\-\-force\fR,\ \fB\-f\fR] [\fB\-\-validate\-only\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+This command is used to deploy a service configuration for a service to Google
+Service Management. As input, it takes one or more paths to service
+configurations that should be uploaded. These configuration files can be Proto
+Descriptors, Open API (Swagger) specifications, or Google Service Configuration
+files in JSON or YAML formats. When specifying Proto Descriptors, you can
+optionally pass in the uncompiled proto files as well to enable documentation
+for your API in the Endpoints Developer Portal.
+
+If a service name is present in multiple configuration files (given in the
+\f5host\fR field in OpenAPI specifications or the \f5name\fR field in Google
+Service Configuration files), the first one will take precedence.
+
+This command will block until deployment is complete unless the \f5\-\-async\fR
+flag is passed.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISERVICE_CONFIG_FILE\fR [\fISERVICE_CONFIG_FILE\fR ...]
+The service configuration file (or files) containing the API specification to
+upload. Proto Descriptors, Open API (Swagger) specifications, and Google Service
+Configuration files in JSON and YAML formats are acceptable. When uploading
+proto descriptors, you can optionally pass the uncompiled proto files as well.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-force\fR, \fB\-f\fR
+Force the deployment even if any hazardous changes to the service configuration
+are detected.
+
+.TP 2m
+\fB\-\-validate\-only\fR
+If included, the command will only validate the service configuration(s). No
+configuration(s) will be persisted.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To deploy a single Open API service configuration, run:
+
+.RS 2m
+$ gcloud endpoints services deploy ~/my_app/openapi.json
+.RE
+
+To run the deployment asynchronously (non\-blocking), run:
+
+.RS 2m
+$ gcloud endpoints services deploy ~/my_app/openapi.json \-\-async
+.RE
+
+To deploy a service config with a Proto, run:
+
+.RS 2m
+$ gcloud endpoints services deploy ~/my_app/service\-config.yaml \e
+    ~/my_app/service\-protos.pb
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha endpoints services deploy
+$ gcloud beta endpoints services deploy
+.RE
+

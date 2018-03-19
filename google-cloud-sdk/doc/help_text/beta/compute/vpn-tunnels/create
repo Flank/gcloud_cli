@@ -1,0 +1,98 @@
+NAME
+    gcloud beta compute vpn-tunnels create - create a VPN tunnel
+
+SYNOPSIS
+    gcloud beta compute vpn-tunnels create NAME --peer-address=PEER_ADDRESS
+        --shared-secret=SHARED_SECRET --target-vpn-gateway=TARGET_VPN_GATEWAY
+        [--description=DESCRIPTION] [--ike-version=IKE_VERSION]
+        [--local-traffic-selector=CIDR,[CIDR,...]] [--region=REGION]
+        [--remote-traffic-selector=CIDR,[CIDR,...]] [--router=ROUTER]
+        [--target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute vpn-tunnels create is used to create a VPN
+    tunnel between a VPN Gateway in Google Cloud Platform and an external
+    gateway that is identified by --peer-address.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the VPN Tunnel to create.
+
+REQUIRED FLAGS
+     --peer-address=PEER_ADDRESS
+        A valid IP-v4 address representing the remote tunnel endpoint
+
+     --shared-secret=SHARED_SECRET
+        A shared secret consisting of printable characters. Valid arguments
+        match the regular expression [ -~]+
+
+     --target-vpn-gateway=TARGET_VPN_GATEWAY
+        A reference to a target vpn gateway
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional, textual description for the target VPN tunnel.
+
+     --ike-version=IKE_VERSION
+        Internet Key Exchange protocol version number. Default is 2.
+        IKE_VERSION must be one of: 1, 2.
+
+     --local-traffic-selector=CIDR,[CIDR,...]
+        Traffic selector is an agreement between IKE peers to permit traffic
+        through a tunnel if the traffic matches a specified pair of local and
+        remote addresses.
+
+        local_traffic_selector allows to configure the local addresses that are
+        permitted. The value should be a comma separated list of CIDR formatted
+        strings. Example: 192.168.0.0/16,10.0.0.0/24.
+
+     --region=REGION
+        The region of the VPN Tunnel to create. If not specified, you will be
+        prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+     --remote-traffic-selector=CIDR,[CIDR,...]
+        Traffic selector is an agreement between IKE peers to permit traffic
+        through a tunnel if the traffic matches a specified pair of local and
+        remote addresses.
+
+        remote_traffic_selector allows to configure the remote addresses that
+        are permitted. The value should be a comma separated list of CIDR
+        formatted strings. Example: 192.168.0.0/16,10.0.0.0/24.
+
+     --router=ROUTER
+        The Router to use for dynamic routing.
+
+     --target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION
+        The region of the Target VPN Gateway to operate on. Should be the same
+        as region, if not specified, it will be automatically set. Overrides
+        the default compute/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute vpn-tunnels create
+        $ gcloud alpha compute vpn-tunnels create
+

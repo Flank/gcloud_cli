@@ -1,0 +1,103 @@
+NAME
+    gcloud alpha compute forwarding-rules update - update a Google Compute
+        Engine forwarding rule
+
+SYNOPSIS
+    gcloud alpha compute forwarding-rules update NAME
+        [--network-tier=NETWORK_TIER] [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute forwarding-rules update updates labels and
+    network tier for a Google Compute Engine forwarding rule.
+
+    Example to update labels:
+
+        $ gcloud alpha compute forwarding-rules update example-fr \
+            --region us-central1 \
+          --update-labels=k0=value1,k1=value2 --remove-labels=k3
+
+    will add/update labels k0 and k1 and remove labels with key k3.
+
+    Labels can be used to identify the forwarding rule and to filter them as in
+
+        $ gcloud alpha compute forwarding-rules list \
+            --filter='labels.k1:value2'
+
+    To list existing labels
+
+        $ gcloud alpha compute forwarding-rules describe example-fr \
+            --format='default(labels)'
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the forwarding rule to operate on.
+
+FLAGS
+     --network-tier=NETWORK_TIER
+        Update the network tier of a forwarding rule. It does not allow to
+        change from PREMIUM to STANDARD and visa versa.
+
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud alpha compute forwarding-rules update --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud alpha compute forwarding-rules update --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, it is assumed the forwarding rule is global.
+
+       --region=REGION
+          The region of the forwarding rule to operate on. If not specified,
+          you will be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta compute forwarding-rules update
+

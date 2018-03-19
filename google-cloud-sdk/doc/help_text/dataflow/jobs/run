@@ -1,0 +1,52 @@
+NAME
+    gcloud dataflow jobs run - runs a job from the specified path
+
+SYNOPSIS
+    gcloud dataflow jobs run JOB_NAME --gcs-location=GCS_LOCATION
+        [--max-workers=MAX_WORKERS] [--parameters=[PARAMETERS,...]]
+        [--region=REGION_ID] [--service-account-email=SERVICE_ACCOUNT_EMAIL]
+        [--staging-location=STAGING_LOCATION] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Runs a job from the specified path.
+
+POSITIONAL ARGUMENTS
+     JOB_NAME
+        The unique name to assign to the job.
+
+REQUIRED FLAGS
+     --gcs-location=GCS_LOCATION
+        The Google Cloud Storage location of the job template to run. (Must be
+        a URL beginning with 'gs://'.)
+
+OPTIONAL FLAGS
+     --max-workers=MAX_WORKERS
+        The maximum number of workers to run.
+
+     --parameters=[PARAMETERS,...]
+        The parameters to pass to the job.
+
+     --region=REGION_ID
+        The region ID of the job's regional endpoint.
+
+     --service-account-email=SERVICE_ACCOUNT_EMAIL
+        The service account to run the workers as.
+
+     --staging-location=STAGING_LOCATION
+        The Google Cloud Storage location to stage temporary files. (Must be a
+        URL beginning with 'gs://'.)
+
+     --zone=ZONE
+        The zone to run the workers in.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dataflow jobs run
+

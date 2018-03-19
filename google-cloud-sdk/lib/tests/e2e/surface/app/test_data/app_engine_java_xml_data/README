@@ -1,0 +1,4 @@
+This is a Java app that has been built and is ready for deployment.
+
+The deployment descriptor is `WEB-INF/appengine-web.xml`, so the app.yaml
+is supposed to be synthesized during the deployment.

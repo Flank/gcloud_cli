@@ -1,0 +1,64 @@
+
+.TH "GCLOUD_BETA_COMPUTE_TPUS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute tpus describe \- describe a Cloud TPU
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute tpus describe\fR \fITPU_ID\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Describe a Cloud TPU.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fITPU_ID\fR
+Name of the TPU.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the tpu to describe. Zone in which TPU lives. If not specified, will
+use \f5default\fR compute/zone.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute tpus describe
+.RE
+

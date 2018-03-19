@@ -1,0 +1,29 @@
+NAME
+    gcloud container builds log - stream the logs for a build
+
+SYNOPSIS
+    gcloud container builds log BUILD [--stream] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Stream the logs for a build.
+
+POSITIONAL ARGUMENTS
+     BUILD
+        The build whose logs shall be printed. The ID of the build is printed
+        at the end of the build submission process, or in the ID column when
+        listing builds.
+
+FLAGS
+     --stream
+        If a build is ongoing, stream the logs to stdout until termination.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta container builds log
+

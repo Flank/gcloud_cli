@@ -1,0 +1,31 @@
+NAME
+    gcloud alpha compute instance-templates delete - delete Google Compute
+        Engine virtual machine instance templates
+
+SYNOPSIS
+    gcloud alpha compute instance-templates delete NAME [NAME ...]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instance-templates delete deletes one or more
+    Google Compute Engine virtual machine instance templates.
+
+POSITIONAL ARGUMENTS
+     NAME [NAME ...]
+        The names of the instance templates to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute instance-templates delete
+        $ gcloud beta compute instance-templates delete
+

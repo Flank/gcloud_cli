@@ -1,0 +1,84 @@
+
+.TH "GCLOUD_ALPHA_CONTAINER_NODE\-POOLS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha container node\-pools describe \- describe an existing node pool for a cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha container node\-pools describe\fR \fINAME\fR [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha container node\-pools describe\fR displays all
+data associated with the node pool in the Google Kubernetes Engine cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the node pool.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+The name of the cluster. Overrides the default \fBcontainer/cluster\fR property
+value for this command invocation.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The compute region (e.g. us\-central1) for the cluster.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
+The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
+\fBcompute/zone\fR property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud container node\-pools describe
+$ gcloud beta container node\-pools describe
+.RE
+

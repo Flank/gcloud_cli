@@ -1,0 +1,90 @@
+NAME
+    gcloud alpha compute instances delete - delete Google Compute Engine
+        virtual machine instances
+
+SYNOPSIS
+    gcloud alpha compute instances delete INSTANCE_NAMES [INSTANCE_NAMES ...]
+        [--zone=ZONE] [--delete-disks=DISK_TYPE | --keep-disks=DISK_TYPE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instances delete deletes one or more Google
+    Compute Engine virtual machine instances.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAMES [INSTANCE_NAMES ...]
+        The names of the instances to delete.
+
+FLAGS
+     --zone=ZONE
+        The zone of the instances to delete. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+     At most one of these may be specified:
+
+       --delete-disks=DISK_TYPE
+          The types of disks to delete with instance deletion regardless of the
+          disks' auto-delete configuration. When this flag is provided, the
+          auto-delete bits on the attached disks are modified accordingly
+          before the instance deletion requests are issued. For more
+          information on disk auto-deletion, see
+          https://cloud.google.com/compute/docs/disks/persistent-disks#updateautodelete.
+          DISK_TYPE must be one of:
+
+       all
+          All disk types.
+       boot
+          The first partition is reserved for the root filesystem.
+       data
+          A non-boot disk.
+
+       --keep-disks=DISK_TYPE
+          The types of disks to not delete with instance deletion regardless of
+          the disks' auto-delete configuration. When this flag is provided, the
+          auto-delete bits on the attached disks are modified accordingly
+          before the instance deletion requests are issued. For more
+          information on disk auto-deletion, see
+          https://cloud.google.com/compute/docs/disks/persistent-disks#updateautodelete.
+          DISK_TYPE must be one of:
+
+       all
+          All disk types.
+       boot
+          The first partition is reserved for the root filesystem.
+       data
+          A non-boot disk.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute instances delete
+        $ gcloud beta compute instances delete
+

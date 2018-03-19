@@ -1,0 +1,215 @@
+
+.TH "GCLOUD_COMPUTE_ROUTERS_UPDATE\-BGP\-PEER" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute routers update\-bgp\-peer \- update a BGP peer on a Google Compute Engine router
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute routers update\-bgp\-peer\fR \fINAME\fR \fB\-\-peer\-name\fR=\fIPEER_NAME\fR [\fB\-\-advertised\-route\-priority\fR=\fIADVERTISED_ROUTE_PRIORITY\fR] [\fB\-\-advertisement\-mode\fR=\fIMODE\fR] [\fB\-\-async\fR] [\fB\-\-interface\fR=\fIINTERFACE\fR] [\fB\-\-ip\-address\fR=\fIIP_ADDRESS\fR] [\fB\-\-peer\-asn\fR=\fIPEER_ASN\fR] [\fB\-\-peer\-ip\-address\fR=\fIPEER_IP_ADDRESS\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-set\-advertisement\-groups\fR=[\fIGROUP\fR,...]] [\fB\-\-set\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]] [\fB\-\-add\-advertisement\-groups\fR=[\fIGROUP\fR,...]\ |\ \fB\-\-add\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]\ |\ \fB\-\-remove\-advertisement\-groups\fR=[\fIGROUP\fR,...]\ |\ \fB\-\-remove\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute routers update\-bgp\-peer\fR is used to update a BGP peer on a
+Google Compute Engine router.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the router to operate on.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-peer\-name\fR=\fIPEER_NAME\fR
+The name of the new BGP peer being updated.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-advertised\-route\-priority\fR=\fIADVERTISED_ROUTE_PRIORITY\fR
+The priority of routes advertised to this BGP peer. In the case where there is
+more than one matching route of maximum length, the routes with lowest priority
+value win. 0 <= priority <= 65535. If not specified, will use Google\-managed
+priorities.
+
+.TP 2m
+\fB\-\-advertisement\-mode\fR=\fIMODE\fR
+The new advertisement mode for this peer. \fIMODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBCUSTOM\fR
+Custom (user\-configured) BGP advertisements.
+.TP 2m
+\fBDEFAULT\fR
+Default (Google\-managed) BGP advertisements.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-interface\fR=\fIINTERFACE\fR
+The name of the interface for this BGP peer.
+
+.TP 2m
+\fB\-\-ip\-address\fR=\fIIP_ADDRESS\fR
+The link\-local address of the Cloud Router interface for this BGP peer. Must be
+a link\-local IPv4 address belonging to the range 169.254.0.0/16 and must belong
+to same subnet as the interface address of the peer router.
+
+.TP 2m
+\fB\-\-peer\-asn\fR=\fIPEER_ASN\fR
+The BGP autonomous system number (ASN) for this BGP peer. For more information
+see: https://tools.ietf.org/html/rfc6996.
+
+.TP 2m
+\fB\-\-peer\-ip\-address\fR=\fIPEER_IP_ADDRESS\fR
+The link\-local address of the peer router. Must be a link\-local IPv4 address
+belonging to the range 169.254.0.0/16.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the router to operate on. If not specified, you will be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-set\-advertisement\-groups\fR=[\fIGROUP\fR,...]
+The list of pre\-defined groups of IP ranges to dynamically advertise on this
+peer. This list can only be specified in custom advertisement mode.
+
+\fIGROUP\fR must be (currently only one value is supported):
+
+.RS 2m
+.TP 2m
+\fBALL_SUBNETS\fR
+Automatically advertise all available subnets.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-set\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]
+The list of individual IP ranges, in CIDR format, to dynamically advertise on
+this peer. Each IP range can (optionally) be given a text description DESC. For
+example, to advertise a specific range, use
+\f5\-\-set\-advertisement\-ranges=192.168.10.0/24\fR. To store a description
+with the range, use
+\f5\-\-set\-advertisement\-ranges=192.168.10.0/24=my\-networks\fR. This list can
+only be specified in custom advertisement mode.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-advertisement\-groups\fR=[\fIGROUP\fR,...]
+A list of pre\-defined groups of IP ranges to dynamically advertise on this
+peer. This list is appended to any existing advertisements. This field can only
+be specified in custom advertisement mode.
+
+\fIGROUP\fR must be (currently only one value is supported):
+
+.TP 2m
+\fBALL_SUBNETS\fR
+Automatically advertise all available subnets.
+
+.TP 2m
+\fB\-\-add\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR=\fIDESC\fR,...]
+A list of individual IP ranges, in CIDR format, to dynamically advertise on this
+peer. This list is appended to any existing advertisements. Each IP range can
+(optionally) be given a text description DESC. For example, to advertise a
+specific range, use \f5\-\-advertisement\-ranges=192.168.10.0/24\fR. To store a
+description with the range, use
+\f5\-\-advertisement\-ranges=192.168.10.0/24=my\-networks\fR. This list can only
+be specified in custom advertisement mode.
+
+.TP 2m
+\fB\-\-remove\-advertisement\-groups\fR=[\fIGROUP\fR,...]
+A list of pre\-defined groups of IP ranges to remove from dynamic advertisement
+on this peer. Each group in the list must exist in the current set of custom
+advertisements. This field can only be specified in custom advertisement mode.
+
+\fIGROUP\fR must be (currently only one value is supported):
+
+.TP 2m
+\fBALL_SUBNETS\fR
+Automatically advertise all available subnets.
+
+.TP 2m
+\fB\-\-remove\-advertisement\-ranges\fR=[\fICIDR_RANGE\fR,...]
+A list of individual IP ranges, in CIDR format, to remove from dynamic
+advertisement on this peer. Each IP range in the list must exist in the current
+set of custom advertisements. This field can only be specified in custom
+advertisement mode.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute routers update\-bgp\-peer
+$ gcloud beta compute routers update\-bgp\-peer
+.RE
+

@@ -1,0 +1,7 @@
+queue:
+- name: queue-blue
+  target: v2.task-module
+  rate: 2/s
+
+- name: queue-red
+  rate: 1/s

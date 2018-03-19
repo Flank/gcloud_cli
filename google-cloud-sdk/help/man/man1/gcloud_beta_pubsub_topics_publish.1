@@ -1,0 +1,94 @@
+
+.TH "GCLOUD_BETA_PUBSUB_TOPICS_PUBLISH" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub topics publish \- publishes a message to the specified topic
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub topics publish\fR \fITOPIC\fR [\fIMESSAGE_BODY\fR] [\fB\-\-attribute\fR=[\fIATTRIBUTE\fR,...]] [\fB\-\-message\fR=\fIMESSAGE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Publishes a message to the specified topic name for testing and
+troubleshooting. Use with caution: all associated subscribers must be able to
+consume and acknowledge any message you publish, otherwise the system will
+continuously re\-attempt delivery of the bad message for 7 days.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fITOPIC\fR
+Name of the topic to publish messages to.
+
+.TP 2m
+[\fIMESSAGE_BODY\fR]
+(DEPRECATED) The body of the message to publish to the given topic name.
+Information on message formatting and size limits can be found at:
+https://cloud.google.com/pubsub/docs/publisher#publish
+
+Positional argument \f5MESSAGE_BODY\fR is deprecated. Please use
+\f5\-\-message\fR instead.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-attribute\fR=[\fIATTRIBUTE\fR,...]
+Comma\-separated list of attributes. Each ATTRIBUTE has the form name=value".
+You can specify up to 100 attributes.
+
+.TP 2m
+\fB\-\-message\fR=\fIMESSAGE\fR
+The body of the message to publish to the given topic name. Information on
+message formatting and size limits can be found at:
+https://cloud.google.com/pubsub/docs/publisher#publish
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To publish messages in a batch to a specific Cloud Pub/Sub topic, run:
+
+.RS 2m
+$ gcloud beta pubsub topics publish mytopic "Hello World!" \e
+    \-\-attribute KEY1=VAL1,KEY2=VAL2
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud pubsub topics publish
+$ gcloud alpha pubsub topics publish
+.RE
+

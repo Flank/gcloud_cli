@@ -1,0 +1,42 @@
+{
+  "components": [
+    {
+      "data": {
+        "contents_checksum": "1cfd3643f543acbd45df3bebf0c9baf4bf215fbc3c1128aba4d6e6b91d556394", 
+        "source": "", 
+        "type": "tar"
+      }, 
+      "dependencies": [
+        "core", 
+        "gcloud-man-pages"
+      ], 
+      "details": {
+        "description": "Man pages for gcloud commands.", 
+        "display_name": "Man pages (Platform Specific)"
+      }, 
+      "id": "gcloud-man-pages-nix", 
+      "is_configuration": false, 
+      "is_hidden": true, 
+      "is_required": false, 
+      "platform": {
+        "operating_systems": [
+          "MACOSX", 
+          "LINUX", 
+          "CYGWIN", 
+          "MSYS"
+        ]
+      }, 
+      "version": {
+        "build_number": 20180309150215, 
+        "version_string": "2018.03.09"
+      }
+    }
+  ], 
+  "revision": 20180309150215, 
+  "schema_version": {
+    "no_update": false, 
+    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz", 
+    "version": 3
+  }, 
+  "version": "193.0.0"
+}

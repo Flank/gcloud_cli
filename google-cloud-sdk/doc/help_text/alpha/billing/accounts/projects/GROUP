@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha billing accounts projects - manage the billing account
+        configuration of your projects
+
+SYNOPSIS
+    gcloud alpha billing accounts projects COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (DEPRECATED) Manage the billing account configuration of your
+    projects.
+
+    The gcloud billing accounts projects group has been moved to gcloud billing
+    projects. Please use the new, shorter commands instead.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) (DEPRECATED) Show detailed billing information for a project.
+
+     link
+        (ALPHA) (DEPRECATED) Link a project with a billing account.
+
+     list
+        (ALPHA) (DEPRECATED) List all active projects associated with the
+        specified billing account.
+
+     unlink
+        (ALPHA) (DEPRECATED) Unlink the account (if any) linked with a project.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

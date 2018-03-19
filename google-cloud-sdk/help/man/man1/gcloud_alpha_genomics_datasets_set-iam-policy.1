@@ -1,0 +1,70 @@
+
+.TH "GCLOUD_ALPHA_GENOMICS_DATASETS_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha genomics datasets set\-iam\-policy \- set IAM policy for a dataset
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha genomics datasets set\-iam\-policy\fR \fIID\fR \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command sets the IAM policy for a dataset, given a dataset ID
+and a file that contains the JSON encoded IAM policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIID\fR
+The ID of the dataset.
+
+.TP 2m
+\fIPOLICY_FILE\fR
+JSON file with the IAM policy
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will read an IAM policy defined in a JSON file
+\'policy.json' and set it for a dataset with identifier '1000'
+
+.RS 2m
+$ gcloud alpha genomics datasets set\-iam\-policy 1000 policy.json
+.RE
+
+See https://cloud.google.com/genomics/v1/access\-control for details on managing
+access control on Genomics datasets.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

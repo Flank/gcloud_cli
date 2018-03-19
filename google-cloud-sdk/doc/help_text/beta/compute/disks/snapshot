@@ -1,0 +1,89 @@
+NAME
+    gcloud beta compute disks snapshot - create snapshots of Google Compute
+        Engine persistent disks
+
+SYNOPSIS
+    gcloud beta compute disks snapshot DISK_NAME [DISK_NAME ...] [--async]
+        [--csek-key-file=FILE] [--description=DESCRIPTION] [--guest-flush]
+        [--snapshot-names=SNAPSHOT_NAME,[SNAPSHOT_NAME,...]] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create snapshots of Google Compute Engine persistent disks.
+
+    gcloud beta compute disks snapshot creates snapshots of persistent disks.
+    Snapshots are useful for backing up data or copying a persistent disk. Once
+    created, snapshots may be managed (listed, deleted, etc.) via gcloud
+    compute snapshots.
+
+POSITIONAL ARGUMENTS
+     DISK_NAME [DISK_NAME ...]
+        The names of the disks to operate on.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --csek-key-file=FILE
+        Path to a Customer-Supplied Encryption Key (CSEK) key file, mapping
+        Google Compute Engine resources to user managed keys to be used when
+        creating, mounting, or snapshotting disks.
+
+        If you pass - as value of the flag the CSEK will be read from stdin.
+        See
+        https://cloud.google.com/compute/docs/disks/customer-supplied-encryption
+        for more details.
+
+     --description=DESCRIPTION
+        An optional, textual description for the snapshots being created.
+
+     --guest-flush
+        Create an application consistent snapshot by informing the OS to
+        prepare for the snapshot process. Currently only supported on Windows
+        instances using the Volume Shadow Copy Service (VSS).
+
+     --snapshot-names=SNAPSHOT_NAME,[SNAPSHOT_NAME,...]
+        Names to assign to the snapshots. Without this option, the name of each
+        snapshot will be a random, 16-character hexadecimal number that starts
+        with a letter. The values of this option run parallel to the disks
+        specified. For example,
+
+            $ gcloud beta compute disks snapshot my-disk-1 my-disk-2 my-disk-3 \
+                --snapshot-names snapshot-1,snapshot-2,snapshot-3
+
+        will result in my-disk-1 being snapshotted as snapshot-1, my-disk-2 as
+        snapshot-2, and so on.
+
+     --zone=ZONE
+        The zone of the disks to operate on. If not specified and the
+        compute/zone property isn't set, you will be prompted to select a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute disks snapshot
+        $ gcloud alpha compute disks snapshot
+

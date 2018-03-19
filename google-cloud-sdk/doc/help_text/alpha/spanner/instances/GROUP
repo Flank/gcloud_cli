@@ -1,0 +1,54 @@
+NAME
+    gcloud alpha spanner instances - manage Cloud Spanner instances
+
+SYNOPSIS
+    gcloud alpha spanner instances COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud Spanner instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add an IAM policy binding to a Cloud Spanner instance.
+
+     create
+        (ALPHA) Create a Cloud Spanner instance.
+
+     delete
+        (ALPHA) Delete a Cloud Spanner instance.
+
+     describe
+        (ALPHA) Describe a Cloud Spanner instance.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a Cloud Spanner instance.
+
+     list
+        (ALPHA) List the Cloud Spanner instances in this project.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove an IAM policy binding from a Cloud Spanner instance.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a Cloud Spanner instance.
+
+     update
+        (ALPHA) Update a Cloud Spanner instance.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud spanner instances
+        $ gcloud beta spanner instances
+

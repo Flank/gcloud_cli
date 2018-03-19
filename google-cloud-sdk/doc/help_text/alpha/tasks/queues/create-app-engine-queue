@@ -1,0 +1,82 @@
+NAME
+    gcloud alpha tasks queues create-app-engine-queue - create an App Engine
+        queue
+
+SYNOPSIS
+    gcloud alpha tasks queues create-app-engine-queue APP_ENGINE_QUEUE_ID
+        [--max-attempts=MAX_ATTEMPTS] [--max-backoff=MAX_BACKOFF]
+        [--max-concurrent-tasks=MAX_CONCURRENT_TASKS]
+        [--max-doublings=MAX_DOUBLINGS]
+        [--max-retry-duration=MAX_RETRY_DURATION]
+        [--max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND]
+        [--min-backoff=MIN_BACKOFF]
+        [--routing-override=KEY:VALUE,[KEY:VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) An App Engine queue is a push queue sent to an App Engine endpoint.
+    The flags available to this command represent the fields of an App Engine
+    queue that are mutable.
+
+    For more information about the different queue target types, see:
+    https://cloud.google.com/cloud-tasks/docs/queue-types
+
+POSITIONAL ARGUMENTS
+     APP_ENGINE_QUEUE_ID
+        ID of the App Engine queue to create.
+
+FLAGS
+     --max-attempts=MAX_ATTEMPTS
+        The maximum number of attempts per task in the queue.
+
+     --max-backoff=MAX_BACKOFF
+        The maximum amount of time to wait before retrying a task after it
+        fails. Must be a string that ends in 's', such as "5s".
+
+     --max-concurrent-tasks=MAX_CONCURRENT_TASKS
+        The maximum number of concurrent tasks that Cloud Tasks allows to be
+        dispatched for this queue. After this threshold has been reached, Cloud
+        Tasks stops dispatching tasks until the number of outstanding requests
+        decreases.
+
+     --max-doublings=MAX_DOUBLINGS
+        The maximum number of times that the interval between failed task
+        retries will be doubled before the increase becomes constant. The
+        constant is: min-backoff * 2 ** (max-doublings - 1).
+
+     --max-retry-duration=MAX_RETRY_DURATION
+        The time limit for retrying a failed task, measured from when the task
+        was first run. Once the --max-retry-duration time has passed and the
+        task has been attempted --max-attempts times, no further attempts will
+        be made and the task will be deleted.
+
+        Must be a string that ends in 's', such as "5s".
+
+     --max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND
+        The maximum rate at which tasks are dispatched from this queue. This
+        also determines "max burst size" for App Engine queues: if
+        --max-tasks-dispatched-per-second is 1, then max burst size is 10;
+        otherwise it is max-tasks-dispatched-per-second / 5.
+
+     --min-backoff=MIN_BACKOFF
+        The minimum amount of time to wait before retrying a task after it
+        fails. Must be a string that ends in 's', such as "5s".
+
+     --routing-override=KEY:VALUE,[KEY:VALUE,...]
+        If provided, the specified route is used for all tasks in the queue, no
+        matter what is set is at the task-level.
+
+        KEY must be at least one of: [service, version, instance]. Any missing
+        keys will use the default.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

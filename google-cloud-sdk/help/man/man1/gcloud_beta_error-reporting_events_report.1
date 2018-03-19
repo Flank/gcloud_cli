@@ -1,0 +1,99 @@
+
+.TH "GCLOUD_BETA_ERROR\-REPORTING_EVENTS_REPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta error\-reporting events report \- report an error
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta error\-reporting events report\fR \fB\-\-service\fR=\fISERVICE\fR (\fB\-\-message\fR=\fIMESSAGE\fR\ |\ \fB\-\-message\-file\fR=\fIMESSAGE_FILE\fR) [\fB\-\-service\-version\fR=\fISERVICE_VERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR gcloud beta error\-reporting events report is used to report errors
+using the error\-reporting service. The required arguments are a service name
+and either an error\-file containing details of an error or an inline error
+message.
+
+The error message must contain a header (typically consisting of the exception
+type name and an error message) and an exception stack trace in one of the
+supported programming languages and formats. Details about supported languages
+and formats can be found at
+https://cloud.google.com/error\-reporting/docs/formatting\-error\-messages
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR
+The name of the service that generated the error
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-message\fR=\fIMESSAGE\fR
+Inline details of the error
+
+.TP 2m
+\fB\-\-message\-file\fR=\fIMESSAGE_FILE\fR
+File containing details of the error
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-service\-version\fR=\fISERVICE_VERSION\fR
+The release version of the service
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To report an error, run:
+
+.RS 2m
+$ gcloud beta error\-reporting events report \-\-service service\-name \e
+    \-\-message error\-message
+.RE
+
+or:
+
+.RS 2m
+$ gcloud beta error\-reporting events report \-\-service service\-name \e
+    \-\-message\-file error\-message.ext.
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

@@ -1,0 +1,77 @@
+
+.TH "GCLOUD_ALPHA_ML_VISION_DETECT\-LOGOS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml vision detect\-logos \- detect popular product logos within an image
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml vision detect\-logos\fR \fIIMAGE_PATH\fR [\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Detect popular product logos within an image.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE_PATH\fR
+The path to the image to be analyzed. This can be either a local path or a URL.
+If you provide a local file, the contents will be sent directly to Google Cloud
+Vision. If you provide a URL, it must be in Google Cloud Storage format
+(gs://bucket/object) or an HTTP URL (http://... or https://...)
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR
+The maximum number of results to be provided.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBvision/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/vision/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud ml vision detect\-logos
+$ gcloud beta ml vision detect\-logos
+.RE
+

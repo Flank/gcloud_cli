@@ -1,0 +1,30 @@
+NAME
+    gcloud alpha functions regions - list regions available to Google Cloud
+        Functions
+
+SYNOPSIS
+    gcloud alpha functions regions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) List regions available to Google Cloud Functions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list
+        (ALPHA) List regions available to Google Cloud Functions.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta functions regions
+

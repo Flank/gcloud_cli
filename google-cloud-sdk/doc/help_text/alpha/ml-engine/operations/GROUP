@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha ml-engine operations - manage Cloud ML Engine operations
+
+SYNOPSIS
+    gcloud alpha ml-engine operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud ML Engine operations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        (ALPHA) Cancel a Cloud ML Engine operation.
+
+     delete
+        (ALPHA) Delete a Cloud ML Engine operation.
+
+     describe
+        (ALPHA) Describe a Cloud ML Engine operation.
+
+     list
+        (ALPHA) List existing Cloud ML Engine jobs.
+
+     wait
+        (ALPHA) Wait for a Cloud ML Engine operation to complete.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml-engine operations
+        $ gcloud beta ml-engine operations
+

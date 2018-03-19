@@ -1,0 +1,61 @@
+NAME
+    gcloud compute commitments create - create Google Compute Engine
+        commitments
+
+SYNOPSIS
+    gcloud compute commitments create COMMITMENT --plan=PLAN
+        --resources=[RESOURCE=COMMITMENT,...] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create Google Compute Engine commitments.
+
+POSITIONAL ARGUMENTS
+     COMMITMENT
+        The name of the commitment to create.
+
+REQUIRED FLAGS
+     --plan=PLAN
+        Duration of the commitment. PLAN must be one of: 12-month, 36-month.
+
+     --resources=[RESOURCE=COMMITMENT,...]
+        Resources to be included in the commitment commitment:
+        * MEMORY should include unit (eg. 3072MB or 9GB). If no units are
+          specified, GB is assumed.
+        * VCPU is number of commited cores.
+    Ratio between number of VCPU cores and memory must conform to limits
+    described on:
+    https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type
+
+OPTIONAL FLAGS
+     --region=REGION
+        The region of the commitment to create. If not specified, you will be
+        prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute commitments create
+        $ gcloud beta compute commitments create
+

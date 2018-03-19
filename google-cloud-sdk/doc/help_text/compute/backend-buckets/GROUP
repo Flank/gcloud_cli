@@ -1,0 +1,41 @@
+NAME
+    gcloud compute backend-buckets - read and manipulate backend buckets
+
+SYNOPSIS
+    gcloud compute backend-buckets COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Backend buckets define Google Cloud Storage buckets that can serve content.
+    URL maps define which requests are sent to which backend buckets. For more
+    information, see:
+    https://cloud.google.com/compute/docs/load-balancing/http/adding-a-backend-bucket-to-content-based-load-balancing.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a backend bucket.
+
+     delete
+        Delete backend buckets.
+
+     describe
+        Describe a backend bucket.
+
+     list
+        List Google Compute Engine backend buckets.
+
+     update
+        Update a backend bucket.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute backend-buckets
+        $ gcloud beta compute backend-buckets
+

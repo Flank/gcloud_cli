@@ -1,0 +1,127 @@
+runtime: java7
+env: 2
+manual_scaling:
+  instances: 1
+inbound_services:
+- warmup
+threadsafe: True
+auto_id_policy: default
+env_variables:
+  'CDBG_AGENT_URL': 'https://storage.googleapis.com/cloud-debugger/appengine-java/current/cdbg_java_agent.tar.gz'
+  'DBG_PORT': '5005'
+  'DBG_ENABLE': '1'
+beta_settings:
+  'machine_type': 'n1-standard-1'
+  'java_quickstart': 'true'
+health_check:
+  enable_health_check: True
+api_version: '1.0'
+handlers:
+- url: (/_ah/queue/__deferred__)
+  static_files: __static__\1
+  upload: __NOT_USED__
+  require_matching_file: True
+  login: admin
+  secure: optional
+- url: (/.*)
+  static_files: __static__\1
+  upload: __NOT_USED__
+  require_matching_file: True
+  login: required
+  secure: optional
+- url: /
+  script: unused
+  login: optional
+  secure: optional
+- url: /_ah/queue/__deferred__
+  script: unused
+  login: admin
+  secure: optional
+- url: /.*\.jsp
+  script: unused
+  login: required
+  secure: optional
+- url: /SystemViewer
+  script: unused
+  login: required
+  secure: optional
+- url: /sign
+  script: unused
+  login: required
+  secure: optional
+- url: /captcha
+  script: unused
+  login: required
+  secure: optional
+- url: /.*/
+  script: unused
+  login: required
+  secure: optional
+- url: .*\.jsp
+  script: unused
+  login: optional
+  secure: optional
+- url: /.*\.XSP
+  script: unused
+  login: required
+  secure: optional
+- url: .*\.XSP
+  script: unused
+  login: optional
+  secure: optional
+- url: /.*\.JSPX
+  script: unused
+  login: required
+  secure: optional
+- url: .*\.JSPX
+  script: unused
+  login: optional
+  secure: optional
+- url: /.*\.JSPF
+  script: unused
+  login: required
+  secure: optional
+- url: .*\.JSPF
+  script: unused
+  login: optional
+  secure: optional
+- url: /.*\.JSP
+  script: unused
+  login: required
+  secure: optional
+- url: .*\.JSP
+  script: unused
+  login: optional
+  secure: optional
+- url: /.*\.xsp
+  script: unused
+  login: required
+  secure: optional
+- url: .*\.xsp
+  script: unused
+  login: optional
+  secure: optional
+- url: /.*\.jspx
+  script: unused
+  login: required
+  secure: optional
+- url: /captcha/.*
+  script: unused
+  login: required
+  secure: optional
+- url: /_ah/.*
+  script: unused
+  login: required
+  secure: optional
+- url: .*\.jspx
+  script: unused
+  login: optional
+  secure: optional
+- url: /.*\.jspf
+  script: unused
+  login: required
+  secure: optional
+- url: .*\.jspf
+  script: unused
+  login: optional
+  secure: optional

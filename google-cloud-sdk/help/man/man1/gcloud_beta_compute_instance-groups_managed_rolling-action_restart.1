@@ -1,0 +1,106 @@
+
+.TH "GCLOUD_BETA_COMPUTE_INSTANCE\-GROUPS_MANAGED_ROLLING\-ACTION_RESTART" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute instance\-groups managed rolling\-action restart \- restarts instances in a managed instance group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute instance\-groups managed rolling\-action restart\fR \fINAME\fR [\fB\-\-max\-unavailable\fR=\fIMAX_UNAVAILABLE\fR] [\fB\-\-min\-ready\fR=\fIMIN_READY\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute instance\-groups managed rolling\-action
+restart\fR restarts instances in a managed instance group.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the managed instance group to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-max\-unavailable\fR=\fIMAX_UNAVAILABLE\fR
+Maximum number of instances that can be unavailable during the update process.
+This can be a fixed number (e.g. 5) or a percentage of size to the managed
+instance group (e.g. 10%)
+
+.TP 2m
+\fB\-\-min\-ready\fR=\fIMIN_READY\fR
+Minimum time for which a newly created instance should be ready to be considered
+available. For example \f510s\fR for 10 seconds. See $ gcloud topic datetimes
+for information on duration formats.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the managed instance group to operate on. If not specified, you
+will be prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the managed instance group to operate on. If not specified, you may
+be prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed rolling\-action restart
+.RE
+

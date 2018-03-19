@@ -1,0 +1,317 @@
+NAME
+    gcloud config get-value - print the value of a Cloud SDK property
+
+SYNOPSIS
+    gcloud config get-value SECTION/PROPERTY [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud config get-value prints the property value from your active
+    configuration only.
+
+POSITIONAL ARGUMENTS
+     SECTION/PROPERTY
+        The property to be fetched. Note that SECTION/ is optional while
+        referring to properties in the core section.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+AVAILABLE PROPERTIES
+     core
+         account
+            The account gcloud should use for authentication. You can run
+            gcloud auth list to see the accounts you currently have available.
+
+         custom_ca_certs_file
+            Absolute path to a custom CA cert file.
+
+         default_regional_backend_service
+            If True, backend services in gcloud compute backend-services will
+            be regional by default. The --global flag will be required for
+            global backend services.
+
+         disable_color
+            If True, color will not be used when printing messages in the
+            terminal.
+
+         disable_prompts
+            If True, the default answer will be assumed for all user prompts.
+            For any prompts that require user input, an error will be raised.
+            This is equivalent to either using the global --quiet flag or
+            setting the environment variable CLOUDSDK_CORE_DISABLE_PROMPTS to
+            1.
+
+         disable_usage_reporting
+            If True, anonymous statistics on SDK usage will not be collected.
+            This is value is set based on your choices during installation, but
+            can be changed at any time. For more information, see:
+            https://cloud.google.com/sdk/usage-statistics
+
+         log_http
+            If True, log HTTP requests and responses to the logs. You may need
+            to adjust your verbosity setting if you want to see in the
+            terminal, otherwise it is available in the log files.
+
+         max_log_days
+            Maximum number of days to retain log files before deleting. If set
+            to 0, turns off log garbage collection and does not delete log
+            files. If unset, defaults to 30.
+
+         pass_credentials_to_gsutil
+            If True, pass the configured Cloud SDK authentication to gsutil.
+
+         project
+            The project id of the Cloud Platform project to operate on by
+            default. This can be overridden by using the global --project flag.
+
+         show_structured_logs
+            Controls when JSON structured log messages for the current
+            verbosity and above will be written to standard error. The default
+            is text format when disabled. Valid values are: never - Log
+            messages as text, always - Always log messages as JSON, log - Only
+            log messages as JSON if stderr is a file, terminal - Only log
+            messages as JSON if stderr is a terminal. If unset default is
+            never.
+
+         trace_token
+            Token used to route traces of service requests for investigation of
+            issues. This token will be provided by Google support.
+
+         user_output_enabled
+            If False, messages to the user and command output on both standard
+            output and standard error will be suppressed.
+
+         verbosity
+            The default logging verbosity for gcloud commands. This is the
+            equivalent of using the global --verbosity flag.
+
+     app
+         cloud_build_timeout
+            The timeout, in seconds, to wait for Docker builds to complete
+            during deployments. All Docker builds now use the Container Builder
+            API.
+
+         promote_by_default
+            If True, when deploying a new version of a service, that version
+            will be promoted to receive all traffic for the service. The flag
+            can be overridden via the --promote-by-default or
+            --no-promote-by-default flags.
+
+         stop_previous_version
+            If True, when deploying a new version of a service, the previously
+            deployed version is stopped. If False, older versions must be
+            stopped manually.
+
+         use_runtime_builders
+            If set, opt in/out to a new code path for building applications
+            using pre-fabricated runtimes that can be updated independently of
+            client tooling. (If not set, will use the default path for each
+            runtime.)
+
+     auth
+         disable_credentials
+            If true, gcloud will not attempt to load any credentials or
+            authenticate any requests. This is useful if you are behind a proxy
+            that adds authentication to your requests.
+
+     billing
+         quota_project
+            This is the project that will be charged quota for the operations
+            performed in gcloud. When unset, the default is CURRENT_PROJECT,
+            which will charge quota against your currently set project for the
+            operations you perform on it. Some existing APIs will continue to
+            use a shared project for quota by default when this property is
+            unset. If you need to operate on one project, but charge quota
+            against a different project, you can use this property to specify
+            the alternate project.
+
+     component_manager
+         additional_repositories
+            A comma separated list of additional repositories to check for
+            components. This property is automatically managed by the gcloud
+            components repositories commands.
+
+         disable_update_check
+            If True, the Cloud SDK will not automatically check for updates.
+
+     compute
+         region
+            The default region to use when working with regional Compute Engine
+            resources. When a --region flag is required but not provided, the
+            command will fall back to this value, if set. To see valid choices,
+            run gcloud compute regions list.
+
+         use_new_list_usable_subnets_api
+            If True, use the new API for listing usable subnets which only
+            returns subnets in the current project.
+
+         zone
+            The default zone to use when working with zonal Compute Engine
+            resources. When a --zone flag is required but not provided, the
+            command will fall back to this value, if set. To see valid choices,
+            run gcloud compute zones list.
+
+     container
+         build_timeout
+            The timeout, in seconds, to wait for container builds to complete.
+
+         cluster
+            The name of the cluster to use by default when working with
+            Kubernetes Engine.
+
+         new_scopes_behavior
+            Use new scopes behavior: if true, do not add compute-rw,
+            storage-ro, service-control, or service-management scopes. The
+            former two (compute-rw and storage-ro) only applies to clusters at
+            Kubernetes v1.9 and below; starting in v1.10, compute-rw and
+            storage-ro are not added by default regardless. Any of these scopes
+            may be added explicitly using --scopes. If true,
+            --[no-]enable-cloud-endpoints is not allowed. This will be the
+            default behavior in a future release. This property is ignored in
+            alpha and beta, which always use the new behavior. See --scopes
+            help for more info.
+
+         use_application_default_credentials
+            Use application default credentials to authenticate to the cluster
+            API server.
+
+         use_client_certificate
+            Use the cluster's client certificate to authenticate to the cluster
+            API server.
+
+         use_v1_api
+            If true, all gcloud Kubernetes Engine commands (regardless of
+            release track) will use the v1 API; otherwise, gcloud beta track
+            commands will use v1beta1 API and gcloud alpha track commands will
+            use v1alpha1 API. By default, it is set to true. The Kubernetes
+            Engine v1alpha1 API is whitelist-only at this time. Note:
+            use_v1_api is an alias of use_v1_api_client.
+
+         use_v1_api_client
+            If true, all gcloud Kubernetes Engine commands (regardless of
+            release track) will use the v1 API; otherwise, gcloud beta track
+            commands will use v1beta1 API and gcloud alpha track commands will
+            use v1alpha1 API. By default, it is set to true. The Kubernetes
+            Engine v1alpha1 API is whitelist-only at this time. Note:
+            use_v1_api_client is an alias of use_v1_api.
+
+     dataproc
+         region
+            Specifies the Cloud Dataproc region to use. Each Cloud Dataproc
+            region constitutes an independent resource namespace constrained to
+            deploying instances into Google Compute Engine zones inside the
+            region. The default value of "global" is a special multi-region
+            namespace which is capable of deploying instances into all Google
+            Compute Engine zones globally, and is disjoint from other Cloud
+            Dataproc regions.
+
+     functions
+         region
+            The default region to use when working with Google Compute
+            functions resources. When a --region flag is required but not
+            provided, the command will fall back to this value, if set. To see
+            valid choices, run gcloud functions regions list.
+
+     gcloudignore
+         enabled
+            Whether to enable .gcloudignore files (see $ gcloud topic
+            gcloudignore). If false, turn off the gcloudignore mechanism
+            entirely and upload all files.
+
+     interactive
+         bottom_bindings_line
+            Display the bottom key bindings line, if true.
+
+         bottom_status_line
+            Display the bottom status line, if true.
+
+         completion_menu_lines
+            Number of lines in the completion menu.
+
+         context
+            Command context string.
+
+         fixed_prompt_position
+            Display the prompt at the same position, if true.
+
+         help_lines
+            Maximum number of help snippet lines.
+
+         hidden
+            Expose hidden commands/flags, if true.
+
+         justify_bottom_lines
+            Left- and right-justify bottom toolbar lines, if true.
+
+         manpage_generator
+            Use the manpage CLI tree generator for unsupported commands, if
+            true.
+
+         multi_column_completion_menu
+            Display the completions as a multi-column menu, if true.
+
+         prompt
+            Command prompt string.
+
+         show_help
+            Show help as command args are entered, if true.
+
+         suggest
+            Add command line suggestions based on history, if true.
+
+     ml_engine
+         local_python
+            The full path to the Python interpreter to use for Cloud ML Engine
+            local predict/train jobs. If not specified, will default to using
+            the Python interpreter found on system PATH.
+
+         polling_interval
+            The interval (in seconds) at which to poll logs from your Cloud ML
+            Engine jobs. Note that making it much faster than the default (60)
+            will quickly use all of your quota.
+
+     proxy
+         address
+            The hostname or IP address of your proxy server.
+
+         password
+            If your proxy requires authentication, the password to use when
+            connecting.
+
+         port
+            The port to use when connected to your proxy server.
+
+         rdns
+            If True (default), DNS queries will not be performed locally, and
+            instead, handed to the proxy to resolve.
+
+         type
+            The type of proxy you are using. Supported proxy types are: [http,
+            http_no_tunnel, socks4, socks5].
+
+         username
+            If your proxy requires authentication, the username to use when
+            connecting.
+
+     spanner
+         instance
+            The default instance to use when working with Cloud Spanner
+            resources. When an instance is required but not provided by a flag,
+            the command will fall back to this value, if set.
+
+EXAMPLES
+    To print the project property in the core section, run:
+
+        $ gcloud config get-value project
+
+    To print the zone property in the compute section, run:
+
+        $ gcloud config get-value compute/zone
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta config get-value
+

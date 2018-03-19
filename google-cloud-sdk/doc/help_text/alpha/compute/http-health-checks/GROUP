@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha compute http-health-checks - read and manipulate HTTP health
+        checks for load balanced instances
+
+SYNOPSIS
+    gcloud alpha compute http-health-checks COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read and manipulate HTTP health checks for load balanced instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create an HTTP health check to monitor load balanced instances.
+
+     delete
+        (ALPHA) Delete HTTP health checks.
+
+     describe
+        (ALPHA) Display detailed information about an HTTP health check.
+
+     list
+        (ALPHA) List Google Compute Engine health checks.
+
+     update
+        (ALPHA) Update an HTTP health check.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute http-health-checks
+        $ gcloud beta compute http-health-checks
+

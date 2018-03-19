@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_BETA_BILLING_PROJECTS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta billing projects \- manage the billing account configuration of your projects
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta billing projects\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Manage the billing account configuration of your projects.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdescribe\fR
+\fB(BETA)\fR Show detailed billing information for a project.
+
+.TP 2m
+\fBlink\fR
+\fB(BETA)\fR Link a project with a billing account.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List all active projects associated with the specified billing
+account.
+
+.TP 2m
+\fBunlink\fR
+\fB(BETA)\fR Unlink the account (if any) linked with a project.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha billing projects
+.RE
+

@@ -1,0 +1,26 @@
+NAME
+    gcloud beta compute diagnose - debugging tools for Google Compute Engine
+        virtual machine instances
+
+SYNOPSIS
+    gcloud beta compute diagnose COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Debugging tools for Google Compute Engine virtual machine instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     routes
+        (BETA) Routes to/from Google Compute Engine virtual machine instances.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

@@ -1,0 +1,67 @@
+NAME
+    gcloud docker - provides the docker CLI access to the Google Container
+        Registry
+
+SYNOPSIS
+    gcloud docker [--authorize-only, -a] [--docker-host=DOCKER_HOST]
+        [--server=SERVER,[SERVER,...], -s SERVER,[SERVER,...];
+          default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,staging-k8s.gcr.io"]
+        [GCLOUD_WIDE_FLAG ...] [-- DOCKER_ARGS ...]
+
+DESCRIPTION
+    The gcloud docker command group wraps docker commands, so that gcloud can
+    inject the appropriate fresh authentication token into requests that
+    interact with the docker registry.
+
+    All docker-specific flags are passed through to the underlying docker
+    command. A full reference of docker's command line options available after
+    -- can be found here:
+    https://docs.docker.com/engine/reference/commandline/cli/.
+
+    You may also run gcloud docker -- --help to view the docker CLI's help
+    directly.
+
+    More information on Google Container Registry can be found here:
+    https://cloud.google.com/container-registry/ and detailed documentation can
+    be found here: https://cloud.google.com/container-registry/docs/
+
+POSITIONAL ARGUMENTS
+     [-- DOCKER_ARGS ...]
+        Arguments to pass to docker.
+
+        The '--' argument must be specified between gcloud specific args on the
+        left and DOCKER_ARGS on the right.
+
+FLAGS
+     --authorize-only, -a
+        Configure docker authorization only, do not launch the docker
+        command-line.
+
+     --docker-host=DOCKER_HOST
+        The URL to connect to Docker Daemon. Format: tcp://host:port or
+        unix:///path/to/socket.
+
+     --server=SERVER,[SERVER,...], -s SERVER,[SERVER,...]; default="gcr.io,us.gcr.io,eu.gcr.io,asia.gcr.io,staging-k8s.gcr.io"
+        The address of the Google Cloud Registry.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    Pull the image 'gcr.io/google-containers/pause:1.0' from the docker
+    registry:
+
+        $ gcloud docker -- pull gcr.io/google-containers/pause:1.0
+
+    Push the image 'gcr.io/example-org/example-image:latest' to our private
+    docker registry.
+
+        $ gcloud docker -- push gcr.io/example-org/example-image:latest
+
+    Configure authentication, then simply use docker:
+
+        $ gcloud docker --authorize-only
+
+        $ docker push gcr.io/example-org/example-image:latest

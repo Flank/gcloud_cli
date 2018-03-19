@@ -1,0 +1,92 @@
+
+.TH "GCLOUD_ALPHA_PUBSUB_SUBSCRIPTIONS_SEEK" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha pubsub subscriptions seek \- this feature is part of an invite\-only release of the Cloud Pub/Sub API
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha pubsub subscriptions seek\fR \fISUBSCRIPTION\fR (\fB\-\-snapshot\fR=\fISNAPSHOT\fR\ |\ \fB\-\-time\fR=\fITIME\fR) [\fB\-\-snapshot\-project\fR=\fISNAPSHOT_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Resets a subscription's backlog to a point in time or to a given
+snapshot. This feature is part of an invitation\-only release of the underlying
+Cloud Pub/Sub API. The command will generate errors unless you have access to
+this API. This restriction should be relaxed in the near future. Please contact
+cloud\-pubsub@google.com with any questions in the meantime.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISUBSCRIPTION\fR
+Name of the subscription to affect.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-snapshot\fR=\fISNAPSHOT\fR
+The name of the snapshot. The snapshot's topic must be the same as that of the
+subscription.
+
+.TP 2m
+\fB\-\-time\fR=\fITIME\fR
+The time to seek to. Messages in the subscription that were published before
+this time are marked as acknowledged, and messages retained in the subscription
+that were published after this time are marked as unacknowledged. See $ gcloud
+topic datetimes for information on time formats.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-snapshot\-project\fR=\fISNAPSHOT_PROJECT\fR
+The name of the project the snapshot belongs to (if seeking to a snapshot). If
+not set, it defaults to the currently selected cloud project.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

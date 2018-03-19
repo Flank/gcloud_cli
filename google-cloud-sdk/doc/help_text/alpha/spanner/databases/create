@@ -1,0 +1,51 @@
+NAME
+    gcloud alpha spanner databases create - create a Cloud Spanner database
+
+SYNOPSIS
+    gcloud alpha spanner databases create (DATABASE : --instance=INSTANCE)
+        [--async] [--ddl=DDL] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a Cloud Spanner database.
+
+POSITIONAL ARGUMENTS
+     DATABASE - The Cloud Spanner database to create. The arguments in this
+     group can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: Set the property [core/project] or
+     provide the flag [--project] on the command line. This must be specified.
+
+       DATABASE
+          The ID of the database or a fully qualified identifier for the
+          database. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --instance=INSTANCE
+          The Cloud Spanner instance for the database.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --ddl=DDL
+        Semi-colon separated DDL (data definition language) statements to run
+        inside the newly created database. If there is an error in any
+        statement, the database is not created. Full DDL specification is at
+        https://cloud.google.com/spanner/docs/data-definition-language
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud spanner databases create
+        $ gcloud beta spanner databases create
+

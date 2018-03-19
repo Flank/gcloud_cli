@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha access-context-manager policies describe - show details about
+        an access policy
+
+SYNOPSIS
+    gcloud alpha access-context-manager policies describe [POLICY]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Show details about a given access policy.
+
+POSITIONAL ARGUMENTS
+     [POLICY]
+        The access level you want to show details about.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the accesscontextmanager/v1alpha API. The full
+    documentation for this API can be found at:
+    https://cloud.google.com/access-context-manager/docs/reference/rest/
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

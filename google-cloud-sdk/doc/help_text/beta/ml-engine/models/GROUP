@@ -1,0 +1,58 @@
+NAME
+    gcloud beta ml-engine models - cloud ML Engine Models commands
+
+SYNOPSIS
+    gcloud beta ml-engine models COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) A Cloud ML Engine model is a container representing an ML
+    application or service. A model may contain multiple versions which act as
+    the implementation of the service. See also:
+
+        $ gcloud beta ml-engine versions --help.
+
+    For more information, please see
+    https://cloud.google.com/ml/docs/concepts/technical-overview#model
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding to a model.
+
+     create
+        (BETA) Create a new Cloud ML Engine model.
+
+     delete
+        (BETA) Delete an existing Cloud ML Engine model.
+
+     describe
+        (BETA) Describe an existing Cloud ML Engine model.
+
+     get-iam-policy
+        (BETA) Get the IAM policy for a model.
+
+     list
+        (BETA) List existing Cloud ML Engine models.
+
+     remove-iam-policy-binding
+        (BETA) Remove a policy binding from a model.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for a model.
+
+     update
+        (BETA) Update an existing Cloud ML Engine model.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ml-engine models
+        $ gcloud alpha ml-engine models
+

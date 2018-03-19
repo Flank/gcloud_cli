@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_ALPHA_ML_PRODUCTS_CATALOGS_DELETE\-IMAGES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml products catalogs delete\-images \- delete ReferenceImages from a Cloud Product Search Catalog
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml products catalogs delete\-images\fR \fICATALOG\fR \fB\-\-product\-id\fR=\fIPRODUCT_ID\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command deletes all ReferenceImages for a given product id
+from a Cloud Product Search Catalog.
+
+Note: ReferenceImages are only marked for deletion. The ReferenceImages will
+remain in the catalog until the next time the catalog is indexed (currently
+daily). The actual image files are not deleted from Google Cloud Storage.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fICATALOG\fR
+The catalog to delete.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-product\-id\fR=\fIPRODUCT_ID\fR
+The product ID to delete ReferenceImages for. Product Id is restricted to 255
+characters including letters, numbers, underscore ( _ ) and hyphen (\-).
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete all images for product abc123 from a catalog, run:
+
+.RS 2m
+$ gcloud alpha ml products catalogs delete\-images CATALOG \e
+    \-\-product\-id abc123
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

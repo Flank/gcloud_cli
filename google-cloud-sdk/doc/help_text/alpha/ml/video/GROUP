@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha ml video - cloud ML Video-Intelligence command groups
+
+SYNOPSIS
+    gcloud alpha ml video GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Cloud ML Video-Intelligence command groups.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     operations
+        (ALPHA) Command group for working with Cloud Video Intelligence
+        operations.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     detect-explicit-content
+        (ALPHA) Detect explicit content in videos.
+
+     detect-labels
+        (ALPHA) Detect general labels for videos.
+
+     detect-shot-changes
+        (ALPHA) Detect shot changes in videos.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml video
+        $ gcloud beta ml video
+

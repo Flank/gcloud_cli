@@ -1,0 +1,91 @@
+NAME
+    gcloud beta compute backend-services remove-backend - remove a backend from
+        a backend service
+
+SYNOPSIS
+    gcloud beta compute backend-services remove-backend BACKEND_SERVICE_NAME
+        --instance-group=INSTANCE_GROUP [--global | --region=REGION]
+        [--instance-group-region=INSTANCE_GROUP_REGION
+          | --instance-group-zone=INSTANCE_GROUP_ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute backend-services remove-backend is used to
+    remove a backend from a backend service.
+
+    Before removing a backend, it is a good idea to "drain" the backend first.
+    A backend can be drained by setting its capacity scaler to zero through
+    'gcloud compute backend-services edit'.
+
+POSITIONAL ARGUMENTS
+     BACKEND_SERVICE_NAME
+        The name of the backend service to operate on.
+
+REQUIRED FLAGS
+     --instance-group=INSTANCE_GROUP
+        The name of the instance group to remove from the backend service.
+
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --global
+          If provided, it is assumed the backend service is global.
+
+       --region=REGION
+          The region of the backend service to operate on. Overrides the
+          default compute/region property value for this command invocation.
+
+     At most one of these may be specified:
+
+       --instance-group-region=INSTANCE_GROUP_REGION
+          The region of the instance group to remove from the backend service.
+          If not specified, you will be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+       --instance-group-zone=INSTANCE_GROUP_ZONE
+          The zone of the instance group to remove from the backend service. If
+          not specified and the compute/zone property isn't set, you will be
+          prompted to select a zone.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
+
+              $ gcloud config set compute/zone ZONE
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute backend-services remove-backend
+        $ gcloud alpha compute backend-services remove-backend
+

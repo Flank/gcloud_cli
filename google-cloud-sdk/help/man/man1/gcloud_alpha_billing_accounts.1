@@ -1,0 +1,75 @@
+
+.TH "GCLOUD_ALPHA_BILLING_ACCOUNTS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha billing accounts \- manage billing accounts
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha billing accounts\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Manage billing accounts.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBprojects\fR
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Manage the billing account configuration of
+your projects.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Show metadata for a billing account.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List all active billing accounts.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta billing accounts
+.RE
+

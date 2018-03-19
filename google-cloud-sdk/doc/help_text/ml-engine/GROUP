@@ -1,0 +1,54 @@
+NAME
+    gcloud ml-engine - manage Cloud ML Engine jobs and models
+
+SYNOPSIS
+    gcloud ml-engine GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The gcloud ml-engine command group lets you manage Google Cloud ML Engine
+    jobs and training models.
+
+    Cloud ML Engine is a managed service that enables you to easily build
+    machine learning models, that work on any type of data, of any size. Create
+    your model with the powerful TensorFlow framework that powers many Google
+    products, from Google Photos to Google Cloud Speech.
+
+    More information on Cloud ML Engine can be found here:
+    https://cloud.google.com/ml and detailed documentation can be found here:
+    https://cloud.google.com/ml/docs/
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     jobs
+        Cloud ML Engine Jobs commands.
+
+     local
+        Cloud ML Engine Local commands.
+
+     models
+        Cloud ML Engine Models commands.
+
+     operations
+        Manage Cloud ML Engine operations.
+
+     versions
+        Cloud ML Engine Versions commands.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     predict
+        Run Cloud ML Engine online prediction.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha ml-engine
+        $ gcloud beta ml-engine
+

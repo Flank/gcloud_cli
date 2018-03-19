@@ -1,0 +1,64 @@
+
+.TH "GCLOUD_BETA_COMPUTE_XPN_ENABLE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute xpn enable \- enable the given project as a shared VPC host
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute xpn enable\fR \fIPROJECT_ID\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR That is, after running this command, one \fBcan\fR enable another
+project to use the VPC networks shared by this project.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+ID for the project to enable as a shared VPC host
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To enable the project \f5myproject\fR as a shared VPC host, run:
+
+.RS 2m
+$ gcloud beta compute xpn enable myproject
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute xpn enable
+$ gcloud alpha compute xpn enable
+.RE
+

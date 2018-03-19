@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha compute maintenance-policies - create Google Compute Engine
+        Maintenance Policies
+
+SYNOPSIS
+    gcloud alpha compute maintenance-policies COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Currently Maintenance Policies are only available for instances.
+    Maintenance policies for instances let you define time windows in which
+    live migrations can take place.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Google Compute Engine Maintenance Policy.
+
+     delete
+        (ALPHA) Deletes a Google Compute Engine maintenance policy.
+
+     describe
+        (ALPHA) Describes a Google Compute Engine maintenance policy.
+
+     list
+        (ALPHA) List Google Compute Engine maintenance policies.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

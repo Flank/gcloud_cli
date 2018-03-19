@@ -1,0 +1,41 @@
+# Valid boolean args
+
+bool-true-lower:
+  async: true
+
+bool-true-upper:
+  async: TRUE
+
+bool-false-lower:
+  async: false
+
+bool-false-mixedcase:
+  async: False
+
+bool-on:
+  async: on
+
+bool-off:
+  async: OFF
+
+bool-yes:
+  async: Yes
+
+bool-no:
+  async: no
+
+
+# Invalid boolean args
+
+bool-xyz:
+  async: xyz
+
+bool-misspell:
+  async: fals
+
+bool-int:  # Integers not allowed
+  async: 0
+
+bool-list:
+  async: [true, false]
+

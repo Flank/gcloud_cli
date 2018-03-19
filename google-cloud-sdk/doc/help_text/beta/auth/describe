@@ -1,0 +1,28 @@
+NAME
+    gcloud beta auth describe - describes credentials
+
+SYNOPSIS
+    gcloud beta auth describe ACCOUNT_NAME [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Returns internal details about specified credentials.
+
+POSITIONAL ARGUMENTS
+     ACCOUNT_NAME
+        Name of the account to describe
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To describe existing credentials, run:
+
+        $ gcloud beta auth describe ACCOUNT_NAME
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

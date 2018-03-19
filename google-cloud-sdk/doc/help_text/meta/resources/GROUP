@@ -1,0 +1,27 @@
+NAME
+    gcloud meta resources - cloud SDK resource parser test commands
+
+SYNOPSIS
+    gcloud meta resources COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Cloud SDK resource parser test commands.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     generate
+        Cloud SDK resource test URI generator.
+
+     parse
+        Cloud SDK resource parser module tester.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

@@ -1,0 +1,63 @@
+
+.TH "GCLOUD_BETA_DATAFLOW_JOBS_EXPORT\-STEPS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dataflow jobs export\-steps \- exports information about the steps for the given job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dataflow jobs export\-steps\fR \fIJOB_ID\fR [\fB\-\-region\fR=\fIREGION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR The only currently supported format is to a GraphViz dot file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB_ID\fR
+The job ID to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION_ID\fR
+The region ID of the job's regional endpoint.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha dataflow jobs export\-steps
+.RE
+

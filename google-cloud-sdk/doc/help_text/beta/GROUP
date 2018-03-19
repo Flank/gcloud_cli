@@ -1,0 +1,202 @@
+NAME
+    gcloud beta - beta versions of gcloud commands
+
+SYNOPSIS
+    gcloud beta GROUP | COMMAND [--account=ACCOUNT]
+        [--configuration=CONFIGURATION] [--flatten=[KEY,...]] [--format=FORMAT]
+        [--help] [--project=PROJECT_ID] [--quiet, -q]
+        [--verbosity=VERBOSITY; default="warning"] [--version, -v] [-h]
+        [--log-http] [--trace-token=TRACE_TOKEN] [--no-user-output-enabled]
+
+DESCRIPTION
+    (BETA) Beta versions of gcloud commands.
+
+GLOBAL FLAGS
+     --account=ACCOUNT
+        Google Cloud Platform user account to use for invocation. Overrides the
+        default core/account property value for this command invocation.
+
+     --configuration=CONFIGURATION
+        The configuration to use for this command invocation. For more
+        information on how to use configurations, run: gcloud topic
+        configurations. You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME]
+        environment variable to set the equivalent of this flag for a terminal
+        session.
+
+     --flatten=[KEY,...]
+        Flatten name[] output resource slices in KEY into separate records for
+        each item in each slice. Multiple keys and slices may be specified.
+        This also flattens keys for --format and --filter. For example,
+        --flatten=abc.def flattens abc.def[].ghi references to abc.def.ghi. A
+        resource record containing abc.def[] with N elements will expand to N
+        records in the flattened output. This flag interacts with other flags
+        that are applied in this order: --flatten, --sort-by, --filter,
+        --limit.
+
+     --format=FORMAT
+        Sets the format for printing command output resources. The default is a
+        command-specific human-friendly output format. The supported formats
+        are: config, csv, default, diff, disable, flattened, get, json, list,
+        multi, none, object, table, text, value, yaml. For more details run $
+        gcloud topic formats.
+
+     --help
+        Display detailed help.
+
+     --project=PROJECT_ID
+        The Google Cloud Platform project name to use for this invocation. If
+        omitted, then the current project is assumed; the current project can
+        be listed using gcloud config list --format='text(core.project)' and
+        can be set using gcloud config set project PROJECTID. Overrides the
+        default core/project property value for this command invocation.
+
+     --quiet, -q
+        Disable all interactive prompts when running gcloud commands. If input
+        is required, defaults will be used, or an error will be raised.
+        Overrides the default core/disable_prompts property value for this
+        command invocation. Must be used at the beginning of commands. This is
+        equivalent to setting the environment variable
+        CLOUDSDK_CORE_DISABLE_PROMPTS to 1.
+
+     --verbosity=VERBOSITY; default="warning"
+        Override the default verbosity for this command with any of the
+        supported standard verbosity levels: debug, info, warning, error, and
+        none. Overrides the default core/verbosity property value for this
+        command invocation.
+
+     --version, -v
+        Print version information and exit. This flag is only available at the
+        global level.
+
+     -h
+        Print a summary help and exit.
+
+OTHER FLAGS
+     --log-http
+        Log all HTTP server requests and responses to stderr. Overrides the
+        default core/log_http property value for this command invocation.
+
+     --trace-token=TRACE_TOKEN
+        Token used to route traces of service requests for investigation of
+        issues. Overrides the default core/trace_token property value for this
+        command invocation.
+
+     --user-output-enabled
+        Print user intended output to the console. Overrides the default
+        core/user_output_enabled property value for this command invocation.
+        Use --no-user-output-enabled to disable.
+
+GROUPS
+    GROUP is one of the following:
+
+     app
+        (BETA) Manage your App Engine deployments.
+
+     auth
+        (BETA) Manage oauth2 credentials for the Google Cloud SDK.
+
+     bigtable
+        (BETA) Manage your Cloud Bigtable storage.
+
+     billing
+        (BETA) Manage billing accounts and associate them with projects.
+
+     compute
+        (BETA) Create and manipulate Google Compute Engine resources.
+
+     config
+        (BETA) View and edit Cloud SDK properties.
+
+     container
+        (BETA) Deploy and manage clusters of machines for running containers.
+
+     dataflow
+        (BETA) Manage Google Cloud Dataflow jobs.
+
+     dataproc
+        (BETA) Create and manage Google Cloud Dataproc clusters and jobs.
+
+     datastore
+        (BETA) Manage your Cloud Datastore indexes.
+
+     debug
+        (BETA) Commands for interacting with the Cloud Debugger.
+
+     deployment-manager
+        (BETA) Manage deployments of cloud resources.
+
+     dns
+        (BETA) Manage your Cloud DNS managed-zones and record-sets.
+
+     domains
+        (BETA) Manage domains for your Google Cloud projects.
+
+     emulators
+        (BETA) Set up your local development environment using emulators.
+
+     endpoints
+        (BETA) Create, enable and manage API services.
+
+     error-reporting
+        (BETA) Manage Stackdriver Error Reporting.
+
+     firebase
+        (BETA) Work with Google Firebase.
+
+     functions
+        (BETA) Manage Google Cloud Functions.
+
+     iam
+        (BETA) Manage IAM service accounts and keys.
+
+     iot
+        (BETA) Manage Cloud IoT resources.
+
+     kms
+        (BETA) Manage cryptographic keys in the cloud.
+
+     logging
+        (BETA) Manage Stackdriver Logging.
+
+     ml
+        (BETA) Use Google Cloud machine learning capabilities.
+
+     ml-engine
+        (BETA) Manage Cloud ML Engine jobs and models.
+
+     organizations
+        (BETA) Create and manage Google Cloud Platform Organizations.
+
+     projects
+        (BETA) Create and manage project access policies.
+
+     pubsub
+        (BETA) Manage Cloud Pub/Sub topics and subscriptions.
+
+     resource-manager
+        (BETA) Manage Cloud Resources.
+
+     runtime-config
+        (BETA) Manage runtime configuration resources.
+
+     services
+        (BETA) List, enable and disable APIs and services.
+
+     source
+        (BETA) Cloud git repository commands.
+
+     spanner
+        (BETA) Command groups for Cloud Spanner.
+
+     sql
+        (BETA) Create and manage Google Cloud SQL databases.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     init
+        (BETA) Initialize or reinitialize gcloud.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

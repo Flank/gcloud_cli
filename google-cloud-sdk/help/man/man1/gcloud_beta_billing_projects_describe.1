@@ -1,0 +1,72 @@
+
+.TH "GCLOUD_BETA_BILLING_PROJECTS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta billing projects describe \- show detailed billing information for a project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta billing projects describe\fR \fIPROJECT_ID\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command shows billing info for a project, given its ID.
+
+This call can fail for the following reasons:
+
+.RS 2m
+.IP "\(bu" 2m
+The project specified does not exist.
+.IP "\(bu" 2m
+The active user does not have permission to access the given project.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+Specify a project id.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To see detailed billing information for a project \f5my\-project\fR, run:
+
+.RS 2m
+$ gcloud beta billing projects describe my\-project
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha billing projects describe
+.RE
+

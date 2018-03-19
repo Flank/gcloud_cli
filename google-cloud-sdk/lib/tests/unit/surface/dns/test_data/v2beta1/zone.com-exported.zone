@@ -1,0 +1,24 @@
+zone.com. 3600 IN A 192.0.2.1
+zone.com. 3600 IN A 192.0.2.2
+zone.com. 3600 IN AAAA 2001:db8:10::1
+zone.com. 3600 IN MX 10 mail.zone.com.
+zone.com. 3600 IN MX 20 mail2.zone.com.
+zone.com. 3600 IN MX 50 mail3.zone.com.
+zone.com. 21600 IN NS ns-cloud1.googledomains.com.
+zone.com. 21600 IN NS ns-cloud2.googledomains.com.
+zone.com. 21600 IN NS ns-cloud3.googledomains.com.
+zone.com. 21600 IN NS ns-cloud4.googledomains.com.
+zone.com. 3600 IN SOA ns-cloud1.googledomains.com. username.zone.com. 20071207 86400 7200 2419200 3600
+zone.com. 3600 IN SPF "v=spf1 mx:zone.com -all"
+zone.com. 3600 IN SPF "v=spf2"
+zone.com. 3600 IN TXT "v=spf1 mx:zone.com -all"
+zone.com. 3600 IN TXT "v=spf2"
+2.zone.com. 600 IN PTR server.zone.com.
+hello.zone.com. 3600 IN CNAME zone.com.
+mail.zone.com. 3600 IN A 192.0.2.3
+mail2.zone.com. 3600 IN A 192.0.2.4
+mail3.zone.com. 3600 IN A 192.0.2.5
+ns.zone.com. 3600 IN A 192.0.2.2
+ns.zone.com. 3600 IN AAAA 2001:db8:10::2
+sip.zone.com. 3600 IN SRV 0 5 5060 sip.zone.com.
+wwwtest.zone.com. 3600 IN CNAME www.zone.com.

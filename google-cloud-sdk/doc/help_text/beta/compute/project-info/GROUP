@@ -1,0 +1,41 @@
+NAME
+    gcloud beta compute project-info - read and manipulate project-level data
+        like quotas and metadata
+
+SYNOPSIS
+    gcloud beta compute project-info COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate project-level data like quotas and metadata.
+
+    Note: project-level metadata is a distinct concept from instance-level
+    metadata; for details on instance metadata see:
+    https://cloud.google.com/compute/docs/storing-retrieving-metadata
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-metadata
+        (BETA) Add or update project-wide metadata.
+
+     describe
+        (BETA) Describe the Google Compute Engine project resource.
+
+     remove-metadata
+        (BETA) Remove project-wide metadata entries.
+
+     set-usage-bucket
+        (BETA) Set the usage reporting bucket for a project.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute project-info
+        $ gcloud alpha compute project-info
+

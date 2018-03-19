@@ -1,0 +1,63 @@
+
+.TH "GCLOUD_BETA_DEPLOYMENT\-MANAGER_DEPLOYMENTS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta deployment\-manager deployments describe \- provide information about a deployment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta deployment\-manager deployments describe\fR \fIDEPLOYMENT_NAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command prints out all available details about a deployment.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIDEPLOYMENT_NAME\fR
+Deployment name.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To display information about a deployment, run:
+
+.RS 2m
+$ gcloud beta deployment\-manager deployments describe my\-deployment
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud deployment\-manager deployments describe
+$ gcloud alpha deployment\-manager deployments describe
+.RE
+

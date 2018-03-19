@@ -1,0 +1,31 @@
+NAME
+    gcloud iam service-accounts update - update the metadata of an IAM service
+        account
+
+SYNOPSIS
+    gcloud iam service-accounts update SERVICE_ACCOUNT
+        [--display-name=DISPLAY_NAME] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Update the metadata of an IAM service account.
+
+POSITIONAL ARGUMENTS
+     SERVICE_ACCOUNT
+        The service account to update. The account should be formatted either
+        as a numeric service account ID or as an email, like this:
+        123456789876543212345 or my-iam-account@somedomain.com.
+
+FLAGS
+     --display-name=DISPLAY_NAME
+        The new textual name to display for the account.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta iam service-accounts update
+

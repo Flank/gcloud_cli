@@ -1,0 +1,31 @@
+NAME
+    gcloud pubsub subscriptions modify-push-config - modifies the push
+        configuration of a Cloud Pub/Sub subscription
+
+SYNOPSIS
+    gcloud pubsub subscriptions modify-push-config SUBSCRIPTION
+        --push-endpoint=PUSH_ENDPOINT [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Modifies the push configuration of a Cloud Pub/Sub subscription.
+
+POSITIONAL ARGUMENTS
+     SUBSCRIPTION
+        Name of the subscription to modify.
+
+REQUIRED FLAGS
+     --push-endpoint=PUSH_ENDPOINT
+        A URL to use as the endpoint for this subscription. This will also
+        automatically set the subscription type to PUSH.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha pubsub subscriptions modify-push-config
+        $ gcloud beta pubsub subscriptions modify-push-config
+

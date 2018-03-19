@@ -1,0 +1,179 @@
+---
+args:
+  command: alpha container images describe gcr.io/argo-integration-testing/vb-qa@sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+  specified_args:
+    --metadata-filter: kind="BUILD_DETAILS"
+    --show-all-metadata: true
+---
+state:
+  interactive_console: true
+  random_seed: 7062065865311588620
+  term_size:
+  - 147
+  - 46
+---
+properties:
+  core:
+    disable_color: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: ''
+  headers:
+    accept: application/json
+    accept-encoding: gzip, deflate
+  method: GET
+  uri: https://containeranalysis.googleapis.com/v1alpha1/projects/argo-integration-testing/occurrences?alt=json&pageSize=1000&filter=%28%28kind%3D%22BUILD_DETAILS%22%29+AND+%28kind+%3D+%22BUILD_DETAILS%22+OR+kind+%3D+%22PACKAGE_VULNERABILITY%22+OR+kind+%3D+%22IMAGE_BASIS%22+OR+kind+%3D+%22DEPLOYABLE%22%29%29+AND+%28resource_url%3D%22https%3A%2F%2Fgcr.io%2Fargo-integration-testing%2Fvb-qa%40sha256%3A1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4%22%29
+---
+response:
+  content:
+  - json:
+      occurrences:
+      - buildDetails:
+          provenance:
+            buildOptions:
+              SourceProvenanceHash: SHA256 MD5
+              VerifyOption: VERIFIED
+            builderVersion: '168652675'
+            builtArtifacts:
+            - checksum: sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+              id: gcr.io/argo-integration-testing/vb-qa@sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+              names:
+              - gcr.io/argo-integration-testing/vb-qa
+              - gcr.io/argo-integration-testing/vb-qa:latest
+            commands:
+            - args:
+              - build
+              - -t
+              - gcr.io/argo-integration-testing/vb-qa
+              - .
+              name: gcr.io/cloud-builders/docker
+            createTime: '2017-09-14T18:21:52.581084993Z'
+            creator: cloud-build-dev-bendory@system.gserviceaccount.com
+            finishTime: '2017-09-14T18:22:05.479508Z'
+            id: c5f1069c-6677-4299-a096-0dd6489a9c79
+            logsBucket: gs://402970047666-test.cloudbuild-logs.googleusercontent.com
+            projectId: argo-integration-testing
+            sourceProvenance:
+              sourceContext:
+                context:
+                  cloudRepo:
+                    repoId:
+                      projectRepoId:
+                        projectId: argo-integration-testing
+                        repoName: default
+                    revisionId: b0f9d2e0ee966f8065eb33c2e2dc3fe847089f82
+                labels:
+                  category: remote_repo
+            startTime: '2017-09-14T18:21:53.222545319Z'
+          provenanceBytes: eyJpZCI6ImM1ZjEwNjljLTY2NzctNDI5OS1hMDk2LTBkZDY0ODlhOWM3OSIsInByb2plY3RJZCI6ImFyZ28taW50ZWdyYXRpb24tdGVzdGluZyIsImNvbW1hbmRzIjpbeyJuYW1lIjoiZ2NyLmlvL2Nsb3VkLWJ1aWxkZXJzL2RvY2tlciIsImFyZ3MiOlsiYnVpbGQiLCItdCIsImdjci5pby9hcmdvLWludGVncmF0aW9uLXRlc3RpbmcvdmItcWEiLCIuIl19XSwiYnVpbHRBcnRpZmFjdHMiOlt7ImNoZWNrc3VtIjoic2hhMjU2OjFhZWI1MmNhNzU0ODIzZDFkYTE1ZWQ3NDRiNzM5Yzc0YzdjNjMzMGJhYzFlMzBlZGUxNWVjZTBjNWRjN2YxZDQiLCJpZCI6Imdjci5pby9hcmdvLWludGVncmF0aW9uLXRlc3RpbmcvdmItcWFAc2hhMjU2OjFhZWI1MmNhNzU0ODIzZDFkYTE1ZWQ3NDRiNzM5Yzc0YzdjNjMzMGJhYzFlMzBlZGUxNWVjZTBjNWRjN2YxZDQiLCJuYW1lcyI6WyJnY3IuaW8vYXJnby1pbnRlZ3JhdGlvbi10ZXN0aW5nL3ZiLXFhIiwiZ2NyLmlvL2FyZ28taW50ZWdyYXRpb24tdGVzdGluZy92Yi1xYTpsYXRlc3QiXX1dLCJjcmVhdGVUaW1lIjoiMjAxNy0wOS0xNFQxODoyMTo1Mi41ODEwODQ5OTNaIiwic3RhcnRUaW1lIjoiMjAxNy0wOS0xNFQxODoyMTo1My4yMjI1NDUzMTlaIiwiZmluaXNoVGltZSI6IjIwMTctMDktMTRUMTg6MjI6MDUuNDc5NTA4WiIsImNyZWF0b3IiOiJjbG91ZC1idWlsZC1kZXYtYmVuZG9yeUBzeXN0ZW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsImxvZ3NCdWNrZXQiOiJnczovLzQwMjk3MDA0NzY2Ni10ZXN0LmNsb3VkYnVpbGQtbG9ncy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzb3VyY2VQcm92ZW5hbmNlIjp7InNvdXJjZUNvbnRleHQiOnsiY29udGV4dCI6eyJjbG91ZFJlcG8iOnsicmVwb0lkIjp7InByb2plY3RSZXBvSWQiOnsicHJvamVjdElkIjoiYXJnby1pbnRlZ3JhdGlvbi10ZXN0aW5nIiwicmVwb05hbWUiOiJkZWZhdWx0In19LCJyZXZpc2lvbklkIjoiYjBmOWQyZTBlZTk2NmY4MDY1ZWIzM2MyZTJkYzNmZTg0NzA4OWY4MiJ9fSwibGFiZWxzIjp7ImNhdGVnb3J5IjoicmVtb3RlX3JlcG8ifX19LCJidWlsZE9wdGlvbnMiOnsiU291cmNlUHJvdmVuYW5jZUhhc2giOiJTSEEyNTYgTUQ1IiwiVmVyaWZ5T3B0aW9uIjoiVkVSSUZJRUQifSwiYnVpbGRlclZlcnNpb24iOiIxNjg2NTI2NzUifQ==
+        createTime: '2017-09-14T18:22:06.330010Z'
+        kind: BUILD_DETAILS
+        name: projects/argo-integration-testing/occurrences/1125a717-b31e-49a3-90db-fa201ef53389
+        noteName: providers/fake-project/notes/c5f1069c-6677-4299-a096-0dd6489a9c79
+        resourceUrl: https://gcr.io/argo-integration-testing/vb-qa@sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+        updateTime: '2017-09-14T18:22:06.330010Z'
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="41,39,38,37,35"
+    cache-control: private
+    content-location: https://containeranalysis.googleapis.com/v1alpha1/projects/argo-integration-testing/occurrences?alt=json&pageSize=1000&filter=%28%28kind%3D%22BUILD_DETAILS%22%29+AND+%28kind+%3D+%22BUILD_DETAILS%22+OR+kind+%3D+%22PACKAGE_VULNERABILITY%22+OR+kind+%3D+%22IMAGE_BASIS%22+OR+kind+%3D+%22DEPLOYABLE%22%29%29+AND+%28resource_url%3D%22https%3A%2F%2Fgcr.io%2Fargo-integration-testing%2Fvb-qa%40sha256%3A1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4%22%29
+    content-type: application/json; charset=UTF-8
+    date: Mon, 30 Oct 2017 19:45:23 GMT
+    server: ESF
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: ''
+  headers:
+    accept: application/json
+    accept-encoding: gzip, deflate
+  method: GET
+  uri: https://containeranalysis.googleapis.com/v1alpha1/projects/argo-integration-testing/occurrences?alt=json&pageSize=1000&filter=%28%28kind%3D%22BUILD_DETAILS%22%29+AND+%28kind+%3D+%22BUILD_DETAILS%22+OR+kind+%3D+%22PACKAGE_VULNERABILITY%22+OR+kind+%3D+%22IMAGE_BASIS%22+OR+kind+%3D+%22DEPLOYABLE%22%29+AND+kind%3D%22DEPLOYABLE%22%29
+---
+response:
+  content:
+  - json: {}
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="41,39,38,37,35"
+    cache-control: private
+    content-location: https://containeranalysis.googleapis.com/v1alpha1/projects/argo-integration-testing/occurrences?alt=json&pageSize=1000&filter=%28%28kind%3D%22BUILD_DETAILS%22%29+AND+%28kind+%3D+%22BUILD_DETAILS%22+OR+kind+%3D+%22PACKAGE_VULNERABILITY%22+OR+kind+%3D+%22IMAGE_BASIS%22+OR+kind+%3D+%22DEPLOYABLE%22%29+AND+kind%3D%22DEPLOYABLE%22%29
+    content-type: application/json; charset=UTF-8
+    date: Mon, 30 Oct 2017 19:45:24 GMT
+    server: ESF
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  stdout: |
+    build_details_summary:
+      build_details:
+      - buildDetails:
+          provenance:
+            buildOptions:
+              SourceProvenanceHash: SHA256 MD5
+              VerifyOption: VERIFIED
+            builderVersion: '168652675'
+            builtArtifacts:
+            - checksum: sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+              id: gcr.io/argo-integration-testing/vb-qa@sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+              names:
+              - gcr.io/argo-integration-testing/vb-qa
+              - gcr.io/argo-integration-testing/vb-qa:latest
+            commands:
+            - args:
+              - build
+              - -t
+              - gcr.io/argo-integration-testing/vb-qa
+              - .
+              name: gcr.io/cloud-builders/docker
+            createTime: '2017-09-14T18:21:52.581084993Z'
+            creator: cloud-build-dev-bendory@system.gserviceaccount.com
+            finishTime: '2017-09-14T18:22:05.479508Z'
+            id: c5f1069c-6677-4299-a096-0dd6489a9c79
+            logsBucket: gs://402970047666-test.cloudbuild-logs.googleusercontent.com
+            projectId: argo-integration-testing
+            sourceProvenance:
+              sourceContext:
+                context:
+                  cloudRepo:
+                    repoId:
+                      projectRepoId:
+                        projectId: argo-integration-testing
+                        repoName: default
+                    revisionId: b0f9d2e0ee966f8065eb33c2e2dc3fe847089f82
+                labels:
+                  category: remote_repo
+            startTime: '2017-09-14T18:21:53.222545319Z'
+          provenanceBytes: eyJpZCI6ImM1ZjEwNjljLTY2NzctNDI5OS1hMDk2LTBkZDY0ODlhOWM3OSIsInByb2plY3RJZCI6ImFyZ28taW50ZWdyYXRpb24tdGVzdGluZyIsImNvbW1hbmRzIjpbeyJuYW1lIjoiZ2NyLmlvL2Nsb3VkLWJ1aWxkZXJzL2RvY2tlciIsImFyZ3MiOlsiYnVpbGQiLCItdCIsImdjci5pby9hcmdvLWludGVncmF0aW9uLXRlc3RpbmcvdmItcWEiLCIuIl19XSwiYnVpbHRBcnRpZmFjdHMiOlt7ImNoZWNrc3VtIjoic2hhMjU2OjFhZWI1MmNhNzU0ODIzZDFkYTE1ZWQ3NDRiNzM5Yzc0YzdjNjMzMGJhYzFlMzBlZGUxNWVjZTBjNWRjN2YxZDQiLCJpZCI6Imdjci5pby9hcmdvLWludGVncmF0aW9uLXRlc3RpbmcvdmItcWFAc2hhMjU2OjFhZWI1MmNhNzU0ODIzZDFkYTE1ZWQ3NDRiNzM5Yzc0YzdjNjMzMGJhYzFlMzBlZGUxNWVjZTBjNWRjN2YxZDQiLCJuYW1lcyI6WyJnY3IuaW8vYXJnby1pbnRlZ3JhdGlvbi10ZXN0aW5nL3ZiLXFhIiwiZ2NyLmlvL2FyZ28taW50ZWdyYXRpb24tdGVzdGluZy92Yi1xYTpsYXRlc3QiXX1dLCJjcmVhdGVUaW1lIjoiMjAxNy0wOS0xNFQxODoyMTo1Mi41ODEwODQ5OTNaIiwic3RhcnRUaW1lIjoiMjAxNy0wOS0xNFQxODoyMTo1My4yMjI1NDUzMTlaIiwiZmluaXNoVGltZSI6IjIwMTctMDktMTRUMTg6MjI6MDUuNDc5NTA4WiIsImNyZWF0b3IiOiJjbG91ZC1idWlsZC1kZXYtYmVuZG9yeUBzeXN0ZW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsImxvZ3NCdWNrZXQiOiJnczovLzQwMjk3MDA0NzY2Ni10ZXN0LmNsb3VkYnVpbGQtbG9ncy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzb3VyY2VQcm92ZW5hbmNlIjp7InNvdXJjZUNvbnRleHQiOnsiY29udGV4dCI6eyJjbG91ZFJlcG8iOnsicmVwb0lkIjp7InByb2plY3RSZXBvSWQiOnsicHJvamVjdElkIjoiYXJnby1pbnRlZ3JhdGlvbi10ZXN0aW5nIiwicmVwb05hbWUiOiJkZWZhdWx0In19LCJyZXZpc2lvbklkIjoiYjBmOWQyZTBlZTk2NmY4MDY1ZWIzM2MyZTJkYzNmZTg0NzA4OWY4MiJ9fSwibGFiZWxzIjp7ImNhdGVnb3J5IjoicmVtb3RlX3JlcG8ifX19LCJidWlsZE9wdGlvbnMiOnsiU291cmNlUHJvdmVuYW5jZUhhc2giOiJTSEEyNTYgTUQ1IiwiVmVyaWZ5T3B0aW9uIjoiVkVSSUZJRUQifSwiYnVpbGRlclZlcnNpb24iOiIxNjg2NTI2NzUifQ==
+        createTime: '2017-09-14T18:22:06.330010Z'
+        kind: BUILD_DETAILS
+        name: projects/argo-integration-testing/occurrences/1125a717-b31e-49a3-90db-fa201ef53389
+        noteName: providers/fake-project/notes/c5f1069c-6677-4299-a096-0dd6489a9c79
+        resourceUrl: https://gcr.io/argo-integration-testing/vb-qa@sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+        updateTime: '2017-09-14T18:22:06.330010Z'
+    deployment_summary:
+      deployments: []
+    image_basis_summary:
+      base_images: []
+    image_summary:
+      digest: sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+      fully_qualified_digest: gcr.io/argo-integration-testing/vb-qa@sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+      registry: gcr.io
+      repository: argo-integration-testing/vb-qa
+    package_vulnerability_summary:
+      not_fixed_vulnerability_count: 0
+      total_vulnerability_found: 0
+      vulnerabilities: {}

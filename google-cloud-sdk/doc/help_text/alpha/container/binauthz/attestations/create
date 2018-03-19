@@ -1,0 +1,95 @@
+NAME
+    gcloud alpha container binauthz attestations create - create a Binary
+        Authorization attestation
+
+SYNOPSIS
+    gcloud alpha container binauthz attestations create
+        --artifact-url=ARTIFACT_URL --signature-file=SIGNATURE_FILE
+        [--public-key-file=PUBLIC_KEY_FILE
+          : --pgp-key-fingerprint=PGP_KEY_FINGERPRINT
+          (--attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
+          : --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT)]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command creates a Binary Authorization attestation for your
+    project. The created attestation is tied to an artifact specified in
+    command line flags.
+
+REQUIRED FLAGS
+     --artifact-url=ARTIFACT_URL
+        Container URL. May be in the .gcr.io/repository/image format, or may
+        optionally contain the http or https scheme
+
+     --signature-file=SIGNATURE_FILE
+        Path to file containing the signature to store, or - to read signature
+        from stdin.
+
+OPTIONAL FLAGS
+     Attestation parameters. At most one of these may be specified:
+
+       --public-key-file=PUBLIC_KEY_FILE
+          Path to file containing the public key to store. This flag must be
+          specified if any of the other arguments in this group are specified.
+
+       v2 (ATTESTATION_AUTHORITY) attestation parameters.
+
+         --pgp-key-fingerprint=PGP_KEY_FINGERPRINT
+            The cryptographic ID of the key used to generate the signature. For
+            Binary Authorization, this must be the version 4, full 160-bit
+            fingerprint, expressed as a 40 character hexidecimal string. See
+            https://tools.ietf.org/html/rfc4880#section-12.2 for details. When
+            using this argument, --attestation-authority-note must also be
+            passed, while --public-key-file must not be passed. This flag must
+            be specified if any of the other arguments in this group are
+            specified.
+
+         ATTESTATION AUTHORITY NOTE - The Container Analysis
+         ATTESTATION_AUTHORITY Note that the created attestation will be bound
+         to. This note must exist and the active gcloud account (core/account)
+         must have the containeranalysis.notes.attachOccurrence permission for
+         the note resource (usually via the containeranalysis.notes.attacher
+         role). The arguments in this group can be used to specify the
+         attributes of this resource. This must be specified.
+
+           --attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
+              The ID of the note or a fully qualified identifier for the note.
+              This flag must be specified if any of the other arguments in this
+              group are specified.
+
+           --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT
+              The Container Analysis provider project for the note.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a v1 attestation (kind=BUILD_DETAILS) by associating a signature
+    to an artifact, run:
+
+        $ gcloud alpha container binauthz attestations create \
+            --artifact-url='gcr.io/example-project/example-image@sha256:abcd' \
+            --signature-file=signed_artifact_attestation.pgp.sig \
+            --public-key-file=my_public_key.pgp.pub
+
+    To create a v2 attestation (kind=ATTESTATION_AUTHORITY) as the attestation
+    authority represented by an ATTESTATION_AUTHORITY note with resource path
+    "providers/exmple-prj/notes/note-id" by associating a signature to an
+    artifact, run:
+
+        $ gcloud alpha container binauthz attestations create \
+            --artifact-url='gcr.io/example-project/example-image@sha256:abcd' \
+            --attestation-authority-note=providers/exmple-prj/notes/note-id \
+            --signature-file=signed_artifact_attestation.pgp.sig \
+            --pgp-key-fingerprint=AAAA0000000000000000FFFFFFFFFFFFFFFFFFFF
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

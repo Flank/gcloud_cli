@@ -1,0 +1,49 @@
+NAME
+    gcloud debug snapshots - commands for interacting with Cloud Debugger
+        snapshots
+
+SYNOPSIS
+    gcloud debug snapshots COMMAND [--target=(ID|DESCRIPTION_REGEXP)]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Commands to interact with debug snapshots. Snapshots allow you to capture
+    stack traces and local variables from running services without interfering
+    with the normal function of the service.
+
+FLAGS
+     --target=(ID|DESCRIPTION_REGEXP)
+        The debug target. It may be a target ID or name obtained from 'debug
+        targets list', or it may be a regular expression uniquely specifying a
+        debuggee based on its description or name. For App Engine projects, if
+        not specified, the default target is the most recent deployment of the
+        default module and version.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create debug snapshots.
+
+     delete
+        Delete debug snapshots.
+
+     describe
+        Describe debug snapshots.
+
+     list
+        List debug snapshots.
+
+     wait
+        Wait for debug snapshots to complete.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta debug snapshots
+

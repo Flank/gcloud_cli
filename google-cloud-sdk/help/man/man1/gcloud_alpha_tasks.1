@@ -1,0 +1,106 @@
+
+.TH "GCLOUD_ALPHA_TASKS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha tasks \- manage Cloud Tasks queues and tasks
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha tasks\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Manage Cloud Tasks queues and tasks.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBlocations\fR
+\fB(ALPHA)\fR Get information about Cloud Tasks locations.
+
+.TP 2m
+\fBqueues\fR
+\fB(ALPHA)\fR Manage Cloud Tasks queues.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBacknowledge\fR
+\fB(ALPHA)\fR Acknowledge the lease on a task in a pull queue.
+
+.TP 2m
+\fBcancel\-lease\fR
+\fB(ALPHA)\fR Cancel the lease on a task in a pull queue.
+
+.TP 2m
+\fBcreate\-app\-engine\-task\fR
+\fB(ALPHA)\fR Create and add a task to an App Engine queue.
+
+.TP 2m
+\fBcreate\-pull\-task\fR
+\fB(ALPHA)\fR Create and add a task to a pull queue.
+
+.TP 2m
+\fBdelete\fR
+\fB(ALPHA)\fR Delete a task from a queue.
+
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Show details about a task.
+
+.TP 2m
+\fBlease\fR
+\fB(ALPHA)\fR Leases a list of tasks and displays them.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List tasks.
+
+.TP 2m
+\fBrenew\-lease\fR
+\fB(ALPHA)\fR Renew the lease on a task in a pull queue.
+
+.TP 2m
+\fBrun\fR
+\fB(ALPHA)\fR Force a task to run now.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

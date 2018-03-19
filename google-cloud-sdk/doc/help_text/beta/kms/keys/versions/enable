@@ -1,0 +1,44 @@
+NAME
+    gcloud beta kms keys versions enable - enable a given version
+
+SYNOPSIS
+    gcloud beta kms keys versions enable VERSION [--key=KEY]
+        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Enables the specified version within the given key.
+
+    Only a version which is Disabled can be Enabled.
+
+POSITIONAL ARGUMENTS
+     VERSION
+        Name of the version to enable.
+
+FLAGS
+     --key=KEY
+        The containing key.
+
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command enables version 3 of key frodo within keyring
+    fellowship and location us-east1:
+
+        $ gcloud beta kms keys versions enable 3 --location us-east1 \
+            --keyring fellowship --key frodo
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud kms keys versions enable
+

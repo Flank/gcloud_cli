@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha source repos set-iam-policy - set the IAM policy for the named
+        repository
+
+SYNOPSIS
+    gcloud alpha source repos set-iam-policy REPOSITORY_NAME POLICY_FILE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command sets the IAM policy for the given repository from the
+    policy in the provided file.
+
+POSITIONAL ARGUMENTS
+     REPOSITORY_NAME
+        Name of the repository.
+
+     POLICY_FILE
+        JSON or YAML file with IAM policy. See
+        https://cloud.google.com/resource-manager/reference/rest/Shared.Types/Policy
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To set the IAM policy, issue the following command:
+
+        $ gcloud alpha source repos set-iam-policy REPOSITORY_NAME \
+            POLICY_FILE
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud source repos set-iam-policy
+        $ gcloud beta source repos set-iam-policy
+

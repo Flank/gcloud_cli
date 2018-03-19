@@ -1,0 +1,10 @@
+---
+# First document
+xxx:
+  type: robo
+---
+# An empty document
+---
+yyy:
+  type: instrumentation
+

@@ -1,0 +1,169 @@
+<html>
+<head>
+<title>gcloud markdown markdown-command</title>
+<style>
+  code { color: green; }
+</style>
+<script>
+  window.onload = function() {
+    if (parent.navigation.navigate) {
+      parent.navigation.navigate(document.location.href);
+    }
+  }
+</script>
+<!--
+        THIS DOC IS GENERATED.  DO NOT EDIT.
+  -->
+<style>
+  dd {
+    margin-bottom: 1ex;
+  }
+  li {
+    margin-top: 1ex; margin-bottom: 1ex;
+  }
+  .hangingindent {
+    padding-left: 1.5em;
+    text-indent: -1.5em;
+  }
+  .normalfont {
+    font-weight: normal;
+  }
+  .notopmargin {
+    margin-top: 0em;
+  }
+  .sectionbody {
+    margin-top: .2em;
+  }
+</style>
+</head>
+<body>
+<dl>
+
+<dt><h4>NAME</h4></dt>
+<dd class="sectionbody">
+<dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
+gcloud markdown markdown-command - markdown command docstring index
+</span></dt></dl>
+</dd>
+
+<dt><h4>SYNOPSIS</h4></dt>
+<dd class="sectionbody">
+<dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
+<code>gcloud markdown markdown-command</code> <nobr>[[<code><var>USER</var></code>@]<code><var>INSTANCE</var></code>:]</nobr><code><var>SRC</var></code> <nobr>[[[<code><var>USER</var></code>@]<code><var>INSTANCE</var></code>:]<code><var>SRC</var></code> &hellip;]</nobr> <nobr>[[<code><var>USER</var></code>@]<code><var>INSTANCE</var></code>:]</nobr><code><var>DEST</var></code> <nobr>[<code><var>USER</var></code>@]</nobr><code><var>INSTANCE</var></code> <nobr>[<code>--dict-flag</code> [<code><var>ITEM</var></code>,&hellip;]; default="aaa=1,bbb=22,ccc=aha"]</nobr> <nobr>[<code>--false-flag</code>]</nobr> <nobr>[<code>--list-flag</code> [<code><var>ITEM</var></code>,&hellip;]; default="aaa,bbb,ccc"]</nobr> <nobr>[<code>--optional-flag</code> <code><var>OPTIONAL_FLAG</var></code>]</nobr> <nobr>[<code>--question-flag</code> <code><var>QUESTION_FLAG</var></code>]</nobr> <nobr>[<code>--root-flag</code> <code><var>ROOT_PATH</var></code>; default="/"]</nobr> <nobr>[<code>--true-flag</code>]</nobr> <nobr>[<code>--value-flag</code> <code><var>VALUE_FLAG</var></code>; default="VALUE"]</nobr> <nobr>[<code><var>GLOBAL-FLAG &hellip;</var></code>]</nobr> <nobr>[-- <code><var>IMPLEMENTATION-ARGS</var></code> &hellip;]</nobr>
+</span></dt></dl>
+</dd>
+
+<dt><h4>DESCRIPTION</h4></dt>
+<dd class="sectionbody">
+Markdown command docstring description. This is a markdown test. If you change
+the docstrings or help strings or argparse flags or argparse positionals in this
+file you should get test regressions. Use gcloud markdown foo. Don't forget the
+<code><code><var>MAGIC_SAUCE@FOO_BAR.COM</var></code></code> arg.
+</dd>
+
+<dt><h4>POSITIONAL ARGUMENTS</h4></dt>
+<dd class="sectionbody">
+<dl class="notopmargin">
+<dt id="USER"><span class="normalfont">[[<code><var>USER</var></code>@]<code><var>INSTANCE</var></code>:]<code><var>SRC</var></code> [[[<code><var>USER</var></code>@]<code><var>INSTANCE</var></code>:]<code><var>SRC</var></code> &hellip;]</span></dt>
+<dd>
+Specifies a source file.
+</dd>
+<dt id="USER-1"><span class="normalfont">[[<code><var>USER</var></code>@]<code><var>INSTANCE</var></code>:]<code><var>DEST</var></code></span></dt>
+<dd>
+Specifies a destination for the source files.
+</dd>
+<dt id="USER-2"><span class="normalfont">[<code><var>USER</var></code>@]<code><var>INSTANCE</var></code></span></dt>
+<dd>
+Specifies the instance to SSH into.
+<p>
+<code><code><var>USER</var></code></code> specifies the username with which to
+SSH. If omitted, $USER from the environment is selected.
+</dd>
+<dt id="IMPLEMENTATION-ARGS"><span class="normalfont">[-- <code><var>IMPLEMENTATION-ARGS</var></code> &hellip;]</span></dt>
+<dd>
+Flags and positionals passed to the underlying ssh implementation.
+<p>
+The '--' argument must be specified between gcloud specific args on the left and
+IMPLEMENTATION-ARGS on the right. Example:
+<p><code>
+&nbsp;&nbsp;$ <a href=".._markdown_markdown-command.html">gcloud markdown markdown-command</a> example-instance \<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--zone us-central1-a -- -vvv -L 80:%INSTANCE%:80<br>
+</code>
+
+</dd>
+</dl>
+</dd>
+
+<dt><h4>FLAGS</h4></dt>
+<dd class="sectionbody">
+<dl class="notopmargin">
+<dt id="--dict-flag"><span class="normalfont"><code>--dict-flag</code> [<code><var>ITEM</var></code>,&hellip;]; default="aaa=1,bbb=22,ccc=aha"</span></dt>
+<dd>
+Command star flag help.
+</dd>
+<dt id="--false-flag"><span class="normalfont"><code>--false-flag</code></span></dt>
+<dd>
+Command false flag detailed help.
+</dd>
+<dt id="--list-flag"><span class="normalfont"><code>--list-flag</code> [<code><var>ITEM</var></code>,&hellip;]; default="aaa,bbb,ccc"</span></dt>
+<dd>
+Command star flag help.
+</dd>
+<dt id="--question-flag"><span class="normalfont"><code>--question-flag</code> <code><var>QUESTION_FLAG</var></code></span></dt>
+<dd>
+Command question flag help.
+</dd>
+<dt id="--root-flag"><span class="normalfont"><code>--root-flag</code> <code><var>ROOT_PATH</var></code>; default="/"</span></dt>
+<dd>
+Command value flag help.
+</dd>
+<dt id="--true-flag"><span class="normalfont"><code>--true-flag</code></span></dt>
+<dd>
+Command true flag help.
+</dd>
+<dt id="--value-flag"><span class="normalfont"><code>--value-flag</code> <code><var>VALUE_FLAG</var></code>; default="VALUE"</span></dt>
+<dd>
+Command value flag help.
+</dd>
+</dl>
+</dd>
+
+<dt><h4>GROUP FLAGS</h4></dt>
+<dd class="sectionbody">
+<dl class="notopmargin">
+<dt id="--optional-flag"><span class="normalfont"><code>--optional-flag</code> <code><var>OPTIONAL_FLAG</var></code></span></dt>
+<dd>
+Optional flag.
+</dd>
+</dl>
+</dd>
+
+<dt><h4>GLOBAL FLAGS</h4></dt>
+<dd class="sectionbody">
+Run <code>$ <a href=".._.html">gcloud</a> help</code> for a description of flags
+available to all commands.
+</dd>
+
+<dt><h4>EXAMPLES</h4></dt>
+<dd class="sectionbody">
+To foo the command run:
+<p><code>
+&nbsp;&nbsp;$ <a href=".._markdown_markdown-command_list.html">gcloud markdown markdown-command list</a> --foo<br>
+</code>
+
+<p>
+To bar the parent command run:
+<p><code>
+&nbsp;&nbsp;$ <a href=".._markdown.html">gcloud markdown</a> --bar list<br>
+</code>
+
+</dd>
+
+<dt><h4>NOTES</h4></dt>
+<dd class="sectionbody">
+A special note.
+</dd>
+
+</dl>
+</body>
+</html>

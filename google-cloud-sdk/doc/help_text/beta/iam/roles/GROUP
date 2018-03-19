@@ -1,0 +1,44 @@
+NAME
+    gcloud beta iam roles - create and manipulate roles
+
+SYNOPSIS
+    gcloud beta iam roles COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create and manipulate roles.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     copy
+        (BETA) Create a role from an existing role.
+
+     create
+        (BETA) Create a custom role for a project or an organization.
+
+     delete
+        (BETA) Delete a custom role from an organization or a project.
+
+     describe
+        (BETA) Show metadata for a role.
+
+     list
+        (BETA) List the roles defined at a parent organization or a project.
+
+     undelete
+        (BETA) Undelete a custom role from an organization or a project.
+
+     update
+        (BETA) Update an IAM custom role.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud iam roles
+

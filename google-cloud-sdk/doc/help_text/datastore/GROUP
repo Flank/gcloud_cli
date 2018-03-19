@@ -1,0 +1,60 @@
+NAME
+    gcloud datastore - manage your Cloud Datastore indexes
+
+SYNOPSIS
+    gcloud datastore GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The gcloud datastore command group lets you create and delete Google Cloud
+    Datastore indexes.
+
+    Cloud Datastore is a highly-scalable NoSQL database for your applications.
+    Cloud Datastore automatically handles sharding and replication, providing
+    you with a highly available and durable database that scales automatically
+    to handle your applications' load.
+
+    More information on Cloud Datastore can be found here:
+    https://cloud.google.com/datastore and detailed documentation can be found
+    here: https://cloud.google.com/datastore/docs
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     operations
+        Manage Long Running Operations for Cloud Datastore.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cleanup-indexes
+        Remove unused datastore indexes based on your local index
+        configuration.
+
+     create-indexes
+        Create new datastore indexes based on your local index configuration.
+
+     export
+        Export Cloud Datastore entities to Google Cloud Storage.
+
+     import
+        Import Cloud Datastore entities from Google Cloud Storage.
+
+EXAMPLES
+    To create new indexes from a file, run:
+
+        $ gcloud datastore create-indexes index.yaml
+
+    To clean up unused indexes from a file, run:
+
+        $ gcloud datastore cleanup-indexes index.yaml
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta datastore
+

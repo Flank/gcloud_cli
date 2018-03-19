@@ -1,0 +1,40 @@
+NAME
+    gcloud meta apis regen - regenerate given API(s) in gcloud
+
+SYNOPSIS
+    gcloud meta apis regen API [--api-discovery-doc=API_DISCOVERY_DOC]
+        [--base-dir=BASE_DIR] [--config=CONFIG] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Regenerate given API(s) in gcloud.
+
+POSITIONAL ARGUMENTS
+     API
+        The APIs to regenerate in api_name/api_version format. These can be
+        filename glob expressions to regenerate multiple apis. For example */*
+        to regegenerate all apis and versions, or */beta to only regenerate
+        existing beta apis. Note that if discovery doc is supplied this cannot
+        contain any wildcards.
+
+FLAGS
+     --api-discovery-doc=API_DISCOVERY_DOC
+        Path to json file describing the api. If not specified, an existing
+        discovery doc will be used.
+
+     --base-dir=BASE_DIR
+        Directory where generated code will be written. By default
+        googlecloudsdk/third_party/apis.
+
+     --config=CONFIG
+        Regeneration config yaml filename. If not specified canonical config
+        will be used.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

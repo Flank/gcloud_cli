@@ -1,0 +1,81 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_BACKEND\-SERVICES_DELETE\-SIGNED\-URL\-KEY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute backend\-services delete\-signed\-url\-key \- delete Cloud CDN Signed URL key from a backend service
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute backend\-services delete\-signed\-url\-key\fR \fIBACKEND_SERVICE_NAME\fR \fB\-\-key\-name\fR=\fIKEY_NAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute backend\-services
+delete\-signed\-url\-key\fR is used to delete an existing Cloud CDN Signed URL
+key from a backend service.
+
+Cloud CDN Signed URLs give you a way to serve responses from the globally
+distributed CDN cache, even if the request needs to be authorized.
+
+Signed URLs are a mechanism to temporarily give a client access to a private
+resource without requiring additional authorization. To achieve this, the full
+request URL that should be allowed is hashed and cryptographically signed. By
+using the signed URL you give it, that one request will be considered authorized
+to receive the requested content.
+
+Generally, a signed URL can be used by anyone who has it. However, it is usually
+only intended to be used by the client that was directly given the URL. To
+mitigate this, they expire at a time chosen by the issuer. To minimize the risk
+of a signed URL being shared, we recommend that you set it to expire as soon as
+possible.
+
+A 128\-bit secret key is used for signing the URLs.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIBACKEND_SERVICE_NAME\fR
+The name of the backend service to operate on.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-key\-name\fR=\fIKEY_NAME\fR
+Name of the Cloud CDN Signed URL key.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

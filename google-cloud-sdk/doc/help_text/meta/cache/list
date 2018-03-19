@@ -1,0 +1,63 @@
+NAME
+    gcloud meta cache list - list the tables or table contents in a persistent
+        cache
+
+SYNOPSIS
+    gcloud meta cache list [TABLES ...]
+        [--cache=CACHE_NAME; default="resource://"] [--filter=EXPRESSION]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List the tables or table contents in a persistent cache.
+
+POSITIONAL ARGUMENTS
+     [TABLES ...]
+        The table names or name patterns to list, where ? matches any character
+        and * matches any string of zero or more characters. If omitted then a
+        table of all tables is displayed.
+
+FLAGS
+     --cache=CACHE_NAME; default="resource://"
+        The cache name to operate on. May be prefixed by "resource://" for
+        resource cache names. If only the prefix is specified then the default
+        cache name for that prefix is used.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True then that item is listed. For more
+        details and examples of filter expressions run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        The maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
+
+     --sort-by=[FIELD,...]
+        A comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+     --uri
+        Print a list of resource URIs instead of the default output.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

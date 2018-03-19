@@ -1,0 +1,181 @@
+NAME
+    gcloud compute backend-services update-backend - update an existing backend
+        in a backend service
+
+SYNOPSIS
+    gcloud compute backend-services update-backend BACKEND_SERVICE_NAME
+        --instance-group=INSTANCE_GROUP [--balancing-mode=BALANCING_MODE]
+        [--capacity-scaler=CAPACITY_SCALER] [--description=DESCRIPTION]
+        [--max-utilization=MAX_UTILIZATION] [--global | --region=REGION]
+        [--instance-group-region=INSTANCE_GROUP_REGION
+          | --instance-group-zone=INSTANCE_GROUP_ZONE]
+        [--max-connections=MAX_CONNECTIONS
+          | --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
+          | --max-rate=MAX_RATE
+          | --max-rate-per-instance=MAX_RATE_PER_INSTANCE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute backend-services update-backend updates a backend that is
+    part of a backend service. This is useful for changing the way a backend
+    behaves. Example changes that can be made include changing the load
+    balancing policy and draining a backend by setting its capacity scaler to
+    zero.
+
+    Backends are named by their associated instances groups, and one of the
+    --group or --instance-group flags is required to identify the backend that
+    you are modifying. You cannot "change" the instance group associated with a
+    backend, but you can accomplish something similar with backend-services
+    remove-backend and backend-services add-backend.
+
+    gcloud compute backend-services edit can also be used to update a backend
+    if the use of a text editor is desired.
+
+POSITIONAL ARGUMENTS
+     BACKEND_SERVICE_NAME
+        The name of the backend service to operate on.
+
+REQUIRED FLAGS
+     --instance-group=INSTANCE_GROUP
+        The name of the instance group to update the backend service.
+
+OPTIONAL FLAGS
+     --balancing-mode=BALANCING_MODE
+        Defines the strategy for balancing load. BALANCING_MODE must be one of:
+
+         CONNECTION
+            Spreads load based on how many concurrent connections the group can
+            handle. There are two ways to specify max connections:
+            --max-connections which defines the max number of connections for
+            the whole group or --max-connections-per-instance, which defines
+            the max number of connections on a per-instance basis. Available
+            for all services.
+         RATE
+            Spreads load based on how many requests per second (RPS) the group
+            can handle. There are two ways to specify max RPS: --max-rate which
+            defines the max RPS for the whole group or --max-rate-per-instance,
+            which defines the max RPS on a per-instance basis. Available only
+            for HTTP based protocols.
+         UTILIZATION
+            Relies on the CPU utilization of the instances in the group when
+            balancing load. Use --max-utilization to set a maximum target CPU
+            utilization for each instance. Use --max-rate-per-instance or
+            --max-rate to optionally limit based on RPS in addition to CPU. You
+            can optionally also limit based on connections (for TCP/SSL) in
+            addition to CPU by setting --max-connections or
+            --max-connections-per-instance. Available for all services without
+            --load-balancing-scheme INTERNAL.
+
+     --capacity-scaler=CAPACITY_SCALER
+        A setting that applies to all balancing modes. This value is multiplied
+        by the balancing mode value to set the current max usage of the
+        instance group. Acceptable values are 0.0 (0%) through 1.0 (100%).
+        Setting this value to 0.0 (0%) drains the backend service. Note that
+        draining a backend service only prevents new connections to instances
+        in the group. All existing connections are allowed to continue until
+        they close by normal means.
+
+     --description=DESCRIPTION
+        An optional, textual description for the backend.
+
+     --max-utilization=MAX_UTILIZATION
+        The maximum average CPU utilization of the backend service. Acceptable
+        values are 0.0 (0%) through 1.0 (100%). This flag can only be provided
+        when the balancing mode is UTILIZATION.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, it is assumed the backend service is global.
+
+       --region=REGION
+          The region of the backend service to operate on. Overrides the
+          default compute/region property value for this command invocation.
+
+     At most one of these may be specified:
+
+       --instance-group-region=INSTANCE_GROUP_REGION
+          The region of the instance group to update the backend service. If
+          not specified, you will be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+       --instance-group-zone=INSTANCE_GROUP_ZONE
+          The zone of the instance group to update the backend service. If not
+          specified and the compute/zone property isn't set, you will be
+          prompted to select a zone.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
+
+              $ gcloud config set compute/zone ZONE
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
+
+     At most one of these may be specified:
+
+       --max-connections=MAX_CONNECTIONS
+          Maximum concurrent connections that the group can handle. Valid only
+          for TCP/SSL connections.
+
+       --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
+          The maximum concurrent connections per instance. Valid only for
+          TCP/SSL connections.
+
+       --max-rate=MAX_RATE
+          Maximum number of requests per second that can be sent to the
+          instance group. Must not be used with Autoscaled Managed Instance
+          Groups. --max-rate and --max-rate-per-instance are mutually
+          exclusive. However, one of them can be set even if --balancing-mode
+          is set to UTILIZATION. If either --max-rate or
+          --max-rate-per-instance is set and --balancing-mode is set to RATE,
+          then only that value is considered when judging capacity. If either
+          --max-rate or --max-rate-per-instance is set and --balancing-mode is
+          set to UTILIZATION, then instances are judged to be at capacity when
+          either the UTILIZATION or RATE value is reached.
+
+       --max-rate-per-instance=MAX_RATE_PER_INSTANCE
+          Maximum number of requests per second that can be sent to each
+          instance in the instance group. --max-rate and
+          --max-rate-per-instance are mutually exclusive. However, one of them
+          can be set even if --balancing-mode is set to UTILIZATION. If either
+          --max-rate or --max-rate-per-instance is set and --balancing-mode is
+          set to RATE, then only that value is considered when judging
+          capacity. If either --max-rate or --max-rate-per-instance is set and
+          --balancing-mode is set to UTILIZATION, then instances are judged to
+          be at capacity when either the UTILIZATION or RATE value is reached.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute backend-services update-backend
+        $ gcloud beta compute backend-services update-backend
+

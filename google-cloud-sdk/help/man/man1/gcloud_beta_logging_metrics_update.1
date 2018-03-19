@@ -1,0 +1,120 @@
+
+.TH "GCLOUD_BETA_LOGGING_METRICS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta logging metrics update \- updates the definition of a logs\-based metric
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta logging metrics update\fR \fIMETRIC_NAME\fR (\fB\-\-config\-from\-file\fR=\fICONFIG_FROM_FILE\fR\ |\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-log\-filter\fR=\fILOG_FILTER\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Updates the description or the filter expression of an existing
+logs\-based metric.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIMETRIC_NAME\fR
+The name of the log\-based metric to update.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Data about the metric to update. Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-config\-from\-file\fR=\fICONFIG_FROM_FILE\fR
+A path to a YAML file specifying the updates to be made to the logs\-based
+metric.
+
+.TP 2m
+
+Arguments to specify information about simple counter logs\-based metrics.
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A new description for the metric. If omitted, the description is not changed.
+
+.TP 2m
+\fB\-\-log\-filter\fR=\fILOG_FILTER\fR
+A new filter string for the metric. If omitted, the filter is not changed.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update the description of a metric called high_severity_count, run:
+
+.RS 2m
+$ gcloud beta logging metrics update high_severity_count \e
+    \-\-description="Count of high\-severity log entries."
+.RE
+
+To update the filter expression of the metric, run:
+
+.RS 2m
+$ gcloud beta logging metrics update high_severity_count \e
+    \-\-log\-filter="severity >= WARNING"
+.RE
+
+Detailed information about filters can be found at:
+https://cloud.google.com/logging/docs/view/advanced_filters
+
+For advanced features such as user\-defined labels and distribution metrics,
+update using a config file:
+
+.RS 2m
+$ gcloud beta logging metrics update high_severity_count \e
+    \-\-config\-from\-file=$PATH_TO_FILE
+.RE
+
+The config file should be in YAML format. Detailed information about how to
+configure metrics can be found at:
+https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.metrics#LogMetric.
+Any top\-level fields in the LogMetric definition that aren't specified in the
+config file will not be updated in the metric.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud logging metrics update
+.RE
+

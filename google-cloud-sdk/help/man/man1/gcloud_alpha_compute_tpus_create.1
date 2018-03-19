@@ -1,0 +1,122 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_TPUS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute tpus create \- create a new Cloud TPU
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute tpus create\fR \fITPU_ID\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="tpu\-v2"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fITPU_ID\fR
+Name of the TPU.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-range\fR=\fIRANGE\fR
+CIDR Range for the TPU. The IP range that the TPU will select an IP address
+from. Must be in CIDR notation and a \f5/29\fR range, for example
+\f5192.168.0.0/29\fR. Errors will occur if the CIDR range has already been used
+for a currently existing TPU, the CIDR range conflicts with any networks in the
+user's provided network, or the provided network is peered with another network
+that is using that CIDR range.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+TensorFlow version for the TPU, such as \f51.6\fR. For a list of available
+TensorFlow versions please see https://www.tensorflow.org/versions/.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR; default="tpu\-v2"
+TPU accelerator type for the TPU. If not specified, this defaults to
+\f5tpu\-v2\fR.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Specifies a text description of the TPU.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Specifies the network that this TPU will be a part of. If not specified, this
+defaults to the \f5default\fR network.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the tpu to create. Zone in which TPU lives. If not specified, will
+use default compute/zone.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a TPU with ID \f5my\-tpu\fR and CIDR range
+\f510.240.0.0/29\fR in the default user project, network and compute/region
+(with other defaults supplied by API):
+
+.RS 2m
+$ gcloud alpha compute tpus create  my\-tpu \-\-range 10.240.0.0/29
+.RE
+
+
+The following command creates a TPU with ID \f5my\-tpu\fR with explicit values
+for all required and optional parameters:
+
+.RS 2m
+$ gcloud alpha compute tpus create my\-tpu \e
+    \-\-zone us\-central1\-a \e
+    \-\-range '10.240.0.0/29' \e
+    \-\-accelerator\-type 'tpu\-v2' \e
+    \-\-network my\-tf\-network \e
+    \-\-description 'My TF Node' \e
+    \-\-version '1.1'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute tpus create
+.RE
+

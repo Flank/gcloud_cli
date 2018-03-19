@@ -1,0 +1,40 @@
+NAME
+    gcloud beta dataproc jobs delete - delete the record of an inactive job
+
+SYNOPSIS
+    gcloud beta dataproc jobs delete JOB [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Delete the record of an inactive job.
+
+POSITIONAL ARGUMENTS
+     JOB
+        The ID of the job to delete.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To delete the record of a job, run:
+
+        $ gcloud beta dataproc jobs delete job_id
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc jobs delete
+

@@ -1,0 +1,10 @@
+imports:
+- path: https://www.google.com/simple.jinja
+  name: simple.jinja
+- path: https://www.google.com/simple.jinja
+  name: simple.jinja
+
+resources:
+- type: blah
+  name: foobar
+

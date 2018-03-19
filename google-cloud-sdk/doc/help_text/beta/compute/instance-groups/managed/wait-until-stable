@@ -1,0 +1,56 @@
+NAME
+    gcloud beta compute instance-groups managed wait-until-stable - waits until
+        state of managed instance group is stable
+
+SYNOPSIS
+    gcloud beta compute instance-groups managed wait-until-stable NAME
+        [--timeout=TIMEOUT] [--region=REGION | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Waits until state of managed instance group is stable.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the managed instance group to operate on.
+
+FLAGS
+     --timeout=TIMEOUT
+        Timeout in seconds for waiting for group becoming stable.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to operate on. If not
+          specified, you will be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          The zone of the managed instance group to operate on. If not
+          specified, you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute instance-groups managed wait-until-stable
+        $ gcloud alpha compute instance-groups managed wait-until-stable
+

@@ -1,0 +1,290 @@
+
+.TH "GCLOUD_BETA_COMPUTE_INSTANCES_UPDATE\-CONTAINER" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute instances update\-container \- updates Google Compute engine virtual machine instances running container     images
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute instances update\-container\fR \fIINSTANCE_NAME\fR [\fB\-\-container\-image\fR=\fICONTAINER_IMAGE\fR] [\fB\-\-container\-privileged\fR] [\fB\-\-container\-restart\-policy\fR=\fIPOLICY\fR] [\fB\-\-container\-stdin\fR] [\fB\-\-container\-tty\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-container\-args\fR\ |\ \fB\-\-container\-arg\fR=\fICONTAINER_ARG\fR] [\fB\-\-clear\-container\-command\fR\ |\ \fB\-\-container\-command\fR=\fICONTAINER_COMMAND\fR] [\fB\-\-container\-env\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]\ \fB\-\-container\-env\-file\fR=\fICONTAINER_ENV_FILE\fR\ \fB\-\-remove\-container\-env\fR=[\fIKEY\fR,...]] [\fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]\ \fB\-\-container\-mount\-tmpfs\fR=[\fImount\-path\fR=\fIMOUNTPATH\fR,...]\ \fB\-\-remove\-container\-mounts\fR=[\fIMOUNTPATH\fR[,\fIMOUNTPATH\fR,...],...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute instances update\-container\fR updates
+Google Compute Engine virtual machines that runs a Docker image. For example:
+
+.RS 2m
+$ gcloud beta compute instances update\-container instance\-1 \e
+    \-\-zone us\-central1\-a         \e
+    \-\-container\-image=gcr.io/google\-containers/busybox
+.RE
+
+updates an instance called instance\-1, in the us\-central1\-a zone, to run the
+\'busybox' image.
+
+For more examples, refer to the \fBEXAMPLES\fR section below.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINSTANCE_NAME\fR
+The name of the instance to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-container\-image\fR=\fICONTAINER_IMAGE\fR
+Sets container image in the declaration to the specified value.
+
+Empty string is not allowed.
+
+.TP 2m
+\fB\-\-container\-privileged\fR
+Sets permission to run container to the specified value.
+
+.TP 2m
+\fB\-\-container\-restart\-policy\fR=\fIPOLICY\fR
+Sets container restart policy to the specified value. \fIPOLICY\fR must be one
+of: \fBnever\fR, \fBon\-failure\fR, \fBalways\fR.
+
+.TP 2m
+\fB\-\-container\-stdin\fR
+Sets configuration whether to keep container \f5STDIN\fR always open to the
+specified value.
+
+.TP 2m
+\fB\-\-container\-tty\fR
+Sets configuration whether to allocate a pseudo\-TTY for the container to the
+specified value.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the instance to update. If not specified, you may be prompted to
+select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
+resources in your project. If the zone cannot be determined, you will then be
+prompted with all Google Cloud Platform zones.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-container\-args\fR
+Removes the list of arguments from container declaration.
+
+Cannot be used in the same command with \f5\-\-container\-arg\fR.
+
+.TP 2m
+\fB\-\-container\-arg\fR=\fICONTAINER_ARG\fR
+Completely replaces the list of arguments with the new list. Each argument must
+have a separate \-\-container\-arg flag. Arguments are appended the new list in
+the order of flags.
+
+Cannot be used in the same command with \f5\-\-clear\-container\-arg\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-container\-command\fR
+Removes command from container declaration.
+
+Cannot be used in the same command with \f5\-\-container\-command\fR.
+
+.TP 2m
+\fB\-\-container\-command\fR=\fICONTAINER_COMMAND\fR
+Sets command in the declaration to the specified value. Empty string is not
+allowed.
+
+Cannot be used in the same command with \f5\-\-clear\-container\-command\fR.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-container\-env\fR=[\fIKEY\fR=\fIVALUE\fR, ...,...]
+Update environment variables \f5KEY\fR with value \f5VALUE\fR passed to
+container.
+.RS 2m
+.IP "\(em" 2m
+Sets \f5KEY\fR to the specified value.
+.IP "\(em" 2m
+Adds \f5KEY\fR = \f5VALUE\fR, if \f5KEY\fR is not yet declared.
+.IP "\(em" 2m
+Only the last value of \f5KEY\fR is taken when \f5KEY\fR is repeated more
+.RE
+.RE
+.sp
+than once.
+
+Values, declared with \f5\-\-container\-env\fR flag override those with the same
+\f5KEY\fR from file, provided in \f5\-\-container\-env\-file\fR.
+
+.RS 2m
+.TP 2m
+\fB\-\-container\-env\-file\fR=\fICONTAINER_ENV_FILE\fR
+Update environment variables from a file. Same update rules as for
+\f5\-\-container\-env\fR apply. Values, declared with \f5\-\-container\-env\fR
+flag override those with the same \f5KEY\fR from file.
+
+File with environment variables declarations in format used by docker (almost).
+This means:
+.RS 2m
+.IP "\(em" 2m
+Lines are in format KEY=VALUE
+.IP "\(em" 2m
+Values must contain equality signs.
+.IP "\(em" 2m
+Variables without values are not supported (this is different from
+.RE
+.RE
+.sp
+docker format).
+.RS 2m
+.IP "\(bu" 2m
+If # is first non\-whitespace character in a line the line is ignored
+.RE
+.sp
+as a comment.
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-container\-env\fR=[\fIKEY\fR,...]
+Removes environment variables \f5KEY\fR from container declaration Does nothing,
+if a variable is not present.
+
+.TP 2m
+\fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]
+Mounts a volume by using \f5host\-path\fR.
+.RS 2m
+.IP "\(em" 2m
+Adds a volume, if \f5mount\-path\fR is not yet declared.
+.IP "\(em" 2m
+Replaces a volume, if \f5mount\-path\fR is declared.
+.RE
+.RE
+.sp
+All parameters (\f5host\-path\fR, \f5mount\-path\fR, \f5mode\fR) are completely
+replaced.
+
+.RS 2m
+.TP 2m
+\fBhost\-path\fR
+Path on host to mount from.
+
+.RS 2m
+.TP 2m
+\fBmount\-path\fR
+Path on container to mount to.
+
+.TP 2m
+\fBmode\fR
+Volume mount mode: rw (read/write) or ro (read\-only).
+
+Default: rw.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-container\-mount\-tmpfs\fR=[\fImount\-path\fR=\fIMOUNTPATH\fR,...]
+
+Mounts empty tmpfs into container at MOUNTPATH.
+
+.RS 2m
+.TP 2m
+\fBmount\-path\fR
+Path on container to mount to.
+.RE
+.sp
+.TP 2m
+\fB\-\-remove\-container\-mounts\fR=[\fIMOUNTPATH\fR[,\fIMOUNTPATH\fR,...],...]
+
+Removes volume mounts (\f5host\-path\fR, \f5tmpfs\fR) with \f5mountPath:
+MOUNTPATH\fR from container declaration.
+
+Does nothing, if a volume mount is not declared.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To run the gcr.io/google\-containers/busybox image on an instance named
+\'instance\-1' that executes 'echo "Hello world"' as a run command, run:
+
+.RS 2m
+$ gcloud beta compute instances update\-container instance\-1        \e
+     \-\-container\-image=gcr.io/google\-containers/busybox         \e
+    \-\-container\-command='echo "Hello world"'
+.RE
+
+To run the gcr.io/google\-containers/busybox image in privileged mode, run:
+
+.RS 2m
+$ gcloud beta compute instances update\-container instance\-1        \e
+     \-\-container\-image=gcr.io/google\-containers/busybox         \e
+    \-\-container\-privileged
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute instances update\-container
+.RE
+

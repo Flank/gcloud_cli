@@ -1,0 +1,40 @@
+NAME
+    gcloud beta compute ssl-certificates - list, create, and delete Google
+        Compute Engine SSL certificates
+
+SYNOPSIS
+    gcloud beta compute ssl-certificates COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) List, create and delete Google Compute Engine SSL certificates that
+    can be used to configure a target HTTPS proxy. For more information, see:
+
+    https://cloud.google.com/compute/docs/load-balancing/http/ssl-certificates
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a Google Compute Engine SSL certificate.
+
+     delete
+        (BETA) Delete Google Compute Engine SSL certificates.
+
+     describe
+        (BETA) Describe a Google Compute Engine SSL certificate.
+
+     list
+        (BETA) List Google Compute Engine SSL certificates.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute ssl-certificates
+        $ gcloud alpha compute ssl-certificates
+

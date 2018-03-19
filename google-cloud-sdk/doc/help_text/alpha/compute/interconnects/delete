@@ -1,0 +1,32 @@
+NAME
+    gcloud alpha compute interconnects delete - delete Google Compute Engine
+        interconnects
+
+SYNOPSIS
+    gcloud alpha compute interconnects delete NAME [NAME ...]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute interconnects delete deletes Google Compute
+    Engine interconnects. Interconnects        can only be deleted when no other resources (e.g.,
+        InterconnectAttachments) refer to them.
+
+POSITIONAL ARGUMENTS
+     NAME [NAME ...]
+        The names of the interconnects to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute interconnects delete
+        $ gcloud beta compute interconnects delete
+

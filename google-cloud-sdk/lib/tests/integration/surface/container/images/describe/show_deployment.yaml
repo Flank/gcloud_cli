@@ -1,0 +1,169 @@
+---
+args:
+  command: alpha container images describe gcr.io/fake-project/service@sha256:d6e275c868acbbe647fcca96582d693ee49629d2033304585722a0ec38be8b8e
+  specified_args:
+    --show-deployment: true
+---
+state:
+  interactive_console: true
+  random_seed: 3785649160762650047
+  term_size:
+  - 147
+  - 46
+---
+properties:
+  core:
+    disable_color: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: ''
+  headers:
+    accept: application/json
+    accept-encoding: gzip, deflate
+  method: GET
+  uri: https://containeranalysis.googleapis.com/v1alpha1/projects/fake-project/occurrences?pageSize=1000&alt=json&filter=%28kind+%3D+%22DEPLOYABLE%22%29+AND+%28resource_url%3D%22https%3A%2F%2Fgcr.io%2Ffake-project%2Fservice%40sha256%3Ad6e275c868acbbe647fcca96582d693ee49629d2033304585722a0ec38be8b8e%22%29
+---
+response:
+  content:
+  - json: {}
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="41,39,38,37,35"
+    cache-control: private
+    content-location: https://containeranalysis.googleapis.com/v1alpha1/projects/fake-project/occurrences?pageSize=1000&alt=json&filter=%28kind+%3D+%22DEPLOYABLE%22%29+AND+%28resource_url%3D%22https%3A%2F%2Fgcr.io%2Ffake-project%2Fservice%40sha256%3Ad6e275c868acbbe647fcca96582d693ee49629d2033304585722a0ec38be8b8e%22%29
+    content-type: application/json; charset=UTF-8
+    date: Tue, 31 Oct 2017 13:54:25 GMT
+    server: ESF
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: ''
+  headers:
+    accept: application/json
+    accept-encoding: gzip, deflate
+  method: GET
+  uri: https://containeranalysis.googleapis.com/v1alpha1/projects/fake-project/occurrences?pageSize=1000&alt=json&filter=%28kind+%3D+%22DEPLOYABLE%22+AND+kind%3D%22DEPLOYABLE%22%29
+---
+response:
+  content:
+  - json:
+      occurrences:
+      - createTime: '2017-10-30T16:24:46.276360Z'
+        deployment:
+          address: apps/fake-project/services/default/versions/20171030t122030
+          deployTime: '2017-10-30T16:20:48Z'
+          platform: FLEX
+          resourceUri:
+          - gcr.io/fake-project/service@sha256:79b076665adf009a4405b1d43f80a68bd502b5c6f301476faf7bd60fd14bb0de
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/a76fcd4d-100b-4184-9a32-30ccca400e99
+        noteName: providers/gcp-deployment-history/notes/fake-project-e2cfadfe9122c3f0cc103f13a9c2cdd8f1c3d738a74ef0f78cb06864039644a5
+        resourceUrl: apps/fake-project/services/default/versions/20171030t122030@1509380448000000000
+        updateTime: '2017-10-30T16:24:46.276360Z'
+      - createTime: '2017-09-21T17:40:35.461657Z'
+        deployment:
+          address: projects/fake-project/zones/us-central1-f/clusters/app-cluster/api/v1/namespaces/default/pods/bydigest-3795257306-ms7rm
+          config: '"{\n \"containers\": [\n  {\n   \"name\": \"\",\n   \"image\": \"gcr.io/fake-project/service@sha256:123xyz\",\n   \"resources\": {}\n  }\n ]\n}"'
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/51a36fcb-6a3f-4f77-bc1c-84e84874af56
+        noteName: providers/gcp-deployment-history/notes/fake-project-e2cfadfe9122c3f0cc103f13a9c2cdd8f1c3d738a74ef0f78cb06864039644a5
+        resourceUrl: projects/fake-project/zones/us-central1-f/clusters/app-cluster/api/v1/namespaces/default/pods/bydigest-3795257306-ms7rm@1506015628000000000
+        updateTime: '2017-09-21T17:40:35.461657Z'
+      - createTime: '2017-09-21T13:41:10.398942Z'
+        deployment:
+          address: projects/fake-project/zones/us-central1-f/clusters/app-cluster/api/v1/namespaces/default/pods/dp-2146888825-v06f8
+          config: '"{\n \"containers\": [\n  {\n   \"name\": \"\",\n   \"image\": \"gcr.io/fake-project/service@sha256:123xyz\",\n   \"resources\": {}\n  }\n ]\n}"'
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/513bc008-fe6a-4b75-a6c7-67eba29007f2
+        noteName: providers/gcp-deployment-history/notes/fake-project-9e45d54b2a6eb9f0f8a0b1693599d0f3be64b4c8ca554de97957f46026218322
+        resourceUrl: projects/fake-project/zones/us-central1-f/clusters/app-cluster/api/v1/namespaces/default/pods/dp-2146888825-v06f8@1506001265000000000
+        updateTime: '2017-09-21T13:41:10.398942Z'
+      - createTime: '2017-10-10T13:24:10.604272Z'
+        deployment:
+          address: projects/fake-project/zones/us-central1-f/clusters/app-cluster/api/v1/namespaces/default/pods/dp1-1855609367-f3kww
+          config: '"{\n \"containers\": [\n  {\n   \"name\": \"\",\n   \"image\": \"gcr.io/fake-project/service@sha256:123xyz\",\n   \"resources\": {}\n  }\n ]\n}"'
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/d30e0822-47f8-41b0-823a-2556864427b8
+        noteName: providers/gcp-deployment-history/notes/fake-project-9e45d54b2a6eb9f0f8a0b1693599d0f3be64b4c8ca554de97957f46026218322
+        resourceUrl: projects/fake-project/zones/us-central1-f/clusters/app-cluster/api/v1/namespaces/default/pods/dp1-1855609367-f3kww@1507641818000000000
+        updateTime: '2017-10-10T13:24:10.604272Z'
+      - createTime: '2017-10-10T13:24:09.774385Z'
+        deployment:
+          address: projects/fake-project/zones/us-central1-f/clusters/app-cluster/api/v1/namespaces/default/pods/whale-442052260-rkmqc
+          config: '"{\n \"containers\": [\n  {\n   \"name\": \"\",\n   \"image\": \"gcr.io/fake-project/service@sha256:123xyz\",\n   \"resources\": {}\n  }\n ]\n}"'
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/04958ee3-2119-4466-92d5-6fa52da7f401
+        noteName: providers/gcp-deployment-history/notes/fake-project-2eea9c973300178d541c5da3a15a5a9ae977f999fae9befcff05a4eeb39d50ad
+        resourceUrl: projects/fake-project/zones/us-central1-f/clusters/app-cluster/api/v1/namespaces/default/pods/whale-442052260-rkmqc@1507641828000000000
+        updateTime: '2017-10-10T13:24:09.774385Z'
+      - createTime: '2017-09-21T17:40:38.135370Z'
+        deployment:
+          address: projects/fake-project/zones/us-central1-f/clusters/app-cluster/apis/extensions/v1beta1/namespaces/default/deployments/bydigest
+          config: '"{\n \"containers\": [\n  {\n   \"name\": \"\",\n   \"image\": \"gcr.io/fake-project/service@sha256:123xyz\",\n   \"resources\": {}\n  }\n ]\n}"'
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/32d13b61-3584-4b5f-aeeb-4212ddc21a41
+        noteName: providers/gcp-deployment-history/notes/fake-project-e2cfadfe9122c3f0cc103f13a9c2cdd8f1c3d738a74ef0f78cb06864039644a5
+        resourceUrl: projects/fake-project/zones/us-central1-f/clusters/app-cluster/apis/extensions/v1beta1/namespaces/default/deployments/bydigest@1506015628000000000
+        updateTime: '2017-09-21T17:40:38.135370Z'
+      - createTime: '2017-10-10T13:24:02.005700Z'
+        deployment:
+          address: projects/fake-project/zones/us-central1-f/clusters/app-cluster/apis/extensions/v1beta1/namespaces/default/deployments/dp1
+          config: '"{\n \"containers\": [\n  {\n   \"name\": \"\",\n   \"image\": \"gcr.io/fake-project/service@sha256:123xyz\",\n   \"resources\": {}\n  }\n ]\n}"'
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/799ea460-23d1-48d5-a3c7-c72d7ac87ae2
+        noteName: providers/gcp-deployment-history/notes/fake-project-9e45d54b2a6eb9f0f8a0b1693599d0f3be64b4c8ca554de97957f46026218322
+        resourceUrl: projects/fake-project/zones/us-central1-f/clusters/app-cluster/apis/extensions/v1beta1/namespaces/default/deployments/dp1@1507641818000000000
+        updateTime: '2017-10-10T13:24:02.005700Z'
+      - createTime: '2017-09-21T13:41:13.871436Z'
+        deployment:
+          address: projects/fake-project/zones/us-central1-f/clusters/app-cluster/apis/extensions/v1beta1/namespaces/default/deployments/dp
+          config: '"{\n \"containers\": [\n  {\n   \"name\": \"\",\n   \"image\": \"gcr.io/fake-project/service@sha256:123xyz\",\n   \"resources\": {}\n  }\n ]\n}"'
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/08e44976-7dc4-43e3-96db-85ca09dde56c
+        noteName: providers/gcp-deployment-history/notes/fake-project-9e45d54b2a6eb9f0f8a0b1693599d0f3be64b4c8ca554de97957f46026218322
+        resourceUrl: projects/fake-project/zones/us-central1-f/clusters/app-cluster/apis/extensions/v1beta1/namespaces/default/deployments/dp@1502908490000000000
+        updateTime: '2017-09-21T13:41:13.871436Z'
+      - createTime: '2017-10-10T13:24:02.092744Z'
+        deployment:
+          address: projects/fake-project/zones/us-central1-f/clusters/app-cluster/apis/extensions/v1beta1/namespaces/default/deployments/whale
+          config: '"{\n \"containers\": [\n  {\n   \"name\": \"\",\n   \"image\": \"gcr.io/fake-project/service@sha256:123xyz\",\n   \"resources\": {}\n  }\n ]\n}"'
+        kind: DEPLOYABLE
+        name: projects/fake-project/occurrences/830a1fcf-1dda-4406-b981-a159393530ed
+        noteName: providers/gcp-deployment-history/notes/fake-project-2eea9c973300178d541c5da3a15a5a9ae977f999fae9befcff05a4eeb39d50ad
+        resourceUrl: projects/fake-project/zones/us-central1-f/clusters/app-cluster/apis/extensions/v1beta1/namespaces/default/deployments/whale@1507641828000000000
+        updateTime: '2017-10-10T13:24:02.092744Z'
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="41,39,38,37,35"
+    cache-control: private
+    content-location: https://containeranalysis.googleapis.com/v1alpha1/projects/fake-project/occurrences?pageSize=1000&alt=json&filter=%28kind+%3D+%22DEPLOYABLE%22+AND+kind%3D%22DEPLOYABLE%22%29
+    content-type: application/json; charset=UTF-8
+    date: Tue, 31 Oct 2017 13:54:26 GMT
+    server: ESF
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  private_files:
+  - content: 'False'
+    name: /usr/local/google/home/jasmuth/.config/gcloud/gce
+  stdout: |
+    deployment_summary:
+      deployments: []
+    image_summary:
+      digest: sha256:d6e275c868acbbe647fcca96582d693ee49629d2033304585722a0ec38be8b8e
+      fully_qualified_digest: gcr.io/fake-project/service@sha256:d6e275c868acbbe647fcca96582d693ee49629d2033304585722a0ec38be8b8e
+      registry: gcr.io
+      repository: fake-project/service

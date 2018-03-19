@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha deployment-manager resources describe - provide information
+        about a resource
+
+SYNOPSIS
+    gcloud alpha deployment-manager resources describe RESOURCE
+        [--deployment=DEPLOYMENT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command prints out all available details about a resource.
+
+POSITIONAL ARGUMENTS
+     RESOURCE
+        Resource name.
+
+FLAGS
+     --deployment=DEPLOYMENT
+        Deployment name
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To display information about a resource, run:
+
+        $ gcloud alpha deployment-manager resources describe \
+            --deployment my-deployment my-resource-name
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud deployment-manager resources describe
+        $ gcloud beta deployment-manager resources describe
+

@@ -1,0 +1,98 @@
+
+.TH "GCLOUD_BETA_KMS_KEYS_VERSIONS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta kms keys versions \- create and manage versions
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta kms keys versions\fR \fICOMMAND\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR A version represents an individual cryptographic key and the
+associated key material.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-key\fR=\fIKEY\fR
+The containing key.
+
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+The containing keyring.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the requested resource.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+\fB(BETA)\fR Create a new version.
+
+.TP 2m
+\fBdescribe\fR
+\fB(BETA)\fR Get metadata for a given version.
+
+.TP 2m
+\fBdestroy\fR
+\fB(BETA)\fR Schedule a version to be destroyed.
+
+.TP 2m
+\fBdisable\fR
+\fB(BETA)\fR Disable a given version.
+
+.TP 2m
+\fBenable\fR
+\fB(BETA)\fR Enable a given version.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List the versions within a key.
+
+.TP 2m
+\fBrestore\fR
+\fB(BETA)\fR Restore a version scheduled for destruction.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud kms keys versions
+.RE
+

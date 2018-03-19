@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_BACKEND\-SERVICES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute backend\-services delete \- delete backend services
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute backend\-services delete\fR \fIBACKEND_SERVICE_NAME\fR [\fIBACKEND_SERVICE_NAME\fR\ ...] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute backend\-services delete\fR deletes one or
+more backend services.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIBACKEND_SERVICE_NAME\fR [\fIBACKEND_SERVICE_NAME\fR ...]
+The names of the backend services to delete.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If provided, it is assumed the backend services are global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the backend services to delete. Overrides the default
+\fBcompute/region\fR property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute backend\-services delete
+$ gcloud beta compute backend\-services delete
+.RE
+

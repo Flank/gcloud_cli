@@ -1,0 +1,43 @@
+NAME
+    gcloud iam roles delete - delete a custom role from an organization or a
+        project
+
+SYNOPSIS
+    gcloud iam roles delete ROLE_ID [--organization=ORGANIZATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command deletes a role.
+
+    This command can fail for the following reasons:
+      o The role specified does not exist.
+      o The active user does not have permission to access the given role.
+
+POSITIONAL ARGUMENTS
+     ROLE_ID
+        The id of the custom role to delete. For example: CustomRole. You must
+        also specify the --organization or --project flag.
+
+FLAGS
+     --organization=ORGANIZATION
+        The organization of the role you want to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To delete a role of an organization, run:
+
+        $ gcloud iam roles delete --organization 1234567 viewer
+
+    To delete a role of a project, run:
+
+        $ gcloud iam roles delete --project myproject viewer
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta iam roles delete
+

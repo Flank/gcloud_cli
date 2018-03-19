@@ -1,0 +1,331 @@
+NAME
+    gcloud compute forwarding-rules create - create a forwarding rule to direct
+        network traffic to a load balancer
+
+SYNOPSIS
+    gcloud compute forwarding-rules create NAME
+        (--backend-service=BACKEND_SERVICE
+          | --target-http-proxy=TARGET_HTTP_PROXY
+          | --target-https-proxy=TARGET_HTTPS_PROXY
+          | --target-instance=TARGET_INSTANCE | --target-pool=TARGET_POOL
+          | --target-ssl-proxy=TARGET_SSL_PROXY
+          | --target-tcp-proxy=TARGET_TCP_PROXY
+          | --target-vpn-gateway=TARGET_VPN_GATEWAY)
+        [--description=DESCRIPTION] [--ip-protocol=IP_PROTOCOL]
+        [--load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"]
+        [--network=NETWORK] [--subnet=SUBNET] [--subnet-region=SUBNET_REGION]
+        [--target-instance-zone=TARGET_INSTANCE_ZONE]
+        [--target-pool-region=TARGET_POOL_REGION]
+        [--target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION]
+        [--address=ADDRESS | --ip-version=IP_VERSION]
+        [--address-region=ADDRESS_REGION | --global-address]
+        [--backend-service-region=BACKEND_SERVICE_REGION
+          | --global-backend-service] [--global | --region=REGION]
+        [--port-range=[PORT | START_PORT-END_PORT] | --ports=[PORT
+          | START_PORT-END_PORT],[[PORT | START_PORT-END_PORT],...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute forwarding-rules create is used to create a forwarding rule.
+    A forwarding rule directs traffic that matches a bound IP address to a
+    forwarding target (load balancer, VPN gateway or VM instance).
+
+    Forwarding rules can be either global or regional, specified with the
+    --global or --region=REGION flag. Global forwarding rules work with global
+    load balancers, which include target HTTP proxies, target HTTPS proxies,
+    target SSL proxies and target TCP proxies; regional forwarding rules work
+    with regional or zonal targets, which include target pools, target
+    instances and target VPN gateways and backend services.
+
+    Forwarding rules can be either external or internal, specified with the
+    --load-balancing-scheme=[EXTERNAL|INTERNAL] flag. External forwarding rules
+    are accessible from the internet, while internal forwarding rules are only
+    accessible from within their VPC networks. You can specify a reserved
+    static external or internal IP address with the --address=ADDRESS flag for
+    the forwarding rule. Otherwise if the flag is unspecified, an external
+    forwaring rule will be automatically assigned an ephemeral external IP
+    address (global IP addresses for global forwarding rules and regional IP
+    addresses for regional forwarding rules); an internal forwarding rule will
+    be automatically assigned an ephemeral internal IP address from the subnet
+    specified with the --subnet flag.
+
+    There are different types of load balancer working at different layers of
+    the OSI networking model (http://en.wikipedia.org/wiki/Network_layer).
+    Layer 3 load balancer targets include target pools, target SSL proxies,
+    target TCP proxies and backend services. Layer 7 load balancer targets
+    include target HTTP proxies and target HTTPS proxies. For more information
+    on load balancing, see
+    https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/.
+
+    When creating a forwarding rule, exactly one of --target-instance,
+    --target-pool, --target-http-proxy, --target-https-proxy,
+    --target-ssl-proxy, --target-tcp-proxy, --target-vpn-gateway or
+    --backend-service must be specified.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the forwarding rule to create.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --backend-service=BACKEND_SERVICE
+          The target backend service that will receive the traffic.
+
+       --target-http-proxy=TARGET_HTTP_PROXY
+          The target HTTP proxy that will receive the traffic. Acceptable
+          values for --ports flag are: 80, 8080.
+
+       --target-https-proxy=TARGET_HTTPS_PROXY
+          The target HTTPS proxy that will receive the traffic. Acceptable
+          values for --ports flag are: 443.
+
+       --target-instance=TARGET_INSTANCE
+          The name of the target instance that will receive the traffic. The
+          target instance must be in a zone that's in the forwarding rule's
+          region. Global forwarding rules may not direct traffic to target
+          instances. If not specified and the compute/zone property isn't set,
+          you will be prompted to select a zone.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
+
+              $ gcloud config set compute/zone ZONE
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
+
+       --target-pool=TARGET_POOL
+          The target pool that will receive the traffic. The target pool must
+          be in the same region as the forwarding rule. Global forwarding rules
+          may not direct traffic to target pools.
+
+       --target-ssl-proxy=TARGET_SSL_PROXY
+          The target SSL proxy that will receive the traffic. Acceptable values
+          for --ports flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993,
+          995, 1883, 5222.
+
+       --target-tcp-proxy=TARGET_TCP_PROXY
+          The target TCP proxy that will receive the traffic. Acceptable values
+          for --ports flag are: 25, 43, 110, 143, 195, 443, 465, 587, 700, 993,
+          995, 1883, 5222.
+
+       --target-vpn-gateway=TARGET_VPN_GATEWAY
+          The target VPN gateway that will receive forwarded traffic.
+          Acceptable values for --ports flag are: 500, 4500.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional textual description for the forwarding rule.
+
+     --ip-protocol=IP_PROTOCOL
+        The IP protocol that the rule will serve. The default is TCP.
+        IP_PROTOCOL must be one of: AH, ESP, ICMP, SCTP, TCP, UDP.
+
+     --load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"
+        This signifies what the forwarding rule will be used for.
+        LOAD_BALANCING_SCHEME must be one of:
+
+         EXTERNAL
+            External load balancing or forwarding, used with one of
+            --target-http-proxy, --target-https-proxy, --target-tcp-proxy,
+            --target-ssl-proxy, --target-pool, --target-vpn-gateway,
+            --target-instance.
+         INTERNAL
+            Internal load balancing or forwarding, used with --backend-service.
+
+     --network=NETWORK
+        (Only for --load-balancing-scheme=INTERNAL) The network that this
+        forwarding rule applies to. If this field is not specified, the default
+        network will be used. In the absence of the default network, this field
+        must be specified.
+
+     --subnet=SUBNET
+        (Only for --load-balancing-scheme=INTERNAL) The subnetwork that this
+        forwarding rule applies to. If the network configured for this
+        forwarding rule is in auto subnet mode, this flag is optional and the
+        subnet in the same region of the forwarding rule will be used. However,
+        if the network is in custom subnet mode, a subnetwork must be
+        specified.
+
+     --subnet-region=SUBNET_REGION
+        The region of the subnetwork to operate on. If not specified it will be
+        set the region of the forwarding rule. Overrides the default
+        compute/region property value for this command invocation.
+
+     --target-instance-zone=TARGET_INSTANCE_ZONE
+        The zone of the target instance to operate on. Overrides the default
+        compute/zone property value for this command invocation.
+
+     --target-pool-region=TARGET_POOL_REGION
+        The region of the target pool to operate on. If not specified it will
+        be set the region of the forwarding rule. Overrides the default
+        compute/region property value for this command invocation.
+
+     --target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION
+        The region of the VPN gateway to operate on. If not specified it will
+        be set the region of the forwarding rule. Overrides the default
+        compute/region property value for this command invocation.
+
+     At most one of these may be specified:
+
+       --address=ADDRESS
+          The IP address that the forwarding rule will serve. All traffic sent
+          to this IP address is directed to the target pointed to by the
+          forwarding rule. Assigned IP addresses can be reserved or unreserved.
+
+          IP addresses are restricted based on the forwarding rule's load
+          balancing scheme (EXTERNAL or INTERNAL) and scope (global or
+          regional).
+
+          When the --load-balancing-scheme is EXTERNAL, if the address is
+          reserved, it must either (1) reside in the global scope if the
+          forwarding rule is being configured to point to a global target
+          (target HTTP proxy, target HTTPS proxy, target SSL proxy and target
+          TCP proxy) or (2) reside in the same region as the forwarding rule if
+          the forwarding rule is being configured to point to a regional target
+          (target pool) or zonal target (target instance). If this flag is
+          omitted, an ephemeral external IP address is automatically assigned.
+
+          When the --load-balancing-scheme is INTERNAL, this can only be an RFC
+          1918 IP address belonging to the network/subnet configured for the
+          forwarding rule. If this flag is omitted, an ephemeral internal IP
+          address will be automatically allocated from the IP range of the
+          subnet or network configured for this forwarding rule.
+
+          Note: An IP address must be specified if the traffic is being
+          forwarded to a VPN.
+
+          This flag can be specified either by a literal IP address or a
+          reference to an existing Address resource. The following examples are
+          all valid:
+          + 100.1.2.3
+          + https://www.googleapis.com/compute/v1/projects/project-1/regions/us-central1/addresses/address-1
+          + projects/project-1/regions/us-central1/addresses/address-1
+          + regions/us-central1/addresses/address-1
+          + global/addresses/address-1
+          + address-1
+
+         --ip-version=IP_VERSION
+            The version of the IP address to be allocated if no --address is
+            given. The default is IPv4. IP_VERSION must be one of: IPV4, IPV6.
+
+     At most one of these may be specified:
+
+       --address-region=ADDRESS_REGION
+          The region of the address to operate on. If not specified, you will
+          be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+       --global-address
+          If provided, it is assumed the address is global.
+
+     At most one of these may be specified:
+
+       --backend-service-region=BACKEND_SERVICE_REGION
+          The region of the backend service to operate on. If not specified it
+          will be set the region of the forwarding rule. Overrides the default
+          compute/region property value for this command invocation.
+
+       --global-backend-service
+          If provided, it is assumed the backend service is global.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, it is assumed the forwarding rule is global.
+
+       --region=REGION
+          The region of the forwarding rule to create. If not specified, you
+          will be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+     At most one of these may be specified:
+
+       --port-range=[PORT | START_PORT-END_PORT]
+          DEPRECATED, use --ports. If specified, only packets addressed to
+          ports in the specified range will be forwarded. If not specified for
+          regional forwarding rules, all ports are matched. This flag is
+          required for global forwarding rules.
+
+          Either an individual port (--port-range 80) or a range of ports
+          (--port-range 3000-3100) may be specified.
+
+       --ports=[PORT | START_PORT-END_PORT],[[PORT | START_PORT-END_PORT],...]
+          If specified, only packets addressed to ports in the specified list
+          will be forwarded. If not specified for regional forwarding rules,
+          all ports are matched. This flag is required for global forwarding
+          rules and accepts a single continuous set of ports.
+
+          Some forwarding targets have restriction on acceptable ports, e.g.,
+          if --target-http-proxy is specified, the acceptable values for
+          --ports are: 80, 8080.
+
+          Individual ports and ranges can be specified, for example (--ports
+          8000-8004 or --ports 80).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a global forwarding rule that will forward all traffic on port
+    8080 for IP address ADDRESS to a target http proxy PROXY, run:
+
+        $ gcloud compute forwarding-rules create RULE_NAME --global \
+            --target-http-proxy PROXY --ports 8080 --address ADDRESS
+
+    To create a regional forwarding rule for the subnet SUBNET_NAME on the
+    default network that will forward all traffic on ports 80-82 to a backend
+    service SERVICE_NAME, run:
+
+        $ gcloud compute forwarding-rules create RULE_NAME \
+            --load-balancing-scheme INTERNAL \
+            --backend-service SERVICE_NAME --subnet SUBNET_NAME \
+            --network default --region REGION --ports 80-82
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute forwarding-rules create
+        $ gcloud beta compute forwarding-rules create
+

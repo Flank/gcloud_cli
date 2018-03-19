@@ -1,0 +1,67 @@
+NAME
+    gcloud alpha compute images - list, create, and delete Google Compute
+        Engine images
+
+SYNOPSIS
+    gcloud alpha compute images GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) List, create, and delete Google Compute Engine images.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     vulnerabilities
+        (ALPHA) List and describe image vulnerabilities and related notes.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-labels
+        (ALPHA) Add labels to Google Compute Engine images.
+
+     create
+        (ALPHA) Create Google Compute Engine images.
+
+     delete
+        (ALPHA) Delete Google Compute Engine images.
+
+     deprecate
+        (ALPHA) Manage deprecation status of Google Compute Engine images.
+
+     describe
+        (ALPHA) Describe a Google Compute Engine image.
+
+     describe-from-family
+        (ALPHA) Describe the latest image from an image family.
+
+     export
+        (ALPHA) Export a Google Compute Engine image.
+
+     import
+        (ALPHA) Import a Google Compute Engine image.
+
+     list
+        (ALPHA) List Google Compute Engine images.
+
+     remove-labels
+        (ALPHA) Remove labels from Google Compute Engine images.
+
+     update
+        (ALPHA) Update a Google Compute Engine image.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute images
+        $ gcloud beta compute images
+

@@ -1,0 +1,31 @@
+NAME
+    gcloud meta cache delete - delete a persistent cache or tables in the cache
+
+SYNOPSIS
+    gcloud meta cache delete [TABLES ...]
+        [--cache=CACHE_NAME; default="resource://"] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Delete a persistent cache or tables in the cache.
+
+POSITIONAL ARGUMENTS
+     [TABLES ...]
+        The table names or name patterns to delete, where ? matches any
+        character and * matches any string of zero or more characters. If
+        omitted then the entired cache is deleted.
+
+FLAGS
+     --cache=CACHE_NAME; default="resource://"
+        The cache name to operate on. May be prefixed by "resource://" for
+        resource cache names. If only the prefix is specified then the default
+        cache name for that prefix is used.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

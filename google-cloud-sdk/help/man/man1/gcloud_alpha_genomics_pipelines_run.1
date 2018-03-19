@@ -1,0 +1,186 @@
+
+.TH "GCLOUD_ALPHA_GENOMICS_PIPELINES_RUN" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha genomics pipelines run \- defines and runs a pipeline
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha genomics pipelines run\fR \fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-inputs\-from\-file\fR=[\fINAME\fR=\fIFILE\fR,...]] [\fB\-\-logging\fR=\fILOGGING\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-outputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-preemptible\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR;\ default="default"] [\fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-zones\fR=[\fIZONE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR A pipeline is a transformation of a set of inputs to a set of
+outputs. Supports docker\-based commands.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR
+A YAML or JSON file containing a Pipeline object. See
+https://cloud.google.com/genomics/reference/rest/v1alpha2/pipelines#Pipeline
+
+.RS 2m
+YAML Example:
+  name: hello world
+.RE
+
+.RS 2m
+inputParameters:
+\- name: greeting
+  defaultValue: Hello
+\- name: object
+  defaultValue: World
+.RE
+
+.RS 2m
+outputParameters:
+\- name: outputFile
+  localCopy:
+    path: /data/output/greeting.txt
+    disk: boot
+.RE
+
+.RS 2m
+resources:
+  minimumCpuCores: 1
+  minimumRamGb: 1
+  preemptible: true
+.RE
+
+.RS 2m
+docker:
+  imageName: ubuntu
+  cmd: >
+    echo "${greeting} ${object}" > /data/output/greeting.txt
+.RE
+
+
+.RE
+.sp
+
+.SH "COMMONLY USED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
+The disk size(s) in GB, specified as a comma\-separated list of pairs of disk
+name and size. For example: \-\-disk\-size "name:size,name2:size2". Overrides
+any values specified in the pipeline\-file.
+
+.TP 2m
+\fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]
+Map of input PipelineParameter names to values. Used to pass literal parameters
+to the pipeline, and to specify input files in Google Cloud Storage that will
+have a localCopy made. Specified as a comma\-separated list: \-\-inputs
+file=gs://my\-bucket/in.txt,name=hello
+
+.TP 2m
+\fB\-\-inputs\-from\-file\fR=[\fINAME\fR=\fIFILE\fR,...]
+Map of input PipelineParameter names to values. Used to pass literal parameters
+to the pipeline where values come from local files; this can be used to send
+large pipeline input parameters, such as code, data, or configuration values.
+Specified as a comma\-separated list: \-\-inputs\-from\-file
+script=myshellscript.sh,pyfile=mypython.py
+
+.TP 2m
+\fB\-\-logging\fR=\fILOGGING\fR
+The location in Google Cloud Storage to which the pipeline logs will be copied.
+Can be specified as a fully qualified directory path, in which case logs will be
+output with a unique identifier as the filename in that directory, or as a fully
+specified path, which must end in \f5.log\fR, in which case that path will be
+used. Stdout and stderr logs from the run are also generated and output as
+\f5\-stdout.log\fR and \f5\-stderr.log\fR.
+
+.TP 2m
+\fB\-\-memory\fR=\fIMEMORY\fR
+The number of GB of RAM needed to run the pipeline. Overrides any value
+specified in the pipeline\-file.
+
+.TP 2m
+\fB\-\-outputs\fR=[\fINAME\fR=\fIVALUE\fR,...]
+Map of output PipelineParameter names to values. Used to specify output files in
+Google Cloud Storage that will be made from a localCopy. Specified as a
+comma\-separated list: \-\-outputs
+ref=gs://my\-bucket/foo,ref2=gs://my\-bucket/bar
+
+.TP 2m
+\fB\-\-preemptible\fR
+Whether to use a preemptible VM for this pipeline. The "resource" section of the
+pipeline\-file must also set preemptible to "true" for this flag to take effect.
+
+
+.RE
+.sp
+
+.SH "OTHER FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to add.
+
+.TP 2m
+\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR; default="default"
+The service account used to run the pipeline. If unspecified, defaults to the
+Compute Engine service account for your project.
+
+.TP 2m
+\fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]
+List of additional scopes to be made available for this service account. The
+following scopes are always requested:
+
+.RS 2m
+https://www.googleapis.com/auth/compute
+https://www.googleapis.com/auth/devstorage.full_control
+https://www.googleapis.com/auth/genomics
+https://www.googleapis.com/auth/logging.write
+https://www.googleapis.com/auth/monitoring.write
+.RE
+
+.TP 2m
+\fB\-\-zones\fR=[\fIZONE\fR,...]
+List of Compute Engine zones the pipeline can run in.
+
+If no zones are specified with the zones flag, then zones in the pipeline
+definition file will be used.
+
+If no zones are specified in the pipeline definition, then the default zone in
+your local client configuration is used.
+
+If you have no default zone, then the pipeline may run in any zone.
+
+For more information on default zones, see
+https://cloud.google.com/compute/docs/gcloud\-compute/#set_default_zone_and_region_in_your_local_client
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

@@ -1,0 +1,59 @@
+NAME
+    gcloud alpha deployment-manager type-providers create - create a type
+        provider
+
+SYNOPSIS
+    gcloud alpha deployment-manager type-providers create PROVIDER_NAME
+        --descriptor-url=DESCRIPTOR_URL [--api-options-file=API_OPTIONS_FILE]
+        [--async] [--description=DESCRIPTION] [--labels=[KEY=VALUE,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command inserts (creates) a new type provider based on a
+    provided configuration file.
+
+POSITIONAL ARGUMENTS
+     PROVIDER_NAME
+        Type provider name or URI.
+
+REQUIRED FLAGS
+     --descriptor-url=DESCRIPTOR_URL
+        URL of API of your type.
+
+OPTIONAL FLAGS
+     --api-options-file=API_OPTIONS_FILE
+        YAML file with options for the API: e.g. options and collection
+        overrides.
+
+     --async
+        Return immediately and print information about the Operation in
+        progress rather than waiting for the Operation to complete.
+        (default=False)
+
+     --description=DESCRIPTION
+        Optional description of the type provider.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a new type provider, run:
+
+        $ gcloud alpha deployment-manager type-providers create \
+            my-type-provider --api-options-file=my-options.yaml \
+            --descriptor-url <descriptor URL> --description "My type."
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta deployment-manager type-providers create
+

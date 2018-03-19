@@ -1,0 +1,38 @@
+NAME
+    gcloud beta deployment-manager type-providers delete - delete a type
+        provider
+
+SYNOPSIS
+    gcloud beta deployment-manager type-providers delete PROVIDER_NAME
+        [--async] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This command deletes a type provider.
+
+POSITIONAL ARGUMENTS
+     PROVIDER_NAME
+        Type provider name or URI.
+
+FLAGS
+     --async
+        Return immediately and print information about the Operation in
+        progress rather than waiting for the Operation to complete.
+        (default=False)
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To delete a type provider, run:
+
+        $ gcloud beta deployment-manager type-providers delete \
+            my-type-provider
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha deployment-manager type-providers delete
+

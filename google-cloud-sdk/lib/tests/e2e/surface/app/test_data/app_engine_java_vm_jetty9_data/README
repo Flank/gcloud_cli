@@ -1,0 +1,7 @@
+If you want to update the binary jar (purejetty9webapp-1.0-SNAPSHOT.war),
+you can unzip the purejetty9webapp.zip file , update the gcloud-maven-plugin
+version to a newer version if needed, and then, using a Maven tool
+(version 3.1 or bigger), run:
+mvn clean install
+This will produce the purejetty9webapp-1.0-SNAPSHOT.war file  in the target
+directory.

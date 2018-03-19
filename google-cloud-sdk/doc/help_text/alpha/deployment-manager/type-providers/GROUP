@@ -1,0 +1,55 @@
+NAME
+    gcloud alpha deployment-manager type-providers - commands for Deployment
+        Manager type providers
+
+SYNOPSIS
+    gcloud alpha deployment-manager type-providers COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for Deployment Manager type providers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a type provider.
+
+     delete
+        (ALPHA) Delete a type provider.
+
+     describe
+        (ALPHA) Describe a type provider entry in Type Registry.
+
+     list
+        (ALPHA) List type providers in a project.
+
+     update
+        (ALPHA) Update a type provider.
+
+EXAMPLES
+    To view the details of a type provider, run:
+
+        $ gcloud alpha deployment-manager type-providers describe TYPE_NAME
+
+    To see the list of all type providers, run:
+
+        $ gcloud alpha deployment-manager type-providers list
+
+    More information about type providers:
+    https://cloud.google.com/deployment-manager/docs/fundamentals#basetypes
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta deployment-manager type-providers
+

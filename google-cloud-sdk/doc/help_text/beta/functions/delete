@@ -1,0 +1,29 @@
+NAME
+    gcloud beta functions delete - delete a Google Cloud Function
+
+SYNOPSIS
+    gcloud beta functions delete NAME [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Delete a Google Cloud Function.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the function to delete.
+
+FLAGS
+     --region=REGION
+        The region of the function to delete. Overrides the default
+        functions/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha functions delete
+

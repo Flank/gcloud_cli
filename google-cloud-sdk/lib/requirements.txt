@@ -1,0 +1,6 @@
+# This complements dependency requirements specified in setup.py.
+# To override specific dependency use
+#  -e https://github.com/foo/bar.git#egg=bar
+
+--index-url https://pypi.python.org/simple/
+-e .

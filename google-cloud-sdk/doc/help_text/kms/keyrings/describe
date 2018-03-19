@@ -1,0 +1,34 @@
+NAME
+    gcloud kms keyrings describe - get metadata for a keyring
+
+SYNOPSIS
+    gcloud kms keyrings describe KEYRING [--location=LOCATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Returns metadata for the given keyring.
+
+POSITIONAL ARGUMENTS
+     KEYRING
+        Name of the keyring to describe.
+
+FLAGS
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command returns the metadata for the keyring towers in the
+    location us-east1:
+
+        $ gcloud kms keyrings describe towers --location us-east1
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta kms keyrings describe
+

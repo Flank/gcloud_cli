@@ -1,0 +1,489 @@
+
+.TH "GCLOUD_ALPHA_CONTAINER_NODE\-POOLS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha container node\-pools create \- create a node pool in a running cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR\ |\ \fB\-\-local\-ssd\-volumes\fR=[[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR],[\fIformat\fR=\fIFORMAT\fR],...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha container node\-pools create\fR facilitates the
+creation of a node pool in a Google Kubernetes Engine cluster. A variety of
+options exists to customize the node configuration and the number of nodes
+created.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the node pool to create.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]
+Attaches accelerators (e.g. GPUs) to all nodes.
+
+.RS 2m
+.TP 2m
+\fBtype\fR
+(Required) The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of
+accelerator to attach to the instances. Use \f5gcloud compute accelerator\-types
+list\fR to learn about all available accelerator types.
+
+.TP 2m
+\fBcount\fR
+(Optional) The number of accelerators to attach to the instances. The default
+value is 1.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+The cluster to add the node pool to. Overrides the default
+\fBcontainer/cluster\fR property value for this command invocation.
+
+.TP 2m
+\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
+Size in GB for node VM boot disks. Defaults to 100GB.
+
+.TP 2m
+\fB\-\-enable\-autorepair\fR
+Sets autorepair feature for a node\-pool.
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-enable\-autorepair
+.RE
+
+See https://cloud.google.com/kubernetes\-engine/docs/node\-auto\-repair for more
+info.
+
+.TP 2m
+\fB\-\-enable\-autoupgrade\fR
+Sets autoupgrade feature for a node\-pool.
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-enable\-autoupgrade
+.RE
+
+See https://cloud.google.com/kubernetes\-engine/docs/node\-managament for more
+info.
+
+.TP 2m
+\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR
+The image type to use for the node pool. Defaults to server\-specified.
+
+Image Type specifies the base OS that the nodes in the node pool will run on. If
+an image type is specified, that will be assigned to the node pool and all
+future upgrades will use the specified image type. If it is not specified the
+server will pick the default image type.
+
+The default image type and the list of valid image types are available using the
+following command.
+
+.RS 2m
+$ gcloud container get\-server\-config
+.RE
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR, \fB\-m\fR \fIMACHINE_TYPE\fR
+The type of machine to use for nodes. Defaults to n1\-standard\-1
+
+.TP 2m
+\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR
+When specified, the nodes for the new node pool will be scheduled on host with
+specified CPU architecture or a newer one.
+
+Examples: $ gcloud alpha container node\-pools create node\-pool\-1 \e
+\-\-cluster=example\-cluster \-\-min\-cpu\-platform=PLATFORM
+
+To list available CPU platforms in given zone, run:
+
+.RS 2m
+$ gcloud beta compute zones describe ZONE \e
+    \-\-format="value(availableCpuPlatforms)"
+.RE
+
+CPU platform selection is available only in selected zones.
+
+.TP 2m
+\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]
+Applies the given kubernetes labels on all nodes in the new node\-pool. Example:
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \e
+    \-\-node\-labels=label1=value1,label2=value2
+.RE
+
+New nodes, including ones created by resize or recreate, will have these labels
+on the kubernetes API node object and can be used in nodeSelectors. See
+http://kubernetes.io/docs/user\-guide/node\-selection/ for examples.
+
+.TP 2m
+\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]
+Applies the given kubernetes taints on all nodes in the new node\-pool, which
+can be used with tolerations for pod scheduling. Example:
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \e
+    \-\-node\-taints=key1=val1:NoSchedule,key2=val2:PreferNoSchedule
+.RE
+
+Note, this feature uses \f5gcloud beta\fR commands. To use gcloud beta commands,
+you must configure \f5gcloud\fR to use the v1beta1 API as described here:
+https://cloud.google.com/kubernetes\-engine/docs/reference/api\-organization#beta.
+To read more about node\-taints, see
+https://cloud.google.com/kubernetes\-engine/docs/node\-taints.
+
+.TP 2m
+\fB\-\-node\-version\fR=\fINODE_VERSION\fR
+The Kubernetes version to use for nodes. Defaults to server\-specified.
+
+The default Kubernetes version is available using the following command.
+
+.RS 2m
+$ gcloud container get\-server\-config
+.RE
+
+.TP 2m
+\fB\-\-num\-nodes\fR=\fINUM_NODES\fR; default=3
+The number of nodes in the node pool in each of the cluster's zones.
+
+.TP 2m
+\fB\-\-preemptible\fR
+Create nodes using preemptible VM instances in the new nodepool.
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-preemptible
+.RE
+
+New nodes, including ones created by resize or recreate, will use preemptible VM
+instances. See https://cloud.google.com/kubernetes\-engine/docs/preemptible\-vm
+for more information on how to use Preemptible VMs with Kubernetes Engine.
+
+.TP 2m
+\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]
+Applies the given Compute Engine tags (comma separated) on all nodes in the new
+node\-pool. Example:
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-tags=tag1,tag2
+.RE
+
+New nodes, including ones created by resize or recreate, will have these tags on
+the Compute Engine API instance object and can be used in firewall rules. See
+https://cloud.google.com/sdk/gcloud/reference/compute/firewall\-rules/create for
+examples.
+
+.TP 2m
+\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR
+Sets the node metadata option for workload metadata configuration. This feature
+is scheduled to be deprecated in the future and later removed.
+\fIWORKLOAD_METADATA_FROM_NODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBEXPOSED\fR
+Exposes all VM metadata to workloads.
+.TP 2m
+\fBSECURE\fR
+Prevents workloads not in hostNetwork from accessing certain VM metadata,
+specifically kube\-env, which contains Kubelet credentials, and the instance
+identity token. This is a temporary security solution available while the
+bootstrapping process for cluster nodes is being redesigned with significant
+security improvements.
+.TP 2m
+\fBUNSPECIFIED\fR
+Chooses the default.
+
+.RE
+.sp
+.TP 2m
+
+Cluster autoscaling
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-autoscaling\fR
+Enables autoscaling for a node pool.
+
+Enables autoscaling in the node pool specified by \-\-node\-pool or the default
+node pool if \-\-node\-pool is not provided.
+
+.TP 2m
+\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR
+Maximum number of nodes in the node pool.
+
+Maximum number of nodes to which the node pool specified by \-\-node\-pool (or
+default node pool if unspecified) can scale. Ignored unless
+\-\-enable\-autoscaling is also specified.
+
+.TP 2m
+\fB\-\-min\-nodes\fR=\fIMIN_NODES\fR
+Minimum number of nodes in the node pool.
+
+Minimum number of nodes to which the node pool specified by \-\-node\-pool (or
+default node pool if unspecified) can scale. Ignored unless
+\-\-enable\-autoscaling is also specified.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR
+\-\-local\-ssd\-volumes enables the ability to request local SSD with variable
+count, interfaces, and format
+
+\-\-local\-ssd\-count is the equivalent of using \-\-local\-ssd\-volumes with
+type=scsi,format=fs
+
+The number of local SSD disks to provision on each node.
+
+Local SSDs have a fixed 375 GB capacity per device. The number of disks that can
+be attached to an instance is limited by the maximum number of disks available
+on a machine, which differs by compute zone. See
+https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
+
+.TP 2m
+\fB\-\-local\-ssd\-volumes\fR=[[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR],[\fIformat\fR=\fIFORMAT\fR],...]
+\-\-local\-ssd\-volumes enables the ability to request local SSD with variable
+count, interfaces, and format
+
+\-\-local\-ssd\-count is the equivalent of using \-\-local\-ssd\-volumes with
+type=scsi,format=fs
+
+Adds the requested local SSDs on all nodes in default node\-pool(s) in new
+cluster. Example:
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \e
+    \-\-local\-ssd\-volumes count=2,type=nvme,format=fs
+.RE
+
+\'count' must be between 1\-8
+
+\'type' must be either scsi or nvme
+
+\'format' must be either fs or block
+
+New nodes, including ones created by resize or recreate, will have these local
+SSDs.
+
+Local SSDs have a fixed 375 GB capacity per device. The number of disks that can
+be attached to an instance is limited by the maximum number of disks available
+on a machine, which differs by compute zone. See
+https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The compute region (e.g. us\-central1) for the cluster.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
+The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
+\fBcompute/zone\fR property value for this command invocation.
+
+.RE
+.sp
+.TP 2m
+
+Options to specify the node identity. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+The Google Cloud Platform Service Account to be used by the node VMs. If a
+service account is specified, the cloud\-platform scope is used. If no Service
+Account is specified, the project default service account is used.
+
+.TP 2m
+
+Scopes options.
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-cloud\-endpoints\fR
+(REMOVED) Automatically enable Google Cloud Endpoints to take advantage of API
+management features by adding service\-control and service\-management scopes.
+
+If \-\-no\-enable\-cloud\-endpoints is set, remove service\-control and
+service\-management scopes, even if they are implicitly (via default) or
+explicitly set via \-\-scopes.
+
+\-\-[no\-]enable\-cloud\-endpoints is not allowed if
+container/new_scopes_behavior property is set to true.
+
+Flag \-\-[no\-]enable\-cloud\-endpoints has been removed.
+
+Enabled by default, use \fB\-\-no\-enable\-cloud\-endpoints\fR to disable.
+
+.TP 2m
+\fB\-\-scopes\fR=[\fISCOPE\fR,...]; default="gke\-default"
+Specifies scopes for the node instances. The project's default service account
+is used. Examples:
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+  \-\-cluster=example\-cluster \e
+  \-\-scopes=https://www.googleapis.com/auth/devstorage.read_only
+.RE
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+  \-\-cluster=example\-cluster \e
+  \-\-scopes=bigquery,storage\-rw,compute\-ro
+.RE
+
+Multiple SCOPEs can specified, separated by commas. logging\-write and/or
+monitoring are added unless Cloud Logging and/or Cloud Monitoring are disabled
+(see \-\-enable\-cloud\-logging and \-\-enable\-cloud\-monitoring for more
+info).
+
+Unless container/new_scopes_behavior property is true, compute\-rw and
+storage\-ro are always added, even if not explicitly specified, and
+\-\-enable\-cloud\-endpoints (by default) adds service\-control and
+service\-management scopes.
+
+If container/new_scopes_behavior property is true, none of the above scopes are
+added (though storage\-ro, service\-control, and service\-management are all
+included in the default scopes. In a future release, this will be the default
+behavior.
+
+SCOPE can be either the full URI of the scope or an alias. Available aliases
+are:
+
+
+.TS
+tab(,);
+lB lB
+l l.
+Alias,URI
+bigquery,https://www.googleapis.com/auth/bigquery
+cloud\-platform,https://www.googleapis.com/auth/cloud\-platform
+cloud\-source\-repos,https://www.googleapis.com/auth/source.full_control
+cloud\-source\-repos\-ro,https://www.googleapis.com/auth/source.read_only
+compute\-ro,https://www.googleapis.com/auth/compute.readonly
+compute\-rw,https://www.googleapis.com/auth/compute
+datastore,https://www.googleapis.com/auth/datastore
+default,https://www.googleapis.com/auth/devstorage.read_only
+,https://www.googleapis.com/auth/logging.write
+,https://www.googleapis.com/auth/monitoring.write
+,https://www.googleapis.com/auth/pubsub
+,https://www.googleapis.com/auth/service.management.readonly
+,https://www.googleapis.com/auth/servicecontrol
+,https://www.googleapis.com/auth/trace.append
+gke\-default,https://www.googleapis.com/auth/devstorage.read_only
+,https://www.googleapis.com/auth/logging.write
+,https://www.googleapis.com/auth/monitoring
+,https://www.googleapis.com/auth/service.management.readonly
+,https://www.googleapis.com/auth/servicecontrol
+,https://www.googleapis.com/auth/trace.append
+logging\-write,https://www.googleapis.com/auth/logging.write
+monitoring,https://www.googleapis.com/auth/monitoring
+monitoring\-write,https://www.googleapis.com/auth/monitoring.write
+pubsub,https://www.googleapis.com/auth/pubsub
+service\-control,https://www.googleapis.com/auth/servicecontrol
+service\-management,https://www.googleapis.com/auth/service.management.readonly
+sql,https://www.googleapis.com/auth/sqlservice
+sql\-admin,https://www.googleapis.com/auth/sqlservice.admin
+storage\-full,https://www.googleapis.com/auth/devstorage.full_control
+storage\-ro,https://www.googleapis.com/auth/devstorage.read_only
+storage\-rw,https://www.googleapis.com/auth/devstorage.read_write
+taskqueue,https://www.googleapis.com/auth/taskqueue
+trace,https://www.googleapis.com/auth/trace.append
+userinfo\-email,https://www.googleapis.com/auth/userinfo.email
+.TE
+
+
+DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice' account scope
+and \f5sql\fR alias do not provide SQL instance management capabilities and have
+been deprecated. Please, use 'https://www.googleapis.com/auth/sqlservice.admin'
+or \f5sql\-admin\fR to manage your Google SQL Service instances.
+
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a new node pool "node\-pool\-1" with the default options in the
+cluster "sample\-cluster", run:
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster
+.RE
+
+The new node pool will show up in the cluster after all the nodes have been
+provisioned.
+
+To create a node pool with 5 nodes, run:
+
+.RS 2m
+$ gcloud alpha container node\-pools create node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-num\-nodes=5
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud container node\-pools create
+$ gcloud beta container node\-pools create
+.RE
+

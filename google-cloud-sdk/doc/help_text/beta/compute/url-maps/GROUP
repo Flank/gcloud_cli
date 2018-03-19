@@ -1,0 +1,60 @@
+NAME
+    gcloud beta compute url-maps - list, create, and delete URL maps
+
+SYNOPSIS
+    gcloud beta compute url-maps COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) List, create, and delete URL maps.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-host-rule
+        (BETA) Add a rule to a URL map to map hosts to a path matcher.
+
+     add-path-matcher
+        (BETA) Add a path matcher to a URL map.
+
+     create
+        (BETA) Create a URL map.
+
+     delete
+        (BETA) Delete URL maps.
+
+     describe
+        (BETA) Describe a URL map.
+
+     edit
+        (BETA) Modify URL maps.
+
+     invalidate-cdn-cache
+        (BETA) Invalidate specified objects for a URL map in Cloud CDN caches.
+
+     list
+        (BETA) List Google Compute Engine URL maps.
+
+     list-cdn-cache-invalidations
+        (BETA) List Cloud CDN cache invalidations for a URL map.
+
+     remove-host-rule
+        (BETA) Remove a host rule from a URL map.
+
+     remove-path-matcher
+        (BETA) Remove a path matcher from a URL map.
+
+     set-default-service
+        (BETA) Change the default service or default bucket of a URL map.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute url-maps
+        $ gcloud alpha compute url-maps
+

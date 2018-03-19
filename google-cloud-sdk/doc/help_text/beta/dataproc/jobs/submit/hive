@@ -1,0 +1,89 @@
+NAME
+    gcloud beta dataproc jobs submit hive - submit a Hive job to a cluster
+
+SYNOPSIS
+    gcloud beta dataproc jobs submit hive --cluster=CLUSTER
+        (--execute=QUERY, -e QUERY | --file=FILE, -f FILE) [--async]
+        [--bucket=BUCKET] [--continue-on-failure] [--jars=[JAR,...]]
+        [--labels=[KEY=VALUE,...]]
+        [--max-failures-per-hour=MAX_FAILURES_PER_HOUR]
+        [--params=[PARAM=VALUE,...]] [--properties=[PROPERTY=VALUE,...]]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Submit a Hive job to a cluster.
+
+REQUIRED FLAGS
+     --cluster=CLUSTER
+        The Dataproc cluster to submit the job to.
+
+     Exactly one of these must be specified:
+
+       --execute=QUERY, -e QUERY
+          A Hive query to execute as part of the job.
+
+       --file=FILE, -f FILE
+          HCFS URI of file containing Hive script to execute as the job.
+
+OPTIONAL FLAGS
+     --async
+        Does not wait for the job to run.
+
+     --bucket=BUCKET
+        The Cloud Storage bucket to stage files in. Defaults to the cluster's
+        configured bucket.
+
+     --continue-on-failure
+        Whether to continue if a single query fails.
+
+     --jars=[JAR,...]
+        Comma separated list of jar files to be provided to the Hive and MR.
+        May contain UDFs.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --max-failures-per-hour=MAX_FAILURES_PER_HOUR
+        Specifies maximum number of times a job can be restarted in event of
+        failure. Expressed as a per-hour rate. Default is 0 (no failure
+        retries).
+
+     --params=[PARAM=VALUE,...]
+        A list of key value pairs to set variables in the Hive queries.
+
+     --properties=[PROPERTY=VALUE,...]
+        A list of key value pairs to configure Hive.
+
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To submit a Hive job with a local script, run:
+
+        $ gcloud beta dataproc jobs submit hive --cluster my_cluster \
+            --file my_queries.q
+
+    To submit a Hive job with inline queries, run:
+
+        $ gcloud beta dataproc jobs submit hive --cluster my_cluster \
+            -e \
+            "CREATE EXTERNAL TABLE foo(bar int) LOCATION\
+         'gs://my_bucket/'" -e "SELECT * FROM foo WHERE bar > 2"
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc jobs submit hive
+

@@ -1,0 +1,132 @@
+
+.TH "GCLOUD_BETA_DATAFLOW_LOGS_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dataflow logs list \- retrieve the job logs for a specific job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dataflow logs list\fR \fIJOB_ID\fR [\fB\-\-after\fR=\fIAFTER\fR] [\fB\-\-before\fR=\fIBEFORE\fR] [\fB\-\-importance\fR=\fIIMPORTANCE\fR;\ default="warning"] [\fB\-\-region\fR=\fIREGION_ID\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Retrieves the job logs from a specified job using the Dataflow
+Messages API with at least the specified importance level. Can also be used to
+display logs between a given time period using the \-\-before and \-\-after
+flags. These logs are produced by the service and are distinct from worker logs.
+Worker logs can be found in Cloud Logging.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB_ID\fR
+The job ID to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-after\fR=\fIAFTER\fR
+Only display messages logged after the given time. See $ gcloud topic datetimes
+for information on time formats. For example, \f52018\-01\-01\fR is the first
+day of the year, and \f5\-P2W\fR is 2 weeks ago.
+
+.TP 2m
+\fB\-\-before\fR=\fIBEFORE\fR
+Only display messages logged before the given time. See $ gcloud topic datetimes
+for information on time formats.
+
+.TP 2m
+\fB\-\-importance\fR=\fIIMPORTANCE\fR; default="warning"
+Minimum importance a message must have to be displayed. \fIIMPORTANCE\fR must be
+one of: \fBdebug\fR, \fBdetailed\fR, \fBwarning\fR, \fBerror\fR.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION_ID\fR
+The region ID of the job's regional endpoint.
+
+
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates True then that item is listed. For more details and
+examples of filter expressions run $ gcloud topic filters. This flag interacts
+with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+Retrieve only error logs:
+
+.RS 2m
+$ gcloud beta dataflow logs list \-\-importance=error
+.RE
+
+Retrieve all logs after some date:
+
+.RS 2m
+$ gcloud beta dataflow logs list \-\-after="2016\-08\-12 00:00:00"
+.RE
+
+Retrieve logs from this year:
+
+.RS 2m
+$ gcloud beta dataflow logs list \-\-after=2018\-01\-01
+.RE
+
+Retrieve logs more than a week old:
+
+.RS 2m
+$ gcloud beta dataflow logs list \-\-before=\-P1W
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha dataflow logs list
+.RE
+

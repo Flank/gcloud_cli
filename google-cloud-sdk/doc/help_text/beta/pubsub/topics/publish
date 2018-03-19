@@ -1,0 +1,55 @@
+NAME
+    gcloud beta pubsub topics publish - publishes a message to the specified
+        topic
+
+SYNOPSIS
+    gcloud beta pubsub topics publish TOPIC [MESSAGE_BODY]
+        [--attribute=[ATTRIBUTE,...]] [--message=MESSAGE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Publishes a message to the specified topic name for testing and
+    troubleshooting. Use with caution: all associated subscribers must be able
+    to consume and acknowledge any message you publish, otherwise the system
+    will continuously re-attempt delivery of the bad message for 7 days.
+
+POSITIONAL ARGUMENTS
+     TOPIC
+        Name of the topic to publish messages to.
+
+     [MESSAGE_BODY]
+        (DEPRECATED) The body of the message to publish to the given topic
+        name. Information on message formatting and size limits can be found
+        at: https://cloud.google.com/pubsub/docs/publisher#publish
+
+        Positional argument MESSAGE_BODY is deprecated. Please use --message
+        instead.
+
+FLAGS
+     --attribute=[ATTRIBUTE,...]
+        Comma-separated list of attributes. Each ATTRIBUTE has the form
+        name=value". You can specify up to 100 attributes.
+
+     --message=MESSAGE
+        The body of the message to publish to the given topic name. Information
+        on message formatting and size limits can be found at:
+        https://cloud.google.com/pubsub/docs/publisher#publish
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To publish messages in a batch to a specific Cloud Pub/Sub topic, run:
+
+        $ gcloud beta pubsub topics publish mytopic "Hello World!" \
+            --attribute KEY1=VAL1,KEY2=VAL2
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud pubsub topics publish
+        $ gcloud alpha pubsub topics publish
+

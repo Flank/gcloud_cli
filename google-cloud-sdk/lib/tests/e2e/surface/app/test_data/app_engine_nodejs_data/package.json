@@ -1,0 +1,17 @@
+{
+  "name": "app_engine_nodejs_data",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.13.3"
+  },
+  "engines": {
+    "node": "~4.1"
+  }
+}

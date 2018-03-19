@@ -1,0 +1,52 @@
+NAME
+    gcloud dns managed-zones - manage your Cloud DNS managed-zones
+
+SYNOPSIS
+    gcloud dns managed-zones COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage your Cloud DNS managed-zones.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Cloud DNS managed-zone.
+
+     delete
+        Delete an empty Cloud DNS managed-zone.
+
+     describe
+        View the details of a Cloud DNS managed-zone.
+
+     list
+        View the list of all your managed-zones.
+
+EXAMPLES
+    To create a managed-zone, run:
+
+        $ gcloud dns managed-zones create my_zone --description="My Zone" \
+            --dns-name="my.zone.com."
+
+    To delete a managed-zone, run:
+
+        $ gcloud dns managed-zones delete my_zone
+
+    To view the details of a managed-zone, run:
+
+        $ gcloud dns managed-zones describe my_zone
+
+    To see the list of all managed-zones, run:
+
+        $ gcloud dns managed-zones list
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dns managed-zones
+

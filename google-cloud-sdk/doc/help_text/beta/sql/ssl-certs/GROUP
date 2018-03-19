@@ -1,0 +1,39 @@
+NAME
+    gcloud beta sql ssl-certs - provide commands for managing SSL certificates
+        of Cloud SQL instances
+
+SYNOPSIS
+    gcloud beta sql ssl-certs COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Provide commands for managing SSL certificates of Cloud SQL
+    instances, including creating, deleting, listing, and getting information
+    about certificates.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Creates an SSL certificate for a Cloud SQL instance.
+
+     delete
+        (BETA) Deletes an SSL certificate for a Cloud SQL instance.
+
+     describe
+        (BETA) Retrieves information about an SSL cert for a Cloud SQL
+        instance.
+
+     list
+        (BETA) Lists all SSL certs for a Cloud SQL instance.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud sql ssl-certs
+

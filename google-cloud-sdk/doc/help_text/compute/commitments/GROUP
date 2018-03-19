@@ -1,0 +1,32 @@
+NAME
+    gcloud compute commitments - manage Google Compute Engine commitments
+
+SYNOPSIS
+    gcloud compute commitments COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Google Compute Engine commitments.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create Google Compute Engine commitments.
+
+     describe
+        Describe a Google Compute Engine commitment.
+
+     list
+        List Google Compute Engine commitments.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute commitments
+        $ gcloud beta compute commitments
+

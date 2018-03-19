@@ -1,0 +1,34 @@
+NAME
+    gcloud beta runtime-config configs variables describe - describe variable
+        resources
+
+SYNOPSIS
+    gcloud beta runtime-config configs variables describe NAME
+        --config-name=CONFIG_NAME [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This command displays information about the variable resource with
+    the specified name.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The variable name.
+
+REQUIRED FLAGS
+     --config-name=CONFIG_NAME
+        The name of the configuration resource to use.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To describe a variable named "my-var", run:
+
+        $ gcloud beta runtime-config configs variables describe \
+            --config-name my-config my-var
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

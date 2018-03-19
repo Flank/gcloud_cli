@@ -1,0 +1,61 @@
+NAME
+    gcloud alpha container images add-tag - adds tags to existing image
+
+SYNOPSIS
+    gcloud alpha container images add-tag SRC_IMAGE DEST_IMAGE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The container images add-tag command adds the tag specified in the
+    second tag parameter to the image referenced in the first tag parameter.
+    Repositories must be hosted by the Google Container Registry.
+
+POSITIONAL ARGUMENTS
+     SRC_IMAGE
+        The fully qualified name(s) of image(s) to add a tag for. The name(s)
+        should be formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH@sha256:DIGEST or
+        *.gcr.io/PROJECT_ID/IMAGE_PATH:TAG.
+
+     DEST_IMAGE
+        The fully qualified name(s) of image(s) to be the new tag. The name(s)
+        should be formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH:TAG.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    Add a tag to another tag:
+
+        $ gcloud alpha container images add-tag \
+            gcr.io/myproject/myimage:mytag1
+          gcr.io/myproject/myimage:mytag2
+
+    Add a tag to a digest
+
+        $ gcloud alpha container images add-tag \
+            gcr.io/myproject/myimage@sha256:digest
+          gcr.io/myproject/myimage:mytag2
+
+    Add a tag to latest
+
+        $ gcloud alpha container images add-tag gcr.io/myproject/myimage
+          gcr.io/myproject/myimage:mytag2
+
+    Promote a tag to latest
+
+        $ gcloud alpha container images add-tag \
+            gcr.io/myproject/myimage:mytag1
+          gcr.io/myproject/myimage:latest
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud container images add-tag
+        $ gcloud beta container images add-tag
+

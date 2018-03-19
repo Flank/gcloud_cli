@@ -1,0 +1,31 @@
+NAME
+    gcloud alpha auth describe - describes credentials
+
+SYNOPSIS
+    gcloud alpha auth describe ACCOUNT_NAME [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Returns internal details about specified credentials.
+
+POSITIONAL ARGUMENTS
+     ACCOUNT_NAME
+        Name of the account to describe
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To describe existing credentials, run:
+
+        $ gcloud alpha auth describe ACCOUNT_NAME
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

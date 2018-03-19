@@ -1,0 +1,56 @@
+NAME
+    gcloud meta test - run miscellaneous gcloud command and CLI test scenarios
+
+SYNOPSIS
+    gcloud meta test [NAME ...]
+        [--argumenterror-outside-argparse | --core-exception
+          | --exec-file=SCRIPT_FILE | --interrupt | --is-interactive
+          | --prompt-completer=MODULE_PATH | --sleep=SECONDS
+          | --uncaught-exception] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command sets up scenarios for testing the gcloud command and CLI.
+
+POSITIONAL ARGUMENTS
+     [NAME ...]
+        command_lib.compute.TestCompleter instance name test.
+
+FLAGS
+     At most one of these may be specified:
+
+       --argumenterror-outside-argparse
+          Trigger a calliope.parser_errors.ArgumentError exception outside of
+          argparse.
+
+       --core-exception
+          Trigger a core exception.
+
+       --exec-file=SCRIPT_FILE
+          Runs bash SCRIPT_FILE.
+
+       --interrupt
+          Kill the command with SIGINT.
+
+       --is-interactive
+          Call console_io.IsInteractive(heuristic=True) and exit 0 if the
+          return value is True, 1 if False.
+
+       --prompt-completer=MODULE_PATH
+          Call console_io.PromptResponse() with a MODULE_PATH completer and
+          print the response on the standard output.
+
+       --sleep=SECONDS
+          Sleep for SECONDS seconds and exit.
+
+       --uncaught-exception
+          Trigger an exception that is not caught.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

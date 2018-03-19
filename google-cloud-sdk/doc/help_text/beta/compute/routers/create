@@ -1,0 +1,92 @@
+NAME
+    gcloud beta compute routers create - create a Google Compute Engine router
+
+SYNOPSIS
+    gcloud beta compute routers create NAME --asn=ASN --network=NETWORK
+        [--advertisement-mode=MODE] [--async] [--description=DESCRIPTION]
+        [--region=REGION] [--set-advertisement-groups=[GROUP,...]]
+        [--set-advertisement-ranges=[CIDR_RANGE=DESC,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute routers create is used to create a router to
+    provide dynamic routing to VPN tunnels and interconnects.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the router to create.
+
+REQUIRED FLAGS
+     --asn=ASN
+        The BGP autonomous system number (ASN) for this router. For more
+        information see: https://tools.ietf.org/html/rfc6996.
+
+     --network=NETWORK
+        The network for this router
+
+OPTIONAL FLAGS
+     --advertisement-mode=MODE
+        The new advertisement mode for this router. MODE must be one of:
+
+         CUSTOM
+            Custom (user-configured) BGP advertisements.
+         DEFAULT
+            Default (Google-managed) BGP advertisements.
+
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --description=DESCRIPTION
+        An optional description of this router.
+
+     --region=REGION
+        The region of the router to create. If not specified, you will be
+        prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+     --set-advertisement-groups=[GROUP,...]
+        The list of pre-defined groups of IP ranges to dynamically advertise on
+        this router. This list can only be specified in custom advertisement
+        mode.
+
+        GROUP must be (currently only one value is supported):
+
+         ALL_SUBNETS
+            Automatically advertise all available subnets.
+
+     --set-advertisement-ranges=[CIDR_RANGE=DESC,...]
+        The list of individual IP ranges, in CIDR format, to dynamically
+        advertise on this router. Each IP range can (optionally) be given a
+        text description DESC. For example, to advertise a specific range, use
+        --set-advertisement-ranges=192.168.10.0/24. To store a description with
+        the range, use --set-advertisement-ranges=192.168.10.0/24=my-networks.
+        This list can only be specified in custom advertisement mode.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute routers create
+        $ gcloud alpha compute routers create
+

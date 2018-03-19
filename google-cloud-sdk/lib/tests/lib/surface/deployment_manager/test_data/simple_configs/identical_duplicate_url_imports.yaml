@@ -1,0 +1,9 @@
+imports:
+- path: https://www.google.com/blah.yaml
+  name: my-import.yaml
+- path: https://www.google.com/blah.yaml
+  name: my-import.yaml
+
+resources:
+- type: blah
+  name: foobar

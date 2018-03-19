@@ -1,0 +1,64 @@
+NAME
+    gcloud meta - cloud meta introspection commands
+
+SYNOPSIS
+    gcloud meta GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Cloud meta introspection commands.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     apis
+        Inspect the APIs registered in gcloud.
+
+     cache
+        Cloud SDK persistent cache commands.
+
+     cli-trees
+        CLI trees manager.
+
+     resources
+        Cloud SDK resource parser test commands.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     debug
+        Run an interactive debug console with the Cloud SDK libraries loaded.
+
+     generate-help-docs
+        Generate all DevSite and man page help docs.
+
+     lint
+        Validate gcloud flags according to Cloud SDK CLI Style.
+
+     list-commands
+        List all possible gcloud commands excluding flags.
+
+     list-files-for-upload
+        List files for upload.
+
+     list-from-json
+        Read JSON data and list it on the standard output.
+
+     list-gcloud
+        List the gcloud CLI command tree with flag, positional and help
+        details.
+
+     render-markdown
+        Uses gcloud's markdown renderer to render the given markdown file.
+
+     test
+        Run miscellaneous gcloud command and CLI test scenarios.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

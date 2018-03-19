@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha ml vision detect-web - detect entities in an image from
+        similar images on the web
+
+SYNOPSIS
+    gcloud alpha ml vision detect-web IMAGE_PATH [--max-results=MAX_RESULTS]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Detect entities in an image from similar images on the web.
+
+POSITIONAL ARGUMENTS
+     IMAGE_PATH
+        The path to the image to be analyzed. This can be either a local path
+        or a URL. If you provide a local file, the contents will be sent
+        directly to Google Cloud Vision. If you provide a URL, it must be in
+        Google Cloud Storage format (gs://bucket/object) or an HTTP URL
+        (http://... or https://...)
+
+FLAGS
+     --max-results=MAX_RESULTS
+        The maximum number of results to be provided.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the vision/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/vision/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml vision detect-web
+        $ gcloud beta ml vision detect-web
+

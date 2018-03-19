@@ -1,0 +1,66 @@
+
+.TH "GCLOUD_ALPHA_EMULATORS_BIGTABLE_START" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha emulators bigtable start \- start a local Bigtable emulator
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha emulators bigtable start\fR [\fB\-\-host\-port\fR=\fIHOST_PORT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command starts a local Bigtable emulator.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-host\-port\fR=\fIHOST_PORT\fR
+The host:port to which the emulator should be bound. The default value is
+localhost:8086.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To start a local Bigtable emulator, run:
+
+.RS 2m
+$ gcloud alpha emulators bigtable start
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta emulators bigtable start
+.RE
+

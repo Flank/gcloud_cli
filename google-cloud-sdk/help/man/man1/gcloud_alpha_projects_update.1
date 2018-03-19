@@ -1,0 +1,135 @@
+
+.TH "GCLOUD_ALPHA_PROJECTS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha projects update \- update the name and/or labels of a project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha projects update\fR \fIPROJECT_ID\fR (\fB\-\-name\fR=\fINAME\fR\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update the name and/or labels of the given project.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+There is no project with the given ID.
+.IP "\(bu" 2m
+The active account does not have Owner or Editor permissions for the given
+project.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+ID for the project you want to update.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+At least one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-name\fR=\fINAME\fR
+New name for the project.
+
+.TP 2m
+
+Labels Flags
+
+.RS 2m
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Removes all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha projects update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha projects update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+
+.RE
+.RE
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command updates a project with the ID \f5example\-foo\-bar\-1\fR
+to have the name "Foo Bar & Grill" and removes the label \f5dive\fR:
+
+.RS 2m
+$ gcloud alpha projects update example\-foo\-bar\-1 \e
+    \-\-name="Foo Bar & Grill" \-\-remove\-labels=dive
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud projects update
+$ gcloud beta projects update
+.RE
+

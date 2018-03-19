@@ -1,0 +1,492 @@
+{
+    "createTime": "2015-01-30T18:58:27.882Z",
+    "currentState": "JOB_STATE_DONE",
+    "currentStateTime": "2015-01-30T19:01:13.451Z",
+    "environment": {
+        "clusterManagerApiService": "compute.googleapis.com",
+        "dataset": "bigquery.googleapis.com/cloud_dataflow",
+        "tempStoragePrefix": "storage.googleapis.com/clouddfe-test/staging-user",
+        "userAgent": {
+            "build.date": "2015-01-30 01:44",
+            "name": "Google Cloud Dataflow Java SDK",
+            "version": "0.3.150130"
+        },
+        "version": {
+            "job_type": "DATA_PARALLEL",
+            "major": "0"
+        },
+        "workerPools": [
+            {
+                "diskSizeGb": 10,
+                "kind": "harness",
+                "machineType": "n1-standard-1",
+                "metadata": {},
+                "numWorkers": 3,
+                "onHostMaintenance": "MIGRATE",
+                "packages": [
+                    {
+                        "location": "storage.googleapis.com/clouddfe-test/staging-user/dataflow-sdk-44Mv06O8E7YJNHrmalylUA.jar",
+                        "name": "dataflow-sdk-44Mv06O8E7YJNHrmalylUA.jar"
+                    },
+                    {
+                        "location": "storage.googleapis.com/clouddfe-test/staging-user/examples-6UC-B5fNkFEsL1ZUGexFsQ.jar",
+                        "name": "examples-6UC-B5fNkFEsL1ZUGexFsQ.jar"
+                    }
+                ],
+                "taskrunnerSettings": {
+                    "parallelWorkerSettings": {
+                        "baseUrl": "https://www-googleapis-staging.sandbox.google.com/",
+                        "servicePath": "dataflow_user/v1b3/projects"
+                    }
+                },
+                "teardownPolicy": "TEARDOWN_ALWAYS",
+                "zone": "us-central1-f"
+            },
+            {
+                "diskSizeGb": 10,
+                "kind": "harness",
+                "machineType": "n1-standard-4",
+                "metadata": {},
+                "numWorkers": 2,
+                "onHostMaintenance": "MIGRATE",
+                "teardownPolicy": "TEARDOWN_ALWAYS",
+                "zone": "us-central1-a"
+            },
+            {
+                "diskSizeGb": 1000,
+                "diskSourceImage": "https://www.googleapis.com/compute/v1/projects/clouddataflow-readonly/global/images/dataflow-batch-dev-latest",
+                "kind": "harness",
+                "machineType": "n1-standard-4",
+                "metadata": {
+                    "config": "{\"task_user\":\"nobody\",\"task_group\":\"nogroup\",\"scopes\":[\"https://www.googleapis.com/auth/devstorage.full_control\",\"https://www.googleapis.com/auth/cloud-platform\"],\"dataflow_api_endpoint\":\"https://www-googleapis-staging.sandbox.google.com/\",\"dataflow_api_version\":\"v1beta1\",\"parallel_worker_flags\":{\"root_url\":\"https://www-googleapis-staging.sandbox.google.com/\",\"reporting_enabled\":true,\"service_path\":\"dataflow_user/v1b3/projects\",\"temp_gcs_directory\":\"gs://clouddfe-test/staging-user\",\"project_id\":\"cloud-sdk-integration-testing\",\"job_id\":\"2015-01-30_10_58_27-16706550262336133032\"},\"base_task_dir\":\"/tmp/tasks/\",\"continue_on_exception\":true,\"log_to_serialconsole\":true,\"alsologtostderr\":true,\"log_to_gcs\":true,\"log_dir\":\"/dataflow/logs/taskrunner/harness\",\"temp_gcs_directory\":\"gs://clouddfe-test/staging-user\",\"python_harness_cmd\":\"python_harness_main\",\"commandlines_file_name\":\"commandlines.txt\"}",
+                    "google-container-manifest": "\ncontainers:\n-\n  env:\n  -\n    name: GCS_BUCKET\n    value: dataflow-docker-images\n  image: google/docker-registry\n  imagePullPolicy: PullNever\n  name: repository\n  ports:\n  -\n    containerPort: 5000\n    hostPort: 5000\n    name: registry\n-\n  image: localhost:5000/dataflow/taskrunner:dev-latest\n  imagePullPolicy: PullAlways\n  name: taskrunner\n  volumeMounts:\n  -\n    mountPath: /dataflow/logs/taskrunner/harness\n    name: dataflowlogs-harness\n-\n  env:\n  -\n    name: LOG_DIR\n    value: /dataflow/logs\n  image: localhost:5000/dataflow/shuffle:dev-latest\n  imagePullPolicy: PullAlways\n  name: shuffle\n  ports:\n  -\n    containerPort: 12345\n    hostPort: 12345\n    name: shuffle1\n  -\n    containerPort: 22349\n    hostPort: 22349\n    name: shuffle2\n  volumeMounts:\n  -\n    mountPath: /var/shuffle\n    name: dataflow-shuffle\n  -\n    mountPath: /dataflow/logs\n    name: dataflowlogs-shuffle\nversion: v1beta2\nvolumes:\n-\n  name: dataflowlogs-harness\n  source:\n   hostDir:\n    path: /var/log/dataflow/taskrunner/harness\n-\n  name: dataflow-shuffle\n  source:\n   hostDir:\n    path: /dataflow/shuffle\n-\n  name: dataflowlogs-shuffle\n  source:\n   hostDir:\n    path: /var/log/dataflow/shuffle\n",
+                    "packages": "gs://clouddfe-test/staging-user/dataflow-sdk-44Mv06O8E7YJNHrmalylUA.jar|dataflow-sdk-44Mv06O8E7YJNHrmalylUA.jar|gs://clouddfe-test/staging-user/examples-6UC-B5fNkFEsL1ZUGexFsQ.jar|examples-6UC-B5fNkFEsL1ZUGexFsQ.jar|gs://dataflow-releases-prod/worker_packages/NOTICES.shuffle|NOTICES.shuffler"
+                },
+                "numWorkers": 3,
+                "onHostMaintenance": "MIGRATE",
+                "teardownPolicy": "TEARDOWN_ALWAYS",
+                "zone": "us-central1-f"
+            },
+            {
+                "diskSizeGb": 10,
+                "kind": "harness",
+                "machineType": "n1-standard-1",
+                "metadata": {},
+                "numWorkers": 3,
+                "onHostMaintenance": "MIGRATE",
+                "packages": [
+                    {
+                        "location": "storage.googleapis.com/clouddfe-test/staging-user/dataflow-sdk-44Mv06O8E7YJNHrmalylUA.jar",
+                        "name": "dataflow-sdk-44Mv06O8E7YJNHrmalylUA.jar"
+                    },
+                    {
+                        "location": "storage.googleapis.com/clouddfe-test/staging-user/examples-6UC-B5fNkFEsL1ZUGexFsQ.jar",
+                        "name": "examples-6UC-B5fNkFEsL1ZUGexFsQ.jar"
+                    }
+                ],
+                "taskrunnerSettings": {
+                    "parallelWorkerSettings": {
+                        "baseUrl": "https://www-googleapis-staging.sandbox.google.com/",
+                        "servicePath": "dataflow_user/v1b3/projects"
+                    }
+                },
+                "teardownPolicy": "TEARDOWN_ALWAYS",
+                "zone": "us-central1-f"
+            }
+        ]
+    },
+    "id": "2016-01-01_13_11_11-11111",
+    "name": "wordcount-user-0130185820",
+    "projectId": "cloud-sdk-integration-testing",
+    "steps": [
+        {
+            "kind": "ParallelRead",
+            "name": "s1",
+            "properties": {
+                "compression_type": {
+                    "@type": "http://schema.org/Text",
+                    "value": "AUTO"
+                },
+                "filepattern": {
+                    "@type": "http://schema.org/Text",
+                    "value": "gs://shakespeare_g/shakespeare/*"
+                },
+                "format": {
+                    "@type": "http://schema.org/Text",
+                    "value": "text"
+                },
+                "output_info": [
+                    {
+                        "encoding": {
+                            "@type": "com.google.cloud.dataflow.sdk.util.WindowedValue$ValueOnlyWindowedValueCoder",
+                            "component_encodings": [
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.coders.StringUtf8Coder"
+                                }
+                            ],
+                            "is_wrapper": {
+                                "@type": "http://schema.org/Boolean",
+                                "value": true
+                            }
+                        },
+                        "output_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "output"
+                        },
+                        "user_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "ReadLines.out"
+                        }
+                    }
+                ],
+                "user_name": {
+                    "@type": "http://schema.org/Text",
+                    "value": "ReadLines"
+                },
+                "validate_source": {
+                    "@type": "http://schema.org/Boolean",
+                    "value": true
+                }
+            }
+        },
+        {
+            "kind": "ParallelDo",
+            "name": "s2",
+            "properties": {
+                "output_info": [
+                    {
+                        "encoding": {
+                            "@type": "com.google.cloud.dataflow.sdk.util.WindowedValue$FullWindowedValueCoder",
+                            "component_encodings": [
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.coders.StringUtf8Coder"
+                                },
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.transforms.windowing.GlobalWindows$GlobalWindow$Coder"
+                                }
+                            ],
+                            "is_wrapper": {
+                                "@type": "http://schema.org/Boolean",
+                                "value": true
+                            }
+                        },
+                        "output_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "out"
+                        },
+                        "user_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "CountWords/ExtractWords.out"
+                        }
+                    }
+                ],
+                "parallel_input": {
+                    "@type": "OutputReference",
+                    "output_name": "output",
+                    "step_name": "s1"
+                },
+                "serialized_fn": {
+                    "@type": "http://schema.org/Text",
+                    "value": "%ac%ed%00%05sr%00+com.google.cloud.dataflow.sdk.util.DoFnInfo%00%00%00%00%00%00%00%00%02%00%02L%00%04doFnt%00/Lcom/google/cloud/dataflow/sdk/transforms/DoFn;L%00%08windowFnt%00=Lcom/google/cloud/dataflow/sdk/transforms/windowing/WindowFn;xpsr%00;com.google.cloud.dataflow.examples.WordCount$ExtractWordsFn%a6%0e%89]%8e%25%e2.%02%00%01L%00%0aemptyLinest%005Lcom/google/cloud/dataflow/sdk/transforms/Aggregator;xr%00-com.google.cloud.dataflow.sdk.transforms.DoFnB%d7%95%eem%1f0%10%02%00%00xppsr%00@com.google.cloud.dataflow.sdk.transforms.windowing.GlobalWindows%db%ce%bb%0fS{f%97%02%00%00xr%00Ecom.google.cloud.dataflow.sdk.transforms.windowing.NonMergingWindowFn%a3%a1>a%9cr%b3)%02%00%00xr%00;com.google.cloud.dataflow.sdk.transforms.windowing.WindowFn?&W>%1e%d3%181%02%00%00xp"
+                },
+                "user_fn": {
+                    "@type": "http://schema.org/Text",
+                    "value": "com.google.cloud.dataflow.examples.WordCount$ExtractWordsFn"
+                },
+                "user_name": {
+                    "@type": "http://schema.org/Text",
+                    "value": "CountWords/ExtractWords"
+                }
+            }
+        },
+        {
+            "kind": "ParallelDo",
+            "name": "s3",
+            "properties": {
+                "output_info": [
+                    {
+                        "encoding": {
+                            "@type": "com.google.cloud.dataflow.sdk.util.WindowedValue$FullWindowedValueCoder",
+                            "component_encodings": [
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.coders.KvCoder",
+                                    "component_encodings": [
+                                        {
+                                            "@type": "com.google.cloud.dataflow.sdk.coders.StringUtf8Coder"
+                                        },
+                                        {
+                                            "@type": "com.google.cloud.dataflow.sdk.coders.VarLongCoder"
+                                        }
+                                    ],
+                                    "is_pair_like": {
+                                        "@type": "http://schema.org/Boolean",
+                                        "value": true
+                                    }
+                                },
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.transforms.windowing.GlobalWindows$GlobalWindow$Coder"
+                                }
+                            ],
+                            "is_wrapper": {
+                                "@type": "http://schema.org/Boolean",
+                                "value": true
+                            }
+                        },
+                        "output_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "out"
+                        },
+                        "user_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "CountWords/Count.PerElement/Init.out"
+                        }
+                    }
+                ],
+                "parallel_input": {
+                    "@type": "OutputReference",
+                    "output_name": "out",
+                    "step_name": "s2"
+                },
+                "serialized_fn": {
+                    "@type": "http://schema.org/Text",
+                    "value": "%ac%ed%00%05sr%00+com.google.cloud.dataflow.sdk.util.DoFnInfo%00%00%00%00%00%00%00%00%02%00%02L%00%04doFnt%00/Lcom/google/cloud/dataflow/sdk/transforms/DoFn;L%00%08windowFnt%00=Lcom/google/cloud/dataflow/sdk/transforms/windowing/WindowFn;xpsr%00;com.google.cloud.dataflow.sdk.transforms.Count$PerElement$1X%ff%f6%1f%85y%aa%ff%02%00%01L%00%06this$0t%00;Lcom/google/cloud/dataflow/sdk/transforms/Count$PerElement;xr%00-com.google.cloud.dataflow.sdk.transforms.DoFnB%d7%95%eem%1f0%10%02%00%00xpsr%009com.google.cloud.dataflow.sdk.transforms.Count$PerElement)E%a4yp%92qR%02%00%00xr%003com.google.cloud.dataflow.sdk.transforms.PTransformf%a4h}(9%17f%03%00%00xpxsr%00@com.google.cloud.dataflow.sdk.transforms.windowing.GlobalWindows%db%ce%bb%0fS{f%97%02%00%00xr%00Ecom.google.cloud.dataflow.sdk.transforms.windowing.NonMergingWindowFn%a3%a1>a%9cr%b3)%02%00%00xr%00;com.google.cloud.dataflow.sdk.transforms.windowing.WindowFn?&W>%1e%d3%181%02%00%00xp"
+                },
+                "user_fn": {
+                    "@type": "http://schema.org/Text",
+                    "value": "com.google.cloud.dataflow.sdk.transforms.Count$PerElement$1"
+                },
+                "user_name": {
+                    "@type": "http://schema.org/Text",
+                    "value": "CountWords/Count.PerElement/Init"
+                }
+            }
+        },
+        {
+            "kind": "GroupByKey",
+            "name": "s4",
+            "properties": {
+                "output_info": [
+                    {
+                        "encoding": {
+                            "@type": "com.google.cloud.dataflow.sdk.util.WindowedValue$FullWindowedValueCoder",
+                            "component_encodings": [
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.coders.KvCoder",
+                                    "component_encodings": [
+                                        {
+                                            "@type": "com.google.cloud.dataflow.sdk.coders.StringUtf8Coder"
+                                        },
+                                        {
+                                            "@type": "com.google.cloud.dataflow.sdk.coders.IterableCoder",
+                                            "component_encodings": [
+                                                {
+                                                    "@type": "com.google.cloud.dataflow.sdk.coders.VarLongCoder"
+                                                }
+                                            ],
+                                            "is_stream_like": {
+                                                "@type": "http://schema.org/Boolean",
+                                                "value": true
+                                            }
+                                        }
+                                    ],
+                                    "is_pair_like": {
+                                        "@type": "http://schema.org/Boolean",
+                                        "value": true
+                                    }
+                                },
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.transforms.windowing.GlobalWindows$GlobalWindow$Coder"
+                                }
+                            ],
+                            "is_wrapper": {
+                                "@type": "http://schema.org/Boolean",
+                                "value": true
+                            }
+                        },
+                        "output_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "output"
+                        },
+                        "user_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "CountWords/Count.PerElement/Sum.PerKey/GroupByKey/GroupByKeyOnly.out"
+                        }
+                    }
+                ],
+                "parallel_input": {
+                    "@type": "OutputReference",
+                    "output_name": "out",
+                    "step_name": "s3"
+                },
+                "user_name": {
+                    "@type": "http://schema.org/Text",
+                    "value": "CountWords/Count.PerElement/Sum.PerKey/GroupByKey/GroupByKeyOnly"
+                }
+            }
+        },
+        {
+            "kind": "CombineValues",
+            "name": "s5",
+            "properties": {
+                "encoding": {
+                    "@type": "com.google.cloud.dataflow.sdk.coders.ListCoder",
+                    "component_encodings": [
+                        {
+                            "@type": "com.google.cloud.dataflow.sdk.coders.VarLongCoder"
+                        }
+                    ]
+                },
+                "output_info": [
+                    {
+                        "encoding": {
+                            "@type": "com.google.cloud.dataflow.sdk.util.WindowedValue$FullWindowedValueCoder",
+                            "component_encodings": [
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.coders.KvCoder",
+                                    "component_encodings": [
+                                        {
+                                            "@type": "com.google.cloud.dataflow.sdk.coders.StringUtf8Coder"
+                                        },
+                                        {
+                                            "@type": "com.google.cloud.dataflow.sdk.coders.VarLongCoder"
+                                        }
+                                    ],
+                                    "is_pair_like": {
+                                        "@type": "http://schema.org/Boolean",
+                                        "value": true
+                                    }
+                                },
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.transforms.windowing.GlobalWindows$GlobalWindow$Coder"
+                                }
+                            ],
+                            "is_wrapper": {
+                                "@type": "http://schema.org/Boolean",
+                                "value": true
+                            }
+                        },
+                        "output_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "output"
+                        },
+                        "user_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "CountWords/Count.PerElement/Sum.PerKey/GroupedValues.out"
+                        }
+                    }
+                ],
+                "parallel_input": {
+                    "@type": "OutputReference",
+                    "output_name": "output",
+                    "step_name": "s4"
+                },
+                "serialized_fn": {
+                    "@type": "http://schema.org/Text",
+                    "value": "%ac%ed%00%05sr%00<com.google.cloud.dataflow.sdk.transforms.Combine$CombineFn$1S%22u.%0a%8c%f2u%02%00%01L%00%06this$0t%00<Lcom/google/cloud/dataflow/sdk/transforms/Combine$CombineFn;xr%00?com.google.cloud.dataflow.sdk.transforms.Combine$KeyedCombineFnP&%ff$%cf%e5Zn%02%00%00xpsr%00@com.google.cloud.dataflow.sdk.transforms.Combine$SimpleCombineFnv%86%d4%f7N%aeB%d8%02%00%01L%00%08combinert%00?Lcom/google/cloud/dataflow/sdk/transforms/SerializableFunction;xr%00:com.google.cloud.dataflow.sdk.transforms.Combine$CombineFn7I9%5c%b0P%d0q%02%00%00xpsr%006com.google.cloud.dataflow.sdk.transforms.Sum$SumLongFn%d8%83%b9%dc%ff%ce%ee%99%02%00%00xp"
+                },
+                "user_name": {
+                    "@type": "http://schema.org/Text",
+                    "value": "CountWords/Count.PerElement/Sum.PerKey/GroupedValues"
+                }
+            }
+        },
+        {
+            "kind": "ParallelDo",
+            "name": "s6",
+            "properties": {
+                "output_info": [
+                    {
+                        "encoding": {
+                            "@type": "com.google.cloud.dataflow.sdk.util.WindowedValue$FullWindowedValueCoder",
+                            "component_encodings": [
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.coders.StringUtf8Coder"
+                                },
+                                {
+                                    "@type": "com.google.cloud.dataflow.sdk.transforms.windowing.GlobalWindows$GlobalWindow$Coder"
+                                }
+                            ],
+                            "is_wrapper": {
+                                "@type": "http://schema.org/Boolean",
+                                "value": true
+                            }
+                        },
+                        "output_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "out"
+                        },
+                        "user_name": {
+                            "@type": "http://schema.org/Text",
+                            "value": "CountWords/FormatCounts.out"
+                        }
+                    }
+                ],
+                "parallel_input": {
+                    "@type": "OutputReference",
+                    "output_name": "output",
+                    "step_name": "s5"
+                },
+                "serialized_fn": {
+                    "@type": "http://schema.org/Text",
+                    "value": "%ac%ed%00%05sr%00+com.google.cloud.dataflow.sdk.util.DoFnInfo%00%00%00%00%00%00%00%00%02%00%02L%00%04doFnt%00/Lcom/google/cloud/dataflow/sdk/transforms/DoFn;L%00%08windowFnt%00=Lcom/google/cloud/dataflow/sdk/transforms/windowing/WindowFn;xpsr%00;com.google.cloud.dataflow.examples.WordCount$FormatCountsFn%b1%9a%b0%06%0e%b3%d2>%02%00%00xr%00-com.google.cloud.dataflow.sdk.transforms.DoFnB%d7%95%eem%1f0%10%02%00%00xpsr%00@com.google.cloud.dataflow.sdk.transforms.windowing.GlobalWindows%db%ce%bb%0fS{f%97%02%00%00xr%00Ecom.google.cloud.dataflow.sdk.transforms.windowing.NonMergingWindowFn%a3%a1>a%9cr%b3)%02%00%00xr%00;com.google.cloud.dataflow.sdk.transforms.windowing.WindowFn?&W>%1e%d3%181%02%00%00xp"
+                },
+                "user_fn": {
+                    "@type": "http://schema.org/Text",
+                    "value": "com.google.cloud.dataflow.examples.WordCount$FormatCountsFn"
+                },
+                "user_name": {
+                    "@type": "http://schema.org/Text",
+                    "value": "CountWords/FormatCounts"
+                }
+            }
+        },
+        {
+            "kind": "ParallelWrite",
+            "name": "s7",
+            "properties": {
+                "encoding": {
+                    "@type": "com.google.cloud.dataflow.sdk.util.WindowedValue$ValueOnlyWindowedValueCoder",
+                    "component_encodings": [
+                        {
+                            "@type": "com.google.cloud.dataflow.sdk.coders.StringUtf8Coder"
+                        }
+                    ],
+                    "is_wrapper": {
+                        "@type": "http://schema.org/Boolean",
+                        "value": true
+                    }
+                },
+                "filename_prefix": {
+                    "@type": "http://schema.org/Text",
+                    "value": "gs://parallel_demo/shakespeare_wordcount_user/result.txt"
+                },
+                "filename_suffix": {
+                    "@type": "http://schema.org/Text",
+                    "value": ""
+                },
+                "format": {
+                    "@type": "http://schema.org/Text",
+                    "value": "text"
+                },
+                "parallel_input": {
+                    "@type": "OutputReference",
+                    "output_name": "out",
+                    "step_name": "s6"
+                },
+                "shard_template": {
+                    "@type": "http://schema.org/Text",
+                    "value": "-SSSSS-of-NNNNN"
+                },
+                "user_name": {
+                    "@type": "http://schema.org/Text",
+                    "value": "WriteCounts"
+                },
+                "validate_sink": {
+                    "@type": "http://schema.org/Boolean",
+                    "value": true
+                }
+            }
+        }
+    ],
+    "type": "JOB_TYPE_BATCH"
+}

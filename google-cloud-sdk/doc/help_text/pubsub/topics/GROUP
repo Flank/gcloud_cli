@@ -1,0 +1,41 @@
+NAME
+    gcloud pubsub topics - manage Cloud Pubsub topics
+
+SYNOPSIS
+    gcloud pubsub topics COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Cloud Pubsub topics.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Creates one or more Cloud Pub/Sub topics.
+
+     delete
+        Deletes one or more Cloud Pub/Sub topics.
+
+     describe
+        Describes a Cloud Pub/Sub topic.
+
+     list
+        Lists Cloud Pub/Sub topics within a project.
+
+     list-subscriptions
+        Lists Cloud Pub/Sub subscriptions from a given topic.
+
+     publish
+        Publishes a message to the specified topic.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha pubsub topics
+        $ gcloud beta pubsub topics
+

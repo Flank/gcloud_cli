@@ -1,0 +1,75 @@
+NAME
+    gcloud beta compute networks subnets create - define a subnet for a network
+        in custom subnet mode
+
+SYNOPSIS
+    gcloud beta compute networks subnets create NAME --network=NETWORK
+        --range=RANGE [--description=DESCRIPTION]
+        [--enable-private-ip-google-access] [--region=REGION]
+        [--secondary-range=PROPERTY=VALUE,[PROPERTY=VALUE,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Define a subnet for a network in custom subnet mode. Subnets must be
+    uniquely named per region.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the subnetwork to create.
+
+REQUIRED FLAGS
+     --network=NETWORK
+        The network to which the subnetwork belongs.
+
+     --range=RANGE
+        The IP space allocated to this subnetwork in CIDR format.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional description of this subnetwork.
+
+     --enable-private-ip-google-access
+        Enable/disable access to Google Cloud APIs from this subnet for
+        instances without a public ip address.
+
+     --region=REGION
+        The region of the subnetwork to create. If not specified, you will be
+        prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+     --secondary-range=PROPERTY=VALUE,[PROPERTY=VALUE,...]
+        Adds a secondary IP range to the subnetwork for use in IP aliasing.
+
+        For example, --secondary-range range1=192.168.64.0/24 adds a secondary
+        range 192.168.64.0/24 with name range1.
+
+        * RANGE_NAME - Name of the secondary range.
+        * RANGE - IP range in CIDR format.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute networks subnets create
+        $ gcloud alpha compute networks subnets create
+

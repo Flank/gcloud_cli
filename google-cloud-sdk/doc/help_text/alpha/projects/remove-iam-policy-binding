@@ -1,0 +1,69 @@
+NAME
+    gcloud alpha projects remove-iam-policy-binding - remove IAM policy binding
+        for a project
+
+SYNOPSIS
+    gcloud alpha projects remove-iam-policy-binding PROJECT_ID --member=MEMBER
+        --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Removes a policy binding to the IAM policy of a project, given a
+    project ID and the binding.
+
+POSITIONAL ARGUMENTS
+     PROJECT_ID
+        ID for the project you want to remove IAM policy binding from.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will remove an IAM policy binding for the role of
+    'roles/editor' for the user 'test-user@gmail.com' on project with
+    identifier 'example-project-id-1'
+
+        $ gcloud alpha projects remove-iam-policy-binding \
+            example-project-id-1 --member='user:test-user@gmail.com' \
+            --role='roles/editor'
+
+    The following command will remove an IAM policy binding for the role of
+    'roles/editor' from all authenticated users on project
+    'example-project-id-1':
+
+        $ gcloud alpha projects remove-iam-policy-binding \
+            example-project-id-1 --member='allAuthenticatedUsers' \
+            --role='roles/editor'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud projects remove-iam-policy-binding
+        $ gcloud beta projects remove-iam-policy-binding
+

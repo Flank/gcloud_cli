@@ -1,0 +1,39 @@
+NAME
+    gcloud dataproc jobs wait - view the output of a job as it runs or after it
+        completes
+
+SYNOPSIS
+    gcloud dataproc jobs wait JOB [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    View the output of a job as it runs or after it completes.
+
+POSITIONAL ARGUMENTS
+     JOB
+        The ID of the job to wait for.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To view the output of a job as it runs, run:
+
+        $ gcloud dataproc jobs wait job_id
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dataproc jobs wait
+

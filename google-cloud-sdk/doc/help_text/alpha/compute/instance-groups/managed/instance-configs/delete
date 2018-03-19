@@ -1,0 +1,75 @@
+NAME
+    gcloud alpha compute instance-groups managed instance-configs delete -
+        delete per instance configs from managed instance group
+
+SYNOPSIS
+    gcloud alpha compute instance-groups managed instance-configs delete NAME
+        --instances=INSTANCE,[INSTANCE,...] [--force-instance-update]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instance-groups managed instance-configs
+    delete deletes one or more per instance configs from a Google Compute
+    Engine managed instance group.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the managed instance group to delete.
+
+REQUIRED FLAGS
+     --instances=INSTANCE,[INSTANCE,...]
+        Names of instances to delete instance-configs from.
+
+OPTIONAL FLAGS
+     --force-instance-update
+        The changes will be applied immediately to the instances. If this flag
+        is not provided, the changes will be applied once the instances are
+        restarted or recreated.
+
+        Example: let's say we have an instance with a disk attached to it and
+        an override for the disk. If we decide to delete the override and
+        provide this flag, this will instantly recreate the instance and detach
+        the disk from it. Similarly if we have attached new disk or changed its
+        definition - with this flag it will instantly recreate instance with
+        newly applied overrides.
+
+        If we omit this flag, the instance will continue to exist with no
+        overrides changes applied until it gets restarted or recreated either
+        manually or by autohealer or updater.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to delete. If not specified,
+          you will be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          The zone of the managed instance group to delete. If not specified,
+          you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

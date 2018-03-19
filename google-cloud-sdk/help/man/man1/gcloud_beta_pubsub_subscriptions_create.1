@@ -1,0 +1,101 @@
+
+.TH "GCLOUD_BETA_PUBSUB_SUBSCRIPTIONS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub subscriptions create \- creates one or more Cloud Pub/Sub subscriptions
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Creates one or more Cloud Pub/Sub subscriptions for a given topic.
+The new subscription defaults to a PULL subscription unless a push endpoint is
+specified.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR ...]
+One or more subscriptions to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+TOPIC \- Name of the topic from which this subscription is receiving messages.
+Each subscription is attached to a single topic. The arguments in this group can
+be used to specify the attributes of this resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-topic\fR=\fITOPIC\fR
+The ID of the topic or a fully qualified identifier for the topic. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR
+The Cloud project for the topic. If not set, it will use the project set in
+properties.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR
+The number of seconds the system will wait for a subscriber to acknowledge
+receiving a message before re\-attempting delivery.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to add.
+
+.TP 2m
+\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR
+A URL to use as the endpoint for this subscription. This will also automatically
+set the subscription type to PUSH.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud pubsub subscriptions create
+$ gcloud alpha pubsub subscriptions create
+.RE
+

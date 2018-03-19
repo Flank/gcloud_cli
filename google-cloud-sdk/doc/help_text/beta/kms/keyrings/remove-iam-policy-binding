@@ -1,0 +1,61 @@
+NAME
+    gcloud beta kms keyrings remove-iam-policy-binding - remove a policy
+        binding from a keyring
+
+SYNOPSIS
+    gcloud beta kms keyrings remove-iam-policy-binding KEYRING --member=MEMBER
+        --role=ROLE [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Removes an IAM policy binding from the given keyring.
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+POSITIONAL ARGUMENTS
+     KEYRING
+        Name of the keyring from which to remove an IAM policy binding.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+OPTIONAL FLAGS
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will remove an IAM policy binding for the role of
+    'roles/editor' for the user 'test-user@gmail.com' on the keyring fellowship
+    with location global:
+
+        $ gcloud beta kms keyrings remove-iam-policy-binding fellowship \
+            --location global \
+            --member='user:test-user@gmail.com' \
+            --role='roles/editor'
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud kms keyrings remove-iam-policy-binding
+

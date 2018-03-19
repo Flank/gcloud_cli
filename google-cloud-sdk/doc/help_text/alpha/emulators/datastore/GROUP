@@ -1,0 +1,56 @@
+NAME
+    gcloud alpha emulators datastore - manage your local datastore emulator
+
+SYNOPSIS
+    gcloud alpha emulators datastore COMMAND [--data-dir=DATA_DIR] [--legacy]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This set of commands allows you to start and use a local datastore
+    emulator.
+
+FLAGS
+     --data-dir=DATA_DIR
+        The directory to be used to store/retrieve data/config for an emulator
+        run. The default value is <USER_CONFIG_DIR>/emulators/datastore. The
+        value of USER_CONFIG_DIR can be found by running:
+
+            $ gcloud info --format='get(config.paths.global_config_dir)'
+
+     --legacy
+        Set to use the legacy emulator which supports Cloud Datastore API
+        v1beta2.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     env-init
+        (ALPHA) Print the commands required to export env variables of a
+        datastore.
+
+     env-unset
+        (ALPHA) Print the commands required to unset a datastore emulators env
+        variables.
+
+     start
+        (ALPHA) Start a local datastore emulator.
+
+EXAMPLES
+    To start a local datastore emulator, run:
+
+        $ gcloud alpha emulators datastore start
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta emulators datastore
+

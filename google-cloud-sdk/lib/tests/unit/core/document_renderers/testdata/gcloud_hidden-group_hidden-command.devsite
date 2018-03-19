@@ -1,0 +1,84 @@
+<html devsite="">
+<head>
+<title>gcloud hidden-group hidden-command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="project_path" value="/sdk/_project.yaml">
+<meta name="book_path" value="/sdk/_book.yaml">
+<!-- Cloud SDK reference documentation consumer survey snippet. -->
+<script async="" defer="" src="//www.google.com/insights/consumersurveys/async_survey?site=szsb56j6kyilrquqs4stl4ugq4"></script>
+<!--
+        THIS DOC IS GENERATED.  DO NOT EDIT.
+  -->
+<style>
+  dd {
+    margin-bottom: 1ex;
+  }
+  li {
+    margin-top: 1ex; margin-bottom: 1ex;
+  }
+  .hangingindent {
+    padding-left: 1.5em;
+    text-indent: -1.5em;
+  }
+  .normalfont {
+    font-weight: normal;
+  }
+  .notopmargin {
+    margin-top: 0em;
+  }
+  .sectionbody {
+    margin-top: .2em;
+  }
+</style>
+</head>
+<body>
+<dl>
+
+<section id="NAME">
+<dt>NAME</dt>
+<dd class="sectionbody">
+<dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
+gcloud hidden-group hidden-command - <code><nobr>(ALPHA)</nobr></code> hidden command docstring index
+</span></dt></dl>
+</dd>
+</section>
+
+<section id="SYNOPSIS">
+<dt>SYNOPSIS</dt>
+<dd class="sectionbody">
+<dl class="notopmargin"><dt class="hangingindent"><span class="normalfont">
+<code>gcloud hidden-group hidden-command</code> <nobr>[<code><var>GLOBAL-FLAG &hellip;</var></code>]</nobr>
+</span></dt></dl>
+</dd>
+</section>
+
+<section id="DESCRIPTION">
+<dt>DESCRIPTION</dt>
+<dd class="sectionbody">
+<code>(ALPHA)</code> Hidden command docstring description.
+</dd>
+</section>
+
+<section id="GLOBAL-FLAGS">
+<dt>GLOBAL FLAGS</dt>
+<dd class="sectionbody">
+Run <code>$ <a href="/sdk/../reference/">gcloud</a> help</code> for a
+description of flags available to all commands.
+</dd>
+</section>
+
+<section id="NOTES">
+<dt>NOTES</dt>
+<dd class="sectionbody">
+A special note.
+<p>
+This command is an internal implementation detail and may change or disappear
+without notice.
+<p>
+This command is currently in ALPHA and may change without notice.
+</dd>
+</section>
+
+</dl>
+</body>
+</html>

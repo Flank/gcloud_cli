@@ -1,0 +1,48 @@
+NAME
+    gcloud beta ml-engine versions - cloud ML Engine Versions commands
+
+SYNOPSIS
+    gcloud beta ml-engine versions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) A version is an implementation of a model, represented as a
+    serialized TensorFlow graph with trained parameters.
+
+    When you communicate with Cloud ML Engine services, you use the combination
+    of the model, version, and current project to identify a specific model
+    implementation that is deployed in the cloud.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a new Cloud ML Engine version.
+
+     delete
+        (BETA) Delete an existing Cloud ML Engine version.
+
+     describe
+        (BETA) Describe an existing Cloud ML Engine version.
+
+     list
+        (BETA) List existing Cloud ML Engine versions.
+
+     set-default
+        (BETA) Sets an existing Cloud ML Engine version as the default for its
+        model.
+
+     update
+        (BETA) Update a Cloud ML Engine model.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ml-engine versions
+        $ gcloud alpha ml-engine versions
+

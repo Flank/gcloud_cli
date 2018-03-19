@@ -1,0 +1,29 @@
+NAME
+    gcloud alpha compute project-info update - update a Google Compute Engine
+        project resource
+
+SYNOPSIS
+    gcloud alpha compute project-info update
+        [--default-network-tier=DEFAULT_NETWORK_TIER] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute project-info update is used to update a Google
+    Compute Engine project resource.
+
+FLAGS
+     --default-network-tier=DEFAULT_NETWORK_TIER
+        The default network tier to assign to the project. DEFAULT_NETWORK_TIER
+        must be one of: PREMIUM, STANDARD.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

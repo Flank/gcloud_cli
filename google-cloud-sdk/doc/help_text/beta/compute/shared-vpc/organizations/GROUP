@@ -1,0 +1,28 @@
+NAME
+    gcloud beta compute shared-vpc organizations - configure organizations for
+        cross-project networking (XPN)
+
+SYNOPSIS
+    gcloud beta compute shared-vpc organizations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Configure organizations for cross-project networking (XPN).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list-host-projects
+        (BETA) List shared VPC host projects in a given organization.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute shared-vpc organizations
+        $ gcloud alpha compute shared-vpc organizations
+

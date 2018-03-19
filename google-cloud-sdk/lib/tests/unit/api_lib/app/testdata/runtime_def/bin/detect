@@ -1,0 +1,16 @@
+#!/usr/bin/python
+"""Example detect script."""
+
+import sys
+import json
+
+print json.dumps({'type': 'query_user', 'prompt': 'gimme some data',
+                  'default': 'reasonable default'})
+sys.stdout.flush()
+result = json.loads(sys.stdin.readline())
+assert result['type'] == 'query_user_response'
+
+print json.dumps({'type': 'runtime_parameters',
+                  'runtime_data': {'a': 'got data',
+                                    'test_string': 'test value',
+                                    'user_data': result['result']}})

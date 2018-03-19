@@ -1,0 +1,219 @@
+{
+  "CLI_VERSION": "v1.7.6",
+  "VERSION": "1",
+  "capsule": "",
+  "commands": {
+    "create": {
+      "capsule": "",
+      "commands": {
+        "deployment": {
+          "capsule": "",
+          "commands": {},
+          "flags": {
+            "--dry-run": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "If true, only print the object that would be sent, without sending it.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--dry-run",
+              "nargs": "0",
+              "type": "bool",
+              "value": ""
+            },
+            "--generator": {
+              "attr": {},
+              "category": "",
+              "default": "",
+              "description": "The name of the API generator to use.",
+              "group": "",
+              "is_global": false,
+              "is_hidden": false,
+              "is_required": false,
+              "name": "--generator",
+              "nargs": "1",
+              "type": "string",
+              "value": "VALUE"
+            }
+          },
+          "groups": {},
+          "is_group": false,
+          "is_hidden": false,
+          "path": [
+            "kubectl",
+            "create",
+            "deployment"
+          ],
+          "positionals": [],
+          "release": "GA",
+          "sections": {
+            "DESCRIPTION": "Create a deployment with the specified name.\n\nAliases:\ndeployment, deploy",
+            "EXAMPLES": "  # Create a new deployment named my-dep that runs the busybox image.\n  kubectl create deployment my-dep --image=busybox"
+          }
+        }
+      },
+      "flags": {
+        "--allow-missing-template-keys": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, ignore any errors in templates when a field or map key is missing in the template. Only applies to golang and jsonpath output formats.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--allow-missing-template-keys",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        },
+        "--filename": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Filename, directory, or URL to files to use to create the resource",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--filename",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        }
+      },
+      "groups": {},
+      "is_group": true,
+      "is_hidden": false,
+      "path": [
+        "kubectl",
+        "create"
+      ],
+      "positionals": [],
+      "release": "GA",
+      "sections": {
+        "DESCRIPTION": "Create a resource by filename or stdin.\n\nJSON and YAML formats are accepted.",
+        "EXAMPLES": "  # Create a pod using the data in pod.json.\n  kubectl create -f ./pod.json\n  # Create a pod based on the JSON passed into stdin.\n  cat pod.json | kubectl create -f -\n  # Edit the data in docker-registry.yaml in JSON using the v1 API format then create the resource using the edited data.\n  kubectl create -f docker-registry.yaml --edit --output-version=v1 -o json"
+      }
+    },
+    "describe": {
+      "capsule": "",
+      "commands": {},
+      "flags": {
+        "--filename": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "Filename, directory, or URL to files containing the resource to describe",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--filename",
+          "nargs": "1",
+          "type": "string",
+          "value": "VALUE"
+        },
+        "--show-events": {
+          "attr": {},
+          "category": "",
+          "default": "",
+          "description": "If true, display events related to the described object.",
+          "group": "",
+          "is_global": false,
+          "is_hidden": false,
+          "is_required": false,
+          "name": "--show-events",
+          "nargs": "0",
+          "type": "bool",
+          "value": ""
+        }
+      },
+      "groups": {},
+      "is_group": false,
+      "is_hidden": false,
+      "path": [
+        "kubectl",
+        "describe"
+      ],
+      "positionals": [],
+      "release": "GA",
+      "sections": {
+        "DESCRIPTION": "Show details of a specific resource or group of resources. This command joins many API calls together to form a detailed description of a given resource or group of resources.\n\n  $ kubectl describe TYPE NAME_PREFIX\n\nwill first check for an exact match on TYPE and NAME PREFIX. If no such resource exists, it will output details for every resource that has a name prefixed with NAME PREFIX.\n\nValid resource types include:\n\n  * all\n  * namespaces (aka 'ns')",
+        "EXAMPLES": "  # Describe a node\n  kubectl describe nodes kubernetes-node-emt8.c.myproject.internal"
+      }
+    }
+  },
+  "flags": {
+    "--alsologtostderr": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "log to standard error as well as files",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--alsologtostderr",
+      "nargs": "0",
+      "type": "bool",
+      "value": ""
+    },
+    "--client-certificate": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "Path to a client certificate file for TLS",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--client-certificate",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
+    "--help": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "List detailed command help.",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--help",
+      "nargs": "0",
+      "type": "bool",
+      "value": ""
+    },
+    "--vmodule": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "comma-separated list of pattern=N settings for file-filtered logging",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--vmodule",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    }
+  },
+  "groups": {},
+  "is_group": true,
+  "is_hidden": false,
+  "path": [
+    "kubectl"
+  ],
+  "positionals": [],
+  "release": "GA",
+  "sections": {
+    "DESCRIPTION": "kubectl controls the Kubernetes cluster manager.\n\nFind more information at https://github.com/kubernetes/kubernetes."
+  }
+}

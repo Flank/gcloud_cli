@@ -1,0 +1,83 @@
+
+.TH "GCLOUD_ALPHA_INIT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha init \- initialize or reinitialize gcloud
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha init\fR [\fB\-\-console\-only\fR] [\fB\-\-skip\-diagnostics\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR gcloud alpha init launches an interactive Getting Started workflow
+for gcloud. It performs the following setup steps:
+
+.RS 2m
+.IP "\(bu" 2m
+Authorizes gcloud and other SDK tools to access Google Cloud Platform using your
+user account credentials, or lets you select from accounts whose credentials are
+already available.
+.IP "\(bu" 2m
+Sets properties in a gcloud configuration, including the current project and the
+default Google Compute Engine region and zone.
+.RE
+.sp
+
+gcloud alpha init can be used for initial setup of gcloud and to create new or
+reinitialize gcloud configurations. More information can be found by running
+\f5gcloud topic configurations\fR.
+
+Properties set by gcloud alpha init are local and persistent, and are not
+affected by remote changes to the project. For example, the default Compute
+Engine zone in your configuration remains stable, even if you or another user
+changes the project\-level default zone in the Cloud Platform Console.
+
+To sync the configuration, re\-run gcloud alpha init
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-console\-only\fR
+Prevent the command from launching a browser for authorization.
+
+.TP 2m
+\fB\-\-skip\-diagnostics\fR
+Do not run diagnostics.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud init
+$ gcloud beta init
+.RE
+

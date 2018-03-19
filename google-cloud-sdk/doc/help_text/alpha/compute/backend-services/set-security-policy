@@ -1,0 +1,47 @@
+NAME
+    gcloud alpha compute backend-services set-security-policy - set the
+        security policy for a backend service
+
+SYNOPSIS
+    gcloud alpha compute backend-services set-security-policy
+        BACKEND_SERVICE_NAME --security-policy=SECURITY_POLICY
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (DEPRECATED) This command is deprecated and will not be promoted to
+    beta. Please use "gcloud beta backend-services update" instead.
+
+    gcloud alpha compute backend-services set-security-policy is used to set
+    the security policy for a backend service. Setting an empty string will
+    clear the existing security policy.
+
+POSITIONAL ARGUMENTS
+     BACKEND_SERVICE_NAME
+        The name of the backend service to operate on.
+
+REQUIRED FLAGS
+     --security-policy=SECURITY_POLICY
+        The security policy that will be set for this backend service.
+
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --global
+          If provided, it is assumed the backend service is global.
+
+       --region=REGION
+          The region of the backend service to operate on. Overrides the
+          default compute/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

@@ -1,0 +1,28 @@
+NAME
+    gcloud kms keyrings create - create a new keyring
+
+SYNOPSIS
+    gcloud kms keyrings create KEYRING [--location=LOCATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Creates a new keyring within the given location.
+
+POSITIONAL ARGUMENTS
+     KEYRING
+        Name of the keyring to create.
+
+FLAGS
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta kms keyrings create
+

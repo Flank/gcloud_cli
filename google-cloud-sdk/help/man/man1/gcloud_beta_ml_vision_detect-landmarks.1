@@ -1,0 +1,75 @@
+
+.TH "GCLOUD_BETA_ML_VISION_DETECT\-LANDMARKS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta ml vision detect\-landmarks \- detect popular natural and man\-made structures within an image
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta ml vision detect\-landmarks\fR \fIIMAGE_PATH\fR [\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Google Cloud Vision will recognize landmarks in an image, such as
+"Palace of Fine Arts."
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE_PATH\fR
+The path to the image to be analyzed. This can be either a local path or a URL.
+If you provide a local file, the contents will be sent directly to Google Cloud
+Vision. If you provide a URL, it must be in Google Cloud Storage format
+(gs://bucket/object) or an HTTP URL (http://... or https://...)
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR
+The maximum number of results to be provided.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBvision/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/vision/
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud ml vision detect\-landmarks
+$ gcloud alpha ml vision detect\-landmarks
+.RE
+

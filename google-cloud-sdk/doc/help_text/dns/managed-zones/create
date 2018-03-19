@@ -1,0 +1,37 @@
+NAME
+    gcloud dns managed-zones create - create a Cloud DNS managed-zone
+
+SYNOPSIS
+    gcloud dns managed-zones create ZONE_NAME --description=DESCRIPTION
+        --dns-name=DNS_NAME [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command creates a Cloud DNS managed-zone.
+
+POSITIONAL ARGUMENTS
+     ZONE_NAME
+        The name of the managed-zone to be created.
+
+REQUIRED FLAGS
+     --description=DESCRIPTION
+        Short description for the managed-zone.
+
+     --dns-name=DNS_NAME
+        The DNS name suffix that will be managed with the created zone.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a managed-zone, run:
+
+        $ gcloud dns managed-zones create my_zone --dns-name my.zone.com. \
+            --description "My zone!"
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dns managed-zones create
+

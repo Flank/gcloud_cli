@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha compute disk-types describe - describe a Google Compute Engine
+        disk type
+
+SYNOPSIS
+    gcloud alpha compute disk-types describe DISK_TYPE [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute disk-types describe displays all data
+    associated with a Google Compute Engine disk type.
+
+POSITIONAL ARGUMENTS
+     DISK_TYPE
+        The name of the disk type to describe.
+
+FLAGS
+     --zone=ZONE
+        The zone of the disk type to describe. Overrides the default
+        compute/zone property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute disk-types describe
+        $ gcloud beta compute disk-types describe
+

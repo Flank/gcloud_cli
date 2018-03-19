@@ -1,0 +1,28 @@
+NAME
+    gcloud alpha auth print-refresh-token - a command that prints the access
+        token for the current account
+
+SYNOPSIS
+    gcloud alpha auth print-refresh-token [ACCOUNT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A command that prints the access token for the current account.
+
+POSITIONAL ARGUMENTS
+     [ACCOUNT]
+        The account to get the access token for. Leave empty for the active
+        account.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

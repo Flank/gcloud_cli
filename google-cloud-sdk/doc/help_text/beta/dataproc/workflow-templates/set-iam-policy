@@ -1,0 +1,47 @@
+NAME
+    gcloud beta dataproc workflow-templates set-iam-policy - set IAM policy for
+        a template
+
+SYNOPSIS
+    gcloud beta dataproc workflow-templates set-iam-policy TEMPLATE POLICY_FILE
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Sets the IAM policy for a workflow template, given a template ID and
+    the policy.
+
+POSITIONAL ARGUMENTS
+     TEMPLATE
+        The ID of the workflow template to set the policy on.
+
+     POLICY_FILE
+        Path to a local JSON or YAML formatted file containing a valid policy.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will read an IAM policy defined in a JSON file
+    'policy.json' and set it for a template with identifier 'example-template'
+
+        $ gcloud beta dataproc workflow-templates set-iam-policy \
+            example-template policy.json
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

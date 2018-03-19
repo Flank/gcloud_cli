@@ -1,0 +1,100 @@
+
+.TH "GCLOUD_ALPHA_ML_LANGUAGE_CLASSIFY\-TEXT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml language classify\-text \- classifies input document into categories
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml language classify\-text\fR (\fB\-\-content\fR=\fICONTENT\fR\ |\ \fB\-\-content\-file\fR=\fICONTENT_FILE\fR) [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR;\ default="plain\-text"] [\fB\-\-language\fR=\fILANGUAGE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Classifies input document into categories. Returns a list of
+categories representing the document. Only the most relevant categories a
+document are returned e.g. if \f5/Science\fR and \f5/Science/Astronomy\fR both
+apply to a document, then only the \f5/Science/Astronomy\fR category is
+returned, as it is the more specific result.
+
+Currently only English is supported for this feature.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-content\fR=\fICONTENT\fR
+Specify input text on the command line. Useful for experiments, or for extremely
+short text.
+
+.TP 2m
+\fB\-\-content\-file\fR=\fICONTENT_FILE\fR
+Specify a local file or Google Cloud Storage (format \f5gs://bucket/object\fR)
+file path containing the text to be analyzed. More useful for longer text or
+data output from another system.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR; default="plain\-text"
+Specify the format of the input text. \fICONTENT_TYPE\fR must be one of:
+\fBhtml\fR, \fBplain\-text\fR.
+
+.TP 2m
+\fB\-\-language\fR=\fILANGUAGE\fR
+Specify the language of the input text. If omitted, the server will attempt to
+auto\-detect. Both ISO (such as \f5en\fR or \f5es\fR) and BCP\-47 (such as
+\f5en\-US\fR or \f5ja\-JP\fR) language codes are accepted.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBlanguage/v1beta2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/natural\-language/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud ml language classify\-text
+$ gcloud beta ml language classify\-text
+.RE
+

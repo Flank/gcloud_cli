@@ -1,0 +1,66 @@
+
+.TH "GCLOUD_ALPHA_RESOURCE\-MANAGER_LIENS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha resource\-manager liens create \- create a new lien
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha resource\-manager liens create\fR \fB\-\-reason\fR=\fIREASON\fR \fB\-\-restrictions\fR=\fIRESTRICTIONS\fR [\fB\-\-origin\fR=\fIORIGIN\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Creates a new lien to be applied to a project.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-reason\fR=\fIREASON\fR
+A human\-readable description of why this lien is being applied.
+
+.TP 2m
+\fB\-\-restrictions\fR=\fIRESTRICTIONS\fR
+Comma separated list of IAM permissions to curtail
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-origin\fR=\fIORIGIN\fR
+The originator of for this Lien. Defaults to user identy.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

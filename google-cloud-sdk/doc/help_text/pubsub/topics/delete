@@ -1,0 +1,29 @@
+NAME
+    gcloud pubsub topics delete - deletes one or more Cloud Pub/Sub topics
+
+SYNOPSIS
+    gcloud pubsub topics delete TOPIC [TOPIC ...] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Deletes one or more Cloud Pub/Sub topics.
+
+POSITIONAL ARGUMENTS
+     TOPIC [TOPIC ...]
+        One or more topics to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To delete a Cloud Pub/Sub topic, run:
+
+        $ gcloud pubsub topics delete mytopic
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha pubsub topics delete
+        $ gcloud beta pubsub topics delete
+

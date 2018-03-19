@@ -1,0 +1,53 @@
+NAME
+    gcloud compute instance-groups managed stop-autoscaling - stop autoscaling
+        a managed instance group
+
+SYNOPSIS
+    gcloud compute instance-groups managed stop-autoscaling NAME
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute instance-groups managed stop-autoscaling stops autoscaling a
+    managed instance group. If autoscaling is not enabled for the managed
+    instance group, this command does nothing and will report an error.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the managed instance group to operate on.
+
+FLAGS
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to operate on. If not
+          specified, you will be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          The zone of the managed instance group to operate on. If not
+          specified, you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute instance-groups managed stop-autoscaling
+        $ gcloud beta compute instance-groups managed stop-autoscaling
+

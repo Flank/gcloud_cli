@@ -1,0 +1,67 @@
+NAME
+    gcloud alpha compute backend-services - list, create, and delete backend
+        services
+
+SYNOPSIS
+    gcloud alpha compute backend-services COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) List, create, and delete backend services.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-backend
+        (ALPHA) Add a backend to a backend service.
+
+     add-signed-url-key
+        (ALPHA) Add Cloud CDN Signed URL key to a backend service.
+
+     create
+        (ALPHA) Create a backend service.
+
+     delete
+        (ALPHA) Delete backend services.
+
+     delete-signed-url-key
+        (ALPHA) Delete Cloud CDN Signed URL key from a backend service.
+
+     describe
+        (ALPHA) Display detailed information about a backend service.
+
+     edit
+        (ALPHA) Modify backend services.
+
+     get-health
+        (ALPHA) Get backend health statuses from a backend service.
+
+     list
+        (ALPHA) List Google Compute Engine backend services.
+
+     remove-backend
+        (ALPHA) Remove a backend from a backend service.
+
+     set-security-policy
+        (ALPHA) (DEPRECATED) Set the security policy for a backend service.
+
+     update
+        (ALPHA) Update a backend service.
+
+     update-backend
+        (ALPHA) Update an existing backend in a backend service.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute backend-services
+        $ gcloud beta compute backend-services
+

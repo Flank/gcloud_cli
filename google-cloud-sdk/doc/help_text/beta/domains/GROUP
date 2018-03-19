@@ -1,0 +1,39 @@
+NAME
+    gcloud beta domains - manage domains for your Google Cloud projects
+
+SYNOPSIS
+    gcloud beta domains COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) The gcloud domains command group lets you view and manage your
+    custom domains for use across Google projects.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list-user-verified
+        (BETA) Lists the user's verified domains.
+
+     verify
+        (BETA) Verifies a domain via an in-browser workflow.
+
+EXAMPLES
+    To verify a domain you own, run:
+
+        $ gcloud beta domains verify example.com
+
+    To list your verified domains, run:
+
+        $ gcloud beta domains list-user-verified
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud domains
+

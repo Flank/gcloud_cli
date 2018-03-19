@@ -1,0 +1,187 @@
+
+.TH "GCLOUD_ALPHA_ML\-ENGINE_JOBS_SUBMIT_PREDICTION" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml\-engine jobs submit prediction \- start a Cloud ML Engine batch prediction job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml\-engine jobs submit prediction\fR \fIJOB\fR \fB\-\-data\-format\fR=\fIDATA_FORMAT\fR \fB\-\-input\-paths\fR=\fIINPUT_PATH\fR,[\fIINPUT_PATH\fR,...] \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR \fB\-\-region\fR=\fIREGION\fR (\fB\-\-model\fR=\fIMODEL\fR\ |\ \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR) [\fB\-\-batch\-size\fR=\fIBATCH_SIZE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-max\-worker\-count\fR=\fIMAX_WORKER_COUNT\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Start a Cloud ML Engine batch prediction job.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+Name of the batch prediction job.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-data\-format\fR=\fIDATA_FORMAT\fR
+Data format of the input files. \fIDATA_FORMAT\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBtext\fR
+Text files with instances separated by the new\-line character.
+.TP 2m
+\fBtf\-record\fR
+TFRecord files; see
+https://www.tensorflow.org/versions/r0.12/how_tos/reading_data/index.html#file\-formats
+.TP 2m
+\fBtf\-record\-gzip\fR
+GZIP\-compressed TFRecord files.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-input\-paths\fR=\fIINPUT_PATH\fR,[\fIINPUT_PATH\fR,...]
+Google Cloud Storage paths to the instances to run prediction on.
+
+Wildcards (\f5*\fR) accepted at the \fBend\fR of a path. More than one path can
+be specified if multiple file patterns are needed. For example,
+
+.RS 2m
+gs://my\-bucket/instances*,gs://my\-bucket/other\-instances1
+.RE
+
+will match any objects whose names start with \f5instances\fR in
+\f5my\-bucket\fR as well as the \f5other\-instances1\fR bucket, while
+
+.RS 2m
+gs://my\-bucket/instance\-dir/*
+.RE
+
+will match any objects in the \f5instance\-dir\fR "directory" (since directories
+aren't a first\-class Cloud Storage concept) of \f5my\-bucket\fR.
+
+.TP 2m
+\fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR
+Google Cloud Storage path to which to save the output. Example:
+gs://my\-bucket/output.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The Google Compute Engine region to run the job in.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-model\fR=\fIMODEL\fR
+Name of the model to use for prediction.
+
+.TP 2m
+\fB\-\-model\-dir\fR=\fIMODEL_DIR\fR
+Google Cloud Storage location where the model files are located.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-batch\-size\fR=\fIBATCH_SIZE\fR
+The number of records per batch. The service will buffer batch_size number of
+records in memory before invoking TensorFlow. Defaults to 64 if not specified.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to add.
+
+.TP 2m
+\fB\-\-max\-worker\-count\fR=\fIMAX_WORKER_COUNT\fR
+The maximum number of workers to be used for parallel processing. Defaults to 10
+if not specified.
+
+.TP 2m
+\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
+The Google Cloud ML Engine runtime version for this job. Defaults to the latest
+stable version. See
+https://cloud.google.com/ml/docs/concepts/runtime\-version\-list for a list of
+accepted versions.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+Model version to be used.
+
+This flag may only be given if \-\-model is specified. If unspecified, the
+default version of the model will be used. To list versions for a model, run
+
+.RS 2m
+$ gcloud ml\-engine versions list
+.RE
+
+.TP 2m
+
+Accelerator Configuration.
+
+.RS 2m
+.TP 2m
+\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR
+The number of accelerators to attach to the machines. Must be >= 1. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR
+The available types of accelerators. \fIACCELERATOR_TYPE\fR must be one of:
+
+.TP 2m
+\fBnvidia\-tesla\-k80\fR
+NVIDIA Tesla K80 GPU
+.TP 2m
+\fBnvidia\-tesla\-p100\fR
+NVIDIA Tesla P100 GPU. + This flag must be specified if any of the other
+arguments in this group are specified.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud ml\-engine jobs submit prediction
+$ gcloud beta ml\-engine jobs submit prediction
+.RE
+

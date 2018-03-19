@@ -1,0 +1,44 @@
+NAME
+    gcloud alpha category-manager taxonomies - a group of subcommands for
+        working with Category Manager taxonomies
+
+SYNOPSIS
+    gcloud alpha category-manager taxonomies GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Category Manager taxonomies. A taxonomy defines how a
+    spectrum of assets should be categorized. Each category in a taxonomy is
+    given a name (that is, an annotation).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     annotations
+        (ALPHA) Manage Category Manager annotations.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Delete a taxonomy and all of its annotations.
+
+     describe
+        (ALPHA) Get the description of a taxonomy.
+
+     list
+        (ALPHA) List taxonomies.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

@@ -1,0 +1,105 @@
+
+.TH "GCLOUD_BETA_SQL_INSTANCES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta sql instances \- provide commands for managing Cloud SQL instances
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta sql instances\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Provide commands for managing Cloud SQL instances including
+creating, configuring, restarting, and deleting instances.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBclone\fR
+\fB(BETA)\fR Clones a Cloud SQL instance.
+
+.TP 2m
+\fBcreate\fR
+\fB(BETA)\fR Creates a new Cloud SQL instance.
+
+.TP 2m
+\fBdelete\fR
+\fB(BETA)\fR Deletes a Cloud SQL instance.
+
+.TP 2m
+\fBdescribe\fR
+\fB(BETA)\fR Displays configuration and metadata about a Cloud SQL instance.
+
+.TP 2m
+\fBexport\fR
+\fB(BETA)\fR \fB(DEPRECATED)\fR Exports data from a Cloud SQL instance.
+
+.TP 2m
+\fBfailover\fR
+\fB(BETA)\fR Causes a high\-availability Cloud SQL instance to failover.
+
+.TP 2m
+\fBimport\fR
+\fB(BETA)\fR \fB(DEPRECATED)\fR Imports data into a Cloud SQL instance from
+Google Cloud Storage.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR Lists Cloud SQL instances in a given project.
+
+.TP 2m
+\fBpatch\fR
+\fB(BETA)\fR Updates the settings of a Cloud SQL instance.
+
+.TP 2m
+\fBpromote\-replica\fR
+\fB(BETA)\fR Promotes Cloud SQL read replica to a stand\-alone instance.
+
+.TP 2m
+\fBreset\-ssl\-config\fR
+\fB(BETA)\fR Deletes all client certificates and generates a new server
+certificate.
+
+.TP 2m
+\fBrestart\fR
+\fB(BETA)\fR Restarts a Cloud SQL instance.
+
+.TP 2m
+\fBrestore\-backup\fR
+\fB(BETA)\fR Restores a backup of a Cloud SQL instance.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud sql instances
+.RE
+

@@ -1,0 +1,57 @@
+NAME
+    gcloud alpha ml vision - use Google Cloud Vision to analyze images
+
+SYNOPSIS
+    gcloud alpha ml vision COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Use Google Cloud Vision to analyze images.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     detect-document
+        (ALPHA) Detect dense text in an image.
+
+     detect-faces
+        (ALPHA) Detect faces within an image.
+
+     detect-image-properties
+        (ALPHA) Detect general attributes of an image.
+
+     detect-labels
+        (ALPHA) Detect broad sets of categories within an image.
+
+     detect-landmarks
+        (ALPHA) Detect popular natural and man-made structures within an image.
+
+     detect-logos
+        (ALPHA) Detect popular product logos within an image.
+
+     detect-safe-search
+        (ALPHA) Detect explicit content in an image.
+
+     detect-text
+        (ALPHA) Detect and extract text within an image.
+
+     detect-web
+        (ALPHA) Detect entities in an image from similar images on the web.
+
+     suggest-crop
+        (ALPHA) Suggest a bounding box in an image.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml vision
+        $ gcloud beta ml vision
+

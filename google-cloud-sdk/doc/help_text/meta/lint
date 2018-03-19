@@ -1,0 +1,25 @@
+NAME
+    gcloud meta lint - validate gcloud flags according to Cloud SDK CLI Style
+
+SYNOPSIS
+    gcloud meta lint [CHECKS ...] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Validate gcloud flags according to Cloud SDK CLI Style.
+
+POSITIONAL ARGUMENTS
+     [CHECKS ...]
+        A list of checks to apply to gcloud groups and commands. If omitted
+        will run all available checks. Available Checks: BadLists Verifies all
+        flags implement lists properly. WhitelistedNameCheck Verifies that
+        every command is whitelisted.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

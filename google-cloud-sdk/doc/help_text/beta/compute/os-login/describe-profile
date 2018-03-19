@@ -1,0 +1,24 @@
+NAME
+    gcloud beta compute os-login describe-profile - describe the OS Login
+        profile for the current user
+
+SYNOPSIS
+    gcloud beta compute os-login describe-profile [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute os-login describe-profile displays the OS Login
+    profile for the currently authenticated user, including Posix accounts and
+    SSH keys associated with the user.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute os-login describe-profile
+        $ gcloud alpha compute os-login describe-profile
+

@@ -1,0 +1,32 @@
+NAME
+    gcloud beta debug source - commands to manage source information for
+        Stackdriver tools
+
+SYNOPSIS
+    gcloud beta debug source COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This set of commands allows you to provide Stackdriver tools with
+    source code version information.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     gen-repo-info-file
+        (BETA) Generates repository information files for the Stackdriver
+        Debugger.
+
+     upload
+        (BETA) Upload a directory tree.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud debug source
+

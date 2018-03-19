@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha pubsub topics create - creates one or more Cloud Pub/Sub
+        topics
+
+SYNOPSIS
+    gcloud alpha pubsub topics create TOPIC [TOPIC ...]
+        [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Creates one or more Cloud Pub/Sub topics.
+
+POSITIONAL ARGUMENTS
+     TOPIC [TOPIC ...]
+        One or more topics to create.
+
+FLAGS
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a Cloud Pub/Sub topic, run:
+
+        $ gcloud alpha pubsub topics create mytopic
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud pubsub topics create
+        $ gcloud beta pubsub topics create
+

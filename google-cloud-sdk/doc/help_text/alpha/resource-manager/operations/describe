@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha resource-manager operations describe - show metadata for an
+        operation
+
+SYNOPSIS
+    gcloud alpha resource-manager operations describe OPERATION_ID
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Show metadata for an operation, given a valid operation ID.
+
+    This command can fail for the following reasons:
+      o The operation specified does not exist.
+      o You do not have permission to view the operation.
+
+POSITIONAL ARGUMENTS
+     OPERATION_ID
+        ID for the operation you want to describe.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command prints metadata for an operation with the ID
+    fc.3589215982:
+
+        $ gcloud alpha resource-manager operations describe fc.3589215982
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

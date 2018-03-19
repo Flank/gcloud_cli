@@ -1,0 +1,98 @@
+
+.TH "GCLOUD_BETA_CONTAINER_NODE\-POOLS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta container node\-pools \- create and delete operations for Google Kubernetes Engine node pools
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta container node\-pools\fR \fICOMMAND\fR [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create and delete operations for Google Kubernetes Engine node
+pools.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The compute region (e.g. us\-central1) for the cluster.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
+The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
+\fBcompute/zone\fR property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+\fB(BETA)\fR Create a node pool in a running cluster.
+
+.TP 2m
+\fBdelete\fR
+\fB(BETA)\fR Delete an existing node pool in a running cluster.
+
+.TP 2m
+\fBdescribe\fR
+\fB(BETA)\fR Describe an existing node pool for a cluster.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List existing node pools for a cluster.
+
+.TP 2m
+\fBrollback\fR
+\fB(BETA)\fR Rollback a node\-pool upgrade.
+
+.TP 2m
+\fBupdate\fR
+\fB(BETA)\fR Updates a node pool in a running cluster.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud container node\-pools
+$ gcloud alpha container node\-pools
+.RE
+

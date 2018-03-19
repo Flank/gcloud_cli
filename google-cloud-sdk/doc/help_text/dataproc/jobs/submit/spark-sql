@@ -1,0 +1,89 @@
+NAME
+    gcloud dataproc jobs submit spark-sql - submit a Spark SQL job to a cluster
+
+SYNOPSIS
+    gcloud dataproc jobs submit spark-sql --cluster=CLUSTER
+        (--execute=QUERY, -e QUERY | --file=FILE, -f FILE) [--async]
+        [--bucket=BUCKET] [--driver-log-levels=[PACKAGE=LEVEL,...]]
+        [--jars=[JAR,...]] [--labels=[KEY=VALUE,...]]
+        [--max-failures-per-hour=MAX_FAILURES_PER_HOUR]
+        [--params=[PARAM=VALUE,...]] [--properties=[PROPERTY=VALUE,...]]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Submit a Spark SQL job to a cluster.
+
+REQUIRED FLAGS
+     --cluster=CLUSTER
+        The Dataproc cluster to submit the job to.
+
+     Exactly one of these must be specified:
+
+       --execute=QUERY, -e QUERY
+          A Spark SQL query to execute as part of the job.
+
+       --file=FILE, -f FILE
+          HCFS URI of file containing Spark SQL script to execute as the job.
+
+OPTIONAL FLAGS
+     --async
+        Does not wait for the job to run.
+
+     --bucket=BUCKET
+        The Cloud Storage bucket to stage files in. Defaults to the cluster's
+        configured bucket.
+
+     --driver-log-levels=[PACKAGE=LEVEL,...]
+        A list of package to log4j log level pairs to configure driver logging.
+        For example: root=FATAL,com.example=INFO
+
+     --jars=[JAR,...]
+        Comma separated list of jar files to be provided to the executor and
+        driver classpaths. May contain UDFs.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --max-failures-per-hour=MAX_FAILURES_PER_HOUR
+        Specifies maximum number of times a job can be restarted in event of
+        failure. Expressed as a per-hour rate. Default is 0 (no failure
+        retries).
+
+     --params=[PARAM=VALUE,...]
+        A list of key value pairs to set variables in the Hive queries.
+
+     --properties=[PROPERTY=VALUE,...]
+        A list of key value pairs to configure Hive.
+
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To submit a Spark SQL job with a local script, run:
+
+        $ gcloud dataproc jobs submit spark-sql --cluster my_cluster \
+            --file my_queries.ql
+
+    To submit a Spark SQL job with inline queries, run:
+
+        $ gcloud dataproc jobs submit spark-sql --cluster my_cluster \
+            -e \
+            "CREATE EXTERNAL TABLE foo(bar int) LOCATION\
+         'gs://my_bucket/'" -e "SELECT * FROM foo WHERE bar > 2"
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dataproc jobs submit spark-sql
+

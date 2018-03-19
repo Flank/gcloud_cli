@@ -1,0 +1,56 @@
+# YAML file with mistakes, used for unit testing.
+
+bad-arg-name:
+  appp: my-app.apk
+
+missing-arg-value:
+  type:
+
+# Note: the yaml parsing package masks this case, silently giving us the last value.
+dup-arg-name:
+  type: instrumentation
+  type: robo
+
+three-OBBs:
+  obb-files: ["foo/file1.obb", "gs://file2.obb", "bar/file3.obb"]
+
+robo-directives.list:
+  robo-directives: ["resource1", "value1", "resource2", 2]
+
+robo-directives.string:
+  robo-directives: "resource1"
+
+robo-directives.int:
+  robo-directives: 2
+
+environment-variables.list:
+  environment-variables: ["e1", "value1", "e2", 2]
+
+environment-variables.string:
+  environment-variables: "e1"
+
+environment-variables.int:
+  environment-variables: 2
+
+sparse1:  # device: must contain a list of dicts
+  device: model
+
+sparse2:  # device: must contain a list of dicts
+  device:
+    model: shamu
+
+sparse3:  # Dimension value must be a string, not a list
+  device: [{model: [shamu, Nexus5], locales: de}]
+
+sparse4:  # Dimension value must be a string, not a dict
+  device:
+    - model: {namu: shamu}
+
+sparse-bad-dim:
+  device: [{brand: Sungsam}]  # Invalid dimension name
+
+robo-script.multiple:
+  robo-script: [
+    'local/dir/robo_script.json',
+    'gs://bucket/robo_script.json'
+  ]

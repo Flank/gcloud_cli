@@ -1,0 +1,89 @@
+NAME
+    gcloud beta dataproc jobs - submit and manage Google Cloud Dataproc jobs
+
+SYNOPSIS
+    gcloud beta dataproc jobs GROUP | COMMAND [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Submit and manage Google Cloud Dataproc jobs.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     submit
+        (BETA) Submit Google Cloud Dataproc jobs to execute on a cluster.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (BETA) Delete the record of an inactive job.
+
+     describe
+        (BETA) View the details of a job.
+
+     get-iam-policy
+        (BETA) Get IAM policy for a job.
+
+     kill
+        (BETA) Kill an active job.
+
+     list
+        (BETA) List jobs in a project.
+
+     set-iam-policy
+        (BETA) Set IAM policy for a job.
+
+     update
+        (BETA) Update the labels for a job.
+
+     wait
+        (BETA) View the output of a job as it runs or after it completes.
+
+EXAMPLES
+    To learn about the types of jobs that can be submitted, run:
+
+        $ gcloud beta dataproc jobs submit
+
+    To view the output of a job as it runs, run:
+
+        $ gcloud beta dataproc jobs wait job_id
+
+    To cancel an active job, run:
+
+        $ gcloud beta dataproc jobs kill job_id
+
+    To view the details of a job, run:
+
+        $ gcloud beta dataproc jobs describe job_id
+
+    To see the list of all jobs, run:
+
+        $ gcloud beta dataproc jobs list
+
+    To delete the record of an inactive job, run:
+
+        $ gcloud beta dataproc jobs delete job_id
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc jobs
+

@@ -1,0 +1,31 @@
+NAME
+    gcloud alpha compute target-tcp-proxies describe - display detailed
+        information about a target TCP proxy
+
+SYNOPSIS
+    gcloud alpha compute target-tcp-proxies describe NAME
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute target-tcp-proxies describe displays all data
+    associated with a target TCP proxy in a project.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the target TCP proxy to describe.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute target-tcp-proxies describe
+        $ gcloud beta compute target-tcp-proxies describe
+

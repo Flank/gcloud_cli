@@ -1,0 +1,32 @@
+NAME
+    gcloud meta resources generate - cloud SDK resource test URI generator
+
+SYNOPSIS
+    gcloud meta resources generate --collection=NAME [--api-version=VERSION]
+        [--count=COUNT; default=1] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud meta resources generate is an handy way to generate test URIs for
+    the resource parser.
+
+REQUIRED FLAGS
+     --collection=NAME
+        The resource collection name of the resource to parse.
+
+OPTIONAL FLAGS
+     --api-version=VERSION
+        The resource collection API version. The collection default is used if
+        not specified.
+
+     --count=COUNT; default=1
+        The number of test resource URIs to generate.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

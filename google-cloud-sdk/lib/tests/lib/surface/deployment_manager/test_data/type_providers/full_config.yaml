@@ -1,0 +1,31 @@
+options:
+  inputMappings:
+  - fieldName: Authorization
+    value: $.BasicAuth($.type.my_secrets, $.type.secrets)
+    location: HEADER
+collectionOverrides:
+- collection: /api/v1/namespaces/{namespace}/pods
+  options:
+    virtualProperties: "quux"
+    validationOptions:
+      schemaValidation: IGNORE
+      undeclaredProperties: INCLUDE_WITH_WARNINGS
+    inputMappings:
+    - methodMatch: ^(get|update|delete)
+      fieldName: id
+      value: $.resource.properties.metadata.name
+      location: PATH
+    - methodMatch: ^(get|update|delete)
+      fieldName: bob
+      value: $.resource.properties.metadata.name
+      location: PATH
+- collection: /api/v1/namespaces/{namespace}/foos
+  options:
+    virtualProperties: "baz"
+    validationOptions:
+      schemaValidation: IGNORE
+      undeclaredProperties: INCLUDE_WITH_WARNINGS
+credential:
+  basicAuth:
+    user: cool_user
+    password: cooler_password

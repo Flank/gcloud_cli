@@ -1,0 +1,37 @@
+NAME
+    gcloud beta compute health-checks update - update health checks for load
+        balanced instances
+
+SYNOPSIS
+    gcloud beta compute health-checks update COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update health checks for load balanced instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     http
+        (BETA) Update a HTTP health check.
+
+     https
+        (BETA) Update a HTTPS health check.
+
+     ssl
+        (BETA) Update a SSL health check.
+
+     tcp
+        (BETA) Update a TCP health check.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute health-checks update
+        $ gcloud alpha compute health-checks update
+

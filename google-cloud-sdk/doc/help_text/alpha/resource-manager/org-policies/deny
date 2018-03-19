@@ -1,0 +1,49 @@
+NAME
+    gcloud alpha resource-manager org-policies deny - add values to an
+        Organization Policy denied_values list policy
+
+SYNOPSIS
+    gcloud alpha resource-manager org-policies deny ORG_POLICY_ID DENIED_VALUE
+        [DENIED_VALUE ...] [--folder=FOLDER_ID]
+        [--organization=ORGANIZATION_ID] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Adds one or more values to the specified Organization Policy
+    denied_values list policy associated with the specified resource.
+
+POSITIONAL ARGUMENTS
+     ORG_POLICY_ID
+        The Org Policy constraint name.
+
+     DENIED_VALUE [DENIED_VALUE ...]
+        The values to add to the denied_values list policy.
+
+FLAGS
+     --folder=FOLDER_ID
+        Folder ID for Org Policies.
+
+     --organization=ORGANIZATION_ID
+        Organization ID for Org Policies.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command adds devEnv and prodEnv to an Organization Policy
+    denied_values list policy for constraint serviceuser.services on project
+    foo-project:
+
+        $ gcloud alpha resource-manager org-policies deny \
+            serviceuser.services --project=foo-project devEnv prodEnv
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta resource-manager org-policies deny
+

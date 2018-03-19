@@ -1,0 +1,140 @@
+
+.TH "GCLOUD_BETA_DATAPROC_JOBS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dataproc jobs update \- update the labels for a job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dataproc jobs update\fR \fIJOB\fR (\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]) [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Update the labels for a job.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+The ID of the job to update.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+At least one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Removes all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud beta dataproc jobs update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud beta dataproc jobs update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+constitutes an independent resource namespace constrained to deploying instances
+into Google Compute Engine zones inside the region. The default value of
+"global" is a special multi\-region namespace which is capable of deploying
+instances into all Google Compute Engine zones globally, and is disjoint from
+other Cloud Dataproc regions. Overrides the default \fBdataproc/region\fR
+property value for this command invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To add the label 'customer=acme' to a job , run:
+
+.RS 2m
+$ gcloud beta dataproc jobs update job_id \e
+    \-\-update\-labels=customer=acme
+.RE
+
+To update the label 'customer=ackme' to 'customer=acme', run:
+
+.RS 2m
+$ gcloud beta dataproc jobs update job_id \e
+    \-\-update\-labels=customer=acme
+.RE
+
+To remove the label whose key is 'customer', run:
+
+.RS 2m
+$ gcloud beta dataproc jobs update job_id \-\-remove\-labels=customer
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud dataproc jobs update
+.RE
+

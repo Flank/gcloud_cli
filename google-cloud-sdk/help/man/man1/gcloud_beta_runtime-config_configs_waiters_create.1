@@ -1,0 +1,124 @@
+
+.TH "GCLOUD_BETA_RUNTIME\-CONFIG_CONFIGS_WAITERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta runtime\-config configs waiters create \- create waiter resources
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta runtime\-config configs waiters create\fR \fINAME\fR \fB\-\-config\-name\fR=\fICONFIG_NAME\fR \fB\-\-success\-cardinality\-path\fR=\fISUCCESS_CARDINALITY_PATH\fR \fB\-\-timeout\fR=\fITIMEOUT\fR [\fB\-\-async\fR] [\fB\-\-failure\-cardinality\-number\fR=\fIFAILURE_CARDINALITY_NUMBER\fR;\ default=1] [\fB\-\-failure\-cardinality\-path\fR=\fIFAILURE_CARDINALITY_PATH\fR] [\fB\-\-success\-cardinality\-number\fR=\fISUCCESS_CARDINALITY_NUMBER\fR;\ default=1] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command creates a new waiter resource with the specified name
+and parameters.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The waiter name.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-config\-name\fR=\fICONFIG_NAME\fR
+The name of the configuration resource to use.
+
+.TP 2m
+\fB\-\-success\-cardinality\-path\fR=\fISUCCESS_CARDINALITY_PATH\fR
+The path where success variables are written.
+
+.TP 2m
+\fB\-\-timeout\fR=\fITIMEOUT\fR
+The amount of time to wait before failing with DEADLINE_EXCEEDED. See $ gcloud
+topic datetimes for information on duration formats.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-failure\-cardinality\-number\fR=\fIFAILURE_CARDINALITY_NUMBER\fR; default=1
+The minimum required number of failure variables.
+
+.TP 2m
+\fB\-\-failure\-cardinality\-path\fR=\fIFAILURE_CARDINALITY_PATH\fR
+The path where failure variables are written.
+
+.TP 2m
+\fB\-\-success\-cardinality\-number\fR=\fISUCCESS_CARDINALITY_NUMBER\fR; default=1
+The minimum required number of success variables.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a waiter in "my\-config" with success and failure paths nested under
+"/status", run:
+
+.RS 2m
+$ gcloud beta runtime\-config configs waiters create my\-waiter \e
+    \-\-config\-name my\-config \-\-timeout 15m \e
+    \-\-success\-cardinality\-path /status/success \e
+    \-\-success\-cardinality\-number 5 \e
+    \-\-failure\-cardinality\-path /status/failure \e
+    \-\-failure\-cardinality\-number 1
+.RE
+
+This waiter will wait for at most 15 minutes for the first of two possible
+scenarios: 1) five or more variables are written to the /status/success/ path;
+or 2) one or more variables are written to the /status/failure/ path.
+
+To create a waiter without a failure path, run:
+
+.RS 2m
+$ gcloud beta runtime\-config configs waiters create my\-waiter \e
+    \-\-config\-name my\-config \-\-timeout 15m \e
+    \-\-success\-cardinality\-path /status/success \e
+    \-\-success\-cardinality\-number 5
+.RE
+
+This waiter will wait until 5 or more success variables are written, or the 15
+minute timeout elapses.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

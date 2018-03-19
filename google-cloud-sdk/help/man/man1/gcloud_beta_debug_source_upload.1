@@ -1,0 +1,73 @@
+
+.TH "GCLOUD_BETA_DEBUG_SOURCE_UPLOAD" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta debug source upload \- upload a directory tree
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta debug source upload\fR \fIDIRECTORY\fR [\fB\-\-branch\fR=\fIBRANCH\fR] [\fB\-\-source\-context\-directory\fR=\fISOURCE_CONTEXT_DIRECTORY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command uploads a directory tree to a branch in the repository
+\'google\-source\-captures' hosted on Cloud Source Repositories.
+
+The files and branches can be managed with git like any other repository.
+
+When uploading is done, this command can also produce a source context json file
+describing it.
+
+See https://cloud.google.com/debugger/docs/source\-context for details on where
+to deploy the source context json file in order to enable Stackdriver tools to
+display the uploaded files.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIDIRECTORY\fR
+The directory tree to upload.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-branch\fR=\fIBRANCH\fR
+The branch name. If the branch already exists, the new upload will overwrite its
+history.
+
+.TP 2m
+\fB\-\-source\-context\-directory\fR=\fISOURCE_CONTEXT_DIRECTORY\fR
+The directory in which to create the source context file.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

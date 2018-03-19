@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha scheduler jobs - manage Cloud Scheduler jobs
+
+SYNOPSIS
+    gcloud alpha scheduler jobs COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud Scheduler jobs.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create-app-engine-job
+        (ALPHA) Create a Cloud Scheduler job with an App Engine target.
+
+     create-pubsub-job
+        (ALPHA) Create a Cloud Scheduler job with a Pub/Sub target.
+
+     delete
+        (ALPHA) Delete a job.
+
+     describe
+        (ALPHA) Show details about a job.
+
+     list
+        (ALPHA) List jobs.
+
+     run
+        (ALPHA) Trigger an on-demand execution of a job.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

@@ -1,0 +1,138 @@
+{
+  "CLI_VERSION": "2.0.27",
+  "VERSION": "1",
+  "capsule": "",
+  "commands": {
+    "cancel": {
+      "capsule": "",
+      "commands": {},
+      "flags": {},
+      "groups": {},
+      "is_group": false,
+      "is_hidden": false,
+      "path": [
+        "bq",
+        "cancel"
+      ],
+      "positionals": [],
+      "release": "GA",
+      "sections": {
+        "DESCRIPTION": "Request a cancel and waits for the job to be cancelled.\n\nRequests a cancel and then either: a) waits until the job is done if\nthe sync flag is set [default], or b) returns immediately if the sync\nflag is not set. Not all job types support a cancel, an error is\nreturned if it cannot be cancelled. Even for jobs that support a\ncancel, success is not guaranteed, the job may have completed by the\ntime the cancel request is noticed, or the job may be in a stage\nwhere it cannot be cancelled.\n",
+        "EXAMPLES": "bq cancel job_id # Requests a cancel and waits until the job is done.\nbq --nosync cancel job_id # Requests a cancel and returns\nimmediately.\n"
+      }
+    },
+    "query": {
+      "capsule": "",
+      "commands": {},
+      "flags": {},
+      "groups": {},
+      "is_group": false,
+      "is_hidden": false,
+      "path": [
+        "bq",
+        "query"
+      ],
+      "positionals": [],
+      "release": "GA",
+      "sections": {
+        "DESCRIPTION": "Execute a query.\n\nQuery should be specified on command line, or passed on stdin.\n",
+        "EXAMPLES": "bq query 'select count(*) from publicdata:samples.shakespeare'\necho 'select count(*) from publicdata:samples.shakespeare' | bq query\n\nUsage:\nquery [<sql_query>]\n\n\nRun 'bq --help' to get help for global flags.\nRun 'bq help <command>' to get help for <command>.\n"
+      }
+    }
+  },
+  "flags": {
+    "--api": {
+      "attr": {},
+      "category": "",
+      "default": "'https://www.googleapis.com'",
+      "description": "API endpoint to talk to.",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--api",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
+    "--auth_host_name": {
+      "attr": {},
+      "category": "",
+      "default": "'localhost'",
+      "description": "Host name to use when running a local web server to handle redirects during OAuth authorization.",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--auth_host_name",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
+    "--debug_mode": {
+      "attr": {},
+      "category": "",
+      "default": "'false'",
+      "description": "Show tracebacks on Python exceptions.",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--debug_mode",
+      "nargs": "0",
+      "type": "bool",
+      "value": ""
+    },
+    "--discovery_file": {
+      "attr": {},
+      "category": "",
+      "default": "'true'",
+      "description": "Filename for JSON document to read for discovery. -q,--[no]quiet: If True, ignore status updates while jobs are running. -sync,--[no]synchronous_mode: If True, wait for command completion before returning, and use the job completion status for error codes. If False, simply create the job, and use the success of job creation as the error code.",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--discovery_file",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
+    "--flagfile": {
+      "attr": {},
+      "category": "",
+      "default": "''",
+      "description": "Insert flag definitions from the given file into the command line.",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--flagfile",
+      "nargs": "1",
+      "type": "string",
+      "value": "VALUE"
+    },
+    "--helpxml": {
+      "attr": {},
+      "category": "",
+      "default": "",
+      "description": "like --help, but generates XML output",
+      "group": "",
+      "is_global": true,
+      "is_hidden": false,
+      "is_required": false,
+      "name": "--helpxml",
+      "nargs": "0",
+      "type": "bool",
+      "value": ""
+    }
+  },
+  "groups": {},
+  "is_group": true,
+  "is_hidden": false,
+  "path": [
+    "bq"
+  ],
+  "positionals": [],
+  "release": "GA",
+  "sections": {}
+}

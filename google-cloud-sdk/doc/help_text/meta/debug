@@ -1,0 +1,39 @@
+NAME
+    gcloud meta debug - run an interactive debug console with the Cloud SDK
+        libraries loaded
+
+SYNOPSIS
+    gcloud meta debug [--mode=MODE; default="python"] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command runs an interactive console with the Cloud SDK libraries
+    loaded.
+
+    It's useful for:
+
+      o Manually testing out an API.
+      o Exploring available Cloud SDK core libraries.
+      o Debugging specific problems.
+
+    It comes with many utilities pre-loaded in the environment:
+
+      o All API clients loaded with one command (LoadApis()). Then, for
+        instance, appengine refers to the App Engine API client.
+      o Many common Cloud SDK imports pre-imported (e.g. core.util.files,
+        console_io, properties).
+
+    Use dir() to explore them all.
+
+FLAGS
+     --mode=MODE; default="python"
+        The debug console mode to run in. MODE must be one of: pdb, python.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

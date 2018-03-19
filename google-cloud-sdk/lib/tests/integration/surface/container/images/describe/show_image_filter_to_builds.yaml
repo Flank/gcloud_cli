@@ -1,0 +1,56 @@
+---
+args:
+  command: alpha container images describe gcr.io/argo-integration-testing/vb-qa@sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+  specified_args:
+    --show-image-basis: True
+    --metadata-filter: 'kind=BUILD_DETAILS'
+---
+state:
+  interactive_console: true
+  random_seed: -4155779774784942898
+  term_size:
+  - 147
+  - 39
+---
+properties:
+  core:
+    disable_color: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: ''
+  headers:
+    accept: application/json
+    accept-encoding: gzip, deflate
+  method: GET
+  uri: https://containeranalysis.googleapis.com/v1alpha1/projects/argo-integration-testing/occurrences?alt=json&pageSize=1000&filter=%28%28kind%3DBUILD_DETAILS%29+AND+%28kind+%3D+%22IMAGE_BASIS%22%29%29+AND+%28resource_url%3D%22https%3A%2F%2Fgcr.io%2Fargo-integration-testing%2Fvb-qa%40sha256%3A1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4%22%29
+---
+response:
+  content:
+  - json: {}
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,35"
+    cache-control: private
+    content-location: https://containeranalysis.googleapis.com/v1alpha1/projects/argo-integration-testing/occurrences?alt=json&pageSize=1000&filter=%28%28kind+%3D+%22BUILD_DETAILS%22%29+AND+%28kind+%3D+%22IMAGE_BASIS%22%29%29+AND+%28resource_url%3D%22https%3A%2F%2Fgcr.io%2Fargo-integration-testing%2Fvb-qa%40sha256%3A1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4%22%29
+    content-type: application/json; charset=UTF-8
+    date: Tue, 03 Oct 2017 19:20:42 GMT
+    server: ESF
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  stdout: |
+    image_basis_summary:
+      base_images: []
+    image_summary:
+      digest: sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+      fully_qualified_digest: gcr.io/argo-integration-testing/vb-qa@sha256:1aeb52ca754823d1da15ed744b739c74c7c6330bac1e30ede15ece0c5dc7f1d4
+      registry: gcr.io
+      repository: argo-integration-testing/vb-qa

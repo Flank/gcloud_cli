@@ -1,0 +1,35 @@
+NAME
+    gcloud info - display information about the current gcloud environment
+
+SYNOPSIS
+    gcloud info [--anonymize] [--run-diagnostics] [--show-log]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud info displays information about the current gcloud environment.
+
+      o gcloud info will print information about the current active
+        configuration, including the Google Cloud Platform account, project and
+        directory paths for logs.
+
+      o gcloud info --run-diagnostics will run a checks on network
+        connectivity.
+
+      o gcloud info --show-log prints the contents of the most recent log
+        file.
+
+FLAGS
+     --anonymize
+        Minimize any personal identifiable information. Use it when sharing
+        output with others.
+
+     --run-diagnostics
+        Run diagnostics on your installation of the Cloud SDK.
+
+     --show-log
+        Print the contents of the last log file.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.

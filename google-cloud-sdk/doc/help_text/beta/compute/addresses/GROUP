@@ -1,0 +1,40 @@
+NAME
+    gcloud beta compute addresses - read and manipulate Google Compute Engine
+        addresses
+
+SYNOPSIS
+    gcloud beta compute addresses COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate Google Compute Engine addresses.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Reserve IP addresses.
+
+     delete
+        (BETA) Release reserved IP addresses.
+
+     describe
+        (BETA) Display detailed information about an address.
+
+     list
+        (BETA) List addresses.
+
+     update
+        (BETA) Update a Google Compute Engine address.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute addresses
+        $ gcloud alpha compute addresses
+

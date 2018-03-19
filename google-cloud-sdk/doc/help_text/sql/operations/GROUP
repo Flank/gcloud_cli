@@ -1,0 +1,34 @@
+NAME
+    gcloud sql operations - provide commands for working with Cloud SQL
+        instance operations
+
+SYNOPSIS
+    gcloud sql operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Provide commands for working with Cloud SQL instance operations, including
+    listing and getting information about instance operations of a Cloud SQL
+    instance.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        Retrieves information about a Cloud SQL instance operation.
+
+     list
+        Lists all instance operations for the given Cloud SQL instance.
+
+     wait
+        Waits for one or more operations to complete.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta sql operations
+

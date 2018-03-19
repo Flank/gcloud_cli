@@ -1,0 +1,32 @@
+NAME
+    gcloud beta dns project-info - view Cloud DNS related information for a
+        project
+
+SYNOPSIS
+    gcloud beta dns project-info COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) View Cloud DNS related information for a project.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (BETA) View Cloud DNS related information for a project.
+
+EXAMPLES
+    To display Cloud DNS related information for your project, run:
+
+        $ gcloud beta dns project-info describe
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dns project-info
+

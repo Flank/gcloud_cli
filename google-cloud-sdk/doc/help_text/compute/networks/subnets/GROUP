@@ -1,0 +1,42 @@
+NAME
+    gcloud compute networks subnets - list, describe, and delete Google Compute
+        Engine subnetworks
+
+SYNOPSIS
+    gcloud compute networks subnets COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List, describe, and delete Google Compute Engine subnetworks.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Define a subnet for a network in custom subnet mode.
+
+     delete
+        Delete Google Compute Engine subnetworks.
+
+     describe
+        Describe a Google Compute Engine subnetwork.
+
+     expand-ip-range
+        Expand the IP range of a Google Compute Engine subnetwork.
+
+     list
+        List Google Compute Engine subnetworks.
+
+     update
+        Updates properties of an existing Google Compute Engine subnetwork.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute networks subnets
+        $ gcloud beta compute networks subnets
+

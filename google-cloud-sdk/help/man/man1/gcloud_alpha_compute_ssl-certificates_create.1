@@ -1,0 +1,113 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SSL\-CERTIFICATES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute ssl\-certificates create \- create a Google Compute Engine SSL certificate
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute ssl\-certificates create\fR \fINAME\fR (\fB\-\-domains\fR=\fIDOMAIN\fR,[\fIDOMAIN\fR,...]\ |\ \fB\-\-certificate\fR=\fILOCAL_FILE_PATH\fR\ \fB\-\-private\-key\fR=\fILOCAL_FILE_PATH\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute ssl\-certificates create\fR is used to
+create SSL certificates which can be used to configure a target HTTPS proxy. An
+SSL certificate consists of a certificate and private key. The private key is
+encrypted before it is stored.
+
+You can create either a managed or a self\-managed SslCertificate. Managed
+SslCertificate will be provisioned and renewed for you, when you specify
+\-\-domains flag. Self\-managed certificate is created by passing certificate
+obtained from Certificate Authority through \-\-certificate and \-\-private\-key
+flags.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the SSL certificate to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Flags for managed or self\-managed certificate. Exactly one of these must be
+specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-domains\fR=\fIDOMAIN\fR,[\fIDOMAIN\fR,...]
+List of domains to create a managed certificate for.
+
+.TP 2m
+
+Flags for self\-managed certificate
+
+.RS 2m
+.TP 2m
+\fB\-\-certificate\fR=\fILOCAL_FILE_PATH\fR
+The path to a local certificate file to create a self\-managed certificate. The
+certificate must be in PEM format. The certificate chain must be no greater than
+5 certs long. The chain must include at least one intermediate cert. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-private\-key\fR=\fILOCAL_FILE_PATH\fR
+The path to a local private key file. The private key must be in PEM format and
+must use RSA or ECDSA encryption. This flag must be specified if any of the
+other arguments in this group are specified.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the SSL certificate.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute ssl\-certificates create
+$ gcloud beta compute ssl\-certificates create
+.RE
+

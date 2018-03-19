@@ -1,0 +1,100 @@
+NAME
+    gcloud alpha container node-pools update - updates a node pool in a running
+        cluster
+
+SYNOPSIS
+    gcloud alpha container node-pools update NAME
+        (--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES
+          | --enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha container node-pools update updates a node pool in a
+    Google Kubernetes Engine cluster.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the node pool.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       Cluster autoscaling
+
+         --enable-autoscaling
+            Enables autoscaling for a node pool.
+
+            Enables autoscaling in the node pool specified by --node-pool or
+            the default node pool if --node-pool is not provided.
+
+         --max-nodes=MAX_NODES
+            Maximum number of nodes in the node pool.
+
+            Maximum number of nodes to which the node pool specified by
+            --node-pool (or default node pool if unspecified) can scale.
+            Ignored unless --enable-autoscaling is also specified.
+
+         --min-nodes=MIN_NODES
+            Minimum number of nodes in the node pool.
+
+            Minimum number of nodes to which the node pool specified by
+            --node-pool (or default node pool if unspecified) can scale.
+            Ignored unless --enable-autoscaling is also specified.
+
+       Node management
+
+         --enable-autorepair
+            Sets autorepair feature for a node-pool.
+
+                $ gcloud alpha container node-pools update node-pool-1 \
+                    --cluster=example-cluster --enable-autorepair
+
+            See
+            https://cloud.google.com/kubernetes-engine/docs/node-auto-repair
+            for more info.
+
+         --enable-autoupgrade
+            Sets autoupgrade feature for a node-pool.
+
+                $ gcloud alpha container node-pools update node-pool-1 \
+                    --cluster=example-cluster --enable-autoupgrade
+
+            See https://cloud.google.com/kubernetes-engine/docs/node-managament
+            for more info.
+
+OPTIONAL FLAGS
+     --cluster=CLUSTER
+        The name of the cluster. Overrides the default container/cluster
+        property value for this command invocation.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To turn on node auto repair in "node-pool-1" in the cluster
+    "sample-cluster", run:
+
+        $ gcloud alpha container node-pools update node-pool-1 \
+            --cluster=example-cluster --enable-autoupgrade
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud container node-pools update
+        $ gcloud beta container node-pools update
+

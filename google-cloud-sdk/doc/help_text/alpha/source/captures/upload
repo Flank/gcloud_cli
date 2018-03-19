@@ -1,0 +1,58 @@
+NAME
+    gcloud alpha source captures upload - upload a source capture from given
+        input files
+
+SYNOPSIS
+    gcloud alpha source captures upload PATH [--capture-id=ID]
+        [--output-directory=OUTPUT_DIRECTORY; default="."] [--target-path=PATH]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (REMOVED) Upload a source capture from given input files.
+
+    This command has been removed.
+
+    This command uploads a capture of the specified source directory to a
+    Google-hosted Git repository accessible with the current project's
+    credentials. If the name of an existing capture is provided, the existing
+    capture will be modified to include the new files. Otherwise a new capture
+    will be created to hold the files.
+
+    When creating a capture, this command can also produce a source context
+    json file describing the capture.
+
+    See https://cloud.google.com/tools/cloud-debugger/ for details on where to
+    deploy the source context json file in order to enable Cloud Diagnostic
+    tools to display the captured sources.
+
+POSITIONAL ARGUMENTS
+     PATH
+        The directory or archive containing the sources to capture. Files and
+        subdirectories contained in that directory or archive will be added to
+        the capture. If PATH refers to a file, the file may be a Java source
+        jar or a zip archive.
+
+FLAGS
+     --capture-id=ID
+        The ID of the capture to create or modify.
+
+     --output-directory=OUTPUT_DIRECTORY; default="."
+        The directory in which to create the source context file.
+
+     --target-path=PATH
+        The directory tree under source-location will be uploaded under
+        target-path in the capture's directory tree.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

@@ -1,0 +1,70 @@
+NAME
+    gcloud kms keys - create and manage keys
+
+SYNOPSIS
+    gcloud kms keys GROUP | COMMAND [--keyring=KEYRING] [--location=LOCATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    A key represents a logical key that can be used for cryptographic
+    operations.
+
+FLAGS
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     versions
+        Create and manage versions.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        Add IAM policy binding to a key.
+
+     create
+        Create a new key.
+
+     describe
+        Get metadata for a given key.
+
+     get-iam-policy
+        Get the IAM policy for a key.
+
+     list
+        List the keys within a keyring.
+
+     remove-iam-policy-binding
+        Remove an IAM policy binding from a key.
+
+     remove-rotation-schedule
+        Remove the rotation schedule for a key.
+
+     set-iam-policy
+        Set the IAM policy for a key.
+
+     set-primary-version
+        Set the primary version of a key.
+
+     set-rotation-schedule
+        Update the rotation schedule for a key.
+
+     update
+        Update a key.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta kms keys
+

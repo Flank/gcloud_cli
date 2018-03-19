@@ -1,0 +1,8 @@
+type: google.api.Service
+config_version: 3
+
+name: ${SERVICE_NAME}
+
+title: Greeter gRPC API
+apis:
+- name: endpoints.sayhello.Greeter

@@ -1,0 +1,160 @@
+NAME
+    gcloud beta compute instance-groups managed set-autoscaling - set
+        autoscaling parameters of a managed instance group
+
+SYNOPSIS
+    gcloud beta compute instance-groups managed set-autoscaling NAME
+        [--autoscaling-file=PATH] [--cool-down-period=COOL_DOWN_PERIOD]
+        [--custom-metric-utilization=[metric=METRIC],
+          [utilization-target=UTILIZATION-TARGET],
+          [utilization-target-type=UTILIZATION-TARGET-TYPE]]
+        [--description=DESCRIPTION] [--max-num-replicas=MAX_NUM_REPLICAS]
+        [--min-num-replicas=MIN_NUM_REPLICAS]
+        [--remove-stackdriver-metric=METRIC] [--scale-based-on-cpu]
+        [--scale-based-on-load-balancing] [--stackdriver-metric-filter=FILTER]
+        [--stackdriver-metric-single-instance-assignment=ASSIGNMENT]
+        [--stackdriver-metric-utilization-target=TARGET]
+        [--stackdriver-metric-utilization-target-type=TARGET_TYPE]
+        [--target-cpu-utilization=TARGET_CPU_UTILIZATION]
+        [--target-load-balancing-utilization=TARGET_LOAD_BALANCING_UTILIZATION]
+        [--update-stackdriver-metric=METRIC] [--region=REGION | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute instance-groups managed set-autoscaling sets
+    autoscaling parameters of specified managed instance group.
+
+    Autoscalers can use one or more policies listed below. Information on using
+    multiple policies can be found here:
+    https://cloud.google.com/compute/docs/autoscaler/multiple-policies
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the managed instance group to operate on.
+
+FLAGS
+     --autoscaling-file=PATH
+        Path of the file from which autoscaling configuration will be loaded.
+        This flag allows you to atomically setup complex autoscalers.
+
+     --cool-down-period=COOL_DOWN_PERIOD
+        The time period that the autoscaler should wait before it starts
+        collecting information from a new instance. This prevents the
+        autoscaler from collecting information when the instance is
+        initializing, during which the collected usage would not be reliable.
+        The default is 60s. See $ gcloud topic datetimes for information on
+        duration formats.
+
+     --custom-metric-utilization=[metric=METRIC],[utilization-target=UTILIZATION-TARGET],[utilization-target-type=UTILIZATION-TARGET-TYPE]
+        Adds a target metric value for the Autoscaler to use.
+
+         metric
+            Protocol-free URL of a Google Cloud Monitoring metric.
+
+         utilization-target
+            Value of the metric Autoscaler will aim to maintain (greater than
+            0.0).
+
+         utilization-target-type
+            How target is expressed. Valid values: DELTA_PER_MINUTE,
+            DELTA_PER_SECOND, GAUGE.
+
+            Mutually exclusive with --update-stackdriver-metric.
+
+     --description=DESCRIPTION
+        Notes about Autoscaler.
+
+     --max-num-replicas=MAX_NUM_REPLICAS
+        Maximum number of replicas Autoscaler will set.
+
+     --min-num-replicas=MIN_NUM_REPLICAS
+        Minimum number of replicas Autoscaler will set.
+
+     --remove-stackdriver-metric=METRIC
+        Stackdriver metric to remove from autoscaling configuration. If the
+        metric is the only input used for autoscaling the command will fail.
+
+     --scale-based-on-cpu
+        Autoscaler will be based on CPU utilization.
+
+     --scale-based-on-load-balancing
+        Use autoscaling based on load balancing utilization.
+
+     --stackdriver-metric-filter=FILTER
+        Expression for filtering samples used to autoscale, see
+        https://cloud.google.com/monitoring/api/v3/filters.
+
+     --stackdriver-metric-single-instance-assignment=ASSIGNMENT
+        Autoscaler will aim to maintain value of metric divided by number of
+        instances at this level. Mutually exclusive with
+        -stackdriver-metric-utilization-target-type,
+        -stackdriver-metric-utilization-target-type, and
+        --custom-metric-utilization.
+
+     --stackdriver-metric-utilization-target=TARGET
+        Value of the metric Autoscaler will aim to maintain. When specifying
+        this flag you must also provide
+        --stackdriver-metric-utilization-target-type. Mutually exclusive with
+        --stackdriver-metric-single-instance-assignment and
+        --custom-metric-utilization.
+
+     --stackdriver-metric-utilization-target-type=TARGET_TYPE
+        Value of the metric Autoscaler will aim to maintain. When specifying
+        this flag you must also provide
+        --stackdriver-metric-utilization-target. Mutually exclusive with
+        --stackdriver-metric-single-instance-assignment and
+        --custom-metric-utilization. TARGET_TYPE must be one of:
+        delta-per-minute, delta-per-second, gauge.
+
+     --target-cpu-utilization=TARGET_CPU_UTILIZATION
+        Autoscaler will aim to maintain CPU utilization at target level (0.0 to
+        1.0).
+
+     --target-load-balancing-utilization=TARGET_LOAD_BALANCING_UTILIZATION
+        Autoscaler will aim to maintain the load balancing utilization level
+        (greater than 0.0).
+
+     --update-stackdriver-metric=METRIC
+        Stackdriver metric to use as an input for autoscaling. When using this
+        flag you must also specify target value of the metric by specifying
+        --stackdriver-metric-single-instance-assignment or
+        --stackdriver-metric-utilization-target and
+        --stackdriver-metric-utilization-target-type. Mutually exclusive with
+        --custom-metric-utilization.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to operate on. If not
+          specified, you will be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          The zone of the managed instance group to operate on. If not
+          specified, you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute instance-groups managed set-autoscaling
+        $ gcloud alpha compute instance-groups managed set-autoscaling
+

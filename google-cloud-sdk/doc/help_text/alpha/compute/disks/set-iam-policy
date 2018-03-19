@@ -1,0 +1,67 @@
+NAME
+    gcloud alpha compute disks set-iam-policy - set IAM policy for a disk
+
+SYNOPSIS
+    gcloud alpha compute disks set-iam-policy DISK_NAME POLICY_FILE
+        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute disks set-iam-policy replaces the existing IAM
+    policy for a disk, given a disk and a file encoded in JSON or YAML that
+    contains the IAM policy. If the given policy file specifies an "etag"
+    value, then the replacement will succeed only if the policy already in
+    place matches that etag. (An etag obtained via get-iam-policy will prevent
+    the replacement if the policy for the disk has been subsequently updated.)
+    A policy file that does not contain an etag value will replace any existing
+    policy for the disk.
+
+POSITIONAL ARGUMENTS
+     DISK_NAME
+        The name of the disk to set the IAM policy of.
+
+     POLICY_FILE
+        JSON or YAML file containing the IAM policy.
+
+FLAGS
+     --zone=ZONE
+        The zone of the disk to set the IAM policy of. If not specified and the
+        compute/zone property isn't set, you will be prompted to select a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will read an IAM policy defined in a JSON file
+    'policy.json' and set it for a disk with identifier 'my-disk'
+
+        $ gcloud alpha compute disks set-iam-policy my-disk policy.json
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

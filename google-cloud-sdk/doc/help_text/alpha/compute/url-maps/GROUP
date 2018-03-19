@@ -1,0 +1,63 @@
+NAME
+    gcloud alpha compute url-maps - list, create, and delete URL maps
+
+SYNOPSIS
+    gcloud alpha compute url-maps COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) List, create, and delete URL maps.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-host-rule
+        (ALPHA) Add a rule to a URL map to map hosts to a path matcher.
+
+     add-path-matcher
+        (ALPHA) Add a path matcher to a URL map.
+
+     create
+        (ALPHA) Create a URL map.
+
+     delete
+        (ALPHA) Delete URL maps.
+
+     describe
+        (ALPHA) Describe a URL map.
+
+     edit
+        (ALPHA) Modify URL maps.
+
+     invalidate-cdn-cache
+        (ALPHA) Invalidate specified objects for a URL map in Cloud CDN caches.
+
+     list
+        (ALPHA) List Google Compute Engine URL maps.
+
+     list-cdn-cache-invalidations
+        (ALPHA) List Cloud CDN cache invalidations for a URL map.
+
+     remove-host-rule
+        (ALPHA) Remove a host rule from a URL map.
+
+     remove-path-matcher
+        (ALPHA) Remove a path matcher from a URL map.
+
+     set-default-service
+        (ALPHA) Change the default service or default bucket of a URL map.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute url-maps
+        $ gcloud beta compute url-maps
+

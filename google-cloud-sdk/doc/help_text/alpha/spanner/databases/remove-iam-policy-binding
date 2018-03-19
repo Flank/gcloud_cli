@@ -1,0 +1,61 @@
+NAME
+    gcloud alpha spanner databases remove-iam-policy-binding - remove an IAM
+        policy binding from a Cloud Spanner database
+
+SYNOPSIS
+    gcloud alpha spanner databases remove-iam-policy-binding
+        (DATABASE : --instance=INSTANCE) --member=MEMBER --role=ROLE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Remove an IAM policy binding from a Cloud Spanner database.
+
+POSITIONAL ARGUMENTS
+     DATABASE - The Cloud Spanner database to remove IAM policy binding from.
+     The arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       DATABASE
+          The ID of the database or a fully qualified identifier for the
+          database. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --instance=INSTANCE
+          The Cloud Spanner instance for the database.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud spanner databases remove-iam-policy-binding
+        $ gcloud beta spanner databases remove-iam-policy-binding
+

@@ -1,0 +1,74 @@
+
+.TH "GCLOUD_BETA_PUBSUB_TOPICS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub topics create \- creates one or more Cloud Pub/Sub topics
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub topics create\fR \fITOPIC\fR [\fITOPIC\fR\ ...] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Creates one or more Cloud Pub/Sub topics.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fITOPIC\fR [\fITOPIC\fR ...]
+One or more topics to create.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to add.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a Cloud Pub/Sub topic, run:
+
+.RS 2m
+$ gcloud beta pubsub topics create mytopic
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud pubsub topics create
+$ gcloud alpha pubsub topics create
+.RE
+

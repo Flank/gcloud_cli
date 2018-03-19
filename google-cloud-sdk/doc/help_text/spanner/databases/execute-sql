@@ -1,0 +1,65 @@
+NAME
+    gcloud spanner databases execute-sql - executes a read-only SQL query
+        against a Cloud Spanner database
+
+SYNOPSIS
+    gcloud spanner databases execute-sql (DATABASE : --instance=INSTANCE)
+        --sql=SQL [--query-mode=QUERY_MODE; default="NORMAL"]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Executes a read-only SQL query against a Cloud Spanner database.
+
+POSITIONAL ARGUMENTS
+     DATABASE - The Cloud Spanner database to execute the SQL query against.
+     The arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       DATABASE
+          The ID of the database or a fully qualified identifier for the
+          database. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --instance=INSTANCE
+          The Cloud Spanner instance for the database.
+
+REQUIRED FLAGS
+     --sql=SQL
+        The SQL query to issue to the database. Cloud Spanner SQL is described
+        at https://cloud.google.com/spanner/docs/query-syntax
+
+OPTIONAL FLAGS
+     --query-mode=QUERY_MODE; default="NORMAL"
+        Mode in which the query must be processed. QUERY_MODE must be one of:
+
+         NORMAL
+            Returns only the query result, without any information about the
+            query plan.
+         PLAN
+            Returns only the query plan, without any result rows or execution
+            statistics information.
+         PROFILE
+            Returns both the query plan and the execution statistics along with
+            the result rows.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To execute a SQL SELECT statement against example-database under        example-instance, run:
+
+        $ gcloud spanner databases execute-sql example-database \
+            --instance=example-instance
+        --sql='SELECT * FROM MyTable WHERE MyKey = 1'
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha spanner databases execute-sql
+        $ gcloud beta spanner databases execute-sql
+

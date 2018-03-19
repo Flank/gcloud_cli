@@ -1,0 +1,83 @@
+NAME
+    gcloud alpha iot devices list - list devices
+
+SYNOPSIS
+    gcloud alpha iot devices list (--registry=REGISTRY : --region=REGION)
+        [--device-ids=[DEVICE_IDS,...]] [--device-num-ids=[DEVICE_NUM_IDS,...]]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) List devices.
+
+REQUIRED FLAGS
+     REGISTRY - The registry you want to list the devices for. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       --registry=REGISTRY
+          The ID of the registry or a fully qualified identifier for the
+          registry. This flag must be specified if any of the other arguments
+          in this group are specified.
+
+       --region=REGION
+          The name of the Cloud IoT region.
+
+FLAGS
+     --device-ids=[DEVICE_IDS,...]
+        If given, show only devices with one of the provided IDs.
+
+     --device-num-ids=[DEVICE_NUM_IDS,...]
+        If given, show only devices with one of the provided numerical IDs.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True then that item is listed. For more
+        details and examples of filter expressions run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        The maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
+
+     --sort-by=[FIELD,...]
+        A comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+     --uri
+        Print a list of resource URIs instead of the default output.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudiot/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/iot
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud iot devices list
+        $ gcloud beta iot devices list
+

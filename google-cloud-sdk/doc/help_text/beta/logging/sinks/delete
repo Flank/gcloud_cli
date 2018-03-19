@@ -1,0 +1,41 @@
+NAME
+    gcloud beta logging sinks delete - deletes a sink
+
+SYNOPSIS
+    gcloud beta logging sinks delete SINK_NAME
+        [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
+          | --organization=ORGANIZATION_ID] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Deletes a sink and halts the export of log entries associated with
+    that sink. Deleting a sink does not affect log entries already exported
+    through the deleted sink, and will not affect other sinks that are
+    exporting the same log(s).
+
+POSITIONAL ARGUMENTS
+     SINK_NAME
+        The name of the sink to delete.
+
+FLAGS
+     At most one of these may be specified:
+
+       --billing-account=BILLING_ACCOUNT_ID
+          Delete a sink associated with this billing account.
+
+       --folder=FOLDER_ID
+          Delete a sink associated with this folder.
+
+       --organization=ORGANIZATION_ID
+          Delete a sink associated with this organization.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud logging sinks delete
+

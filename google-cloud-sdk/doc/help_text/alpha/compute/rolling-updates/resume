@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha compute rolling-updates resume - resume an existing update
+
+SYNOPSIS
+    gcloud alpha compute rolling-updates resume UPDATE [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (DEPRECATED) Resume an existing update.
+
+    This command group is deprecated. Use gcloud alpha compute instance-groups
+    managed rolling-action command group instead.
+
+    Resumes the update in state ROLLING_FORWARD or PAUSED (fails if the update
+    is in any other state). No-op if invoked in state ROLLED_OUT.
+
+    Resume continues applying the new template and should be used when rollback
+    was started, but the user decided to proceed with the update.
+
+POSITIONAL ARGUMENTS
+     UPDATE
+        Update id.
+
+FLAGS
+     --zone=ZONE
+        Rolling update zone name. Overrides the default compute/zone property
+        value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

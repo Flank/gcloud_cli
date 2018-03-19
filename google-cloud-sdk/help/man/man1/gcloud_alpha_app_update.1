@@ -1,0 +1,75 @@
+
+.TH "GCLOUD_ALPHA_APP_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha app update \- updates an App Engine application
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha app update\fR [\fB\-\-[no\-]split\-health\-checks\fR] [\fB\-\-[no\-]use\-container\-optimized\-os\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command is used to update settings on an app engine
+application.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-[no\-]split\-health\-checks\fR
+Enables/disables split health checks by default on new deployments. Use
+\fB\-\-split\-health\-checks\fR to enable and
+\fB\-\-no\-split\-health\-checks\fR to disable.
+
+.TP 2m
+\fB\-\-[no\-]use\-container\-optimized\-os\fR
+Enables/disables Container\-Optimized OS as Flex base VM image by default on new
+deployments. Use \fB\-\-use\-container\-optimized\-os\fR to enable and
+\fB\-\-no\-use\-container\-optimized\-os\fR to disable.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To enable split health checks on an application:
+
+.RS 2m
+$ gcloud alpha app update \-\-split\-health\-checks
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud app update
+$ gcloud beta app update
+.RE
+

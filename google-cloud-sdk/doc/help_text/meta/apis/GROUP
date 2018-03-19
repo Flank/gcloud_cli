@@ -1,0 +1,45 @@
+NAME
+    gcloud meta apis - inspect the APIs registered in gcloud
+
+SYNOPSIS
+    gcloud meta apis GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Inspect the APIs registered in gcloud.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     collections
+        Inspect the API collections registered in gcloud.
+
+     discovery
+        Inspect the Google Cloud Platform APIs through the discovery service.
+
+     messages
+        Inspect the API messages in an API.
+
+     methods
+        Inspect the methods for an API collection registered in gcloud.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        Describe the details of an API registered in gcloud.
+
+     list
+        List the APIs registered in gcloud.
+
+     regen
+        Regenerate given API(s) in gcloud.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

@@ -1,0 +1,78 @@
+NAME
+    gcloud alpha tasks create-app-engine-task - create and add a task to an App
+        Engine queue
+
+SYNOPSIS
+    gcloud alpha tasks create-app-engine-task
+        [--header=HEADER_FIELD: HEADER_VALUE] [--id=TASK_ID] [--method=METHOD]
+        [--queue=QUEUE] [--routing=KEY:VALUE,[KEY:VALUE,...]]
+        [--schedule-time=SCHEDULE_TIME] [--url=URL]
+        [--payload-content=PAYLOAD_CONTENT | --payload-file=PAYLOAD_FILE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create and add a task to an App Engine queue.
+
+FLAGS
+     --header=HEADER_FIELD: HEADER_VALUE
+        An HTTP request header. Header values can contain commas. This flag can
+        be repeated. Repeated header fields will have their values overridden.
+
+     --id=TASK_ID
+        The ID of the task to create.
+
+        If not specified then the system will generate a random unique task ID.
+        Explicitly specifying a task ID enables task de-duplication. If a
+        task's ID is identical to that of an existing task or a task that was
+        deleted or completed recently then the call will fail.
+
+        Because there is an extra lookup cost to identify duplicate task names,
+        tasks created with IDs have significantly increased latency. Using
+        hashed strings for the task ID or for the prefix of the task ID is
+        recommended.
+
+     --method=METHOD
+        The HTTP method to use for the request. If not specified, "POST" will
+        be used.
+
+     --queue=QUEUE
+        The queue the task belongs to.
+
+     --routing=KEY:VALUE,[KEY:VALUE,...]
+        The route to be used for this task. KEY must be at least one of:
+        [service, version, instance]. Any missing keys will use the default.
+
+        Routing can be overridden by the queue-level --routing-override flag.
+
+     --schedule-time=SCHEDULE_TIME
+        The time when the task is scheduled to be first attempted. Defaults to
+        "now" if not specified.
+
+     --url=URL
+        The relative URL of the request. Must begin with "/" and must be a
+        valid HTTP relative URL. It can contain a path and query string
+        arguments. If not specified, then the root path "/" will be used.
+
+     At most one of these may be specified:
+
+       --payload-content=PAYLOAD_CONTENT
+          Data payload to be consumed by the task worker to process the task.
+
+       --payload-file=PAYLOAD_FILE
+          File containing data payload to be consumed by the task worker to
+          execute the task. The payload will be sent as the HTTP message body.
+          A message body, and thus a payload, is allowed only if the HTTP
+          method is "POST" or "PUT".
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

@@ -1,0 +1,37 @@
+NAME
+    gcloud beta container clusters describe - describe an existing cluster for
+        running containers
+
+SYNOPSIS
+    gcloud beta container clusters describe NAME
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Describe an existing cluster for running containers.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of this cluster.
+
+FLAGS
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud container clusters describe
+        $ gcloud alpha container clusters describe
+

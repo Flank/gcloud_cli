@@ -1,0 +1,34 @@
+{
+  "components": [
+    {
+      "data": {
+        "contents_checksum": "0b219dd3cb96cbabde70a83e2c3fe23c9061409915912c97258840a0e10026ef", 
+        "source": "", 
+        "type": "tar"
+      }, 
+      "dependencies": [
+        "core"
+      ], 
+      "details": {
+        "description": "Collection of tests used to verity Cloud SDK", 
+        "display_name": "Cloud SDK tests"
+      }, 
+      "id": "tests", 
+      "is_configuration": false, 
+      "is_hidden": true, 
+      "is_required": false, 
+      "platform": {}, 
+      "version": {
+        "build_number": 20180309150215, 
+        "version_string": "2018.03.09"
+      }
+    }
+  ], 
+  "revision": 20180309150215, 
+  "schema_version": {
+    "no_update": false, 
+    "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz", 
+    "version": 3
+  }, 
+  "version": "193.0.0"
+}

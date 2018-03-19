@@ -1,0 +1,49 @@
+NAME
+    gcloud beta kms keyrings - create and manage keyrings
+
+SYNOPSIS
+    gcloud beta kms keyrings COMMAND [--location=LOCATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) A keyring is a toplevel logical grouping of keys.
+
+FLAGS
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding to a keyring.
+
+     create
+        (BETA) Create a new keyring.
+
+     describe
+        (BETA) Get metadata for a keyring.
+
+     get-iam-policy
+        (BETA) Get the IAM policy for a keyring.
+
+     list
+        (BETA) List keyrings within a location.
+
+     remove-iam-policy-binding
+        (BETA) Remove a policy binding from a keyring.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for a keyring.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud kms keyrings
+

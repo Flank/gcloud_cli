@@ -1,0 +1,115 @@
+
+.TH "GCLOUD_BETA_BIGTABLE_INSTANCES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta bigtable instances create \- create a new Bigtable instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta bigtable instances create\fR \fIINSTANCE\fR \fB\-\-cluster\fR=\fICLUSTER\fR \fB\-\-cluster\-zone\fR=\fICLUSTER_ZONE\fR (\fB\-\-description\fR=\fIDESCRIPTION\fR\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR) [\fB\-\-async\fR] [\fB\-\-cluster\-num\-nodes\fR=\fICLUSTER_NUM_NODES\fR] [\fB\-\-cluster\-storage\-type\fR=\fICLUSTER_STORAGE_TYPE\fR;\ default="ssd"] [\fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR;\ default="PRODUCTION"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a new Bigtable instance.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+ID of the cluster.
+
+.TP 2m
+\fB\-\-cluster\-zone\fR=\fICLUSTER_ZONE\fR
+ID of the zone where the cluster is located. Supported zones are listed at
+https://cloud.google.com/bigtable/docs/locations.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+(DEPRECATED) Friendly name of the instance.
+
+Flag \-\-description is deprecated. Use \-\-display\-name=DISPLAY_NAME instead.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+Friendly name of the instance.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately, without waiting for operation to complete.
+
+.TP 2m
+\fB\-\-cluster\-num\-nodes\fR=\fICLUSTER_NUM_NODES\fR
+Number of nodes to serve.
+
+.TP 2m
+\fB\-\-cluster\-storage\-type\fR=\fICLUSTER_STORAGE_TYPE\fR; default="ssd"
+Storage class for the cluster. \fICLUSTER_STORAGE_TYPE\fR must be one of:
+\fBhdd\fR, \fBssd\fR.
+
+.TP 2m
+\fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR; default="PRODUCTION"
+The type of instance to create. \fIINSTANCE_TYPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBDEVELOPMENT\fR
+Development instances are low\-cost instances meant for development and testing
+only. They do not provide high availability and no service level agreement
+applies.
+.TP 2m
+\fBPRODUCTION\fR
+Production instances have a minimum of three nodes, provide high availability,
+and are suitable for applications in production.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

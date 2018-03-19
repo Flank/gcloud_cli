@@ -1,0 +1,79 @@
+NAME
+    gcloud alpha compute images import - import a Google Compute Engine image
+
+SYNOPSIS
+    gcloud alpha compute images import IMAGE_NAME (--os=OS | --no-translate)
+        (--source-file=SOURCE_FILE | --source-image=SOURCE_IMAGE) [--async]
+        [--log-location=LOG_LOCATION] [--timeout=TIMEOUT; default="2h"]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute images import imports Virtual Disk images,
+    such as VMWare VMDK files and VHD files, into Google Compute Engine.
+
+    Importing images involves 3 steps:
+      o Upload the virtual disk file to Google Cloud Storage.
+      o Import the image to Google Compute Engine.
+      o Translate the image to make a bootable image.
+    This command will perform all three of these steps as necessary, depending
+    on the input arguments specified by the user.
+
+    This command uses the --os flag to choose the appropriate translation. You
+    can omit the translation step using the --no-translate flag.
+
+POSITIONAL ARGUMENTS
+     IMAGE_NAME
+        The name of the disk image to create.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --os=OS
+          Specifies the OS of the image being translated. OS must be one of:
+          centos-6, centos-7, debian-8, debian-9, rhel-6, rhel-6-byol, rhel-7,
+          rhel-7-byol, ubuntu-1404, ubuntu-1604, windows-2008r2,
+          windows-2012r2, windows-2016.
+
+       --translate
+          Import the disk without making it bootable or installing Google tools
+          on it. Enabled by default, use --no-translate to disable.
+
+     Exactly one of these must be specified:
+
+       --source-file=SOURCE_FILE
+          A local file, or the Google Cloud Storage URI of the virtual disk
+          file to import. For example: gs://my-bucket/my-image.vmdk or
+          ./my-local-image.vmdk
+
+       --source-image=SOURCE_IMAGE
+          The name of the imported image to translate.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --log-location=LOG_LOCATION
+        Directory in Google Cloud Storage to hold build logs. If not set,
+        gs://<project num>.cloudbuild-logs.googleusercontent.com/ will be
+        created and used.
+
+     --timeout=TIMEOUT; default="2h"
+        Maximum time a build can last before it is failed as "TIMEOUT". For
+        example, specifying 2h will fail the process after 2 hours. See $
+        gcloud topic datetimes for information on duration formats.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta compute images import
+

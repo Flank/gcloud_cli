@@ -1,0 +1,58 @@
+NAME
+    gcloud alpha compute images export - export a Google Compute Engine image
+
+SYNOPSIS
+    gcloud alpha compute images export IMAGE_NAME
+        --destination-uri=DESTINATION_URI [--async]
+        [--export-format=EXPORT_FORMAT] [--log-location=LOG_LOCATION]
+        [--timeout=TIMEOUT; default="2h"] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute images export exports Virtual Disk images from
+    Google Compute Engine.
+
+    By default, images are exported in the Google Compute Engine format, which
+    is a disk.raw file that has been tarred and gzipped.
+
+    The --export-format flag will export the image to a format supported by
+    QEMU using qemu-img. Valid formats include vmdk, vhdx, vpc, vdi, and qcow2.
+
+POSITIONAL ARGUMENTS
+     IMAGE_NAME
+        The name of the disk image to export.
+
+REQUIRED FLAGS
+     --destination-uri=DESTINATION_URI
+        The Google Cloud Storage URI destination for the exported virtual disk
+        file.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --export-format=EXPORT_FORMAT
+        Specify the format to export to, such as vmdk, vhdx, vpc, or qcow2.
+
+     --log-location=LOG_LOCATION
+        Directory in Google Cloud Storage to hold build logs. If not set,
+        gs://<project num>.cloudbuild-logs.googleusercontent.com/ will be
+        created and used.
+
+     --timeout=TIMEOUT; default="2h"
+        Maximum time a build can last before it is failed as "TIMEOUT". For
+        example, specifying 2h will fail the process after 2 hours. See $
+        gcloud topic datetimes for information on duration formats.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

@@ -1,0 +1,45 @@
+NAME
+    gcloud beta iam service-accounts keys create - create a private key for a
+        service account
+
+SYNOPSIS
+    gcloud beta iam service-accounts keys create OUTPUT-FILE
+        --iam-account=IAM_ACCOUNT
+        [--key-file-type=KEY_FILE_TYPE; default="json"] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create a private key for a service account.
+
+POSITIONAL ARGUMENTS
+     OUTPUT-FILE
+        The path where the resulting private key should be written.
+
+REQUIRED FLAGS
+     --iam-account=IAM_ACCOUNT
+        The service account for which to create a key.
+
+OPTIONAL FLAGS
+     --key-file-type=KEY_FILE_TYPE; default="json"
+        The type of key to create. KEY_FILE_TYPE must be one of: json, p12.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a new private key for a service account, and save a copy of it
+    locally, run:
+
+        $ gcloud beta iam service-accounts keys create \
+            --iam-account my-iam-account@somedomain.com key.json
+
+NOTES
+    The option --key-file-type=p12 is available here only for legacy reasons;
+    all new use cases are encouraged to use the default 'json' format.
+
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud iam service-accounts keys create
+

@@ -1,0 +1,70 @@
+NAME
+    gcloud alpha compute disks move - move a disk between zones
+
+SYNOPSIS
+    gcloud alpha compute disks move DISK_NAME
+        --destination-zone=DESTINATION_ZONE [--async] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute disks move facilitates moving a Google Compute
+    Engine disk volume from one zone to another. You cannot move a disk if it
+    is attached to a running or stopped instance; use the gcloud compute
+    instances move command instead.
+
+    For example, running:
+
+        $ gcloud compute disks move example-disk-1 --zone us-central1-b \
+           --destination-zone us-central1-f
+
+    will move the disk called example-disk-1, currently running in
+    us-central1-b, to us-central1-f.
+
+POSITIONAL ARGUMENTS
+     DISK_NAME
+        The name of the disk to operate on.
+
+REQUIRED FLAGS
+     --destination-zone=DESTINATION_ZONE
+        The zone to move the disk to.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --zone=ZONE
+        The zone of the disk to operate on. If not specified and the
+        compute/zone property isn't set, you will be prompted to select a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute disks move
+        $ gcloud beta compute disks move
+

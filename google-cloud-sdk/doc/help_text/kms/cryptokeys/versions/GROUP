@@ -1,0 +1,59 @@
+NAME
+    gcloud kms cryptokeys versions - create and manage CryptoKeyVersions
+
+SYNOPSIS
+    gcloud kms cryptokeys versions COMMAND [--key=KEY] [--keyring=KEYRING]
+        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (REMOVED) Create and manage CryptoKeyVersions.
+
+    The command group cryptokeys is deprecated, please use the keys command
+    group.
+
+    A CryptoKeyVersion represents an individual cryptographic key and the
+    associated key material.
+
+FLAGS
+     --key=KEY
+        The containing key.
+
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (REMOVED) Create a new CryptoKeyVersion.
+
+     describe
+        (REMOVED) Get metadata for a given CryptoKeyVersion.
+
+     destroy
+        (REMOVED) Schedule a CryptoKeyVersion to be destroyed.
+
+     disable
+        (REMOVED) Disable a given CryptoKeyVersion.
+
+     enable
+        (REMOVED) Enable a given CryptoKeyVersion.
+
+     list
+        (REMOVED) List the versions within a CryptoKey.
+
+     restore
+        (REMOVED) Restore a CryptoKeyVersion scheduled for destruction.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

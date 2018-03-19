@@ -1,0 +1,35 @@
+# Valid Duration args
+
+timeout-200:
+  timeout: 200   # 's' units implied
+
+timeout-500s:
+  timeout: 500s   # 's' units
+
+timeout-10m:
+  timeout: 10m   # 'm' units
+
+timeout-2h:
+  timeout: 2h   # 'h' units
+
+
+# Invalid Duration args
+
+timeout-abcd:
+  timeout: abcd   # invalid string arg
+
+timeout-10e:
+  timeout: 10e   # invalid units
+
+timeout-1.1h:
+  timeout: 1.1h  # float values not allowed
+
+timeout-lower:
+  timeout: 59s   # below lower_bound
+
+timeout-upper:
+  timeout: 7h   # above upper_bound
+
+timeout-list:
+  timeout: [15m, 1h]
+

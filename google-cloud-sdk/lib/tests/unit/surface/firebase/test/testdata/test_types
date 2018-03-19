@@ -1,0 +1,20 @@
+# Valid test type args
+
+type-instr:
+  type: instrumentation
+
+type-robo:
+  type: robo
+
+
+# Invalid test type args
+
+type-misspell:
+  type: robot
+
+type-int:
+  type: 42
+
+type-bool:
+  type: true
+

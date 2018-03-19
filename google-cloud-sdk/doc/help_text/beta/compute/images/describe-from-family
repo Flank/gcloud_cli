@@ -1,0 +1,28 @@
+NAME
+    gcloud beta compute images describe-from-family - describe the latest image
+        from an image family
+
+SYNOPSIS
+    gcloud beta compute images describe-from-family IMAGE_NAME
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute images describe-from-family looks up the latest
+    image from an image family and runs a describe on it.
+
+POSITIONAL ARGUMENTS
+     IMAGE_NAME
+        The name of the disk image to describe.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute images describe-from-family
+        $ gcloud alpha compute images describe-from-family
+

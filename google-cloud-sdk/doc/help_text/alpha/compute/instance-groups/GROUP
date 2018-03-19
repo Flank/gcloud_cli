@@ -1,0 +1,56 @@
+NAME
+    gcloud alpha compute instance-groups - read and manipulate Google Compute
+        Engine instance groups
+
+SYNOPSIS
+    gcloud alpha compute instance-groups GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read and manipulate Google Compute Engine instance groups. To
+    accommodate the differences between managed and unmanaged instances, some
+    commands (such as delete) are in the managed or unmanaged subgroups.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     managed
+        (ALPHA) Read and manipulate Google Compute Engine managed instance
+        groups.
+
+     unmanaged
+        (ALPHA) Read and manipulate Google Compute Engine unmanaged instance
+        group.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Display detailed information about an instance group.
+
+     get-named-ports
+        (ALPHA) Lists the named ports for an instance group resource.
+
+     list
+        (ALPHA) List Google Compute Engine instance groups.
+
+     list-instances
+        (ALPHA) List instances present in the instance group.
+
+     set-named-ports
+        (ALPHA) Sets the list of named ports for an instance group.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute instance-groups
+        $ gcloud beta compute instance-groups
+

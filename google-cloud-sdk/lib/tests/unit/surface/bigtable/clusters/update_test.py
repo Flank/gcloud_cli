@@ -1,0 +1,48 @@
+# Copyright 2016 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""Test of the 'update' command."""
+
+from googlecloudsdk.core import resources
+from tests.lib import test_case
+from tests.lib.surface.bigtable import base
+
+
+class UpdateCommandTest(base.BigtableV2TestBase):
+
+  def SetUp(self):
+    self.cmd = ('clusters update --instance theinstance thecluster --num-nodes '
+                '5 --async')
+    self.svc = self.client.projects_instances_clusters.Update
+    cluster_ref = resources.REGISTRY.Create(
+        'bigtableadmin.projects.instances.clusters',
+        projectsId=self.Project(),
+        instancesId='theinstance',
+        clustersId='thecluster')
+    self.msg = self.msgs.Cluster(name=cluster_ref.RelativeName(),
+                                 serveNodes=5)
+
+  def testUpdate(self):
+    self.svc.Expect(request=self.msg, response=self.msgs.Operation())
+    self.RunBT(self.cmd)
+    self.AssertOutputEquals('')
+    self.AssertErrEquals('Update in progress for cluster [thecluster].\n')
+
+  def testErrorResponse(self):
+    with self.AssertHttpResponseError(self.svc, self.msg):
+      self.RunBT(self.cmd)
+    self.AssertErrContains('Resource not found.')
+
+
+if __name__ == '__main__':
+  test_case.main()

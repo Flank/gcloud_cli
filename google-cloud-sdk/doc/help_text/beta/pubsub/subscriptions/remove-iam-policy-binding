@@ -1,0 +1,64 @@
+NAME
+    gcloud beta pubsub subscriptions remove-iam-policy-binding - remove IAM
+        policy binding for a subscription
+
+SYNOPSIS
+    gcloud beta pubsub subscriptions remove-iam-policy-binding SUBSCRIPTION
+        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Removes an IAM policy binding for a Cloud Pub/Sub Subscription.
+
+POSITIONAL ARGUMENTS
+     SUBSCRIPTION
+        Name of the subscription to remove an IAM policy binding from.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will remove an IAM policy binding for the role of
+    'roles/editor' for the user 'test-user@gmail.com' on subscription with
+    identifier 'my-subscription'
+
+        $ gcloud beta pubsub subscriptions remove-iam-policy-binding \
+            my-subscription --member='user:test-user@gmail.com' \
+            --role='roles/editor'
+
+    The following command will remove an IAM policy binding for the role of
+    'roles/editor' from all authenticated users on subscription
+    'my-subscription':
+
+        $ gcloud beta pubsub subscriptions remove-iam-policy-binding \
+            my-subscription --member='allAuthenticatedUsers' \
+            --role='roles/editor'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha pubsub subscriptions remove-iam-policy-binding
+

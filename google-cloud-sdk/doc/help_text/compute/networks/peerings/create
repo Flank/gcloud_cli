@@ -1,0 +1,44 @@
+NAME
+    gcloud compute networks peerings create - create a Google Compute Engine
+        network peering
+
+SYNOPSIS
+    gcloud compute networks peerings create NAME --network=NETWORK
+        --peer-network=PEER_NETWORK [--auto-create-routes]
+        [--peer-project=PEER_PROJECT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create a Google Compute Engine network peering.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the peering.
+
+REQUIRED FLAGS
+     --network=NETWORK
+        The name of the network in the current project to be peered with the
+        peer network.
+
+     --peer-network=PEER_NETWORK
+        The name of the network to be peered with the current network.
+
+OPTIONAL FLAGS
+     --auto-create-routes
+        If set, will automatically create routes for the network peering. Note
+        that a backend error will be returned if this is not set.
+
+     --peer-project=PEER_PROJECT
+        The name of the project for the peer network. If not specified,
+        defaults to current project.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute networks peerings create
+        $ gcloud beta compute networks peerings create
+

@@ -1,0 +1,51 @@
+NAME
+    gcloud beta compute interconnects - read and manipulate Google Compute
+        Engine interconnects
+
+SYNOPSIS
+    gcloud beta compute interconnects GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate Google Compute Engine interconnects.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     attachments
+        (BETA) Read and manipulate Google Compute Engine interconnect
+        attachments.
+
+     locations
+        (BETA) Read and manipulate Google Compute Engine interconnect
+        locations.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a Google Compute Engine interconnect.
+
+     delete
+        (BETA) Delete Google Compute Engine interconnects.
+
+     describe
+        (BETA) Describe a Google Compute Engine interconnect.
+
+     list
+        (BETA) List Google Compute Engine interconnects.
+
+     patch
+        (BETA) Patch a Google Compute Engine interconnect.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute interconnects
+        $ gcloud alpha compute interconnects
+

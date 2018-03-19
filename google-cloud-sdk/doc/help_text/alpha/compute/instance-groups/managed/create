@@ -1,0 +1,134 @@
+NAME
+    gcloud alpha compute instance-groups managed create - create a Compute
+        Engine managed instance group
+
+SYNOPSIS
+    gcloud alpha compute instance-groups managed create NAME --size=SIZE
+        --template=TEMPLATE [--base-instance-name=BASE_INSTANCE_NAME]
+        [--description=DESCRIPTION] [--initial-delay=INITIAL_DELAY]
+        [--stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]] [--stateful-names]
+        [--target-pool=[TARGET_POOL,...]] [--zones=ZONE,[ZONE,...]]
+        [--health-check=HEALTH_CHECK | --http-health-check=HTTP_HEALTH_CHECK
+          | --https-health-check=HTTPS_HEALTH_CHECK]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instance-groups managed create creates a
+    Google Compute Engine managed instance group.
+
+    For example, running:
+
+        $ gcloud alpha compute instance-groups managed create \
+        example-managed-instance-group --zone us-central1-a \
+        --template example-instance-template --size 1
+
+    will create one managed instance group called
+    'example-managed-instance-group' in the us-central1-a zone.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the managed instance group to create.
+
+REQUIRED FLAGS
+     --size=SIZE
+        The initial number of instances you want in this group.
+
+     --template=TEMPLATE
+        Specifies the instance template to use when creating new instances.
+
+OPTIONAL FLAGS
+     --base-instance-name=BASE_INSTANCE_NAME
+        The base name to use for the Compute Engine instances that will be
+        created with the managed instance group. If not provided base instance
+        name will be the prefix of instance group name.
+
+     --description=DESCRIPTION
+        An optional description for this group.
+
+     --initial-delay=INITIAL_DELAY
+        Specifies the length of the period during which the instance is known
+        to be initializing and should not be autohealed even if unhealthy. This
+        value cannot be greater than 1 hour. See $ gcloud topic datetimes for
+        information on duration formats.
+
+     --stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]
+        Disks considered stateful by the instance group. Usually, the managed
+        instance group deletes disks when deleting instances; however, in the
+        case of stateful disks, these disks are detached from the deleted
+        instance and attached to new instances the managed instance group
+        creates.
+
+     --stateful-names
+        Enable stateful names of instances. Whenever instances with those names
+        are restarted or recreated, they will have the same names as before.
+        Use --no-stateful-names to disable stateful names.
+
+     --target-pool=[TARGET_POOL,...]
+        Specifies any target pools you want the instances of this managed
+        instance group to be part of.
+
+     --zones=ZONE,[ZONE,...]
+        If this flag is specified a regional managed instance group will be
+        created. The managed instance group will be in the same region as
+        specified zones and will spread instances in it between specified
+        zones.
+
+        All zones must belong to the same region. You may specify --region flag
+        but it must be the region to which zones belong. This flag is mutually
+        exclusive with --zone flag.
+
+     At most one of these may be specified:
+
+       --health-check=HEALTH_CHECK
+          The name of the health check to operate on.
+
+       --http-health-check=HTTP_HEALTH_CHECK
+          Specifies the HTTP health check object used for autohealing instances
+          in this group.
+
+       --https-health-check=HTTPS_HEALTH_CHECK
+          Specifies the HTTPS health check object used for autohealing
+          instances in this group.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to create. If not specified,
+          you will be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+    If you specify --zones flag this flag must be unspecified or specify the
+    region to which the zones you listed belong.
+
+    Overrides the default compute/region property value for this command
+    invocation.
+
+         --zone=ZONE
+            The zone of the managed instance group to create. If not specified,
+            you may be prompted to select a zone.
+
+            A list of zones can be fetched by running:
+
+                $ gcloud compute zones list
+
+            Overrides the default compute/zone property value for this command
+            invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute instance-groups managed create
+        $ gcloud beta compute instance-groups managed create
+

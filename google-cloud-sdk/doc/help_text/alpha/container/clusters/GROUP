@@ -1,0 +1,68 @@
+NAME
+    gcloud alpha container clusters - deploy and teardown Google Kubernetes
+        Engine clusters
+
+SYNOPSIS
+    gcloud alpha container clusters COMMAND
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The gcloud container clusters command group lets you deploy and
+    teardown Google Kubernetes Engine clusters.
+
+    See $ gcloud docker --help for information about deploying docker images to
+    clusters.
+
+FLAGS
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a cluster for running containers.
+
+     delete
+        (ALPHA) Delete an existing cluster for running containers.
+
+     describe
+        (ALPHA) Describe an existing cluster for running containers.
+
+     get-credentials
+        (ALPHA) Fetch credentials for a running cluster.
+
+     list
+        (ALPHA) List existing clusters for running containers.
+
+     resize
+        (ALPHA) Resizes an existing cluster for running containers.
+
+     update
+        (ALPHA) Update cluster settings for an existing container cluster.
+
+     upgrade
+        (ALPHA) Upgrade the Kubernetes version of an existing container
+        cluster.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud container clusters
+        $ gcloud beta container clusters
+

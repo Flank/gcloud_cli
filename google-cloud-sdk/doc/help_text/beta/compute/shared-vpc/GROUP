@@ -1,0 +1,48 @@
+NAME
+    gcloud beta compute shared-vpc - configure shared VPC
+
+SYNOPSIS
+    gcloud beta compute shared-vpc GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Configure shared VPC.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     associated-projects
+        (BETA) Configure associated projects for cross-project networking
+        (XPN).
+
+     organizations
+        (BETA) Configure organizations for cross-project networking (XPN).
+
+COMMANDS
+    COMMAND is one of the following:
+
+     disable
+        (BETA) Disable the given project as a shared VPC host.
+
+     enable
+        (BETA) Enable the given project as a shared VPC host.
+
+     get-host-project
+        (BETA) Get the shared VPC host project that the given project is
+        associated with.
+
+     list-associated-resources
+        (BETA) List the resources associated with the given shared VPC host
+        project.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute shared-vpc
+        $ gcloud alpha compute shared-vpc
+

@@ -1,0 +1,27 @@
+NAME
+    gcloud hidden-group - (ALPHA) hidden Group docstring index
+
+SYNOPSIS
+    gcloud hidden-group COMMAND [GLOBAL-FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Hidden group docstring description.
+
+    More text.
+
+GLOBAL FLAGS
+    Run $ gcloud help for a description of flags available to all commands.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     hidden-command
+        (ALPHA) Hidden command docstring index.
+
+NOTES
+    A special note.
+
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+
+    This command is currently in ALPHA and may change without notice.

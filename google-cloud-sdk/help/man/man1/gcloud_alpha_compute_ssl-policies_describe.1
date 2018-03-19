@@ -1,0 +1,63 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SSL\-POLICIES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute ssl\-policies describe \- describe a Google Compute Engine ssl policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute ssl\-policies describe\fR \fINAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute ssl\-policies describe\fR is used to
+display all data associated with a Google Compute Engine SSL policy in a
+project.
+
+An SSL policy specifies the server\-side support for SSL features. An SSL policy
+can be attached to a TargetHttpsProxy or a TargetSslProxy. This affects
+connections between clients and the HTTPS or SSL proxy load balancer. SSL
+policies do not affect the connection between the load balancers and the
+backends.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the SSL policy to describe.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute ssl\-policies describe
+.RE
+

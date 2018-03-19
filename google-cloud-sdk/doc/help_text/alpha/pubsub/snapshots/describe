@@ -1,0 +1,30 @@
+NAME
+    gcloud alpha pubsub snapshots describe - this feature is part of an
+        invite-only release of the Cloud Pub/Sub API
+
+SYNOPSIS
+    gcloud alpha pubsub snapshots describe SNAPSHOT [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describes a Cloud Pub/Sub snapshot. This feature is part of an
+    invitation-only release of the underlying Cloud Pub/Sub API. The command
+    will generate errors unless you have access to this API. This restriction
+    should be relaxed in the near future. Please contact
+    cloud-pubsub@google.com with any questions in the meantime.
+
+POSITIONAL ARGUMENTS
+     SNAPSHOT
+        snapshot to describe.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

@@ -1,0 +1,107 @@
+
+.TH "GCLOUD_ALPHA_PROJECTS_MOVE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha projects move \- move a project into an organization
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha projects move\fR \fIPROJECT_ID\fR [\fB\-\-folder\fR=\fIFOLDER_ID\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Moves the given project into the given organization.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+There is no project with the given ID.
+.IP "\(bu" 2m
+There is no organization with the given ID, if an organization is given as the
+destination.
+.IP "\(bu" 2m
+There is no folder with the given ID, if a folder is given as the destination.
+.IP "\(bu" 2m
+More than one of organization or folder is provided.
+.IP "\(bu" 2m
+The new destination is not in the same organization as the project, if the
+project is already in an organization.
+.IP "\(bu" 2m
+The active account does not have the resourcemanager.projects.update permission
+for the given project.
+.IP "\(bu" 2m
+The active account does not have the resourcemanager.projects.create permission
+for the given organization.
+.IP "\(bu" 2m
+The given project is already in an organization.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+ID for the project you want to move.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+ID for the folder to use as a parent
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+ID for the organization to use as a parent
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command moves a project with the ID \f5super\-awesome\-project\fR
+into the organization \f525872158\fR:
+
+.RS 2m
+$ gcloud alpha projects move super\-awesome\-project \e
+    \-\-organization=25872158
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta projects move
+.RE
+

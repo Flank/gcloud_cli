@@ -1,0 +1,65 @@
+
+.TH "GCLOUD_BETA_PUBSUB_SUBSCRIPTIONS_MODIFY\-PUSH\-CONFIG" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub subscriptions modify\-push\-config \- modifies the push configuration of a Cloud Pub/Sub subscription
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub subscriptions modify\-push\-config\fR \fISUBSCRIPTION\fR \fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Modifies the push configuration of a Cloud Pub/Sub subscription.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISUBSCRIPTION\fR
+Name of the subscription to modify.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR
+A URL to use as the endpoint for this subscription. This will also automatically
+set the subscription type to PUSH.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud pubsub subscriptions modify\-push\-config
+$ gcloud alpha pubsub subscriptions modify\-push\-config
+.RE
+

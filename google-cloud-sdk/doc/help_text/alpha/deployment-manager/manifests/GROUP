@@ -1,0 +1,45 @@
+NAME
+    gcloud alpha deployment-manager manifests - commands for Deployment Manager
+        manifests
+
+SYNOPSIS
+    gcloud alpha deployment-manager manifests COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands to list and examine manifests within a deployment.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Provide information about a manifest.
+
+     list
+        (ALPHA) List manifests in a deployment.
+
+EXAMPLES
+    To view all details about a manifest, run:
+
+        $ gcloud alpha deployment-manager manifests describe manifest-name \
+            --deployment my-deployment
+
+    To see the list of all manifests in a deployment, run:
+
+        $ gcloud alpha deployment-manager manifests list \
+            --deployment my-deployment
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud deployment-manager manifests
+        $ gcloud beta deployment-manager manifests
+

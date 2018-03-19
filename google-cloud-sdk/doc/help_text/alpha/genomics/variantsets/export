@@ -1,0 +1,51 @@
+NAME
+    gcloud alpha genomics variantsets export - exports data from a variant set
+        to an external destination
+
+SYNOPSIS
+    gcloud alpha genomics variantsets export ID TABLE
+        --bigquery-dataset=BIGQUERY_DATASET
+        [--bigquery-project=BIGQUERY_PROJECT]
+        [--call-set-ids=[CALL_SET_IDS,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Exports data from a variant set to an external destination.
+
+POSITIONAL ARGUMENTS
+     ID
+        The ID of the variant set to export.
+
+     TABLE
+        The BigQuery table to which data is exported. If this table does not
+        exist, it will be created. If it already exists, it will be
+        overwritten.
+
+REQUIRED FLAGS
+     --bigquery-dataset=BIGQUERY_DATASET
+        The BigQuery dataset to which data is exported. This dataset must
+        already exist. Note that this is distinct from the Genomics concept of
+        "dataset."
+
+OPTIONAL FLAGS
+     --bigquery-project=BIGQUERY_PROJECT
+        The Google Cloud project ID that owns the destination BigQuery dataset.
+        The caller must have WRITE access to this project. This project will
+        also own the resulting export job.If not supplied, defaults to the
+        gcloud project ID.
+
+     --call-set-ids=[CALL_SET_IDS,...]
+        If provided, only variant call information from the specified call sets
+        will be exported. By default all variant call sets are exported.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

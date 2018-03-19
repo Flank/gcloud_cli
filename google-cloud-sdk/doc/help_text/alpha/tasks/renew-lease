@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha tasks renew-lease - renew the lease on a task in a pull queue
+
+SYNOPSIS
+    gcloud alpha tasks renew-lease TASK --lease-duration=LEASE_DURATION
+        --schedule-time=SCHEDULE_TIME [--queue=QUEUE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Renew the lease on a task in a pull queue.
+
+POSITIONAL ARGUMENTS
+     TASK
+        The task to renew the lease of.
+
+REQUIRED FLAGS
+     --lease-duration=LEASE_DURATION
+        The number of seconds for the desired new lease duration, starting from
+        now. The maximum lease duration is 1 week.
+
+     --schedule-time=SCHEDULE_TIME
+        The task's current schedule time. This restriction is to check that the
+        caller is renewing the correct task.
+
+OPTIONAL FLAGS
+     --queue=QUEUE
+        The queue the task belongs to.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

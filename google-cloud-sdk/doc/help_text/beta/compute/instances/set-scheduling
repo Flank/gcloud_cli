@@ -1,0 +1,70 @@
+NAME
+    gcloud beta compute instances set-scheduling - set scheduling options for
+        Google Compute Engine virtual machines
+
+SYNOPSIS
+    gcloud beta compute instances set-scheduling INSTANCE_NAME
+        [--maintenance-policy=MAINTENANCE_POLICY] [--[no-]restart-on-failure]
+        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) $gcloud beta compute instances set-scheduling is used to configure
+    scheduling options for Google Compute Engine virtual machines.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        The name of the instance to operate on.
+
+FLAGS
+     --maintenance-policy=MAINTENANCE_POLICY
+        Specifies the behavior of the instances when their host machines
+        undergo maintenance. The default is MIGRATE. MAINTENANCE_POLICY must be
+        one of:
+
+         MIGRATE
+            The instances should be migrated to a new host. This will
+            temporarily impact the performance of instances during a migration
+            event.
+         TERMINATE
+            The instances should be terminated.
+
+     --[no-]restart-on-failure
+        The instances will be restarted if they are terminated by Compute
+        Engine. This does not affect terminations performed by the user. Use
+        --restart-on-failure to enable and --no-restart-on-failure to disable.
+
+     --zone=ZONE
+        The zone of the instance to operate on. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute instances set-scheduling
+        $ gcloud alpha compute instances set-scheduling
+

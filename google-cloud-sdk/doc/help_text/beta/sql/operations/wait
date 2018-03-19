@@ -1,0 +1,26 @@
+NAME
+    gcloud beta sql operations wait - waits for one or more operations to
+        complete
+
+SYNOPSIS
+    gcloud beta sql operations wait OPERATION [OPERATION ...]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Waits for one or more operations to complete.
+
+POSITIONAL ARGUMENTS
+     OPERATION [OPERATION ...]
+        An identifier that uniquely identifies the operation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud sql operations wait
+

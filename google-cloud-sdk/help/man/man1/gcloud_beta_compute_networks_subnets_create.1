@@ -1,0 +1,126 @@
+
+.TH "GCLOUD_BETA_COMPUTE_NETWORKS_SUBNETS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute networks subnets create \- define a subnet for a network in custom subnet mode
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Define a subnet for a network in custom subnet mode. Subnets must
+be uniquely named per region.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the subnetwork to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The network to which the subnetwork belongs.
+
+.TP 2m
+\fB\-\-range\fR=\fIRANGE\fR
+The IP space allocated to this subnetwork in CIDR format.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional description of this subnetwork.
+
+.TP 2m
+\fB\-\-enable\-private\-ip\-google\-access\fR
+Enable/disable access to Google Cloud APIs from this subnet for instances
+without a public ip address.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the subnetwork to create. If not specified, you will be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]
+Adds a secondary IP range to the subnetwork for use in IP aliasing.
+
+For example, \f5\-\-secondary\-range range1=192.168.64.0/24\fR adds a secondary
+range 192.168.64.0/24 with name range1.
+
+.RS 2m
+.IP "\(em" 2m
+\f5RANGE_NAME\fR \- Name of the secondary range.
+.IP "\(em" 2m
+\f5RANGE\fR \- \f5IP range in CIDR format.\fR
+.RE
+.RE
+.sp
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute networks subnets create
+$ gcloud alpha compute networks subnets create
+.RE
+

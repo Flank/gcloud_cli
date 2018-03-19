@@ -1,0 +1,289 @@
+
+.TH "GCLOUD_TOPIC_FILTERS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud topic filters \- resource filters supplementary help
+
+
+
+.SH "DESCRIPTION"
+
+Most \fBgcloud\fR commands return a list of resources on success. By default
+they are pretty\-printed on the standard output. The
+\fB\-\-format=\fR\fINAME\fR[\fIATTRIBUTES\fR]\fB(\fR\fIPROJECTION\fR\fB)\fR and
+\fB\-\-filter=\fR\fIEXPRESSION\fR flags along with projections can be used to
+format and change the default output to a more meaningful result.
+
+To change the default output format of a command, use the \-\-format flag. For
+details run $ gcloud topic formats.
+
+To select resources to be listed, use the \-\-filter flag. Resource filters are
+described in detail below.
+
+To reach resource items through a unique path of names from the root, use
+resource\-keys. For details run $ gcloud topic resource\-keys.
+
+To list a subset of resource keys in a resource, use projections. For details
+run $ gcloud topic projections.
+
+
+
+.SH "Filter Expressions"
+
+A filter expression is a Boolean function that selects the resources to print
+from a list of resources. Expressions are composed of terms connected by logic
+operators.
+
+.RS 2m
+.TP 2m
+\fBLogicOperator\fR
+Expressions containing both \fBAND\fR and \fBOR\fR must be parenthesized to
+disambiguate precedence.
+
+.RS 2m
+.TP 2m
+\fBNOT\fR \fIterm\-1\fR
+True if \fIterm\-1\fR is False, otherwise False.
+
+.TP 2m
+\fIterm\-1\fR \fBAND\fR \fIterm\-2\fR
+True if both \fIterm\-1\fR and \fIterm\-2\fR are true.
+
+.TP 2m
+\fIterm\-1\fR \fBOR\fR \fIterm\-2\fR
+True if at least one of \fIterm\-1\fR or \fIterm\-2\fR is true.
+
+.TP 2m
+\fIterm\-1\fR \fIterm\-2\fR
+Term conjunction (implicit \fBAND\fR) is True if both \fIterm\-1\fR and
+\fIterm\-2\fR are true. Conjunction has lower precedence than \fBOR\fR.
+
+.RE
+.sp
+.TP 2m
+\fBTerms\fR
+A term is a \fIkey\fR \fIoperator\fR \fIvalue\fR tuple, where \fIkey\fR is a
+dotted name that evaluates to the value of a resource attribute, and \fIvalue\fR
+may be:
+
+.RS 2m
+.TP 2m
+\fBnumber\fR
+integer or floating point numeric constant
+.TP 2m
+\fBunquoted literal\fR
+character sequence terminated by space, ( or )
+.TP 2m
+\fBquoted literal\fR
+\fI"..."\fR or \fI'...'\fR Most filter expressions need to be quoted in shell
+commands. If you use \fI'...'\fR shell quotes then use \fI"..."\fR filter string
+literal quotes and vice versa.
+
+.RE
+.sp
+.TP 2m
+\fBOperator Terms\fR
+.RS 2m
+.TP 2m
+\fIkey\fR \fB:\fR \fIsimple\-pattern\fR
+\fB:\fR operator evaluation is changing for consistency across Google APIs. The
+current default is deprecated and will be dropped shortly. A warning will be
+displayed when a \-\-filter expression would return different matches using both
+the deprecated and new implementations.
+
+The current deprecated default is True if \fIkey\fR contains
+\fIsimple\-pattern\fR. The match is case insensitive. It allows one \f5*\fR that
+matches any sequence of 0 or more characters. If \f5*\fR is specified then the
+match is anchored, meaning all characters from the beginning and end of the
+value must match.
+
+The new implementation is True if \fIsimple\-pattern\fR matches any \fIword\fR
+in \fIkey\fR. Words are locale specific but typically consist of alpha\-numeric
+characters. Non\-word characters that do not appear in \fIsimple\-pattern\fR are
+ignored. The matching is anchored and case insensitive. An optional trailing
+\f5*\fR does a word prefix match.
+
+Use \fIkey\fR\f5:*\fR to test if \fIkey\fR is defined and
+\f5\-\fR\fIkey\fR\f5:*\fR to test if \fIkey\fR is undefined.
+
+.TP 2m
+\fIkey\fR \fB:(\fR \fIsimple\-pattern\fR ... \fB)\fR
+True if \fIkey\fR matches any \fIsimple\-pattern\fR in the (space, tab, newline,
+comma) separated list.
+
+.TP 2m
+\fIkey\fR \fB=\fR \fIvalue\fR
+True if \fIkey\fR is equal to \fIvalue\fR. Equivalent to \fB:\fR, with the
+exception that the trailing \f5*\fR prefix match is not supported.
+
+.TP 2m
+\fIkey\fR \fB=(\fR \fIvalue\fR ... \fB)\fR
+True if \fIkey\fR is equal to any \fIvalue\fR in the (space, tab, newline,
+\fB,\fR) separated list.
+
+.TP 2m
+\fIkey\fR \fB!=\fR \fIvalue\fR
+True if \fIkey\fR is not \fIvalue\fR. Equivalent to \-\fIkey\fR=\fIvalue\fR and
+NOT \fIkey\fR=\fIvalue\fR.
+
+.TP 2m
+\fIkey\fR \fB<\fR \fIvalue\fR
+True if \fIkey\fR is less than \fIvalue\fR. If both \fIkey\fR and \fIvalue\fR
+are numeric then numeric comparison is used, otherwise lexicographic string
+comparison is used.
+
+.TP 2m
+\fIkey\fR \fB<=\fR \fIvalue\fR
+True if \fIkey\fR is less than or equal to \fIvalue\fR. If both \fIkey\fR and
+\fIvalue\fR are numeric then numeric comparison is used, otherwise lexicographic
+string comparison is used.
+
+.TP 2m
+\fIkey\fR \fB>=\fR \fIvalue\fR
+True if \fIkey\fR is greater than or equal to \fIvalue\fR. If both \fIkey\fR and
+\fIvalue\fR are numeric then numeric comparison is used, otherwise lexicographic
+string comparison is used.
+
+.TP 2m
+\fIkey\fR \fB>\fR \fIvalue\fR
+True if \fIkey\fR is greater than \fIvalue\fR. If both \fIkey\fR and \fIvalue\fR
+are numeric then numeric comparison is used, otherwise lexicographic string
+comparison is used.
+
+.TP 2m
+\fIkey\fR \fB~\fR \fIvalue\fR
+True if \fIkey\fR matches the RE (regular expression) pattern \fIvalue\fR.
+
+.TP 2m
+\fIkey\fR \fB!\fR~ \fIvalue\fR
+True if \fIkey\fR does not match the RE (regular expression) pattern
+\fIvalue\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+List all instances resources:
+
+.RS 2m
+$ gcloud compute instances list
+.RE
+
+List instances resources that have machineType \fBf1\-micro\fR:
+
+.RS 2m
+$ gcloud compute instances list \-\-filter='machineType:f1\-micro'
+.RE
+
+List resources with zone prefix \fBus\fR and not MachineType \fBf1\-micro\fR:
+
+.RS 2m
+$ gcloud compute instances list \e
+    \-\-filter='zone ~ ^us AND \-machineType:f1\-micro'
+.RE
+
+List resources with tag \fBmy\-tag\fR:
+
+.RS 2m
+$ gcloud compute instances list \-\-filter='tags.items=my\-tag'
+.RE
+
+List resources with tag \fBmy\-tag\fR or \fBmy\-other\-tag\fR:
+
+.RS 2m
+$ gcloud compute instances list \e
+    \-\-filter='tags.items=(my\-tag,my\-other\-tag)'
+.RE
+
+List resources with tag \fBmy\-tag\fR and \fBmy\-other\-tag\fR:
+
+.RS 2m
+$ gcloud compute instances list \e
+    \-\-filter='tags.items=my\-tag AND tags.items=my\-other\-tag'
+.RE
+
+List resources which either have tag \fBmy\-tag\fR but not \fBmy\-other\-tag\fR
+or have tag \fBalternative\-tag\fR:
+
+.RS 2m
+$ gcloud compute instances list \e
+    \-\-filter='(tags.items=my\-tag AND \-tags.items=my\-other\-tag) OR
+ tags.items=alternative\-tag'
+.RE
+
+List resources with label \fBmy\-label\fR with any value:
+
+.RS 2m
+$ gcloud compute instances list \-\-filter='labels.my\-label:*'
+.RE
+
+List in JSON format those projects where the labels match specific values (e.g.
+label.env is 'test' and label.version is alpha):
+
+.RS 2m
+$ gcloud projects list \-\-format="json" \e
+    \-\-filter="labels.env=test AND labels.version=alpha"
+.RE
+
+List projects that were created on and after a specific date:
+
+.RS 2m
+$ gcloud projects list \e
+    \-\-format="table(projectNumber,projectId,createTime)" \e
+    \-\-filter="createTime>=2018\-01\-15"
+.RE
+
+List projects that were created on and after a specific date and time, and sort
+from oldest to newest:
+
+.RS 2m
+$ gcloud projects list \e
+    \-\-format="table(projectNumber,projectId,createTime)" \e
+    \-\-filter="createTime>=2018\-01\-15T12:00:00" \-\-sort\-by=createTime
+.RE
+
+List projects that were created within the last two weeks, using ISO8601
+durations:
+
+.RS 2m
+$ gcloud projects list \e
+    \-\-format="table(projectNumber,projectId,createTime)" \e
+    \-\-filter="createTime>\-P2W"
+.RE
+
+For more about ISO8601 durations, see: https://en.wikipedia.org/wiki/ISO_8601
+
+
+This table shows : operator pattern matching:
+
+
+.TS
+tab(,);
+lB lB
+l l.
+PATTERN,VALUE,MATCHES,DEPRECATED_MATCHES
+abc\f5*\fR,abcpdqxyz,True,True
+abc,abcpdqxyz,False,True
+pdq\f5*\fR,abcpdqxyz,False,False
+pdq,abcpdqxyz,False,True
+xyz\f5*\fR,abcpdqxyz,False,False
+xyz,abcpdqxyz,False,True
+\f5*\fR,abcpdqxyz,True,True
+\f5*\fR,<None>,False,False
+\f5*\fR,<''>,False,False
+\f5*\fR,<otherwise>,True,True
+abc\f5*\fR,abc.pdq.xyz,True,True
+abc,abc.pdq.xyz,True,True
+abc.pdq,abc.pdq.xyz,True,True
+pdq\f5*\fR,abc.pdq.xyz,True,False
+pdq,abc.pdq.xyz,True,True
+pdq.xyz,abc.pdq.xyz,True,True
+xyz\f5*\fR,abc.pdq.xyz,True,False
+xyz,abc.pdq.xyz,True,True
+.TE

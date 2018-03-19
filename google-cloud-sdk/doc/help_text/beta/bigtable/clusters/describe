@@ -1,0 +1,27 @@
+NAME
+    gcloud beta bigtable clusters describe - describe an existing Bigtable
+        cluster
+
+SYNOPSIS
+    gcloud beta bigtable clusters describe CLUSTER [--instance=INSTANCE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Describe an existing Bigtable cluster.
+
+POSITIONAL ARGUMENTS
+     CLUSTER
+        ID of the cluster.
+
+FLAGS
+     --instance=INSTANCE
+        ID of the instance.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

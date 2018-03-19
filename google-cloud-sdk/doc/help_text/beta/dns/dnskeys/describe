@@ -1,0 +1,31 @@
+NAME
+    gcloud beta dns dnskeys describe - get a DnsKey
+
+SYNOPSIS
+    gcloud beta dns dnskeys describe KEY-ID --zone=ZONE, -z ZONE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This command displays the details of a single DnsKey.
+
+POSITIONAL ARGUMENTS
+     KEY-ID
+        The DNS key identifier.
+
+REQUIRED FLAGS
+     --zone=ZONE, -z ZONE
+        The name of the managed-zone the DnsKey belongs to
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To get a DnsKey from a managed-zone, run:
+
+        $ gcloud beta dns dnskeys describe my_zone --key_id my_key
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

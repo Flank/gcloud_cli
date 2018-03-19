@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha auth configure-docker - registers gcloud as a Docker
+        credential helper
+
+SYNOPSIS
+    gcloud alpha auth configure-docker [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Adds Docker credHelper entry to Docker's configuration file, or
+    creates the file if it doesn't exist, which will register gcloud as the
+    credential helper for all Google supported Docker registries.
+
+    If Docker configuration already contains a credHelper entry it will be
+    overwritten.
+
+    See
+    https://docs.docker.com/engine/reference/commandline/login/#credential-helpers
+    for more details on Docker credential helpers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta auth configure-docker
+

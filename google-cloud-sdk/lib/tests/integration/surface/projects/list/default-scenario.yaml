@@ -1,0 +1,97 @@
+---
+args:
+  command: projects list
+  specified_args:
+    --limit: 5
+---
+state: {}
+---
+properties:
+  component_manager:
+    disable_update_check: 'True'
+  core:
+    disable_color: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: ''
+  headers:
+    accept: application/json
+    accept-encoding: gzip, deflate
+    content-length: '0'
+  method: GET
+  uri: https://cloudresourcemanager.googleapis.com/v1/projects?alt=json&filter=lifecycleState%3AACTIVE&pageSize=5
+---
+response:
+  content:
+  - json:
+      nextPageToken: EpABQ21nS05mZjd1UC1GX3NVNG81eVRrSXFialpxTWtJcU5uSnFTbnBHZW1KcU54WS1Oa0pXYW5JdU0wTWpJenNmTXpNZk95czNPenZfLUVBVWhCaExMdXpQdy02c3hMdF9QeUNfdkxtMDVYTWM2QVhvQVJ3UlFBRm9MQ2NNMVE5czBGR3BCRUFKZ3VNbUVFdz09
+      projects:
+      - createTime: '2017-09-22T18:04:56.775Z'
+        lifecycleState: ACTIVE
+        name: project_name
+        parent:
+          id: '00000000000'
+          type: organization
+        projectId: project_id
+        projectNumber: '00000000000'
+      - createTime: '2017-09-22T18:02:05.609Z'
+        lifecycleState: ACTIVE
+        name: project_name
+        parent:
+          id: '00000000000'
+          type: organization
+        projectId: project_id
+        projectNumber: '00000000000'
+      - createTime: '2017-09-22T17:58:52.040Z'
+        lifecycleState: ACTIVE
+        name: project_name
+        parent:
+          id: '00000000000'
+          type: organization
+        projectId: project_id
+        projectNumber: '00000000000'
+      - createTime: '2017-09-22T14:19:08.310Z'
+        lifecycleState: ACTIVE
+        name: project_name
+        parent:
+          id: '00000000000'
+          type: folder
+        projectId: project_id
+        projectNumber: '00000000000'
+      - createTime: '2017-09-22T10:05:58.138Z'
+        labels:
+          creation-date: created-2017-09-22
+        lifecycleState: ACTIVE
+        name: project_name
+        parent:
+          id: '00000000000'
+          type: organization
+        projectId: project_id
+        projectNumber: '00000000000'
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,35"
+    cache-control: private
+    content-length: '1913'
+    content-location: https://cloudresourcemanager.googleapis.com/v1/projects?alt=json&filter=lifecycleState%3AACTIVE&pageSize=5
+    content-type: application/json; charset=UTF-8
+    date: Fri, 22 Sep 2017 18:05:17 GMT
+    server: ESF
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  stdout: |
+    PROJECT_ID  NAME          PROJECT_NUMBER
+    project_id  project_name  0
+    project_id  project_name  0
+    project_id  project_name  0
+    project_id  project_name  0
+    project_id  project_name  0

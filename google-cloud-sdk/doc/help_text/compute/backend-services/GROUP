@@ -1,0 +1,53 @@
+NAME
+    gcloud compute backend-services - list, create, and delete backend services
+
+SYNOPSIS
+    gcloud compute backend-services COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List, create, and delete backend services.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-backend
+        Add a backend to a backend service.
+
+     create
+        Create a backend service.
+
+     delete
+        Delete backend services.
+
+     describe
+        Display detailed information about a backend service.
+
+     edit
+        Modify backend services.
+
+     get-health
+        Get backend health statuses from a backend service.
+
+     list
+        List Google Compute Engine backend services.
+
+     remove-backend
+        Remove a backend from a backend service.
+
+     update
+        Update a backend service.
+
+     update-backend
+        Update an existing backend in a backend service.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute backend-services
+        $ gcloud beta compute backend-services
+

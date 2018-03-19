@@ -1,0 +1,108 @@
+
+.TH "GCLOUD_COMPUTE_INTERCONNECTS_ATTACHMENTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute interconnects attachments create \- create a Google Compute Engine interconnect attachment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute interconnects attachments create\fR \fINAME\fR \fB\-\-interconnect\fR=\fIINTERCONNECT\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute interconnects attachments create\fR is used to create
+interconnect attachments. An interconnect attachment is what binds the
+underlying connectivity of an Interconnect to a path into and out of the
+customer's cloud network.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the interconnect attachment to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-interconnect\fR=\fIINTERCONNECT\fR
+The interconnect for the interconnect attachment
+
+.TP 2m
+\fB\-\-router\fR=\fIROUTER\fR
+The Google Cloud Router to use for dynamic routing.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the interconnect attachment.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the interconnect attachment to create. If not specified, you will
+be prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute interconnects attachments create
+$ gcloud beta compute interconnects attachments create
+.RE
+

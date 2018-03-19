@@ -1,0 +1,29 @@
+NAME
+    gcloud alpha tasks describe - show details about a task
+
+SYNOPSIS
+    gcloud alpha tasks describe TASK [--queue=QUEUE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Show details about a task.
+
+POSITIONAL ARGUMENTS
+     TASK
+        The task to describe.
+
+FLAGS
+     --queue=QUEUE
+        The queue the task belongs to.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

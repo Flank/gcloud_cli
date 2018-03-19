@@ -1,0 +1,71 @@
+NAME
+    gcloud dataproc clusters - create and manage Google Cloud Dataproc clusters
+
+SYNOPSIS
+    gcloud dataproc clusters COMMAND [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create and manage Google Cloud Dataproc clusters.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a cluster.
+
+     delete
+        Delete a cluster.
+
+     describe
+        View the details of a cluster.
+
+     diagnose
+        Run a detailed diagnostic on a cluster.
+
+     list
+        View a list of clusters in a project.
+
+     update
+        Update labels and/or the number of worker nodes in a cluster.
+
+EXAMPLES
+    To create a cluster, run:
+
+        $ gcloud dataproc clusters create my_cluster
+
+    To resize a cluster, run:
+
+        $ gcloud dataproc clusters update my_cluster --num_workers 5
+
+    To delete a cluster, run:
+
+        $ gcloud dataproc clusters delete my_cluster
+
+    To view the details of a cluster, run:
+
+        $ gcloud dataproc clusters describe my_cluster
+
+    To see the list of all clusters, run:
+
+        $ gcloud dataproc clusters list
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dataproc clusters
+

@@ -1,0 +1,44 @@
+NAME
+    gcloud alpha compute firewall-rules - list, create, update, and delete
+        Google Compute Engine firewall rules
+
+SYNOPSIS
+    gcloud alpha compute firewall-rules COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) List, create, update, and delete Google Compute Engine firewall
+    rules.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Google Compute Engine firewall rule.
+
+     delete
+        (ALPHA) Delete Google Compute Engine firewall rules.
+
+     describe
+        (ALPHA) Describe a Google Compute Engine firewall rule.
+
+     list
+        (ALPHA) List Google Compute Engine firewall rules.
+
+     update
+        (ALPHA) Update a firewall rule.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute firewall-rules
+        $ gcloud beta compute firewall-rules
+

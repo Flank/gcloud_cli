@@ -1,0 +1,52 @@
+NAME
+    gcloud beta compute instances describe - describe a virtual machine
+        instance
+
+SYNOPSIS
+    gcloud beta compute instances describe INSTANCE_NAME [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute instances describe displays all data associated
+    with a Google Compute Engine virtual machine instance.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        The name of the instance to describe.
+
+FLAGS
+     --zone=ZONE
+        The zone of the instance to describe. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute instances describe
+        $ gcloud alpha compute instances describe
+

@@ -1,0 +1,87 @@
+
+.TH "GCLOUD_ML\-ENGINE_JOBS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud ml\-engine jobs describe \- describe a Cloud ML Engine job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud ml\-engine jobs describe\fR \fIJOB\fR [\fB\-\-summarize\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Describe a Cloud ML Engine job.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+Name of the job.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-summarize\fR
+Summarize job output in a set of human readable tables instead of rendering the
+entire resource as json or yaml. The tables currently rendered are:
+
+.RS 2m
+.IP "\(em" 2m
+\f5Job Overview\fR: Overview of job including, jobId, status and create time.
+.IP "\(em" 2m
+\f5Training Input Summary\fR: Summary of input for a training job including
+region, main training python module and scale tier.
+.IP "\(em" 2m
+\f5Training Output Summary\fR: Summary of output for a training job including
+the amount of ML units consumed by the job.
+.IP "\(em" 2m
+\f5Training Output Trials\fR: Summary of hyperparameter trials run for a
+hyperparameter tuning training job.
+.IP "\(em" 2m
+\f5Predict Input Summary\fR: Summary of input for a prediction job including
+region, model verion and output path.
+.IP "\(em" 2m
+\f5Predict Output Summary\fR: Summary of output for a prediction job including
+prediction count and output path.
+
+.RE
+.RE
+.sp
+This flag overrides the \f5\-\-format\fR flag. If both are present on the
+command line, a warning is displayed.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha ml\-engine jobs describe
+$ gcloud beta ml\-engine jobs describe
+.RE
+

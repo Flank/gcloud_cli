@@ -1,0 +1,71 @@
+
+.TH "GCLOUD_BETA_PROJECTS_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta projects set\-iam\-policy \- set IAM policy for a project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta projects set\-iam\-policy\fR \fIPROJECT_ID\fR \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Sets the IAM policy for a project, given a project ID and a file
+encoded in JSON or YAML that contains the IAM policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+ID for the project you want to set IAM policy for.
+
+.TP 2m
+\fIPOLICY_FILE\fR
+JSON or YAML file with the IAM policy
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command reads an IAM policy defined in a JSON file
+\f5policy.json\fR and sets it for a project with the ID
+\f5example\-project\-id\-1\fR:
+
+.RS 2m
+$ gcloud beta projects set\-iam\-policy example\-project\-id\-1 \e
+    policy.json
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud projects set\-iam\-policy
+$ gcloud alpha projects set\-iam\-policy
+.RE
+

@@ -1,0 +1,10 @@
+imports:
+- path: string_properties.jinja
+resources:
+- name: string-properties-jinja
+  properties:
+    a: foo
+    b: '3'
+    c: 'true'
+    d: "'3'"
+  type: string_properties.jinja

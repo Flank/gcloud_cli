@@ -1,0 +1,62 @@
+
+.TH "GCLOUD_BETA_APP_OPERATIONS_WAIT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta app operations wait \- polls an operation until completion
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta app operations wait\fR \fIOPERATION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Polls an operation until completion.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIOPERATION\fR
+ID of operation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To wait for an App Engine operation called o1 to complete, run:
+
+.RS 2m
+$ gcloud beta app operations wait o1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud app operations wait
+.RE
+

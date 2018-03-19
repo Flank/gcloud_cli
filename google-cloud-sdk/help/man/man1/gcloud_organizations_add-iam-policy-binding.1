@@ -1,0 +1,121 @@
+
+.TH "GCLOUD_ORGANIZATIONS_ADD\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud organizations add\-iam\-policy\-binding \- add IAM policy binding for a organization
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud organizations add\-iam\-policy\-binding\fR \fIORGANIZATION_ID\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Adds a policy binding to the IAM policy of an organization, given an
+organization ID and the binding.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIORGANIZATION_ID\fR
+ID for the organization to which you want to add a binding
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to add the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com\fR, or
+\f5domain:example.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- anyone who is on the internet, with or without a Google
+account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
+or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will add an IAM policy binding for the role of
+\'roles/editor' for the user 'test\-user@gmail.com' on a organization with
+identifier '123456789'
+
+.RS 2m
+$ gcloud organizations add\-iam\-policy\-binding 123456789 \e
+    \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
+.RE
+
+For a service account 'my\-sa' linked to project 'test\-123', the following
+command will add an IAM policy binding for the role of 'roles/editor' to the
+given service account:
+
+.RS 2m
+$ gcloud organizations add\-iam\-policy\-binding test\-123 \e
+    \-\-member='serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com'\e
+ \-\-role='roles/editor'
+.RE
+
+The following command will add an IAM policy binding for the role of
+\'roles/editor' for all authenticated users on a organization with identifier
+\'123456789':
+
+.RS 2m
+$ gcloud organizations add\-iam\-policy\-binding 123456789 \e
+    \-\-member='allAuthenticatedUsers' \-\-role='roles/editor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha organizations add\-iam\-policy\-binding
+$ gcloud beta organizations add\-iam\-policy\-binding
+.RE
+

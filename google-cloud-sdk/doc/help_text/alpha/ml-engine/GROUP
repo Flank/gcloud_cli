@@ -1,0 +1,61 @@
+NAME
+    gcloud alpha ml-engine - manage Cloud ML Engine jobs and models
+
+SYNOPSIS
+    gcloud alpha ml-engine GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The gcloud alpha ml-engine command group lets you manage Google
+    Cloud ML Engine jobs and training models.
+
+    Cloud ML Engine is a managed service that enables you to easily build
+    machine learning models, that work on any type of data, of any size. Create
+    your model with the powerful TensorFlow framework that powers many Google
+    products, from Google Photos to Google Cloud Speech.
+
+    More information on Cloud ML Engine can be found here:
+    https://cloud.google.com/ml and detailed documentation can be found here:
+    https://cloud.google.com/ml/docs/
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     jobs
+        (ALPHA) Cloud ML Engine Jobs commands.
+
+     local
+        (ALPHA) Cloud ML Engine Local commands.
+
+     locations
+        (ALPHA) Query Cloud ML Engine location capabilities.
+
+     models
+        (ALPHA) Cloud ML Engine Models commands.
+
+     operations
+        (ALPHA) Manage Cloud ML Engine operations.
+
+     versions
+        (ALPHA) Cloud ML Engine Versions commands.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     predict
+        (ALPHA) Run Cloud ML Engine online prediction.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml-engine
+        $ gcloud beta ml-engine
+

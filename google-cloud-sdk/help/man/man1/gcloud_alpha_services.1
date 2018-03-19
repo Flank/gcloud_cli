@@ -1,0 +1,102 @@
+
+.TH "GCLOUD_ALPHA_SERVICES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha services \- list, enable and disable APIs and services
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha services\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR The gcloud services command group lets you manage your project's
+access to services provided by Google and third parties.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBoperations\fR
+\fB(ALPHA)\fR Manage Operation for various services.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdisable\fR
+\fB(ALPHA)\fR Disable a service for consumption for a project.
+
+.TP 2m
+\fBenable\fR
+\fB(ALPHA)\fR Enables a service for consumption for a project.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List services for a project.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To see how to enable a service, run:
+
+.RS 2m
+$ gcloud alpha services enable \-\-help
+.RE
+
+To see how to list services, run:
+
+.RS 2m
+$ gcloud alpha services list \-\-help
+.RE
+
+To see how to disable a service, run:
+
+.RS 2m
+$ gcloud alpha services disable \-\-help
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud services
+$ gcloud beta services
+.RE
+

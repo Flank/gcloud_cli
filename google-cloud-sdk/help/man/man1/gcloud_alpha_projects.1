@@ -1,0 +1,109 @@
+
+.TH "GCLOUD_ALPHA_PROJECTS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha projects \- create and manage project access policies
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha projects\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR The gcloud alpha projects group lets you create and manage IAM
+policies for projects on the Google Cloud Platform. Resources are organized
+hierarchically and assigned to a particular project. A Project resource is
+required to use Google Cloud Platform, and forms the basis for creating,
+enabling and using all Cloud Platform services, managing APIs, enabling billing,
+adding and removing collaborators, and managing permissions.
+
+More information on the Cloud Platform Resource Hierarchy and the project
+resource can be found here:
+https://cloud.google.com/resource\-manager/docs/creating\-managing\-organization
+and detailed documentation on creating and managing projects can be found here:
+https://cloud.google.com/resource\-manager/docs/creating\-managing\-projects
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Add IAM policy binding for a project.
+
+.TP 2m
+\fBcreate\fR
+\fB(ALPHA)\fR Create a new project.
+
+.TP 2m
+\fBdelete\fR
+\fB(ALPHA)\fR Delete a project.
+
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Show metadata for a project.
+
+.TP 2m
+\fBget\-iam\-policy\fR
+\fB(ALPHA)\fR Get IAM policy for a project.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List projects accessible by the active account.
+
+.TP 2m
+\fBmove\fR
+\fB(ALPHA)\fR Move a project into an organization.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Remove IAM policy binding for a project.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(ALPHA)\fR Set IAM policy for a project.
+
+.TP 2m
+\fBundelete\fR
+\fB(ALPHA)\fR Undelete a project.
+
+.TP 2m
+\fBupdate\fR
+\fB(ALPHA)\fR Update the name and/or labels of a project.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud projects
+$ gcloud beta projects
+.RE
+

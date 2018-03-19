@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha services operations wait - waits for an operation to complete
+
+SYNOPSIS
+    gcloud alpha services operations wait OPERATION [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command will block until an operation has been marked as
+    complete.
+
+    Note that the operations/ prefix of the operation name is optional and may
+    be omitted.
+
+POSITIONAL ARGUMENTS
+     OPERATION
+        The name of the operation on which to wait.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To wait on an operation named operations/serviceConfigs.my-service.1 to
+    complete, run:
+
+        $ gcloud alpha services operations wait serviceConfigs.my-service.1
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud services operations wait
+        $ gcloud beta services operations wait
+

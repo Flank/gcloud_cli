@@ -1,0 +1,46 @@
+NAME
+    gcloud beta compute forwarding-rules - read and manipulate traffic
+        forwarding rules to network load balancers
+
+SYNOPSIS
+    gcloud beta compute forwarding-rules COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read and manipulate traffic forwarding rules to network load
+    balancers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a forwarding rule to direct network traffic to a load
+        balancer.
+
+     delete
+        (BETA) Delete forwarding rules.
+
+     describe
+        (BETA) Display detailed information about a forwarding rule.
+
+     list
+        (BETA) List Google Compute Engine forwarding rules.
+
+     set-target
+        (BETA) Modify a forwarding rule to direct network traffic to a new
+        target.
+
+     update
+        (BETA) Update a Google Compute Engine forwarding rule.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute forwarding-rules
+        $ gcloud alpha compute forwarding-rules
+

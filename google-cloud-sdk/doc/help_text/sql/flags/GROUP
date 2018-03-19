@@ -1,0 +1,25 @@
+NAME
+    gcloud sql flags - provide a command to list flags
+
+SYNOPSIS
+    gcloud sql flags COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Provide a command to list flags.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list
+        List customizable flags for Google Cloud SQL instances.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta sql flags
+

@@ -1,0 +1,1351 @@
+{
+  "CLI_VERSION": "TEST",
+  "SERIALIZED_FLAG_LIST": [
+    {
+      "attr": {
+        "property": {
+          "name": "auth/authority_selector"
+        }
+      },
+      "choices": [],
+      "description": "THIS ARGUMENT NEEDS HELP TEXT.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": true,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--authority-selector",
+      "nargs": "0",
+      "type": "string",
+      "value": "AUTHORITY_SELECTOR"
+    },
+    {
+      "attr": {
+        "property": {
+          "name": "auth/authorization_token_file"
+        }
+      },
+      "choices": [],
+      "description": "THIS ARGUMENT NEEDS HELP TEXT.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": true,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--authorization-token-file",
+      "nargs": "0",
+      "type": "string",
+      "value": "AUTHORIZATION_TOKEN_FILE"
+    },
+    {
+      "attr": {},
+      "category": "GLOBAL",
+      "choices": [],
+      "description": "The configuration to use for this command invocation. For more\ninformation on how to use configurations, run:\n`gcloud topic configurations`.  You can also use the [CLOUDSDK_ACTIVE_CONFIG_NAME] environment\nvariable to set the equivalent of this flag for a terminal\nsession.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--configuration",
+      "nargs": "0",
+      "type": "string",
+      "value": "CONFIGURATION"
+    },
+    {
+      "attr": {
+        "property": {
+          "name": "auth/credential_file_override"
+        }
+      },
+      "choices": [],
+      "description": "THIS ARGUMENT NEEDS HELP TEXT.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": true,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--credential-file-override",
+      "nargs": "0",
+      "type": "string",
+      "value": "CREDENTIAL_FILE_OVERRIDE"
+    },
+    {
+      "attr": {},
+      "choices": [],
+      "description": "Specifies the amount of time until this image should become DELETED.",
+      "is_global": false,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--delete-in",
+      "nargs": "0",
+      "type": "string",
+      "value": "DELETE_IN"
+    },
+    {
+      "attr": {},
+      "choices": [],
+      "description": "This flag is mutually exclusive with --delete-in.",
+      "is_global": false,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--delete-on",
+      "nargs": "0",
+      "type": "string",
+      "value": "DELETE_ON"
+    },
+    {
+      "attr": {},
+      "choices": [],
+      "description": "THIS TEXT SHOULD BE HIDDEN",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": true,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--document",
+      "nargs": "1",
+      "type": "dict",
+      "value": "ATTRIBUTES"
+    },
+    {
+      "attr": {},
+      "category": "GLOBAL",
+      "choices": [],
+      "description": "Flatten _name_[] output resource slices in _KEY_ into separate records\nfor each item in each slice. Multiple keys and slices may be specified.\nThis also flattens keys for *--format* and *--filter*. For example,\n*--flatten=abc.def* flattens *abc.def[].ghi* references to\n*abc.def.ghi*. A resource record containing *abc.def[]* with N elements\nwill expand to N records in the flattened output. This flag interacts\nwith other flags that are applied in this order: *--flatten*,\n*--sort-by*, *--filter*, *--limit*.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--flatten",
+      "nargs": "0",
+      "type": "list",
+      "value": "KEY"
+    },
+    {
+      "attr": {},
+      "category": "GLOBAL",
+      "choices": [],
+      "description": "Sets the format for printing command output resources. The default is a\ncommand-specific human-friendly output format. The supported formats\nare: `config`, `csv`, `default`, `diff`, `disable`, `flattened`, `get`, `json`, `list`, `multi`, `none`, `object`, `table`, `text`, `value`, `yaml`. For more details run $ gcloud topic formats.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--format",
+      "nargs": "0",
+      "type": "string",
+      "value": "FORMAT"
+    },
+    {
+      "attr": {},
+      "category": "COMMONLY USED",
+      "choices": [],
+      "default": false,
+      "description": "Display detailed help.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--help",
+      "nargs": "0",
+      "type": "bool",
+      "value": "HELP"
+    },
+    {
+      "attr": {},
+      "category": "GLOBAL",
+      "choices": [],
+      "default": false,
+      "description": "Display detailed help.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--help",
+      "nargs": "0",
+      "type": "bool",
+      "value": "HELP"
+    },
+    {
+      "attr": {
+        "property": {
+          "name": "core/http_timeout"
+        }
+      },
+      "choices": [],
+      "description": "THIS ARGUMENT NEEDS HELP TEXT.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": true,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--http-timeout",
+      "nargs": "0",
+      "type": "string",
+      "value": "HTTP_TIMEOUT"
+    },
+    {
+      "attr": {
+        "property": {
+          "name": "core/log_http"
+        }
+      },
+      "choices": [],
+      "default": false,
+      "description": "Log all HTTP server requests and responses to stderr. Overrides the default *core/log_http* property value for this command invocation.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--log-http",
+      "nargs": "0",
+      "type": "bool",
+      "value": "LOG_HTTP"
+    },
+    {
+      "attr": {
+        "property": {
+          "name": "core/log_http"
+        }
+      },
+      "choices": [],
+      "default": false,
+      "description": "Log all HTTP server requests and responses to stderr.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": true,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--no-log-http",
+      "nargs": "0",
+      "type": "bool",
+      "value": "NO_LOG_HTTP"
+    },
+    {
+      "attr": {
+        "property": {
+          "name": "core/user_output_enabled"
+        }
+      },
+      "choices": [],
+      "default": false,
+      "description": "Print user intended output to the console.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": true,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--no-user-output-enabled",
+      "nargs": "0",
+      "type": "bool",
+      "value": " "
+    },
+    {
+      "attr": {},
+      "choices": [],
+      "description": "Specifies the amount of time until this image should become OBSOLETE.",
+      "is_global": false,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--obsolete-in",
+      "nargs": "0",
+      "type": "string",
+      "value": "OBSOLETE_IN"
+    },
+    {
+      "attr": {},
+      "choices": [],
+      "description": "This flag is mutually exclusive with --obsolete-in.",
+      "is_global": false,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--obsolete-on",
+      "nargs": "0",
+      "type": "string",
+      "value": "OBSOLETE_ON"
+    },
+    {
+      "attr": {
+        "inverted_synopsis": true,
+        "property": {
+          "name": "core/user_output_enabled"
+        }
+      },
+      "choices": [],
+      "description": "Print user intended output to the console. Overrides the default *core/user_output_enabled* property value for this command invocation. Use *--no-user-output-enabled* to disable.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--user-output-enabled",
+      "nargs": "?",
+      "type": "bool",
+      "value": " "
+    },
+    {
+      "attr": {
+        "property": {
+          "name": "core/verbosity"
+        }
+      },
+      "category": "GLOBAL",
+      "choices": [
+        "debug",
+        "info",
+        "warning",
+        "error",
+        "critical",
+        "none"
+      ],
+      "default": "warning",
+      "description": "Override the default verbosity for this command with any of the supported standard verbosity levels: `debug`, `info`, `warning`, `error`, and `none`. Overrides the default *core/verbosity* property value for this command invocation.",
+      "is_global": true,
+      "is_group": false,
+      "is_hidden": false,
+      "is_mutex": false,
+      "is_positional": false,
+      "is_required": false,
+      "name": "--verbosity",
+      "nargs": "0",
+      "type": "string",
+      "value": "VERBOSITY"
+    }
+  ],
+  "VERSION": "1",
+  "capsule": "gcloud sdk tests super-group.",
+  "commands": {
+    "alpha": {
+      "capsule": "*(ALPHA)*  Alpha versions of gcloud commands.",
+      "commands": {
+        "sdk": {
+          "capsule": "*(ALPHA)*  gcloud sdk tests second level group.",
+          "commands": {
+            "subgroup": {
+              "capsule": "*(ALPHA)*  gcloud sdk tests subgroup.",
+              "commands": {
+                "subgroup-command-2": {
+                  "capsule": "*(ALPHA)*  gcloud sdk tests command.",
+                  "commands": {},
+                  "constraints": {
+                    "arguments": [
+                      0,
+                      1,
+                      2,
+                      3,
+                      6,
+                      7,
+                      8,
+                      10,
+                      11,
+                      12,
+                      17,
+                      18
+                    ],
+                    "attr": {},
+                    "description": "",
+                    "is_group": true,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false
+                  },
+                  "flags": {
+                    "--authority-selector": 0,
+                    "--authorization-token-file": 1,
+                    "--configuration": 2,
+                    "--credential-file-override": 3,
+                    "--flatten": 7,
+                    "--format": 8,
+                    "--help": 9,
+                    "--http-timeout": 11,
+                    "--log-http": 12,
+                    "--no-log-http": 13,
+                    "--no-user-output-enabled": 14,
+                    "--user-output-enabled": 17,
+                    "--verbosity": 18
+                  },
+                  "is_global": false,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "name": "subgroup-command-2",
+                  "path": [
+                    "gcloud",
+                    "alpha",
+                    "sdk",
+                    "subgroup",
+                    "subgroup-command-2"
+                  ],
+                  "positionals": [],
+                  "release": "ALPHA",
+                  "sections": {
+                    "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
+                    "NOTES": "This command is currently in ALPHA and may change without notice. Usually, users of ALPHA commands and flags need to apply for access, agree to applicable terms, and have their projects whitelisted. Contact Google or sign up on a product's page for ALPHA access. Product pages can be found at https://cloud.google.com/products/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-2\n  $ gcloud beta sdk subgroup subgroup-command-2"
+                  }
+                },
+                "subgroup-command-a": {
+                  "capsule": "*(ALPHA)*  gcloud sdk tests command.",
+                  "commands": {},
+                  "constraints": {
+                    "arguments": [
+                      -1,
+                      0,
+                      1,
+                      2,
+                      3,
+                      {
+                        "arguments": [
+                          4,
+                          5
+                        ],
+                        "attr": {},
+                        "description": "",
+                        "is_group": true,
+                        "is_hidden": false,
+                        "is_mutex": true,
+                        "is_positional": false,
+                        "is_required": false
+                      },
+                      6,
+                      7,
+                      8,
+                      10,
+                      11,
+                      12,
+                      {
+                        "arguments": [
+                          15,
+                          16
+                        ],
+                        "attr": {},
+                        "description": "",
+                        "is_group": true,
+                        "is_hidden": false,
+                        "is_mutex": true,
+                        "is_positional": false,
+                        "is_required": false
+                      },
+                      17,
+                      18
+                    ],
+                    "attr": {},
+                    "description": "",
+                    "is_group": true,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false
+                  },
+                  "flags": {
+                    "--authority-selector": 0,
+                    "--authorization-token-file": 1,
+                    "--configuration": 2,
+                    "--credential-file-override": 3,
+                    "--delete-in": 4,
+                    "--delete-on": 5,
+                    "--flatten": 7,
+                    "--format": 8,
+                    "--help": 9,
+                    "--http-timeout": 11,
+                    "--log-http": 12,
+                    "--no-log-http": 13,
+                    "--no-user-output-enabled": 14,
+                    "--obsolete-in": 15,
+                    "--obsolete-on": 16,
+                    "--user-output-enabled": 17,
+                    "--verbosity": 18
+                  },
+                  "is_global": false,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "name": "subgroup-command-a",
+                  "path": [
+                    "gcloud",
+                    "alpha",
+                    "sdk",
+                    "subgroup",
+                    "subgroup-command-a"
+                  ],
+                  "positionals": [
+                    {
+                      "attr": {},
+                      "category": "",
+                      "description": "ghi the JKL.",
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": true,
+                      "is_required": true,
+                      "name": "eureka",
+                      "nargs": "1",
+                      "value": "EUREKA"
+                    }
+                  ],
+                  "release": "ALPHA",
+                  "sections": {
+                    "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests command.",
+                    "NOTES": "This command is currently in ALPHA and may change without notice. Usually, users of ALPHA commands and flags need to apply for access, agree to applicable terms, and have their projects whitelisted. Contact Google or sign up on a product's page for ALPHA access. Product pages can be found at https://cloud.google.com/products/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-a\n  $ gcloud beta sdk subgroup subgroup-command-a"
+                  }
+                }
+              },
+              "constraints": {
+                "arguments": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  6,
+                  7,
+                  8,
+                  10,
+                  11,
+                  12,
+                  17,
+                  18
+                ],
+                "attr": {},
+                "description": "",
+                "is_group": true,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false
+              },
+              "flags": {
+                "--authority-selector": 0,
+                "--authorization-token-file": 1,
+                "--configuration": 2,
+                "--credential-file-override": 3,
+                "--flatten": 7,
+                "--format": 8,
+                "--help": 9,
+                "--http-timeout": 11,
+                "--log-http": 12,
+                "--no-log-http": 13,
+                "--no-user-output-enabled": 14,
+                "--user-output-enabled": 17,
+                "--verbosity": 18
+              },
+              "is_global": false,
+              "is_group": true,
+              "is_hidden": false,
+              "name": "subgroup",
+              "path": [
+                "gcloud",
+                "alpha",
+                "sdk",
+                "subgroup"
+              ],
+              "positionals": [],
+              "release": "ALPHA",
+              "sections": {
+                "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests subgroup.",
+                "NOTES": "This command is currently in ALPHA and may change without notice. Usually, users of ALPHA commands and flags need to apply for access, agree to applicable terms, and have their projects whitelisted. Contact Google or sign up on a product's page for ALPHA access. Product pages can be found at https://cloud.google.com/products/.\nThese variants are also available:\n\n  $ gcloud sdk subgroup\n  $ gcloud beta sdk subgroup"
+              }
+            }
+          },
+          "constraints": {
+            "arguments": [
+              0,
+              1,
+              2,
+              3,
+              6,
+              7,
+              8,
+              10,
+              11,
+              12,
+              17,
+              18
+            ],
+            "attr": {},
+            "description": "",
+            "is_group": true,
+            "is_hidden": false,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false
+          },
+          "flags": {
+            "--authority-selector": 0,
+            "--authorization-token-file": 1,
+            "--configuration": 2,
+            "--credential-file-override": 3,
+            "--flatten": 7,
+            "--format": 8,
+            "--help": 9,
+            "--http-timeout": 11,
+            "--log-http": 12,
+            "--no-log-http": 13,
+            "--no-user-output-enabled": 14,
+            "--user-output-enabled": 17,
+            "--verbosity": 18
+          },
+          "is_global": false,
+          "is_group": true,
+          "is_hidden": false,
+          "name": "sdk",
+          "path": [
+            "gcloud",
+            "alpha",
+            "sdk"
+          ],
+          "positionals": [],
+          "release": "ALPHA",
+          "sections": {
+            "DESCRIPTION": "*(ALPHA)*  gcloud sdk tests second level group.",
+            "NOTES": "This command is currently in ALPHA and may change without notice. Usually, users of ALPHA commands and flags need to apply for access, agree to applicable terms, and have their projects whitelisted. Contact Google or sign up on a product's page for ALPHA access. Product pages can be found at https://cloud.google.com/products/.\nThese variants are also available:\n\n  $ gcloud sdk\n  $ gcloud beta sdk"
+          }
+        }
+      },
+      "constraints": {
+        "arguments": [
+          0,
+          1,
+          2,
+          3,
+          6,
+          7,
+          8,
+          10,
+          11,
+          12,
+          17,
+          18
+        ],
+        "attr": {},
+        "description": "",
+        "is_group": true,
+        "is_hidden": false,
+        "is_mutex": false,
+        "is_positional": false,
+        "is_required": false
+      },
+      "flags": {
+        "--authority-selector": 0,
+        "--authorization-token-file": 1,
+        "--configuration": 2,
+        "--credential-file-override": 3,
+        "--flatten": 7,
+        "--format": 8,
+        "--help": 9,
+        "--http-timeout": 11,
+        "--log-http": 12,
+        "--no-log-http": 13,
+        "--no-user-output-enabled": 14,
+        "--user-output-enabled": 17,
+        "--verbosity": 18
+      },
+      "is_global": false,
+      "is_group": true,
+      "is_hidden": false,
+      "name": "alpha",
+      "path": [
+        "gcloud",
+        "alpha"
+      ],
+      "positionals": [],
+      "release": "ALPHA",
+      "sections": {
+        "DESCRIPTION": "*(ALPHA)*  Alpha versions of gcloud commands.",
+        "NOTES": "This command is currently in ALPHA and may change without notice. Usually, users of ALPHA commands and flags need to apply for access, agree to applicable terms, and have their projects whitelisted. Contact Google or sign up on a product's page for ALPHA access. Product pages can be found at https://cloud.google.com/products/."
+      }
+    },
+    "beta": {
+      "capsule": "*(BETA)*  Beta versions of gcloud commands.",
+      "commands": {
+        "sdk": {
+          "capsule": "*(BETA)*  gcloud sdk tests second level group.",
+          "commands": {
+            "subgroup": {
+              "capsule": "*(BETA)*  gcloud sdk tests subgroup.",
+              "commands": {
+                "subgroup-command-2": {
+                  "capsule": "*(BETA)*  gcloud sdk tests command.",
+                  "commands": {},
+                  "constraints": {
+                    "arguments": [
+                      0,
+                      1,
+                      2,
+                      3,
+                      6,
+                      7,
+                      8,
+                      10,
+                      11,
+                      12,
+                      17,
+                      18
+                    ],
+                    "attr": {},
+                    "description": "",
+                    "is_group": true,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false
+                  },
+                  "flags": {
+                    "--authority-selector": 0,
+                    "--authorization-token-file": 1,
+                    "--configuration": 2,
+                    "--credential-file-override": 3,
+                    "--flatten": 7,
+                    "--format": 8,
+                    "--help": 9,
+                    "--http-timeout": 11,
+                    "--log-http": 12,
+                    "--no-log-http": 13,
+                    "--no-user-output-enabled": 14,
+                    "--user-output-enabled": 17,
+                    "--verbosity": 18
+                  },
+                  "is_global": false,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "name": "subgroup-command-2",
+                  "path": [
+                    "gcloud",
+                    "beta",
+                    "sdk",
+                    "subgroup",
+                    "subgroup-command-2"
+                  ],
+                  "positionals": [],
+                  "release": "BETA",
+                  "sections": {
+                    "DESCRIPTION": "*(BETA)*  gcloud sdk tests command.",
+                    "NOTES": "This command is currently in BETA and may change without notice.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-2\n  $ gcloud alpha sdk subgroup subgroup-command-2"
+                  }
+                },
+                "subgroup-command-a": {
+                  "capsule": "*(BETA)*  gcloud sdk tests command.",
+                  "commands": {},
+                  "constraints": {
+                    "arguments": [
+                      -1,
+                      0,
+                      1,
+                      2,
+                      3,
+                      {
+                        "arguments": [
+                          4,
+                          5
+                        ],
+                        "attr": {},
+                        "description": "",
+                        "is_group": true,
+                        "is_hidden": false,
+                        "is_mutex": true,
+                        "is_positional": false,
+                        "is_required": false
+                      },
+                      6,
+                      7,
+                      8,
+                      10,
+                      11,
+                      12,
+                      {
+                        "arguments": [
+                          15,
+                          16
+                        ],
+                        "attr": {},
+                        "description": "",
+                        "is_group": true,
+                        "is_hidden": false,
+                        "is_mutex": true,
+                        "is_positional": false,
+                        "is_required": false
+                      },
+                      17,
+                      18
+                    ],
+                    "attr": {},
+                    "description": "",
+                    "is_group": true,
+                    "is_hidden": false,
+                    "is_mutex": false,
+                    "is_positional": false,
+                    "is_required": false
+                  },
+                  "flags": {
+                    "--authority-selector": 0,
+                    "--authorization-token-file": 1,
+                    "--configuration": 2,
+                    "--credential-file-override": 3,
+                    "--delete-in": 4,
+                    "--delete-on": 5,
+                    "--flatten": 7,
+                    "--format": 8,
+                    "--help": 9,
+                    "--http-timeout": 11,
+                    "--log-http": 12,
+                    "--no-log-http": 13,
+                    "--no-user-output-enabled": 14,
+                    "--obsolete-in": 15,
+                    "--obsolete-on": 16,
+                    "--user-output-enabled": 17,
+                    "--verbosity": 18
+                  },
+                  "is_global": false,
+                  "is_group": false,
+                  "is_hidden": false,
+                  "name": "subgroup-command-a",
+                  "path": [
+                    "gcloud",
+                    "beta",
+                    "sdk",
+                    "subgroup",
+                    "subgroup-command-a"
+                  ],
+                  "positionals": [
+                    {
+                      "attr": {},
+                      "category": "",
+                      "description": "ghi the JKL.",
+                      "is_group": false,
+                      "is_hidden": false,
+                      "is_mutex": false,
+                      "is_positional": true,
+                      "is_required": true,
+                      "name": "eureka",
+                      "nargs": "1",
+                      "value": "EUREKA"
+                    }
+                  ],
+                  "release": "BETA",
+                  "sections": {
+                    "DESCRIPTION": "*(BETA)*  gcloud sdk tests command.",
+                    "NOTES": "This command is currently in BETA and may change without notice.\nThese variants are also available:\n\n  $ gcloud sdk subgroup subgroup-command-a\n  $ gcloud alpha sdk subgroup subgroup-command-a"
+                  }
+                }
+              },
+              "constraints": {
+                "arguments": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  6,
+                  7,
+                  8,
+                  10,
+                  11,
+                  12,
+                  17,
+                  18
+                ],
+                "attr": {},
+                "description": "",
+                "is_group": true,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false
+              },
+              "flags": {
+                "--authority-selector": 0,
+                "--authorization-token-file": 1,
+                "--configuration": 2,
+                "--credential-file-override": 3,
+                "--flatten": 7,
+                "--format": 8,
+                "--help": 9,
+                "--http-timeout": 11,
+                "--log-http": 12,
+                "--no-log-http": 13,
+                "--no-user-output-enabled": 14,
+                "--user-output-enabled": 17,
+                "--verbosity": 18
+              },
+              "is_global": false,
+              "is_group": true,
+              "is_hidden": false,
+              "name": "subgroup",
+              "path": [
+                "gcloud",
+                "beta",
+                "sdk",
+                "subgroup"
+              ],
+              "positionals": [],
+              "release": "BETA",
+              "sections": {
+                "DESCRIPTION": "*(BETA)*  gcloud sdk tests subgroup.",
+                "NOTES": "This command is currently in BETA and may change without notice.\nThese variants are also available:\n\n  $ gcloud sdk subgroup\n  $ gcloud alpha sdk subgroup"
+              }
+            }
+          },
+          "constraints": {
+            "arguments": [
+              0,
+              1,
+              2,
+              3,
+              6,
+              7,
+              8,
+              10,
+              11,
+              12,
+              17,
+              18
+            ],
+            "attr": {},
+            "description": "",
+            "is_group": true,
+            "is_hidden": false,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false
+          },
+          "flags": {
+            "--authority-selector": 0,
+            "--authorization-token-file": 1,
+            "--configuration": 2,
+            "--credential-file-override": 3,
+            "--flatten": 7,
+            "--format": 8,
+            "--help": 9,
+            "--http-timeout": 11,
+            "--log-http": 12,
+            "--no-log-http": 13,
+            "--no-user-output-enabled": 14,
+            "--user-output-enabled": 17,
+            "--verbosity": 18
+          },
+          "is_global": false,
+          "is_group": true,
+          "is_hidden": false,
+          "name": "sdk",
+          "path": [
+            "gcloud",
+            "beta",
+            "sdk"
+          ],
+          "positionals": [],
+          "release": "BETA",
+          "sections": {
+            "DESCRIPTION": "*(BETA)*  gcloud sdk tests second level group.",
+            "NOTES": "This command is currently in BETA and may change without notice.\nThese variants are also available:\n\n  $ gcloud sdk\n  $ gcloud alpha sdk"
+          }
+        }
+      },
+      "constraints": {
+        "arguments": [
+          0,
+          1,
+          2,
+          3,
+          6,
+          7,
+          8,
+          10,
+          11,
+          12,
+          17,
+          18
+        ],
+        "attr": {},
+        "description": "",
+        "is_group": true,
+        "is_hidden": false,
+        "is_mutex": false,
+        "is_positional": false,
+        "is_required": false
+      },
+      "flags": {
+        "--authority-selector": 0,
+        "--authorization-token-file": 1,
+        "--configuration": 2,
+        "--credential-file-override": 3,
+        "--flatten": 7,
+        "--format": 8,
+        "--help": 9,
+        "--http-timeout": 11,
+        "--log-http": 12,
+        "--no-log-http": 13,
+        "--no-user-output-enabled": 14,
+        "--user-output-enabled": 17,
+        "--verbosity": 18
+      },
+      "is_global": false,
+      "is_group": true,
+      "is_hidden": false,
+      "name": "beta",
+      "path": [
+        "gcloud",
+        "beta"
+      ],
+      "positionals": [],
+      "release": "BETA",
+      "sections": {
+        "DESCRIPTION": "*(BETA)*  Beta versions of gcloud commands.",
+        "NOTES": "This command is currently in BETA and may change without notice."
+      }
+    },
+    "sdk": {
+      "capsule": "gcloud sdk tests second level group.",
+      "commands": {
+        "subgroup": {
+          "capsule": "gcloud sdk tests subgroup.",
+          "commands": {
+            "subgroup-command-2": {
+              "capsule": "gcloud sdk tests command.",
+              "commands": {},
+              "constraints": {
+                "arguments": [
+                  0,
+                  1,
+                  2,
+                  3,
+                  6,
+                  7,
+                  8,
+                  10,
+                  11,
+                  12,
+                  17,
+                  18
+                ],
+                "attr": {},
+                "description": "",
+                "is_group": true,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false
+              },
+              "flags": {
+                "--authority-selector": 0,
+                "--authorization-token-file": 1,
+                "--configuration": 2,
+                "--credential-file-override": 3,
+                "--flatten": 7,
+                "--format": 8,
+                "--help": 9,
+                "--http-timeout": 11,
+                "--log-http": 12,
+                "--no-log-http": 13,
+                "--no-user-output-enabled": 14,
+                "--user-output-enabled": 17,
+                "--verbosity": 18
+              },
+              "is_global": false,
+              "is_group": false,
+              "is_hidden": false,
+              "name": "subgroup-command-2",
+              "path": [
+                "gcloud",
+                "sdk",
+                "subgroup",
+                "subgroup-command-2"
+              ],
+              "positionals": [],
+              "release": "GA",
+              "sections": {
+                "DESCRIPTION": "gcloud sdk tests command.",
+                "NOTES": "These variants are also available:\n\n  $ gcloud alpha sdk subgroup subgroup-command-2\n  $ gcloud beta sdk subgroup subgroup-command-2"
+              }
+            },
+            "subgroup-command-a": {
+              "capsule": "gcloud sdk tests command.",
+              "commands": {},
+              "constraints": {
+                "arguments": [
+                  -1,
+                  0,
+                  1,
+                  2,
+                  3,
+                  {
+                    "arguments": [
+                      4,
+                      5
+                    ],
+                    "attr": {},
+                    "description": "",
+                    "is_group": true,
+                    "is_hidden": false,
+                    "is_mutex": true,
+                    "is_positional": false,
+                    "is_required": false
+                  },
+                  6,
+                  7,
+                  8,
+                  10,
+                  11,
+                  12,
+                  {
+                    "arguments": [
+                      15,
+                      16
+                    ],
+                    "attr": {},
+                    "description": "",
+                    "is_group": true,
+                    "is_hidden": false,
+                    "is_mutex": true,
+                    "is_positional": false,
+                    "is_required": false
+                  },
+                  17,
+                  18
+                ],
+                "attr": {},
+                "description": "",
+                "is_group": true,
+                "is_hidden": false,
+                "is_mutex": false,
+                "is_positional": false,
+                "is_required": false
+              },
+              "flags": {
+                "--authority-selector": 0,
+                "--authorization-token-file": 1,
+                "--configuration": 2,
+                "--credential-file-override": 3,
+                "--delete-in": 4,
+                "--delete-on": 5,
+                "--flatten": 7,
+                "--format": 8,
+                "--help": 9,
+                "--http-timeout": 11,
+                "--log-http": 12,
+                "--no-log-http": 13,
+                "--no-user-output-enabled": 14,
+                "--obsolete-in": 15,
+                "--obsolete-on": 16,
+                "--user-output-enabled": 17,
+                "--verbosity": 18
+              },
+              "is_global": false,
+              "is_group": false,
+              "is_hidden": false,
+              "name": "subgroup-command-a",
+              "path": [
+                "gcloud",
+                "sdk",
+                "subgroup",
+                "subgroup-command-a"
+              ],
+              "positionals": [
+                {
+                  "attr": {},
+                  "category": "",
+                  "description": "ghi the JKL.",
+                  "is_group": false,
+                  "is_hidden": false,
+                  "is_mutex": false,
+                  "is_positional": true,
+                  "is_required": true,
+                  "name": "eureka",
+                  "nargs": "1",
+                  "value": "EUREKA"
+                }
+              ],
+              "release": "GA",
+              "sections": {
+                "DESCRIPTION": "gcloud sdk tests command.",
+                "NOTES": "These variants are also available:\n\n  $ gcloud alpha sdk subgroup subgroup-command-a\n  $ gcloud beta sdk subgroup subgroup-command-a"
+              }
+            }
+          },
+          "constraints": {
+            "arguments": [
+              0,
+              1,
+              2,
+              3,
+              6,
+              7,
+              8,
+              10,
+              11,
+              12,
+              17,
+              18
+            ],
+            "attr": {},
+            "description": "",
+            "is_group": true,
+            "is_hidden": false,
+            "is_mutex": false,
+            "is_positional": false,
+            "is_required": false
+          },
+          "flags": {
+            "--authority-selector": 0,
+            "--authorization-token-file": 1,
+            "--configuration": 2,
+            "--credential-file-override": 3,
+            "--flatten": 7,
+            "--format": 8,
+            "--help": 9,
+            "--http-timeout": 11,
+            "--log-http": 12,
+            "--no-log-http": 13,
+            "--no-user-output-enabled": 14,
+            "--user-output-enabled": 17,
+            "--verbosity": 18
+          },
+          "is_global": false,
+          "is_group": true,
+          "is_hidden": false,
+          "name": "subgroup",
+          "path": [
+            "gcloud",
+            "sdk",
+            "subgroup"
+          ],
+          "positionals": [],
+          "release": "GA",
+          "sections": {
+            "DESCRIPTION": "gcloud sdk tests subgroup.",
+            "NOTES": "These variants are also available:\n\n  $ gcloud alpha sdk subgroup\n  $ gcloud beta sdk subgroup"
+          }
+        }
+      },
+      "constraints": {
+        "arguments": [
+          0,
+          1,
+          2,
+          3,
+          6,
+          7,
+          8,
+          10,
+          11,
+          12,
+          17,
+          18
+        ],
+        "attr": {},
+        "description": "",
+        "is_group": true,
+        "is_hidden": false,
+        "is_mutex": false,
+        "is_positional": false,
+        "is_required": false
+      },
+      "flags": {
+        "--authority-selector": 0,
+        "--authorization-token-file": 1,
+        "--configuration": 2,
+        "--credential-file-override": 3,
+        "--flatten": 7,
+        "--format": 8,
+        "--help": 9,
+        "--http-timeout": 11,
+        "--log-http": 12,
+        "--no-log-http": 13,
+        "--no-user-output-enabled": 14,
+        "--user-output-enabled": 17,
+        "--verbosity": 18
+      },
+      "is_global": false,
+      "is_group": true,
+      "is_hidden": false,
+      "name": "sdk",
+      "path": [
+        "gcloud",
+        "sdk"
+      ],
+      "positionals": [],
+      "release": "GA",
+      "sections": {
+        "DESCRIPTION": "gcloud sdk tests second level group.",
+        "NOTES": "These variants are also available:\n\n  $ gcloud alpha sdk\n  $ gcloud beta sdk"
+      }
+    }
+  },
+  "constraints": {
+    "arguments": [
+      0,
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12,
+      17,
+      18
+    ],
+    "attr": {},
+    "description": "",
+    "is_group": true,
+    "is_hidden": false,
+    "is_mutex": false,
+    "is_positional": false,
+    "is_required": false
+  },
+  "flags": {
+    "--authority-selector": 0,
+    "--authorization-token-file": 1,
+    "--configuration": 2,
+    "--credential-file-override": 3,
+    "--document": 6,
+    "--flatten": 7,
+    "--format": 8,
+    "--help": 10,
+    "--http-timeout": 11,
+    "--log-http": 12,
+    "--no-log-http": 13,
+    "--no-user-output-enabled": 14,
+    "--user-output-enabled": 17,
+    "--verbosity": 18
+  },
+  "is_global": true,
+  "is_group": true,
+  "is_hidden": false,
+  "name": "gcloud",
+  "path": [
+    "gcloud"
+  ],
+  "positionals": [],
+  "release": "GA",
+  "sections": {
+    "DESCRIPTION": "gcloud sdk tests super-group."
+  }
+}

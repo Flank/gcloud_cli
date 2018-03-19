@@ -1,0 +1,107 @@
+NAME
+    gcloud alpha ml speech recognize-long-running - get transcripts of longer
+        audio from an audio file
+
+SYNOPSIS
+    gcloud alpha ml speech recognize-long-running AUDIO
+        --language-code=LANGUAGE_CODE [--async]
+        [--encoding=ENCODING; default="encoding-unspecified"]
+        [--filter-profanity] [--hints=[HINTS,...]]
+        [--include-word-time-offsets]
+        [--max-alternatives=MAX_ALTERNATIVES; default=1]
+        [--sample-rate=SAMPLE_RATE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Get a transcript of audio up to 80 minutes in length. If the audio
+    is under 60 seconds, you may also use gcloud alpha ml speech recognize to
+    analyze it.
+
+    To block the command from completing until analysis is finished, run:
+
+        $ gcloud alpha ml speech recognize-long-running AUDIO_FILE \
+            --language LANGUAGE --sample-rate SAMPLE_RATE
+
+    You can also receive an operation as the result of the command by running:
+
+        $ gcloud alpha ml speech recognize-long-running AUDIO_FILE \
+            --language LANGUAGE --sample-rate SAMPLE_RATE --async
+
+    This will return information about an operation. To get information about
+    the operation, run:
+
+        $ gcloud alpha ml speech operations describe OPERATION_ID
+
+    To poll the operation until it's complete, run:
+
+        $ gcloud alpha ml speech operations wait OPERATION_ID
+
+POSITIONAL ARGUMENTS
+     AUDIO
+        The location of the audio file to transcribe. Must be a local path or a
+        Google Cloud Storage URL (in the format gs://bucket/object).
+
+REQUIRED FLAGS
+     --language-code=LANGUAGE_CODE
+        The language of the supplied audio as a BCP-47
+        (https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag. Example:
+        "en-US". See https://cloud.google.com/speech/docs/languages for a list
+        of the currently supported language codes.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --encoding=ENCODING; default="encoding-unspecified"
+        The type of encoding of the file. Required if the file format is not
+        WAV or FLAC. ENCODING must be one of: amr, amr-wb,
+        encoding-unspecified, flac, linear16, mulaw, ogg-opus,
+        speex-with-header-byte.
+
+     --filter-profanity
+        If True, the server will attempt to filter out profanities, replacing
+        all but the initial character in each filtered word with asterisks,
+        e.g. \"f**\".
+
+     --hints=[HINTS,...]
+        A list of strings containing word and phrase "hints" so that the speech
+        recognition is more likely to recognize them. This can be used to
+        improve the accuracy for specific words and phrases, for example, if
+        specific commands are typically spoken by the user. This can also be
+        used to add additional words to the vocabulary of the recognizer. See
+        https://cloud.google.com/speech/limits#content.
+
+     --include-word-time-offsets
+        If True, the top result includes a list of words with the start and end
+        time offsets (timestamps) for those words. If False, no word-level time
+        offset information is returned.
+
+     --max-alternatives=MAX_ALTERNATIVES; default=1
+        Maximum number of recognition hypotheses to be returned. The server may
+        return fewer than max_alternatives. Valid values are 0-30. A value of 0
+        or 1 will return a maximum of one.
+
+     --sample-rate=SAMPLE_RATE
+        The sample rate in Hertz. For best results, set the sampling rate of
+        the audio source to 16000 Hz. If that's not possible, use the native
+        sample rate of the audio source (instead of re-sampling).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the speech/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/speech/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml speech recognize-long-running
+        $ gcloud beta ml speech recognize-long-running
+

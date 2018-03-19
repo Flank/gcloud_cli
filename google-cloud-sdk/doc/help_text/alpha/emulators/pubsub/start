@@ -1,0 +1,49 @@
+NAME
+    gcloud alpha emulators pubsub start - start a local pubsub emulator
+
+SYNOPSIS
+    gcloud alpha emulators pubsub start [--data-dir=DATA_DIR]
+        [--host-port=HOST_PORT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command starts a local pubsub emulator.
+
+    On successful start up, you should expect to see:
+
+        ...
+        [pubsub] This is the Google Pub/Sub fake.
+        [pubsub] Implementation may be incomplete or differ from the real system.
+        ...
+        [pubsub] INFO: Server started, listening on 8538
+
+FLAGS
+     --data-dir=DATA_DIR
+        The directory to be used to store/retrieve data/config for an emulator
+        run. The default value is <USER_CONFIG_DIR>/emulators/pubsub. The value
+        of USER_CONFIG_DIR can be found by running:
+
+            $ gcloud info --format='get(config.paths.global_config_dir)'
+
+     --host-port=HOST_PORT
+        The host:port to which the emulator should be bound. The default value
+        is localhost:8085.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To start a local pubsub emulator, run:
+
+        $ gcloud alpha emulators pubsub start --data-dir DATA-DIR
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta emulators pubsub start
+

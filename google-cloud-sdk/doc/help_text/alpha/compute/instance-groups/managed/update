@@ -1,0 +1,91 @@
+NAME
+    gcloud alpha compute instance-groups managed update - update Google Compute
+        Engine managed instance groups
+
+SYNOPSIS
+    gcloud alpha compute instance-groups managed update NAME
+        [--add-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
+        [--remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
+        [--stateful-names] [--region=REGION | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instance-groups managed update allows to
+    update StatefulPolicy for a managed instance group. Stateful Policy defines
+    what stateful resources should be preserved for the group. When instances
+    in the group are removed or recreated, those stateful properties are always
+    applied to them. This command allows to change the preserved resources by
+    adding more disks or removing existing disks and to turn on and off
+    preserving instance names.
+
+    Example:
+
+        $ gcloud alpha compute instance-groups managed update \
+            example-group --add-stateful-disks my-disk-1,my-disk-2 \
+        --remove-stateful-disks my-disk-0
+
+    will for each instance mark disk my-disk-0 as not stateful and disks
+    my-disk-1 and my-disk-2 as stateful. That means that disks my-disk-1 and
+    my-disk-2 will be preserved when the instances get recreated or restarted,
+    while disk my-disk-0 will not be preserved anymore.
+
+    When there are any disks marked as stateful, the instances automatically
+    will be assigned stateful names as well. You cannot turn off stateful names
+    without marking all disks as non-stateful.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the managed instance group to update.
+
+FLAGS
+     --add-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]
+        Add more disks to be considered stateful by the instance group.
+        Usually, the managed instance group deletes disks when deleting
+        instances; however, in the case of stateful disks, these disks are
+        detached from the deleted instance and attached to new instances the
+        managed instance group creates.
+
+     --remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]
+        Stop considering the disks stateful by the instance group.
+
+     --stateful-names
+        Enable stateful names of instances. Whenever instances with those names
+        are restarted or recreated, they will have the same names as before.
+        Use --no-stateful-names to disable stateful names.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to update. If not specified,
+          you will be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          The zone of the managed instance group to update. If not specified,
+          you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

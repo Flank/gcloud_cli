@@ -1,0 +1,137 @@
+NAME
+    gcloud beta dataproc clusters update - update labels and/or the number of
+        worker nodes in a cluster
+
+SYNOPSIS
+    gcloud beta dataproc clusters update NAME [--async]
+        [--graceful-decommission-timeout=GRACEFUL_DECOMMISSION_TIMEOUT]
+        [--num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS]
+        [--num-workers=NUM_WORKERS] [--region=REGION]
+        [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--expiration-time=EXPIRATION_TIME | --max-age=MAX_AGE | --no-max-age]
+        [--max-idle=MAX_IDLE | --no-max-idle] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update the number of worker nodes and/or the labels in a cluster.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the cluster to update.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --graceful-decommission-timeout=GRACEFUL_DECOMMISSION_TIMEOUT
+        The graceful decommission timeout for decommissioning Node Managers in
+        the cluster, used when removing nodes. Graceful decommissioning allows
+        removing nodes from the cluster without interrupting jobs in progress.
+        Timeout specifies how long to wait for jobs in progress to finish
+        before forcefully removing nodes (and potentially interrupting jobs).
+        Timeout defaults to 0 if not set (for forceful decommission), and the
+        maximum allowed timeout is 1 day. See $ gcloud topic datetimes for
+        information on duration formats.
+
+     --num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS
+        The new number of preemptible worker nodes in the cluster.
+
+     --num-workers=NUM_WORKERS
+        The new number of worker nodes in the cluster.
+
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud beta dataproc clusters update --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud beta dataproc clusters update --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+     At most one of these may be specified:
+
+       --expiration-time=EXPIRATION_TIME
+          The time when cluster will be auto-deleted, such as
+          "2017-08-29T18:52:51.142Z". See $ gcloud topic datetimes for
+          information on time formats.
+
+       --max-age=MAX_AGE
+          The lifespan of the cluster before it is auto-deleted, such as "2h"
+          or "1d". See $ gcloud topic datetimes for information on duration
+          formats.
+
+       --no-max-age
+          Cancels the cluster auto-deletion by maximum cluster age (configured
+          by --max-age or --expiration-time flags)
+
+     At most one of these may be specified:
+
+       --max-idle=MAX_IDLE
+          The duration before cluster is auto-deleted after last job finished,
+          such as "2h" or "1d". See $ gcloud topic datetimes for information on
+          duration formats.
+
+       --no-max-idle
+          Cancels the cluster auto-deletion by cluster idle duration
+          (configured by --max-idle flag)
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To resize a cluster, run:
+
+        $ gcloud beta dataproc clusters update my_cluster --num-workers 5
+
+    To change the number preemptible workers in a cluster, run:
+
+        $ gcloud beta dataproc clusters update my_cluster \
+            --num-preemptible-workers 5
+
+    To add the label 'customer=acme' to a cluster, run:
+
+        $ gcloud beta dataproc clusters update my_cluster \
+            --update-labels=customer=acme
+
+    To update the label 'customer=ackme' to 'customer=acme', run:
+
+        $ gcloud beta dataproc clusters update my_cluster \
+            --update-labels=customer=acme
+
+    To remove the label whose key is 'customer', run:
+
+        $ gcloud beta dataproc clusters update my_cluster \
+            --remove-labels=customer
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc clusters update
+

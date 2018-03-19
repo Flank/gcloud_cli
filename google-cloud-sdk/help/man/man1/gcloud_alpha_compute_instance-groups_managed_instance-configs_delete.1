@@ -1,0 +1,121 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_INSTANCE\-GROUPS_MANAGED_INSTANCE\-CONFIGS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute instance\-groups managed instance\-configs delete \- delete per instance configs from managed instance group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute instance\-groups managed instance\-configs delete\fR \fINAME\fR \fB\-\-instances\fR=\fIINSTANCE\fR,[\fIINSTANCE\fR,...] [\fB\-\-force\-instance\-update\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed instance\-configs
+delete\fR deletes one or more per instance configs from a Google Compute Engine
+managed instance group.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the managed instance group to delete.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instances\fR=\fIINSTANCE\fR,[\fIINSTANCE\fR,...]
+Names of instances to delete instance\-configs from.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-force\-instance\-update\fR
+The changes will be applied immediately to the instances. If this flag is not
+provided, the changes will be applied once the instances are restarted or
+recreated.
+
+Example: let's say we have an instance with a disk attached to it and an
+override for the disk. If we decide to delete the override and provide this
+flag, this will instantly recreate the instance and detach the disk from it.
+Similarly if we have attached new disk or changed its definition \- with this
+flag it will instantly recreate instance with newly applied overrides.
+
+If we omit this flag, the instance will continue to exist with no overrides
+changes applied until it gets restarted or recreated either manually or by
+autohealer or updater.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the managed instance group to delete. If not specified, you will
+be prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the managed instance group to delete. If not specified, you may be
+prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

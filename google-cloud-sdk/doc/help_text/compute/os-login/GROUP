@@ -1,0 +1,39 @@
+NAME
+    gcloud compute os-login - create and manipulate Google Compute Engine OS
+        Login resources
+
+SYNOPSIS
+    gcloud compute os-login GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The gcloud oslogin command group lets you manage your Google OS Login
+    profile. OS Login profiles can be used to store infomation such as Posix
+    account information and SSH keys used for other Google Cloud Platform
+    products such as Google Compute Engine.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     ssh-keys
+        List, add, update, and remove OS Login SSH Keys.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe-profile
+        Describe the OS Login profile for the current user.
+
+     remove-profile
+        Remove the posix account information for the current user.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute os-login
+        $ gcloud beta compute os-login
+

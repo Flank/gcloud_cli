@@ -1,0 +1,119 @@
+
+.TH "GCLOUD_BETA_IAM_ROLES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta iam roles update \- update an IAM custom role
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta iam roles update\fR \fIROLE_ID\fR [\fB\-\-file\fR=\fIFILE\fR] [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fB\-\-add\-permissions\fR=\fIADD_PERMISSIONS\fR\ \fB\-\-description\fR=\fIDESCRIPTION\fR\ \fB\-\-permissions\fR=\fIPERMISSIONS\fR\ \fB\-\-remove\-permissions\fR=\fIREMOVE_PERMISSIONS\fR\ \fB\-\-stage\fR=\fISTAGE\fR\ \fB\-\-title\fR=\fITITLE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command updates an IAM custom role.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIROLE_ID\fR
+The id of the custom role to update. For example: CustomRole. You must also
+specify the \f5\-\-organization\fR or \f5\-\-project\fR flag.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-file\fR=\fIFILE\fR
+The Yaml file you want to use to update a role. Can not be specified with other
+flags except role\-id.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization of the role you want to update.
+
+.TP 2m
+
+The following flags determine the fields need to be updated. You can update a
+role by specifying the following flags, or you can update a role from a Yaml
+file by specifying the file flag.
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-permissions\fR=\fIADD_PERMISSIONS\fR
+The permissions you want to add to the role. Use commas to separate them.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+The description of the role you want to update.
+
+.TP 2m
+\fB\-\-permissions\fR=\fIPERMISSIONS\fR
+The permissions of the role you want to set. Use commas to separate them.
+
+.TP 2m
+\fB\-\-remove\-permissions\fR=\fIREMOVE_PERMISSIONS\fR
+The permissions you want to remove from the role. Use commas to separate them.
+
+.TP 2m
+\fB\-\-stage\fR=\fISTAGE\fR
+The state of the role you want to update.
+
+.TP 2m
+\fB\-\-title\fR=\fITITLE\fR
+The title of the role you want to update.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a role from a Yaml file, run:
+
+.RS 2m
+$ gcloud beta iam roles update viewer \-\-organization 123 \e
+    \-\-file role_file_path
+.RE
+
+To update a role with flags, run:
+
+.RS 2m
+$ gcloud beta iam roles update viewer \-\-project myproject \e
+    \-\-permissions permission1,permission2
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud iam roles update
+.RE
+

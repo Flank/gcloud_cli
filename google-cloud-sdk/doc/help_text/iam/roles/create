@@ -1,0 +1,66 @@
+NAME
+    gcloud iam roles create - create a custom role for a project or an
+        organization
+
+SYNOPSIS
+    gcloud iam roles create ROLE_ID [--organization=ORGANIZATION]
+        [--file=FILE | --description=DESCRIPTION
+          --permissions=PERMISSIONS --stage=STAGE --title=TITLE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command creates a custom role with the provided information.
+
+POSITIONAL ARGUMENTS
+     ROLE_ID
+        The id of the custom role to create. For example: CustomRole. You must
+        also specify the --organization or --project flag.
+
+FLAGS
+     --organization=ORGANIZATION
+        The organization of the role you want to create.
+
+     At most one of these may be specified:
+
+       --file=FILE
+          The JSON or YAML file with the IAM Role to create. See
+          https://cloud.google.com/iam/reference/rest/v1/projects.roles.
+
+       Roles Settings
+
+         --description=DESCRIPTION
+            The description of the role you want to create.
+
+         --permissions=PERMISSIONS
+            The permissions of the role you want to create. Use commas to
+            separate them.
+
+         --stage=STAGE
+            The state of the role you want to create.
+
+         --title=TITLE
+            The title of the role you want to create.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a custom role from a yaml file, run:
+
+        $ gcloud iam roles create viewer --organization 12345 \
+            --file role_file_path
+
+    To create a custom role with flags, run:
+
+        $ gcloud iam roles create editor --project myproject \
+            --title myrole --description \
+            "Have access to get and update the project" --permissions \
+            resourcemanager.projects.get,resourcemanager.projects.update
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta iam roles create
+

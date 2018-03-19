@@ -1,0 +1,185 @@
+
+.TH "GCLOUD_COMPUTE_SCP" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute scp \- copy files to and from Google Compute Engine virtual machines via scp
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute scp\fR [[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR\ ...] [[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR [\fB\-\-compress\fR] [\fB\-\-dry\-run\fR] [\fB\-\-force\-key\-file\-overwrite\fR] [\fB\-\-plain\fR] [\fB\-\-port\fR=\fIPORT\fR] [\fB\-\-recurse\fR] [\fB\-\-scp\-flag\fR=\fISCP_FLAG\fR] [\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR] [\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute scp\fR securely copies files between a virtual machine
+instance and your local machine using the scp command. **This command does not
+work for Windows VMs.**
+
+In order to set up a successful transfer, follow these guidelines:
+.RS 2m
+.IP "\(bu" 2m
+Prefix remote file names with the virtual machine instance name (e.g.,
+\fIexample\-instance\fR:~/\fIFILE\fR).
+.IP "\(bu" 2m
+Local file names can be used as is (e.g., ~/\fIFILE\fR).
+.IP "\(bu" 2m
+File names containing a colon (``:'') must be invoked by either their absolute
+path or a path that begins with ``./''.
+.IP "\(bu" 2m
+When the destination of your transfer is local, all source files must be from
+the same virtual machine.
+.IP "\(bu" 2m
+When the destination of your transfer is remote instead, all sources must be
+local.
+.RE
+.sp
+
+To copy a remote directory, \f5~/narnia\fR, from \f5\fIexample\-instance\fR\fR
+to the \f5~/wardrobe\fR directory of your local host, run:
+
+.RS 2m
+$ gcloud compute scp example\-instance:~/narnia ~/wardrobe
+.RE
+
+Conversely, files from your local computer can be copied to a virtual machine:
+
+.RS 2m
+$ gcloud compute scp ~/localtest.txt ~/localtest2.txt \e
+    example\-instance:~/narnia
+.RE
+
+If the zone cannot be determined, you will be prompted for it. Use the
+\f5\-\-zone\fR flag to avoid being prompted:
+
+.RS 2m
+$ gcloud compute scp example\-instance:~/narnia ~/wardrobe \e
+    \-\-zone us\-central1\-a
+.RE
+
+Under the covers, \fBscp(1)\fR is used to facilitate the transfer.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR [[[\fIUSER\fR@]\fIINSTANCE\fR:]\fISRC\fR ...]
+Specifies the files to copy.
+
+.TP 2m
+[[\fIUSER\fR@]\fIINSTANCE\fR:]\fIDEST\fR
+Specifies a destination for the source files.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-compress\fR
+Enable compression.
+
+.TP 2m
+\fB\-\-dry\-run\fR
+Print the equivalent scp/ssh command that would be run to stdout, instead of
+executing it.
+
+.TP 2m
+\fB\-\-force\-key\-file\-overwrite\fR
+If enabled, the gcloud command\-line tool will regenerate and overwrite the
+files associated with a broken SSH key without asking for confirmation in both
+interactive and non\-interactive environments.
+
+If disabled, the files associated with a broken SSH key will not be regenerated
+and will fail in both interactive and non\-interactive environments.
+
+.TP 2m
+\fB\-\-plain\fR
+Suppress the automatic addition of \fBssh(1)\fR/\fBscp(1)\fR flags. This flag is
+useful if you want to take care of authentication yourself or use specific
+ssh/scp features.
+
+.TP 2m
+\fB\-\-port\fR=\fIPORT\fR
+The port to connect to.
+
+.TP 2m
+\fB\-\-recurse\fR
+Upload directories recursively.
+
+.TP 2m
+\fB\-\-scp\-flag\fR=\fISCP_FLAG\fR
+Extra flag to be sent to scp. This flag may be repeated.
+
+.TP 2m
+\fB\-\-ssh\-key\-file\fR=\fISSH_KEY_FILE\fR
+The path to the SSH key file. By default, this is
+\f5\fI~/.ssh/google_compute_engine\fR\fR.
+
+.TP 2m
+\fB\-\-strict\-host\-key\-checking\fR=\fISTRICT_HOST_KEY_CHECKING\fR
+Override the default behavior of StrictHostKeyChecking for the connection. By
+default, StrictHostKeyChecking is set to 'no' the first time you connect to an
+instance, and will be set to 'yes' for all subsequent connections.
+\fISTRICT_HOST_KEY_CHECKING\fR must be one of: \fByes\fR, \fBno\fR, \fBask\fR.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the instance to copy files to/from.
+
+If not specified and the \f5\fIcompute/zone\fR\fR property isn't set, you will
+be prompted to select a zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute scp
+$ gcloud beta compute scp
+.RE
+

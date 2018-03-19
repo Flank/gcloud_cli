@@ -1,0 +1,35 @@
+NAME
+    gcloud spanner - command groups for Cloud Spanner
+
+SYNOPSIS
+    gcloud spanner GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Command groups for Cloud Spanner.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     databases
+        Manage Cloud Spanner databases.
+
+     instance-configs
+        Manage Cloud Spanner instance configs.
+
+     instances
+        Manage Cloud Spanner instances.
+
+     operations
+        Manage Cloud Spanner operations.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha spanner
+        $ gcloud beta spanner
+

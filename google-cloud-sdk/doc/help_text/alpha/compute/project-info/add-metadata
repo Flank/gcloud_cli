@@ -1,0 +1,68 @@
+NAME
+    gcloud alpha compute project-info add-metadata - add or update project-wide
+        metadata
+
+SYNOPSIS
+    gcloud alpha compute project-info add-metadata
+        [--metadata=KEY=VALUE,[KEY=VALUE,...]]
+        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute project-info add-metadata can be used to add
+    or update project-wide metadata. Every instance has access to a metadata
+    server that can be used to query metadata that has been set through this
+    tool. Project-wide metadata entries are visible to all instances. To set
+    metadata for individual instances, use gcloud compute instances
+    add-metadata. For information on metadata, see
+    https://cloud.google.com/compute/docs/metadata
+
+    Only metadata keys that are provided are mutated. Existing metadata entries
+    will remain unaffected.
+
+FLAGS
+     --metadata=KEY=VALUE,[KEY=VALUE,...]
+        Metadata to be made available to the guest operating system running on
+        the instances. Each metadata entry is a key/value pair separated by an
+        equals sign. Metadata keys must be unique and less than 128 bytes in
+        length. Values must be less than or equal to 32,768 bytes in length.
+        Multiple arguments can be passed to this flag, e.g., --metadata
+        key-1=value-1,key-2=value-2,key-3=value-3.
+
+        In images that have Compute Engine tools installed on them, such as the
+        official images (https://cloud.google.com/compute/docs/images), the
+        following metadata keys have special meanings:
+
+         startup-script
+            Specifies a script that will be executed by the instances once they
+            start running. For convenience, --metadata-from-file can be used to
+            pull the value from a file.
+
+         startup-script-url
+            Same as startup-script except that the script contents are pulled
+            from a publicly-accessible location on the web.
+
+    At least one of [--metadata] or [--metadata-from-file] is required.
+
+     --metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]
+        Same as --metadata except that the value for the entry will be read
+        from a local file. This is useful for values that are too large such as
+        startup-script contents.
+
+    At least one of [--metadata] or [--metadata-from-file] is required.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute project-info add-metadata
+        $ gcloud beta compute project-info add-metadata
+

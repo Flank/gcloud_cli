@@ -1,0 +1,74 @@
+
+.TH "GCLOUD_BETA_BILLING_ACCOUNTS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta billing accounts describe \- show metadata for a billing account
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta billing accounts describe\fR \fIACCOUNT_ID\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command shows info for a billing account, given its ID.
+
+This call can fail for the following reasons:
+
+.RS 2m
+.IP "\(bu" 2m
+The account specified does not exist.
+.IP "\(bu" 2m
+The active user does not have permission to access the given account.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIACCOUNT_ID\fR
+Specify a billing account ID. Billing account IDs are of the form
+\f50X0X0X\-0X0X0X\-0X0X0X\fR. To see available IDs, run \f5$ gcloud alpha
+billing accounts list\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To see details for billing account \f50X0X0X\-0X0X0X\-0X0X0X\fR, run:
+
+.RS 2m
+$ gcloud beta billing accounts describe 0X0X0X\-0X0X0X\-0X0X0X
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha billing accounts describe
+.RE
+

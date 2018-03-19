@@ -1,0 +1,58 @@
+
+.TH "GCLOUD_BETA_SQL_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta sql export \- provide commands to export Cloud SQL instances
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta sql export\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Provide commands to export Cloud SQL instances.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcsv\fR
+\fB(BETA)\fR Exports data from a Cloud SQL instance to a CSV file.
+
+.TP 2m
+\fBsql\fR
+\fB(BETA)\fR Exports data from a Cloud SQL instance to a SQL file.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud sql export
+.RE
+

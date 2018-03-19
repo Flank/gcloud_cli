@@ -1,0 +1,62 @@
+NAME
+    gcloud beta compute interconnects attachments create - create a Google
+        Compute Engine interconnect attachment
+
+SYNOPSIS
+    gcloud beta compute interconnects attachments create NAME
+        --interconnect=INTERCONNECT --router=ROUTER [--description=DESCRIPTION]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute interconnects attachments create is used to
+    create interconnect attachments. An interconnect attachment is what binds
+    the underlying connectivity of an Interconnect to a path into and out of
+    the customer's cloud network.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the interconnect attachment to create.
+
+REQUIRED FLAGS
+     --interconnect=INTERCONNECT
+        The interconnect for the interconnect attachment
+
+     --router=ROUTER
+        The Google Cloud Router to use for dynamic routing.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional, textual description for the interconnect attachment.
+
+     --region=REGION
+        The region of the interconnect attachment to create. If not specified,
+        you will be prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute interconnects attachments create
+        $ gcloud alpha compute interconnects attachments create
+

@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_ALPHA_SPANNER_OPERATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha spanner operations describe \- describe a Cloud Spanner operation
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha spanner operations describe\fR \fIOPERATION\-ID\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-database\fR=\fIDATABASE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describe a Cloud Spanner operation.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIOPERATION\-ID\fR
+ID of the operation
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+The ID of the instance the operation is executing on.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-database\fR=\fIDATABASE\fR
+For a database operation, the name of the database the operation is executing
+on.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud spanner operations describe
+$ gcloud beta spanner operations describe
+.RE
+

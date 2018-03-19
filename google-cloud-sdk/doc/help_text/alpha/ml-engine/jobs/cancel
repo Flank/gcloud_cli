@@ -1,0 +1,30 @@
+NAME
+    gcloud alpha ml-engine jobs cancel - cancel a running Cloud ML Engine job
+
+SYNOPSIS
+    gcloud alpha ml-engine jobs cancel JOB [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha ml-engine jobs cancel cancels a running Cloud ML
+    Engine job. If the job is already finished, the command will not perform an
+    operation and exit successfully.
+
+POSITIONAL ARGUMENTS
+     JOB
+        Name of the job.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud ml-engine jobs cancel
+        $ gcloud beta ml-engine jobs cancel
+

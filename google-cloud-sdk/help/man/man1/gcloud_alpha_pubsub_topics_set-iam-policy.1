@@ -1,0 +1,74 @@
+
+.TH "GCLOUD_ALPHA_PUBSUB_TOPICS_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha pubsub topics set\-iam\-policy \- set IAM policy for a topic
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha pubsub topics set\-iam\-policy\fR \fITOPIC\fR \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Set the IAM policy for a Cloud Pub/Sub Topic.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fITOPIC\fR
+Name of the topic to set an IAM policy on.
+
+.TP 2m
+\fIPOLICY_FILE\fR
+JSON or YAML file with the IAM policy
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will read an IAM policy defined in a JSON file
+\'policy.json' and set it for a topic with identifier 'my\-topic'
+
+.RS 2m
+$ gcloud alpha pubsub topics set\-iam\-policy my\-topic policy.json
+.RE
+
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta pubsub topics set\-iam\-policy
+.RE
+

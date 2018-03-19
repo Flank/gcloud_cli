@@ -1,0 +1,132 @@
+
+.TH "GCLOUD_ALPHA_CONTAINER_IMAGES_LIST\-TAGS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha container images list\-tags \- list tags and digests for the specified image
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha container images list\-tags\fR \fIIMAGE_NAME\fR [\fB\-\-occurrence\-filter\fR=\fIOCCURRENCE_FILTER\fR;\ default='kind\ =\ "BUILD_DETAILS"\ OR\ kind\ =\ "IMAGE_BASIS"'] [\fB\-\-show\-occurrences\fR] [\fB\-\-show\-occurrences\-from\fR=\fISHOW_OCCURRENCES_FROM\fR;\ default=10] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...];\ default="~timestamp"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR The container images list\-tags command of gcloud lists metadata
+about tags and digests for the specified container image. Images must be hosted
+by the Google Container Registry.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE_NAME\fR
+The name of the image to list tags for. The name format should be
+*.gcr.io/PROJECT_ID/IMAGE_PATH[:TAG|@sha256:DIGEST].
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-occurrence\-filter\fR=\fIOCCURRENCE_FILTER\fR; default='kind = "BUILD_DETAILS" OR kind = "IMAGE_BASIS"'
+A filter for the Occurrences which will be summarized.
+
+.TP 2m
+\fB\-\-show\-occurrences\fR
+Whether to show summaries of the various Occurrence types.
+
+.TP 2m
+\fB\-\-show\-occurrences\-from\fR=\fISHOW_OCCURRENCES_FROM\fR; default=10
+How many of the most recent images for which to summarize Occurences.
+
+
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates True then that item is listed. For more details and
+examples of filter expressions run $ gcloud topic filters. This flag interacts
+with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]; default="~timestamp"
+A comma\-separated list of resource field key names to sort by. The default
+order is ascending. Prefix a field with ``~'' for descending order on that
+field. This flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR. The
+default is \fB~timestamp\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+List the tags in a specified image:
+
+.RS 2m
+$ gcloud alpha container images list\-tags gcr.io/myproject/myimage
+.RE
+
+To receive the full, JSON\-formatted output (with untruncated digests):
+
+.RS 2m
+$ gcloud alpha container images list\-tags gcr.io/myproject/myimage \e
+    \-\-format=json
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud container images list\-tags
+$ gcloud beta container images list\-tags
+.RE
+

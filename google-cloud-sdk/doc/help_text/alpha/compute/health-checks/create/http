@@ -1,0 +1,101 @@
+NAME
+    gcloud alpha compute health-checks create http - create a HTTP health check
+        to monitor load balanced instances
+
+SYNOPSIS
+    gcloud alpha compute health-checks create http NAME
+        [--check-interval=CHECK_INTERVAL; default="5s"]
+        [--description=DESCRIPTION]
+        [--healthy-threshold=HEALTHY_THRESHOLD; default=2] [--host=HOST]
+        [--port=PORT; default=80] [--port-name=PORT_NAME]
+        [--proxy-header=PROXY_HEADER; default="NONE"]
+        [--request-path=REQUEST_PATH; default="/"] [--response=RESPONSE]
+        [--timeout=TIMEOUT; default="5s"]
+        [--unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute health-checks create http is used to create a
+    HTTP health check. HTTP health checks monitor instances in a load balancer
+    controlled by a target pool. All arguments to the command are optional
+    except for the name of the health check. For more information on load
+    balancing, see
+    https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the HTTP health check to create.
+
+FLAGS
+     --check-interval=CHECK_INTERVAL; default="5s"
+        How often to perform a health check for an instance. For example,
+        specifying 10s will run the check every 10 seconds. The default value
+        is 5s. See $ gcloud topic datetimes for information on duration
+        formats.
+
+     --description=DESCRIPTION
+        An optional string description for the HTTP health check.
+
+     --healthy-threshold=HEALTHY_THRESHOLD; default=2
+        The number of consecutive successful health checks before an unhealthy
+        instance is marked as healthy. The default is 2.
+
+     --host=HOST
+        The value of the host header used in this HTTP health check request. By
+        default, this is empty and Google Compute Engine automatically sets the
+        host header in health requests to the same external IP address as the
+        forwarding rule associated with the target pool.
+
+     --port=PORT; default=80
+        The TCP port number that this health check monitors. The default value
+        is 80.
+
+     --port-name=PORT_NAME
+        The port name that this health check monitors. By default, this is
+        empty.
+
+     --proxy-header=PROXY_HEADER; default="NONE"
+        The type of proxy protocol header to be sent to the backend.
+        PROXY_HEADER must be one of:
+
+         NONE
+            No proxy header is added.
+         PROXY_V1
+            Adds the header "PROXY UNKNOWN\r\n".
+
+     --request-path=REQUEST_PATH; default="/"
+        The request path that this health check monitors. For example,
+        /healthcheck. The default value is ``/''.
+
+     --response=RESPONSE
+        When empty, status code of the response determines health. When not
+        empty, presence of specified string in first 1024 characters of
+        response body determines health. Only ASCII characters allowed.
+
+     --timeout=TIMEOUT; default="5s"
+        If Google Compute Engine doesn't receive a healthy response from the
+        instance by the time specified by the value of this flag, the health
+        check request is considered a failure. For example, specifying 10s will
+        cause the check to wait for 10 seconds before considering the request a
+        failure. The default value is 5s. See $ gcloud topic datetimes for
+        information on duration formats.
+
+     --unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2
+        The number of consecutive health check failures before a healthy
+        instance is marked as unhealthy. The default is 2.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute health-checks create http
+        $ gcloud beta compute health-checks create http
+

@@ -1,0 +1,43 @@
+NAME
+    gcloud meta list-commands - list all possible gcloud commands excluding
+        flags
+
+SYNOPSIS
+    gcloud meta list-commands [COMMAND/GROUP ...] [--completions]
+        [--flag-values] [--flags] [--hidden] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List all possible gcloud commands excluding flags.
+
+POSITIONAL ARGUMENTS
+     [COMMAND/GROUP ...]
+        Restrict the listing to these dotted command paths. For example:
+        gcloud.alpha gcloud.beta.test
+
+FLAGS
+     --completions
+        Write the static TAB completion data on the standard output. The data
+        is a shell script containing variable definitons of the form
+        _SC_{COMMAND.PATH} for each dotted command path.
+
+     --flag-values
+        Include the non-global flags and flag values/types for each
+        command/group. Flags with fixed choice values will be listed as
+        --flag=choice1,..., and flags with typed values will be listed as
+        --flag=:type:.
+
+     --flags
+        Include the non-global flags for each command/group.
+
+     --hidden
+        Include hidden commands and groups.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

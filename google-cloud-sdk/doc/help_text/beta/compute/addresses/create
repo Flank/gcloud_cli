@@ -1,0 +1,96 @@
+NAME
+    gcloud beta compute addresses create - reserve IP addresses
+
+SYNOPSIS
+    gcloud beta compute addresses create [NAME ...] [--description=DESCRIPTION]
+        [--subnet=SUBNET]
+        [--addresses=ADDRESS,[ADDRESS,...] | --ip-version=IP_VERSION]
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute addresses create is used to reserve one or more
+    IP addresses. Once an IP address is reserved, it will be associated with
+    the project until it is released using 'gcloud compute addresses delete'.
+    Ephemeral IP addresses that are in use by resources in the project, can be
+    reserved using the --addresses flag.
+
+POSITIONAL ARGUMENTS
+     [NAME ...]
+        The names of the addresses to create.
+
+FLAGS
+     --description=DESCRIPTION
+        An optional textual description for the addresses.
+
+     --subnet=SUBNET
+        If specified, the subnet name in which the address(es) should be
+        reserved. The subnet must be in the same region as the address.
+
+        The address will represent an internal IP reservation from within the
+        subnet. If --address is specified, it must be within the subnet's IP
+        range.
+
+        May not be specified with --global.
+
+     At most one of these may be specified:
+
+       --addresses=ADDRESS,[ADDRESS,...]
+          Ephemeral IP addresses to promote to reserved status. Only addresses
+          that are being used by resources in the project can be promoted. When
+          providing this flag, a parallel list of names for the addresses can
+          be provided. For example,
+
+              $ gcloud beta compute addresses create ADDRESS-1 ADDRESS-2         \
+                    --addresses 162.222.181.197,162.222.181.198             \
+                --region us-central1
+
+          will result in 162.222.181.197 being reserved as 'ADDRESS-1' and
+          162.222.181.198 as 'ADDRESS-2'. If no names are given,
+          server-generated names will be assigned to the IP addresses.
+
+       --ip-version=IP_VERSION
+          The version of the IP address to be allocated and reserved if
+          --addresses is not used. The default is IPv4. IP_VERSION must be one
+          of: IPV4, IPV6.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, it is assumed the addresses are global.
+
+       --region=REGION
+          The region of the addresses to create. Overrides the default
+          compute/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To reserve three IP addresses in the us-central1 region, run:
+
+        $ gcloud beta compute addresses create ADDRESS-1 ADDRESS-2 \
+            ADDRESS-3 --region us-central1
+
+    To reserve ephemeral IP addresses 162.222.181.198 and 23.251.146.189 which
+    are being used by virtual machine instances in the us-central1 region, run:
+
+        $ gcloud beta compute addresses create \
+            --addresses 162.222.181.198,23.251.146.189 --region us-central1
+
+    In the above invocation, the two addresses will be assigned random names.
+
+    To reserve an IP address from the subnet default in the us-central1 region,
+    run:
+
+        $ gcloud beta compute addresses create SUBNET-ADDRESS-1 \
+            --region us-central1 --subnet default
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute addresses create
+        $ gcloud alpha compute addresses create
+

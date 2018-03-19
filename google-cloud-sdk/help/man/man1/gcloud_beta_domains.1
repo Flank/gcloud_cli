@@ -1,0 +1,75 @@
+
+.TH "GCLOUD_BETA_DOMAINS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta domains \- manage domains for your Google Cloud projects
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta domains\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR The gcloud domains command group lets you view and manage your
+custom domains for use across Google projects.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBlist\-user\-verified\fR
+\fB(BETA)\fR Lists the user's verified domains.
+
+.TP 2m
+\fBverify\fR
+\fB(BETA)\fR Verifies a domain via an in\-browser workflow.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To verify a domain you own, run:
+
+.RS 2m
+$ gcloud beta domains verify example.com
+.RE
+
+To list your verified domains, run:
+
+.RS 2m
+$ gcloud beta domains list\-user\-verified
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud domains
+.RE
+

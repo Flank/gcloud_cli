@@ -1,0 +1,26 @@
+NAME
+    gcloud feedback - provide feedback to the Google Cloud SDK team
+
+SYNOPSIS
+    gcloud feedback [--log-file=LOG_FILE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    The Google Cloud SDK team offers support through a number of channels:
+
+      o Google Cloud SDK Issue Tracker
+      o Stack Overflow "#gcloud" tag
+      o google-cloud-dev Google group
+
+    This command lists the available channels and facilitates getting help
+    through one of them by opening a web browser to the relevant page, possibly
+    with information relevant to the current install and configuration
+    pre-populated in form fields on that page.
+
+FLAGS
+     --log-file=LOG_FILE
+        Path to the log file from a prior gcloud run.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.

@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_ALPHA_CONTAINER_IMAGES_UNTAG" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha container images untag \- remove existing image tags
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha container images untag\fR \fIIMAGE_NAME\fR [\fIIMAGE_NAME\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR The container images untag command removes the specified tag from
+the image.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE_NAME\fR [\fIIMAGE_NAME\fR ...]
+The fully qualified name(s) of image(s) to untag. The name(s) should be
+formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH:TAG.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+Removes the tag from the input IMAGE_NAME:
+
+.RS 2m
+$ gcloud alpha container images untag <IMAGE_NAME>
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud container images untag
+$ gcloud beta container images untag
+.RE
+

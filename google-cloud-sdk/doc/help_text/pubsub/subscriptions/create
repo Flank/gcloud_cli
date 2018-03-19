@@ -1,0 +1,54 @@
+NAME
+    gcloud pubsub subscriptions create - creates one or more Cloud Pub/Sub
+        subscriptions
+
+SYNOPSIS
+    gcloud pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
+        (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
+        [--ack-deadline=ACK_DEADLINE] [--push-endpoint=PUSH_ENDPOINT]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Creates one or more Cloud Pub/Sub subscriptions for a given topic. The new
+    subscription defaults to a PULL subscription unless a push endpoint is
+    specified.
+
+POSITIONAL ARGUMENTS
+     SUBSCRIPTION [SUBSCRIPTION ...]
+        One or more subscriptions to create.
+
+REQUIRED FLAGS
+     TOPIC - Name of the topic from which this subscription is receiving
+     messages. Each subscription is attached to a single topic. The arguments
+     in this group can be used to specify the attributes of this resource. This
+     must be specified.
+
+       --topic=TOPIC
+          The ID of the topic or a fully qualified identifier for the topic.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
+
+       --topic-project=TOPIC_PROJECT
+          The Cloud project for the topic. If not set, it will use the project
+          set in properties.
+
+OPTIONAL FLAGS
+     --ack-deadline=ACK_DEADLINE
+        The number of seconds the system will wait for a subscriber to
+        acknowledge receiving a message before re-attempting delivery.
+
+     --push-endpoint=PUSH_ENDPOINT
+        A URL to use as the endpoint for this subscription. This will also
+        automatically set the subscription type to PUSH.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha pubsub subscriptions create
+        $ gcloud beta pubsub subscriptions create
+

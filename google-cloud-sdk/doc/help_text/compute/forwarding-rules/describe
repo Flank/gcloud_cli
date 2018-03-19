@@ -1,0 +1,63 @@
+NAME
+    gcloud compute forwarding-rules describe - display detailed information
+        about a forwarding rule
+
+SYNOPSIS
+    gcloud compute forwarding-rules describe NAME [--global | --region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute forwarding-rules describe displays all data associated with
+    a forwarding rule in a project.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the forwarding rule to describe.
+
+FLAGS
+     At most one of these may be specified:
+
+       --global
+          If provided, it is assumed the forwarding rule is global.
+
+       --region=REGION
+          The region of the forwarding rule to describe. If not specified, you
+          will be prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To get details about a global forwarding rule, run:
+
+        $ gcloud compute forwarding-rules describe FORWARDING-RULE --global
+
+    To get details about a regional forwarding rule, run:
+
+        $ gcloud compute forwarding-rules describe FORWARDING-RULE \
+            --region us-central1
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute forwarding-rules describe
+        $ gcloud beta compute forwarding-rules describe
+

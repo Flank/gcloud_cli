@@ -1,0 +1,40 @@
+NAME
+    gcloud meta cli-trees update - updates gcloud CLI command trees in the
+        installation directory
+
+SYNOPSIS
+    gcloud meta cli-trees update [--commands=[COMMAND,...]]
+        [--directory=DIRECTORY] [--force] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    A CLI tree is a module or JSON file that describes a command and its
+    subcommands, flags, arguments, help text and TAB completers. gcloud
+    interactive uses CLI trees for typeahead, command line completion, and
+    as-you-type documentation.
+
+    Most CLI tree files are cached in the cli subdirectory of the gcloud
+    installation root directory. The cache is automatically updated by the
+    Cloud SDK installers and the gcloud components command group.
+
+    These CLIs are currently supported: bq, gcloud, gsutil, kubectl.
+
+FLAGS
+     --commands=[COMMAND,...]
+        Update only the commands in this list.
+
+     --directory=DIRECTORY
+        Update this directory instead of the default installation directory.
+
+     --force
+        Force existing CLI trees to be out of date. This causes them to be
+        regenerated.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

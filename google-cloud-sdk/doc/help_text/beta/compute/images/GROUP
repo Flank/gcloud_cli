@@ -1,0 +1,55 @@
+NAME
+    gcloud beta compute images - list, create, and delete Google Compute Engine
+        images
+
+SYNOPSIS
+    gcloud beta compute images COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) List, create, and delete Google Compute Engine images.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-labels
+        (BETA) Add labels to Google Compute Engine images.
+
+     create
+        (BETA) Create Google Compute Engine images.
+
+     delete
+        (BETA) Delete Google Compute Engine images.
+
+     deprecate
+        (BETA) Manage deprecation status of Google Compute Engine images.
+
+     describe
+        (BETA) Describe a Google Compute Engine image.
+
+     describe-from-family
+        (BETA) Describe the latest image from an image family.
+
+     import
+        (BETA) Import a Google Compute Engine image.
+
+     list
+        (BETA) List Google Compute Engine images.
+
+     remove-labels
+        (BETA) Remove labels from Google Compute Engine images.
+
+     update
+        (BETA) Update a Google Compute Engine image.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute images
+        $ gcloud alpha compute images
+

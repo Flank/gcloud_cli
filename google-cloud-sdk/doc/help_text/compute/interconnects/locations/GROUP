@@ -1,0 +1,30 @@
+NAME
+    gcloud compute interconnects locations - read and manipulate Google Compute
+        Engine interconnect locations
+
+SYNOPSIS
+    gcloud compute interconnects locations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Read and manipulate Google Compute Engine interconnect locations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        Describe a Google Compute Engine interconnect location.
+
+     list
+        List Google Compute Engine interconnect locations.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute interconnects locations
+        $ gcloud beta compute interconnects locations
+

@@ -1,0 +1,215 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_INSTANCES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute instances \- read and manipulate Google Compute Engine virtual machine instances
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute instances\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Read and manipulate Google Compute Engine virtual machine
+instances.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBnetwork\-interfaces\fR
+\fB(ALPHA)\fR Read and manipulate Google Compute Engine instance network
+interfaces.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBadd\-access\-config\fR
+\fB(ALPHA)\fR Create a Google Compute Engine virtual machine access
+configuration.
+
+.TP 2m
+\fBadd\-labels\fR
+\fB(ALPHA)\fR Add labels to Google Compute Engine virtual machine instances.
+
+.TP 2m
+\fBadd\-maintenance\-policies\fR
+\fB(ALPHA)\fR Adds maintenance policies to Google Compute Engine VM instances.
+
+.TP 2m
+\fBadd\-metadata\fR
+\fB(ALPHA)\fR Add or update instance metadata.
+
+.TP 2m
+\fBadd\-tags\fR
+\fB(ALPHA)\fR Add tags to Google Compute Engine virtual machine instances.
+
+.TP 2m
+\fBattach\-disk\fR
+\fB(ALPHA)\fR Attach a disk to an instance.
+
+.TP 2m
+\fBcreate\fR
+\fB(ALPHA)\fR Create Google Compute Engine virtual machine instances.
+
+.TP 2m
+\fBcreate\-with\-container\fR
+\fB(ALPHA)\fR Creates Google Compute engine virtual machine instances running
+container images.
+
+.TP 2m
+\fBdelete\fR
+\fB(ALPHA)\fR Delete Google Compute Engine virtual machine instances.
+
+.TP 2m
+\fBdelete\-access\-config\fR
+\fB(ALPHA)\fR Delete an access configuration from a virtual machine network
+interface.
+
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Describe a virtual machine instance.
+
+.TP 2m
+\fBdetach\-disk\fR
+\fB(ALPHA)\fR Detach disks from Compute Engine virtual machine instances.
+
+.TP 2m
+\fBget\-serial\-port\-output\fR
+\fB(ALPHA)\fR Read output from a virtual machine instance's serial port.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List Google Compute Engine instances.
+
+.TP 2m
+\fBmove\fR
+\fB(ALPHA)\fR Move an instance and its attached persistent disks between zones.
+
+.TP 2m
+\fBremove\-labels\fR
+\fB(ALPHA)\fR Remove labels from Google Compute Engine virtual machine
+instances.
+
+.TP 2m
+\fBremove\-maintenance\-policies\fR
+\fB(ALPHA)\fR Removes maintenance policies to Google Compute Engine VM
+instances.
+
+.TP 2m
+\fBremove\-metadata\fR
+\fB(ALPHA)\fR Remove instance metadata.
+
+.TP 2m
+\fBremove\-tags\fR
+\fB(ALPHA)\fR Remove tags from Google Compute Engine virtual machine instances.
+
+.TP 2m
+\fBreset\fR
+\fB(ALPHA)\fR Reset a virtual machine instance.
+
+.TP 2m
+\fBresume\fR
+\fB(ALPHA)\fR Resume a virtual machine instance.
+
+.TP 2m
+\fBset\-disk\-auto\-delete\fR
+\fB(ALPHA)\fR Set auto\-delete behavior for disks.
+
+.TP 2m
+\fBset\-machine\-type\fR
+\fB(ALPHA)\fR Set machine type for Google Compute Engine virtual machines.
+
+.TP 2m
+\fBset\-min\-cpu\-platform\fR
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Set minimum CPU platform for Google Compute
+Engine virtual machines.
+
+.TP 2m
+\fBset\-scheduling\fR
+\fB(ALPHA)\fR Set scheduling options for Google Compute Engine virtual machines.
+
+.TP 2m
+\fBset\-scopes\fR
+\fB(ALPHA)\fR Set scopes and service account for a Google Compute Engine
+instance.
+
+.TP 2m
+\fBsimulate\-maintenance\-event\fR
+\fB(ALPHA)\fR Simulate maintenance of virtual machine instances.
+
+.TP 2m
+\fBstart\fR
+\fB(ALPHA)\fR Start a stopped virtual machine instance.
+
+.TP 2m
+\fBstop\fR
+\fB(ALPHA)\fR Stop a virtual machine instance.
+
+.TP 2m
+\fBsuspend\fR
+\fB(ALPHA)\fR Suspend a virtual machine instance.
+
+.TP 2m
+\fBtail\-serial\-port\-output\fR
+\fB(ALPHA)\fR Periodically fetch new output from a virtual machine instance's
+serial port and display it as it becomes available.
+
+.TP 2m
+\fBupdate\fR
+\fB(ALPHA)\fR Update a Google Compute Engine virtual machine.
+
+.TP 2m
+\fBupdate\-access\-config\fR
+\fB(ALPHA)\fR Update a Google Compute Engine virtual machine access
+configuration.
+
+.TP 2m
+\fBupdate\-container\fR
+\fB(ALPHA)\fR Updates Google Compute engine virtual machine instances running
+container images.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute instances
+$ gcloud beta compute instances
+.RE
+

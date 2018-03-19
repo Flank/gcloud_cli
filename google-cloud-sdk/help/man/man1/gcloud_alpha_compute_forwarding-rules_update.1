@@ -1,0 +1,165 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_FORWARDING\-RULES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute forwarding\-rules update \- update a Google Compute Engine forwarding rule
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute forwarding\-rules update\fR \fINAME\fR [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute forwarding\-rules update\fR updates labels
+and network tier for a Google Compute Engine forwarding rule.
+
+Example to update labels:
+
+.RS 2m
+$ gcloud alpha compute forwarding\-rules update example\-fr \e
+    \-\-region us\-central1 \e
+  \-\-update\-labels=k0=value1,k1=value2 \-\-remove\-labels=k3
+.RE
+
+will add/update labels \f5\fIk0\fR\fR and \f5\fIk1\fR\fR and remove labels with
+key \f5\fIk3\fR\fR.
+
+Labels can be used to identify the forwarding rule and to filter them as in
+
+.RS 2m
+$ gcloud alpha compute forwarding\-rules list \e
+    \-\-filter='labels.k1:value2'
+.RE
+
+To list existing labels
+
+.RS 2m
+$ gcloud alpha compute forwarding\-rules describe example\-fr \e
+    \-\-format='default(labels)'
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the forwarding rule to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
+Update the network tier of a forwarding rule. It does not allow to change from
+\f5PREMIUM\fR to \f5STANDARD\fR and visa versa.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Removes all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha compute forwarding\-rules update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha compute forwarding\-rules update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-global\fR
+If provided, it is assumed the forwarding rule is global.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the forwarding rule to operate on. If not specified, you will be
+prompted to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute forwarding\-rules update
+.RE
+

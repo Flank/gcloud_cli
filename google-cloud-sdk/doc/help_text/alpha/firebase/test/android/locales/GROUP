@@ -1,0 +1,45 @@
+NAME
+    gcloud alpha firebase test android locales - explore Android locales
+        available for testing
+
+SYNOPSIS
+    gcloud alpha firebase test android locales COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Explore Android locales available for testing.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe an Android locale.
+
+     list
+        (ALPHA) List all Android locales available for testing
+        internationalized apps.
+
+EXAMPLES
+    To list all available Android locales which can be used for testing
+    international applications, run:
+
+        $ gcloud alpha firebase test android locales list
+
+    To view information about a specific locale, run:
+
+        $ gcloud alpha firebase test android locales describe LOCALE
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud firebase test android locales
+        $ gcloud beta firebase test android locales
+

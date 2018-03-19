@@ -1,0 +1,91 @@
+NAME
+    gcloud beta dataproc clusters list - view a list of clusters in a project
+
+SYNOPSIS
+    gcloud beta dataproc clusters list [--region=REGION] [--filter=EXPRESSION]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE; default=100]
+        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) View a list of clusters in a project. An optional filter can be used
+    to constrain the clusters returned. Filters are case-sensitive and have the
+    following syntax:
+
+        field = value [AND [field = value]] ...
+
+    where field is one of status.state, clusterName, or labels.[KEY], and [KEY]
+    is a label key. value can be * to match all values. status.state can be one
+    of the following: ACTIVE, INACTIVE, CREATING, RUNNING, ERROR, DELETING, or
+    UPDATING. ACTIVE contains the CREATING, UPDATING, and RUNNING states.
+    INACTIVE contains the DELETING and ERROR states. clusterName is the name of
+    the cluster provided at creation time. Only the logical AND operator is
+    supported; space-separated items are treated as having an implicit AND
+    operator.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True then that item is listed. For more
+        details and examples of filter expressions run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        The maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE; default=100
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is 100.
+        Paging may be applied before or after --filter and --limit depending on
+        the service.
+
+     --sort-by=[FIELD,...]
+        A comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To see the list of all clusters, run:
+
+        $ gcloud beta dataproc clusters list
+
+    To show a cluster whose name is mycluster, run:
+
+        $ gcloud beta dataproc clusters list \
+            --filter='clusterName = mycluster'
+
+    To see the list of all clusters with particular labels, run:
+
+        $ gcloud beta dataproc clusters list \
+            --filter='labels.env = staging AND labels.starred = *'
+
+    To see a list of all active clusters with particular labels, run:
+
+        $ gcloud beta dataproc clusters list \
+            --filter='status.state = ACTIVE labels.env = staging AND
+         labels.starred = *'
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dataproc clusters list
+

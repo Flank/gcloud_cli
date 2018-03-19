@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha resource-manager folders undelete - undelete a folder
+
+SYNOPSIS
+    gcloud alpha resource-manager folders undelete FOLDER_ID
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Undeletes the folder with the given folder ID.
+
+    This command can fail for the following reasons:
+      o There is no folder with the given ID.
+      o The active account does not have Owner or Editor permissions for the
+        given folder.
+      o When the folder to be undeleted has the same display name as an
+        active folder under this folder's parent.
+
+POSITIONAL ARGUMENTS
+     FOLDER_ID
+        ID for the folder you want to undelete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command undeletes the folder with the ID 3589215982:
+
+        $ gcloud alpha resource-manager folders undelete 3589215982
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

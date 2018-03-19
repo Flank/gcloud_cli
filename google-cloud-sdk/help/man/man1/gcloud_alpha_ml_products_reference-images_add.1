@@ -1,0 +1,122 @@
+
+.TH "GCLOUD_ALPHA_ML_PRODUCTS_REFERENCE\-IMAGES_ADD" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml products reference\-images add \- add a Cloud Product Search ReferenceImage to a Catalog
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml products reference\-images add\fR \fIIMAGE_PATH\fR \fB\-\-catalog\fR=\fICATALOG\fR \fB\-\-product\-id\fR=\fIPRODUCT_ID\fR [\fB\-\-bounds\fR=\fIx\fR:\fIy\fR,\fIx\fR:\fIy\fR,\fIx\fR:\fIy\fR,[\fIx\fR:\fIy\fR,...]\ \fB\-\-category\fR=\fICATEGORY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command creates a Cloud Product Search ReferenceImage and
+adds it to the provided catalog.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE_PATH\fR
+The Google Cloud Storage URI of the input image file. The URI must start with
+gs://.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-catalog\fR=\fICATALOG\fR
+The catalog to add ReferenceImages to.
+
+.TP 2m
+\fB\-\-product\-id\fR=\fIPRODUCT_ID\fR
+The product ID to associate this ReferenceImage to. Product Id is restricted to
+255 characters including letters, numbers, underscore ( _ ) and hyphen (\-).
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+Both \f5\-\-category\fR and \f5\-\-bounds\fR should be specified if either is
+provided.
+
+.RS 2m
+.TP 2m
+\fB\-\-bounds\fR=\fIx\fR:\fIy\fR,\fIx\fR:\fIy\fR,\fIx\fR:\fIy\fR,[\fIx\fR:\fIy\fR,...]
+A set of vertices defining the bounding polygon aroundthe area of interest in
+the image. Should be a list of integer pairs, separated by commas specifying the
+vertices (e.g. [x1:y2, x2:y2,x3:y3...xn:yn]). Defaults to full image if empty.
+
+.TP 2m
+\fB\-\-category\fR=\fICATEGORY\fR
+String specifying the product category to associate this ReferenceImage to.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a reference image, using default bounds and no category, run:
+
+.RS 2m
+$ gcloud alpha ml products reference\-images add \e
+gs:\e\emy\-bucket\emyimage.jpg
+\-\-catalog=101
+\-\-product\-id=my\-product\-123
+.RE
+
+To add a reference image, using custom bounds and category, run:
+
+.RS 2m
+$ gcloud alpha ml products reference\-images add \e
+gs:\e\emy\-bucket\emyimage.jpg
+\-\-catalog=101
+\-\-product\-id=my\-product\-123
+\-\-category=mens_shoes
+\-\-bounds=200:200,200:400,400:200,400:400
+.RE
+
+
+Note: For alpha, only catalogs with associated ReferenceImages will be displayed
+by the list command. Please be sure to note the catalog name at creation time so
+that it can be used by \f5ml products catalogs reference\-image\fR commands.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

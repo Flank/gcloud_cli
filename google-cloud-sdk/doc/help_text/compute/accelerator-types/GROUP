@@ -1,0 +1,30 @@
+NAME
+    gcloud compute accelerator-types - read Google Compute Engine accelerator
+        types
+
+SYNOPSIS
+    gcloud compute accelerator-types COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Read Google Compute Engine accelerator types.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        Describe Google Compute Engine accelerator types.
+
+     list
+        List Google Compute Engine accelerator types.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute accelerator-types
+        $ gcloud beta compute accelerator-types
+

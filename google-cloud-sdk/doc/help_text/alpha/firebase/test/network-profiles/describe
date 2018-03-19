@@ -1,0 +1,32 @@
+NAME
+    gcloud alpha firebase test network-profiles describe - describe a network
+        profile
+
+SYNOPSIS
+    gcloud alpha firebase test network-profiles describe PROFILE_ID
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Run $ gcloud alpha firebase test network-profiles --help for
+    descriptions of the network profile parameters.
+
+POSITIONAL ARGUMENTS
+     PROFILE_ID
+        The network profile to describe, found using $ gcloud alpha firebase
+        test network-profiles list.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud firebase test network-profiles describe
+        $ gcloud beta firebase test network-profiles describe
+

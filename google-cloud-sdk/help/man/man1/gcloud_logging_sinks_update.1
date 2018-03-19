@@ -1,0 +1,102 @@
+
+.TH "GCLOUD_LOGGING_SINKS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud logging sinks update \- updates a sink
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud logging sinks update\fR \fISINK_NAME\fR [\fIDESTINATION\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Changes the \fB[destination]\fR or \fB\-\-log\-filter\fR associated with a sink.
+The new destination must already exist and Stackdriver Logging must have
+permission to write to it. Log entries are exported to the new destination
+immediately.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISINK_NAME\fR
+The name of the sink to update.
+
+.TP 2m
+[\fIDESTINATION\fR]
+A new destination for the sink. If omitted, the sink's existing destination is
+unchanged.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-log\-filter\fR=\fILOG_FILTER\fR
+A new filter expression for the sink. If omitted, the sink's existing filter (if
+any) is unchanged.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR
+Update a sink associated with this billing account.
+
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+Update a sink associated with this folder.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+Update a sink associated with this organization.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To only update a sink filter, run:
+
+.RS 2m
+$ gcloud logging sinks update my\-sink \-\-log\-filter='severity>=ERROR'
+.RE
+
+Detailed information about filters can be found at:
+https://cloud.google.com/logging/docs/view/advanced_filters
+
+
+
+.SH "NOTES"
+
+This variant is also available:
+
+.RS 2m
+$ gcloud beta logging sinks update
+.RE
+

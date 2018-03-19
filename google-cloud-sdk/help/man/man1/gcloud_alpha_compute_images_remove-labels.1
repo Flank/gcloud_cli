@@ -1,0 +1,99 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_IMAGES_REMOVE\-LABELS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute images remove\-labels \- remove labels from Google Compute Engine images
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute images remove\-labels\fR \fIIMAGE_NAME\fR (\fB\-\-all\fR\ |\ \fB\-\-labels\fR=\fIKEY\fR,[\fIKEY\fR,...]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute images remove\-labels\fR removes labels
+from a Google Compute Engine image. For example, running:
+
+.RS 2m
+$ gcloud alpha compute images remove\-labels example\-image \e
+    \-\-labels=k0,k1
+.RE
+
+will remove existing labels with key \f5\fIk0\fR\fR and \f5\fIk1\fR\fR from
+\'example\-image'.
+
+Labels can be used to identify the image and to filter them as in
+
+.RS 2m
+$ gcloud alpha compute images list \-\-filter='labels.k1:value2'
+.RE
+
+To list existing labels
+
+.RS 2m
+$ gcloud alpha compute images describe example\-image \e
+    \-\-format='default(labels)'
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE_NAME\fR
+The name of the disk image to operate on.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-all\fR
+Remove all labels from the resource.
+
+.TP 2m
+\fB\-\-labels\fR=\fIKEY\fR,[\fIKEY\fR,...]
+A comma\-separated list of label keys to remove from the resource.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute images remove\-labels
+$ gcloud beta compute images remove\-labels
+.RE
+

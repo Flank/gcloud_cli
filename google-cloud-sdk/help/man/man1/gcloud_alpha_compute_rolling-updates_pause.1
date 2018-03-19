@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_ROLLING\-UPDATES_PAUSE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute rolling\-updates pause \- pauses an existing update
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute rolling\-updates pause\fR \fIUPDATE\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR This command group is deprecated. Use \f5gcloud
+alpha compute instance\-groups managed rolling\-action\fR command group instead.
+
+Pauses the update in state ROLLING_FORWARD, ROLLING_BACK or PAUSED (fails if the
+update is in any other state). No\-op if invoked in state PAUSED.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIUPDATE\fR
+Update id.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Rolling update zone name. Overrides the default \fBcompute/zone\fR property
+value for this command invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

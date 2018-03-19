@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha resource-manager folders delete - delete a folder
+
+SYNOPSIS
+    gcloud alpha resource-manager folders delete FOLDER_ID
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Delete a folder, given a valid folder ID.
+
+    This command can fail for the following reasons:
+      o There is no folder with the given ID.
+      o The active account does not have permission to delete the given
+        folder.
+      o The folder to be deleted is not empty.
+
+POSITIONAL ARGUMENTS
+     FOLDER_ID
+        ID for the folder you want to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command deletes a folder with the ID 123456789:
+
+        $ gcloud alpha resource-manager folders delete 123456789
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

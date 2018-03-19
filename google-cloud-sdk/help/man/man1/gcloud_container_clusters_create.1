@@ -1,0 +1,655 @@
+
+.TH "GCLOUD_CONTAINER_CLUSTERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud container clusters create \- create a cluster for running containers
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud container clusters create\fR \fINAME\fR [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-no\-enable\-cloud\-logging\fR] [\fB\-\-no\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-no\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-addons\fR=[\fIADDON\fR,...]\ |\ \fB\-\-disable\-addons\fR=[\fIDISABLE_ADDON\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-no\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR;\ default="admin"] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create a cluster for running containers.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of this cluster.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]
+(DEPRECATED) The set of additional zones in which the specified node footprint
+should be replicated. All zones must be in the same region as the cluster's
+primary zone. If additional\-zones is not specified, all nodes will be in the
+cluster's primary zone.
+
+Note that \f5NUM_NODES\fR nodes will be created in each zone, such that if you
+specify \f5\-\-num\-nodes=4\fR and choose one additional zone, 8 nodes will be
+created.
+
+Multiple locations can be specified, separated by commas. For example:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-zone us\-central1\-a \e
+    \-\-additional\-zones us\-central1\-b,us\-central1\-c
+.RE
+
+This flag is deprecated. Use \-\-node\-locations=PRIMARY_ZONE,[ZONE,...]
+instead.
+
+.TP 2m
+\fB\-\-async\fR
+Don't wait for the operation to complete.
+
+.TP 2m
+\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR
+The IP address range for the pods in this cluster in CIDR notation (e.g.
+10.0.0.0/14). Prior to Kubernetes version 1.7.0 this must be a subset of
+10.0.0.0/8; however, starting with version 1.7.0 can be any RFC 1918 IP range.
+
+.TP 2m
+\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR
+Set the secondary range to be used as the source for pod IPs. Alias ranges will
+be allocated from this secondary range. NAME must be the name of an existing
+secondary range in the cluster subnetwork.
+
+Must be used in conjunction with '\-\-enable\-ip\-alias'. Cannot be used with
+\-\-create\-subnetwork.
+
+.TP 2m
+\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR
+The Kubernetes version to use for the master and nodes. Defaults to
+server\-specified.
+
+The default Kubernetes version is available using the following command.
+
+.RS 2m
+$ gcloud container get\-server\-config
+.RE
+
+.TP 2m
+\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+Create a new subnetwork for the cluster. The name and range of the subnetwork
+can be customized via optional 'name' and 'range' key\-value pairs.
+
+\'name' specifies the name of the subnetwork to be created.
+
+\'range' specifies the IP range for the new subnetwork. This can either be a
+netmask size (e.g. '/20') or a CIDR range (e.g. '10.0.0.0/20'). If a netmask
+size is specified, the IP is automatically taken from the free space in the
+cluster's network.
+
+Examples:
+
+Create a new subnetwork with a default name and size.
+
+.RS 2m
+$ gcloud container clusters create \-\-create\-subnetwork ""
+.RE
+
+Create a new subnetwork named "my\-subnet" with netmask of size 21.
+
+.RS 2m
+$ gcloud container clusters create \e
+\-\-create\-subnetwork name=my\-subnet,range=/21
+.RE
+
+Create a new subnetwork with a default name with the primary range of
+10.100.0.0/16.
+
+.RS 2m
+$ gcloud container clusters create \e
+\-\-create\-subnetwork range=10.100.0.0/16
+.RE
+
+Create a new subnetwork with the name "my\-subnet" with a default range.
+
+.RS 2m
+$ gcloud container clusters create \-\-create\-subnetwork name=my\-subnet
+.RE
+
+Can not be specified unless '\-\-enable\-ip\-alias' is also specified. Can not
+be used in conjunction with the '\-\-subnetwork' option.
+
+.TP 2m
+\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
+Size in GB for node VM boot disks. Defaults to 100GB.
+
+.TP 2m
+\fB\-\-enable\-autorepair\fR
+Sets autorepair feature for a cluster's default node\-pool(s).
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-enable\-autorepair
+.RE
+
+See https://cloud.google.com/kubernetes\-engine/docs/node\-auto\-repair for more
+info.
+
+.TP 2m
+\fB\-\-enable\-autoupgrade\fR
+Sets autoupgrade feature for a cluster's default node\-pool(s).
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-enable\-autoupgrade
+.RE
+
+See https://cloud.google.com/kubernetes\-engine/docs/node\-managament for more
+info.
+
+.TP 2m
+\fB\-\-enable\-cloud\-logging\fR
+Automatically send logs from the cluster to the Google Cloud Logging API.
+Enabled by default, use \fB\-\-no\-enable\-cloud\-logging\fR to disable.
+
+.TP 2m
+\fB\-\-enable\-cloud\-monitoring\fR
+Automatically send metrics from pods in the cluster to the Google Cloud
+Monitoring API. VM metrics will be collected by Google Compute Engine regardless
+of this setting. Enabled by default, use \fB\-\-no\-enable\-cloud\-monitoring\fR
+to disable.
+
+.TP 2m
+\fB\-\-enable\-ip\-alias\fR
+Enable use of alias IPs (https://cloud.google.com/compute/docs/alias\-ip/) for
+pod IPs. This will create two new subnetworks, one for the instance and pod IPs,
+and another to reserve space for the services range.
+
+.TP 2m
+\fB\-\-enable\-kubernetes\-alpha\fR
+Enable Kubernetes alpha features on this cluster. Selecting this option will
+result in the cluster having all Kubernetes alpha API groups and features turned
+on. Cluster upgrades (both manual and automatic) will be disabled and the
+cluster will be automatically deleted after 30 days.
+
+Alpha clusters are not covered by the Kubernetes Engine SLA and should not be
+used for production workloads.
+
+.TP 2m
+\fB\-\-enable\-legacy\-authorization\fR
+Enables the legacy ABAC authentication for the cluster. User rights are granted
+through the use of policies which combine attributes together. For a detailed
+look at these properties and related formats, see
+https://kubernetes.io/docs/admin/authorization/abac/. To use RBAC permissions
+instead, create or update your cluster with the option
+\f5\-\-no\-enable\-legacy\-authorization\fR.
+
+.TP 2m
+\fB\-\-enable\-network\-policy\fR
+Enable network policy enforcement for this cluster. If you are enabling network
+policy on an existing cluster the network policy addon must first be enabled on
+the master by using \-\-update\-addons=NetworkPolicy=ENABLED flag.
+
+.TP 2m
+\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR
+The image type to use for the cluster. Defaults to server\-specified.
+
+Image Type specifies the base OS that the nodes in the cluster will run on. If
+an image type is specified, that will be assigned to the cluster and all future
+upgrades will use the specified image type. If it is not specified the server
+will pick the default image type.
+
+The default image type and the list of valid image types are available using the
+following command.
+
+.RS 2m
+$ gcloud container get\-server\-config
+.RE
+
+.TP 2m
+\fB\-\-issue\-client\-certificate\fR
+Issue a TLS client certificate with admin permissions.
+
+When enabled, the certificate and private key pair will be present in MasterAuth
+field of the Cluster object.
+
+Enabled by default, use \fB\-\-no\-issue\-client\-certificate\fR to disable.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+Labels to apply to the Google Cloud resources in use by the Kubernetes Engine
+cluster. These are unrelated to Kubernetes labels. Example:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-labels=label_a=value1,label_b=,label_c=value3
+.RE
+
+.TP 2m
+\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR
+The number of local SSD disks to provision on each node.
+
+Local SSDs have a fixed 375 GB capacity per device. The number of disks that can
+be attached to an instance is limited by the maximum number of disks available
+on a machine, which differs by compute zone. See
+https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR, \fB\-m\fR \fIMACHINE_TYPE\fR
+The type of machine to use for nodes. Defaults to n1\-standard\-1.
+
+.TP 2m
+\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR
+Set a time of day when you prefer maintenance to start on this cluster. For
+example:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-maintenance\-window=12:43
+.RE
+
+The time corresponds to the UTC time zone, and must be in HH:MM format.
+
+.TP 2m
+\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR
+The maximum number of nodes to allocate per default initial node pool.
+Kubernetes Engine will automatically create enough nodes pools such that each
+node pool contains less than \-\-max\-nodes\-per\-pool nodes. Defaults to 1000
+nodes, but can be set as low as 100 nodes per pool on initial create.
+
+.TP 2m
+\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR
+When specified, the nodes for the new cluster's default node pool will be
+scheduled on host with specified CPU architecture or a newer one.
+
+Examples: $ gcloud container clusters create example\-cluster \e
+\-\-min\-cpu\-platform=PLATFORM
+
+To list available CPU platforms in given zone, run:
+
+.RS 2m
+$ gcloud beta compute zones describe ZONE \e
+    \-\-format="value(availableCpuPlatforms)"
+.RE
+
+CPU platform selection is available only in selected zones.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The Compute Engine Network that the cluster will connect to. Google Kubernetes
+Engine will use this network when creating routes and firewalls for the
+clusters. Defaults to the 'default' network.
+
+.TP 2m
+\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]
+Applies the given kubernetes labels on all nodes in the new node\-pool. Example:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-node\-labels=label\-a=value1,label\-2=value2
+.RE
+
+New nodes, including ones created by resize or recreate, will have these labels
+on the kubernetes API node object and can be used in nodeSelectors. See
+http://kubernetes.io/docs/user\-guide/node\-selection/ for examples.
+
+.TP 2m
+\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]
+The set of zones in which the specified node footprint should be replicated. All
+zones must be in the same region as the cluster's primary zone, specified by the
+\-\-zone flag. \-\-node\-locations must contain the primary zone. If
+node\-locations is not specified, all nodes will be in the primary zone.
+
+Note that \f5NUM_NODES\fR nodes will be created in each zone, such that if you
+specify \f5\-\-num\-nodes=4\fR and choose two locations, 8 nodes will be
+created.
+
+Multiple locations can be specified, separated by commas. For example:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-zone us\-central1\-a \e
+    \-\-node\-locations us\-central1\-a,us\-central1\-b
+.RE
+
+.TP 2m
+\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]
+Applies the given kubernetes taints on all nodes in default node\-pool(s) in new
+cluster, which can be used with tolerations for pod scheduling. Example:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+    \-\-node\-taints=key1=val1:NoSchedule,key2=val2:PreferNoSchedule
+.RE
+
+Note, this feature uses \f5gcloud beta\fR commands. To use gcloud beta commands,
+you must configure \f5gcloud\fR to use the v1beta1 API as described here:
+https://cloud.google.com/kubernetes\-engine/docs/reference/api\-organization#beta.
+To read more about node\-taints, see
+https://cloud.google.com/kubernetes\-engine/docs/node\-taints.
+
+.TP 2m
+\fB\-\-node\-version\fR=\fINODE_VERSION\fR
+The Kubernetes version to use for nodes. Defaults to server\-specified.
+
+The default Kubernetes version is available using the following command.
+
+.RS 2m
+$ gcloud container get\-server\-config
+.RE
+
+.TP 2m
+\fB\-\-num\-nodes\fR=\fINUM_NODES\fR; default=3
+The number of nodes to be created in each of the cluster's zones.
+
+.TP 2m
+\fB\-\-preemptible\fR
+Create nodes using preemptible VM instances in the new cluster.
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \-\-preemptible
+.RE
+
+New nodes, including ones created by resize or recreate, will use preemptible VM
+instances. See https://cloud.google.com/kubernetes\-engine/docs/preemptible\-vm
+for more information on how to use Preemptible VMs with Kubernetes Engine.
+
+.TP 2m
+\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR
+Set the IP range for the services IPs.
+
+Can be specified as a netmask size (e.g. '/20') or as in CIDR notion (e.g.
+\'10.100.0.0/20'). If given as a netmask size, the IP range will be chosen
+automatically from the available space in the network.
+
+If unspecified, the services CIDR range will use automatic defaults.
+
+Can not be specified unless '\-\-enable\-ip\-alias' is also specified.
+
+.TP 2m
+\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR
+Set the secondary range to be used for services (e.g. ClusterIPs). NAME must be
+the name of an existing secondary range in the cluster subnetwork.
+
+Must be used in conjunction with '\-\-enable\-ip\-alias'. Cannot be used with
+\-\-create\-subnetwork.
+
+.TP 2m
+\fB\-\-subnetwork\fR=\fISUBNETWORK\fR
+The Google Compute Engine subnetwork
+(https://cloud.google.com/compute/docs/subnetworks) to which the cluster is
+connected. The subnetwork must belong to the network specified by \-\-network.
+
+Cannot be used with the "\-\-create\-subnetwork" option.
+
+.TP 2m
+\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]
+Applies the given Compute Engine tags (comma separated) on all nodes in the new
+node\-pool. Example:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \-\-tags=tag1,tag2
+.RE
+
+New nodes, including ones created by resize or recreate, will have these tags on
+the Compute Engine API instance object and can be used in firewall rules. See
+https://cloud.google.com/sdk/gcloud/reference/compute/firewall\-rules/create for
+examples.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
+The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
+\fBcompute/zone\fR property value for this command invocation.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-addons\fR=[\fIADDON\fR,...]
+Default set of addons includes HttpLoadBalancing, HorizontalPodAutoscaling.
+Addons
+(https://cloud.google.com/kubernetes\-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
+are additional Kubernetes cluster components. Addons specified by this flag will
+be enabled. The others will be disabled. \fIADDON\fR must be one of:
+\fBHttpLoadBalancing\fR, \fBHorizontalPodAutoscaling\fR,
+\fBKubernetesDashboard\fR, \fBIstio\fR.
+
+.TP 2m
+\fB\-\-disable\-addons\fR=[\fIDISABLE_ADDON\fR,...]
+(DEPRECATED) List of cluster addons to disable. Options are HttpLoadBalancing,
+HorizontalPodAutoscaling, KubernetesDashboard, Istio
+
+This flag is deprecated. Use \-\-addons instead. \fIDISABLE_ADDON\fR must be one
+of: \fBHttpLoadBalancing\fR, \fBHorizontalPodAutoscaling\fR,
+\fBKubernetesDashboard\fR, \fBIstio\fR.
+
+.RE
+.sp
+.TP 2m
+
+Cluster autoscaling
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-autoscaling\fR
+Enables autoscaling for a node pool.
+
+Enables autoscaling in the node pool specified by \-\-node\-pool or the default
+node pool if \-\-node\-pool is not provided.
+
+.TP 2m
+\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR
+Maximum number of nodes in the node pool.
+
+Maximum number of nodes to which the node pool specified by \-\-node\-pool (or
+default node pool if unspecified) can scale. Ignored unless
+\-\-enable\-autoscaling is also specified.
+
+.TP 2m
+\fB\-\-min\-nodes\fR=\fIMIN_NODES\fR
+Minimum number of nodes in the node pool.
+
+Minimum number of nodes to which the node pool specified by \-\-node\-pool (or
+default node pool if unspecified) can scale. Ignored unless
+\-\-enable\-autoscaling is also specified.
+
+.RE
+.sp
+.TP 2m
+
+Master Authorized Networks
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-master\-authorized\-networks\fR
+Allow only Authorized Networks (specified by the
+\f5\-\-master\-authorized\-networks\fR flag) and Google Compute Engine Public
+IPs to connect to Kubernetes master through HTTPS. By default public internet
+(0.0.0.0/0) is allowed to connect to Kubernetes master through HTTPS.
+
+.TP 2m
+\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]
+The list of external networks (up to 10) that are allowed to connect to
+Kubernetes master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30).
+Can not be specified unless \f5\-\-enable\-master\-authorized\-networks\fR is
+also specified.
+
+.RE
+.sp
+.TP 2m
+
+Basic auth
+
+.RS 2m
+.TP 2m
+\fB\-\-password\fR=\fIPASSWORD\fR
+The password to use for cluster auth. Defaults to a server\-specified
+randomly\-generated string.
+
+.TP 2m
+
+Options to specify the username. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-basic\-auth\fR
+Enable basic (username/password) auth for the cluster.
+\f5\-\-enable\-basic\-auth\fR is an alias for \f5\-\-username=admin\fR;
+\f5\-\-no\-enable\-basic\-auth\fR is an alias for \f5\-\-username=""\fR. Use
+\f5\-\-password\fR to specify a password; if not, the server will randomly
+generate one. Enabled by default, use \fB\-\-no\-enable\-basic\-auth\fR to
+disable.
+
+.TP 2m
+\fB\-\-username\fR=\fIUSERNAME\fR, \fB\-u\fR \fIUSERNAME\fR; default="admin"
+The user name to use for basic auth for the cluster. Use \f5\-\-password\fR to
+specify a password; if not, the server will randomly generate one.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Options to specify the node identity. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+The Google Cloud Platform Service Account to be used by the node VMs. If a
+service account is specified, the cloud\-platform scope is used. If no Service
+Account is specified, the project default service account is used.
+
+.TP 2m
+
+Scopes options.
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-cloud\-endpoints\fR
+(DEPRECATED) Automatically enable Google Cloud Endpoints to take advantage of
+API management features by adding service\-control and service\-management
+scopes.
+
+If \-\-no\-enable\-cloud\-endpoints is set, remove service\-control and
+service\-management scopes, even if they are implicitly (via default) or
+explicitly set via \-\-scopes.
+
+\-\-[no\-]enable\-cloud\-endpoints is not allowed if
+container/new_scopes_behavior property is set to true.
+
+Flag \-\-[no\-]enable\-cloud\-endpoints is deprecated and will be removed in a
+future release. Scopes necessary for Google Cloud Endpoints are now included in
+the default set and may be excluded using \-\-scopes.
+
+Enabled by default, use \fB\-\-no\-enable\-cloud\-endpoints\fR to disable.
+
+.TP 2m
+\fB\-\-scopes\fR=[\fISCOPE\fR,...]; default="gke\-default"
+Specifies scopes for the node instances. The project's default service account
+is used. Examples:
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+  \-\-scopes=https://www.googleapis.com/auth/devstorage.read_only
+.RE
+
+.RS 2m
+$ gcloud container clusters create example\-cluster \e
+  \-\-scopes=bigquery,storage\-rw,compute\-ro
+.RE
+
+Multiple SCOPEs can specified, separated by commas. logging\-write and/or
+monitoring are added unless Cloud Logging and/or Cloud Monitoring are disabled
+(see \-\-enable\-cloud\-logging and \-\-enable\-cloud\-monitoring for more
+info).
+
+SCOPE can be either the full URI of the scope or an alias. Available aliases
+are:
+
+
+.TS
+tab(,);
+lB lB
+l l.
+Alias,URI
+bigquery,https://www.googleapis.com/auth/bigquery
+cloud\-platform,https://www.googleapis.com/auth/cloud\-platform
+cloud\-source\-repos,https://www.googleapis.com/auth/source.full_control
+cloud\-source\-repos\-ro,https://www.googleapis.com/auth/source.read_only
+compute\-ro,https://www.googleapis.com/auth/compute.readonly
+compute\-rw,https://www.googleapis.com/auth/compute
+datastore,https://www.googleapis.com/auth/datastore
+default,https://www.googleapis.com/auth/devstorage.read_only
+,https://www.googleapis.com/auth/logging.write
+,https://www.googleapis.com/auth/monitoring.write
+,https://www.googleapis.com/auth/pubsub
+,https://www.googleapis.com/auth/service.management.readonly
+,https://www.googleapis.com/auth/servicecontrol
+,https://www.googleapis.com/auth/trace.append
+gke\-default,https://www.googleapis.com/auth/devstorage.read_only
+,https://www.googleapis.com/auth/logging.write
+,https://www.googleapis.com/auth/monitoring
+,https://www.googleapis.com/auth/service.management.readonly
+,https://www.googleapis.com/auth/servicecontrol
+,https://www.googleapis.com/auth/trace.append
+logging\-write,https://www.googleapis.com/auth/logging.write
+monitoring,https://www.googleapis.com/auth/monitoring
+monitoring\-write,https://www.googleapis.com/auth/monitoring.write
+pubsub,https://www.googleapis.com/auth/pubsub
+service\-control,https://www.googleapis.com/auth/servicecontrol
+service\-management,https://www.googleapis.com/auth/service.management.readonly
+sql,https://www.googleapis.com/auth/sqlservice
+sql\-admin,https://www.googleapis.com/auth/sqlservice.admin
+storage\-full,https://www.googleapis.com/auth/devstorage.full_control
+storage\-ro,https://www.googleapis.com/auth/devstorage.read_only
+storage\-rw,https://www.googleapis.com/auth/devstorage.read_write
+taskqueue,https://www.googleapis.com/auth/taskqueue
+trace,https://www.googleapis.com/auth/trace.append
+userinfo\-email,https://www.googleapis.com/auth/userinfo.email
+.TE
+
+
+DEPRECATION WARNING: 'https://www.googleapis.com/auth/sqlservice' account scope
+and \f5sql\fR alias do not provide SQL instance management capabilities and have
+been deprecated. Please, use 'https://www.googleapis.com/auth/sqlservice.admin'
+or \f5sql\-admin\fR to manage your Google SQL Service instances.
+
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha container clusters create
+$ gcloud beta container clusters create
+.RE
+

@@ -1,0 +1,74 @@
+
+.TH "GCLOUD_ALPHA_DEPLOYMENT\-MANAGER_OPERATIONS_WAIT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha deployment\-manager operations wait \- wait for all operations specified to complete before returning
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha deployment\-manager operations wait\fR \fIOPERATION_NAME\fR [\fIOPERATION_NAME\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Polls until all operations have finished, then prints the
+resulting operations along with any operation errors.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIOPERATION_NAME\fR [\fIOPERATION_NAME\fR ...]
+Operation name.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To poll until an operation has completed, run:
+
+.RS 2m
+$ gcloud alpha deployment\-manager operations wait operation\-name
+.RE
+
+To poll until several operations have all completed, run:
+
+.RS 2m
+$ gcloud alpha deployment\-manager operations wait operation\-one \e
+    operation\-two operation\-three
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud deployment\-manager operations wait
+$ gcloud beta deployment\-manager operations wait
+.RE
+

@@ -1,0 +1,85 @@
+
+.TH "GCLOUD_COMPUTE_NETWORKS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute networks update \- update a Google Compute Engine network
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute networks update\fR \fINAME\fR [\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR\ |\ \fB\-\-switch\-to\-custom\-subnet\-mode\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute networks update\fR is used to update Google Compute Engine
+networks.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the network to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-bgp\-routing\-mode\fR=\fIMODE\fR
+The target BGP routing mode for this network. \fIMODE\fR must be one of:
+
+.TP 2m
+\fBglobal\fR
+Cloud Routers in this network advertise subnetworks from all regions to their
+BGP peers, and program instances in all regions with the router's best learned
+BGP routes.
+.TP 2m
+\fBregional\fR
+Cloud Routers in this network advertise subnetworks from their local region only
+to their BGP peers, and program instances in their local region only with the
+router's best learned BGP routes.
+
+.TP 2m
+\fB\-\-switch\-to\-custom\-subnet\-mode\fR
+Switch to custom subnet mode. This action cannot be undone.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute networks update
+$ gcloud beta compute networks update
+.RE
+

@@ -1,0 +1,33 @@
+NAME
+    gcloud compute xpn associated-projects - configure associated projects for
+        cross-project networking (XPN)
+
+SYNOPSIS
+    gcloud compute xpn associated-projects COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Configure associated projects for cross-project networking (XPN).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add
+        Associate the given project with a given shared VPC host project.
+
+     list
+        List the associated service projects of the given host project.
+
+     remove
+        Disassociate the given project from the given shared VPC host project.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute xpn associated-projects
+        $ gcloud beta compute xpn associated-projects
+

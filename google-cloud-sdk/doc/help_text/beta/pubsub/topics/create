@@ -1,0 +1,35 @@
+NAME
+    gcloud beta pubsub topics create - creates one or more Cloud Pub/Sub topics
+
+SYNOPSIS
+    gcloud beta pubsub topics create TOPIC [TOPIC ...]
+        [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Creates one or more Cloud Pub/Sub topics.
+
+POSITIONAL ARGUMENTS
+     TOPIC [TOPIC ...]
+        One or more topics to create.
+
+FLAGS
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a Cloud Pub/Sub topic, run:
+
+        $ gcloud beta pubsub topics create mytopic
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud pubsub topics create
+        $ gcloud alpha pubsub topics create
+

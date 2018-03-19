@@ -1,0 +1,51 @@
+NAME
+    gcloud beta compute networks subnets set-iam-policy - set the IAM Policy
+        for a Google Compute Engine subnetwork
+
+SYNOPSIS
+    gcloud beta compute networks subnets set-iam-policy NAME POLICY_FILE
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute networks subnets set-iam-policy sets the Iam
+    Policy associated with a Google Compute Engine subnetwork in a project.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the subnetwork to set the IAM Policy of.
+
+     POLICY_FILE
+        Path to a local JSON or YAML formatted file containing a valid policy.
+
+FLAGS
+     --region=REGION
+        The region of the subnetwork to set the IAM Policy of. If not
+        specified, you will be prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute networks subnets set-iam-policy
+

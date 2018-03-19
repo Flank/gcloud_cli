@@ -1,0 +1,31 @@
+NAME
+    gcloud beta sql instances promote-replica - promotes Cloud SQL read replica
+        to a stand-alone instance
+
+SYNOPSIS
+    gcloud beta sql instances promote-replica REPLICA [--async]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Promotes Cloud SQL read replica to a stand-alone instance.
+
+POSITIONAL ARGUMENTS
+     REPLICA
+        Cloud SQL read replica ID.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud sql instances promote-replica
+

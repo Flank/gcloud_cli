@@ -1,0 +1,54 @@
+NAME
+    gcloud alpha iot devices - manage Cloud IoT Devices
+
+SYNOPSIS
+    gcloud alpha iot devices GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands for managing Google Cloud IoT Devices.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     configs
+        (ALPHA) Manage configurations for Cloud IoT devices.
+
+     credentials
+        (ALPHA) Manage credentials for Cloud IoT devices.
+
+     states
+        (ALPHA) Manage states for Cloud IoT devices.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a new device.
+
+     delete
+        (ALPHA) Delete a device.
+
+     describe
+        (ALPHA) Show details about a device.
+
+     list
+        (ALPHA) List devices.
+
+     update
+        (ALPHA) Update an existing device.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud iot devices
+        $ gcloud beta iot devices
+

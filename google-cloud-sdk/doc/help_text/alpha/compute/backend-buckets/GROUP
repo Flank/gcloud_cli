@@ -1,0 +1,51 @@
+NAME
+    gcloud alpha compute backend-buckets - read and manipulate backend buckets
+
+SYNOPSIS
+    gcloud alpha compute backend-buckets COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Backend buckets define Google Cloud Storage buckets that can serve
+    content. URL maps define which requests are sent to which backend buckets.
+    For more information, see:
+    https://cloud.google.com/compute/docs/load-balancing/http/adding-a-backend-bucket-to-content-based-load-balancing.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-signed-url-key
+        (ALPHA) Add Cloud CDN Signed URL key to a backend bucket.
+
+     create
+        (ALPHA) Create a backend bucket.
+
+     delete
+        (ALPHA) Delete backend buckets.
+
+     delete-signed-url-key
+        (ALPHA) Delete Cloud CDN Signed URL key from a backend bucket.
+
+     describe
+        (ALPHA) Describe a backend bucket.
+
+     list
+        (ALPHA) List Google Compute Engine backend buckets.
+
+     update
+        (ALPHA) Update a backend bucket.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute backend-buckets
+        $ gcloud beta compute backend-buckets
+

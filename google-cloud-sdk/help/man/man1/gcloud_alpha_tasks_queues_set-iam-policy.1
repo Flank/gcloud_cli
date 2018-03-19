@@ -1,0 +1,77 @@
+
+.TH "GCLOUD_ALPHA_TASKS_QUEUES_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha tasks queues set\-iam\-policy \- set IAM policy for a queue
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha tasks queues set\-iam\-policy\fR \fIQUEUE\fR \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command replaces the existing IAM policy for a queue, given a
+queue and a file encoded in JSON or YAML that contains the IAM policy. If the
+given policy file specifies an "etag" value, then the replacement will succeed
+only if the policy already in place matches that etag. (An etag obtained via
+\f5get\-iam\-policy\fR will prevent the replacement if the policy for the queue
+has been subsequently updated.) A policy file that does not contain an etag
+value will replace any existing policy for the queue.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIQUEUE\fR
+The queue to set the IAM policy for.
+
+
+.TP 2m
+\fIPOLICY_FILE\fR
+JSON or YAML file containing the IAM policy.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command will read an IAM policy defined in a JSON file
+\'policy.json' and set it for a queue with identifier 'my\-queue'
+
+.RS 2m
+$ gcloud alpha tasks queues set\-iam\-policy my\-queue policy.json
+.RE
+
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

@@ -1,0 +1,26 @@
+NAME
+    gcloud logging resource-descriptors - get information about resource
+        descriptors
+
+SYNOPSIS
+    gcloud logging resource-descriptors COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Get information about resource descriptors.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list
+        Lists all available resource descriptors.
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta logging resource-descriptors
+

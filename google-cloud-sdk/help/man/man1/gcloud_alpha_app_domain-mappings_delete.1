@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_ALPHA_APP_DOMAIN\-MAPPINGS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha app domain\-mappings delete \- deletes a specified domain mapping
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha app domain\-mappings delete\fR \fIDOMAIN\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Deletes a specified domain mapping.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIDOMAIN\fR
+A valid domain which may begin with a wildcard, such as: \f5example.com\fR or
+\f5\fB.example.com\fR
+
+
+\fR
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete an App Engine domain mapping, run:
+
+.RS 2m
+$ gcloud alpha app domain\-mappings delete '*.example.com'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud app domain\-mappings delete
+$ gcloud beta app domain\-mappings delete
+.RE
+

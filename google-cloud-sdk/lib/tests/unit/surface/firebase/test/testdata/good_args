@@ -1,0 +1,73 @@
+# Valid arg groups for unit tests
+
+test-override:
+  results-bucket: gs://arg-file-bucket
+
+my-group:
+  type: instrumentation
+  test: startrek.apk
+  locales: [klingon, romulan]
+  max-steps: 333
+  results-dir: my/results/dir
+  robo-directives:
+    resource1: value1
+    'text:resource2': 2
+    'click:resource3': ''
+  test-targets: ['package kirk', 'class enterprise.spock']
+
+one.obb:
+  obb-files: gs://dir1/dir2/file.obb
+
+two.obb:
+  obb-files:
+    - file1.obb
+    - file2.obb
+
+directories-to-pull.list:
+  directories-to-pull: ['/sdcard/tempDirUno', '/sdcard/tempDirDos']
+
+directories-to-pull.string:
+  directories-to-pull: "/singleStringPath"
+
+environment-variables.good:
+  environment-variables:
+    e1: value1
+    e2: value2
+
+
+sparse-terse1:  # Terse device list with terse maps notation
+  device: [{model: Nexus5}, {model: sailfish}, {model: shamu}]
+
+sparse-terse2:  # Device list with terse maps notation
+  device:
+    - {model: NexusLowRes, version: 23, locale: es, orientation: landscape}
+    - {model: shamu}
+    - {version: 5.1.x, locale: zh}
+
+sparse-verbose:  # Verbose list with verbose maps notation
+  device:
+    - model: m1
+      version: v1
+      locale: l1
+      orientation: o1
+    - model: m2
+      version: v2
+      locale: l2
+      orientation: o2
+
+sparse-empty:
+  device: [{}]  # should produce a device with defaults for all dimensions
+
+use-orchestrator-true:
+  use-orchestrator: true
+
+use-orchestrator-false:
+  use-orchestrator: false
+
+use-orchestrator-unspecified:
+
+robo-script.local:
+  robo-script: local/dir/robo_script.json
+
+robo-script.gcs:
+  robo-script: gs://bucket/robo_script.json

@@ -1,0 +1,5 @@
+blacklist:
+- subnet: 192.0.2.1
+  description: A single IPv4 address
+- subnet: abcd::123:4567
+  description: A single IPv6 address

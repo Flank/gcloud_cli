@@ -1,0 +1,49 @@
+NAME
+    gcloud - markdown top group docstring index
+
+SYNOPSIS
+    gcloud GROUP [--format FORMAT] [--help] [--log-http LOG_HTTP]
+        [--top-group-flag TOP_GROUP_FLAG]
+        [--user-output-enabled USER_OUTPUT_ENABLED] [--verbosity VERBOSITY]
+        [-h]
+
+DESCRIPTION
+    Markdown top group docstring description.
+
+FLAGS
+     --format FORMAT
+        Specify a format for printed output. By default, a command-specific
+        human-friendly output format is used. Setting this flag to one of the
+        available options will serialize the result of the command in the
+        chosen format and print it to stdout. Supported formats are: json,
+        text, yaml.
+
+     --help
+        Display detailed help.
+
+     --log-http LOG_HTTP
+        Logs all HTTP server requests and responses to stderr. (true/false)
+
+     --top-group-flag TOP_GROUP_FLAG
+        Top group flag detailed help.
+
+     --user-output-enabled USER_OUTPUT_ENABLED
+        Control whether user intended output is printed to the console.
+        (true/false)
+
+     --verbosity VERBOSITY
+        Override the default verbosity for this command. This must be a
+        standard logging verbosity level: [debug, info, warning, error,
+        critical, none] (Default: [warning]).
+
+     -h
+        Print a summary help and exit.
+
+GROUPS
+    GROUP is one of the following:
+
+     markdown
+        Markdown group docstring index.
+
+NOTES
+    A special note.

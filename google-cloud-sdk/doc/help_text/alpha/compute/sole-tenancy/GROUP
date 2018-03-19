@@ -1,0 +1,32 @@
+NAME
+    gcloud alpha compute sole-tenancy - read and manage Google Compute Engine
+        sole-tenancy resources
+
+SYNOPSIS
+    gcloud alpha compute sole-tenancy GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read and manage Google Compute Engine sole-tenancy resources.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     host-types
+        (ALPHA) Read Google Compute Engine sole-tenancy host types.
+
+     hosts
+        (ALPHA) Read and manage Google Compute Engine sole-tenancy hosts.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

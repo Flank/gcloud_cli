@@ -1,0 +1,88 @@
+
+.TH "GCLOUD_ALPHA_SCHEDULER_JOBS_CREATE\-PUBSUB\-JOB" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha scheduler jobs create\-pubsub\-job \- create a Cloud Scheduler job with a Pub/Sub target
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha scheduler jobs create\-pubsub\-job\fR \fB\-\-message\-body\fR=\fIMESSAGE_BODY\fR \fB\-\-schedule\fR=\fISCHEDULE\fR \fB\-\-topic\fR=\fITOPIC\fR [\fB\-\-attributes\fR=\fIATTRIBUTES\fR] [\fB\-\-timezone\fR=\fITIMEZONE\fR;\ default="Etc/UTC"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Cloud Scheduler job with a Pub/Sub target.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-message\-body\fR=\fIMESSAGE_BODY\fR
+The body of the message to publish to the given topic name. Information on
+message formatting and size limits can be found at:
+https://cloud.google.com/pubsub/docs/publisher#publish
+
+.TP 2m
+\fB\-\-schedule\fR=\fISCHEDULE\fR
+String, English\-like description of the schedule at which the job should be
+run. See
+https://cloud.google.com/appengine/docs/standard/python/config/cronref#schedule_format
+for details.
+
+.TP 2m
+\fB\-\-topic\fR=\fITOPIC\fR
+The name of the Google Cloud Pub/Sub topic to publish to when the job runs.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-attributes\fR=\fIATTRIBUTES\fR
+Comma\-separated list of attributes. Each attribute has the form "NAME=VALUE".
+You can specify up to 100 attributes.
+
+.TP 2m
+\fB\-\-timezone\fR=\fITIMEZONE\fR; default="Etc/UTC"
+String, a time zone name from the tz database
+(http://en.wikipedia.org/wiki/Tz_database).
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudscheduler/v1alpha1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/cloud\-scheduler/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

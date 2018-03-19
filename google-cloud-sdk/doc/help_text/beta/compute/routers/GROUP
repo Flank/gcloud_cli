@@ -1,0 +1,61 @@
+NAME
+    gcloud beta compute routers - list, create, and delete Google Compute
+        Engine routers
+
+SYNOPSIS
+    gcloud beta compute routers COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) List, create, and delete Google Compute Engine routers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-bgp-peer
+        (BETA) Add a BGP peer to a Google Compute Engine router.
+
+     add-interface
+        (BETA) Add an interface to a Google Compute Engine router.
+
+     create
+        (BETA) Create a Google Compute Engine router.
+
+     delete
+        (BETA) Delete Google Compute Engine routers.
+
+     describe
+        (BETA) Describe a Google Compute Engine router.
+
+     get-status
+        (BETA) Get status of a Google Compute Engine router.
+
+     list
+        (BETA) List Google Compute Engine routers.
+
+     remove-bgp-peer
+        (BETA) Remove a BGP peer from a Google Compute Engine router.
+
+     remove-interface
+        (BETA) Remove an interface from a Google Compute Engine router.
+
+     update
+        (BETA) Update a Google Compute Engine router.
+
+     update-bgp-peer
+        (BETA) Update a BGP peer on a Google Compute Engine router.
+
+     update-interface
+        (BETA) Update an interface on a Google Compute Engine router.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute routers
+        $ gcloud alpha compute routers
+

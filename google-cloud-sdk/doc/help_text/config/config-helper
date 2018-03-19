@@ -1,0 +1,54 @@
+NAME
+    gcloud config config-helper - a helper for providing auth and config data
+        to external tools
+
+SYNOPSIS
+    gcloud config config-helper [--force-auth-refresh] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    A helper for providing auth and config data to external tools.
+
+    Tools can call out to this command to get gcloud's current auth and
+    configuration context when needed. This is appropriate when external tools
+    want to operate within the context of the user's current gcloud session.
+
+    This command returns a nested data structure with the following schema:
+
+      o credential
+        * access_token - string, The current OAuth2 access token
+        * token_expiry - string, The time the token will expire. This can be
+          empty for some credential types. It is a UTC time formatted as:
+          '%Y-%m-%dT%H:%M:%SZ'
+      o configuration
+        * active_configuration - string, The name of the active gcloud
+          configuration
+        * properties - {string: {string: string}}, The full set of active
+          gcloud properties
+
+FLAGS
+     --force-auth-refresh
+        Force a refresh of the credentials even if they have not yet expired.
+        By default, credentials will only refreshed when necessary.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    This command should always be used with the --format flag to get the output
+    in a structured format.
+
+    To get the current gcloud context:
+
+        $ gcloud config config-helper --format=json
+
+    To get the current gcloud context after forcing a refresh of the OAuth2
+    credentials:
+
+        $ gcloud config config-helper --format=json --force-auth-refresh
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

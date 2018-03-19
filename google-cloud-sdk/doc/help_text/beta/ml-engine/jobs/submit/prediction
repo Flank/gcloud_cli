@@ -1,0 +1,103 @@
+NAME
+    gcloud beta ml-engine jobs submit prediction - start a Cloud ML Engine
+        batch prediction job
+
+SYNOPSIS
+    gcloud beta ml-engine jobs submit prediction JOB --data-format=DATA_FORMAT
+        --input-paths=INPUT_PATH,[INPUT_PATH,...] --output-path=OUTPUT_PATH
+        --region=REGION (--model=MODEL | --model-dir=MODEL_DIR)
+        [--batch-size=BATCH_SIZE] [--labels=[KEY=VALUE,...]]
+        [--max-worker-count=MAX_WORKER_COUNT]
+        [--runtime-version=RUNTIME_VERSION] [--version=VERSION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Start a Cloud ML Engine batch prediction job.
+
+POSITIONAL ARGUMENTS
+     JOB
+        Name of the batch prediction job.
+
+REQUIRED FLAGS
+     --data-format=DATA_FORMAT
+        Data format of the input files. DATA_FORMAT must be one of:
+
+         text
+            Text files with instances separated by the new-line character.
+         tf-record
+            TFRecord files; see
+            https://www.tensorflow.org/versions/r0.12/how_tos/reading_data/index.html#file-formats
+         tf-record-gzip
+            GZIP-compressed TFRecord files.
+
+     --input-paths=INPUT_PATH,[INPUT_PATH,...]
+        Google Cloud Storage paths to the instances to run prediction on.
+
+        Wildcards (*) accepted at the end of a path. More than one path can be
+        specified if multiple file patterns are needed. For example,
+
+            gs://my-bucket/instances*,gs://my-bucket/other-instances1
+
+        will match any objects whose names start with instances in my-bucket as
+        well as the other-instances1 bucket, while
+
+            gs://my-bucket/instance-dir/*
+
+        will match any objects in the instance-dir "directory" (since
+        directories aren't a first-class Cloud Storage concept) of my-bucket.
+
+     --output-path=OUTPUT_PATH
+        Google Cloud Storage path to which to save the output. Example:
+        gs://my-bucket/output.
+
+     --region=REGION
+        The Google Compute Engine region to run the job in.
+
+     Exactly one of these must be specified:
+
+       --model=MODEL
+          Name of the model to use for prediction.
+
+       --model-dir=MODEL_DIR
+          Google Cloud Storage location where the model files are located.
+
+OPTIONAL FLAGS
+     --batch-size=BATCH_SIZE
+        The number of records per batch. The service will buffer batch_size
+        number of records in memory before invoking TensorFlow. Defaults to 64
+        if not specified.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --max-worker-count=MAX_WORKER_COUNT
+        The maximum number of workers to be used for parallel processing.
+        Defaults to 10 if not specified.
+
+     --runtime-version=RUNTIME_VERSION
+        The Google Cloud ML Engine runtime version for this job. Defaults to
+        the latest stable version. See
+        https://cloud.google.com/ml/docs/concepts/runtime-version-list for a
+        list of accepted versions.
+
+     --version=VERSION
+        Model version to be used.
+
+        This flag may only be given if --model is specified. If unspecified,
+        the default version of the model will be used. To list versions for a
+        model, run
+
+            $ gcloud ml-engine versions list
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ml-engine jobs submit prediction
+        $ gcloud alpha ml-engine jobs submit prediction
+

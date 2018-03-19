@@ -1,0 +1,49 @@
+NAME
+    gcloud alpha endpoints services undelete - undeletes a service
+        configuration that was previously deleted
+
+SYNOPSIS
+    gcloud alpha endpoints services undelete SERVICE [--async]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Services that are deleted will be retained in the system for 30
+    days. If a deleted service is still within this retention window, it can be
+    undeleted with this command.
+
+    Note that this means that this command will not be effective for service
+    configurations marked for deletion more than 30 days ago.
+
+POSITIONAL ARGUMENTS
+     SERVICE
+        The name of the service to undelete.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To undelete a service named my-service, run:
+
+        $ gcloud alpha endpoints services undelete my-service
+
+    To run the same command asynchronously (non-blocking), run:
+
+        $ gcloud alpha endpoints services undelete my-service --async
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud endpoints services undelete
+        $ gcloud beta endpoints services undelete
+

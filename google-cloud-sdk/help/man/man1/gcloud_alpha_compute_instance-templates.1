@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_INSTANCE\-TEMPLATES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute instance\-templates \- read and manipulate Google Compute Engine instances templates
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute instance\-templates\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Lists, creates, deletes, and modifies Compute Engine instance
+templates.
+
+More information on Compute Engine instance templates can be found here:
+https://cloud.google.com/compute/docs/instance\-templates
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+\fB(ALPHA)\fR Create a Compute Engine virtual machine instance template.
+
+.TP 2m
+\fBcreate\-with\-container\fR
+\fB(ALPHA)\fR Creates Google Compute Engine virtual machine instance template
+running Docker images.
+
+.TP 2m
+\fBdelete\fR
+\fB(ALPHA)\fR Delete Google Compute Engine virtual machine instance templates.
+
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Describe a virtual machine instance template.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List Google Compute Engine instance templates.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute instance\-templates
+$ gcloud beta compute instance\-templates
+.RE
+

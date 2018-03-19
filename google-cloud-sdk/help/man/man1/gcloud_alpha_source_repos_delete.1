@@ -1,0 +1,82 @@
+
+.TH "GCLOUD_ALPHA_SOURCE_REPOS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha source repos delete \- delete a cloud source repository
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha source repos delete\fR \fIREPOSITORY_NAME\fR [\fB\-\-force\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command deletes a named git repository from the currently
+active Google Cloud Platform project.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIREPOSITORY_NAME\fR
+Name of the repository.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-force\fR
+(REMOVED) If provided, skip the delete confirmation prompt.
+
+The \-\-force option has been removed; use \-\-quiet to suppress prompting.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a named repository in the current project issue the following
+commands:
+
+.RS 2m
+$ gcloud init
+$ gcloud alpha source repos delete REPOSITORY_NAME
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud source repos delete
+$ gcloud beta source repos delete
+.RE
+

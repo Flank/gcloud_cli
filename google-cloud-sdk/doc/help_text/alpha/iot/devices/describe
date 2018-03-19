@@ -1,0 +1,47 @@
+NAME
+    gcloud alpha iot devices describe - show details about a device
+
+SYNOPSIS
+    gcloud alpha iot devices describe
+        (DEVICE : --region=REGION --registry=REGISTRY) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Show details about a device.
+
+POSITIONAL ARGUMENTS
+     DEVICE - The device you want to describe. The arguments in this group can
+     be used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
+
+       DEVICE
+          The ID of the device or a fully qualified identifier for the device.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --region=REGION
+          The name of the Cloud IoT region.
+
+       --registry=REGISTRY
+          The name of the Cloud IoT registry.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudiot/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/iot
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud iot devices describe
+        $ gcloud beta iot devices describe
+

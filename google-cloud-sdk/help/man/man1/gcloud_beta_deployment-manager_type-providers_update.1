@@ -1,0 +1,105 @@
+
+.TH "GCLOUD_BETA_DEPLOYMENT\-MANAGER_TYPE\-PROVIDERS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta deployment\-manager type\-providers update \- update a type provider
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta deployment\-manager type\-providers update\fR \fIPROVIDER_NAME\fR \fB\-\-descriptor\-url\fR=\fIDESCRIPTOR_URL\fR [\fB\-\-api\-options\-file\fR=\fIAPI_OPTIONS_FILE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command updates a type provider.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROVIDER_NAME\fR
+Type provider name or URI.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-descriptor\-url\fR=\fIDESCRIPTOR_URL\fR
+URL of API of your type.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-api\-options\-file\fR=\fIAPI_OPTIONS_FILE\fR
+YAML file with options for the API: e.g. options and collection overrides.
+
+.TP 2m
+\fB\-\-async\fR
+Return immediately and print information about the Operation in progress rather
+than waiting for the Operation to complete. (default=False)
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Optional description of the type provider.
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a type provider, run:
+
+.RS 2m
+$ gcloud beta deployment\-manager type\-providers update \e
+    my\-type\-provider \-\-api\-options=my\-options.yaml \e
+    \-\-descriptor\-url <descriptor URL> \-\-description "My type."
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha deployment\-manager type\-providers update
+.RE
+

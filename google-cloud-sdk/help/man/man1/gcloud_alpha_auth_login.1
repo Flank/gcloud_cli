@@ -1,0 +1,105 @@
+
+.TH "GCLOUD_ALPHA_AUTH_LOGIN" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha auth login \- authorize gcloud to access the Cloud Platform with Google user credentials
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha auth login\fR [\fIACCOUNT\fR] [\fB\-\-no\-activate\fR] [\fB\-\-brief\fR] [\fB\-\-enable\-gdrive\-access\fR] [\fB\-\-force\fR] [\fB\-\-no\-launch\-browser\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Obtains access credentials for your user account via a web\-based
+authorization flow. When this command completes successfully, it sets the active
+account in the current configuration to the account specified. If no
+configuration exists, it creates a configuration named default.
+
+If valid credentials for an account are already available from a prior
+authorization, the account is set to active without rerunning the flow.
+
+Use \f5gcloud auth list\fR to view credentialed accounts.
+
+If you'd rather authorize without a web browser but still interact with the
+command line, use the \f5\-\-no\-launch\-browser\fR flag. To authorize without a
+web browser and non\-interactively, create a service account with the
+appropriate scopes using the Google Cloud Platform Console
+(https://console.cloud.google.com) and use \f5gcloud auth
+activate\-service\-account\fR with the corresponding JSON key file.
+
+For more information on authorization and credential types, see:
+https://cloud.google.com/sdk/docs/authorizing.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+[\fIACCOUNT\fR]
+User account used for authorization.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-activate\fR
+Set the new account to active. Enabled by default, use \fB\-\-no\-activate\fR to
+disable.
+
+.TP 2m
+\fB\-\-brief\fR
+Minimal user output.
+
+.TP 2m
+\fB\-\-enable\-gdrive\-access\fR
+Enable Google Drive access.
+
+.TP 2m
+\fB\-\-force\fR
+Re\-run the web authorization flow even if the given account has valid
+credentials.
+
+.TP 2m
+\fB\-\-launch\-browser\fR
+Launch a browser for authorization. If not enabled or DISPLAY variable is not
+set, prints a URL to standard output to be copied. Enabled by default, use
+\fB\-\-no\-launch\-browser\fR to disable.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud auth login
+$ gcloud beta auth login
+.RE
+

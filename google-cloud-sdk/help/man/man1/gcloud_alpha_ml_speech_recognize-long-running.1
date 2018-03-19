@@ -1,0 +1,159 @@
+
+.TH "GCLOUD_ALPHA_ML_SPEECH_RECOGNIZE\-LONG\-RUNNING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml speech recognize\-long\-running \- get transcripts of longer audio from an audio file
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml speech recognize\-long\-running\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-async\fR] [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Get a transcript of audio up to 80 minutes in length. If the audio
+is under 60 seconds, you may also use \f5gcloud alpha ml speech recognize\fR to
+analyze it.
+
+To block the command from completing until analysis is finished, run:
+
+.RS 2m
+$ gcloud alpha ml speech recognize\-long\-running AUDIO_FILE \e
+    \-\-language LANGUAGE \-\-sample\-rate SAMPLE_RATE
+.RE
+
+You can also receive an operation as the result of the command by running:
+
+.RS 2m
+$ gcloud alpha ml speech recognize\-long\-running AUDIO_FILE \e
+    \-\-language LANGUAGE \-\-sample\-rate SAMPLE_RATE \-\-async
+.RE
+
+This will return information about an operation. To get information about the
+operation, run:
+
+.RS 2m
+$ gcloud alpha ml speech operations describe OPERATION_ID
+.RE
+
+To poll the operation until it's complete, run:
+
+.RS 2m
+$ gcloud alpha ml speech operations wait OPERATION_ID
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIAUDIO\fR
+The location of the audio file to transcribe. Must be a local path or a Google
+Cloud Storage URL (in the format gs://bucket/object).
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR
+The language of the supplied audio as a BCP\-47
+(https://www.rfc\-editor.org/rfc/bcp/bcp47.txt) language tag. Example: "en\-US".
+See https://cloud.google.com/speech/docs/languages for a list of the currently
+supported language codes.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-encoding\fR=\fIENCODING\fR; default="encoding\-unspecified"
+The type of encoding of the file. Required if the file format is not WAV or
+FLAC. \fIENCODING\fR must be one of: \fBamr\fR, \fBamr\-wb\fR,
+\fBencoding\-unspecified\fR, \fBflac\fR, \fBlinear16\fR, \fBmulaw\fR,
+\fBogg\-opus\fR, \fBspeex\-with\-header\-byte\fR.
+
+.TP 2m
+\fB\-\-filter\-profanity\fR
+If True, the server will attempt to filter out profanities, replacing all but
+the initial character in each filtered word with asterisks, e.g. \e"f**\fB\e".
+
+.TP 2m
+\fR\-\-hints\fB=[\fIHINTS\fR,...]
+A list of strings containing word and phrase "hints" so that the speech
+recognition is more likely to recognize them. This can be used to improve the
+accuracy for specific words and phrases, for example, if specific commands are
+typically spoken by the user. This can also be used to add additional words to
+the vocabulary of the recognizer. See
+https://cloud.google.com/speech/limits#content.
+
+.TP 2m
+\fR\-\-include\-word\-time\-offsets\fB
+If True, the top result includes a list of words with the start and end time
+offsets (timestamps) for those words. If False, no word\-level time offset
+information is returned.
+
+.TP 2m
+\fR\-\-max\-alternatives\fB=\fIMAX_ALTERNATIVES\fR; default=1
+Maximum number of recognition hypotheses to be returned. The server may return
+fewer than max_alternatives. Valid values are 0\-30. A value of 0 or 1 will
+return a maximum of one.
+
+.TP 2m
+\fR\-\-sample\-rate\fB=\fISAMPLE_RATE\fR
+The sample rate in Hertz. For best results, set the sampling rate of the audio
+source to 16000 Hz. If that's not possible, use the native sample rate of the
+audio source (instead of re\-sampling).
+
+
+\fR
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBspeech/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/speech/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud ml speech recognize\-long\-running
+$ gcloud beta ml speech recognize\-long\-running
+.RE
+

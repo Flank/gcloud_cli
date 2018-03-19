@@ -1,0 +1,68 @@
+NAME
+    gcloud beta dataproc workflow-templates add-job hive - add a Hive job to
+        the workflow template
+
+SYNOPSIS
+    gcloud beta dataproc workflow-templates add-job hive --step-id=STEP_ID
+        --workflow-template=WORKFLOW_TEMPLATE
+        (--execute=QUERY, -e QUERY | --file=FILE, -f FILE)
+        [--continue-on-failure] [--jars=[JAR,...]] [--labels=[KEY=VALUE,...]]
+        [--params=[PARAM=VALUE,...]] [--properties=[PROPERTY=VALUE,...]]
+        [--region=REGION] [--start-after=STEP_ID,[STEP_ID,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Add a Hive job to the workflow template.
+
+REQUIRED FLAGS
+     --step-id=STEP_ID
+        The step ID of the job in the workflow template.
+
+     --workflow-template=WORKFLOW_TEMPLATE
+        The dataproc workflow template ID.
+
+     Exactly one of these must be specified:
+
+       --execute=QUERY, -e QUERY
+          A Hive query to execute as part of the job.
+
+       --file=FILE, -f FILE
+          HCFS URI of file containing Hive script to execute as the job.
+
+OPTIONAL FLAGS
+     --continue-on-failure
+        Whether to continue if a single query fails.
+
+     --jars=[JAR,...]
+        Comma separated list of jar files to be provided to the Hive and MR.
+        May contain UDFs.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --params=[PARAM=VALUE,...]
+        A list of key value pairs to set variables in the Hive queries.
+
+     --properties=[PROPERTY=VALUE,...]
+        A list of key value pairs to configure Hive.
+
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+     --start-after=STEP_ID,[STEP_ID,...]
+        (Optional) List of step IDs to start this job after.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

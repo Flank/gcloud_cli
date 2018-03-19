@@ -1,0 +1,25 @@
+NAME
+    gcloud compute url-maps delete - delete URL maps
+
+SYNOPSIS
+    gcloud compute url-maps delete URL_MAP_NAME [URL_MAP_NAME ...]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute url-maps delete deletes one or more URL maps.
+
+POSITIONAL ARGUMENTS
+     URL_MAP_NAME [URL_MAP_NAME ...]
+        The names of the URL maps to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute url-maps delete
+        $ gcloud beta compute url-maps delete
+

@@ -1,0 +1,15 @@
+description: my description
+fingerprint: PWfLGDWQDLY=
+id: '123'
+name: my-policy
+rules:
+- action: allow
+  description: default rule
+  match:
+    config:
+      srcIpRanges:
+      - '*'
+    versionedExpr: SRC_IPS_V1
+  preview: false
+  priority: 2147483647
+selfLink: https://www.googleapis.com/compute/beta/projects/my-project/global/securityPolicies/my-policy

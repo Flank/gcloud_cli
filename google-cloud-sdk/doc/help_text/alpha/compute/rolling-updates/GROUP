@@ -1,0 +1,58 @@
+NAME
+    gcloud alpha compute rolling-updates - manage updates in a managed instance
+        group
+
+SYNOPSIS
+    gcloud alpha compute rolling-updates COMMAND [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (DEPRECATED) Manage updates in a managed instance group.
+
+    This command group is deprecated. Use gcloud alpha compute instance-groups
+    managed rolling-action command group instead.
+
+FLAGS
+     --zone=ZONE
+        Rolling update zone name. Overrides the default compute/zone property
+        value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        (ALPHA) (DEPRECATED) Cancels an existing update.
+
+     describe
+        (ALPHA) (DEPRECATED) Gets information about a single update.
+
+     list
+        (ALPHA) (DEPRECATED) Lists all updates for a given group.
+
+     list-instance-updates
+        (ALPHA) (DEPRECATED) Lists all instance updates for a given update.
+
+     pause
+        (ALPHA) (DEPRECATED) Pauses an existing update.
+
+     resume
+        (ALPHA) (DEPRECATED) Resume an existing update.
+
+     rollback
+        (ALPHA) (DEPRECATED) Rolls back an existing update.
+
+     start
+        (ALPHA) (DEPRECATED) Starts a new rolling update.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

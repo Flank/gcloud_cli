@@ -1,0 +1,134 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_NETWORKS_SUBNETS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute networks subnets update \- updates properties of an existing Google Compute Engine subnetwork
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute networks subnets update\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Updates properties of an existing Google Compute Engine
+subnetwork.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the subnetwork to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the subnetwork to update. If not specified, you will be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]
+Adds secondary IP ranges to the subnetwork for use in IP aliasing.
+
+For example, \f5\-\-add\-secondary\-ranges range1=192.168.64.0/24\fR adds a
+secondary range 192.168.64.0/24 with name range1.
+
+.RS 2m
+.IP "\(bu" 2m
+\f5RANGE_NAME\fR \- Name of the secondary range.
+.IP "\(bu" 2m
+\f5RANGE\fR \- \f5IP range in CIDR format.\fR
+.RE
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-[no\-]enable\-flow\-logs\fR
+Enable/disable flow logging for this subnet. Use \fB\-\-enable\-flow\-logs\fR to
+enable and \fB\-\-no\-enable\-flow\-logs\fR to disable.
+
+.RS 2m
+.TP 2m
+\fB\-\-[no\-]enable\-private\-ip\-google\-access\fR
+Enable/disable access to Google Cloud APIs from this subnet for instances
+without a public ip address. Use \fB\-\-enable\-private\-ip\-google\-access\fR
+to enable and \fB\-\-no\-enable\-private\-ip\-google\-access\fR to disable.
+
+.TP 2m
+\fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]
+Removes secondary ranges from the subnetwork.
+
+For example, \f5\-\-remove\-secondary\-ranges range2,range3\fR removes the
+secondary ranges with names range2 and range3.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute networks subnets update
+$ gcloud beta compute networks subnets update
+.RE
+

@@ -1,0 +1,110 @@
+
+.TH "GCLOUD_BETA_IOT_DEVICES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta iot devices update \- update an existing device
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta iot devices update\fR (\fIDEVICE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR\ \fB\-\-registry\fR=\fIREGISTRY\fR) [\fB\-\-blocked\fR] [\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=[\fIKEY\fR=\fIPATH\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Update an existing device.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+DEVICE \- The device to update. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: Set the property [core/project] or provide the flag [\-\-project] on
+the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDEVICE\fR
+The ID of the device or a fully qualified identifier for the device. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The Cloud region for the device.
+
+.TP 2m
+\fB\-\-registry\fR=\fIREGISTRY\fR
+The device registry for the device.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-blocked\fR
+If blocked, connections from this device will fail.
+
+Can be used to temporarily prevent the device from connecting if, for example,
+the sensor is generating bad data and needs maintenance.
+
+
+
+Use \f5\-\-no\-blocked\fR to enable connections and \f5\-\-blocked\fR to
+disable.
+
+.TP 2m
+\fB\-\-metadata\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+The metadata key/value pairs assigned to devices. This metadata is not
+interpreted or indexed by Cloud IoT Core. It can be used to add contextual
+information for the device.
+
+Keys should only contain the following characters \f5[a\-zA\-Z0\-9\-_]\fR and be
+fewer than 128 bytes in length. Values are free\-form strings. Each value must
+be fewer than or equal to 32 KB in size.
+
+The total size of all keys and values must be less than 256 KB, and the maximum
+number of key\-value pairs is 500.
+
+.TP 2m
+\fB\-\-metadata\-from\-file\fR=[\fIKEY\fR=\fIPATH\fR,...]
+Same as \-\-metadata, but the metadata values will be read from the file
+specified by path.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud iot devices update
+$ gcloud alpha iot devices update
+.RE
+

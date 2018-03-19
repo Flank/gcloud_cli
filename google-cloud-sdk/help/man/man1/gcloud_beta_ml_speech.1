@@ -1,0 +1,88 @@
+
+.TH "GCLOUD_BETA_ML_SPEECH" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta ml speech \- use Google Cloud Speech to get transcripts of audio
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta ml speech\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Use Google Cloud Speech to get transcripts of recorded audio, and
+to get information about long\-running speech recognition operations. For audio
+under 60 seconds, use:
+
+.RS 2m
+$ gcloud beta ml speech recognize
+.RE
+
+For audio 60 seconds or longer, use:
+
+.RS 2m
+$ gcloud beta ml speech recognize\-long\-running
+.RE
+
+For more information about the Google Cloud Speech API, refer to this guide:
+https://cloud.google.com/speech/docs/
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBoperations\fR
+\fB(BETA)\fR Interact with Google Cloud Speech operations.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBrecognize\fR
+\fB(BETA)\fR Get transcripts of short (less than 60 seconds) audio from an audio
+file.
+
+.TP 2m
+\fBrecognize\-long\-running\fR
+\fB(BETA)\fR Get transcripts of longer audio from an audio file.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud ml speech
+$ gcloud alpha ml speech
+.RE
+

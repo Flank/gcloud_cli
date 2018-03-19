@@ -1,0 +1,24 @@
+NAME
+    gcloud auth print-access-token - print an access token for the active
+        account
+
+SYNOPSIS
+    gcloud auth print-access-token [ACCOUNT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Print an access token for the active account.
+
+POSITIONAL ARGUMENTS
+     [ACCOUNT]
+        The account to get the access token for. Leave empty for the active
+        account.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

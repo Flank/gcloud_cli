@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha compute interconnects attachments partner - create or
+        manipulate partner interconnect attachments
+
+SYNOPSIS
+    gcloud alpha compute interconnects attachments partner COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create or manipulate partner interconnect attachments.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Google Compute Engine partner interconnect attachment.
+
+     update
+        (ALPHA) Update a Google Compute Engine partner interconnect attachment.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

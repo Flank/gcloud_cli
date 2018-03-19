@@ -1,0 +1,41 @@
+NAME
+    gcloud beta compute backend-buckets update - update a backend bucket
+
+SYNOPSIS
+    gcloud beta compute backend-buckets update BACKEND_BUCKET_NAME
+        [--description=DESCRIPTION] [--enable-cdn]
+        [--gcs-bucket-name=GCS_BUCKET_NAME] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute backend-buckets update is used to update backend
+    buckets.
+
+POSITIONAL ARGUMENTS
+     BACKEND_BUCKET_NAME
+        The name of the backend bucket to update.
+
+FLAGS
+     --description=DESCRIPTION
+        An optional, textual description for the backend bucket.
+
+     --enable-cdn
+        Enable Cloud CDN for the backend bucket. Cloud CDN can cache HTTP
+        responses from a backend bucket at the edge of the network, close to
+        users.
+
+     --gcs-bucket-name=GCS_BUCKET_NAME
+        The name of the Google Cloud Storage bucket to serve from. The storage
+        bucket must be in the same project.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute backend-buckets update
+        $ gcloud alpha compute backend-buckets update
+

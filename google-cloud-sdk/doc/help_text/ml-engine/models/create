@@ -1,0 +1,42 @@
+NAME
+    gcloud ml-engine models create - create a new Cloud ML Engine model
+
+SYNOPSIS
+    gcloud ml-engine models create MODEL [--description=DESCRIPTION]
+        [--enable-logging] [--labels=[KEY=VALUE,...]]
+        [--regions=REGION,[REGION,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create a new Cloud ML Engine model.
+
+POSITIONAL ARGUMENTS
+     MODEL
+        Name of the model.
+
+FLAGS
+     --description=DESCRIPTION
+        The description of the model.
+
+     --enable-logging
+        If set, enables StackDriver Logging for online prediction.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --regions=REGION,[REGION,...]
+        The Google Cloud region where the model will be deployed (currently
+        only a single region is supported).
+
+        Will soon be required, but defaults to 'us-central1' for now.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha ml-engine models create
+        $ gcloud beta ml-engine models create
+

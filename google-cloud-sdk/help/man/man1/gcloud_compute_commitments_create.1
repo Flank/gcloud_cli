@@ -1,0 +1,112 @@
+
+.TH "GCLOUD_COMPUTE_COMMITMENTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute commitments create \- create Google Compute Engine commitments
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR \fB\-\-resources\fR=[\fIRESOURCE\fR=\fICOMMITMENT\fR,...] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create Google Compute Engine commitments.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fICOMMITMENT\fR
+The name of the commitment to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-plan\fR=\fIPLAN\fR
+Duration of the commitment. \fIPLAN\fR must be one of: \fB12\-month\fR,
+\fB36\-month\fR.
+
+.TP 2m
+\fB\-\-resources\fR=[\fIRESOURCE\fR=\fICOMMITMENT\fR,...]
+Resources to be included in the commitment commitment:
+.RS 2m
+.IP "\(em" 2m
+MEMORY should include unit (eg. 3072MB or 9GB). If no units are specified, GB is
+assumed.
+.IP "\(em" 2m
+VCPU is number of commited cores.
+.RE
+.RE
+.sp
+Ratio between number of VCPU cores and memory must conform to limits described
+on:
+https://cloud.google.com/compute/docs/instances/creating\-instance\-with\-custom\-machine\-type
+
+
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the commitment to create. If not specified, you will be prompted
+to select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute commitments create
+$ gcloud beta compute commitments create
+.RE
+

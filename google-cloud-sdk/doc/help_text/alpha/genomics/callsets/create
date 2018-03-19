@@ -1,0 +1,31 @@
+NAME
+    gcloud alpha genomics callsets create - creates a call set with a specified
+        name
+
+SYNOPSIS
+    gcloud alpha genomics callsets create --name=NAME
+        --variant-set-id=VARIANT_SET_ID [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A call set is a collection of variant calls, typically for one
+    sample.
+
+REQUIRED FLAGS
+     --name=NAME
+        The name of the call set being created.
+
+     --variant-set-id=VARIANT_SET_ID
+        Variant set that this call set belongs to.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

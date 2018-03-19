@@ -1,0 +1,12 @@
+#!/usr/bin/python
+"""Example plugin.
+
+This tests the basic message passing protocol between a plugin and the
+library.
+"""
+
+import sys
+
+print 'this should go to info'
+print '{"type": "info", "message": "this should also go to info"}'
+sys.stderr.write('this should go to warning')

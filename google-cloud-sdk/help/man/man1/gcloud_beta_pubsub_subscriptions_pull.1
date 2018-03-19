@@ -1,0 +1,120 @@
+
+.TH "GCLOUD_BETA_PUBSUB_SUBSCRIPTIONS_PULL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta pubsub subscriptions pull \- pulls one or more Cloud Pub/Sub messages from a subscription
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta pubsub subscriptions pull\fR \fISUBSCRIPTION\fR [\fB\-\-auto\-ack\fR] [\fB\-\-max\-messages\fR=\fIMAX_MESSAGES\fR;\ default=1] [\fB\-\-wait\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Returns one or more messages from the specified Cloud Pub/Sub
+subscription, if there are any messages enqueued.
+
+By default, this command returns only one message from the subscription. Use the
+\f5\-\-limit\fR flag to specify the max messages to return.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISUBSCRIPTION\fR
+Name of the subscription to pull messages from.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-auto\-ack\fR
+Automatically ACK every message pulled from this subscription.
+
+.TP 2m
+\fB\-\-max\-messages\fR=\fIMAX_MESSAGES\fR; default=1
+(DEPRECATED) The maximum number of messages that Cloud Pub/Sub can return in
+this response.
+
+\f5\-\-max\-messages\fR is deprecated. Please use \-\-limit instead.
+
+.TP 2m
+\fB\-\-wait\fR
+Wait (for a bounded amount of time) for new messages from the subscription, if
+there are none.
+
+
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates True then that item is listed. For more details and
+examples of filter expressions run $ gcloud topic filters. This flag interacts
+with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+A comma\-separated list of resource field key names to sort by. The default
+order is ascending. Prefix a field with ``~'' for descending order on that
+field. This flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-uri\fR
+Print a list of resource URIs instead of the default output.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud pubsub subscriptions pull
+$ gcloud alpha pubsub subscriptions pull
+.RE
+

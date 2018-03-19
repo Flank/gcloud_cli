@@ -1,0 +1,62 @@
+NAME
+    gcloud alpha genomics readgroupsets import - imports read group sets into a
+        dataset
+
+SYNOPSIS
+    gcloud alpha genomics readgroupsets import --dataset-id=DATASET_ID
+        --source-uris=[SOURCE_URIS,...]
+        [--partition-strategy=PARTITION_STRATEGY]
+        [--reference-set-id=REFERENCE_SET_ID] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Imports read group sets from a set of BAM files in Google Cloud
+    Storage. See [](https://cloud.google.com/genomics/managing-reads for more
+    details)
+
+REQUIRED FLAGS
+     --dataset-id=DATASET_ID
+        The ID of the dataset the imported read group sets will belong to.
+
+     --source-uris=[SOURCE_URIS,...]
+        Comma separated list of Google Cloud Storage URIs for BAM files
+        (https://samtools.github.io/hts-specs/SAMv1.pdf) to be imported.
+
+OPTIONAL FLAGS
+     --partition-strategy=PARTITION_STRATEGY
+        One of "PER_FILE_PER_SAMPLE" or "MERGE_ALL". The partition strategy
+        describes how read groups from the provided files are partitioned into
+        read group sets. In general, use PER_FILE_PER_SAMPLE when importing
+        multiple samples from multiple files and use MERGE_ALL when importing a
+        single sample from multiple files. Defaults to PER_FILE_PER_SAMPLE
+
+     --reference-set-id=REFERENCE_SET_ID
+        The reference set ID to associate with the imported read group sets.
+        The reference headers in the provided BAM files will be validated
+        against this ID. The reference set ID can be used by consumers of your
+        imported read group sets for more robust reference genome comparison.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    Import a single BAM file and associate with the GRCh38 reference set:
+
+        $ gcloud alpha genomics readgroupsets import --dataset-id 123 \
+            --reference-set-id "EMud_c37lKPXTQ" \
+            --source-uris "gs://mybucket/reads.bam"
+
+    Import a single sample which is sharded across multiple BAM files:
+
+        $ gcloud alpha genomics readgroupsets import --dataset-id 123 \
+            --partition-strategy MERGE_ALL \
+            --source-uris "gs://mybucket/chr?.bam,gs://mybucket/mt.bam"
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

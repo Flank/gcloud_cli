@@ -1,0 +1,46 @@
+NAME
+    gcloud kms cryptokeys versions create - create a new CryptoKeyVersion
+
+SYNOPSIS
+    gcloud kms cryptokeys versions create [--key=KEY] [--keyring=KEYRING]
+        [--location=LOCATION] [--primary] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (REMOVED) Create a new CryptoKeyVersion.
+
+    The command group cryptokeys is deprecated, please use the keys command
+    group.
+
+    Creates a new CryptoKeyVersion within the given CryptoKey.
+
+FLAGS
+     --key=KEY
+        The containing key.
+
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+     --primary
+        If specified, immediately make the new version primary.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command creates a new CryptoKeyVersion within the frodo
+    CryptoKey, fellowship KeyRing, and global Location and sets it as the
+    primary version:
+
+        $ gcloud kms cryptokeys versions create --location global \
+            --keyring fellowship \
+            --cryptokey frodo --primary
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

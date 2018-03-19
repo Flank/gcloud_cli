@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha compute security-policies import - import security policy
+        configs into your project
+
+SYNOPSIS
+    gcloud alpha compute security-policies import NAME --file-name=FILE_NAME
+        [--file-format=FILE_FORMAT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Import security policy configs into your project.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the security policy to import.
+
+REQUIRED FLAGS
+     --file-name=FILE_NAME
+        The name of the JSON or YAML file to import the security policy config
+        from.
+
+OPTIONAL FLAGS
+     --file-format=FILE_FORMAT
+        The format of the file to import the security policy config from.
+        Specify either yaml or json. Defaults to yaml if not specified.
+        FILE_FORMAT must be one of: json, yaml.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta compute security-policies import
+

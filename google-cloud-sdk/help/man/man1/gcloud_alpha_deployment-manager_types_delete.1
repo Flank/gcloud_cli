@@ -1,0 +1,77 @@
+
+.TH "GCLOUD_ALPHA_DEPLOYMENT\-MANAGER_TYPES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha deployment\-manager types delete \- delete a composite type
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha deployment\-manager types delete\fR \fINAME\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Delete a composite type.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Composite type name.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Return immediately and print information about the Operation in progress rather
+than waiting for the Operation to complete. (default=False)
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a composite type, run:
+
+.RS 2m
+$ gcloud alpha deployment\-manager types delete my\-composite\-type
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta deployment\-manager types delete
+.RE
+

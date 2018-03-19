@@ -1,0 +1,49 @@
+NAME
+    gcloud alpha compute snapshots add-labels - add labels to Google Compute
+        Engine snapshots
+
+SYNOPSIS
+    gcloud alpha compute snapshots add-labels SNAPSHOT_NAME
+        --labels=[KEY=VALUE,...] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute snapshots add-labels adds labels to a Google
+    Compute Engine snapshot. For example, running:
+
+        $ gcloud alpha compute snapshots add-labels example-snapshot \
+            --labels=k0=v0,k1=v1
+
+    will add key-value pairs k0=v0 and k1=v1 to 'example-snapshot'.
+
+    Labels can be used to identify the snapshot and to filter them as in
+
+        $ gcloud alpha compute snapshots list --filter='labels.k1:value2'
+
+    To list existing labels
+
+        $ gcloud alpha compute snapshots describe example-snapshot \
+            --format='default(labels)'
+
+POSITIONAL ARGUMENTS
+     SNAPSHOT_NAME
+        The name of the snapshot to operate on.
+
+REQUIRED FLAGS
+     --labels=[KEY=VALUE,...]
+        A list of labels to add.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute snapshots add-labels
+        $ gcloud beta compute snapshots add-labels
+

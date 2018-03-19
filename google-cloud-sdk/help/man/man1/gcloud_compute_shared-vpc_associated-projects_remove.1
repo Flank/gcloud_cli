@@ -1,0 +1,75 @@
+
+.TH "GCLOUD_COMPUTE_SHARED\-VPC_ASSOCIATED\-PROJECTS_REMOVE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute shared\-vpc associated\-projects remove \- disassociate the given project from the given shared VPC host project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute shared\-vpc associated\-projects remove\fR \fIPROJECT_ID\fR \fB\-\-host\-project\fR=\fIHOST_PROJECT\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Disassociate the given project from the given shared VPC host project.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+ID for the project to remove from the host project
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-host\-project\fR=\fIHOST_PROJECT\fR
+The XPN host to remove the associated project from
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To remove the project \f5service\-project\fR as an associated shared VPC service
+project of the shared VPC host project \f5host\-project\fR, run:
+
+.RS 2m
+$ gcloud compute shared\-vpc associated\-projects remove \e
+    \-\-host\-project=host\-project service\-project
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute shared\-vpc associated\-projects remove
+$ gcloud beta compute shared\-vpc associated\-projects remove
+.RE
+

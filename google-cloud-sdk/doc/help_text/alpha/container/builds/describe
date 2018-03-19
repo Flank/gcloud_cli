@@ -1,0 +1,30 @@
+NAME
+    gcloud alpha container builds describe - get information about a particular
+        build
+
+SYNOPSIS
+    gcloud alpha container builds describe BUILD [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Get information about a particular build.
+
+POSITIONAL ARGUMENTS
+     BUILD
+        The build to describe. The ID of the build is printed at the end of the
+        build submission process, or in the ID column when listing builds.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud container builds describe
+        $ gcloud beta container builds describe
+

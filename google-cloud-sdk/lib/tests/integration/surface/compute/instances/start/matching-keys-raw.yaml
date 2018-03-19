@@ -1,0 +1,368 @@
+---
+args:
+  command: beta compute instances start z2
+  specified_args:
+    --csek-key-file: key-file.json
+    --zone: us-east1-b
+---
+state:
+  interactive_console: true
+  random_seed: 6784406474706088648
+---
+properties:
+  api_endpoint_overrides:
+    compute: https://www.googleapis.com/compute/beta/
+  app:
+    runtime_root: /tmp/tmphgCP7n/runtimes
+  component_manager:
+    disable_update_check: 'True'
+  compute:
+    zone: us-east1-b
+  core:
+    disable_color: 'True'
+    disable_usage_reporting: 'True'
+    project: fake-project
+---
+input:
+  files:
+  - content: |
+      [
+        {
+        "uri": "https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b/disks/z2",
+        "key": "acXTX3rxrKAFTF0tYVLvydU1riRZTvUNC4g5I11NY1c=",
+        "key-type": "raw"
+        }
+      ]
+    name: key-file.json
+---
+request:
+  body: |-
+    --===============0174599144534358633==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <2f2cd371-db32-4f3a-b09d-87552c6a2d41+0>
+
+    GET /compute/beta/projects/fake-project/zones/us-east1-b/instances/z2?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    accept-encoding: gzip, deflate
+    content-length: 0
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============0174599144534358633==--
+  headers:
+    content-type: multipart/mixed; boundary="===============0174599144534358633=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/beta
+---
+response:
+  content:
+  - "\r\n--batch_1TMZkSu4Cc6V08UxvgmiYj5orr--YQ6H\r\nContent-Type: application/http\r\
+    \nContent-ID: <response-2f2cd371-db32-4f3a-b09d-87552c6a2d41+0>\r\n\r\nHTTP/1.1\
+    \ 200 OK\r\nX-Google-Session-Info: CNDGp7X4BBoEGBAoCzpWEiZzdGFnaW5nLWNvbXB1dGUuc2FuZGJveC5nb29nbGVhcGlzLmNvbRjP9fCjeSImMzI1NTU5NDA1NTkuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb21KDzoNMS82MTRFendtMFNZfrIBD0lNWFl4UGZuMGJMMHdnRQ\r\
+    \nX-Google-Backends: 127.0.0.1:4333\r\nContent-Type: application/json; charset=UTF-8\r\
+    \nVary: Origin\r\nVary: X-Origin\r\nVary: Referer\r\nX-Google-GFE-Backend-Request-Cost:\
+    \ 6.1248\r\n\r\n"
+  - json:
+      canIpForward: false
+      cpuPlatform: Intel Haswell
+      creationTimestamp: '2017-11-09T15:00:28.963-08:00'
+      deletionProtection: false
+      disks:
+      - autoDelete: true
+        boot: true
+        deviceName: z2
+        diskEncryptionKey:
+          sha256: M4Gh4pcYnPvIo0s73QigwGxy3krUcNbJ8qe02a21uEc=
+        diskSizeGb: '10'
+        index: 0
+        interface: SCSI
+        kind: compute#attachedDisk
+        licenses:
+        - https://www.googleapis.com/compute/beta/projects/bct-staging-functional/global/licenses/debian-9-stretch
+        mode: READ_WRITE
+        source: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z2
+        type: PERSISTENT
+      id: '5668794497172594915'
+      kind: compute#instance
+      labelFingerprint: 42WmSpB8rSM=
+      machineType: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
+      metadata:
+        fingerprint: Tewg-kYB2-A=
+        kind: compute#metadata
+      name: z2
+      networkInterfaces:
+      - accessConfigs:
+        - kind: compute#accessConfig
+          name: external-nat
+          natIP: 74.125.64.163
+          networkTier: PREMIUM
+          type: ONE_TO_ONE_NAT
+        fingerprint: msa80dimyyw=
+        kind: compute#networkInterface
+        name: nic0
+        network: https://www.googleapis.com/compute/beta/projects/fake-project/global/networks/default
+        networkIP: 10.240.0.7
+      scheduling:
+        automaticRestart: true
+        onHostMaintenance: MIGRATE
+        preemptible: false
+      selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
+      serviceAccounts:
+      - email: 341306109951-compute@developer.gserviceaccount.com
+        scopes:
+        - https://www.googleapis.com/auth/cloud.useraccounts.readonly
+        - https://www.googleapis.com/auth/devstorage.read_only
+        - https://www.googleapis.com/auth/logging.write
+        - https://www.googleapis.com/auth/monitoring.write
+        - https://www.googleapis.com/auth/pubsub
+        - https://www.googleapis.com/auth/service.management.readonly
+        - https://www.googleapis.com/auth/servicecontrol
+        - https://www.googleapis.com/auth/trace.append
+      startRestricted: false
+      status: RUNNING
+      tags:
+        fingerprint: 42WmSpB8rSM=
+      zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+  - "\n\r\n--batch_1TMZkSu4Cc6V08UxvgmiYj5orr--YQ6H--\r\n"
+  response:
+    alt-svc: quic=":443"; ma=2592000; v="41,39,38,37,35"
+    content-type: multipart/mixed; boundary=batch_1TMZkSu4Cc6V08UxvgmiYj5orr--YQ6H
+    date: Thu, 09 Nov 2017 23:01:30 GMT
+    server: ESF
+    status: '200'
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: |-
+    --===============6078977470525156926==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <ae90f216-d2d9-4912-8227-511073bc2080+0>
+
+    POST /compute/beta/projects/fake-project/zones/us-east1-b/instances/z2/startWithEncryptionKey?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    accept-encoding: gzip, deflate
+    content-length: 195
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+    {"disks": [{"diskEncryptionKey": {"rawKey": "acXTX3rxrKAFTF0tYVLvydU1riRZTvUNC4g5I11NY1c="}, "source": "https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z2"}]}
+    --===============6078977470525156926==--
+  headers:
+    content-type: multipart/mixed; boundary="===============6078977470525156926=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/beta
+---
+response:
+  content:
+  - "\r\n--batch__dJnzJae0dPmRdyGj-vX1FISaHw5sVQf\r\nContent-Type: application/http\r\
+    \nContent-ID: <response-ae90f216-d2d9-4912-8227-511073bc2080+0>\r\n\r\nHTTP/1.1\
+    \ 200 OK\r\nX-Google-Session-Info: CNDGp7X4BBoEGBAoCzpWEiZzdGFnaW5nLWNvbXB1dGUuc2FuZGJveC5nb29nbGVhcGlzLmNvbRjP9fCjeSImMzI1NTU5NDA1NTkuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb21KDzoNMS82MTRFendtMFNZfrIBD0lNWFl4UGZuMGJMMHdnRQ\r\
+    \nX-Google-Backends: 127.0.0.1:4025\r\nContent-Type: application/json; charset=UTF-8\r\
+    \nVary: Origin\r\nVary: X-Origin\r\nVary: Referer\r\nX-Google-GFE-Backend-Request-Cost:\
+    \ 5.5596\r\n\r\n"
+  - json:
+      endTime: '2017-11-09T15:01:30.800-08:00'
+      id: '7682801402110369957'
+      insertTime: '2017-11-09T15:01:30.800-08:00'
+      kind: compute#operation
+      name: operation-1510268490504-55d94c8e45827-bc5f9a9d-75aaeb63
+      operationType: startWithEncryptionKey
+      progress: 100
+      selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/operations/operation-1510268490504-55d94c8e45827-bc5f9a9d-75aaeb63
+      startTime: '2017-11-09T15:01:30.800-08:00'
+      status: DONE
+      targetId: '5668794497172594915'
+      targetLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
+      zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+  - "\n\r\n--batch__dJnzJae0dPmRdyGj-vX1FISaHw5sVQf--\r\n"
+  response:
+    alt-svc: quic=":443"; ma=2592000; v="41,39,38,37,35"
+    content-type: multipart/mixed; boundary=batch__dJnzJae0dPmRdyGj-vX1FISaHw5sVQf
+    date: Thu, 09 Nov 2017 23:01:30 GMT
+    server: ESF
+    status: '200'
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: |-
+    --===============0503988372723117136==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <451ff2aa-5b69-42ad-ac7d-98469956cae4+0>
+
+    GET /compute/beta/projects/fake-project/zones/us-east1-b/operations/operation-1510268490504-55d94c8e45827-bc5f9a9d-75aaeb63?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    accept-encoding: gzip, deflate
+    content-length: 0
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============0503988372723117136==--
+  headers:
+    content-type: multipart/mixed; boundary="===============0503988372723117136=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/beta
+---
+response:
+  content:
+  - "\r\n--batch_mxBBvVkFxuTBGYMljj2zcMd3FruQph1F\r\nContent-Type: application/http\r\
+    \nContent-ID: <response-451ff2aa-5b69-42ad-ac7d-98469956cae4+0>\r\n\r\nHTTP/1.1\
+    \ 200 OK\r\nX-Google-Session-Info: CNDGp7X4BBoEGBAoCzpWEiZzdGFnaW5nLWNvbXB1dGUuc2FuZGJveC5nb29nbGVhcGlzLmNvbRjP9fCjeSImMzI1NTU5NDA1NTkuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb21KDzoNMS82MTRFendtMFNZfrIBD0lNWFl4UGZuMGJMMHdnRQ\r\
+    \nX-Google-Backends: 127.0.0.1:4382\r\nContent-Type: application/json; charset=UTF-8\r\
+    \nVary: Origin\r\nVary: X-Origin\r\nVary: Referer\r\nX-Google-GFE-Backend-Request-Cost:\
+    \ 7.3836\r\n\r\n"
+  - json:
+      endTime: '2017-11-09T15:01:30.800-08:00'
+      id: '7682801402110369957'
+      insertTime: '2017-11-09T15:01:30.800-08:00'
+      kind: compute#operation
+      name: operation-1510268490504-55d94c8e45827-bc5f9a9d-75aaeb63
+      operationType: startWithEncryptionKey
+      progress: 100
+      selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/operations/operation-1510268490504-55d94c8e45827-bc5f9a9d-75aaeb63
+      startTime: '2017-11-09T15:01:30.800-08:00'
+      status: DONE
+      targetId: '5668794497172594915'
+      targetLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
+      zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+  - "\n\r\n--batch_mxBBvVkFxuTBGYMljj2zcMd3FruQph1F--\r\n"
+  response:
+    alt-svc: quic=":443"; ma=2592000; v="41,39,38,37,35"
+    content-type: multipart/mixed; boundary=batch_mxBBvVkFxuTBGYMljj2zcMd3FruQph1F
+    date: Thu, 09 Nov 2017 23:01:32 GMT
+    server: ESF
+    status: '200'
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: |-
+    --===============7782658101145831089==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <33c32be6-f400-4254-b9ed-bb59e9a14664+0>
+
+    GET /compute/beta/projects/fake-project/zones/us-east1-b/instances/z2?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    accept-encoding: gzip, deflate
+    content-length: 0
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============7782658101145831089==--
+  headers:
+    content-type: multipart/mixed; boundary="===============7782658101145831089=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/beta
+---
+response:
+  content:
+  - "\r\n--batch_I7LghY_qjspBM-C79-wAqkq9qOtLBtSL\r\nContent-Type: application/http\r\
+    \nContent-ID: <response-33c32be6-f400-4254-b9ed-bb59e9a14664+0>\r\n\r\nHTTP/1.1\
+    \ 200 OK\r\nX-Google-Session-Info: CNDGp7X4BBoEGBAoCzpWEiZzdGFnaW5nLWNvbXB1dGUuc2FuZGJveC5nb29nbGVhcGlzLmNvbRjP9fCjeSImMzI1NTU5NDA1NTkuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb21KDzoNMS82MTRFendtMFNZfrIBD0lNWFl4UGZuMGJMMHdnRQ\r\
+    \nX-Google-Backends: 127.0.0.1:4292\r\nContent-Type: application/json; charset=UTF-8\r\
+    \nVary: Origin\r\nVary: X-Origin\r\nVary: Referer\r\nX-Google-GFE-Backend-Request-Cost:\
+    \ 4.0115\r\n\r\n"
+  - json:
+      canIpForward: false
+      cpuPlatform: Intel Haswell
+      creationTimestamp: '2017-11-09T15:00:28.963-08:00'
+      deletionProtection: false
+      disks:
+      - autoDelete: true
+        boot: true
+        deviceName: z2
+        diskEncryptionKey:
+          sha256: M4Gh4pcYnPvIo0s73QigwGxy3krUcNbJ8qe02a21uEc=
+        diskSizeGb: '10'
+        index: 0
+        interface: SCSI
+        kind: compute#attachedDisk
+        licenses:
+        - https://www.googleapis.com/compute/beta/projects/bct-staging-functional/global/licenses/debian-9-stretch
+        mode: READ_WRITE
+        source: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/disks/z2
+        type: PERSISTENT
+      id: '5668794497172594915'
+      kind: compute#instance
+      labelFingerprint: 42WmSpB8rSM=
+      machineType: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/machineTypes/n1-standard-1
+      metadata:
+        fingerprint: Tewg-kYB2-A=
+        kind: compute#metadata
+      name: z2
+      networkInterfaces:
+      - accessConfigs:
+        - kind: compute#accessConfig
+          name: external-nat
+          natIP: 74.125.64.163
+          networkTier: PREMIUM
+          type: ONE_TO_ONE_NAT
+        fingerprint: msa80dimyyw=
+        kind: compute#networkInterface
+        name: nic0
+        network: https://www.googleapis.com/compute/beta/projects/fake-project/global/networks/default
+        networkIP: 10.240.0.7
+      scheduling:
+        automaticRestart: true
+        onHostMaintenance: MIGRATE
+        preemptible: false
+      selfLink: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2
+      serviceAccounts:
+      - email: 341306109951-compute@developer.gserviceaccount.com
+        scopes:
+        - https://www.googleapis.com/auth/cloud.useraccounts.readonly
+        - https://www.googleapis.com/auth/devstorage.read_only
+        - https://www.googleapis.com/auth/logging.write
+        - https://www.googleapis.com/auth/monitoring.write
+        - https://www.googleapis.com/auth/pubsub
+        - https://www.googleapis.com/auth/service.management.readonly
+        - https://www.googleapis.com/auth/servicecontrol
+        - https://www.googleapis.com/auth/trace.append
+      startRestricted: false
+      status: RUNNING
+      tags:
+        fingerprint: 42WmSpB8rSM=
+      zone: https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b
+  - "\n\r\n--batch_I7LghY_qjspBM-C79-wAqkq9qOtLBtSL--\r\n"
+  response:
+    alt-svc: quic=":443"; ma=2592000; v="41,39,38,37,35"
+    content-type: multipart/mixed; boundary=batch_I7LghY_qjspBM-C79-wAqkq9qOtLBtSL
+    date: Thu, 09 Nov 2017 23:01:32 GMT
+    server: ESF
+    status: '200'
+    vary: Origin, X-Origin, Referer
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  stderr: |
+    <START PROGRESS TRACKER>Starting instance(s) z2
+    <END PROGRESS TRACKER>SUCCESS
+    Updated [https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z2].

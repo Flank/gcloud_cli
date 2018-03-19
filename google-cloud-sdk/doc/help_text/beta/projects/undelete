@@ -1,0 +1,39 @@
+NAME
+    gcloud beta projects undelete - undelete a project
+
+SYNOPSIS
+    gcloud beta projects undelete PROJECT_ID [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Undeletes the project with the given project ID.
+
+    This command can fail for the following reasons:
+      o There is no project with the given ID.
+      o The active account does not have Owner or Editor permissions for the
+        given project.
+
+POSITIONAL ARGUMENTS
+     PROJECT_ID
+        ID for the project you want to undelete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command undeletes the project with the ID example-foo-bar-1:
+
+        $ gcloud beta projects undelete example-foo-bar-1
+
+SEE ALSO
+    See https://support.google.com/cloud/answer/6251787 for information on
+    creating or deleting projects from the Google Cloud Platform Console.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud projects undelete
+        $ gcloud alpha projects undelete
+

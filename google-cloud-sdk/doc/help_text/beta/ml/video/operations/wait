@@ -1,0 +1,32 @@
+NAME
+    gcloud beta ml video operations wait - poll long-running video analysis
+        operation until it completes
+
+SYNOPSIS
+    gcloud beta ml video operations wait OPERATION_ID [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Poll a long-running video analysis operation until it completes.
+    When the operation is complete, this command will display the results of
+    the analysis.
+
+POSITIONAL ARGUMENTS
+     OPERATION_ID
+        ID for the operation to poll until complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the videointelligence/v1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/video-intelligence/docs/
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ml video operations wait
+        $ gcloud alpha ml video operations wait
+

@@ -1,0 +1,197 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_INSTANCE\-GROUPS_MANAGED_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute instance\-groups managed create \- create a Compute Engine managed instance group
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-names\fR] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed create\fR creates
+a Google Compute Engine managed instance group.
+
+For example, running:
+
+.RS 2m
+$ gcloud alpha compute instance\-groups managed create \e
+example\-managed\-instance\-group \-\-zone us\-central1\-a \e
+\-\-template example\-instance\-template \-\-size 1
+.RE
+
+will create one managed instance group called
+\'example\-managed\-instance\-group' in the \f5\fIus\-central1\-a\fR\fR zone.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the managed instance group to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-size\fR=\fISIZE\fR
+The initial number of instances you want in this group.
+
+.TP 2m
+\fB\-\-template\fR=\fITEMPLATE\fR
+Specifies the instance template to use when creating new instances.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR
+The base name to use for the Compute Engine instances that will be created with
+the managed instance group. If not provided base instance name will be the
+prefix of instance group name.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional description for this group.
+
+.TP 2m
+\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR
+Specifies the length of the period during which the instance is known to be
+initializing and should not be autohealed even if unhealthy. This value cannot
+be greater than 1 hour. See $ gcloud topic datetimes for information on duration
+formats.
+
+.TP 2m
+\fB\-\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]
+Disks considered stateful by the instance group. Usually, the managed instance
+group deletes disks when deleting instances; however, in the case of stateful
+disks, these disks are detached from the deleted instance and attached to new
+instances the managed instance group creates.
+
+.TP 2m
+\fB\-\-stateful\-names\fR
+Enable stateful names of instances. Whenever instances with those names are
+restarted or recreated, they will have the same names as before. Use
+\-\-no\-stateful\-names to disable stateful names.
+
+.TP 2m
+\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]
+Specifies any target pools you want the instances of this managed instance group
+to be part of.
+
+.TP 2m
+\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]
+If this flag is specified a regional managed instance group will be created. The
+managed instance group will be in the same region as specified zones and will
+spread instances in it between specified zones.
+
+All zones must belong to the same region. You may specify \-\-region flag but it
+must be the region to which zones belong. This flag is mutually exclusive with
+\-\-zone flag.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR
+The name of the health check to operate on.
+
+.TP 2m
+\fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR
+Specifies the HTTP health check object used for autohealing instances in this
+group.
+
+.TP 2m
+\fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR
+Specifies the HTTPS health check object used for autohealing instances in this
+group.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the managed instance group to create. If not specified, you will
+be prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+
+.RE
+.RE
+.sp
+If you specify \f5\-\-zones\fR flag this flag must be unspecified or specify the
+region to which the zones you listed belong.
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.RS 2m
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the managed instance group to create. If not specified, you may be
+prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute instance\-groups managed create
+$ gcloud beta compute instance\-groups managed create
+.RE
+

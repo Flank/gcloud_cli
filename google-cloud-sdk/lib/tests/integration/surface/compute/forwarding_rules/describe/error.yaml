@@ -1,0 +1,186 @@
+---
+args:
+  command: compute forwarding-rules describe rule1
+  specified_args: {}
+---
+state:
+  interactive_console: true
+---
+properties:
+  component_manager:
+    disable_update_check: 'True'
+  core:
+    disable_color: 'True'
+    project: fake-project
+---
+input:
+  files: []
+  stdin: |
+    1
+---
+request:
+  body: |
+    --===============5253138134393522605==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <d846a205-fa76-4bd2-925e-4d492748b5e0+0>
+
+    GET /compute/v1/projects/fake-project/regions?alt=json&maxResults=500 HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    content-length: 0
+    accept-encoding: gzip, deflate
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============5253138134393522605==--
+  headers:
+    Authorization: Bearer ya29.GluaBNj4A25OrDsnv_9dV6KNYSyj0edYTT5tK1f5OXhq6tUhRp28nRZlVnWw-FAZA4EYca-VYfHtrExrwEjIxbvqy6YTbVzCS2JbAj-ymhfv7jlDzYCu9-jrdRkJ
+    content-length: '483'
+    content-type: multipart/mixed; boundary="===============5253138134393522605=="
+    user-agent: google-cloud-sdk gcloud/HEAD command/gcloud.compute.forwarding-rules.describe
+      invocation-id/fd87d120ddc8447c841919f969e02cf4 environment/None environment-version/None
+      interactive/False python/2.7.6 (Linux 4.4.0-79-generic)
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_f4YzVz__gIs_AAnepUSqLPs\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-d846a205-fa76-4bd2-925e-4d492748b5e0+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"AhMNZHfgI8vVha8d7DAAA2BB2rY/skSKPF29Jdrc1a7M3mnXaZwd5vE\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Tue, 01 Aug 2017 18:18:40 GMT\r\nExpires:\
+    \ Tue, 01 Aug 2017 18:18:40 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 21712\r\n\r\n"
+  - json:
+      id: projects/fake-project/regions
+      items:
+      - creationTimestamp: '2016-06-14T17:29:18.761-07:00'
+        description: us-central1
+        id: '1000'
+        kind: compute#region
+        name: us-central1
+        quotas:
+        - limit: 33.0
+          metric: CPUS
+          usage: 25.0
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/regions/us-central1
+        status: UP
+        zones:
+        - https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-a
+        - https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-b
+        - https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-c
+        - https://www.googleapis.com/compute/v1/projects/fake-project/zones/us-central1-f
+      - creationTimestamp: '2017-03-14T04:48:48.301-07:00'
+        description: europe-west2
+        id: '1290'
+        kind: compute#region
+        name: europe-west2
+        quotas:
+        - limit: 24.0
+          metric: CPUS
+          usage: 0.0
+        selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/regions/europe-west2
+        status: UP
+        zones:
+        - https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west2-a
+        - https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west2-b
+        - https://www.googleapis.com/compute/v1/projects/fake-project/zones/europe-west2-c
+      kind: compute#regionList
+      selfLink: https://www.googleapis.com/compute/v1/projects/fake-project/regions
+  - "\n\r\n--batch_f4YzVz__gIs_AAnepUSqLPs--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,36,35"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    content-length: '22145'
+    content-type: multipart/mixed; boundary=batch_f4YzVz__gIs_AAnepUSqLPs
+    date: Tue, 01 Aug 2017 18:18:40 GMT
+    expires: Mon, 01 Jan 1990 00:00:00 GMT
+    pragma: no-cache
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+request:
+  body: |
+    --===============2065296809484258882==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <814d331c-6fc9-4541-ad95-08809a08d0b2+0>
+
+    GET /compute/v1/projects/fake-project/global/forwardingRules/rule1?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    content-length: 0
+    accept-encoding: gzip, deflate
+    accept: application/json
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+
+    --===============2065296809484258882==--
+  headers:
+    Authorization: Bearer ya29.GluaBNj4A25OrDsnv_9dV6KNYSyj0edYTT5tK1f5OXhq6tUhRp28nRZlVnWw-FAZA4EYca-VYfHtrExrwEjIxbvqy6YTbVzCS2JbAj-ymhfv7jlDzYCu9-jrdRkJ
+    content-length: '502'
+    content-type: multipart/mixed; boundary="===============2065296809484258882=="
+    user-agent: google-cloud-sdk gcloud/HEAD command/gcloud.compute.forwarding-rules.describe
+      invocation-id/fd87d120ddc8447c841919f969e02cf4 environment/None environment-version/None
+      interactive/False python/2.7.6 (Linux 4.4.0-79-generic)
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/v1
+---
+response:
+  content:
+  - "--batch_GoBn__dH_kI_AAa2LLoGsF8\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-8cfa60c4-362c-4d10-9906-9f32f3c01ad9+0>\r\n\r\nHTTP/1.1 404 Not Found\r\
+    \nContent-Type: application/json; charset=UTF-8\r\nDate: Tue, 08 Aug 2017 18:45:26\
+    \ GMT\r\nExpires: Tue, 08 Aug 2017 18:45:26 GMT\r\nCache-Control: private, max-age=0\r\
+    \nContent-Length: 3396\r\n\r\n"
+  - json:
+      error:
+        code: 404
+        errors:
+        - domain: global
+          message: The resource 'projects/fake-project/global/forwardingRules/rule1'
+            was not found
+          reason: notFound
+        message: The resource 'projects/fake-project/global/forwardingRules/rule1'
+          was not found
+  - "\n\r\n--batch_GoBn__dH_kI_AAa2LLoGsF8--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: quic=":443"; ma=2592000; v="39,38,37,36,35"
+    cache-control: private, max-age=0
+    content-length: '3770'
+    content-type: multipart/mixed; boundary=batch_GoBn__dH_kI_AAa2LLoGsF8
+    date: Tue, 08 Aug 2017 18:45:26 GMT
+    expires: Tue, 08 Aug 2017 18:45:26 GMT
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+exception:
+  message: |
+    Could not fetch resource:
+     - The resource 'projects/fake-project/global/forwardingRules/rule1' was not found
+  type: <class 'googlecloudsdk.calliope.exceptions.ToolException'>
+---
+output:
+  stderr: "For the following forwarding rule:\n - [rule1]\nchoose a region or global:\n\
+    \ [1] global\n [2] region: europe-west2\n [3] region: us-central1\nPlease enter\
+    \ your numeric choice:  \nERROR: (gcloud.compute.forwarding-rules.describe)\
+    \ Could not fetch resource:\n - The resource 'projects/fake-project/global/forwardingRules/rule1'\
+    \ was not found\n\n"

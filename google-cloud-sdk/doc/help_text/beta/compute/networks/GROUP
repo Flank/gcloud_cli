@@ -1,0 +1,52 @@
+NAME
+    gcloud beta compute networks - list, create, and delete Google Compute
+        Engine networks
+
+SYNOPSIS
+    gcloud beta compute networks GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) List, create, and delete Google Compute Engine networks.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     peerings
+        (BETA) List, create, and delete Google Compute Engine network peerings.
+
+     subnets
+        (BETA) List, describe, and delete Google Compute Engine subnetworks.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a Google Compute Engine network.
+
+     delete
+        (BETA) Delete Google Compute Engine networks.
+
+     describe
+        (BETA) Describe a Google Compute Engine network.
+
+     list
+        (BETA) List Google Compute Engine networks.
+
+     switch-mode
+        (BETA) (DEPRECATED) Switch the mode of a Google Compute Engine network.
+
+     update
+        (BETA) Update a Google Compute Engine network.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute networks
+        $ gcloud alpha compute networks
+

@@ -1,0 +1,44 @@
+NAME
+    gcloud alpha firebase test android models - explore Android models
+        available in the Test Environment catalog
+
+SYNOPSIS
+    gcloud alpha firebase test android models COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Explore Android models available in the Test Environment catalog.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe an Android model.
+
+     list
+        (ALPHA) List all Android models available for testing.
+
+EXAMPLES
+    To list all Android models available for running tests, along with their
+    basic characteristics and supported Android OS versions, run:
+
+        $ gcloud alpha firebase test android models list
+
+    To view more detailed information about a specific Android model, run:
+
+        $ gcloud alpha firebase test android models describe MODEL_ID
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud firebase test android models
+        $ gcloud beta firebase test android models
+

@@ -1,0 +1,75 @@
+NAME
+    gcloud iot devices list - list devices
+
+SYNOPSIS
+    gcloud iot devices list (--registry=REGISTRY : --region=REGION)
+        [--device-ids=[[ID,...],...]] [--device-num-ids=[[NUM_ID,...],...]]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List devices.
+
+REQUIRED FLAGS
+     REGISTRY - The device registry in which to show devices. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       --registry=REGISTRY
+          The ID of the registry or a fully qualified identifier for the
+          registry. This flag must be specified if any of the other arguments
+          in this group are specified.
+
+       --region=REGION
+          The Cloud region for the registry.
+
+FLAGS
+     --device-ids=[[ID,...],...]
+        If given, show only devices with one of the provided IDs.
+
+     --device-num-ids=[[NUM_ID,...],...]
+        If given, show only devices with one of the provided numerical IDs.
+
+LIST COMMAND FLAGS
+     --filter=EXPRESSION
+        Apply a Boolean filter EXPRESSION to each resource item to be listed.
+        If the expression evaluates True then that item is listed. For more
+        details and examples of filter expressions run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --limit=LIMIT
+        The maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+     --page-size=PAGE_SIZE
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        unlimited (no paging). Paging may be applied before or after --filter
+        and --limit depending on the service.
+
+     --sort-by=[FIELD,...]
+        A comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: --flatten, --sort-by, --filter, --limit.
+
+     --uri
+        Print a list of resource URIs instead of the default output.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha iot devices list
+        $ gcloud beta iot devices list
+

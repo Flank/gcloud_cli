@@ -1,0 +1,81 @@
+
+.TH "GCLOUD_BETA_DATAPROC_CLUSTERS_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dataproc clusters set\-iam\-policy \- set IAM policy for a cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dataproc clusters set\-iam\-policy\fR \fINAME\fR \fIPOLICY_FILE\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Sets the IAM policy for a cluster, given a cluster name and the
+policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the cluster to set the policy on.
+
+.TP 2m
+\fIPOLICY_FILE\fR
+Path to a local JSON or YAML formatted file containing a valid policy.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+constitutes an independent resource namespace constrained to deploying instances
+into Google Compute Engine zones inside the region. The default value of
+"global" is a special multi\-region namespace which is capable of deploying
+instances into all Google Compute Engine zones globally, and is disjoint from
+other Cloud Dataproc regions. Overrides the default \fBdataproc/region\fR
+property value for this command invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command sets the IAM policy for a cluster with the name
+\f5example\-cluster\-name\-1\fR using policy.yaml:
+
+.RS 2m
+$ gcloud beta dataproc clusters set\-iam\-policy \e
+    example\-cluster\-name\-1 policy.yaml
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

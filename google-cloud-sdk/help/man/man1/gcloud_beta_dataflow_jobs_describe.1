@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_BETA_DATAFLOW_JOBS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dataflow jobs describe \- outputs the Job object resulting from the Get API
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dataflow jobs describe\fR \fIJOB_ID\fR [\fB\-\-full\fR] [\fB\-\-region\fR=\fIREGION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR By default this will display the Summary view which includes:
+.RS 2m
+.IP "\(bu" 2m
+Project ID
+.IP "\(bu" 2m
+Regional Endpoint
+.IP "\(bu" 2m
+Job ID
+.IP "\(bu" 2m
+Job Name
+.IP "\(bu" 2m
+Job Type (Batch vs. Streaming)
+.IP "\(bu" 2m
+Job Create Time
+.IP "\(bu" 2m
+Job Status (Running, Done, Cancelled, Failed)
+.IP "\(bu" 2m
+Job Status Time
+.RE
+.sp
+
+Notable values that are only in the full view:
+.RS 2m
+.IP "\(bu" 2m
+Environment (staging Jars, information about workers, etc.)
+.IP "\(bu" 2m
+Steps from the workflow graph
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB_ID\fR
+The job ID to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-full\fR
+Retrieve the full Job rather than the summary view
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION_ID\fR
+The region ID of the job's regional endpoint.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud dataflow jobs describe
+.RE
+

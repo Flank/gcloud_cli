@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha genomics operations list - list Genomics operations in a
+        project
+
+SYNOPSIS
+    gcloud alpha genomics operations list [--where=WHERE] [--limit=LIMIT]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Prints a table with summary information on operations in the
+    project.
+
+FLAGS
+     --where=WHERE
+        A string for filtering operations. The following filter fields are
+        supported:
+
+            createTime - The time this job was created, in seconds from the
+                         epoch. Can use '>=' and/or '<=' operators.
+            status     - Can be 'RUNNING', 'SUCCESS', 'FAILURE' or 'CANCELED'.
+                         Only one status may be specified.
+            labels.key - 'key' is a label key to match against a target value.
+
+        Example:
+
+            'createTime >= 1432140000 AND
+             createTime <= 1432150000 AND
+             labels.batch = test AND
+             status = RUNNING'
+
+        To calculate the timestamp as seconds from the epoch, on UNIX-like
+        systems (e.g.: Linux, Mac) use the 'date' command:
+
+            $ date --date '20150701' '+%s'
+
+            1435734000
+
+        or with Python (e.g.: Linux, Mac, Windows):
+
+            $ python \
+                -c \
+                'from time import mktime, strptime; print
+             int(mktime(strptime("01 July 2015", "%d %B %Y")))'
+
+            1435734000
+
+LIST COMMAND FLAGS
+     --limit=LIMIT
+        The maximum number of resources to list. The default is unlimited. This
+        flag interacts with other flags that are applied in this order:
+        --flatten, --sort-by, --filter, --limit.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

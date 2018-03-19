@@ -1,0 +1,133 @@
+NAME
+    gcloud alpha genomics pipelines run - defines and runs a pipeline
+
+SYNOPSIS
+    gcloud alpha genomics pipelines run --pipeline-file=PIPELINE_FILE
+        [--disk-size=DISK_SIZE] [--inputs=[NAME=VALUE,...]]
+        [--inputs-from-file=[NAME=FILE,...]] [--logging=LOGGING]
+        [--memory=MEMORY] [--outputs=[NAME=VALUE,...]] [--preemptible]
+        [--labels=[KEY=VALUE,...]]
+        [--service-account-email=SERVICE_ACCOUNT_EMAIL; default="default"]
+        [--service-account-scopes=[SCOPE,...]] [--zones=[ZONE,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A pipeline is a transformation of a set of inputs to a set of
+    outputs. Supports docker-based commands.
+
+REQUIRED FLAGS
+     --pipeline-file=PIPELINE_FILE
+        A YAML or JSON file containing a Pipeline object. See
+        https://cloud.google.com/genomics/reference/rest/v1alpha2/pipelines#Pipeline
+
+            YAML Example:
+              name: hello world
+
+            inputParameters:
+            - name: greeting
+              defaultValue: Hello
+            - name: object
+              defaultValue: World
+
+            outputParameters:
+            - name: outputFile
+              localCopy:
+                path: /data/output/greeting.txt
+                disk: boot
+
+            resources:
+              minimumCpuCores: 1
+              minimumRamGb: 1
+              preemptible: true
+
+            docker:
+              imageName: ubuntu
+              cmd: >
+                echo "${greeting} ${object}" > /data/output/greeting.txt
+
+COMMONLY USED FLAGS
+     --disk-size=DISK_SIZE
+        The disk size(s) in GB, specified as a comma-separated list of pairs of
+        disk name and size. For example: --disk-size "name:size,name2:size2".
+        Overrides any values specified in the pipeline-file.
+
+     --inputs=[NAME=VALUE,...]
+        Map of input PipelineParameter names to values. Used to pass literal
+        parameters to the pipeline, and to specify input files in Google Cloud
+        Storage that will have a localCopy made. Specified as a comma-separated
+        list: --inputs file=gs://my-bucket/in.txt,name=hello
+
+     --inputs-from-file=[NAME=FILE,...]
+        Map of input PipelineParameter names to values. Used to pass literal
+        parameters to the pipeline where values come from local files; this can
+        be used to send large pipeline input parameters, such as code, data, or
+        configuration values. Specified as a comma-separated list:
+        --inputs-from-file script=myshellscript.sh,pyfile=mypython.py
+
+     --logging=LOGGING
+        The location in Google Cloud Storage to which the pipeline logs will be
+        copied. Can be specified as a fully qualified directory path, in which
+        case logs will be output with a unique identifier as the filename in
+        that directory, or as a fully specified path, which must end in .log,
+        in which case that path will be used. Stdout and stderr logs from the
+        run are also generated and output as -stdout.log and -stderr.log.
+
+     --memory=MEMORY
+        The number of GB of RAM needed to run the pipeline. Overrides any value
+        specified in the pipeline-file.
+
+     --outputs=[NAME=VALUE,...]
+        Map of output PipelineParameter names to values. Used to specify output
+        files in Google Cloud Storage that will be made from a localCopy.
+        Specified as a comma-separated list: --outputs
+        ref=gs://my-bucket/foo,ref2=gs://my-bucket/bar
+
+     --preemptible
+        Whether to use a preemptible VM for this pipeline. The "resource"
+        section of the pipeline-file must also set preemptible to "true" for
+        this flag to take effect.
+
+OTHER FLAGS
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --service-account-email=SERVICE_ACCOUNT_EMAIL; default="default"
+        The service account used to run the pipeline. If unspecified, defaults
+        to the Compute Engine service account for your project.
+
+     --service-account-scopes=[SCOPE,...]
+        List of additional scopes to be made available for this service
+        account. The following scopes are always requested:
+
+            https://www.googleapis.com/auth/compute
+            https://www.googleapis.com/auth/devstorage.full_control
+            https://www.googleapis.com/auth/genomics
+            https://www.googleapis.com/auth/logging.write
+            https://www.googleapis.com/auth/monitoring.write
+
+     --zones=[ZONE,...]
+        List of Compute Engine zones the pipeline can run in.
+
+        If no zones are specified with the zones flag, then zones in the
+        pipeline definition file will be used.
+
+        If no zones are specified in the pipeline definition, then the default
+        zone in your local client configuration is used.
+
+        If you have no default zone, then the pipeline may run in any zone.
+
+        For more information on default zones, see
+        https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_region_in_your_local_client
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

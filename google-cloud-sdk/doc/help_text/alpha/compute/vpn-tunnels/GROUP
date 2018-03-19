@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha compute vpn-tunnels - read and manipulate Google Compute
+        Engine VPN Tunnels
+
+SYNOPSIS
+    gcloud alpha compute vpn-tunnels COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read and manipulate Google Compute Engine VPN Tunnels.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a VPN tunnel.
+
+     delete
+        (ALPHA) Delete vpn tunnels.
+
+     describe
+        (ALPHA) Describe a Google Compute Engine vpn tunnel.
+
+     list
+        (ALPHA) List Google Compute Engine VPN tunnels.
+
+     update
+        (ALPHA) Update a Google Compute Engine VPN tunnel.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute vpn-tunnels
+        $ gcloud beta compute vpn-tunnels
+

@@ -1,0 +1,107 @@
+NAME
+    gcloud beta dataproc workflow-templates - create and manage Google Cloud
+        Dataproc workflow templates
+
+SYNOPSIS
+    gcloud beta dataproc workflow-templates GROUP | COMMAND [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Create and manage Google Cloud Dataproc workflow templates.
+
+FLAGS
+     --region=REGION
+        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+        constitutes an independent resource namespace constrained to deploying
+        instances into Google Compute Engine zones inside the region. The
+        default value of "global" is a special multi-region namespace which is
+        capable of deploying instances into all Google Compute Engine zones
+        globally, and is disjoint from other Cloud Dataproc regions. Overrides
+        the default dataproc/region property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     add-job
+        (BETA) Add Google Cloud Dataproc jobs to workflow template.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create a workflow template.
+
+     delete
+        (BETA) Delete a workflow template.
+
+     describe
+        (BETA) Describe a workflow template.
+
+     get-iam-policy
+        (BETA) Get IAM policy for a workflow template.
+
+     instantiate
+        (BETA) Instantiate a workflow template.
+
+     list
+        (BETA) List workflow templates.
+
+     remove-job
+        (BETA) Remove a job from workflow template.
+
+     run
+        (BETA) (DEPRECATED) Run a workflow template.
+
+     set-cluster-selector
+        (BETA) Set cluster selector for the workflow template.
+
+     set-iam-policy
+        (BETA) Set IAM policy for a template.
+
+     set-managed-cluster
+        (BETA) Set a managed cluster for the workflow template.
+
+EXAMPLES
+    To create a workflow template, run:
+
+        $ gcloud beta dataproc workflow-templates create my_template
+
+    To instantiate a workflow template, run:
+
+        $ gcloud beta dataproc workflow-templates instantiate my_template
+
+    To delete a workflow template, run:
+
+        $ gcloud beta dataproc workflow-templates delete my_template
+
+    To view the details of a workflow template, run:
+
+        $ gcloud beta dataproc workflow-templates describe my_template
+
+    To see the list of all workflow templates, run:
+
+        $ gcloud beta dataproc workflow-templates list
+
+    To remove a job from a workflow template, run:
+
+        $ gcloud beta dataproc workflow-templates remove-job my_template \
+            --step-id id
+
+    To update managed cluster in a workflow template, run:
+
+        $ gcloud beta dataproc workflow-templates set-managed-cluster \
+            my_template --num-masters 5
+
+    To update cluster selector in a workflow template, run:
+
+        $ gcloud beta dataproc workflow-templates set-cluster-selector \
+            my_template --num-workers 5
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

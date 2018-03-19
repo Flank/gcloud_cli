@@ -1,0 +1,118 @@
+
+.TH "GCLOUD_IOT_REGISTRIES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud iot registries create \- create a new device registry
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud iot registries create\fR (\fIREGISTRY\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-no\-enable\-http\-config\fR] [\fB\-\-no\-enable\-mqtt\-config\fR] [\fB\-\-event\-notification\-config\fR=[\fIsubfolder\fR=\fISUBFOLDER\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-public\-key\-path\fR=\fIPUBLIC_KEY_PATH\fR] [\fB\-\-state\-pubsub\-topic\fR=\fISTATE_PUBSUB_TOPIC\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Create a new device registry.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+REGISTRY \- The device registry to create. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: Set the property [core/project] or provide the flag [\-\-project] on
+the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIREGISTRY\fR
+The ID of the registry or a fully qualified identifier for the registry. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The Cloud region for the registry.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-http\-config\fR
+Whether to allow device connections to the HTTP bridge. Enabled by default, use
+\fB\-\-no\-enable\-http\-config\fR to disable.
+
+.TP 2m
+\fB\-\-enable\-mqtt\-config\fR
+Whether to allow MQTT connections to this device registry. Enabled by default,
+use \fB\-\-no\-enable\-mqtt\-config\fR to disable.
+
+.TP 2m
+\fB\-\-event\-notification\-config\fR=[\fIsubfolder\fR=\fISUBFOLDER\fR],[\fItopic\fR=\fITOPIC\fR]
+The configuration for notification of telemetry events received from the device.
+This flag can be specified multiple times to add multiple configs to the device
+registry. Configs are added to the registry in the order the flags are
+specified. Only one config with an empty subfolder field is allowed and must be
+specified last.
+
+.RS 2m
+.TP 2m
+\fBtopic\fR
+A Google Cloud Pub/Sub topic name for event notifications
+
+.RS 2m
+.TP 2m
+\fBsubfolder\fR
+If the subfolder name matches this string exactly, this configuration will be
+used to publish telemetry events. If empty all strings are matched.
+
+.RE
+.RE
+.sp
+.TP 2m
+\fB\-\-public\-key\-path\fR=\fIPUBLIC_KEY_PATH\fR
+Path to a file containing an X.509v3 certificate (RFC5280
+(https://www.ietf.org/rfc/rfc5280.txt)), encoded in base64, and wrapped by
+\f5\-\-\-\-\-BEGIN CERTIFICATE\-\-\-\-\-\fR and \f5\-\-\-\-\-END
+CERTIFICATE\-\-\-\-\-\fR.
+
+.TP 2m
+\fB\-\-state\-pubsub\-topic\fR=\fISTATE_PUBSUB_TOPIC\fR
+A Google Cloud Pub/Sub topic name for state notifications.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha iot registries create
+$ gcloud beta iot registries create
+.RE
+

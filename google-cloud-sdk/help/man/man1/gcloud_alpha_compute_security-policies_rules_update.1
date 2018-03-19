@@ -1,0 +1,104 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SECURITY\-POLICIES_RULES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute security\-policies rules update \- update a Google Compute Engine security policy rule
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute security\-policies rules update\fR \fIPRIORITY\fR [\fB\-\-action\fR=\fIACTION\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-preview\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-expression\fR=\fIEXPRESSION\fR\ |\ \fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute security\-policies rules update\fR is used
+to update security policy rules.
+
+For example to update the description and IP ranges of a rule at priority 1000,
+run:
+
+.RS 2m
+$ gcloud alpha compute security\-policies rules update 1000 \e
+    \-\-security\-policy my\-policy \e
+    \-\-description "block 1.2.3.4/32" \e
+    \-\-src\-ip\-ranges 1.2.3.4/32
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPRIORITY\fR
+The priority of the rule to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-action\fR=\fIACTION\fR
+The action to take if the request matches the match condition. \fIACTION\fR must
+be one of: \fBallow\fR, \fBdeny\-403\fR, \fBdeny\-404\fR, \fBdeny\-502\fR.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the rule.
+
+.TP 2m
+\fB\-\-preview\fR
+If specified, the action will not be enforced.
+
+.TP 2m
+\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR
+The security policy that this rule belongs to.
+
+.TP 2m
+
+Security policy rule matcher. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-expression\fR=\fIEXPRESSION\fR
+The Cloud Armor rules language expression to match for this rule.
+
+.TP 2m
+\fB\-\-src\-ip\-ranges\fR=[\fISRC_IP_RANGE\fR,...]
+The source IP ranges to match for this rule.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute security\-policies rules update
+.RE
+

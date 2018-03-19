@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha compute target-http-proxies update - update a target HTTP
+        proxy
+
+SYNOPSIS
+    gcloud alpha compute target-http-proxies update NAME --url-map=URL_MAP
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute target-http-proxies update is used to change
+    the URL map of existing target HTTP proxies. A target HTTP proxy is
+    referenced by one or more forwarding rules which define which packets the
+    proxy is responsible for routing. The target HTTP proxy in turn points to a
+    URL map that defines the rules for routing the requests. The URL map's job
+    is to map URLs to backend services which handle the actual requests.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the target HTTP proxy to update.
+
+REQUIRED FLAGS
+     --url-map=URL_MAP
+        A reference to a URL map resource that defines the mapping of URLs to
+        backend services. The URL map must exist and cannot be deleted while
+        referenced by a target HTTP proxy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute target-http-proxies update
+        $ gcloud beta compute target-http-proxies update
+

@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_COMPUTE_OS\-LOGIN_SSH\-KEYS_REMOVE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute os\-login ssh\-keys remove \- remove an SSH public key from an OS Login profile
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute os\-login ssh\-keys remove\fR (\fB\-\-key\fR=\fIKEY\fR\ |\ \fB\-\-key\-file\fR=\fIKEY_FILE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute os\-login ssh\-keys remove\fR will take either a string
+containing an SSH public key or a filename for an SSH public key and will remove
+that key from the user's OS Login profile. The key value passed in can either be
+the full SSH key or the OS Login fingerprint for that key.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-key\fR=\fIKEY\fR
+The SSH public key to remove from the OS Login Profile. Key value can either be
+the SSH key or the OS Login fingerprint of the key.
+
+.TP 2m
+\fB\-\-key\-file\fR=\fIKEY_FILE\fR
+The path to a file containing an SSH public key to remove from the OS Login
+Profile. Key value can either be the SSH key or the OS Login fingerprint of the
+key.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute os\-login ssh\-keys remove
+$ gcloud beta compute os\-login ssh\-keys remove
+.RE
+

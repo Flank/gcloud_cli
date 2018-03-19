@@ -1,0 +1,180 @@
+
+.TH "GCLOUD_TOPIC_COMMAND\-CONVENTIONS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud topic command\-conventions \- gcloud command conventions supplementary help
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud\fR command design follows a common set of principles and conventions.
+This document describes them in detail.
+
+Conventions are goals more than rules. Refer to individual command
+\fB\-\-help\fR for any exceptions.
+
+
+.SH "Command Hierarchy"
+
+\fBgcloud\fR commands are organized as a tree with \fBgcloud\fR at the root,
+command \fIgroups\fR in the inner nodes, and \fIcommands\fR at the leaf nodes.
+Each command group typically contains a set of CRUD commands (\fBcreate\fR,
+\fBdescribe\fR, \fBlist\fR, \fBupdate\fR, \fBdelete\fR) that operate on a
+resource for a single API. Group commands are executable, but only for
+displaying help.
+
+All groups and commands have a \fB\-\-help\fR flag that displays a \fBman\fR(1)
+style document on the standard output. The display is run through the default
+pager if the calling environment specifies one. Help documents are derived from
+the running executable, so they are always up to date, even when switching
+between multiple release installations.
+
+
+.SH "Command Line"
+
+Every \fBgcloud\fR command line follows the same form:
+
+.RS 2m
+gcloud GROUP GROUP ... COMMAND POSITIONAL ... FLAG ...
+.RE
+
+Flag and positional arguments can be intermixed but for consistency are usually
+displayed positionals first in order, followed by flags in any order.
+
+
+.SH "Command Usage Notation"
+
+Command usage is a shorthand notation that contains the full command name, the
+positional arguments, and the flag arguments in group sorted order. Optional
+arguments are enclosed in \fB[ ... ]\fR. For example:
+
+.RS 2m
+gcloud foo bar NAME [EXTRA] [\-\-format=FORMAT]
+.RE
+
+is the usage for the \f5gcloud foo bar\fR command with a required NAME
+positional argument, an optional EXTRA positional argument, and an optional
+\fB\-\-format\fR flag argument.
+
+Mutually exclusive arguments are separated by \fB|\fR; at most one arg in the
+list of mutually exclusive args may be specified:
+
+.RS 2m
+[ \-\-foo | \-\-bar ]
+.RE
+
+This means that either \fB\-\-foo\fR or \fB\-\-bar\fR may be specified, but not
+both.
+
+Mutually exclusive args may also be \fIrequired\fR, meaning exactly one arg in
+the list must be specified. This is denoted by enclosing the args in \fB( ...
+)\fR:
+
+.RS 2m
+( \-\-foo | \-\-bar )
+.RE
+
+Modal argument groups are also supported. If any arg in the group is specified,
+then the modal arguments must also be specified. This is denoted by using
+\fB:\fR to separate the modal args on the left from the other args on the right:
+
+.RS 2m
+[ \-\-must\-a \-\-must\-b : \-\-maybe\-c \-\-maybe\-d ]
+.RE
+
+This means that if \fB\-\-maybe\-c\fR and/or \fB\-\-maybe\-d\fR are specified
+then both \fB\-\-must\-a\fR and \fB\-\-must\-b\fR must be specified.
+
+
+.SH "Positional Arguments"
+
+Positional arguments are ordered and must be specified in the order listed in
+the command usage and help document argument definition list.
+
+File input arguments usually accept the special name \fB\-\fR to mean \fIread
+from the standard input\fR. This can be used only once per command line.
+
+
+.SH "Flag Arguments"
+
+Flag names are lower case with a \fB\-\-\fR prefix. Multi\-word flags use
+\fB\-\fR (dash) as a word separator. Single character flags are deprecated, rare
+and may not be documented at all.
+
+Following UNIX convention, if a flag is repeated on the command line, then only
+the rightmost occurrence takes effect, no diagnostic is emitted. This makes it
+easy to set up command aliases and wrapper scripts that provide default flag
+values; values that can easily be overridden by specifying them on the alias or
+wrapper script command line.
+
+
+.SH "Boolean Flags"
+
+Boolean flags have an implied value of \fBfalse\fR or \fBtrue\fR. The presence
+of \fB\-\-foo\fR sets the flag to \fBtrue\fR. All Boolean flags have a
+\fB\-\-no\-\fR prefix variant. For example, \fB\-\-no\-foo\fR sets the Boolean
+\fB\-\-foo\fR flag to \fBfalse\fR. Boolean flags are documented using the
+positive form. This keeps the style consistent across all commands, and also
+makes the meaning of the \fB\-\-no\-\fR variant clear. In the case a Boolean
+flag has a default value of \fBtrue\fR, the \fB\-\-no\-\fR variant will appear
+in the command usage and help text and like all other \fB\-\-no\-\fR flags, will
+set the value of the flag to \fBfalse\fR.
+
+
+.SH "Valued Flags"
+
+Non\-Boolean flags have an explicit value. The value can be specified using
+\fB=\fR:
+
+.RS 2m
+\-\-flag=value
+.RE
+
+or by placing the value as the next arg after the flag:
+
+.RS 2m
+\-\-flag value
+.RE
+
+The \fB=\fR form must be used if \fIvalue\fR starts with \fB\-\fR.
+
+The second form requires extra context to determine if \fB\-\-flag\fR is Boolean
+and \fBvalue\fR is a positional, or if \fB\-\-flag\fR is valued and \fBvalue\fR
+is its value. Because of the visual ambiguity, usage notation and most command
+examples use the first form to make intentions clear. The \fB=\fR form also has
+a diagnostic bonus: it is an error to specify a value for a Boolean flag.
+
+
+.SH "Output"
+
+The standard output is for explicit information requested by the command.
+Depending on the context, there may be guarantees on the output format to
+support deterministic parsing. For example, the \fByaml\fR, \fBjson\fR and
+\fBcsv\fR output \fB\-\-formats\fR guarantee that successful command completion
+results in standard output data that can be parsed using the respective format.
+
+The standard error is reserved for diagnostics. In general, the format of
+standard error data may change from release to release. Users should not script
+against specific content, or even the existence of output to the standard error
+at all. The only reliable error indicator is the \fIexit status\fR described
+below.
+
+Most standard error messaging is also logged to a file that can be accessed by $
+gcloud info \-\-show\-logs.
+
+No \fBgcloud\fR command should crash with an uncaught exception. However, if
+\fBgcloud\fR does crash the stack trace is intercepted and written to the log
+file, and a crash diagnostic is written to the standard error.
+
+
+.SH "Exit Status"
+
+Exit status \fB0\fR indicates success. For async commands it indicates that the
+operation started successfully but may not have completed yet.
+
+Any other exit status indicates an error. Command\-specific diagnostics should
+explain the nature of the error and how to correct it.

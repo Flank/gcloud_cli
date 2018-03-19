@@ -1,0 +1,25 @@
+NAME
+    gcloud meta list-gcloud - list the gcloud CLI command tree with flag,
+        positional and help details
+
+SYNOPSIS
+    gcloud meta list-gcloud [--branch=COMMAND_PATH] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List the gcloud CLI command tree with flag, positional and help details.
+
+FLAGS
+     --branch=COMMAND_PATH
+        The branch of the CLI subtree to generate as a dotted command path.
+        Mainly used to generate test data. For example, for the gcloud compute
+        instances branch use "compute.instances".
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

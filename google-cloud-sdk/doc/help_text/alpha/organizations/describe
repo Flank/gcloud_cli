@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha organizations describe - show metadata for an organization
+
+SYNOPSIS
+    gcloud alpha organizations describe ORGANIZATION_ID [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Shows metadata for an organization, given a valid organization ID.
+
+    This command can fail for the following reasons:
+      o The organization specified does not exist.
+      o The active account does not have permission to access the given
+        organization.
+
+POSITIONAL ARGUMENTS
+     ORGANIZATION_ID
+        ID for the organization you want to describe.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command prints metadata for an organization with the ID
+    3589215982:
+
+        $ gcloud alpha organizations describe 3589215982
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud organizations describe
+        $ gcloud beta organizations describe
+

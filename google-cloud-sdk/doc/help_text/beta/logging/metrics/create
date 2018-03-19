@@ -1,0 +1,66 @@
+NAME
+    gcloud beta logging metrics create - creates a logs-based metric
+
+SYNOPSIS
+    gcloud beta logging metrics create METRIC_NAME
+        (--config-from-file=CONFIG_FROM_FILE
+          | --description=DESCRIPTION --log-filter=LOG_FILTER)
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Creates a logs-based metric to count the number of log entries that
+    match a filter expression. Logs-based metrics can also be used to extract
+    values from logs and create a distribution of the values.
+
+POSITIONAL ARGUMENTS
+     METRIC_NAME
+        The name of the new metric.
+
+REQUIRED FLAGS
+     Data about the new metric. Exactly one of these must be specified:
+
+       --config-from-file=CONFIG_FROM_FILE
+          A path to a YAML file specifying the logs-based metric to create.
+
+       A group of arguments to specify simple counter logs-based metrics.
+
+         --description=DESCRIPTION
+            The metric's description. This flag must be specified if any of the
+            other arguments in this group are specified.
+
+         --log-filter=LOG_FILTER
+            The metric's filter expression. This flag must be specified if any
+            of the other arguments in this group are specified.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a metric that counts the number of log entries with a severity
+    level higher than WARNING, run:
+
+        $ gcloud beta logging metrics create high_severity_count \
+            --description="Number of high severity log entries" \
+            --log-filter="severity > WARNING"
+
+    Detailed information about filters can be found at:
+    https://cloud.google.com/logging/docs/view/advanced_filters
+
+    To create a metric that uses advanced features like distribution or
+    user-defined labels, run:
+
+        $ gcloud beta logging metrics create my_metric \
+            --config-from-file=$PATH_TO_FILE
+
+    The config file should be in YAML format. Detailed information about how to
+    configure metrics can be found at:
+    https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.metrics#LogMetric.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud logging metrics create
+

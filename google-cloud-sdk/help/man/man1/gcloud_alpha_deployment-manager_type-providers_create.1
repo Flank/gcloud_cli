@@ -1,0 +1,103 @@
+
+.TH "GCLOUD_ALPHA_DEPLOYMENT\-MANAGER_TYPE\-PROVIDERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha deployment\-manager type\-providers create \- create a type provider
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha deployment\-manager type\-providers create\fR \fIPROVIDER_NAME\fR \fB\-\-descriptor\-url\fR=\fIDESCRIPTOR_URL\fR [\fB\-\-api\-options\-file\fR=\fIAPI_OPTIONS_FILE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command inserts (creates) a new type provider based on a
+provided configuration file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIPROVIDER_NAME\fR
+Type provider name or URI.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-descriptor\-url\fR=\fIDESCRIPTOR_URL\fR
+URL of API of your type.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-api\-options\-file\fR=\fIAPI_OPTIONS_FILE\fR
+YAML file with options for the API: e.g. options and collection overrides.
+
+.TP 2m
+\fB\-\-async\fR
+Return immediately and print information about the Operation in progress rather
+than waiting for the Operation to complete. (default=False)
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Optional description of the type provider.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to add.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a new type provider, run:
+
+.RS 2m
+$ gcloud alpha deployment\-manager type\-providers create \e
+    my\-type\-provider \-\-api\-options\-file=my\-options.yaml \e
+    \-\-descriptor\-url <descriptor URL> \-\-description "My type."
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta deployment\-manager type\-providers create
+.RE
+

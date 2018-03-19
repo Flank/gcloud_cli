@@ -1,0 +1,4 @@
+imports:
+- path: simple.jinja
+- path: sub_directory/simple.jinja
+  name: sub_simple.jinja

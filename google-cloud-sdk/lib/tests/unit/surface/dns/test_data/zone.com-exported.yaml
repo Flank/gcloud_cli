@@ -1,0 +1,127 @@
+---
+kind: dns#resourceRecordSet
+name: zone.com.
+rrdatas:
+- 192.0.2.1
+- 192.0.2.2
+ttl: 3600
+type: A
+---
+kind: dns#resourceRecordSet
+name: zone.com.
+rrdatas:
+- 2001:db8:10::1
+ttl: 3600
+type: AAAA
+---
+kind: dns#resourceRecordSet
+name: zone.com.
+rrdatas:
+- 10 mail.zone.com.
+- 20 mail2.zone.com.
+- 50 mail3.zone.com.
+ttl: 3600
+type: MX
+---
+kind: dns#resourceRecordSet
+name: zone.com.
+rrdatas:
+- ns-cloud1.googledomains.com.
+- ns-cloud2.googledomains.com.
+- ns-cloud3.googledomains.com.
+- ns-cloud4.googledomains.com.
+ttl: 21600
+type: NS
+---
+kind: dns#resourceRecordSet
+name: zone.com.
+rrdatas:
+- ns-cloud1.googledomains.com. username.zone.com. 20071207 86400 7200 2419200 3600
+ttl: 3600
+type: SOA
+---
+kind: dns#resourceRecordSet
+name: zone.com.
+rrdatas:
+- '"v=spf1 mx:zone.com -all"'
+- '"v=spf2"'
+ttl: 3600
+type: SPF
+---
+kind: dns#resourceRecordSet
+name: zone.com.
+rrdatas:
+- '"v=spf1 mx:zone.com -all"'
+- '"v=spf2"'
+ttl: 3600
+type: TXT
+---
+kind: dns#resourceRecordSet
+name: zone.com.
+rrdatas:
+- 0 issue "ca.example.net"
+ttl: 3600
+type: CAA
+---
+kind: dns#resourceRecordSet
+name: 2.zone.com.
+rrdatas:
+- server.zone.com.
+ttl: 600
+type: PTR
+---
+kind: dns#resourceRecordSet
+name: hello.zone.com.
+rrdatas:
+- zone.com.
+ttl: 3600
+type: CNAME
+---
+kind: dns#resourceRecordSet
+name: mail.zone.com.
+rrdatas:
+- 192.0.2.3
+ttl: 3600
+type: A
+---
+kind: dns#resourceRecordSet
+name: mail2.zone.com.
+rrdatas:
+- 192.0.2.4
+ttl: 3600
+type: A
+---
+kind: dns#resourceRecordSet
+name: mail3.zone.com.
+rrdatas:
+- 192.0.2.5
+ttl: 3600
+type: A
+---
+kind: dns#resourceRecordSet
+name: ns.zone.com.
+rrdatas:
+- 192.0.2.2
+ttl: 3600
+type: A
+---
+kind: dns#resourceRecordSet
+name: ns.zone.com.
+rrdatas:
+- 2001:db8:10::2
+ttl: 3600
+type: AAAA
+---
+kind: dns#resourceRecordSet
+name: sip.zone.com.
+rrdatas:
+- 0 5 5060 sip.zone.com.
+ttl: 3600
+type: SRV
+---
+kind: dns#resourceRecordSet
+name: wwwtest.zone.com.
+rrdatas:
+- www.zone.com.
+ttl: 3600
+type: CNAME

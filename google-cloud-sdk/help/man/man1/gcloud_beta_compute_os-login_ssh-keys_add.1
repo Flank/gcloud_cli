@@ -1,0 +1,79 @@
+
+.TH "GCLOUD_BETA_COMPUTE_OS\-LOGIN_SSH\-KEYS_ADD" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute os\-login ssh\-keys add \- add an SSH public key to an OS Login profile
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute os\-login ssh\-keys add\fR (\fB\-\-key\fR=\fIKEY\fR\ |\ \fB\-\-key\-file\fR=\fIKEY_FILE\fR) [\fB\-\-ttl\fR=\fITTL\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute os\-login ssh\-keys add\fR will take either
+a string containing an SSH public key or a filename for an SSH public key and
+will add that key to the user's OS Login profile.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-key\fR=\fIKEY\fR
+The SSH public key to add to the OS Login Profile.
+
+.TP 2m
+\fB\-\-key\-file\fR=\fIKEY_FILE\fR
+The path to a file containing an SSH public key to add to the OS Login Profile.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-ttl\fR=\fITTL\fR
+The amount of time before the SSH key expires. For example, specifying
+\f5\fI30m\fR\fR will set the expiration time on the SSH key for 30 minutes from
+the current time. A value of 0 will result in no expiration time. See $ gcloud
+topic datetimes for information on duration formats.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute os\-login ssh\-keys add
+$ gcloud alpha compute os\-login ssh\-keys add
+.RE
+

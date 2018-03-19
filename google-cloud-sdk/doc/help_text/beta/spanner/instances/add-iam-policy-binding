@@ -1,0 +1,45 @@
+NAME
+    gcloud beta spanner instances add-iam-policy-binding - add an IAM policy
+        binding to a Cloud Spanner instance
+
+SYNOPSIS
+    gcloud beta spanner instances add-iam-policy-binding INSTANCE
+        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Add an IAM policy binding to a Cloud Spanner instance.
+
+POSITIONAL ARGUMENTS
+     INSTANCE
+        Cloud Spanner instance ID.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to add the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        Define the role of the member.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud spanner instances add-iam-policy-binding
+        $ gcloud alpha spanner instances add-iam-policy-binding
+

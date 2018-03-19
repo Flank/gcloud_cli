@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha compute routers - list, create, and delete Google Compute
+        Engine routers
+
+SYNOPSIS
+    gcloud alpha compute routers COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) List, create, and delete Google Compute Engine routers.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-bgp-peer
+        (ALPHA) Add a BGP peer to a Google Compute Engine router.
+
+     add-interface
+        (ALPHA) Add an interface to a Google Compute Engine router.
+
+     create
+        (ALPHA) Create a Google Compute Engine router.
+
+     delete
+        (ALPHA) Delete Google Compute Engine routers.
+
+     describe
+        (ALPHA) Describe a Google Compute Engine router.
+
+     get-status
+        (ALPHA) Get status of a Google Compute Engine router.
+
+     list
+        (ALPHA) List Google Compute Engine routers.
+
+     remove-bgp-peer
+        (ALPHA) Remove a BGP peer from a Google Compute Engine router.
+
+     remove-interface
+        (ALPHA) Remove an interface from a Google Compute Engine router.
+
+     update
+        (ALPHA) Update a Google Compute Engine router.
+
+     update-bgp-peer
+        (ALPHA) Update a BGP peer on a Google Compute Engine router.
+
+     update-interface
+        (ALPHA) Update an interface on a Google Compute Engine router.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute routers
+        $ gcloud beta compute routers
+

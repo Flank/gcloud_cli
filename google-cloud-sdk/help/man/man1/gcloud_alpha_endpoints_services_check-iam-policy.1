@@ -1,0 +1,70 @@
+
+.TH "GCLOUD_ALPHA_ENDPOINTS_SERVICES_CHECK\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha endpoints services check\-iam\-policy \- returns information about a member's permissions on a service
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha endpoints services check\-iam\-policy\fR \fISERVICE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command lists the permissions that the current authenticated
+gcloud user has for a service. For example, if the authenticated user is able to
+delete the service, \f5servicemanagement.services.delete\fR will be among the
+returned permissions.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISERVICE\fR
+The name of the service for which to check the IAM policy.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To check the permissions for the currently authenticated gcloud, run:
+
+.RS 2m
+$ gcloud alpha endpoints services check\-iam\-policy \e
+    my_produced_service_name
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud endpoints services check\-iam\-policy
+$ gcloud beta endpoints services check\-iam\-policy
+.RE
+

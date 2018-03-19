@@ -1,0 +1,82 @@
+
+.TH "GCLOUD_BETA_RUNTIME\-CONFIG_CONFIGS_WAITERS_WAIT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta runtime\-config configs waiters wait \- wait for a waiter to end in success or failure
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta runtime\-config configs waiters wait\fR \fINAME\fR \fB\-\-config\-name\fR=\fICONFIG_NAME\fR [\fB\-\-max\-wait\fR=\fIMAX_WAIT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR This command waits for a waiter to end in success or failure.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The waiter name.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-config\-name\fR=\fICONFIG_NAME\fR
+The name of the configuration resource to use.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-max\-wait\fR=\fIMAX_WAIT\fR
+The maximum amount of time to wait for a waiter to finish. See $ gcloud topic
+datetimes for information on duration formats.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To wait for a waiter named "my\-waiter" within a configuration named
+"my\-config", run:
+
+.RS 2m
+$ gcloud beta runtime\-config configs waiters wait my\-waiter \e
+    \-\-config\-name my\-config
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

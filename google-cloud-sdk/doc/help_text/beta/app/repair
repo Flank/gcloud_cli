@@ -1,0 +1,24 @@
+NAME
+    gcloud beta app repair - restores required App Engine features to the
+        current application
+
+SYNOPSIS
+    gcloud beta app repair [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) For example, this command will restore the App Engine service
+    account if it has been deleted.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To repair the application, run
+
+        $ gcloud beta app repair
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

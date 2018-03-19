@@ -1,0 +1,107 @@
+
+.TH "GCLOUD_ALPHA_TASKS_CREATE\-APP\-ENGINE\-TASK" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha tasks create\-app\-engine\-task \- create and add a task to an App Engine queue
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha tasks create\-app\-engine\-task\fR [\fB\-\-header\fR=\fIHEADER_FIELD\fR:\ \fIHEADER_VALUE\fR] [\fB\-\-id\fR=\fITASK_ID\fR] [\fB\-\-method\fR=\fIMETHOD\fR] [\fB\-\-queue\fR=\fIQUEUE\fR] [\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[\fIKEY\fR:\fIVALUE\fR,...]] [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-url\fR=\fIURL\fR] [\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR\ |\ \fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create and add a task to an App Engine queue.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-header\fR=\fIHEADER_FIELD\fR: \fIHEADER_VALUE\fR
+An HTTP request header. Header values can contain commas. This flag can be
+repeated. Repeated header fields will have their values overridden.
+
+.TP 2m
+\fB\-\-id\fR=\fITASK_ID\fR
+The ID of the task to create.
+
+If not specified then the system will generate a random unique task ID.
+Explicitly specifying a task ID enables task de\-duplication. If a task's ID is
+identical to that of an existing task or a task that was deleted or completed
+recently then the call will fail.
+
+Because there is an extra lookup cost to identify duplicate task names, tasks
+created with IDs have significantly increased latency. Using hashed strings for
+the task ID or for the prefix of the task ID is recommended.
+
+.TP 2m
+\fB\-\-method\fR=\fIMETHOD\fR
+The HTTP method to use for the request. If not specified, "POST" will be used.
+
+.TP 2m
+\fB\-\-queue\fR=\fIQUEUE\fR
+The queue the task belongs to.
+
+.TP 2m
+\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[\fIKEY\fR:\fIVALUE\fR,...]
+The route to be used for this task. KEY must be at least one of: [service,
+version, instance]. Any missing keys will use the default.
+
+Routing can be overridden by the queue\-level \f5\-\-routing\-override\fR flag.
+
+.TP 2m
+\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR
+The time when the task is scheduled to be first attempted. Defaults to "now" if
+not specified.
+
+.TP 2m
+\fB\-\-url\fR=\fIURL\fR
+The relative URL of the request. Must begin with "/" and must be a valid HTTP
+relative URL. It can contain a path and query string arguments. If not
+specified, then the root path "/" will be used.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR
+Data payload to be consumed by the task worker to process the task.
+
+.TP 2m
+\fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR
+File containing data payload to be consumed by the task worker to execute the
+task. The payload will be sent as the HTTP message body. A message body, and
+thus a payload, is allowed only if the HTTP method is "POST" or "PUT".
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

@@ -1,0 +1,131 @@
+
+.TH "GCLOUD_ENDPOINTS_OPERATIONS_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud endpoints operations list \- list operations for a project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud endpoints operations list\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-service\fR=\fISERVICE\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+This command will list operations for a service, optionally matching a
+particular filter.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates as True then that item is listed.
+
+The available filter fields are startTime and done. Unrecognized fields will
+cause an error.
+
+startTime is an ISO 8601 datetime and supports >=, >, <=, and < operators. The
+datetime value must be wrapped in quotation marks. For example:
+
+.RS 2m
+\-\-filter 'startTime < "2017\-03\-20T16:02:32"'
+.RE
+
+done is a boolean value and supports = and != operators.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR
+The name of the service for which to list operations.
+
+
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+A comma\-separated list of resource field key names to sort by. The default
+order is ascending. Prefix a field with ``~'' for descending order on that
+field. This flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-uri\fR
+Print a list of resource URIs instead of the default output.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To list all operations for a service named \f5api.endpoints.proj.cloud.goog\fR,
+run:
+
+.RS 2m
+$ gcloud endpoints operations list \e
+    \-\-service api.endpoints.proj.cloud.goog
+.RE
+
+To list only operations which are complete, add the \f5\-\-filter\fR argument
+with a status filter:
+
+.RS 2m
+$ gcloud endpoints operations list \e
+    \-\-service api.endpoints.proj.cloud.goog \-\-filter 'done = true'
+.RE
+
+To list only operations begun after a certain point in time, add the
+\f5\-\-filter\fR argument with an ISO 8601 datetime startTime filter:
+
+.RS 2m
+$ gcloud endpoints operations list \e
+    \-\-service api.endpoints.proj.cloud.goog \e
+    \-\-filter 'startTime >= "2017\-02\-01"'
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha endpoints operations list
+$ gcloud beta endpoints operations list
+.RE
+

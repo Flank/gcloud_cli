@@ -1,0 +1,27 @@
+NAME
+    gcloud functions event-types list - list types of events that can be a
+        trigger for a Google Cloud Function
+
+SYNOPSIS
+    gcloud functions event-types list [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+      o For an event type, EVENT_TYPE_DEFAULT marks whether the given event
+        type is the default for its provider (in which case the --event-type
+        flag may be omitted).
+      o For a resource, RESOURCE_OPTIONAL marks whether the resource has a
+        corresponding default value (in which case the --trigger-resource flag
+        may be omitted).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. These variants are also available:
+
+        $ gcloud alpha functions event-types list
+        $ gcloud beta functions event-types list
+

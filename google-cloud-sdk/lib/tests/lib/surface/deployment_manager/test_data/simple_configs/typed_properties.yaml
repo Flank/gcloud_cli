@@ -1,0 +1,10 @@
+imports:
+- path: typed_properties.jinja
+resources:
+- name: typed-properties-jinja
+  properties:
+    a: foo
+    b: 3
+    c: true
+    d: '3'
+  type: typed_properties.jinja

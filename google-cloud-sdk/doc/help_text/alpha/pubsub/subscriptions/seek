@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha pubsub subscriptions seek - this feature is part of an
+        invite-only release of the Cloud Pub/Sub API
+
+SYNOPSIS
+    gcloud alpha pubsub subscriptions seek SUBSCRIPTION
+        (--snapshot=SNAPSHOT | --time=TIME)
+        [--snapshot-project=SNAPSHOT_PROJECT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Resets a subscription's backlog to a point in time or to a given
+    snapshot. This feature is part of an invitation-only release of the
+    underlying Cloud Pub/Sub API. The command will generate errors unless you
+    have access to this API. This restriction should be relaxed in the near
+    future. Please contact cloud-pubsub@google.com with any questions in the
+    meantime.
+
+POSITIONAL ARGUMENTS
+     SUBSCRIPTION
+        Name of the subscription to affect.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --snapshot=SNAPSHOT
+          The name of the snapshot. The snapshot's topic must be the same as
+          that of the subscription.
+
+       --time=TIME
+          The time to seek to. Messages in the subscription that were published
+          before this time are marked as acknowledged, and messages retained in
+          the subscription that were published after this time are marked as
+          unacknowledged. See $ gcloud topic datetimes for information on time
+          formats.
+
+OPTIONAL FLAGS
+     --snapshot-project=SNAPSHOT_PROJECT
+        The name of the project the snapshot belongs to (if seeking to a
+        snapshot). If not set, it defaults to the currently selected cloud
+        project.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

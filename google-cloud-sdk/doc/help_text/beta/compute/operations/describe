@@ -1,0 +1,66 @@
+NAME
+    gcloud beta compute operations describe - describe a Google Compute Engine
+        operation
+
+SYNOPSIS
+    gcloud beta compute operations describe NAME [--user-accounts]
+        [--global | --region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute operations describe displays all data associated
+    with a Google Compute Engine operation in a project.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the operation to describe.
+
+FLAGS
+     --user-accounts
+        If provided, it is assumed that the requested operation is a Compute
+        User Accounts operation. Mutually exclusive with --global, --region,
+        and --zone flags.
+
+     At most one of these may be specified:
+
+       --global
+          If provided, it is assumed the operation is global.
+
+       --region=REGION
+          The region of the operation to describe. Overrides the default
+          compute/region property value for this command invocation.
+
+       --zone=ZONE
+          The zone of the operation to describe. Overrides the default
+          compute/zone property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To get details about a global operation, run:
+
+        $ gcloud beta compute operations describe OPERATION --global
+
+    To get details about a regional operation, run:
+
+        $ gcloud beta compute operations describe OPERATION \
+            --region us-central1
+
+    To get details about a zonal operation, run:
+
+        $ gcloud beta compute operations describe OPERATION \
+            --zone us-central1-a
+
+    To get details about a Compute User Accounts operation, run:
+
+        $ gcloud beta compute operations describe OPERATION --user-accounts
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute operations describe
+        $ gcloud alpha compute operations describe
+

@@ -1,0 +1,34 @@
+NAME
+    gcloud beta compute groups delete - delete Google Compute Engine groups
+
+SYNOPSIS
+    gcloud beta compute groups delete NAME [NAME ...] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute groups delete deletes one or more Google Compute
+    Engine groups.
+
+POSITIONAL ARGUMENTS
+     NAME [NAME ...]
+        The names of the groups to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To delete a group, run:
+
+        $ gcloud beta compute groups delete example-group
+
+    To delete multiple groups, run:
+
+        $ gcloud beta compute groups delete example-group-1 example-group-2
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute groups delete
+

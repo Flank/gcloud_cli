@@ -1,0 +1,123 @@
+---
+args:
+  command: alpha compute instances resume z1
+  specified_args:
+    --zone: us-central1-a
+---
+state:
+  interactive_console: true
+  random_seed: 2412161367143644001
+---
+properties:
+  app:
+    runtime_root: /tmp/tmpywLAyH/runtimes
+  component_manager:
+    disable_update_check: 'True'
+  compute:
+    zone: us-central1-a
+  core:
+    disable_color: 'True'
+    disable_usage_reporting: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: |-
+    --===============8618069154888170098==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <9f961fff-4f52-4a59-b1c8-315cbab6d0f0+0>
+
+    POST /compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1/resume?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    accept: application/json
+    accept-encoding: gzip, deflate
+    content-length: 2
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    Host: www.googleapis.com
+
+    {}
+    --===============8618069154888170098==--
+  headers:
+    content-type: multipart/mixed; boundary="===============8618069154888170098=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/alpha
+---
+response:
+  content:
+  - "--batch_pd52d39aWdA_AAEpAjaudUs\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-9f961fff-4f52-4a59-b1c8-315cbab6d0f0+0>\r\n\r\nHTTP/1.1 400 Bad Request\r\
+    \nContent-Type: application/json; charset=UTF-8\r\nDate: Mon, 27 Nov 2017 23:53:21\
+    \ GMT\r\nExpires: Mon, 27 Nov 2017 23:53:21 GMT\r\nCache-Control: private, max-age=0\r\
+    \nContent-Length: 3369\r\n\r\n"
+  - json:
+      error:
+        code: 400
+        errors:
+        - debugInfo: "com.google.api.server.core.Fault: ImmutableErrorDefinition{base=BAD_REQUEST,\
+            \ category=USER_ERROR, cause=null, debugInfo=null, domain=global, extendedHelp=null,\
+            \ httpHeaders={}, httpStatus=badRequest, internalReason=Reason{arguments={},\
+            \ cause=null, code=bigcluster.BigClusterErrorDomain.UNSUPPORTED_OPERATION,\
+            \ createdByBackend=true, debugMessage=null, errorProtoCode=UNSUPPORTED_OPERATION,\
+            \ errorProtoDomain=bigcluster.BigClusterErrorDomain, filteredMessage=null,\
+            \ location=null, message=You can only resume an instance that has previously\
+            \ been suspended., unnamedArguments=[You can only resume an instance that\
+            \ has previously been suspended.]}, location=null, message=You can only\
+            \ resume an instance that has previously been suspended., reason=badRequest,\
+            \ rpcCode=400} You can only resume an instance that has previously been\
+            \ suspended.\n\tat com.google.api.server.core.ErrorCollector.toFault(ErrorCollector.java:54)\n\
+            \tat com.google.api.server.rest.adapter.rosy.RosyErrorConverter.toFault(RosyErrorConverter.java:67)\n\
+            \tat com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:258)\n\
+            \tat com.google.api.server.rest.adapter.rosy.RosyHandler$2.call(RosyHandler.java:238)\n\
+            \tat com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)\n\
+            \tat com.google.common.util.concurrent.MoreExecutors$DirectExecutor.execute(MoreExecutors.java:401)\n\
+            \tat com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1019)\n\
+            \tat com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:870)\n\
+            \tat com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:694)\n\
+            \tat com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)\n\
+            \tat com.google.common.util.concurrent.MoreExecutors$DirectExecutor.execute(MoreExecutors.java:401)\n\
+            \tat com.google.common.util.concurrent.AbstractFuture.executeListener(AbstractFuture.java:1019)\n\
+            \tat com.google.common.util.concurrent.AbstractFuture.complete(AbstractFuture.java:870)\n\
+            \tat com.google.common.util.concurrent.AbstractFuture.set(AbstractFuture.java:694)\n\
+            \tat com.google.api.server.core.util.CallableFuture.run(CallableFuture.java:62)\n\
+            \tat com.google.api.server.thread.ThreadTrackers$ThreadTrackingRunnable.run(ThreadTrackers.java:126)\n\
+            \tat com.google.tracing.TraceContext$TraceContextRunnable.runInContext(TraceContext.java:454)\n\
+            \tat com.google.api.server.server.CommonModule$ContextCarryingExecutorService$1.runInContext(CommonModule.java:846)\n\
+            \tat com.google.tracing.TraceContext$TraceContextRunnable$1.run(TraceContext.java:461)\n\
+            \tat com.google.tracing.CurrentContext.runInContext(CurrentContext.java:351)\n\
+            \tat com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContextNoUnref(TraceContext.java:320)\n\
+            \tat com.google.tracing.TraceContext$AbstractTraceContextCallback.runInInheritedContext(TraceContext.java:312)\n\
+            \tat com.google.tracing.TraceContext$TraceContextRunnable.run(TraceContext.java:458)\n\
+            \tat com.google.gse.internal.DispatchQueueImpl$WorkerThread.run(DispatchQueueImpl.java:403)\n"
+          domain: global
+          message: You can only resume an instance that has previously been suspended.
+          reason: badRequest
+        message: You can only resume an instance that has previously been suspended.
+  - "\n\r\n--batch_pd52d39aWdA_AAEpAjaudUs--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: hq=":443"; ma=2592000; quic=51303431; quic=51303339; quic=51303338; quic=51303337;
+      quic=51303335,quic=":443"; ma=2592000; v="41,39,38,37,35"
+    cache-control: private, max-age=0
+    content-type: multipart/mixed; boundary=batch_pd52d39aWdA_AAEpAjaudUs
+    date: Mon, 27 Nov 2017 23:53:21 GMT
+    expires: Mon, 27 Nov 2017 23:53:21 GMT
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+exception:
+  message: 'HTTPError 400: You can only resume an instance that has previously been
+    suspended.'
+  type: <class 'googlecloudsdk.core.exceptions.MultiError'>
+---
+output:
+  stderr: "ERROR: (gcloud.alpha.compute.instances.resume) HTTPError 400:\
+    \ You can only resume an instance that has previously been suspended.\n"

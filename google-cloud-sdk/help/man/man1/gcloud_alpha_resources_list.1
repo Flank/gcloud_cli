@@ -1,0 +1,137 @@
+
+.TH "GCLOUD_ALPHA_RESOURCES_LIST" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha resources list \- list Google Cloud resources accessible from your account
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha resources list\fR [\fB\-\-filter\fR=\fIFILTER\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR;\ default=500] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha resources list\fR lists all indexed Google Cloud
+resources that you have access to. Filter expressions apply to the specific
+resource type selected. Currently, only a limited subset of Cloud resource types
+are supported.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIFILTER\fR
+A filter expression that is rewritten into a CloudResourceSearch query
+expression. It is applied to the resource specific data in the search results.
+
+By default all indexed resources are listed. Use \f5@type\fR:\fICOLLECTION\fR to
+select resources for \fICOLLECTION\fR. It is an error to specify a
+\fICOLLECTION\fR not indexed by the API. The supported collections are:
+.RS 2m
+.IP "\(em" 2m
+cloudresourcemanager.projects
+.IP "\(em" 2m
+compute.disks
+.IP "\(em" 2m
+compute.healthChecks
+.IP "\(em" 2m
+compute.httpHealthChecks
+.IP "\(em" 2m
+compute.httpsHealthChecks
+.IP "\(em" 2m
+compute.images
+.IP "\(em" 2m
+compute.instanceGroups
+.IP "\(em" 2m
+compute.instances
+.IP "\(em" 2m
+compute.subnetworks
+.RE
+.RE
+.sp
+Collections named \f5resources.\fR\fIRESOURCE\-TYPE\fR may be used for
+debugging, where \fIRESOURCE\-TYPE\fR is defined by the CloudResourceSearch API.
+
+See \f5$ gcloud topic filters\fR for filter expression details.
+
+
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR; default=500
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is \fB500\fR. Paging may be
+applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+A comma\-separated list of resource field key names to sort by. The default
+order is ascending. Prefix a field with ``~'' for descending order on that
+field. This flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-uri\fR
+Print a list of resource URIs instead of the default output.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+List all compute instances URIs with names starting with \f5test\fR or
+\f5prod\fR:
+
+.RS 2m
+$ gcloud alpha resources list \-\-uri \e
+    \-\-filter="@type:compute.instances name:(test prod)"
+.RE
+
+Print the number of resources with any part containing the substring
+\f5foobar\fR:
+
+.RS 2m
+$ gcloud alpha resources list \-\-filter="foobar" \-\-uri | wc \-l
+.RE
+
+The previous command uses \f5\-\-uri\fR to count because each output line is the
+URI for one resource. Otherwise the resource descriptions could be multiple
+lines per resource.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

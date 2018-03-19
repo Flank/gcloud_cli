@@ -1,0 +1,116 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_INSTANCES_NETWORK\-INTERFACES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute instances network\-interfaces update \- update a Google Compute Engine virtual machine network interface
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute instances network\-interfaces update\fR \fIINSTANCE_NAME\fR [\fB\-\-aliases\fR=\fIALIASES\fR] [\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR;\ default="nic0"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute instances network\-interfaces update\fR
+updates network interfaces of a Google Compute Engine virtual machine. For
+example:
+
+.RS 2m
+$ gcloud alpha compute instances network\-interfaces update \e
+    example\-instance \-\-zone us\-central1\-a \-\-aliases r1:172.16.0.1/32
+.RE
+
+sets 172.16.0.1/32 from range r1 of the default interface's subnetwork as the
+interface's alias IP.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINSTANCE_NAME\fR
+The name of the instance to operate on.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-aliases\fR=\fIALIASES\fR
+The IP alias ranges to allocate for this interface. If there are multiple IP
+alias ranges, they are separated by semicolons.
+
+For example:
+
+.RS 2m
+\-\-aliases="10.128.1.0/24;r1:/32"
+.RE
+
+.TP 2m
+\fB\-\-network\-interface\fR=\fINETWORK_INTERFACE\fR; default="nic0"
+The name of the network interface to update.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the instance to operate on. If not specified, you may be prompted to
+select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
+resources in your project. If the zone cannot be determined, you will then be
+prompted with all Google Cloud Platform zones.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute instances network\-interfaces update
+.RE
+

@@ -1,0 +1,31 @@
+NAME
+    gcloud beta compute groups describe - describe a Google Compute Engine
+        group
+
+SYNOPSIS
+    gcloud beta compute groups describe NAME [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) gcloud beta compute groups describe displays all data associated
+    with a Google Compute Engine group in a project.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the group to describe.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To describe a user, run:
+
+        $ gcloud beta compute groups describe example-user
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute groups describe
+

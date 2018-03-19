@@ -1,0 +1,90 @@
+NAME
+    gcloud compute instances attach-disk - attach a disk to an instance
+
+SYNOPSIS
+    gcloud compute instances attach-disk INSTANCE_NAME --disk=DISK
+        [--csek-key-file=FILE] [--device-name=DEVICE_NAME]
+        [--mode=MODE; default="rw"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute instances attach-disk is used to attach a disk to an
+    instance. For example,
+
+        $ gcloud compute instances attach-disk example-instance \
+            --disk DISK --zone us-central1-a
+
+    attaches the disk named 'DISK' to the instance named 'example-instance' in
+    zone us-central1-a.
+
+    After you create and attach a new disk to an instance, you must format and
+    mount
+    (https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting)
+    the disk so that the operating system can use the available storage space.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        The name of the instance to operate on.
+
+REQUIRED FLAGS
+     --disk=DISK
+        The name of the disk to attach to the instance.
+
+OPTIONAL FLAGS
+     --csek-key-file=FILE
+        Path to a Customer-Supplied Encryption Key (CSEK) key file, mapping
+        Google Compute Engine resources to user managed keys to be used when
+        creating, mounting, or snapshotting disks.
+
+        If you pass - as value of the flag the CSEK will be read from stdin.
+        See
+        https://cloud.google.com/compute/docs/disks/customer-supplied-encryption
+        for more details.
+
+     --device-name=DEVICE_NAME
+        An optional name that indicates the disk name the guest operating
+        system will see. (Note: Device name does not correspond to mounted
+        volume name)
+
+     --mode=MODE; default="rw"
+        Specifies the mode of the disk. MODE must be one of:
+
+         ro
+            Read-only.
+         rw
+            Read-write. It is an error to attach a disk in read-write mode to
+            more than one instance.
+
+     --zone=ZONE
+        The zone of the instance to operate on. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute instances attach-disk
+        $ gcloud beta compute instances attach-disk
+

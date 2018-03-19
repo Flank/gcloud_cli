@@ -1,0 +1,85 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SECURITY\-POLICIES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute security\-policies create \- create a Google Compute Engine security policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute security\-policies create\fR \fINAME\fR [\fB\-\-file\-format\fR=\fIFILE_FORMAT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR\ |\ \fB\-\-file\-name\fR=\fIFILE_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute security\-policies create\fR is used to
+create security policies. A security policy policy is a set of rules that
+controls access to various resources.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the security policy to create.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-file\-format\fR=\fIFILE_FORMAT\fR
+The format of the file to create the security policy config from. Specify either
+yaml or json. Defaults to yaml if not specified. Will be ignored if
+\-\-file\-name is not specified. \fIFILE_FORMAT\fR must be one of: \fBjson\fR,
+\fByaml\fR.
+
+.TP 2m
+
+Creation options. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the security policy.
+
+.TP 2m
+\fB\-\-file\-name\fR=\fIFILE_NAME\fR
+The name of the JSON or YAML file to create a security policy config from.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute security\-policies create
+.RE
+

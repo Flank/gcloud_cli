@@ -1,0 +1,117 @@
+
+.TH "GCLOUD_ALPHA_ML\-ENGINE_VERSIONS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml\-engine versions update \- update a Cloud ML Engine model
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml\-engine versions update\fR (\fIVERSION\fR\ :\ \fB\-\-model\fR=\fIMODEL\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update a Cloud ML Engine model.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+VERSION \- The Cloud ML Engine model to update. The arguments in this group can
+be used to specify the attributes of this resource. (NOTE) Some attributes are
+not given arguments in this group but can be set in other ways. To set the
+[project] attribute: Set the property [core/project] or provide the flag
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIVERSION\fR
+The ID of the version or a fully qualified identifier for the version. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-model\fR=\fIMODEL\fR
+The model for the version.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+The description of the version.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Removes all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha ml\-engine versions update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha ml\-engine versions update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud ml\-engine versions update
+$ gcloud beta ml\-engine versions update
+.RE
+

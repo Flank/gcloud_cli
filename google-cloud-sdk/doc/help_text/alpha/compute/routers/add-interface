@@ -1,0 +1,85 @@
+NAME
+    gcloud alpha compute routers add-interface - add an interface to a Google
+        Compute Engine router
+
+SYNOPSIS
+    gcloud alpha compute routers add-interface NAME
+        --interface-name=INTERFACE_NAME
+        (--interconnect-attachment=INTERCONNECT_ATTACHMENT
+          | --interconnect-attachment-region=INTERCONNECT_ATTACHMENT_REGION
+          | --vpn-tunnel=VPN_TUNNEL | --vpn-tunnel-region=VPN_TUNNEL_REGION)
+        [--ip-address=IP_ADDRESS] [--mask-length=MASK_LENGTH] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute routers add-interface is used to add an
+    interface to a Google Compute Engine router.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the router to update.
+
+REQUIRED FLAGS
+     --interface-name=INTERFACE_NAME
+        The name of the interface being added.
+
+     Exactly one of these must be specified:
+
+       --interconnect-attachment=INTERCONNECT_ATTACHMENT
+          The interconnect attachment of the interface being added.
+
+       --interconnect-attachment-region=INTERCONNECT_ATTACHMENT_REGION
+          The region of the interconnectAttachment to operate on. If not
+          specified it will be set to the region of the router. Overrides the
+          default compute/region property value for this command invocation.
+
+       --vpn-tunnel=VPN_TUNNEL
+          The tunnel of the interface being added.
+
+       --vpn-tunnel-region=VPN_TUNNEL_REGION
+          The region of the vpn tunnel to operate on. If not specified it will
+          be set to the region of the router. Overrides the default
+          compute/region property value for this command invocation.
+
+OPTIONAL FLAGS
+     --ip-address=IP_ADDRESS
+        The link local address of the router for this interface.
+
+     --mask-length=MASK_LENGTH
+        The mask for network used for the server IP address.
+
+     --region=REGION
+        The region of the router to update. If not specified, you will be
+        prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute routers add-interface
+        $ gcloud beta compute routers add-interface
+

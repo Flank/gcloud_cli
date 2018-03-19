@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha compute instance-groups managed instance-configs - manage
+        instance-specific settings of managed instance group
+
+SYNOPSIS
+    gcloud alpha compute instance-groups managed instance-configs COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage instance-specific settings of managed instance group.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create per instance config for managed instance group.
+
+     delete
+        (ALPHA) Delete per instance configs from managed instance group.
+
+     list
+        (ALPHA) List per instance configs of a managed instance group.
+
+     update
+        (ALPHA) Update per instance config of a managed instance group.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

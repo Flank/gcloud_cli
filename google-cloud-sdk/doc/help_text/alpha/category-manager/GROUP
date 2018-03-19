@@ -1,0 +1,34 @@
+NAME
+    gcloud alpha category-manager - cloud category manager command groups
+
+SYNOPSIS
+    gcloud alpha category-manager GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Commands to create / update / delete data taxonomies and labels,
+    and tag data objects in cloud storage.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     stores
+        (ALPHA) A group of subcommands for working with Category Manager
+        stores.
+
+     taxonomies
+        (ALPHA) A group of subcommands for working with Category Manager
+        taxonomies.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

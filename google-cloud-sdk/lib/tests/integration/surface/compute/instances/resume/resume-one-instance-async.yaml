@@ -1,0 +1,93 @@
+---
+args:
+  command: alpha compute instances resume z1
+  specified_args:
+    --async: true
+    --zone: us-central1-a
+---
+state:
+  interactive_console: true
+  random_seed: -425049146076733404
+---
+properties:
+  app:
+    runtime_root: /tmp/tmpsJchci/runtimes
+  component_manager:
+    disable_update_check: 'True'
+  compute:
+    zone: us-central1-a
+  core:
+    disable_color: 'True'
+    disable_usage_reporting: 'True'
+    project: fake-project
+---
+input: {}
+---
+request:
+  body: |-
+    --===============3196725778142096245==
+    Content-Type: application/http
+    MIME-Version: 1.0
+    Content-Transfer-Encoding: binary
+    Content-ID: <1e3bdaa6-c5d6-42b3-85b1-7a51086278d0+0>
+
+    POST /compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1/resume?alt=json HTTP/1.1
+    Content-Type: application/json
+    MIME-Version: 1.0
+    accept-encoding: gzip, deflate
+    user-agent: x_Tw5K8nnjoRAqULM9PFAC2b
+    accept: application/json
+    content-length: 2
+    Host: www.googleapis.com
+
+    {}
+    --===============3196725778142096245==--
+  headers:
+    content-type: multipart/mixed; boundary="===============3196725778142096245=="
+  method: POST
+  uri: https://www.googleapis.com/batch/compute/alpha
+---
+response:
+  content:
+  - "--batch_QPjg072gm5E_AARDCp8dLBU\r\nContent-Type: application/http\r\nContent-ID:\
+    \ <response-1e3bdaa6-c5d6-42b3-85b1-7a51086278d0+0>\r\n\r\nHTTP/1.1 200 OK\r\n\
+    ETag: \"L5iXtcPWT8hFaiPTIYTU-uLThUs/eCWCP3SvAYcPODw1GLTuhClDJlw\"\r\nContent-Type:\
+    \ application/json; charset=UTF-8\r\nDate: Mon, 27 Nov 2017 23:07:08 GMT\r\nExpires:\
+    \ Mon, 27 Nov 2017 23:07:08 GMT\r\nCache-Control: private, max-age=0\r\nContent-Length:\
+    \ 815\r\n\r\n"
+  - json:
+      endTime: '2017-11-27T15:07:08.566-08:00'
+      id: '1732385214370489459'
+      insertTime: '2017-11-27T15:07:08.566-08:00'
+      kind: compute#operation
+      name: operation-1511824028294-55efef62b5b71-bed135c4-3ad4b65b
+      operationType: resume
+      progress: 100
+      selfLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511824028294-55efef62b5b71-bed135c4-3ad4b65b
+      startTime: '2017-11-27T15:07:08.566-08:00'
+      status: DONE
+      targetId: '7014533340148607708'
+      targetLink: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1
+      zone: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a
+  - "\n\r\n--batch_QPjg072gm5E_AARDCp8dLBU--\r\n"
+  response:
+    -content-encoding: gzip
+    alt-svc: hq=":443"; ma=2592000; quic=51303431; quic=51303339; quic=51303338; quic=51303337;
+      quic=51303335,quic=":443"; ma=2592000; v="41,39,38,37,35"
+    cache-control: no-cache, no-store, max-age=0, must-revalidate
+    content-type: multipart/mixed; boundary=batch_QPjg072gm5E_AARDCp8dLBU
+    date: Mon, 27 Nov 2017 23:07:08 GMT
+    expires: Mon, 01 Jan 1990 00:00:00 GMT
+    pragma: no-cache
+    server: GSE
+    status: '200'
+    transfer-encoding: chunked
+    vary: Origin, X-Origin
+    x-content-type-options: nosniff
+    x-frame-options: SAMEORIGIN
+    x-xss-protection: 1; mode=block
+---
+output:
+  stderr: |
+    Resume instance in progress for [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/operations/operation-1511824028294-55efef62b5b71-bed135c4-3ad4b65b].
+    Use [gcloud compute operations describe URI] command to check the status of the operation(s).

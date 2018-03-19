@@ -1,0 +1,69 @@
+
+.TH "GCLOUD_ALPHA_SOURCE_REPOS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha source repos describe \- describe a cloud source repository
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha source repos describe\fR \fIREPOSITORY_NAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command describes a repository from the currently active
+Google Cloud Platform project. The description includes the full repository name
+(projects/<projectid>/repos/<reponame>), the size (if non\-zero), and the url.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIREPOSITORY_NAME\fR
+Name of the repository.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe a repository named example\-repo in the current project issue the
+following command:
+
+.RS 2m
+$ gcloud alpha source repos describe REPOSITORY_NAME
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud source repos describe
+$ gcloud beta source repos describe
+.RE
+

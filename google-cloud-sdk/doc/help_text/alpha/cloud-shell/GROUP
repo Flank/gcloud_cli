@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha cloud-shell - manage Google Cloud Shell
+
+SYNOPSIS
+    gcloud alpha cloud-shell COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The gcloud shell command group lets you interact with and connect
+    to your Google Cloud Shell environment.
+
+    More information on Cloud Shell can be found at
+    https://cloud.google.com/shell/docs/.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     get-mount-command
+        (ALPHA) Prints a command to mount the Cloud Shell home directory via
+        sshfs.
+
+     scp
+        (ALPHA) Copies files between Cloud Shell and the local machine.
+
+     ssh
+        (ALPHA) Allows you to establish an interactive SSH session with Cloud
+        Shell.
+
+NOTES
+    The previous gcloud alpha shell command to launch an interactive shell was
+    renamed to gcloud alpha interactive.
+
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

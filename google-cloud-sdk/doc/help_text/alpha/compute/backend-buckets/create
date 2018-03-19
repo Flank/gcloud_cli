@@ -1,0 +1,63 @@
+NAME
+    gcloud alpha compute backend-buckets create - create a backend bucket
+
+SYNOPSIS
+    gcloud alpha compute backend-buckets create BACKEND_BUCKET_NAME
+        --gcs-bucket-name=GCS_BUCKET_NAME [--description=DESCRIPTION]
+        [--enable-cdn] [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute backend-buckets create is used to create
+    backend buckets. Backend buckets define a Google Cloud Storage bucket that
+    can serve content. URL maps define which requests are sent to which backend
+    buckets.
+
+POSITIONAL ARGUMENTS
+     BACKEND_BUCKET_NAME
+        The name of the backend bucket to create.
+
+REQUIRED FLAGS
+     --gcs-bucket-name=GCS_BUCKET_NAME
+        The name of the Google Cloud Storage bucket to serve from. The storage
+        bucket must be in the same project.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional, textual description for the backend bucket.
+
+     --enable-cdn
+        Enable Cloud CDN for the backend bucket. Cloud CDN can cache HTTP
+        responses from a backend bucket at the edge of the network, close to
+        users.
+
+     --signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE
+        The amount of time up to which the response to a signed URL request
+        will be cached in the CDN. After this time period, the Signed URL will
+        be revalidated before being served. Cloud CDN will internally act as
+        though all responses from this backend had a Cache-Control: public,
+        max-age=[TTL] header, regardless of any existing Cache-Control header.
+        The actual headers served in responses will not be altered. If
+        unspecified, the default value is 3600s.
+
+        For example, specifying 12h will cause the responses to signed URL
+        requests to be cached in the CDN up to 12 hours. See $ gcloud topic
+        datetimes for information on duration formats.
+
+        This flag only affects signed URL requests.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute backend-buckets create
+        $ gcloud beta compute backend-buckets create
+

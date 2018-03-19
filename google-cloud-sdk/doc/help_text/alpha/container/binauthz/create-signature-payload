@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha container binauthz create-signature-payload - create a JSON
+        container image signature object
+
+SYNOPSIS
+    gcloud alpha container binauthz create-signature-payload
+        --artifact-url=ARTIFACT_URL [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Given a container image URL specified by the manifest digest, this
+    command will produce a JSON object whose signature is expected by Cloud
+    Binary Authorization.
+
+REQUIRED FLAGS
+     --artifact-url=ARTIFACT_URL
+        Container URL. May be in the .gcr.io/repository/image format, or may
+        optionally contain the http or https scheme
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To output serialized JSON to sign, run:
+
+        $ gcloud alpha container binauthz create-signature-payload \
+            --artifact-url="gcr.io/example-project/example-image@sha256:abcd"
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

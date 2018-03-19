@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_BETA_DATAPROC_WORKFLOW\-TEMPLATES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta dataproc workflow\-templates describe \- describe a workflow template
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta dataproc workflow\-templates describe\fR \fITEMPLATE\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Describe a workflow template.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fITEMPLATE\fR
+The ID of the workflow template to describe.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
+constitutes an independent resource namespace constrained to deploying instances
+into Google Compute Engine zones inside the region. The default value of
+"global" is a special multi\-region namespace which is capable of deploying
+instances into all Google Compute Engine zones globally, and is disjoint from
+other Cloud Dataproc regions. Overrides the default \fBdataproc/region\fR
+property value for this command invocation.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+The version of the workflow template.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

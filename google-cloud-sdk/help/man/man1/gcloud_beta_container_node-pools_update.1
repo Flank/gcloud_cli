@@ -1,0 +1,130 @@
+
+.TH "GCLOUD_BETA_CONTAINER_NODE\-POOLS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta container node\-pools update \- updates a node pool in a running cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta container node\-pools update\fR \fINAME\fR (\fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta container node\-pools update\fR updates a node pool
+in a Google Kubernetes Engine cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the node pool.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Node management At least one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-enable\-autorepair\fR
+Sets autorepair feature for a node\-pool.
+
+.RS 2m
+$ gcloud beta container node\-pools update node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-enable\-autorepair
+.RE
+
+See https://cloud.google.com/kubernetes\-engine/docs/node\-auto\-repair for more
+info.
+
+.TP 2m
+\fB\-\-enable\-autoupgrade\fR
+Sets autoupgrade feature for a node\-pool.
+
+.RS 2m
+$ gcloud beta container node\-pools update node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-enable\-autoupgrade
+.RE
+
+See https://cloud.google.com/kubernetes\-engine/docs/node\-managament for more
+info.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+The name of the cluster. Overrides the default \fBcontainer/cluster\fR property
+value for this command invocation.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The compute region (e.g. us\-central1) for the cluster.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
+The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
+\fBcompute/zone\fR property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To turn on node auto repair in "node\-pool\-1" in the cluster "sample\-cluster",
+run:
+
+.RS 2m
+$ gcloud beta container node\-pools update node\-pool\-1 \e
+    \-\-cluster=example\-cluster \-\-enable\-autoupgrade
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud container node\-pools update
+$ gcloud alpha container node\-pools update
+.RE
+

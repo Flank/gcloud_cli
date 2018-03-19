@@ -1,0 +1,273 @@
+
+.TH "GCLOUD_BETA_COMPUTE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute \- create and manipulate Google Compute Engine resources
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR The gcloud compute command group lets you create, configure and
+manipulate Google Compute Engine virtual machines.
+
+With Compute Engine you can create and run virtual machines on Google
+infrastructure. Compute Engine offers scale, performance, and value that allows
+you to easily launch large compute clusters on Google's infrastructure.
+
+More information on Compute Engine can be found here:
+https://cloud.google.com/compute/ and detailed documentation can be found here:
+https://cloud.google.com/compute/docs/
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBaccelerator\-types\fR
+\fB(BETA)\fR Read Google Compute Engine accelerator types.
+
+.TP 2m
+\fBaddresses\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine addresses.
+
+.TP 2m
+\fBbackend\-buckets\fR
+\fB(BETA)\fR Read and manipulate backend buckets.
+
+.TP 2m
+\fBbackend\-services\fR
+\fB(BETA)\fR List, create, and delete backend services.
+
+.TP 2m
+\fBcommitments\fR
+\fB(BETA)\fR Manage Google Compute Engine commitments.
+
+.TP 2m
+\fBdisk\-types\fR
+\fB(BETA)\fR Read Google Compute Engine virtual disk types.
+
+.TP 2m
+\fBdisks\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine disks.
+
+.TP 2m
+\fBfirewall\-rules\fR
+\fB(BETA)\fR List, create, update, and delete Google Compute Engine firewall
+rules.
+
+.TP 2m
+\fBforwarding\-rules\fR
+\fB(BETA)\fR Read and manipulate traffic forwarding rules to network load
+balancers.
+
+.TP 2m
+\fBgroups\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine groups.
+
+.TP 2m
+\fBhealth\-checks\fR
+\fB(BETA)\fR Read and manipulate health checks for load balanced instances.
+
+.TP 2m
+\fBhttp\-health\-checks\fR
+\fB(BETA)\fR Read and manipulate HTTP health checks for load balanced instances.
+
+.TP 2m
+\fBhttps\-health\-checks\fR
+\fB(BETA)\fR Read and manipulate HTTPS health checks for load balanced
+instances.
+
+.TP 2m
+\fBimages\fR
+\fB(BETA)\fR List, create, and delete Google Compute Engine images.
+
+.TP 2m
+\fBinstance\-groups\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine instance groups.
+
+.TP 2m
+\fBinstance\-templates\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine instances templates.
+
+.TP 2m
+\fBinstances\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine virtual machine
+instances.
+
+.TP 2m
+\fBinterconnects\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine interconnects.
+
+.TP 2m
+\fBmachine\-types\fR
+\fB(BETA)\fR Read Google Compute Engine virtual machine types.
+
+.TP 2m
+\fBnetworks\fR
+\fB(BETA)\fR List, create, and delete Google Compute Engine networks.
+
+.TP 2m
+\fBoperations\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine operations.
+
+.TP 2m
+\fBos\-login\fR
+\fB(BETA)\fR Create and manipulate Google Compute Engine OS Login resources.
+
+.TP 2m
+\fBproject\-info\fR
+\fB(BETA)\fR Read and manipulate project\-level data like quotas and metadata.
+
+.TP 2m
+\fBregions\fR
+\fB(BETA)\fR List Google Compute Engine regions.
+
+.TP 2m
+\fBrouters\fR
+\fB(BETA)\fR List, create, and delete Google Compute Engine routers.
+
+.TP 2m
+\fBroutes\fR
+\fB(BETA)\fR Read and manipulate routes.
+
+.TP 2m
+\fBsecurity\-policies\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine security policies.
+Security policies are used to control access to Google Cloud HTTP/HTTPS load
+balancers.
+
+.TP 2m
+\fBshared\-vpc\fR
+\fB(BETA)\fR Configure shared VPC.
+
+.TP 2m
+\fBsnapshots\fR
+\fB(BETA)\fR List, describe, and delete Google Compute Engine snapshots.
+
+.TP 2m
+\fBssl\-certificates\fR
+\fB(BETA)\fR List, create, and delete Google Compute Engine SSL certificates.
+
+.TP 2m
+\fBssl\-policies\fR
+\fB(BETA)\fR List, create, delete and update Google Compute Engine SSL policies.
+
+.TP 2m
+\fBtarget\-http\-proxies\fR
+\fB(BETA)\fR List, create, and delete target HTTP proxies.
+
+.TP 2m
+\fBtarget\-https\-proxies\fR
+\fB(BETA)\fR List, create, and delete target HTTPS proxies.
+
+.TP 2m
+\fBtarget\-instances\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine virtual target instances.
+
+.TP 2m
+\fBtarget\-pools\fR
+\fB(BETA)\fR Control Compute Engine target pools for network load balancing.
+
+.TP 2m
+\fBtarget\-ssl\-proxies\fR
+\fB(BETA)\fR List, create, and delete target SSL proxies.
+
+.TP 2m
+\fBtarget\-tcp\-proxies\fR
+\fB(BETA)\fR List, create, and delete target TCP proxies.
+
+.TP 2m
+\fBtarget\-vpn\-gateways\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine VPN Gateways.
+
+.TP 2m
+\fBtpus\fR
+\fB(BETA)\fR List, create, and delete Cloud TPUs.
+
+.TP 2m
+\fBurl\-maps\fR
+\fB(BETA)\fR List, create, and delete URL maps.
+
+.TP 2m
+\fBvpn\-tunnels\fR
+\fB(BETA)\fR Read and manipulate Google Compute Engine VPN Tunnels.
+
+.TP 2m
+\fBxpn\fR
+\fB(BETA)\fR Configure shared VPC.
+
+.TP 2m
+\fBzones\fR
+\fB(BETA)\fR List Google Compute Engine zones.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBconfig\-ssh\fR
+\fB(BETA)\fR Populate SSH config files with Host entries from each instance.
+
+.TP 2m
+\fBconnect\-to\-serial\-port\fR
+\fB(BETA)\fR Connect to the serial port of an instance.
+
+.TP 2m
+\fBcopy\-files\fR
+\fB(BETA)\fR \fB(DEPRECATED)\fR Copy files to and from Google Compute Engine
+virtual machines via scp.
+
+.TP 2m
+\fBreset\-windows\-password\fR
+\fB(BETA)\fR Reset and return a password for a Windows machine instance.
+
+.TP 2m
+\fBscp\fR
+\fB(BETA)\fR Copy files to and from Google Compute Engine virtual machines via
+scp.
+
+.TP 2m
+\fBssh\fR
+\fB(BETA)\fR SSH into a virtual machine instance.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute
+$ gcloud alpha compute
+.RE
+

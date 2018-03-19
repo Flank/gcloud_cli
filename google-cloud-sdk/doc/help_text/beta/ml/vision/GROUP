@@ -1,0 +1,54 @@
+NAME
+    gcloud beta ml vision - use Google Cloud Vision to analyze images
+
+SYNOPSIS
+    gcloud beta ml vision COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Use Google Cloud Vision to analyze images.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     detect-document
+        (BETA) Detect dense text in an image.
+
+     detect-faces
+        (BETA) Detect faces within an image.
+
+     detect-image-properties
+        (BETA) Detect general attributes of an image.
+
+     detect-labels
+        (BETA) Detect broad sets of categories within an image.
+
+     detect-landmarks
+        (BETA) Detect popular natural and man-made structures within an image.
+
+     detect-logos
+        (BETA) Detect popular product logos within an image.
+
+     detect-safe-search
+        (BETA) Detect explicit content in an image.
+
+     detect-text
+        (BETA) Detect and extract text within an image.
+
+     detect-web
+        (BETA) Detect entities in an image from similar images on the web.
+
+     suggest-crop
+        (BETA) Suggest a bounding box in an image.
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ml vision
+        $ gcloud alpha ml vision
+

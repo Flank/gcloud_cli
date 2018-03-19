@@ -1,0 +1,78 @@
+NAME
+    gcloud alpha pubsub subscriptions create - creates one or more Cloud
+        Pub/Sub subscriptions
+
+SYNOPSIS
+    gcloud alpha pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
+        (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
+        [--ack-deadline=ACK_DEADLINE] [--labels=[KEY=VALUE,...]]
+        [--message-retention-duration=MESSAGE_RETENTION_DURATION]
+        [--push-endpoint=PUSH_ENDPOINT] [--retain-acked-messages]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Creates one or more Cloud Pub/Sub subscriptions for a given topic.
+    The new subscription defaults to a PULL subscription unless a push endpoint
+    is specified.
+
+POSITIONAL ARGUMENTS
+     SUBSCRIPTION [SUBSCRIPTION ...]
+        One or more subscriptions to create.
+
+REQUIRED FLAGS
+     TOPIC - Name of the topic from which this subscription is receiving
+     messages. Each subscription is attached to a single topic. The arguments
+     in this group can be used to specify the attributes of this resource. This
+     must be specified.
+
+       --topic=TOPIC
+          The ID of the topic or a fully qualified identifier for the topic.
+          This flag must be specified if any of the other arguments in this
+          group are specified.
+
+       --topic-project=TOPIC_PROJECT
+          The Cloud project for the topic. If not set, it will use the project
+          set in properties.
+
+OPTIONAL FLAGS
+     --ack-deadline=ACK_DEADLINE
+        The number of seconds the system will wait for a subscriber to
+        acknowledge receiving a message before re-attempting delivery.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --message-retention-duration=MESSAGE_RETENTION_DURATION
+        How long to retain unacknowledged messages in the subscription's
+        backlog, from the moment a message is published. If
+        --retain-acked-messages is true, this also configures the retention of
+        acknowledged messages. The default value is 7 days, the minimum is 10
+        minutes, and the maximum is 7 days. Valid values are strings of the
+        form INTEGER[UNIT], where UNIT is one of "s", "m", "h", and "d" for
+        seconds, seconds, minutes, hours, and days, respectively. If the unit
+        is omitted, seconds is assumed.
+
+     --push-endpoint=PUSH_ENDPOINT
+        A URL to use as the endpoint for this subscription. This will also
+        automatically set the subscription type to PUSH.
+
+     --retain-acked-messages
+        Whether or not to retain acknowledged messages. If true, messages are
+        not expunged from the subscription's backlog until they fall out of the
+        --message-retention-duration window.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud pubsub subscriptions create
+        $ gcloud beta pubsub subscriptions create
+
