@@ -30,7 +30,13 @@ BILLING_ACCOUNTS = [
     ),
     messages.BillingAccount(
         displayName='Another Billing Account',
-        name='billingAccounts/000000-000000-000001',
+        name='billingAccounts/111111-111111-111111',
+        open=False,
+    ),
+    messages.BillingAccount(
+        displayName='A Billing SubAccount',
+        name='billingAccounts/222222-222222-222222',
+        masterBillingAccount='billingAccounts/111111-111111-111111',
         open=False,
     ),
 ]

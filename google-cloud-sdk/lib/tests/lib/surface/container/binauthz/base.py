@@ -17,7 +17,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from datetime import datetime
+import datetime
 import random
 import uuid
 
@@ -27,8 +27,11 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.binauthz import binauthz_util as binauthz_command_util
 from googlecloudsdk.core import properties
+from tests.lib import cli_test_base
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
+
+import six
 
 
 def GetNoteRelativeName(provider_id, note_id):
@@ -43,7 +46,7 @@ def CreateUtcIsoNowTimestamp():
   # pytz dependency or extra verbose code.  Probably the exact timestamp
   # format doesn't matter here, but for consistency this is what the prod API
   # actually returns.
-  return '{}Z'.format(datetime.utcnow().isoformat())
+  return '{}Z'.format(datetime.datetime.utcnow().isoformat())
 
 
 class BinauthzUnitTestBase(sdk_test_base.SdkBase):
@@ -68,7 +71,10 @@ class BinauthzUnitTestBase(sdk_test_base.SdkBase):
         random_sha256=self.GenerateValidBogusLookingRandomSha256())
 
   def RunBinauthz(self, cmd):
-    return self.Run(['container', 'binauthz'] + cmd)
+    prefix = ['container', 'binauthz']
+    if isinstance(cmd, six.string_types):
+      return self.Run(' '.join(prefix + [cmd]))
+    return self.Run(prefix + cmd)
 
   def SetUp(self):
     self.track = base.ReleaseTrack.ALPHA
@@ -112,6 +118,22 @@ class BinauthzUnitTestBase(sdk_test_base.SdkBase):
     self.ListNoteOccurrencesResponse = (
         self.containeranalysis_messages.ListNoteOccurrencesResponse)
     # pylint: enable=invalid-name
+
+
+class BinauthzMockedPolicyClientUnitTest(sdk_test_base.WithFakeAuth,
+                                         BinauthzUnitTestBase,
+                                         cli_test_base.CliTestBase):
+
+  def SetUp(self):
+    self.client = mock.Client(
+        apis.GetClientClass('binaryauthorization', 'v1alpha1'),
+        real_client=apis.GetClientInstance(
+            'binaryauthorization', 'v1alpha1', no_http=True),
+    )
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+
+    self.messages = self.client.MESSAGES_MODULE
 
 
 class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,

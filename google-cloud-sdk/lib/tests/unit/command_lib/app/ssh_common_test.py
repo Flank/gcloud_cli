@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 from googlecloudsdk.api_lib.app import appengine_api_client
 from googlecloudsdk.api_lib.app import util
 from googlecloudsdk.command_lib.app import exceptions as command_exceptions
@@ -69,7 +70,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
     self._ExpectDebugInstanceCall('default', 'v1', 'i2', ssh_key=self.key_field)
     connection_details = ssh_common.PopulatePublicKey(
         self.api_client, 'default', 'v1', 'i2', self.public_key)
-    self.assertEquals(connection_details, self.connection_details)
+    self.assertEqual(connection_details, self.connection_details)
 
   def testPopulateKeyDebugOff(self):
     """Debug not enabled on the instance."""
@@ -79,7 +80,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
     self.WriteInput('y')
     connection_details = ssh_common.PopulatePublicKey(
         self.api_client, 'default', 'v1', 'i2', self.public_key)
-    self.assertEquals(connection_details, self.connection_details)
+    self.assertEqual(connection_details, self.connection_details)
     self.AssertErrContains(
         'This instance is serving live application traffic.')
 

@@ -32,14 +32,14 @@ class DescribeTest(base.Base, cli_test_base.CliTestBase):
     self.AssertOutputContains('canIpForward:')
 
   def testDescribeMissingVersion(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         registry.UnknownAPIVersionError,
         r'Version \[v0\] does not exist for API \[compute\].'):
       self.Run(
           'meta apis messages describe --api compute --api-version v0 Instance')
 
   def testDescribeInvalidCollection(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[message\]: Message \[asdf\] does not exist for '
         r'API \[compute\]'):

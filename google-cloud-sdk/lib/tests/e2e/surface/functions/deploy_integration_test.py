@@ -159,7 +159,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
       f.write('debris')
     # The deployment will fail if because it doesn't skip trash file, it's
     # uncompressed size is over allowed max of 512MB.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.OversizedDeployment,
         (r'Uncompressed deployment is \d+B, bigger than maximum allowed '
          r'size of \d+B')):
@@ -173,7 +173,6 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run('functions list')
     self. AssertOutputNotContains(self.function_name)
 
-  @test_case.Filters.skip('Failing', 'b/74079729')
   def testDeployChangeSourceType(self):
     self.Run(
         'functions deploy {0} '

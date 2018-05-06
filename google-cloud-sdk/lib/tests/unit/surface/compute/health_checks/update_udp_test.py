@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the health-checks update udp subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -699,7 +701,7 @@ class HealthChecksUpdateUdpTest(test_base.BaseTest,
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         'update udp subcommand applied to health check with protocol HTTP'):
       self.Run('compute health-checks update udp my-health-check --port 8888')

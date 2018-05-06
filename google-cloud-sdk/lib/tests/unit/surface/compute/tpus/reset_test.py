@@ -15,6 +15,7 @@
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -29,11 +30,18 @@ class ResetTest(base.TpuUnitTestBase):
     self.zone = 'us-central1-c'
     self.track = calliope_base.ReleaseTrack.ALPHA
     properties.VALUES.compute.zone.Set(self.zone)
+    self.reset_op_ref = resources.REGISTRY.Parse(
+        'reset',
+        params={
+            'projectsId': self.Project(),
+            'locationsId': self.zone},
+        collection='tpu.projects.locations.operations')
     self.StartPatch('time.sleep')
 
   def testReset(self, track):
     self._SetTrack(track)
-    reset_response = self.GetOperationResponse('reset')
+    reset_response = self.GetOperationResponse(
+        op_name=self.reset_op_ref.RelativeName())
     self.mock_client.projects_locations_nodes.Reset.Expect(
         self.messages.TpuProjectsLocationsNodesResetRequest(
             name='projects/{0}/locations/{1}/nodes/mytpu'.format(
@@ -54,7 +62,8 @@ class ResetTest(base.TpuUnitTestBase):
   def testResetLongRunningOperation(self, track):
     self._SetTrack(track)
     # Reset Request
-    reset_response = self.GetOperationResponse('reset')
+    reset_response = self.GetOperationResponse(
+        op_name=self.reset_op_ref.RelativeName())
     self.mock_client.projects_locations_nodes.Reset.Expect(
         self.messages.TpuProjectsLocationsNodesResetRequest(
             name='projects/{0}/locations/{1}/nodes/mytpu'.format(
@@ -65,7 +74,8 @@ class ResetTest(base.TpuUnitTestBase):
 
     # Operation Polling Interval
     for _ in xrange(3):
-      op_polling_response = self.GetOperationResponse('reset', is_done=False)
+      op_polling_response = self.GetOperationResponse(
+          op_name=self.reset_op_ref.RelativeName(), is_done=False)
       self.mock_client.projects_locations_operations.Get.Expect(
           self.messages.TpuProjectsLocationsOperationsGetRequest(
               name='projects/{0}/locations/{1}/operations/reset'.format(
@@ -75,7 +85,8 @@ class ResetTest(base.TpuUnitTestBase):
       )
 
     # Operation Complete
-    op_done_response = self.GetOperationResponse('reset', is_done=True)
+    op_done_response = self.GetOperationResponse(
+        op_name=self.reset_op_ref.RelativeName(), is_done=True)
     self.mock_client.projects_locations_operations.Get.Expect(
         self.messages.TpuProjectsLocationsOperationsGetRequest(
             name='projects/{0}/locations/{1}/operations/reset'.format(
@@ -90,7 +101,8 @@ class ResetTest(base.TpuUnitTestBase):
   def testResetLongRunningOperationError(self, track):
     self._SetTrack(track)
     # Reset Request
-    reset_response = self.GetOperationResponse('reset')
+    reset_response = self.GetOperationResponse(
+        op_name=self.reset_op_ref.RelativeName())
     self.mock_client.projects_locations_nodes.Reset.Expect(
         self.messages.TpuProjectsLocationsNodesResetRequest(
             name='projects/{0}/locations/{1}/nodes/mytpu'.format(
@@ -101,7 +113,8 @@ class ResetTest(base.TpuUnitTestBase):
 
     # Operation Polling Interval
     for _ in xrange(3):
-      op_polling_response = self.GetOperationResponse('reset', is_done=False)
+      op_polling_response = self.GetOperationResponse(
+          op_name=self.reset_op_ref.RelativeName(), is_done=False)
       self.mock_client.projects_locations_operations.Get.Expect(
           self.messages.TpuProjectsLocationsOperationsGetRequest(
               name='projects/{0}/locations/{1}/operations/reset'.format(
@@ -112,7 +125,7 @@ class ResetTest(base.TpuUnitTestBase):
 
     # Operation Error on Complete
     op_done_response = self.GetOperationResponse(
-        'reset',
+        op_name=self.reset_op_ref.RelativeName(),
         is_done=True,
         error_json={'code': 400, 'message': 'Reset Failed.'}
     )
@@ -126,12 +139,13 @@ class ResetTest(base.TpuUnitTestBase):
     )
 
     self.WriteInput('Y\n')
-    with self.assertRaisesRegexp(waiter.OperationError, r'Reset Failed.'):
+    with self.assertRaisesRegex(waiter.OperationError, r'Reset Failed.'):
       self.Run('compute tpus reset mytpu')
 
   def testResetWithZone(self, track):
     self._SetTrack(track)
-    reset_response = self.GetOperationResponse('reset')
+    reset_response = self.GetOperationResponse(
+        op_name=self.reset_op_ref.RelativeName())
     self.mock_client.projects_locations_nodes.Reset.Expect(
         self.messages.TpuProjectsLocationsNodesResetRequest(
             name='projects/{0}/locations/{1}/nodes/mytpu'.format(
@@ -154,16 +168,17 @@ class ResetTest(base.TpuUnitTestBase):
 
   def testResetCancelled(self, track):
     self._SetTrack(track)
-    self.WriteInput('N\n')
+    self.WriteInput('n\n')
     with self.AssertRaisesExceptionMatches(
         console_io.OperationCancelledError,
-        'Reset aborted by user.'):
+        'Aborted by user.'):
       self.Run('compute tpus reset mytpu')
 
   def testResetOutput(self, track):
     self._SetTrack(track)
     properties.VALUES.core.user_output_enabled.Set(True)
-    reset_response = self.GetOperationResponse('reset')
+    reset_response = self.GetOperationResponse(
+        op_name=self.reset_op_ref.RelativeName())
     self.mock_client.projects_locations_nodes.Reset.Expect(
         self.messages.TpuProjectsLocationsNodesResetRequest(
             name='projects/{0}/locations/{1}/nodes/mytpu'.format(
@@ -180,13 +195,9 @@ class ResetTest(base.TpuUnitTestBase):
     )
     self.WriteInput('Y\n')
     self.Run('compute tpus reset mytpu')
-    self.AssertErrContains("""\
-Your TPU [mytpu] will be reset.
-
-Do you want to continue (Y/n)?
-""", normalize_space=True)
-    self.AssertErrContains('Waiting for [reset] to finish')
-    self.AssertErrContains('Reset [mytpu].', normalize_space=True)
+    self.AssertErrContains("""You are about to reset tpu [mytpu].
+    Do you want to continue (Y/n)?""", normalize_space=r'\n\t\s')
+    self.AssertErrMatches(r'Waiting for operation \[.*reset\] to complete')
 
 
 if __name__ == '__main__':

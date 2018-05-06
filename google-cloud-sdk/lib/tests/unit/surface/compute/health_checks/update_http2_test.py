@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the health-checks update http2 subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -20,7 +22,8 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class HealthChecksUpdateHttp2Test(test_base.BaseTest):
+class HealthChecksUpdateHttp2Test(test_base.BaseTest,
+                                  test_case.WithOutputCapture):
 
   def SetUp(self):
     self.SelectApi('alpha')
@@ -114,7 +117,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest):
     )
 
     # By default, the resource should not be displayed
-    self.assertFalse(self.stdout.getvalue())
+    self.assertFalse(self.GetOutput())
 
   def testJsonOutput(self):
     self.make_requests.side_effect = iter([
@@ -141,7 +144,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest):
         """)
 
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        self.GetOutput(),
         textwrap.dedent("""\
             [
               {
@@ -181,7 +184,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest):
         """)
 
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        self.GetOutput(),
         textwrap.dedent("""\
             ---
             http2HealthCheck.host:        www.google.com
@@ -216,7 +219,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest):
         """)
 
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        self.GetOutput(),
         textwrap.dedent("""\
             ---
             http2HealthCheck:
@@ -709,7 +712,7 @@ class HealthChecksUpdateHttp2Test(test_base.BaseTest):
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         'update http2 subcommand applied to health check with protocol '
         'HTTPS'):

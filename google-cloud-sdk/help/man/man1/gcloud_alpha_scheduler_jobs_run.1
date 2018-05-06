@@ -25,10 +25,20 @@ gcloud alpha scheduler jobs run \- trigger an on\-demand execution of a job
 
 .RS 2m
 .TP 2m
+
+JOB \- The job you want to run. This represents a Cloud resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: Set the property [core/project] or provide the
+flag [\-\-project] on the command line. To set the [location] attribute: As the
+location of the current project's App Engine App.. This must be specified.
+
+.RS 2m
+.TP 2m
 \fIJOB\fR
-The job you want to run.
+The ID of the job or a fully qualified identifier for the job.
 
 
+.RE
 .RE
 .sp
 

@@ -13,6 +13,9 @@
 # limitations under the License.
 """Base class for all Datastore Command e2e tests."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 
@@ -40,7 +43,7 @@ class DatastoreE2ETestBase(e2e_base.WithServiceAuth):
     def _Helper(props, path_elements):
       path_element = path_elements.pop(0)
       for prop in props:
-        print 'Looking at prop: %s for %s' % (prop.key, path_element)
+        print('Looking at prop: %s for %s' % (prop.key, path_element))
         if path_element == prop.key:
           return prop.value if not path_elements else _Helper(
               prop.value.object_value.properties, path_elements)

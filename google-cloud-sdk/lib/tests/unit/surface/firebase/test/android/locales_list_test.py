@@ -18,8 +18,9 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_attr
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test import test_utils
+from tests.lib.surface.firebase.test.android import commands
+from tests.lib.surface.firebase.test.android import unit_base
 
 
 TESTING_MESSAGES = apis.GetMessagesModule('testing', 'v1')
@@ -50,7 +51,7 @@ _THREE_LOCALES_CATALOG = TESTING_MESSAGES.AndroidDeviceCatalog(
         locales=[_LOCALE_1, _LOCALE_2, _LOCALE_3]))
 
 
-class TestLocalesListTest(unit_base.TestMockClientTest):
+class TestLocalesListTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
@@ -69,7 +70,7 @@ class TestLocalesListTest(unit_base.TestMockClientTest):
         | fe | Ferengi | Alliance | |""", normalize_space=True)
 
   def testLocalesList_ApiThrowsHttpError(self):
-    err = unit_base.MakeHttpError('Failure 3', 'Environment catalog missing.')
+    err = test_utils.MakeHttpError('Failure 3', 'Environment catalog missing.')
     self.ExpectCatalogGetError(err)
 
     with self.assertRaises(exceptions.HttpException):

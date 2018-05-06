@@ -78,16 +78,16 @@ class InterconnectLocationsDescribeTest(test_base.BaseTest):
         [(self.message_version.interconnectLocations, 'Get',
           self.messages.ComputeInterconnectLocationsGetRequest(
               project='my-project', interconnectLocation='eap-lga07'))],)
-    self.assertEquals(
+    self.assertEqual(
         result.address,
         'Bell Canada 111 8th Ave, Suite 831 New York, NY 10011 New York '
         'United States')
-    self.assertEquals(result.description, 'Bell-Canada')
-    self.assertEquals(result.facilityProviderFacilityId, '111 8th')
-    self.assertEquals(result.name, 'eap-lga07')
-    self.assertEquals(result.peeringdbFacilityId, '38')
-    self.assertEquals(result.selfLink, self.compute_uri + '/projects/'
-                      'my-project/global/interconnectLocations/eap-lga07')
+    self.assertEqual(result.description, 'Bell-Canada')
+    self.assertEqual(result.facilityProviderFacilityId, '111 8th')
+    self.assertEqual(result.name, 'eap-lga07')
+    self.assertEqual(result.peeringdbFacilityId, '38')
+    self.assertEqual(result.selfLink, self.compute_uri + '/projects/'
+                     'my-project/global/interconnectLocations/eap-lga07')
 
 
 class InterconnectLocationsDescribeBetaTest(InterconnectLocationsDescribeTest):

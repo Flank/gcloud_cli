@@ -5,8 +5,8 @@ SYNOPSIS
     gcloud debug snapshots list [ID ...] [--all-users]
         [--include-inactive=INCLUDE_INACTIVE; default=300]
         [--location=LOCATION-REGEXP] [--target=(ID|DESCRIPTION_REGEXP)]
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--sort-by=[FIELD,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     This command displays a list of the active debug snapshots for a Cloud
@@ -56,13 +56,6 @@ LIST COMMAND FLAGS
         The maximum number of resources to list. The default is unlimited. This
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
-
-     --page-size=PAGE_SIZE
-        Some services group resource list output into pages. This flag
-        specifies the maximum number of resources per page. The default is
-        determined by the service if it supports paging, otherwise it is
-        unlimited (no paging). Paging may be applied before or after --filter
-        and --limit depending on the service.
 
      --sort-by=[FIELD,...]
         A comma-separated list of resource field key names to sort by. The

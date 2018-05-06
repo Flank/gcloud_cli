@@ -5,21 +5,24 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute networks subnets get\-iam\-policy \- get the IAM Policy for a Google Compute Engine subnetwork
+gcloud alpha compute networks subnets get\-iam\-policy \- get the IAM policy for a Google Compute Engine subnetwork
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks subnets get\-iam\-policy\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks subnets get\-iam\-policy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute networks subnets get\-iam\-policy\fR
-displays the Iam Policy associated with a Google Compute Engine subnetwork in a
-project.
+displays the IAM policy associated with a Google Compute Engine subnetwork in a
+project. If formatted as JSON, the output can be edited and used as a policy
+file for set\-iam\-policy. The output includes an "etag" field identifying the
+version emitted and allowing detection of concurrent policy updates; see $
+{parent} set\-iam\-policy for additional details.
 
 
 
@@ -27,44 +30,26 @@ project.
 
 .RS 2m
 .TP 2m
-\fINAME\fR
-The name of the subnetwork to describe the IAM Policy of.
 
-
-.RE
-.sp
-
-.SH "FLAGS"
+NAME \- The network for which to display the IAM policy. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: Set the property [core/project] or provide the
+flag [\-\-project] on the command line. This must be specified.
 
 .RS 2m
 .TP 2m
+\fINAME\fR
+The ID of the subnetwork or a fully qualified identifier for the subnetwork.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the subnetwork to describe the IAM Policy of. If not specified,
-you will be prompted to select a region.
+The name of the Google Compute Engine region.
 
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/region\fR\fR property:
 
-.RS 2m
-$ gcloud config set compute/region REGION
 .RE
-
-A list of regions can be fetched by running:
-
-.RS 2m
-$ gcloud compute regions list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/region
-.RE
-
-Alternatively, the region can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
-
-
 .RE
 .sp
 
@@ -110,6 +95,25 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/alpha\fR API. The full documentation for this
+API can be found at:
+https://developers.google.com/compute/docs/reference/latest/
+
+
+
+.SH "EXAMPLES"
+
+To print the IAM policy for a given subnetwork, run:
+
+.RS 2m
+$ gcloud alpha compute networks subnets get\-iam\-policy \e
+    \-\-region=us\-central1 my\-subnet
+.RE
 
 
 

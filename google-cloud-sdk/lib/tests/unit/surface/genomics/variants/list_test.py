@@ -60,7 +60,7 @@ class ListTest(base.GenomicsUnitTest):
     resp = self.messages.SearchVariantsResponse(variants=variants)
     self.mocked_client.variants.Search.Expect(request=req, response=resp)
 
-    self.assertEquals(variants,
+    self.assertEqual(variants,
                       list(self.RunGenomics(
                           ['variants', 'list',
                            '--variant-set-id', '42',
@@ -78,11 +78,11 @@ class ListTest(base.GenomicsUnitTest):
                                                     referenceName='empty',
                                                     pageSize=512),
         response=self.messages.SearchVariantsResponse())
-    self.assertEquals([],
-                      list(self.RunGenomics(['variants', 'list',
-                                             '--variant-set-id', '42',
-                                             '--call-set-ids', '42-1',
-                                             '--reference-name', 'empty'])))
+    self.assertEqual([],
+                     list(self.RunGenomics(['variants', 'list',
+                                            '--variant-set-id', '42',
+                                            '--call-set-ids', '42-1',
+                                            '--reference-name', 'empty'])))
 
   def testVariantsList_Limit_InvalidLow(self):
     with self.AssertRaisesArgumentErrorRegexp(

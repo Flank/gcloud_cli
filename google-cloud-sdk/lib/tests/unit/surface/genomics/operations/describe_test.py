@@ -28,8 +28,24 @@ class DescribeTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsOperationsGetRequest(
             name='operations/operation-name'),
         response=op)
-    self.assertEquals(op, self.RunGenomics(['operations', 'describe',
-                                            'operation-name']))
+    self.assertEqual(op, self.RunGenomics(['operations', 'describe',
+                                           'operation-name']))
+
+  def testOperationsDescribeV2(self):
+    name = 'projects/fake-project/operations/12345678'
+    queries = [
+        'projects/fake-project/operations/12345678',
+        'fake-project/operations/12345678',
+        'operations/12345678',
+        '12345678']
+
+    for query in queries:
+      op = self.messages_v2.Operation(name=name)
+      self.mocked_client_v2.projects_operations.Get.Expect(
+          request=self.messages_v2.GenomicsProjectsOperationsGetRequest(
+              name=name),
+          response=op)
+      self.assertEqual(op, self.RunGenomics(['operations', 'describe', query]))
 
   def testOperationsDescribeWithOpsPrefix(self):
     op = self.messages.Operation(done=False, name='operations/operation-name')
@@ -37,8 +53,8 @@ class DescribeTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsOperationsGetRequest(
             name='operations/operation-name'),
         response=op)
-    self.assertEquals(op, self.RunGenomics(['operations', 'describe',
-                                            'operations/operation-name']))
+    self.assertEqual(op, self.RunGenomics(['operations', 'describe',
+                                           'operations/operation-name']))
 
   def testOperationsDescribeNotExists(self):
     self.mocked_client.operations.Get.Expect(
@@ -46,8 +62,8 @@ class DescribeTest(base.GenomicsUnitTest):
             name='operations/operation-name'),
         exception=self.MakeHttpError(404,
                                      'Operation not found: operation-name'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Operation not found: operation-name'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Operation not found: operation-name'):
       self.RunGenomics(['operations', 'describe', 'operation-name'])
 
 

@@ -15,7 +15,6 @@
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core.util import times
-from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
@@ -229,7 +228,7 @@ class SubmitPredictionBase(object):
              '    --region us-central1')
 
   def testBatchPredictionVersionWithModelDir(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error, '`--version` cannot be set with `--model-dir`'):
       self.Run('ml-engine jobs submit prediction my_job '
                '    --model-dir gs://some_bucket/models '
@@ -324,10 +323,19 @@ class SubmitPredictionAlphaTest(SubmitPredictionBase,
     self.track = calliope_base.ReleaseTrack.ALPHA
 
   @parameterized.parameters(
-      # Bad accelerator type
+      # Bad accelerator type no accelerator count.
       {'acc_type_flag': '--accelerator-type IN_VALID',
        'acc_count_flag': '', 'error_msg': (r'argument --accelerator-type: '
                                            r'Invalid choice: \'in-valid\'')},
+      # Bad accelerator type
+      {'acc_type_flag': '--accelerator-type IN_VALID',
+       'acc_count_flag': '--accelerator-count 2',
+       'error_msg': (r'argument --accelerator-type: '
+                     r'Invalid choice: \'in-valid\'')},
+      # Good accelerator type and no count
+      {'acc_type_flag': '--accelerator-type nvidia-tesla-k80',
+       'acc_count_flag': '', 'error_msg': (r'argument --accelerator-count: '
+                                           r'Must be specified.')},
       # Good accelerator type and bad count (negative)
       {'acc_type_flag': '--accelerator-type nvidia-tesla-k80',
        'acc_count_flag': '--accelerator-count -1', 'error_msg':
@@ -345,8 +353,7 @@ class SubmitPredictionAlphaTest(SubmitPredictionBase,
                                                      acc_type_flag,
                                                      acc_count_flag,
                                                      error_msg):
-    with self.assertRaisesRegexp(
-        cli_test_base.MockArgumentError, error_msg):
+    with self.AssertRaisesArgumentErrorRegexp(error_msg):
       self.Run('ml-engine jobs submit prediction my_job '
                '    --model my_model '
                '    --version v1 '

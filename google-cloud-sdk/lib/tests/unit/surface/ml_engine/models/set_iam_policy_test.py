@@ -14,97 +14,91 @@
 # limitations under the License.
 """ml-engine models set-iam-policy tests."""
 
+from apitools.base.py import encoding
+
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.command_lib.ml_engine import models_util
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 
-import mock
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class SetIamPolicyUnitTests(base.MlGaPlatformTestBase):
 
-class SetIamPolicyUnitTestse(base.MlGaPlatformTestBase):
+  POLICY_FILE = {
+      'bindings': [{
+          'members': ['user:email1@gmail.com', 'user:user2@gmail.com'],
+          'role': 'roles/owner'
+      }],
+      'etag': 'YWJjZA==',
+      'version': 1
+  }
 
   def SetUp(self):
-    self.policy = self.msgs.GoogleIamV1Policy(
-        bindings=[
-            self.msgs.GoogleIamV1Binding(
-                members=[
-                    'user:test-user1@gmail.com',
-                    'user:test-user2@gmail.com'
-                ],
-                role='roles/editor'
-            )
-        ],
-        etag='abcd'
-    )
+    self.policy = encoding.DictToMessage(self.POLICY_FILE,
+                                         self.msgs.GoogleIamV1Policy)
+
+  def testSetIamPolicy(self, track):
+    self.track = track
     self.set_iam_policy = self.StartObjectPatch(
-        models_util, 'SetIamPolicy', return_value=self.policy)
+        iam_util, 'ParsePolicyFileWithUpdateMask',
+        return_value=(self.policy, 'bindings,etag,version'))
 
-  def testSetIamPolicy(self):
-    response = self.Run('ml-engine models set-iam-policy myModel policy.json '
-                        '    --format disable')
+    iam_request = self.msgs.GoogleIamV1SetIamPolicyRequest(
+        policy=self.policy,
+        updateMask='bindings,etag,version')
+    ml_set_iam_request = self.msgs.MlProjectsModelsSetIamPolicyRequest(
+        googleIamV1SetIamPolicyRequest=iam_request,
+        resource='projects/{}/models/myModel'.format(self.Project()))
+    self.client.projects_models.SetIamPolicy.Expect(
+        request=ml_set_iam_request,
+        response=self.policy)
 
-    self.assertEquals(response, self.policy)
+    response = self.Run('ml-engine models set-iam-policy myModel policy_file '
+                        '--format disable')
+
+    self.assertEqual(response, self.policy)
     self.set_iam_policy.assert_called_once_with(
-        mock.ANY, 'myModel', 'policy.json')
+        'policy_file', self.msgs.GoogleIamV1Policy)
 
-  def testSetIamPolicyOutput(self):
-    self.Run('ml-engine models set-iam-policy myModel policy.json')
+  def testSetIamPolicyOutput(self, track):
+    self.set_iam_policy = self.StartObjectPatch(
+        iam_util, 'ParsePolicyFileWithUpdateMask',
+        return_value=(self.policy, 'bindings,etag,version'))
 
-    self.AssertOutputEquals("""\
-        bindings:
-        - members:
-          - user:test-user1@gmail.com
-          - user:test-user2@gmail.com
-        role: roles/editor
-        etag: YWJjZA==
-        """, normalize_space=True)
-    self.set_iam_policy.assert_called_once_with(
-        mock.ANY, 'myModel', 'policy.json')
-
-  def testSetIamPolicyPolicyFileRequired(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument POLICY_FILE: Must be specified.'):
-      self.Run('ml-engine models set-iam-policy myModel')
-
-
-class SetIamPolicyIntegrationTestBase(base.MlGaPlatformTestBase):
-
-  POLICY_FILE = """\
-      {
-        "bindings": [
-          {
-            "members": [
-              "user:email1@gmail.com",
-              "user:user2@gmail.com"
-            ],
-            "role": "roles/owner"
-          }
-        ],
-        "etag": "YWJjZA==",
-        "version": 1
-      }
-  """
-
-  def testSetIamPolicy(self):
-    policy_file = self.Touch(self.temp_path, 'policy.json',
-                             contents=self.POLICY_FILE)
-    new_policy = self.msgs.GoogleIamV1Policy(
-        bindings=[
-            self.msgs.GoogleIamV1Binding(
-                members=['user:email1@gmail.com', 'user:user2@gmail.com'],
-                role='roles/owner')],
-        etag='abcd',
-        version=1)
     request = self.msgs.GoogleIamV1SetIamPolicyRequest(
-        policy=new_policy,
+        policy=self.policy,
         updateMask='bindings,etag,version')
     self.client.projects_models.SetIamPolicy.Expect(
         request=self.msgs.MlProjectsModelsSetIamPolicyRequest(
             googleIamV1SetIamPolicyRequest=request,
             resource='projects/{}/models/myModel'.format(self.Project())),
-        response=new_policy)
+        response=self.policy)
+    self.Run('ml-engine models set-iam-policy myModel policy.json')
 
-    self.Run('ml-engine models set-iam-policy myModel {}'.format(policy_file))
+    self.AssertOutputEquals("""\
+        bindings:
+        - members:
+        - user:email1@gmail.com
+        - user:user2@gmail.com
+        role: roles/owner
+        etag: YWJjZA==
+        version: 1
+        """, normalize_space=True)
+    self.set_iam_policy.assert_called_once_with(
+        'policy.json', self.msgs.GoogleIamV1Policy)
+
+  def testSetIamPolicyPolicyFileRequired(self, track):
+    self.track = track
+    self.set_iam_policy = self.StartObjectPatch(
+        models_util, 'SetIamPolicy', return_value=self.policy)
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument POLICY_FILE: Must be specified.'):
+      self.Run('ml-engine models set-iam-policy myModel')
 
 
 if __name__ == '__main__':

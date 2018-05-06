@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha kms keyrings - create and manage keyrings
+
+SYNOPSIS
+    gcloud alpha kms keyrings COMMAND [--location=LOCATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A keyring is a toplevel logical grouping of keys.
+
+FLAGS
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding to a keyring.
+
+     create
+        (ALPHA) Create a new keyring.
+
+     describe
+        (ALPHA) Get metadata for a keyring.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a keyring.
+
+     list
+        (ALPHA) List keyrings within a location.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove a policy binding from a keyring.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a keyring.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keyrings
+        $ gcloud beta kms keyrings
+

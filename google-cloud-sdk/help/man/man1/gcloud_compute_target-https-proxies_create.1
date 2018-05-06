@@ -11,7 +11,7 @@ gcloud compute target\-https\-proxies create \- create a target HTTPS proxy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute target\-https\-proxies create\fR \fINAME\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...] \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute target\-https\-proxies create\fR \fINAME\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...] \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -23,7 +23,8 @@ rules which define which packets the proxy is responsible for routing. The
 target HTTPS proxy points to a URL map that defines the rules for routing the
 requests. The URL map's job is to map URLs to backend services which handle the
 actual requests. The target HTTPS proxy also points to at most 10 SSL
-certificates used for server\-side authentication.
+certificates used for server\-side authentication. The target HTTPS proxy can be
+associated with at most one SSL policy.
 
 
 
@@ -42,7 +43,7 @@ The name of the target HTTPS proxy to create.
 
 .RS 2m
 .TP 2m
-\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...]
+\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
 References to at most 10 SSL certificate resources that are used for
 server\-side authentication. The first SSL certificate in this list is
 considered the primary SSL certificate associated with the load balancer. The
@@ -65,6 +66,13 @@ target HTTPS proxy.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the target HTTPS proxy.
+
+.TP 2m
+\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR
+A reference to an SSL policy resource that defines the server\-side support for
+SSL features and affects the connections between clients and the HTTPS proxy
+load balancer. The SSL policy must exist and cannot be deleted while referenced
+by a target HTTPS proxy.
 
 
 .RE

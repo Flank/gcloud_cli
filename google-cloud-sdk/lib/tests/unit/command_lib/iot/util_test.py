@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Unit tests for parallel Google Cloud Storage operations."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import datetime
 import os
 import re
@@ -24,6 +29,8 @@ from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import times
 from tests.lib import parameterized
 from tests.lib import test_case
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 _DUMMY_X509_CERT_CONTENTS = """\
@@ -68,7 +75,7 @@ class ParseCredentialsTest(test_case.Base):
         [])
 
   def testParseCredentials_TooManyValues(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidPublicKeySpecificationError,
         re.escape('Too many public keys specified: [4] given, '
                   'but maximum [3] allowed.')):
@@ -80,14 +87,14 @@ class ParseCredentialsTest(test_case.Base):
       ], messages=self.messages)
 
   def testParseCredentials_MissingRequiredKey(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidPublicKeySpecificationError,
         re.escape('--public-key argument missing value for `path`')):
       util.ParseCredentials([
           {'type': 'rsa-x509-pem'}
       ], messages=self.messages)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidPublicKeySpecificationError,
         re.escape('--public-key argument missing value for `type`')):
       util.ParseCredentials([
@@ -95,7 +102,7 @@ class ParseCredentialsTest(test_case.Base):
       ], messages=self.messages)
 
   def testParseCredentials_ExtraInvalidKeys(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         TypeError,
         (r'Unrecognized keys \[badkey[12], badkey[12]] for public key '
          r'specification')):
@@ -105,7 +112,7 @@ class ParseCredentialsTest(test_case.Base):
       ], messages=self.messages)
 
   def testParseCredentials_BadKeyType(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError,
         re.escape('Invalid key type [invalid-type]')):
       util.ParseCredentials([
@@ -127,7 +134,7 @@ class ParseCredentialsTest(test_case.Base):
         ])
 
   def testParseCredentials_RsaKeyUnreadableKeyFile(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidKeyFileError,
         re.escape(
             ('Could not read key file [{}]:').format(self.bad_key_path))):
@@ -177,15 +184,15 @@ class ParseCredentialTest(test_case.Base):
     self.bad_key_path = os.path.join(self.temp_path, 'bad.pub')
 
   def testParseCredential_MissingRequiredKey(self):
-    with self.assertRaisesRegexp(ValueError, 'path is required'):
+    with self.assertRaisesRegex(ValueError, 'path is required'):
       util.ParseCredential(None, 'rsa-x509-pem', messages=self.messages)
 
-    with self.assertRaisesRegexp(ValueError,
-                                 re.escape('Invalid key type [None]')):
+    with self.assertRaisesRegex(ValueError,
+                                re.escape('Invalid key type [None]')):
       util.ParseCredential(self.rsa_key_path, None, messages=self.messages)
 
   def testParseCredential_BadKeyType(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError,
         re.escape('Invalid key type [invalid-type]')):
       util.ParseCredential(self.rsa_key_path, 'invalid-type',
@@ -212,7 +219,7 @@ class ParseCredentialTest(test_case.Base):
                 key=_DUMMY_RSA_FILE_CONTENTS)))
 
   def testParseCredential_RsaKeyUnreadableKeyFile(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidKeyFileError,
         re.escape(
             ('Could not read key file [{}]:').format(self.bad_key_path))):
@@ -240,7 +247,7 @@ class ParseCredentialTest(test_case.Base):
                 key=_DUMMY_ECDSA_FILE_CONTENTS)))
 
   def testParseCredential_EcdsaKeyUnreadableKeyFile(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidKeyFileError,
         re.escape(
             ('Could not read key file [{}]:').format(self.bad_key_path))):
@@ -268,7 +275,7 @@ class ParseRegistryCredentialsTest(test_case.Base):
 
   def testParseRegistryCredential_UnreadableKeyFile(self):
     bad_key_path = os.path.join(self.temp_path, 'bad.pub')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidKeyFileError,
         re.escape(
             ('Could not read key file [{}]:').format(bad_key_path))):
@@ -312,7 +319,7 @@ class ParseMetadataTest(test_case.Base, parameterized.TestCase):
 
   def testParseMetadata_TooManyKeys(self):
     metadata = dict([(str(i), str(i)) for i in range(501)])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidMetadataError,
         r'Maximum number of metadata key-value pairs is 500.'):
       util.ParseMetadata(metadata, None, self.messages)
@@ -320,7 +327,7 @@ class ParseMetadataTest(test_case.Base, parameterized.TestCase):
   def testParseMetadata_OverlappingKeys(self):
     metadata = {'key1': 'value1', 'key2': 'value2'}
     metadata_from_file = {'key1': 'value3', 'key3': 'value4'}
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidMetadataError,
         r'Cannot specify the same key in both '
         r'--metadata and --metadata-from-file'):
@@ -329,7 +336,7 @@ class ParseMetadataTest(test_case.Base, parameterized.TestCase):
   def testParseMetadata_ValueTooBig(self):
     value = 'a' * (32 * 1024 + 1)  # Value must be <= 32 KB in size.
     metadata = {'key': value}
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidMetadataError,
         r'Maximum size of metadata values are 32KB'):
       util.ParseMetadata(metadata, None, self.messages)
@@ -338,7 +345,7 @@ class ParseMetadataTest(test_case.Base, parameterized.TestCase):
     value = 'a' * (32 * 1024 + 1)  # Value must be <= 32 KB in size.
     path = self._CreateMetadataValueFile('value.txt', value)
     metadata_from_file = {'key': path}
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidMetadataError,
         r'Maximum size of metadata values are 32KB'):
       util.ParseMetadata(None, metadata_from_file, self.messages)
@@ -347,7 +354,7 @@ class ParseMetadataTest(test_case.Base, parameterized.TestCase):
     value = ''
     path = self._CreateMetadataValueFile('value.txt', value)
     metadata_from_file = {'key': path}
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidMetadataError,
         r'Metadata value cannot be empty'):
       util.ParseMetadata(None, metadata_from_file, self.messages)
@@ -355,7 +362,7 @@ class ParseMetadataTest(test_case.Base, parameterized.TestCase):
   def testParseMetadata_FileDoesntExist(self):
     path = 'fake/value.txt'
     metadata_from_file = {'key': path}
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidMetadataError,
         r'Could not read value file'):
       util.ParseMetadata(None, metadata_from_file, self.messages)
@@ -363,7 +370,7 @@ class ParseMetadataTest(test_case.Base, parameterized.TestCase):
   def testParseMetadata_TotalSizeTooBig(self):
     value = 'a' * (26 * 1024)
     metadata = dict([(str(i), value) for i in range(10)])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidMetadataError,
         r'Maximum size of metadata key-value pairs is 256KB'):
       util.ParseMetadata(metadata, None, self.messages)

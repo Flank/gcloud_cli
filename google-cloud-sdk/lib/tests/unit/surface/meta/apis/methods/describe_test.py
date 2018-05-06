@@ -40,13 +40,13 @@ class DescribeTest(base.Base, cli_test_base.CliTestBase):
         'path: projects/{project}/zones/{zone}/disks/{disk}')
 
   def testDescribeMissingAPI(self):
-    with self.assertRaisesRegexp(registry.UnknownAPIError,
-                                 r'\[x\] does not exist'):
+    with self.assertRaisesRegex(registry.UnknownAPIError,
+                                r'\[x\] does not exist'):
       self.Run('meta apis methods describe --api-version=v1 '
                '--collection=x.disks get')
 
   def testDescribeMissingVersion(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         registry.UnknownAPIVersionError,
         r'Version \[v12345\] does not exist for API \[compute\].'):
       self.Run(
@@ -54,13 +54,13 @@ class DescribeTest(base.Base, cli_test_base.CliTestBase):
           '--collection=compute.disks get ')
 
   def testDescribeMissingCollection(self):
-    with self.assertRaisesRegexp(registry.UnknownCollectionError,
-                                 r'\[x\] does not exist'):
+    with self.assertRaisesRegex(registry.UnknownCollectionError,
+                                r'\[x\] does not exist'):
       self.Run('meta apis methods describe --api-version=v1 '
                '--collection=compute.x get')
 
   def testDescribeMissingMethod(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         registry.UnknownMethodError,
         r'Method \[x\] does not exist for collection \[compute.disks\].'):
       self.Run('meta apis methods describe --api-version=v1 '

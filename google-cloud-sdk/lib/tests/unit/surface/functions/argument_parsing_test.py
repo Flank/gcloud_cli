@@ -34,7 +34,7 @@ class ArgumentParsingTest(sdk_test_base.SdkBase):
 
   def __badFunctionName(self, name):
     error_pattern = self.__formatError(name, util._FUNCTION_NAME_ERROR)
-    with self.assertRaisesRegexp(arg_parsers.ArgumentTypeError, error_pattern):
+    with self.assertRaisesRegex(arg_parsers.ArgumentTypeError, error_pattern):
       util.ValidateFunctionNameOrRaise(name)
 
   def testValidateFunctionName_singleLetter(self):
@@ -85,7 +85,7 @@ class ArgumentParsingTest(sdk_test_base.SdkBase):
 
   def __badEntryPoint(self, name):
     error_pattern = self.__formatError(name, util._ENTRY_POINT_NAME_ERROR)
-    with self.assertRaisesRegexp(arg_parsers.ArgumentTypeError, error_pattern):
+    with self.assertRaisesRegex(arg_parsers.ArgumentTypeError, error_pattern):
       util.ValidateEntryPointNameOrRaise(name)
 
   def testValidateEntryPointName_singleLetter(self):
@@ -144,7 +144,7 @@ class ArgumentParsingTest(sdk_test_base.SdkBase):
   def __badTopic(self, name):
     properties.VALUES.core.project.Set('myproject')
     error_pattern = self.__formatError(name, util._TOPIC_NAME_ERROR)
-    with self.assertRaisesRegexp(arg_parsers.ArgumentTypeError, error_pattern):
+    with self.assertRaisesRegex(arg_parsers.ArgumentTypeError, error_pattern):
       util.ValidatePubsubTopicNameOrRaise(name)
 
   def testValidateTopic_minLength(self):

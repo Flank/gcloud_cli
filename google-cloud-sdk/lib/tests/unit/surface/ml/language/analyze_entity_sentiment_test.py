@@ -12,14 +12,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for gcloud ml language analyze-entity-sentiment."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import textwrap
 
 from apitools.base.py import encoding
-from googlecloudsdk.api_lib.ml.language import util
 from googlecloudsdk.api_lib.util import exceptions
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.ml.language import util
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the job_utils."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import shlex
 
 from googlecloudsdk.command_lib.dataflow import job_utils
@@ -37,10 +39,10 @@ class _BaseJobHelpersTest(base.DataflowMockingTestBase):
   def AssertJobRef(self, job_ref, job_id, project_id=None, location=None):
     location = location or base.DEFAULT_REGION
 
-    self.assertEquals(
+    self.assertEqual(
         project_id or self.Project(), job_ref.projectId)
-    self.assertEquals(location, job_ref.location)
-    self.assertEquals(job_id, job_ref.jobId)
+    self.assertEqual(location, job_ref.location)
+    self.assertEqual(job_id, job_ref.jobId)
 
 
 class OneJobHelperTest(_BaseJobHelpersTest):
@@ -88,19 +90,19 @@ class MultiJobHelperTest(_BaseJobHelpersTest):
 
   def testExtractJobRefsNoneOptional(self):
     job_utils.ArgsForJobRefs(self.parser, nargs='*')
-    self.assertEquals([], job_utils.ExtractJobRefs(self.parser.parse_args([])))
+    self.assertEqual([], job_utils.ExtractJobRefs(self.parser.parse_args([])))
 
   def testExtractJobRefsOne(self):
     job_utils.ArgsForJobRefs(self.parser, nargs='+')
     jobs = job_utils.ExtractJobRefs(self.parser.parse_args([JOB_1_ID]))
-    self.assertEquals(1, len(jobs))
+    self.assertEqual(1, len(jobs))
     self.AssertJobRef(jobs[0], JOB_1_ID)
 
   def testExtractJobRefsTwo(self):
     job_utils.ArgsForJobRefs(self.parser, nargs='+')
     jobs = job_utils.ExtractJobRefs(
         self.ParseArgs('%s %s' % (JOB_1_ID, JOB_2_ID)))
-    self.assertEquals(2, len(jobs))
+    self.assertEqual(2, len(jobs))
     self.AssertJobRef(jobs[0], JOB_1_ID)
     self.AssertJobRef(jobs[1], JOB_2_ID)
 
@@ -108,14 +110,14 @@ class MultiJobHelperTest(_BaseJobHelpersTest):
     job_utils.ArgsForJobRefs(self.parser, nargs='+')
     jobs = job_utils.ExtractJobRefs(
         self.ParseArgs('--region=%s %s' % (REGION, JOB_1_ID)))
-    self.assertEquals(1, len(jobs))
+    self.assertEqual(1, len(jobs))
     self.AssertJobRef(jobs[0], JOB_1_ID, location=REGION)
 
   def testExtractJobRefsTwoWithRegion(self):
     job_utils.ArgsForJobRefs(self.parser, nargs='+')
     jobs = job_utils.ExtractJobRefs(
         self.ParseArgs('--region=%s %s %s' % (REGION, JOB_1_ID, JOB_2_ID)))
-    self.assertEquals(2, len(jobs))
+    self.assertEqual(2, len(jobs))
     self.AssertJobRef(jobs[0], JOB_1_ID, location=REGION)
     self.AssertJobRef(jobs[1], JOB_2_ID, location=REGION)
 

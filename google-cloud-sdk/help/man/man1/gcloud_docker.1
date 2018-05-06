@@ -17,6 +17,17 @@ gcloud docker \- provides the docker CLI access to the Google Container Registry
 
 .SH "DESCRIPTION"
 
+\fB(DEPRECATED)\fR Provides the docker CLI access to the Google Container
+Registry.
+
+\f5gcloud docker\fR will not be supported for Docker client versions above
+18.03. Please use \f5gcloud auth configure\-docker\fR to configure \f5docker\fR
+to use \f5gcloud\fR as a credential helper, then use \f5docker\fR as you would
+for non\-GCR registries, e.g. \f5docker pull gcr.io/project\-id/my\-image\fR.
+Add \f5\-\-verbosity=error\fR to silence this warning, e.g. \f5gcloud docker
+\-\-verbosity=error \-\- pull gcr.io/project\-id/my\-image\fR. See:
+https://cloud.google.com/container\-registry/docs/support/deprecation\-notices#gcloud\-docker
+
 The gcloud docker command group wraps docker commands, so that gcloud can inject
 the appropriate fresh authentication token into requests that interact with the
 docker registry.

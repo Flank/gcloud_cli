@@ -16,7 +16,8 @@ from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test import test_utils
+from tests.lib.surface.firebase.test.android import unit_base
 
 TESTING_V1_MESSAGES = apis.GetMessagesModule('testing', 'v1')
 
@@ -41,7 +42,7 @@ M_CANCEL = TESTING_V1_MESSAGES.TestMatrix.StateValueValuesEnum.CANCELLED
 M_INVALID = TESTING_V1_MESSAGES.TestMatrix.StateValueValuesEnum.INVALID
 
 
-class MatrixMonitorTests(unit_base.TestMockClientTest):
+class MatrixMonitorTests(unit_base.AndroidMockClientTest):
   """Unit tests for api_lib/test/matrix_ops.MatrixMonitor."""
 
   def testMatrixMonitor_GetTestMatrixStatus_GetsHttpError(self):
@@ -50,9 +51,8 @@ class MatrixMonitorTests(unit_base.TestMockClientTest):
 
     self.testing_client.projects_testMatrices.Get.Expect(
         request=TESTING_V1_MESSAGES.TestingProjectsTestMatricesGetRequest(
-            projectId=self.PROJECT_ID,
-            testMatrixId=matrix_id),
-        exception=unit_base.MakeHttpError(
+            projectId=self.PROJECT_ID, testMatrixId=matrix_id),
+        exception=test_utils.MakeHttpError(
             'notFound', 'Simulated failure to get test matrix status.'))
 
     # An HttpError from the rpc should be converted to an HttpException
@@ -65,9 +65,8 @@ class MatrixMonitorTests(unit_base.TestMockClientTest):
 
     self.testing_client.projects_testMatrices.Get.Expect(
         request=TESTING_V1_MESSAGES.TestingProjectsTestMatricesGetRequest(
-            projectId=self.PROJECT_ID,
-            testMatrixId=matrix_id),
-        exception=unit_base.MakeHttpError(
+            projectId=self.PROJECT_ID, testMatrixId=matrix_id),
+        exception=test_utils.MakeHttpError(
             'notFound', 'Simulated failure to get test execution status.'))
 
     # An HttpError from the rpc should be converted to an HttpException
@@ -279,9 +278,8 @@ Instrumentation testing complete.
     monitor = self.CreateMatrixMonitor(matrix_id, self.args)
     self.testing_client.projects_testMatrices.Cancel.Expect(
         request=self.testing_msgs.TestingProjectsTestMatricesCancelRequest(
-            projectId=self.PROJECT_ID,
-            testMatrixId=matrix_id),
-        exception=unit_base.MakeHttpError('oops', 'Simulated cancel failure'))
+            projectId=self.PROJECT_ID, testMatrixId=matrix_id),
+        exception=test_utils.MakeHttpError('oops', 'Simulated cancel failure'))
 
     # An HttpError from the rpc should be converted to an HttpException
     with self.assertRaises(calliope_exceptions.HttpException) as ex_ctx:

@@ -13,11 +13,17 @@
 # limitations under the License.
 """Tests for the Cloud IoT Devices library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.cloudiot import devices as devices_api
 from googlecloudsdk.command_lib.iot import util
 from tests.lib import test_case
 from tests.lib.api_lib.util import list_slicer
 from tests.lib.surface.cloudiot import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class DevicesTest(base.CloudIotBase):
@@ -232,7 +238,7 @@ class DevicesTest(base.CloudIotBase):
     self.assertEqual(result, device)
 
   def testModifyConfig(self):
-    data = '\x00\x01\x02\x03'
+    data = b'\x00\x01\x02\x03'
     device_config = self.messages.DeviceConfig(
         cloudUpdateTime='2017-01-01T00:00Z',
         binaryData=data,
@@ -273,7 +279,7 @@ class DeviceConfigsTest(base.CloudIotBase):
   def _MakeDeviceConfigs(self, num=10):
     device_configs = []
     for i in range(num):
-      device_configs.append(self.messages.DeviceConfig(binaryData=str(i)))
+      device_configs.append(self.messages.DeviceConfig(binaryData=bytes(i)))
     return device_configs
 
   def testList(self):
@@ -327,7 +333,7 @@ class DeviceStatesTest(base.CloudIotBase):
   def _MakeDeviceStates(self, num=10):
     device_states = []
     for i in range(num):
-      device_states.append(self.messages.DeviceState(binaryData=str(i)))
+      device_states.append(self.messages.DeviceState(binaryData=bytes(i)))
     return device_states
 
   def testList(self):

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for 'category-manager taxonomies remove-iam-policy-binding' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
@@ -58,7 +60,7 @@ class RemoveIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
     result = self.Run('alpha category-manager stores remove-iam-policy-binding '
                       'organizations/1 --role=roles/categorymanager.admin '
                       '--member=user:admin@gmail.com')
-    self.assertEquals(self.new_policy, result)
+    self.assertEqual(self.new_policy, result)
 
   def testRemoveIamPolicyBindingWithOrganizationId(self):
     self.ExpectGetTaxonomyStore(org_id='1', taxonomy_store_id='2')
@@ -75,7 +77,7 @@ class RemoveIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
     result = self.Run('alpha category-manager stores remove-iam-policy-binding '
                       '1 --role=roles/categorymanager.admin '
                       '--member=user:admin@gmail.com')
-    self.assertEquals(self.new_policy, result)
+    self.assertEqual(self.new_policy, result)
 
 
 if __name__ == '__main__':

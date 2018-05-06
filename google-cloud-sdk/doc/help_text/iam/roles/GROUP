@@ -37,7 +37,8 @@ COMMANDS
         Update an IAM custom role.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam roles
         $ gcloud beta iam roles
 

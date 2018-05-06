@@ -268,7 +268,7 @@ class WaitersCreateTest(base.RuntimeConfigTestBase):
         'waiters create bar --config-name foo --timeout 1m '
         '--success-cardinality-path /success --async')
 
-    self.assertEquals(util.FormatWaiter(expected_result), got_result)
+    self.assertEqual(util.FormatWaiter(expected_result), got_result)
 
   def testCreateAsyncEpilog(self):
     self._setupCreateAsyncTest()

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Utilities shared by cloud-shell commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import base64
 
 from googlecloudsdk.api_lib.util import apis
@@ -102,7 +104,7 @@ def PrepareEnvironment(args):
         StartEnvironmentPoller(client.users_environments,
                                operations_client.operations),
         start_operation,
-        'Waiting for your Google Cloud Shell machine to start',
+        'Waiting for your Cloud Shell machine to start',
         sleep_ms=500,
         max_wait_ms=None)
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for gcloud app ssl-certificates."""
 
+from __future__ import absolute_import
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util.files import Error as FileError
 from tests.lib import cli_test_base
@@ -41,13 +42,13 @@ class SslCertificatesCreateTest(ssl_certificates_base.SslCertificatesBase):
          """.format(
              certificate_file=self.certificate_file,
              key_file=self.private_key_file))
-    self.assertEquals(result.id, '1234')
-    self.assertEquals(result.certificateRawData.publicCertificate, 'cert_data')
-    self.assertEquals(result.certificateRawData.privateKey, 'key_data')
+    self.assertEqual(result.id, '1234')
+    self.assertEqual(result.certificateRawData.publicCertificate, 'cert_data')
+    self.assertEqual(result.certificateRawData.privateKey, 'key_data')
     self.AssertErrContains('Created [1234].')
 
   def testCreateSslCertificate_missingKey(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         'argument --private-key: Must be specified.'):
       self.Run("""app ssl-certificates create
@@ -56,7 +57,7 @@ class SslCertificatesCreateTest(ssl_certificates_base.SslCertificatesBase):
           """.format(certificate_file=self.certificate_file))
 
   def testCreateSslCertificate_missingCert(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         'argument --certificate: Must be specified.'):
       self.Run("""app ssl-certificates create
@@ -95,6 +96,6 @@ class SslCertificatesCreateBetaTest(
          """.format(
              certificate_file=self.certificate_file,
              key_file=self.private_key_file))
-    self.assertEquals(result.id, '1234')
-    self.assertEquals(result.certificateRawData.publicCertificate, 'cert_data')
-    self.assertEquals(result.certificateRawData.privateKey, 'key_data')
+    self.assertEqual(result.id, '1234')
+    self.assertEqual(result.certificateRawData.publicCertificate, 'cert_data')
+    self.assertEqual(result.certificateRawData.privateKey, 'key_data')

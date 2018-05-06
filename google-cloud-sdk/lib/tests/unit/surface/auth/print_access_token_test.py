@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.auth import exceptions as auth_exceptions
 from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
@@ -39,8 +42,8 @@ class PrintAccessTokenTest(sdk_test_base.WithFakeAuth,
         cred.access_token = None
 
     self.StartObjectPatch(store, 'Refresh', side_effect=FakeRefresh)
-    with self.assertRaisesRegexp(auth_exceptions.InvalidCredentialsError,
-                                 'No access token could be obtained'):
+    with self.assertRaisesRegex(auth_exceptions.InvalidCredentialsError,
+                                'No access token could be obtained'):
       self.Run('auth print-access-token')
 
 

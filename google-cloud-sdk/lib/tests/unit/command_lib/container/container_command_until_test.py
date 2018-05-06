@@ -14,6 +14,8 @@
 
 """Tests for container_command_util.py utils."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.api_lib.container import util
@@ -132,7 +134,7 @@ class GetUseV1APIPropertyTest(
     properties.VALUES.container.use_v1_api.Set(use_v1_api)
     properties.VALUES.container.use_v1_api_client.Set(use_v1_api_client)
     actual = container_command_util.GetUseV1APIProperty()
-    self.assertEquals(expected, actual)
+    self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':

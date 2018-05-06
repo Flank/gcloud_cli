@@ -88,7 +88,7 @@ newcert  d926e1fb26e4dba2f73a14bea4ee9554577deda9  -
     self.assertEqual(open(cert_file).read(), 'cert private key\n')
 
   def testSslCertsCreateBadDestination(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ArgumentError,
         r'unable to write \[/foobar\]'):
       self.Run('sql ssl-certs create newcert /foobar '
@@ -97,7 +97,7 @@ newcert  d926e1fb26e4dba2f73a14bea4ee9554577deda9  -
   def testSslCertsCreateAlreadyExists(self):
     file_contents = 'arbitrary data\n'
     path = self.Touch(self.temp_path, 'arbitrary_file', file_contents)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ArgumentError,
         r'file \[{file}\] already exists'.format(file=re.escape(path))):
       self.Run('sql ssl-certs create newcert {file} --instance=integration-test'

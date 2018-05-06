@@ -78,7 +78,7 @@ class WatchDogTest(test_case.WithOutputCapture):
     time_mock.time.return_value = 20
     watchdog.join(timeout=1.0)
     self.assertFalse(watchdog.isAlive())
-    self.assertEquals(1, self._timeout_cb_call_count)
+    self.assertEqual(1, self._timeout_cb_call_count)
 
   def testAlivePreventsFiring(self):
     time_mock = mock.MagicMock()
@@ -96,7 +96,7 @@ class WatchDogTest(test_case.WithOutputCapture):
     time_mock.time.return_value = 20
     watchdog.join(timeout=1.0)
     self.assertTrue(watchdog.isAlive())
-    self.assertEquals(0, self._timeout_cb_call_count)
+    self.assertEqual(0, self._timeout_cb_call_count)
 
 
 if __name__ == '__main__':

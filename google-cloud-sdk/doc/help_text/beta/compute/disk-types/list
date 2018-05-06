@@ -3,39 +3,37 @@ NAME
 
 SYNOPSIS
     gcloud beta compute disk-types list [NAME ...] [--regexp=REGEXP, -r REGEXP]
-        [--zones=ZONE,[ZONE,...]] [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [--regions=[REGION,...] | --zones=[ZONE,...]] [--filter=EXPRESSION]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute disk-types list displays all Google Compute
     Engine disk types in a project.
 
-    By default, disk types from all zones are listed. The results can be
-    narrowed down using a filter: --filter="zone:( ZONE ... )".
+    By default, disk types from all regions and disk types from all zones are
+    listed. The results can be narrowed down by providing the --regions or
+    --zones flag.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
-        (DEPRECATED) If provided, show details for the specified names and/or
-        URIs of resources.
-
-        Argument NAME is deprecated. Use --filter="name=( 'NAME' ... )"
-        instead.
+        If provided, show details for the specified names and/or URIs of
+        resources.
 
 FLAGS
      --regexp=REGEXP, -r REGEXP
-        (DEPRECATED) A regular expression to filter the names of the results
-        on. Any names that do not match the entire regular expression will be
-        filtered out.
+        A regular expression to filter the names of the results on. Any names
+        that do not match the entire regular expression will be filtered out.
 
-        Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
+     At most one of these may be specified:
 
-     --zones=ZONE,[ZONE,...]
-        (DEPRECATED) If provided, only resources from the given zones are
-        queried.
+       --regions=[REGION,...]
+          If provided, only regional resources are shown. If arguments are
+          provided, only resources from the given regions are shown.
 
-        Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
-        For example --filter="zone:( europe-west1-b europe-west1-c )".
+       --zones=[ZONE,...]
+          If provided, only zonal resources are shown. If arguments are
+          provided, only resources from the given zones are shown.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -80,10 +78,17 @@ EXAMPLES
 
         $ gcloud beta compute disk-types list --uri
 
-    To list all disk types in the us-central1-b and europe-west1-d zones, run:
+    To list all disk types in the us-central1 and europe-west1 regions, given
+    they are regional resources, run:
 
         $ gcloud beta compute disk-types list \
-            --filter="zone:( us-central1-b europe-west1-d )"
+            --filter="region:( europe-west1 us-central1 )"
+
+    To list all disk types in zones us-central1-b and europe-west1-d, given
+    they are zonal resources, run:
+
+        $ gcloud beta compute disk-types list \
+            --filter="zone:( europe-west1-d us-central1-b )"
 
 NOTES
     This command is currently in BETA and may change without notice. These

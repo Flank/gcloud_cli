@@ -14,6 +14,8 @@
 
 """Unit tests for the completers in general."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import completer_test_base
 
 

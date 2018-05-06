@@ -28,8 +28,8 @@ class DeleteTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsVariantsDeleteRequest(variantId=
                                                             variant_id),
         response={})
-    self.assertEquals(variant_id, self.RunGenomics(['variants', 'delete',
-                                                    variant_id]))
+    self.assertEqual(variant_id, self.RunGenomics(['variants', 'delete',
+                                                   variant_id]))
 
   def testDeleteNotExists(self):
     variant_id = 'abc123'
@@ -37,8 +37,8 @@ class DeleteTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsVariantsDeleteRequest(variantId=
                                                             variant_id),
         exception=self.MakeHttpError(404, 'Variant not found: ' + variant_id))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Variant not found: ' + variant_id):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Variant not found: ' + variant_id):
       self.RunGenomics(['variants', 'delete', variant_id])
 
 

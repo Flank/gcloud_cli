@@ -1,0 +1,80 @@
+
+.TH "GCLOUD_COMPUTE_INTERCONNECTS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud compute interconnects update \- update a Google Compute Engine interconnect
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud compute interconnects update\fR \fINAME\fR [\fB\-\-admin\-enabled\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-noc\-contact\-email\fR=\fINOC_CONTACT_EMAIL\fR] [\fB\-\-requested\-link\-count\fR=\fIREQUESTED_LINK_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud compute interconnects update\fR is used to update interconnects. An
+interconnect represents a single specific connection between Google and the
+customer.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the interconnect to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-admin\-enabled\fR
+Administrative status of the interconnect. When this is enabled, the
+interconnect is operational and will carry traffic across any functioning linked
+interconnect attachments. Use \-\-no\-admin\-enabled to disable it.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional, textual description for the interconnect.
+
+.TP 2m
+\fB\-\-noc\-contact\-email\fR=\fINOC_CONTACT_EMAIL\fR
+Email address to contact the customer NOC for operations and maintenance
+notifications regarding this interconnect.
+
+.TP 2m
+\fB\-\-requested\-link\-count\fR=\fIREQUESTED_LINK_COUNT\fR
+Target number of physical links in the link bundle.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha compute interconnects update
+$ gcloud beta compute interconnects update
+.RE
+

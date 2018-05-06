@@ -4,7 +4,7 @@
  "id": "dns:v1alpha2",
  "name": "dns",
  "version": "v1alpha2",
- "revision": "20180223",
+ "revision": "20180420",
  "title": "Google Cloud DNS API",
  "description": "Configures and serves authoritative DNS records.",
  "ownerDomain": "google.com",
@@ -56,12 +56,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },
@@ -106,6 +106,10 @@
     "id": {
      "type": "string",
      "description": "Unique identifier for the resource; defined by the server (output only)."
+    },
+    "isServing": {
+     "type": "boolean",
+     "description": "If the DNS queries for the zone will be served."
     },
     "kind": {
      "type": "string",
@@ -542,15 +546,6 @@
     }
    }
   },
-  "ManagedZonesDeleteResponse": {
-   "id": "ManagedZonesDeleteResponse",
-   "type": "object",
-   "properties": {
-    "header": {
-     "$ref": "ResponseHeader"
-    }
-   }
-  },
   "ManagedZonesListResponse": {
    "id": "ManagedZonesListResponse",
    "type": "object",
@@ -652,15 +647,6 @@
     }
    }
   },
-  "PoliciesDeleteResponse": {
-   "id": "PoliciesDeleteResponse",
-   "type": "object",
-   "properties": {
-    "header": {
-     "$ref": "ResponseHeader"
-    }
-   }
-  },
   "PoliciesListResponse": {
    "id": "PoliciesListResponse",
    "type": "object",
@@ -683,6 +669,18 @@
      "items": {
       "$ref": "Policy"
      }
+    }
+   }
+  },
+  "PoliciesPatchResponse": {
+   "id": "PoliciesPatchResponse",
+   "type": "object",
+   "properties": {
+    "header": {
+     "$ref": "ResponseHeader"
+    },
+    "policy": {
+     "$ref": "Policy"
     }
    }
   },
@@ -823,6 +821,10 @@
    "type": "object",
    "description": "Limits associated with a Project.",
    "properties": {
+    "blackHoleHidesSystemZones": {
+     "type": "boolean",
+     "description": "Whether a black hole zone should suppress system zones for this project."
+    },
     "dnsKeysPerManagedZone": {
      "type": "integer",
      "description": "Maximum allowed number of DnsKeys per ManagedZone.",
@@ -1400,9 +1402,6 @@
       "project",
       "managedZone"
      ],
-     "response": {
-      "$ref": "ManagedZonesDeleteResponse"
-     },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
@@ -1492,7 +1491,7 @@
      "id": "dns.managedZones.patch",
      "path": "{project}/managedZones/{managedZone}",
      "httpMethod": "PATCH",
-     "description": "Update an existing ManagedZone. This method supports patch semantics.",
+     "description": "Apply a partial update to an existing ManagedZone.",
      "parameters": {
       "clientOperationId": {
        "type": "string",
@@ -1630,9 +1629,6 @@
       "project",
       "policy"
      ],
-     "response": {
-      "$ref": "PoliciesDeleteResponse"
-     },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
@@ -1717,7 +1713,7 @@
      "id": "dns.policies.patch",
      "path": "{project}/policies/{policy}",
      "httpMethod": "PATCH",
-     "description": "Update an existing Policy. This method supports patch semantics.",
+     "description": "Apply a partial update to an existing Policy.",
      "parameters": {
       "clientOperationId": {
        "type": "string",
@@ -1745,7 +1741,7 @@
       "$ref": "Policy"
      },
      "response": {
-      "$ref": "PoliciesUpdateResponse"
+      "$ref": "PoliciesPatchResponse"
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",

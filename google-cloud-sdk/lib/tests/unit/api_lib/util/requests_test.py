@@ -26,27 +26,27 @@ class RequestsTest(test_case.TestCase):
   def testExtractErrorMessageBlank(self):
     error = {}
     message = requests.ExtractErrorMessage(error)
-    self.assertEquals('Error Response: [UNKNOWN] ', message)
+    self.assertEqual('Error Response: [UNKNOWN] ', message)
 
   def testExtractErrorMessageSimple(self):
     error = {'code': 8, 'message': 'error message'}
     message = requests.ExtractErrorMessage(error)
-    self.assertEquals('Error Response: [8] error message', message)
+    self.assertEqual('Error Response: [8] error message', message)
 
   def testExtractErrorMessageUrl(self):
     error = {'code': 8,
              'message': 'error message',
              'url': 'http://example.com'}
     message = requests.ExtractErrorMessage(error)
-    self.assertEquals('Error Response: [8] error message\nhttp://example.com',
-                      message)
+    self.assertEqual('Error Response: [8] error message\nhttp://example.com',
+                     message)
 
   def testExtractErrorMessageDetails(self):
     error = {'code': 8,
              'message': 'error message',
              'details': {'data': 'data'}}
     message = requests.ExtractErrorMessage(error)
-    self.assertEquals(
+    self.assertEqual(
         ('Error Response: [8] error message\n\n'
          'Details: [\n  {\n    "data": "data"\n  }\n]\n'), message)
 
@@ -56,7 +56,7 @@ class RequestsTest(test_case.TestCase):
              'url': 'http://example.com',
              'details': {'data': 'data'}}
     message = requests.ExtractErrorMessage(error)
-    self.assertEquals(
+    self.assertEqual(
         ('Error Response: [8] error message\n'
          'http://example.com\n\n'
          'Details: [\n  {\n    "data": "data"\n  }\n]\n'), message)
@@ -70,7 +70,7 @@ class RequestsTest(test_case.TestCase):
     # TODO(b/73727780): Include actual unicode output in json dumps.
     # When we do that, the 'data' in the output won't have the escaped unicode
     # character.
-    self.assertEquals(
+    self.assertEqual(
         ('Error Response: [8] error ⛴\n'
          'http://example.com/⛴\n\n'
          'Details: [\n  {\n    "data": "\\u26f4"\n  }\n]\n'), message)

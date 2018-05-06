@@ -1,0 +1,45 @@
+NAME
+    gcloud alpha kms keys versions restore - restore a version scheduled for
+        destruction
+
+SYNOPSIS
+    gcloud alpha kms keys versions restore VERSION [--key=KEY]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Restores the given version that was scheduled to be destroyed.
+
+    This moves the version from Scheduled for destruction to Disabled. Only
+    versions which are Scheduled for destruction can be Restored.
+
+POSITIONAL ARGUMENTS
+     VERSION
+        Name of the version to restore.
+
+FLAGS
+     --key=KEY
+        The containing key.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command restores version 9 of key frodo within keyring
+    fellowship and location us-east1 which was previously scheduled for
+    destruction:
+
+        $ gcloud alpha kms keys versions restore 9 --location us-east1 \
+            --keyring fellowship --key frodo
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keys versions restore
+        $ gcloud beta kms keys versions restore
+

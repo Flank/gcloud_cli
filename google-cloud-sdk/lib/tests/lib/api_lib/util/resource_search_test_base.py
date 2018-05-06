@@ -14,6 +14,8 @@
 
 """Base class for CloudResourceSearch unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 from apitools.base.py.testing import mock
 
@@ -21,27 +23,29 @@ from googlecloudsdk.api_lib.util import apis
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
+from six.moves import range  # pylint: disable=redefined-builtin
+
 
 def _MakeScheduling():
   return extra_types.JsonValue(
       object_value=extra_types.JsonObject(
           properties=[
               extra_types.JsonObject.Property(
-                  key=u'automaticRestart',
+                  key='automaticRestart',
                   value=extra_types.JsonValue(
                       boolean_value=True,
                   ),
               ),
               extra_types.JsonObject.Property(
-                  key=u'preemptible',
+                  key='preemptible',
                   value=extra_types.JsonValue(
                       boolean_value=False,
                   ),
               ),
               extra_types.JsonObject.Property(
-                  key=u'onHostMaintenance',
+                  key='onHostMaintenance',
                   value=extra_types.JsonValue(
-                      string_value=u'MIGRATE',
+                      string_value='MIGRATE',
                   ),
               ),
           ],
@@ -64,13 +68,13 @@ def _MakeDisk(parameters):
                   object_value=extra_types.JsonObject(
                       properties=[
                           extra_types.JsonObject.Property(
-                              key=u'index',
+                              key='index',
                               value=extra_types.JsonValue(
                                   integer_value=0,
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'license',
+                              key='license',
                               value=extra_types.JsonValue(
                                   array_value=extra_types.JsonArray(
                                       entries=[
@@ -82,51 +86,51 @@ def _MakeDisk(parameters):
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'autoDelete',
+                              key='autoDelete',
                               value=extra_types.JsonValue(
                                   boolean_value=True,
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'deviceName',
+                              key='deviceName',
                               value=extra_types.JsonValue(
-                                  string_value=u'persistent-disk-0',
+                                  string_value='persistent-disk-0',
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'boot',
+                              key='boot',
                               value=extra_types.JsonValue(
                                   boolean_value=True,
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'source',
+                              key='source',
                               value=extra_types.JsonValue(
                                   string_value=disk_url,
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'mode',
+                              key='mode',
                               value=extra_types.JsonValue(
-                                  string_value=u'READ_WRITE',
+                                  string_value='READ_WRITE',
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'interface',
+                              key='interface',
                               value=extra_types.JsonValue(
-                                  string_value=u'SCSI',
+                                  string_value='SCSI',
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'type',
+                              key='type',
                               value=extra_types.JsonValue(
-                                  string_value=u'PERSISTENT',
+                                  string_value='PERSISTENT',
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'diskSizeGb',
+                              key='diskSizeGb',
                               value=extra_types.JsonValue(
-                                  string_value=u'0',
+                                  string_value='0',
                               ),
                           ),
                       ],
@@ -139,10 +143,6 @@ def _MakeDisk(parameters):
 
 def _MakeServiceAccountScopes():
   return [
-      extra_types.JsonValue(
-          string_value=(
-              'https://www.googleapis.com/auth/cloud.useraccounts.readonly'),
-      ),
       extra_types.JsonValue(
           string_value='https://www.googleapis.com/auth/devstorage.read_only',
       ),
@@ -176,7 +176,7 @@ def _MakeServiceAccount():
                   object_value=extra_types.JsonObject(
                       properties=[
                           extra_types.JsonObject.Property(
-                              key=u'scope',
+                              key='scope',
                               value=extra_types.JsonValue(
                                   array_value=extra_types.JsonArray(
                                       entries=_MakeServiceAccountScopes(),
@@ -184,9 +184,9 @@ def _MakeServiceAccount():
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'email',
+                              key='email',
                               value=extra_types.JsonValue(
-                                  string_value=u'bozo@big.top',
+                                  string_value='bozo@big.top',
                               ),
                           ),
                       ],
@@ -203,51 +203,51 @@ def _MakeAccessConfigEntries():
           object_value=extra_types.JsonObject(
               properties=[
                   extra_types.JsonObject.Property(
-                      key=u'externalIp',
+                      key='externalIp',
                       value=extra_types.JsonValue(
-                          string_value=u'',
+                          string_value='',
                       ),
                   ),
                   extra_types.JsonObject.Property(
-                      key=u'name',
+                      key='name',
                       value=extra_types.JsonValue(
-                          string_value=u'external-nat',
+                          string_value='external-nat',
                       ),
                   ),
                   extra_types.JsonObject.Property(
-                      key=u'publicDnsName',
+                      key='publicDnsName',
                       value=extra_types.JsonValue(
-                          string_value=u'',
+                          string_value='',
                       ),
                   ),
                   extra_types.JsonObject.Property(
-                      key=u'setPublicDns',
+                      key='setPublicDns',
                       value=extra_types.JsonValue(
                           boolean_value=False,
                       ),
                   ),
                   extra_types.JsonObject.Property(
-                      key=u'networkTier',
+                      key='networkTier',
                       value=extra_types.JsonValue(
-                          string_value=u'INVALID_NETWORK_TIER',
+                          string_value='INVALID_NETWORK_TIER',
                       ),
                   ),
                   extra_types.JsonObject.Property(
-                      key=u'setPublicPtr',
+                      key='setPublicPtr',
                       value=extra_types.JsonValue(
                           boolean_value=False,
                       ),
                   ),
                   extra_types.JsonObject.Property(
-                      key=u'type',
+                      key='type',
                       value=extra_types.JsonValue(
-                          string_value=u'ONE_TO_ONE_NAT',
+                          string_value='ONE_TO_ONE_NAT',
                       ),
                   ),
                   extra_types.JsonObject.Property(
-                      key=u'publicPtrDomainName',
+                      key='publicPtrDomainName',
                       value=extra_types.JsonValue(
-                          string_value=u''),
+                          string_value=''),
                   ),
               ],
           ),
@@ -263,7 +263,7 @@ def _MakeNetworkInterface(parameters):
                   object_value=extra_types.JsonObject(
                       properties=[
                           extra_types.JsonObject.Property(
-                              key=u'network',
+                              key='network',
                               value=extra_types.JsonValue(
                                   string_value=(
                                       'https://www.googleapis.com/compute'
@@ -272,7 +272,7 @@ def _MakeNetworkInterface(parameters):
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'accessConfig',
+                              key='accessConfig',
                               value=extra_types.JsonValue(
                                   array_value=extra_types.JsonArray(
                                       entries=_MakeAccessConfigEntries(),
@@ -280,7 +280,7 @@ def _MakeNetworkInterface(parameters):
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'aliasIpRange',
+                              key='aliasIpRange',
                               value=extra_types.JsonValue(
                                   array_value=extra_types.JsonArray(
                                       entries=[],
@@ -288,26 +288,26 @@ def _MakeNetworkInterface(parameters):
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'fingerprint',
+                              key='fingerprint',
                               value=extra_types.JsonValue(
-                                  string_value=u'',
+                                  string_value='',
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'subnetwork',
+                              key='subnetwork',
                               value=extra_types.JsonValue(
-                                  string_value=u'',),
+                                  string_value='',),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'ipAddress',
+                              key='ipAddress',
                               value=extra_types.JsonValue(
-                                  string_value=u'',
+                                  string_value='',
                               ),
                           ),
                           extra_types.JsonObject.Property(
-                              key=u'name',
+                              key='name',
                               value=extra_types.JsonValue(
-                                  string_value=u'nic0',
+                                  string_value='nic0',
                               ),
                           ),
                       ],
@@ -321,13 +321,13 @@ def _MakeNetworkInterface(parameters):
 def _MakeAdditionalProperties(messages, parameters):
   return [
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'status',
+          key='status',
           value=extra_types.JsonValue(
-              string_value=u'PROVISIONING',
+              string_value='PROVISIONING',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'labels',
+          key='labels',
           value=extra_types.JsonValue(
               object_value=extra_types.JsonObject(
                   properties=[],
@@ -335,45 +335,45 @@ def _MakeAdditionalProperties(messages, parameters):
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'minCpuPlatform',
+          key='minCpuPlatform',
           value=extra_types.JsonValue(
-              string_value=u'',
+              string_value='',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'scheduling',
+          key='scheduling',
           value=_MakeScheduling(),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'canIpForward',
+          key='canIpForward',
           value=extra_types.JsonValue(
               boolean_value=False,
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'disk',
+          key='disk',
           value=_MakeDisk(parameters),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'creationTimestamp',
+          key='creationTimestamp',
           value=extra_types.JsonValue(
-              string_value=u'2017-05-10T10:56:17.853-07:00',
+              string_value='2017-05-10T10:56:17.853-07:00',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'id',
+          key='id',
           value=extra_types.JsonValue(
-              string_value=u'6131310587503635118',
+              string_value='6131310587503635118',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'startRestricted',
+          key='startRestricted',
           value=extra_types.JsonValue(
               boolean_value=False,
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'zone',
+          key='zone',
           value=extra_types.JsonValue(
               string_value=(
                   'https://www.googleapis.com/compute/{track}/projects'
@@ -381,27 +381,27 @@ def _MakeAdditionalProperties(messages, parameters):
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'serviceAccount',
+          key='serviceAccount',
           value=_MakeServiceAccount(),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'networkInterface',
+          key='networkInterface',
           value=_MakeNetworkInterface(parameters),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'statusMessage',
+          key='statusMessage',
           value=extra_types.JsonValue(
-              string_value=u'',
+              string_value='',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'cpuPlatform',
+          key='cpuPlatform',
           value=extra_types.JsonValue(
-              string_value=u'Unknown CPU Platform',
+              string_value='Unknown CPU Platform',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'machineType',
+          key='machineType',
           value=extra_types.JsonValue(
               string_value=(
                   'https://www.googleapis.com/compute{track}beta/projects'
@@ -410,18 +410,18 @@ def _MakeAdditionalProperties(messages, parameters):
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'description',
+          key='description',
           value=extra_types.JsonValue(
-              string_value=u'',
+              string_value='',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'tags',
+          key='tags',
           value=extra_types.JsonValue(
               object_value=extra_types.JsonObject(
                   properties=[
                       extra_types.JsonObject.Property(
-                          key=u'tag',
+                          key='tag',
                           value=extra_types.JsonValue(
                               array_value=extra_types.JsonArray(
                                   entries=[],
@@ -429,9 +429,9 @@ def _MakeAdditionalProperties(messages, parameters):
                           ),
                       ),
                       extra_types.JsonObject.Property(
-                          key=u'fingerprint',
+                          key='fingerprint',
                           value=extra_types.JsonValue(
-                              string_value=u'42WmSpB8rSM=',
+                              string_value='42WmSpB8rSM=',
                           ),
                       ),
                   ],
@@ -439,19 +439,19 @@ def _MakeAdditionalProperties(messages, parameters):
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'labelFingerprint',
+          key='labelFingerprint',
           value=extra_types.JsonValue(
-              string_value=u'42WmSpB8rSM=',
+              string_value='42WmSpB8rSM=',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'host',
+          key='host',
           value=extra_types.JsonValue(
-              string_value=u'',
+              string_value='',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'guestAccelerator',
+          key='guestAccelerator',
           value=extra_types.JsonValue(
               array_value=extra_types.JsonArray(
                   entries=[],
@@ -459,19 +459,19 @@ def _MakeAdditionalProperties(messages, parameters):
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'name',
+          key='name',
           value=extra_types.JsonValue(
-              string_value=u'{name}'.format(**parameters),
+              string_value='{name}'.format(**parameters),
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'@type',
+          key='@type',
           value=extra_types.JsonValue(
-              string_value=u'type.googleapis.com/compute.Instance',
+              string_value='type.googleapis.com/compute.Instance',
           ),
       ),
       messages.SearchResult.ResourceValue.AdditionalProperty(
-          key=u'selfLink',
+          key='selfLink',
           value=extra_types.JsonValue(
               string_value=(
                   'https://www.googleapis.com/compute/{track}/projects'
@@ -496,7 +496,7 @@ def _MakeResourceSearchResult(messages, prefix='test', suffix='1', track='beta',
   }
   # pylint: disable=line-too-long
   return messages.SearchResult(
-      discoveryType=u'Instance',
+      discoveryType='Instance',
       discoveryUrl=(
           'https://www.googleapis.com/discovery/v1/apis/compute'
           '/{track}/rest'.format(**parameters)),
@@ -505,7 +505,7 @@ def _MakeResourceSearchResult(messages, prefix='test', suffix='1', track='beta',
       resourceName=(
           '//compute.googleapis.com/projects/{project}/zones/{zone}'
           '/instances/{name}'.format(**parameters)),
-      resourceType=u'type.googleapis.com/compute.Instance',
+      resourceType='type.googleapis.com/compute.Instance',
       resourceUrl=(
           'https://www.googleapis.com/compute/{track}/projects'
           '/{project}/zones/{zone}/instances/{name}'.format(**parameters)),

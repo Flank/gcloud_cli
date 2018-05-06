@@ -94,7 +94,7 @@ class GetIamPolicyTest(unit_test_base.BaseTest, test_case.WithOutputCapture):
     self.assertEqual(result, policy)
 
   def testGetIamPolicyInvalidName(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         r'Not a valid service account identifier. It should be either a '
         r'numeric string representing the unique_id or an email of the form: '

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'dataflow jobs describe' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.dataflow import base
@@ -36,7 +38,7 @@ class DescribeUnitTest(
     self.MockGetJob(self.SampleJob(JOB_1_ID))
 
     job = self.Run('beta dataflow jobs describe ' + JOB_1_ID)
-    self.assertEquals(JOB_1_ID, job.id)
+    self.assertEqual(JOB_1_ID, job.id)
     self.assertIsNone(job.environment)
 
   def testDescribeRegionSet(self):
@@ -46,7 +48,7 @@ class DescribeUnitTest(
 
     job = self.Run('beta dataflow jobs describe --region=' + my_region + ' ' +
                    JOB_1_ID)
-    self.assertEquals(JOB_1_ID, job.id)
+    self.assertEqual(JOB_1_ID, job.id)
     self.assertIsNone(job.environment)
 
   def testDescribeFull(self):
@@ -56,7 +58,7 @@ class DescribeUnitTest(
 
     job = self.Run('beta dataflow jobs describe --full ' + JOB_1_ID)
     self.assertIsNotNone(job.environment)
-    self.assertEquals(self.fake_environment, job.environment)
+    self.assertEqual(self.fake_environment, job.environment)
 
   def testDescribeMissingJobId(self):
     # argparse raises SystemExit rather than ArgumentError for missing

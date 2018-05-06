@@ -11,12 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for the Cloud Pub/Sub Subscriptions library."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.pubsub import subscriptions
 from googlecloudsdk.command_lib.pubsub import util
 from tests.lib import test_case
 from tests.lib.api_lib.util import list_slicer
 from tests.lib.surface.pubsub import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class SubscriptionsTest(base.CloudPubsubTestBase):

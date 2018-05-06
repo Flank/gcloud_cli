@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """gcloud ml video detect-labels unit tests."""
 
-import base64
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import textwrap
 
 from apitools.base.py import encoding
@@ -165,11 +168,11 @@ class DetectLabelsTest(base.MlVideoTestBase):
   def testLocalVideo(self, track):
     """Test that the command correctly sends contents of local file."""
     self._InitTest(track)
-    tempdir = self.CreateTempDir()
-    video_path = self.Touch(tempdir, name='videofile', contents='video content')
+    video_path = self.Touch(
+        self.root_path, name='videofile', contents=b'video content')
     self.ExpectAnnotateRequest(
         self.feature,
-        input_content=base64.b64encode('video content'),
+        input_content=b'video content',
         label_detection_mode=self.label_detection_enum.SHOT_MODE,
         operation_id='10000'
     )

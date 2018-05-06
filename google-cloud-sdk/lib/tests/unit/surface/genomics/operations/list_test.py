@@ -38,6 +38,21 @@ class ListTest(base.GenomicsUnitTest):
       name = 'operation-name'
     return self.messages.Operation(name=name, done=False,)
 
+  def createV2OperationResponseMessage(self, identifier=None):
+    """Helper function to simulate a simple v2 operation response.
+
+    Args:
+      identifier: Optional integer to act as id and append to name.
+
+    Returns:
+      Operation with name and id set.
+    """
+    if identifier is not None:
+      name = 'operation-name' + str(identifier)
+    else:
+      name = 'operation-name'
+    return self.messages_v2.Operation(name=name, done=False,)
+
   def testOperationsList(self):
     num_operations = 3
     self.mocked_client.operations.List.Expect(
@@ -62,14 +77,20 @@ class ListTest(base.GenomicsUnitTest):
                             normalize_space=True)
 
   def testOperationsList_WithoutWhere(self):
-    num_operations = 3
+    self.mocked_client_v2.projects_operations.List.Expect(
+        request=self.messages_v2.GenomicsProjectsOperationsListRequest(
+            name='projects/fake-project/operations',
+            filter='',),
+        response=self.messages_v2.ListOperationsResponse(
+            operations=[self.createV2OperationResponseMessage(i)
+                        for i in range(1)]))
     self.mocked_client.operations.List.Expect(
         request=self.messages.GenomicsOperationsListRequest(
             name='operations',
             filter='projectId=fake-project',),
         response=self.messages.ListOperationsResponse(
             operations=[self.createOperationResponseMessage(i)
-                        for i in range(num_operations)]))
+                        for i in range(2)]))
     self.RunGenomics(['operations', 'list'])
     self.AssertOutputEquals(textwrap.dedent("""\
       ---
@@ -77,10 +98,10 @@ class ListTest(base.GenomicsUnitTest):
       name: operation-name0
       ---
       done: false
-      name: operation-name1
+      name: operation-name0
       ---
       done: false
-      name: operation-name2
+      name: operation-name1
       """),
                             normalize_space=True)
 
@@ -126,15 +147,15 @@ class ListTest(base.GenomicsUnitTest):
       """), normalize_space=True)
 
   def testInaccessibleProject(self):
-    self.mocked_client.operations.List.Expect(
-        request=self.messages.GenomicsOperationsListRequest(
-            name='operations',
-            filter='projectId=secret-project',),
+    self.mocked_client_v2.projects_operations.List.Expect(
+        request=self.messages_v2.GenomicsProjectsOperationsListRequest(
+            name='projects/secret-project/operations',
+            filter='',),
         exception=self.MakeHttpError(403,
                                      'Permission denied; need GET permission'))
 
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Permission denied; need GET permission'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Permission denied; need GET permission'):
       self.RunGenomics(['operations', 'list', '--project', 'secret-project'])
 
 if __name__ == '__main__':

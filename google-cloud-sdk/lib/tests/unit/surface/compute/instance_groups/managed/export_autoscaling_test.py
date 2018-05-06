@@ -139,7 +139,7 @@ class InstanceGroupManagersExportAutoscalingTest(test_base.BaseTest):
     self.Run('compute instance-groups managed export-autoscaling group-1 '
              '--zone zone-1 --autoscaling-file=' + autoscaling_file)
     exported_autoscaler = json.load(open(autoscaling_file))
-    self.assertEquals(self._GetStrippedAutoscaler(), exported_autoscaler)
+    self.assertEqual(self._GetStrippedAutoscaler(), exported_autoscaler)
     autoscalers_list_request = [
         (
             self.compute.autoscalers,
@@ -162,7 +162,7 @@ class InstanceGroupManagersExportAutoscalingTest(test_base.BaseTest):
     self.Run('compute instance-groups managed export-autoscaling group-1 '
              '--region region-1 --autoscaling-file=' + autoscaling_file)
     exported_autoscaler = json.load(open(autoscaling_file))
-    self.assertEquals(self._GetStrippedAutoscaler(), exported_autoscaler)
+    self.assertEqual(self._GetStrippedAutoscaler(), exported_autoscaler)
     autoscalers_list_request = [
         (
             self.compute.regionAutoscalers,

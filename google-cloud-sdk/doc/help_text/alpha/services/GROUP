@@ -19,6 +19,9 @@ GROUPS
      operations
         (ALPHA) Manage Operation for various services.
 
+     vpc-peerings
+        (ALPHA) VPC Peerings to various services.
+
 COMMANDS
     COMMAND is one of the following:
 

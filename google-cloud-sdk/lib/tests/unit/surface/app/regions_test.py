@@ -15,6 +15,7 @@
 """Tests for gcloud app regions."""
 
 
+from __future__ import absolute_import
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -70,7 +71,7 @@ class QuotaHeaderTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
     properties.VALUES.billing.quota_project.Set(prop_value)
     self.Run(track + ' app regions list')
     header = self.request_mock.call_args[0][3].get('X-Goog-User-Project', None)
-    self.assertEquals(header, header_value)
+    self.assertEqual(header, header_value)
 
 
 if __name__ == '__main__':

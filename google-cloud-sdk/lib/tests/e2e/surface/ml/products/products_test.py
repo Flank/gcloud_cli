@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """e2e tests for ml products catalogs command group."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import contextlib
 
 from googlecloudsdk.api_lib.ml.products import product_util
@@ -39,6 +44,7 @@ class ProductsTests(e2e_base.WithServiceAuth):
       api_client = product_util.ProductsClient()
       api_client.DeleteCatalog(catalog.name)
 
+  @test_case.Filters.skip('Failing', 'b/78623351')
   def testCatalogWorkflow(self):
     with self._CreateCatalog() as catalog:
       image_path = BUCKET_URI_ROOT.format('ref-image-test/shoe1.jpg')

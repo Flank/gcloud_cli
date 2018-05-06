@@ -461,13 +461,13 @@ class _BaseMysqlConnectTest(_BaseConnectTest):
     subprocess_args = exec_ordered_arguments[0]
     (actual_mysql_path, actual_host_flag, actual_ip_address, actual_user_flag,
      actual_username, actual_pass_flag) = subprocess_args
-    self.assertEquals(mocked_mysql_path, actual_mysql_path)
-    self.assertEquals('-h', actual_host_flag)
+    self.assertEqual(mocked_mysql_path, actual_mysql_path)
+    self.assertEqual('-h', actual_host_flag)
     # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
     self.assertIn('.', actual_ip_address)
-    self.assertEquals('-u', actual_user_flag)
-    self.assertEquals(mysql_user, actual_username)
-    self.assertEquals('-p', actual_pass_flag)
+    self.assertEqual('-u', actual_user_flag)
+    self.assertEqual(mysql_user, actual_username)
+    self.assertEqual('-p', actual_pass_flag)
 
   def testMysqlConnectWithNoUser(self):
     self.RunMysqlConnectTest()
@@ -580,19 +580,19 @@ class _BasePsqlConnectTest(_BaseConnectTest):
     subprocess_args = exec_ordered_arguments[0]
     (actual_psql_path, actual_host_flag, actual_ip_address, actual_user_flag,
      actual_username, actual_pass_flag) = subprocess_args[:BASE_ARGS_LENGTH]
-    self.assertEquals(mocked_psql_path, actual_psql_path)
-    self.assertEquals('-h', actual_host_flag)
+    self.assertEqual(mocked_psql_path, actual_psql_path)
+    self.assertEqual('-h', actual_host_flag)
     # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
     self.assertIn('.', actual_ip_address)
-    self.assertEquals('-U', actual_user_flag)
-    self.assertEquals('postgres', actual_username)
-    self.assertEquals('-W', actual_pass_flag)
+    self.assertEqual('-U', actual_user_flag)
+    self.assertEqual('postgres', actual_username)
+    self.assertEqual('-W', actual_pass_flag)
 
     # Check for additional args.
     if len(subprocess_args) > BASE_ARGS_LENGTH:
       (actual_db_flag, actual_db) = subprocess_args[BASE_ARGS_LENGTH:]
-      self.assertEquals('-d', actual_db_flag)
-      self.assertEquals('somedb', actual_db)
+      self.assertEqual('-d', actual_db_flag)
+      self.assertEqual('somedb', actual_db)
 
   def testPsqlConnect(self):
     self.RunPsqlConnectTest()

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the target-vpn-gateways create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources

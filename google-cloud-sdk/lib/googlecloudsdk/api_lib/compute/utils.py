@@ -13,8 +13,10 @@
 # limitations under the License.
 """Utility functions that don't belong in the other utility modules."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
-import cStringIO
+import io
 import re
 
 from googlecloudsdk.api_lib.compute import constants
@@ -95,7 +97,7 @@ def CamelCaseToOutputFriendly(string):
 
 def ConstructList(title, items):
   """Returns a string displaying the items and a title."""
-  buf = cStringIO.StringIO()
+  buf = io.StringIO()
   fmt = 'list[title="{title}",always-display-title]'.format(title=title)
   resource_printer.Print(sorted(set(items)), fmt, out=buf)
   return buf.getvalue()

@@ -28,7 +28,7 @@ COMMANDS
         (ALPHA) Returns details about a dataset.
 
      get-iam-policy
-        (ALPHA) Get IAM policy for a dataset.
+        (ALPHA) Get the IAM policy for a dataset.
 
      list
         (ALPHA) List Genomics datasets in a project.

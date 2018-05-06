@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for all 'gcloud test android' integration tests."""
+"""Shared module for 'gcloud firebase test' integration tests."""
 
 import os
 
@@ -31,4 +31,4 @@ FTLGAME_APP = os.path.join(E2E_TEST_DATA_PATH, 'ftlgame.apk')
 
 
 class TestIntegrationTestBase(e2e_base.WithServiceAuth):
-  """Base class for all 'gcloud test android' integration tests."""
+  """Base class for all 'gcloud firebase test' integration tests."""

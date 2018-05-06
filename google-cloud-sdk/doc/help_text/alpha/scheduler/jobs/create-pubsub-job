@@ -3,19 +3,28 @@ NAME
         job with a Pub/Sub target
 
 SYNOPSIS
-    gcloud alpha scheduler jobs create-pubsub-job --message-body=MESSAGE_BODY
-        --schedule=SCHEDULE --topic=TOPIC [--attributes=ATTRIBUTES]
-        [--timezone=TIMEZONE; default="Etc/UTC"] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha scheduler jobs create-pubsub-job JOB --schedule=SCHEDULE
+        --topic=TOPIC
+        (--message-body=MESSAGE_BODY
+          | --message-body-from-file=MESSAGE_BODY_FROM_FILE)
+        [--attributes=ATTRIBUTES] [--description=DESCRIPTION]
+        [--time-zone=TIME_ZONE; default="Etc/UTC"] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a Cloud Scheduler job with a Pub/Sub target.
 
-REQUIRED FLAGS
-     --message-body=MESSAGE_BODY
-        The body of the message to publish to the given topic name. Information
-        on message formatting and size limits can be found at:
-        https://cloud.google.com/pubsub/docs/publisher#publish
+POSITIONAL ARGUMENTS
+     JOB - The job to create. This represents a Cloud resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: Set the property [core/project] or
+     provide the flag [--project] on the command line. To set the [location]
+     attribute: As the location of the current project's App Engine App.. This
+     must be specified.
 
+       JOB
+          The ID of the job or a fully qualified identifier for the job.
+
+REQUIRED FLAGS
      --schedule=SCHEDULE
         String, English-like description of the schedule at which the job
         should be run. See
@@ -26,12 +35,26 @@ REQUIRED FLAGS
         The name of the Google Cloud Pub/Sub topic to publish to when the job
         runs.
 
+     The body of the message to publish to the given topic name. Information on
+     message formatting and size limits can be found at:
+     https://cloud.google.com/pubsub/docs/publisher#publish Exactly one of
+     these must be specified:
+
+       --message-body=MESSAGE_BODY
+          The body of the message.
+
+       --message-body-from-file=MESSAGE_BODY_FROM_FILE
+          Path to a file containing the body of the message.
+
 OPTIONAL FLAGS
      --attributes=ATTRIBUTES
         Comma-separated list of attributes. Each attribute has the form
         "NAME=VALUE". You can specify up to 100 attributes.
 
-     --timezone=TIMEZONE; default="Etc/UTC"
+     --description=DESCRIPTION
+        A human-readable description of the job.
+
+     --time-zone=TIME_ZONE; default="Etc/UTC"
         String, a time zone name from the tz database
         (http://en.wikipedia.org/wiki/Tz_database).
 

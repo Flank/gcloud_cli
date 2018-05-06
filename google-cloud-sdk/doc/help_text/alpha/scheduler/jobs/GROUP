@@ -18,6 +18,9 @@ COMMANDS
      create-app-engine-job
         (ALPHA) Create a Cloud Scheduler job with an App Engine target.
 
+     create-http-job
+        (ALPHA) Create a Cloud Scheduler job that triggers an action via HTTP.
+
      create-pubsub-job
         (ALPHA) Create a Cloud Scheduler job with a Pub/Sub target.
 

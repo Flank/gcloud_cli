@@ -19,6 +19,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -71,18 +72,21 @@ class DisksListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     )
 
 
-class RegionalDisksListTest(test_base.BaseTest):
+@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
+                          (base.ReleaseTrack.BETA, 'beta'))
+class RegionalDisksListTest(test_base.BaseTest, parameterized.TestCase):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
+  def _SetUp(self, track, api_version):
+    self.SelectApi(api_version)
+    self.track = track
 
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
     self.addCleanup(list_json_patcher.stop)
     self.list_json = list_json_patcher.start()
 
-  def testOutputFormat(self):
+  def testOutputFormat(self, track, api_version):
+    self._SetUp(track, api_version)
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(test_resources.DISKS + [
             self.messages.Disk(
@@ -119,7 +123,8 @@ class RegionalDisksListTest(test_base.BaseTest):
               disk-3 region-1 region 10 pd-standard READY
               """), normalize_space=True)
 
-  def testOnlyRegional(self):
+  def testOnlyRegional(self, track, api_version):
+    self._SetUp(track, api_version)
     self.list_json.side_effect = [
         [encoding.MessageToDict(self.messages.Disk(
             name='disk-3',

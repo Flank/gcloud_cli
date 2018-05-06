@@ -76,7 +76,7 @@ class ApiMapGeneratorTest(test_case.Base):
         }
     }
     actual_map = generate._MakeApiMap('fruits', config)
-    self.assertEquals(expected_map, actual_map)
+    self.assertEqual(expected_map, actual_map)
 
   def testGetAPIsMapMultipleDefaultsClientsForAPI(self):
     config = yaml.load(textwrap.dedent("""\
@@ -93,8 +93,8 @@ class ApiMapGeneratorTest(test_case.Base):
       generate._MakeApiMap('fruits', config)
 
     msg = str(ctx.exception)
-    self.assertEquals(msg,
-                      'Multiple default client versions found for [orange]!')
+    self.assertEqual(msg,
+                     'Multiple default client versions found for [orange]!')
 
   def testGetAPIsMapNoDefaultsClientsForAPIs(self):
     config = yaml.load(textwrap.dedent("""\
@@ -109,7 +109,7 @@ class ApiMapGeneratorTest(test_case.Base):
       generate._MakeApiMap('fruits', config)
 
     msg = str(ctx.exception)
-    self.assertEquals(msg, 'No default client versions found for [orange]!')
+    self.assertEqual(msg, 'No default client versions found for [orange]!')
 
   def testCreateAPIsMapFile(self):
     config = yaml.load(textwrap.dedent("""\
@@ -146,7 +146,7 @@ class ApiMapGeneratorTest(test_case.Base):
   def testSanityOfGeneratedApisMap(self):
     for api_name, ver_map in apis_map.MAP.iteritems():
       for ver, api_definition in ver_map.iteritems():
-        self.assertEquals(api_definition, core_apis._GetApiDef(api_name, ver))
+        self.assertEqual(api_definition, core_apis._GetApiDef(api_name, ver))
 
 
 if __name__ == '__main__':

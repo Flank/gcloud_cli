@@ -14,8 +14,8 @@
 
 from googlecloudsdk.core import properties
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
 from tests.lib.surface.firebase.test import e2e_base
+from tests.lib.surface.firebase.test.android import commands
 
 _PROJECT_ARG = ' --project cloud-sdk-integration-testing'
 
@@ -49,7 +49,6 @@ class ModelsTests(e2e_base.TestIntegrationTestBase):
     self.AssertOutputContains('default')
     self.AssertOutputContains('PHYSICAL')
 
-  @test_case.Filters.skip('Failing', 'b/73120615')
   def testModelsDescribePhysical(self):
     self.Run(commands.ANDROID_MODELS_DESCRIBE + 'hammerhead')
     self.AssertOutputContains('id: hammerhead')

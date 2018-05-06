@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
+
 import contextlib
 import inspect
 import io
@@ -31,6 +32,7 @@ import time
 import traceback
 import unittest
 import uuid
+import warnings
 
 if 'google' in sys.modules:
   # By this time 'google' should NOT be in sys.modules, but some releases of
@@ -145,6 +147,21 @@ class FakeStd(io.BytesIO):
     # On Python 2, return byte strings.
     return data
 
+  def readlines(self, *args, **kwargs):
+    # Get raw data from the buffer.
+    # pylint:disable=g-builtin-op, We need to pass args so can't use the default
+    # iterator.
+    for line in self.buffer.readlines(*args, **kwargs):
+      if not six.PY2:
+        # Only Python 3, return text strings.
+        yield console_attr.Decode(line)
+      else:
+        # On Python 2, return byte strings.
+        yield line
+
+  def __iter__(self):
+    return self.readlines()
+
   def write(self, s):
     # Unknown object type.
     if not isinstance(s, six.string_types):
@@ -199,6 +216,15 @@ class TestCase(unittest.TestCase, object):
                       alt=alt + '()'))
     super(TestCase, self).__init__(*args, **kwargs)
 
+    if six.PY2:
+      # Using this assertRaisesRegex in py2 shuts up the py3 assertRaisesRegexp
+      # deprecation warning.
+      self.assertRaisesRegex = self._assertRaisesRegex  # pylint: disable=invalid-name
+
+  def _assertRaisesRegex(self, *args, **kwargs):  # pylint: disable=invalid-name
+    """python3 really hates that trailing p."""
+    return six.assertRaisesRegex(self, *args, **kwargs)
+
   @classmethod
   def __Subclasses(cls):
     for clazz in cls.__mro__:
@@ -225,6 +251,15 @@ class TestCase(unittest.TestCase, object):
         cls.TearDownClass()
 
   def setUp(self):
+    # TODO(b/77644889): Figure out what's going on and remove this warning skip.
+    # This gets reset by unittest after each test case so it needs to be done
+    # here in setUp().
+    if not six.PY2:
+      warnings.filterwarnings(
+          action='ignore',
+          message='unclosed <ssl.SSLSocket',
+          # This only exists in Python 3.
+          category=ResourceWarning)  # pylint:disable=undefined-variable
     # Make sure certain things are restored between tests
     self._originals = {
         'working directory': os.getcwd(),
@@ -253,7 +288,8 @@ class TestCase(unittest.TestCase, object):
   def tearDown(self):
     # stdout and stderr gets logged only in the base class's TearDown method.
     # So we need to let that get executed
-    err = None
+    exception_type = None
+    exception_message = None
     for cls in self.__Subclasses():
       if 'TearDown' in cls.__dict__:
         try:
@@ -261,9 +297,10 @@ class TestCase(unittest.TestCase, object):
         # pylint:disable=broad-except, we will be reraising the exception
         # anyway
         except Exception as e:
-          err = e
-    if err:
-      raise err  # pylint: disable=raising-bad-type, Lint is wrong.
+          exception_type = type(e)
+          exception_message = six.text_type(e)
+    if exception_type:
+      raise exception_type(exception_message)
 
   @contextlib.contextmanager
   def _VerifyTestCleanup(self, name, target):
@@ -804,6 +841,12 @@ class Base(WithContentAssertions):
     self._AssertEquals(expected, self.GetFileContents(path), path,
                        normalize_space=normalize_space,
                        actual_filter=actual_filter, success=success)
+
+  def AssertBinaryFileEquals(self, expected, path, success=True):
+    with io.open(path, mode='rb') as f:
+      contents = f.read()
+    self._AssertEquals(
+        expected, contents, path, normalize_space=False, success=success)
 
   def AssertFileNotEquals(self, expected, path, normalize_space=False,
                           actual_filter=None, success=False):
@@ -1683,6 +1726,20 @@ class WithOutputCapture(WithContentAssertions):
                          normalize_space=normalize_space,
                          actual_filter=actual_filter, success=success,
                          golden=True)
+
+  def AssertOutputBytesEquals(self,
+                              expected,
+                              name=OUT,
+                              normalize_space=False,
+                              actual_filter=None,
+                              success=True):
+    self._AssertEquals(
+        expected,
+        self.GetOutputBytes(),
+        name,
+        normalize_space=normalize_space,
+        actual_filter=actual_filter,
+        success=success)
 
   def AssertErrContains(self, expected, name=ERR, normalize_space=False,
                         actual_filter=None, success=True):

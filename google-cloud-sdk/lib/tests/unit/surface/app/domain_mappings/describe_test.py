@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for gcloud app domain-mappings."""
 
+from __future__ import absolute_import
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.app import domain_mappings_base
 
@@ -38,8 +39,8 @@ class DomainMappingsCommandTest(domain_mappings_base.DomainMappingsBase):
   def testDescribeDomainMapping(self):
     self.ExpectGetDomainMapping('*.example.com', '1234')
     result = self.Run('app domain-mappings describe *.example.com')
-    self.assertEquals('*.example.com', result.id)
-    self.assertEquals('1234', result.sslSettings.certificateId)
+    self.assertEqual('*.example.com', result.id)
+    self.assertEqual('1234', result.sslSettings.certificateId)
 
 
 class DomainMappingsCommandBetaTest(
@@ -67,5 +68,5 @@ class DomainMappingsCommandBetaTest(
   def testDescribeDomainMapping(self):
     self.ExpectGetDomainMapping('*.example.com', '1234', 'MANUAL')
     result = self.Run('app domain-mappings describe *.example.com')
-    self.assertEquals('*.example.com', result.id)
-    self.assertEquals('1234', result.sslSettings.certificateId)
+    self.assertEqual('*.example.com', result.id)
+    self.assertEqual('1234', result.sslSettings.certificateId)

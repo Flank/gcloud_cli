@@ -100,13 +100,13 @@ class UpdateTest(base.GenomicsUnitTest):
             readGroupSetId='1000',
             updateMask='name'),
         exception=self.MakeHttpError(404, 'Readgroupset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Readgroupset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Readgroupset not found: 1000'):
       self.RunGenomics(['readgroupsets', 'update', '1000',
                         '--name', 'readgroupset-name-new'])
 
   def testReadgroupsetsUpdateFailsWithoutParameters(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         GenomicsError,
         'Must specify --name and/or --reference-set-id'):
       self.RunGenomics(['readgroupsets', 'update', '1000'])

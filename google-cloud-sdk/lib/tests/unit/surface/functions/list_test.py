@@ -75,7 +75,7 @@ class FunctionsListTest(base.FunctionsTestBase):
     # Remove credentials.
     self.FakeAuthSetCredentialsPresent(False)
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_AUTH_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_AUTH_REGEXP):
       self.Run('functions list')
 
   def testListEmptyResult(self):
@@ -170,7 +170,7 @@ class FunctionsListTest(base.FunctionsTestBase):
     self._setListResponseWithException()
     expected = (
         r'ResponseError: status=\[404\], code=\[Not Found\], message=\[\]')
-    with self.assertRaisesRegexp(base_exceptions.HttpException, expected):
+    with self.assertRaisesRegex(base_exceptions.HttpException, expected):
       self.Run('functions list')
 
 
@@ -181,7 +181,7 @@ class FunctionsListWithoutProjectTest(base.FunctionsTestBase):
 
   def testListNoProject(self):
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_PROJECT_REGEXP):
       self.Run('functions list')
 
 if __name__ == '__main__':

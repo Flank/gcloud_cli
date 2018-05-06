@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha category-manager assets delete-annotation - deletes an
+        annotation tag on a given asset
+
+SYNOPSIS
+    gcloud alpha category-manager assets delete-annotation ASSET
+        (--annotation=ANNOTATION : --taxonomy=TAXONOMY) [--sub-asset=SUB_ASSET]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Deletes an annotation tag on a given asset.
+
+POSITIONAL ARGUMENTS
+     ASSET - The asset reference. This represents a Cloud resource. This must
+     be specified.
+
+       ASSET
+          The ID of the asset or a fully qualified identifier for the asset.
+
+REQUIRED FLAGS
+     ANNOTATION - An annotation reference. The arguments in this group can be
+     used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
+
+       --annotation=ANNOTATION
+          The ID of the annotation or a fully qualified identifier for the
+          annotation. This flag must be specified if any of the other arguments
+          in this group are specified.
+
+       --taxonomy=TAXONOMY
+          The ID of the taxonomy for the annotation.
+
+OPTIONAL FLAGS
+     --sub-asset=SUB_ASSET
+        The name of the sub-asset to apply an annotation to. For instance, for
+        Google Cloud Bigquery, this is the name of the column in the table
+        (which is the asset).
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

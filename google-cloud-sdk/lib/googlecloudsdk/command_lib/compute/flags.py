@@ -14,6 +14,8 @@
 
 """Flags and helpers for the compute related commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import functools
 import enum  # pylint: disable=unused-import, for pytype
 
@@ -32,10 +34,11 @@ from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import resource_projection_spec
 from googlecloudsdk.core.util import text
+import six
 
 ZONE_PROPERTY_EXPLANATION = """\
 If not specified and the ``compute/zone'' property isn't set, you
-will be prompted to select a zone.
+may be prompted to select a zone.
 
 To avoid prompting when this flag is omitted, you can set the
 ``compute/zone'' property:
@@ -63,7 +66,7 @@ A list of zones can be fetched by running:
 """
 
 REGION_PROPERTY_EXPLANATION = """\
-If not specified, you will be prompted to select a region.
+If not specified, you may be prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 ``compute/region'' property:
@@ -83,7 +86,7 @@ variable ``CLOUDSDK_COMPUTE_REGION''.
 """
 
 REGION_PROPERTY_EXPLANATION_NO_DEFAULT = """\
-If not specified, you will be prompted to select a region.
+If not specified, you may be prompted to select a region.
 
 A list of regions can be fetched by running:
 
@@ -236,7 +239,7 @@ class ResourceArgScopes(object):
 
   def SpecifiedByArgs(self, args):
     """Given argparse args return selected scope and its value."""
-    for resource_scope in self.scopes.itervalues():
+    for resource_scope in six.itervalues(self.scopes):
       scope_value = getattr(args, resource_scope.flag_name, None)
       if scope_value is not None:
         return resource_scope, scope_value
@@ -245,11 +248,11 @@ class ResourceArgScopes(object):
   def GetImplicitScope(self, default_scope=None):
     """See if there is no ambiguity even if scope is not known from args."""
     if len(self.scopes) == 1:
-      return next(self.scopes.itervalues())
+      return next(six.itervalues(self.scopes))
     return default_scope
 
   def __iter__(self):
-    return iter(self.scopes.itervalues())
+    return iter(six.itervalues(self.scopes))
 
   def __contains__(self, scope):
     return scope in self.scopes
@@ -326,7 +329,7 @@ class ResourceResolver(object):
       New instance of ResourceResolver.
     """
     scopes = ResourceArgScopes(flag_prefix=scope_flag_prefix)
-    for scope, resource in scopes_map.iteritems():
+    for scope, resource in six.iteritems(scopes_map):
       scopes.AddScope(scope, resource)
     return ResourceResolver(scopes, resource_name)
 
@@ -776,6 +779,17 @@ def AddRegexArg(parser):
 def AddPolicyFileFlag(parser):
   parser.add_argument('policy_file', help="""\
       JSON or YAML file containing the IAM policy.""")
+
+
+def AddStorageLocationFlag(parser, resource):
+  parser.add_argument(
+      '--storage-location',
+      metavar='LOCATION',
+      help="""\
+      Google Cloud Storage location, either regional or multi-regional, where
+      {} content is to be stored. If absent, a nearby regional or
+      multi-regional location is chosen automatically.
+      """.format(resource))
 
 
 def RewriteFilter(args, message=None, frontend_fields=None):

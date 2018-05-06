@@ -14,6 +14,8 @@
 
 """Tests for the 'debug targets list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.debug import debug
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -29,7 +31,7 @@ class ListTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):
 
     list_mock.assert_called_once_with(include_inactive=False,
                                       include_stale=False)
-    self.assertEquals([], list(result))
+    self.assertEqual([], list(result))
 
   def testList(self):
     targets = [
@@ -47,7 +49,7 @@ class ListTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):
     result = self.RunDebug(['targets', 'list'])
     list_mock.assert_called_once_with(include_inactive=False,
                                       include_stale=False)
-    self.assertEquals(targets, list(result))
+    self.assertEqual(targets, list(result))
     self.AssertOutputContains('test-module-testV1')
     self.AssertOutputContains('test-module-testV2')
     self.AssertOutputContains('NAME ID', normalize_space=True)
@@ -68,7 +70,7 @@ class ListTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):
     result = self.RunDebug(['targets', 'list', '--include-inactive'])
     list_mock.assert_called_once_with(include_inactive=True,
                                       include_stale=True)
-    self.assertEquals(targets, list(result))
+    self.assertEqual(targets, list(result))
     self.AssertOutputContains('test-module-testV1')
     self.AssertOutputContains('test-module-testV2')
     self.AssertOutputContains('NAME ID', normalize_space=True)

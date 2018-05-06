@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for 'clusters list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 
 from googlecloudsdk.command_lib.container import constants
@@ -20,6 +22,7 @@ from googlecloudsdk.core import properties
 from surface.container.clusters.upgrade import UpgradeHelpText
 from tests.lib import test_case
 from tests.lib.surface.container import base
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 def _MockUri(project='test', zone='us-central1-a', name=None):
@@ -30,6 +33,9 @@ def _MockUri(project='test', zone='us-central1-a', name=None):
 
 class ListTestGA(base.TestBaseV1, base.GATestBase, base.ClustersTestBase):
   """gcloud GA track using container v1 API."""
+
+  def SetUp(self):
+    self.api_mismatch = False
 
   def testListAggregate(self):
     clusters = [
@@ -239,6 +245,17 @@ cluster2 zone2 2.2.2.2 5 PROVISIONING
     self.AssertOutputContains(self.ENDPOINT)
     self.AssertOutputContains(str(self.running))
 
+  def testListOneRegion(self):
+    if self.api_mismatch:
+      self.WriteInput('y')
+    kwargs = {'zone': self.REGION}
+    self.ExpectListClusters([self._RunningCluster(**kwargs)], zone=self.REGION)
+    self.Run(self.regional_clusters_command_base.format(self.REGION) + ' list')
+    self.AssertOutputContains(self.ENDPOINT)
+    self.AssertOutputContains(str(self.running))
+    if self.api_mismatch:
+      self.AssertErrContains('You invoked')
+
   def testListMissingProject(self):
     properties.VALUES.core.project.Set(None)
     with self.assertRaises(properties.RequiredPropertyError):
@@ -301,17 +318,6 @@ class ListTestBetaV1API(base.BetaTestBase, ListTestGA):
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(True)
     self.api_mismatch = True
-
-  def testListOneRegion(self):
-    if self.api_mismatch:
-      self.WriteInput('y')
-    kwargs = {'zone': self.REGION}
-    self.ExpectListClusters([self._RunningCluster(**kwargs)], zone=self.REGION)
-    self.Run(self.regional_clusters_command_base.format(self.REGION) + ' list')
-    self.AssertOutputContains(self.ENDPOINT)
-    self.AssertOutputContains(str(self.running))
-    if self.api_mismatch:
-      self.AssertErrContains('You invoked')
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.

@@ -6,7 +6,7 @@ SYNOPSIS
     gcloud compute networks switch-mode NAME --mode=MODE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (DEPRECATED) switch-mode is deprecated. Please use
+    (REMOVED) switch-mode has been removed. Please use
     --switch-to-custom-subnet-mode with gcloud compute networks update instead.
 
     gcloud compute networks switch-mode is used to change the mode of a
@@ -31,8 +31,6 @@ EXAMPLES
         $ gcloud compute networks switch-mode NETWORK --mode custom
 
 NOTES
-    These variants are also available:
-
-        $ gcloud alpha compute networks switch-mode
-        $ gcloud beta compute networks switch-mode
+    This command is an internal implementation detail and may change or
+    disappear without notice.
 

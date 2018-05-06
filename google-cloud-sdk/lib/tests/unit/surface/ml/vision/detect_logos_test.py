@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """beta ml vision tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import textwrap
 
@@ -23,12 +27,12 @@ from tests.lib.surface.ml.vision import base as vision_base
 
 
 @parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA),
-    ('Beta', base.ReleaseTrack.BETA),
-    ('GA', base.ReleaseTrack.GA))
-class DetectLogosTest(vision_base.MlVisionTestBase):
+    ('Alpha', base.ReleaseTrack.ALPHA, 'builtin/stable'),
+    ('Beta', base.ReleaseTrack.BETA, 'builtin/stable'),
+    ('GA', base.ReleaseTrack.GA, None))
+class DetectLogosCommonTest(vision_base.MlVisionTestBase):
 
-  def testDetectLogos_Success(self, track):
+  def testDetectLogos_Success(self, track, model):
     """Test `gcloud vision detect-logos` runs & displays correctly."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
@@ -36,7 +40,8 @@ class DetectLogosTest(vision_base.MlVisionTestBase):
         path_to_image,
         self.messages.Feature.TypeValueValuesEnum.LOGO_DETECTION,
         'logoAnnotations',
-        results=['Google', 'Alphabet'])
+        results=['Google', 'Alphabet'],
+        model=model)
     self.Run('ml vision detect-logos {path}'.format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
         {
@@ -57,7 +62,7 @@ class DetectLogosTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectLogos_LocalPath(self, track):
+  def testDetectLogos_LocalPath(self, track, model):
     """Test `gcloud vision detect-landmarks` with a local image path."""
     self.track = track
     tempdir = self.CreateTempDir()
@@ -67,8 +72,8 @@ class DetectLogosTest(vision_base.MlVisionTestBase):
         self.messages.Feature.TypeValueValuesEnum.LOGO_DETECTION,
         'logoAnnotations',
         results=['Google', 'Alphabet'],
-        contents=bytes('image')
-    )
+        contents=b'image',
+        model=model)
     self.Run('ml vision detect-logos {path}'.format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
         {
@@ -89,7 +94,7 @@ class DetectLogosTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectLandmarks_MaxResults(self, track):
+  def testDetectLandmarks_MaxResults(self, track, model):
     """Test `gcloud vision detect-landmarks` with --max-results flag."""
     self.track = track
     path_to_image = 'https://example.com/fake-file'
@@ -98,11 +103,12 @@ class DetectLogosTest(vision_base.MlVisionTestBase):
         self.messages.Feature.TypeValueValuesEnum.LOGO_DETECTION,
         'logoAnnotations',
         max_results=4,
-        results=['Google', 'Alphabet'])
+        results=['Google', 'Alphabet'],
+        model=model)
     self.Run('ml vision detect-logos {path} '
              '--max-results 4'.format(path=path_to_image))
 
-  def testDetectLogos_Error(self, track):
+  def testDetectLogos_Error(self, track, model):
     """Test `gcloud vision detect-landmarks` when result contains an error."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
@@ -110,10 +116,29 @@ class DetectLogosTest(vision_base.MlVisionTestBase):
         path_to_image,
         self.messages.Feature.TypeValueValuesEnum.LOGO_DETECTION,
         'logoAnnotations',
-        error_message='Not found.')
+        error_message='Not found.',
+        model=model)
     with self.AssertRaisesExceptionMatches(exceptions.Error,
                                            'Code: [400] Message: [Not found.]'):
       self.Run('ml vision detect-logos {path}'.format(path=path_to_image))
+
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA),
+    ('Beta', base.ReleaseTrack.BETA))
+class DetectLogosAlphaBetaTest(vision_base.MlVisionTestBase):
+
+  def testDetectLandmarks_ModelVersion(self, track):
+    self.track = track
+    path_to_image = 'https://example.com/fake-file'
+    self._ExpectEntityAnnotationRequest(
+        path_to_image,
+        self.messages.Feature.TypeValueValuesEnum.LOGO_DETECTION,
+        'logoAnnotations',
+        results=['Google', 'Alphabet'],
+        model='builtin/latest')
+    self.Run('ml vision detect-logos {path} '
+             '--model-version builtin/latest'.format(path=path_to_image))
 
 
 if __name__ == '__main__':

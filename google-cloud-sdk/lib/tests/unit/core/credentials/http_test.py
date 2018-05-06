@@ -14,6 +14,9 @@
 
 """Tests for the http module."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 import uuid
 
 from apitools.base.py import batch
@@ -29,6 +32,7 @@ from tests.lib import test_case
 
 import httplib2
 from oauth2client import client
+import six
 
 
 class CredentialsTest(sdk_test_base.WithFakeAuth):
@@ -41,12 +45,12 @@ class CredentialsTest(sdk_test_base.WithFakeAuth):
                                          '_do_refresh_request')
     refresh_mock.side_effect = client.AccessTokenRefreshError
     http_client = http.Http()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         store.TokenRefreshError,
         'There was a problem refreshing your current auth tokens'):
       http_client.request('http://foo.com')
     # Make sure it also extends the original exception.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         client.AccessTokenRefreshError,
         'There was a problem refreshing your current auth tokens'):
       http_client.request('http://foo.com')
@@ -58,7 +62,7 @@ class CredentialsTest(sdk_test_base.WithFakeAuth):
     http_client = http.Http()
     batch_http_request = batch.BatchHttpRequest(
         batch_url='https://www.googleapis.com/batch/compute')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         store.TokenRefreshError,
         'There was a problem refreshing your current auth tokens'):
       batch_http_request.Execute(http_client)
@@ -108,6 +112,11 @@ class HttpTestBase(sdk_test_base.SdkBase):
 
 class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
 
+  def _EncodeHeaders(self, headers):
+    return {
+        k.encode('ascii'): v.encode('ascii')
+        for k, v in six.iteritems(headers)}
+
   def testIAMAuthoritySelectorHeader(self):
     url = 'http://foo.com'
     authority_selector = 'superuser@google.com'
@@ -117,6 +126,7 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
         'user-agent': self.expected_user_agent,
         'x-goog-iam-authority-selector': authority_selector,
         'Authorization': 'Bearer ' + self.FakeAuthAccessToken()}
+    expect_headers = self._EncodeHeaders(expect_headers)
     http.Http().request(url, 'GET', None, {}, 0, None)
     self.request_mock.assert_called_once_with(
         url, 'GET', None, expect_headers, 0, None)
@@ -133,6 +143,7 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
         'user-agent': self.expected_user_agent,
         'x-goog-iam-authorization-token': authorization_token,
         'Authorization': 'Bearer ' + self.FakeAuthAccessToken()}
+    expect_headers = self._EncodeHeaders(expect_headers)
     http.Http().request(url, 'GET', None, {}, 0, None)
     self.request_mock.assert_called_once_with(
         url, 'GET', None, expect_headers, 0, None)
@@ -141,6 +152,7 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
     properties.VALUES.auth.disable_credentials.Set(True)
     url = 'http://foo.com'
     expect_headers = {'user-agent': self.expected_user_agent}
+    expect_headers = self._EncodeHeaders(expect_headers)
     http_client = http.Http()
     http_client.request(url, 'GET', None, None, 0, None)
     self.request_mock.assert_called_once_with(
@@ -153,13 +165,17 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
     for x in [False, True]:
       http.Http(enable_resource_quota=x).request(
           'http://foo.com', 'GET', None, {})
-      self.assertNotIn('X-Goog-User-Project', self.request_mock.call_args[0][3])
+      self.assertNotIn(u'X-Goog-User-Project',
+                       self.request_mock.call_args[0][3])
+      self.assertNotIn(b'X-Goog-User-Project',
+                       self.request_mock.call_args[0][3])
 
     # Legacy is the default, so if unset, don't use the header.
     properties.VALUES.billing.quota_project.Set(None)
     http.Http(enable_resource_quota=False).request(
         'http://foo.com', 'GET', None, {})
-    self.assertNotIn('X-Goog-User-Project', self.request_mock.call_args[0][3])
+    self.assertNotIn(u'X-Goog-User-Project', self.request_mock.call_args[0][3])
+    self.assertNotIn(b'X-Goog-User-Project', self.request_mock.call_args[0][3])
 
     # Use the header.
     properties.VALUES.billing.quota_project.Set(
@@ -167,13 +183,15 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
     properties.VALUES.core.project.Set('foo')
     http.Http(enable_resource_quota=True).request(
         'http://foo.com', 'GET', None, {})
-    self.assertDictContainsSubset({'X-Goog-User-Project': 'foo'},
+    expect_headers = self._EncodeHeaders({'X-Goog-User-Project': 'foo'})
+    self.assertDictContainsSubset(expect_headers,
                                   self.request_mock.call_args[0][3])
     # Custom project.
     properties.VALUES.billing.quota_project.Set('bar')
     http.Http(enable_resource_quota=True).request(
         'http://foo.com', 'GET', None, {})
-    self.assertDictContainsSubset({'X-Goog-User-Project': 'bar'},
+    expect_headers = self._EncodeHeaders({'X-Goog-User-Project': 'bar'})
+    self.assertDictContainsSubset(expect_headers,
                                   self.request_mock.call_args[0][3])
 
 
@@ -184,7 +202,8 @@ class HttpTestGCECreds(HttpTestBase, sdk_test_base.WithFakeComputeAuth):
     properties.VALUES.billing.quota_project.Set('bar')
     http.Http(enable_resource_quota=True).request(
         'http://foo.com', 'GET', None, {})
-    self.assertNotIn('X-Goog-User-Project', self.request_mock.call_args[0][3])
+    self.assertNotIn(u'X-Goog-User-Project', self.request_mock.call_args[0][3])
+    self.assertNotIn(b'X-Goog-User-Project', self.request_mock.call_args[0][3])
 
 
 if __name__ == '__main__':

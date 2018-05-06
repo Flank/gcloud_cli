@@ -90,8 +90,8 @@ class ConfigTest(test_case.TestCase):
     with open(tmp) as f:
       data = json.load(f)
 
-    self.assertEquals(emulator_a.prefixes, data.get(emulator_a.service_name))
-    self.assertEquals(emulator_b.prefixes, data.get(emulator_b.service_name))
+    self.assertEqual(emulator_a.prefixes, data.get(emulator_a.service_name))
+    self.assertEqual(emulator_b.prefixes, data.get(emulator_b.service_name))
 
   def testWriteJsonToFile(self):
     for conf in [config.ProxyConfiguration({'ni': 1, 'hao': 2}, True, 1234),
@@ -100,9 +100,9 @@ class ConfigTest(test_case.TestCase):
       conf.WriteJsonToFile(tmp)
       with open(tmp) as f:
         data = json.load(f)
-      self.assertEquals(conf._local_emulators, data.get('localEmulators'))
-      self.assertEquals(conf._proxy_port, data.get('proxyPort'))
-      self.assertEquals(conf._should_proxy_to_gcp, data.get('shouldProxyToGcp'))
+      self.assertEqual(conf._local_emulators, data.get('localEmulators'))
+      self.assertEqual(conf._proxy_port, data.get('proxyPort'))
+      self.assertEqual(conf._should_proxy_to_gcp, data.get('shouldProxyToGcp'))
 
 
 if __name__ == '__main__':

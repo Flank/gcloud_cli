@@ -248,6 +248,12 @@ class BaseTest(e2e_base.WithServiceAuth):
     stderr = self.GetNewErr()
     return stderr
 
+  def DeleteSslPolicy(self, name):
+    self.GetNewErr()
+    self.Run('compute ssl-policies delete {0} --quiet'.format(name))
+    stderr = self.GetNewErr()
+    return stderr
+
   def DeleteDisk(self, disk):
     # Update seek position
     self.GetNewErr()

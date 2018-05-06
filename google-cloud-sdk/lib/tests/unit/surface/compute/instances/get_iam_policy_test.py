@@ -1,4 +1,4 @@
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,40 +11,44 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Generate tests for the get-iam-policy subcommand."""
+"""Unit tests for the `gcloud compute instances get-iam-policy`."""
 import textwrap
 
+from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import base
+from tests.lib import cli_test_base
+from tests.lib import sdk_test_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+
 
 messages = core_apis.GetMessagesModule('compute', 'alpha')
 
 
-class GetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
+class GetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.mock_client = mock.Client(
+        core_apis.GetClientClass('compute', 'alpha'),
+        real_client=core_apis.GetClientInstance('compute', 'alpha',
+                                                no_http=True))
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
+
+    self.track = base.ReleaseTrack.ALPHA
 
   def testSimpleEmptyResponseCase(self):
-    self.make_requests.side_effect = iter([
-        iter([test_resources.EmptyAlphaIamPolicy()]),
-    ])
+    self.mock_client.instances.GetIamPolicy.Expect(
+        messages.ComputeInstancesGetIamPolicyRequest(resource='my-resource',
+                                                     zone='my-zone',
+                                                     project='fake-project'),
+        response=test_resources.EmptyAlphaIamPolicy())
+
     self.Run("""
-        compute instances get-iam-policy my-resource --zone zone-1
+        compute instances get-iam-policy --zone=my-zone my-resource
         """)
 
-    self.CheckRequests(
-        [(self.compute.instances,
-          'GetIamPolicy',
-          messages.ComputeInstancesGetIamPolicyRequest(
-              resource='my-resource',
-              project='my-project',
-              zone='zone-1'))],
-    )
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -52,21 +56,16 @@ class GetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
             """))
 
   def testSimpleResponseCase(self):
-    self.make_requests.side_effect = iter([
-        iter([test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag()]),
-    ])
+    self.mock_client.instances.GetIamPolicy.Expect(
+        messages.ComputeInstancesGetIamPolicyRequest(resource='my-resource',
+                                                     zone='my-zone',
+                                                     project='fake-project'),
+        response=test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+
     self.Run("""
-        compute instances get-iam-policy my-resource --zone zone-1
+        compute instances get-iam-policy --zone=my-zone my-resource
         """)
 
-    self.CheckRequests(
-        [(self.compute.instances,
-          'GetIamPolicy',
-          messages.ComputeInstancesGetIamPolicyRequest(
-              resource='my-resource',
-              project='my-project',
-              zone='zone-1'))],
-    )
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
@@ -78,63 +77,19 @@ class GetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
             """))
 
   def testListCommandFilter(self):
-    self.make_requests.side_effect = iter([
-        iter([test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag()]),
-    ])
+    self.mock_client.instances.GetIamPolicy.Expect(
+        messages.ComputeInstancesGetIamPolicyRequest(resource='my-resource',
+                                                     zone='my-zone',
+                                                     project='fake-project'),
+        response=test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+
     self.Run("""
-        compute instances get-iam-policy my-resource --zone zone-1
+        compute instances get-iam-policy --zone=my-zone my-resource
         --flatten=bindings[].members --filter=bindings.role:owner
         --format='value(bindings.members)'
         """)
 
-    self.CheckRequests(
-        [(self.compute.instances,
-          'GetIamPolicy',
-          messages.ComputeInstancesGetIamPolicyRequest(
-              resource='my-resource',
-              project='my-project',
-              zone='zone-1'))],
-    )
     self.AssertOutputContains('user:testuser@google.com')
-
-  def testNotFound(self):
-    def MakeRequests(*_, **kwargs):
-      if False:  # pylint: disable=using-constant-test
-        yield
-      kwargs['errors'].append((404, 'Not Found'))
-    self.make_requests.side_effect = MakeRequests
-
-    with self.AssertRaisesToolExceptionRegexp(textwrap.dedent("""\
-        Could not fetch resource:
-         - Not Found
-        """)):
-      self.Run("""
-          compute instances get-iam-policy my-resource --zone zone-1
-          """)
-
-
-class GetIamPolicyTestBeta(test_base.BaseTest, test_case.WithOutputCapture):
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testNotInGA(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        'Invalid choice:'):
-      self.Run("""
-          compute instances get-iam-policy my-resource
-          """)
-
-
-class GetIamPolicyTestGa(test_base.BaseTest, test_case.WithOutputCapture):
-
-  def testNotInBeta(self):
-    with self.AssertRaisesArgumentErrorRegexp(
-        'Invalid choice: \'get-iam-policy\''):
-      self.Run("""
-          beta compute instances get-iam-policy my-resource
-          """)
 
 
 if __name__ == '__main__':

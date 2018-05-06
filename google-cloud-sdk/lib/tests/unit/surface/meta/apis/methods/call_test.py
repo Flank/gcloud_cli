@@ -131,29 +131,26 @@ class NonPageableListTests(base.Base, cli_test_base.CliTestBase,
         clusters=[client.MESSAGES_MODULE.Cluster(name='c-1'),
                   client.MESSAGES_MODULE.Cluster(name='c-2')]
     )
-    self.mocked_client.projects_zones_clusters.List.Expect(
-        client.MESSAGES_MODULE.ContainerProjectsZonesClustersListRequest(
-            zone='zone1',
-            projectId='foo',
-        ),
+    self.mocked_client.projects_locations_clusters.List.Expect(
+        client.MESSAGES_MODULE.ContainerProjectsLocationsClustersListRequest(
+            parent='projects/foo/locations/zone1'),
         response=response)
 
   def testRawListNonPageable(self):
     properties.VALUES.core.user_output_enabled.Set(False)
-    response = self.Run(
-        'meta apis methods call --raw '
-        '--collection=container.projects.zones.clusters '
-        'list zone1:foo')
+    response = self.Run('meta apis methods call --raw '
+                        '--collection=container.projects.locations.clusters '
+                        'list zone1:foo')
     self.assertEqual(len(response.clusters), 2)
     self.assertEqual(response.clusters[0].name, 'c-1')
     self.assertEqual(response.clusters[1].name, 'c-2')
 
   def testFlatListNonPageable(self):
     properties.VALUES.core.user_output_enabled.Set(False)
-    response = list(self.Run(
-        'meta apis methods call '
-        '--collection=container.projects.zones.clusters '
-        'list zone1:foo'))
+    response = list(
+        self.Run('meta apis methods call '
+                 '--collection=container.projects.locations.clusters '
+                 'list zone1:foo'))
     self.assertEqual(len(response), 2)
     self.assertEqual(response[0].name, 'c-1')
     self.assertEqual(response[1].name, 'c-2')

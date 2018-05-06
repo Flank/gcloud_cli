@@ -43,6 +43,9 @@ To reach resource items through a unique path of names from the root,
 use resource-keys. For details run $ gcloud topic resource-keys.
 
 To list a subset of resource keys in a resource, use projections.   For details run $ gcloud topic projections.
+
+To work through an interactive tutorial about using the filter and format
+flags instead, see: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
 """
     actual = resource_topics.ResourceDescription('format')
     self.assertEqual(expected, actual)
@@ -63,6 +66,9 @@ To reach resource items through a unique path of names from the root,
 use resource-keys. Resource keys are described in detail below.
 
 To list a subset of resource keys in a resource, use projections.   For details run $ gcloud topic projections.
+
+To work through an interactive tutorial about using the filter and format
+flags instead, see: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
 """
     actual = resource_topics.ResourceDescription('key')
     self.assertEqual(expected, actual)
@@ -83,13 +89,16 @@ To reach resource items through a unique path of names from the root,
 use resource-keys. For details run $ gcloud topic resource-keys.
 
 To list a subset of resource keys in a resource, use projections.   Resource projections are described in detail below.
+
+To work through an interactive tutorial about using the filter and format
+flags instead, see: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
 """
     actual = resource_topics.ResourceDescription('projection')
     self.assertEqual(expected, actual)
 
   def testResourceDescriptionUnknown(self):
-    with self.assertRaisesRegexp(ValueError, r'Expected one of \[filter,format,'
-                                 r'key,projection\], got \[unknown\].'):
+    with self.assertRaisesRegex(ValueError, r'Expected one of \[filter,format,'
+                                r'key,projection\], got \[unknown\].'):
       resource_topics.ResourceDescription('unknown')
 
   def testFormatRegistryDescriptions(self):

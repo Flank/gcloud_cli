@@ -72,7 +72,7 @@ class InstanceGroupManagersWaitUntilStableZonalTest(test_base.BaseTest):
   def testTimeout(self):
     self._SetRequestsSideEffects()
     self.time.side_effect = iter([0, 10])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         utils.TimeoutError,
         'Timeout while waiting for group to become stable'):
       self.Run("""compute instance-groups managed wait-until-stable group-1
@@ -139,7 +139,7 @@ class InstanceGroupManagersWaitUntilStableRegionalTest(test_base.BaseTest):
 
   def testTimeout(self):
     self.time.side_effect = iter([0, 10])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         utils.TimeoutError,
         'Timeout while waiting for group to become stable'):
       self.Run("""

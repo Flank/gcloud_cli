@@ -14,6 +14,8 @@
 
 """Tests of the 'delete' subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -31,7 +33,7 @@ class DeleteTest(base.ErrorReportingTestBase):
   def testDeletePromptNo(self):
     self.WriteInput('n')
     expected = r'Aborted by user.'
-    with self.assertRaisesRegexp(console_io.OperationCancelledError, expected):
+    with self.assertRaisesRegex(console_io.OperationCancelledError, expected):
       self.RunCmd(self.COMMAND)
 
   def testDeletePromptYes(self):

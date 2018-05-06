@@ -13,7 +13,8 @@
 # limitations under the License.
 """Tests of the 'export' command."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.datastore import admin_api
 from googlecloudsdk.api_lib.datastore import operations
@@ -23,6 +24,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.datastore import base
+import six.moves.http_client
 
 
 class ExportTest(base.DatastoreCommandUnitTest, sdk_test_base.WithLogCapture):
@@ -107,11 +109,11 @@ class ExportTest(base.DatastoreCommandUnitTest, sdk_test_base.WithLogCapture):
                                                  output_url_prefix)
 
     exception = http_error.MakeHttpError(
-        httplib.BAD_REQUEST, 'error_message', url='Fake url')
+        six.moves.http_client.BAD_REQUEST, 'error_message', url='Fake url')
 
     self.mock_datastore_v1.projects.Export.Expect(request, exception=exception)
 
-    with self.assertRaisesRegexp(exceptions.HttpException, 'error_message'):
+    with self.assertRaisesRegex(exceptions.HttpException, 'error_message'):
       self.RunExportTest(output_url_prefix=output_url_prefix)
 
   def testOutputUrlPrefixConversion(self):

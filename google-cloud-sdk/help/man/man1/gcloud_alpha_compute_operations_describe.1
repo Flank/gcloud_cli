@@ -11,7 +11,7 @@ gcloud alpha compute operations describe \- describe a Google Compute Engine ope
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute operations describe\fR \fINAME\fR [\fB\-\-user\-accounts\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute operations describe\fR \fINAME\fR [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,12 +36,6 @@ The name of the operation to describe.
 .SH "FLAGS"
 
 .RS 2m
-.TP 2m
-\fB\-\-user\-accounts\fR
-If provided, it is assumed that the requested operation is a Compute User
-Accounts operation. Mutually exclusive with \-\-global, \-\-region, and \-\-zone
-flags.
-
 .TP 2m
 
 At most one of these may be specified:
@@ -95,12 +89,6 @@ To get details about a zonal operation, run:
 .RS 2m
 $ gcloud alpha compute operations describe OPERATION \e
     \-\-zone us\-central1\-a
-.RE
-
-To get details about a Compute User Accounts operation, run:
-
-.RS 2m
-$ gcloud alpha compute operations describe OPERATION \-\-user\-accounts
 .RE
 
 

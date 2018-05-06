@@ -11,7 +11,13 @@ gcloud alpha compute tpus create \- create a new Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute tpus create\fR \fITPU_ID\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="tpu\-v2"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute tpus create\fR (\fITPU_ID\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="tpu\-v2"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a new Cloud TPU.
 
 
 
@@ -19,10 +25,27 @@ gcloud alpha compute tpus create \- create a new Cloud TPU
 
 .RS 2m
 .TP 2m
+
+TPU ID \- The Cloud TPU you want to create. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: Set the property [core/project] or provide the flag [\-\-project] on
+the command line. This must be specified.
+
+.RS 2m
+.TP 2m
 \fITPU_ID\fR
-Name of the TPU.
+The ID of the tpu or a fully qualified identifier for the tpu. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The compute/zone of the Cloud TPU.
+
+If not specified, will use \f5default\fR compute/zone.
 
 
+.RE
 .RE
 .sp
 
@@ -30,13 +53,18 @@ Name of the TPU.
 
 .RS 2m
 .TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+Specifies the network that this TPU will be a part of.
+
+.TP 2m
 \fB\-\-range\fR=\fIRANGE\fR
-CIDR Range for the TPU. The IP range that the TPU will select an IP address
-from. Must be in CIDR notation and a \f5/29\fR range, for example
-\f5192.168.0.0/29\fR. Errors will occur if the CIDR range has already been used
-for a currently existing TPU, the CIDR range conflicts with any networks in the
-user's provided network, or the provided network is peered with another network
-that is using that CIDR range.
+CIDR Range for the TPU.
+
+The IP range that the TPU will select an IP address from. Must be in CIDR
+notation and a \f5/29\fR range, for example \f5192.168.0.0/29\fR. Errors will
+occur if the CIDR range has already been used for a currently existing TPU, the
+CIDR range conflicts with any networks in the user's provided network, or the
+provided network is peered with another network that is using that CIDR range.
 
 .TP 2m
 \fB\-\-version\fR=\fIVERSION\fR
@@ -55,19 +83,18 @@ TensorFlow versions please see https://www.tensorflow.org/versions/.
 TPU accelerator type for the TPU. If not specified, this defaults to
 \f5tpu\-v2\fR.
 
+For a list of available accelerator types run:
+
+\f5gcloud alpha compute tpus accelerator\-types list\fR
+
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Specifies a text description of the TPU.
-
-.TP 2m
-\fB\-\-network\fR=\fINETWORK\fR
-Specifies the network that this TPU will be a part of. If not specified, this
-defaults to the \f5default\fR network.
-
-.TP 2m
-\fB\-\-zone\fR=\fIZONE\fR
-The zone of the tpu to create. Zone in which TPU lives. If not specified, will
-use default compute/zone.
 
 
 .RE
@@ -79,6 +106,13 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBtpu/v1alpha1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/tpu/
 
 
 

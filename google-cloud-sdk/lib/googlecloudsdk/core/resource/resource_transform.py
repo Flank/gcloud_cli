@@ -463,13 +463,16 @@ def TransformEncode(r, encoding, undefined=''):
   Returns:
     The encoded resource.
   """
-  # Some codecs support 'replace', all support 'strict' (the default).
-  for errors in ('replace', 'strict'):
+  if encoding == 'base64':
     try:
-      return r.encode(encoding, errors).rstrip('\n')
+      b = base64.b64encode(console_attr.EncodeToBytes(r))
+      return console_attr.SafeText(b).rstrip('\n')
     except:  # pylint: disable=bare-except, undefined for any exception
-      pass
-  return undefined
+      return undefined
+  try:
+    return console_attr.SafeText(r, encoding)
+  except:  # pylint: disable=bare-except, undefined for any exception
+    return undefined
 
 
 def TransformEnum(r, projection, enums, inverse=False, undefined=''):
@@ -907,9 +910,9 @@ def TransformScope(r, *args):
       component in r if none found.
 
   Example:
-    `"https://abc/foo/projects/bar/xyz".scope("projects")`:::
+    `"http://abc/foo/projects/bar/xyz".scope("projects")`:::
     Returns "bar/xyz".
-    `"https://xyz/foo/regions/abc".scope()`:::
+    `"http://xyz/foo/regions/abc".scope()`:::
     Returns "abc".
   """
   if not r:
@@ -1334,6 +1337,7 @@ _API_TO_TRANSFORMS = {
                   'GetTransforms'),
     'runtimeconfig': ('googlecloudsdk.api_lib.runtime_config.transforms',
                       'GetTransforms'),
+    'dns': ('googlecloudsdk.command_lib.dns.dns_keys', 'GetTransforms'),
 }
 
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for step_json."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.dataflow import step_json
@@ -29,9 +31,9 @@ class StepJsonTest(sdk_test_base.SdkBase):
         name='Name',
     )
     result = step_json._ExtractStep(step_msg)
-    self.assertEquals('Kind', result['kind'])
-    self.assertEquals('Name', result['name'])
-    self.assertEquals({}, result['properties'])
+    self.assertEqual('Kind', result['kind'])
+    self.assertEqual('Name', result['name'])
+    self.assertEqual({}, result['properties'])
 
   def testExtractStepEmptyProperties(self):
     step_msg = base.MESSAGE_MODULE.Step(
@@ -40,9 +42,9 @@ class StepJsonTest(sdk_test_base.SdkBase):
         properties=base.MESSAGE_MODULE.Step.PropertiesValue(
             additionalProperties=[]))
     result = step_json._ExtractStep(step_msg)
-    self.assertEquals('Kind', result['kind'])
-    self.assertEquals('Name', result['name'])
-    self.assertEquals({}, result['properties'])
+    self.assertEqual('Kind', result['kind'])
+    self.assertEqual('Name', result['name'])
+    self.assertEqual({}, result['properties'])
 
   def testExtractStepBooleanProperty(self):
     step_msg = encoding.JsonToMessage(base.MESSAGE_MODULE.Step,
@@ -57,9 +59,9 @@ class StepJsonTest(sdk_test_base.SdkBase):
   }
 }""")
     result = step_json._ExtractStep(step_msg)
-    self.assertEquals('Kind', result['kind'])
-    self.assertEquals('Name', result['name'])
-    self.assertEquals({'bool_value': True}, result['properties'])
+    self.assertEqual('Kind', result['kind'])
+    self.assertEqual('Name', result['name'])
+    self.assertEqual({'bool_value': True}, result['properties'])
 
   def testExtractStepStringProperty(self):
     step_msg = encoding.JsonToMessage(base.MESSAGE_MODULE.Step,
@@ -74,9 +76,9 @@ class StepJsonTest(sdk_test_base.SdkBase):
   }
 }""")
     result = step_json._ExtractStep(step_msg)
-    self.assertEquals('Kind', result['kind'])
-    self.assertEquals('Name', result['name'])
-    self.assertEquals({'string_value': 'Hello'}, result['properties'])
+    self.assertEqual('Kind', result['kind'])
+    self.assertEqual('Name', result['name'])
+    self.assertEqual({'string_value': 'Hello'}, result['properties'])
 
   def testExtractStepStringList(self):
     step_msg = encoding.JsonToMessage(base.MESSAGE_MODULE.Step,
@@ -97,10 +99,10 @@ class StepJsonTest(sdk_test_base.SdkBase):
   }
 }""")
     result = step_json._ExtractStep(step_msg)
-    self.assertEquals('Kind', result['kind'])
-    self.assertEquals('Name', result['name'])
-    self.assertEquals({'array_value': ['Hello', 'World']},
-                      result['properties'])
+    self.assertEqual('Kind', result['kind'])
+    self.assertEqual('Name', result['name'])
+    self.assertEqual({'array_value': ['Hello', 'World']},
+                     result['properties'])
 
   def testExtractStepBadValue(self):
     step_msg = encoding.JsonToMessage(base.MESSAGE_MODULE.Step, """{
@@ -115,9 +117,9 @@ class StepJsonTest(sdk_test_base.SdkBase):
   }
 }""")
     result = step_json._ExtractStep(step_msg)
-    self.assertEquals('Kind', result['kind'])
-    self.assertEquals('Name', result['name'])
-    self.assertEquals(
+    self.assertEqual('Kind', result['kind'])
+    self.assertEqual('Name', result['name'])
+    self.assertEqual(
         {'object_value': {'@type': 'OutputReference',
                           'output_name': 'No decoding provided '
                                          'for: <JsonValue\n integer_value: '
@@ -135,16 +137,14 @@ class StepJsonTest(sdk_test_base.SdkBase):
   }
 }""")
     result = step_json._ExtractStep(step_msg)
-    self.assertEquals('Kind', result['kind'])
-    self.assertEquals('Name', result['name'])
-    self.assertEquals(
-        {'object_value':
-             'Missing value for type [http://schema.org/Text] in proto '
-             '[<JsonValue\n object_value: '
-             '<JsonObject\n properties: ['
-             '<Property\n key: u\'@type\'\n value: '
-             '<JsonValue\n string_value: u\'http://schema.org/Text\'>>]>>]'},
-        result['properties'])
+    self.assertEqual('Kind', result['kind'])
+    self.assertEqual('Name', result['name'])
+    pattern = ('Missing value for type \\[http://schema.org/Text] in proto '
+               '\\[<JsonValue\n object_value: '
+               '<JsonObject\n properties: \\['
+               '<Property\n key: u?\'@type\'\n value: '
+               '<JsonValue\n string_value: u?\'http://schema.org/Text\'>>]>>]')
+    self.assertRegexpMatches(result['properties']['object_value'], pattern)
 
   def testExtractStepObject(self):
     step_msg = encoding.JsonToMessage(base.MESSAGE_MODULE.Step,
@@ -160,12 +160,12 @@ class StepJsonTest(sdk_test_base.SdkBase):
   }
 }""")
     result = step_json._ExtractStep(step_msg)
-    self.assertEquals('Kind', result['kind'])
-    self.assertEquals('Name', result['name'])
-    self.assertEquals({'object_value': {'@type': 'OutputReference',
-                                        'output_name': 'output',
-                                        'step_name': 's1'}},
-                      result['properties'])
+    self.assertEqual('Kind', result['kind'])
+    self.assertEqual('Name', result['name'])
+    self.assertEqual({'object_value': {'@type': 'OutputReference',
+                                       'output_name': 'output',
+                                       'step_name': 's1'}},
+                     result['properties'])
 
 
 if __name__ == '__main__':

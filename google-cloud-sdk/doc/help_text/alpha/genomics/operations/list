@@ -3,17 +3,41 @@ NAME
         project
 
 SYNOPSIS
-    gcloud alpha genomics operations list [--where=WHERE] [--limit=LIMIT]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha genomics operations list [--filter=FILTER] [--where=WHERE]
+        [--limit=LIMIT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Prints a table with summary information on operations in the
     project.
 
 FLAGS
+     --filter=FILTER
+        A string for filtering operations created with the v2alpha1 API. In
+        addition to typical operators (AND, OR, =, >, etc.) the following
+        filter fields are supported:
+
+            createTime - The time the operation was created as a timestamp
+                         YYYY-MM-DD HH:MM:SS<time zone>.  T can also be used as
+                         a separator between the date and time.  The time zone
+                         is optional and can be specified as an offset from
+                         UTC, a name, or 'Z' for UTC.
+                             ex. 2018-02-15T16:53:38
+                                 2018-02-15 16:53:38-5:00
+                                 2018-02-15T16:53:38Z
+                                 2018-02-15 16:53:38 America/Los_Angeles
+                  done - A boolean for whether the operation has completed.
+                 error - A google.rpc.Code for a completed operation.
+                events - A set of strings for all events on the operation.
+                             ex. events:WorkerStartedEvent
+                labels - A map of string key and value for the operation.
+                             ex. labels.key = value
+                                 labels."key with space" = "value with space"
+                         For the existence of a key with any value.
+                             ex. labels.key:*
+
      --where=WHERE
-        A string for filtering operations. The following filter fields are
-        supported:
+        A string for filtering operations created with the v1alpha2 API. The
+        following filter fields are supported:
 
             createTime - The time this job was created, in seconds from the
                          epoch. Can use '>=' and/or '<=' operators.

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for gcloud kms commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.core import yaml
@@ -25,11 +27,11 @@ class CryptoKeysTest(base.KmsE2ETestBase):
 
   def SetUp(self):
     self.glbl = 'global'
-    self.keyring = self.keyring_namer.next()
+    self.keyring = next(self.keyring_namer)
     self.RunKms('keyrings', 'create', self.keyring, '--location', self.glbl)
 
   def testCreateWithLabels(self):
-    cryptokey = self.cryptokey_namer.next()
+    cryptokey = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'create', cryptokey, '--keyring', self.keyring,
                 '--location', self.glbl, '--purpose', 'encryption', '--labels',
@@ -55,7 +57,7 @@ class CryptoKeysTest(base.KmsE2ETestBase):
     self.AssertOutputContains('k1: v1')
 
   def testIamCommands(self):
-    cryptokey = self.cryptokey_namer.next()
+    cryptokey = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'create', cryptokey, '--keyring', self.keyring,
                 '--location', self.glbl, '--purpose', 'encryption')
@@ -105,8 +107,8 @@ class CryptoKeysTest(base.KmsE2ETestBase):
 
   def testCreateList(self):
     # Create 2 cryptokeys, check that both are shown by list command
-    cryptokey_a = self.cryptokey_namer.next()
-    cryptokey_b = self.cryptokey_namer.next()
+    cryptokey_a = next(self.cryptokey_namer)
+    cryptokey_b = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'list', '--keyring', self.keyring, '--location',
                 self.glbl)
@@ -130,7 +132,7 @@ class CryptoKeysTest(base.KmsE2ETestBase):
             self.Project(), self.glbl, self.keyring, cryptokey_a))
 
   def testSetRotationSchedule(self):
-    ck = self.cryptokey_namer.next()
+    ck = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'create', ck, '--keyring', self.keyring, '--location',
                 self.glbl, '--purpose', 'encryption', '--labels', 'k1=v1')
@@ -155,7 +157,7 @@ class CryptoKeysTest(base.KmsE2ETestBase):
     self.AssertOutputContains('rotationPeriod: 9936000s')
 
   def testUpdateCommands(self):
-    ck = self.cryptokey_namer.next()
+    ck = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'create', ck, '--keyring', self.keyring,
                 '--location', self.glbl, '--purpose', 'encryption',
@@ -214,7 +216,7 @@ class CryptoKeysTest(base.KmsE2ETestBase):
     self.AssertOutputContains('k1: v1')
 
   def testEncryptDecrypt(self):
-    ck = self.cryptokey_namer.next()
+    ck = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'create', ck, '--keyring', self.keyring, '--location',
                 self.glbl, '--purpose', 'encryption')
@@ -237,10 +239,10 @@ class CryptoKeysTest(base.KmsE2ETestBase):
     # Windows.
     with open(dc_path, 'rb') as f:
       decrypted = f.read()
-    self.assertEquals(plaintext, decrypted)
+    self.assertEqual(plaintext, decrypted)
 
   def testEncryptDecryptWithStdio(self):
-    ck = self.cryptokey_namer.next()
+    ck = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'create', ck, '--keyring', self.keyring, '--location',
                 self.glbl, '--purpose', 'encryption')
@@ -259,7 +261,7 @@ class CryptoKeysTest(base.KmsE2ETestBase):
     self.assertEqual(plaintext, self.GetOutputBytes())
 
   def testEncryptDecryptWithNonPrimaryVersion(self):
-    ck = self.cryptokey_namer.next()
+    ck = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'create', ck, '--keyring', self.keyring, '--location',
                 self.glbl, '--purpose', 'encryption')
@@ -286,10 +288,10 @@ class CryptoKeysTest(base.KmsE2ETestBase):
     # Windows.
     with open(dc_path, 'rb') as f:
       decrypted = f.read()
-    self.assertEquals(plaintext, decrypted)
+    self.assertEqual(plaintext, decrypted)
 
   def testUpdatePrimaryVersion(self):
-    ck = self.cryptokey_namer.next()
+    ck = next(self.cryptokey_namer)
 
     self.RunKms('keys', 'create', ck, '--keyring', self.keyring, '--location',
                 self.glbl, '--purpose', 'encryption', '--labels', 'k1=v1')

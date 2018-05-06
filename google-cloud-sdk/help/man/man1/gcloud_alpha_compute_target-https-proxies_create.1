@@ -11,7 +11,7 @@ gcloud alpha compute target\-https\-proxies create \- create a target HTTPS prox
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute target\-https\-proxies create\fR \fINAME\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...] \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR;\ default="NONE"] [\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute target\-https\-proxies create\fR \fINAME\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...] \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR;\ default="NONE"] [\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -43,7 +43,7 @@ The name of the target HTTPS proxy to create.
 
 .RS 2m
 .TP 2m
-\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...]
+\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
 References to at most 10 SSL certificate resources that are used for
 server\-side authentication. The first SSL certificate in this list is
 considered the primary SSL certificate associated with the load balancer. The

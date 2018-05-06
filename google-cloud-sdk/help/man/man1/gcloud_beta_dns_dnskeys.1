@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta dns dnskeys \- manage your Cloud DNS DnsKeys
+gcloud beta dns dnskeys \- manage Cloud DNS DNSKEY records
 
 
 
@@ -17,8 +17,17 @@ gcloud beta dns dnskeys \- manage your Cloud DNS DnsKeys
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Manage your Cloud DNS DnsKeys. The DnsKey resource represents a
-public/private key pair to be used for digitally signing zone data.
+\fB(BETA)\fR \fB(DEPRECATED)\fR Manage Cloud DNS DNSKEY records.
+
+The \f5gcloud beta dnskeys\fR commands are deprecated; please use the \f5gcloud
+beta dnskeys\fR commands instead.
+
+The commands in this group manage Cloud DNS DNS key resources. A DNS key
+resource represents a cryptographic signing key for use in DNSSEC; a DNSKEY
+record contains a public key used for digitally signing zone data.
+
+For more information, including instructions for managing and using DNS keys,
+see the documentation for DNSSEC (https://cloud.google.com/dns/dnssec).
 
 
 
@@ -38,11 +47,11 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBdescribe\fR
-\fB(BETA)\fR Get a DnsKey.
+\fB(BETA)\fR \fB(DEPRECATED)\fR Show details about a DNS key resource.
 
 .TP 2m
 \fBlist\fR
-\fB(BETA)\fR View the list of all your DnsKeys.
+\fB(BETA)\fR \fB(DEPRECATED)\fR List DNS key resources.
 
 
 .RE

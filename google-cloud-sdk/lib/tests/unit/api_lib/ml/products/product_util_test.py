@@ -12,10 +12,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for the ML vision api_lib products_utils."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
+
 from googlecloudsdk.api_lib.ml.products import product_util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import waiter
@@ -71,27 +76,26 @@ class ProductsApiClientTest(sdk_test_base.WithFakeAuth,
     self.assertIsNone(self.client.BuildBoundingPoly([]))
 
   def testBuildBoundingPolyBadVertices(self):
-    with self.assertRaisesRegexp(product_util.InvalidBoundsError,
-                                 'Too few vertices'):
+    with self.assertRaisesRegex(product_util.InvalidBoundsError,
+                                'Too few vertices'):
       self.client.BuildBoundingPoly(['200:200', '200:400'])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         product_util.InvalidBoundsError,
         r'vertices must be a list of coordinate pairs representing the '
         r'vertices of the bounding polygon e.g. \[x1:y1, x2:y2, x3:y3,...\].'):
       self.client.BuildBoundingPoly(['200:200', '200:400', '400'])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         product_util.InvalidBoundsError,
         r'vertices must be a list of coordinate pairs representing the '
         r'vertices of the bounding polygon e.g. \[x1:y1, x2:y2, x3:y3,...\].'):
       self.client.BuildBoundingPoly(['200,200', '200,400', '400,200'])
 
   def testBuildRefImage(self):
-    expected_image = self.messages.ReferenceImage(imageUri='gs://fake/image',
-                                                  productCategory='test-hats',
-                                                  productId='abc123',
-                                                  boundingPoly=self.test_bounds)
+    expected_image = self.client.ref_image_msg(
+        imageUri='gs://fake/image', productCategory='test-hats',
+        productId='abc123', boundingPoly=self.test_bounds)
     self.assertEqual(expected_image, self.client.BuildRefImage(
         'abc123', 'gs://fake/image',
         bounds=self.test_bounds,
@@ -99,8 +103,8 @@ class ProductsApiClientTest(sdk_test_base.WithFakeAuth,
 
   def testBuildRefImageBadParams(self):
     # Bad ProductId
-    with self.assertRaisesRegexp(product_util.ProductIdError,
-                                 r'Invalid product_id \[abc 123\]'):
+    with self.assertRaisesRegex(product_util.ProductIdError,
+                                r'Invalid product_id \[abc 123\]'):
       self.client.BuildRefImage('abc 123', 'gs://fake-bucket')
     # Bad Bounds
     with self.assertRaises(TypeError):
@@ -132,7 +136,8 @@ class ProductsApiClientTest(sdk_test_base.WithFakeAuth,
         pageSize=10, parent='productSearch/catalogs/12345', productId='abc123')
     self.client.ref_image_service.List.Expect(
         expected_request,
-        self.messages.ListReferenceImagesResponse(referenceImages=ref_images))
+        self.messages.GoogleCloudVisionV1alpha1ListReferenceImagesResponse(
+            referenceImages=ref_images))
     result_generator = self.client.ListRefImages('productSearch/catalogs/12345',
                                                  product_id='abc123')
     self.assertEqual(ref_images, list(result_generator))
@@ -151,7 +156,8 @@ class ProductsApiClientTest(sdk_test_base.WithFakeAuth,
     catalogs = self.test_resources.MakeCatalogList()
     self.client.catalog_service.List.Expect(
         self.client.list_catalogs_msg(),
-        self.messages.ListCatalogsResponse(catalogs=catalogs))
+        self.messages.GoogleCloudVisionV1alpha1ListCatalogsResponse(
+            catalogs=catalogs))
     results = self.client.ListCatalogs()
     self.assertEqual(catalogs, results)
 
@@ -161,11 +167,13 @@ class ProductsApiClientTest(sdk_test_base.WithFakeAuth,
     imported_images_response = self.test_resources.GetImportOperationResponse()
     import_response.response = imported_images_response
 
-    import_config = self.messages.ImportCatalogsInputConfig(
-        gcsSource=self.messages.ImportCatalogsGcsSource(
-            csvFileUri='gs://fake-bucket/mycatalog'))
+    import_config = (
+        self.messages.GoogleCloudVisionV1alpha1ImportCatalogsInputConfig(
+            gcsSource=self.client.import_catalog_src(
+                csvFileUri='gs://fake-bucket/mycatalog')))
     self.client.catalog_service.Import.Expect(
-        self.messages.ImportCatalogsRequest(inputConfig=import_config),
+        self.messages.GoogleCloudVisionV1alpha1ImportCatalogsRequest(
+            inputConfig=import_config),
         import_response)
     self.test_resources.ExpectLongRunningOpResult(
         'operations/import', poll_count=3,
@@ -173,12 +181,12 @@ class ProductsApiClientTest(sdk_test_base.WithFakeAuth,
 
     import_result = self.client.ImportCatalog('gs://fake-bucket/mycatalog')
     decoded_expected_response = encoding.JsonToMessage(
-        self.messages.ImportCatalogsResponse,
+        self.messages.GoogleCloudVisionV1alpha1ImportCatalogsResponse,
         encoding.MessageToJson(imported_images_response))
     self.assertEqual(decoded_expected_response, import_result)
 
   def testImportCatalogBucketError(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         product_util.GcsPathError,
         r'The catalog csv file path \[NOT_A_BUCKET\] is not a properly '
         r'formatted URI for a remote catalog csv file. URI must be a Google '
@@ -217,8 +225,8 @@ class ProductsApiClientTest(sdk_test_base.WithFakeAuth,
 
     self.test_resources.ExpectLongRunningOpResult(
         'operations/12345', error_json=error)
-    with self.assertRaisesRegexp(waiter.OperationError,
-                                 r'Invalid Catalog config'):
+    with self.assertRaisesRegex(waiter.OperationError,
+                                r'Invalid Catalog config'):
       self.client.WaitOperation(operation_ref)
 
 if __name__ == '__main__':

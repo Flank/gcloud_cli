@@ -17,15 +17,20 @@ gcloud alpha functions event\-types list \- list types of events that can be a t
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR * For an event type, EVENT_TYPE_DEFAULT marks whether the given
-event type is.RS 2m
-the default for its provider (in which case the \-\-event\-type flag may be
-omitted).
- * For a resource, RESOURCE_OPTIONAL marks whether the resource has
-acorresponding default value (in which case the \-\-trigger\-resource flag
-may be omitted).
+\fB(ALPHA)\fR \f5gcloud alpha functions event\-types list\fR displays types of
+events that can be a trigger for a Google Cloud Function.
 
+.RS 2m
+.IP "\(bu" 2m
+For an event type, \f5EVENT_TYPE_DEFAULT\fR marks whether the given event type
+is the default for its provider (in which case the \f5\-\-event\-type\fR flag
+may be omitted).
+.IP "\(bu" 2m
+For a resource, \f5RESOURCE_OPTIONAL\fR marks whether the resource has a
+corresponding default value (in which case the \f5\-\-trigger\-resource\fR flag
+may be omitted).
 .RE
+.sp
 
 
 

@@ -9,8 +9,12 @@ DESCRIPTION
     Get information about a long-running video analysis operation.
 
 POSITIONAL ARGUMENTS
-     OPERATION_ID
-        The ID of the operation to describe.
+     OPERATION ID - The ID of the operation to describe. This represents a
+     Cloud resource. This must be specified.
+
+       OPERATION_ID
+          The ID of the operation or a fully qualified identifier for the
+          operation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

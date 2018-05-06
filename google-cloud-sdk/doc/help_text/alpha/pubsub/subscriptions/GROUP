@@ -32,7 +32,7 @@ COMMANDS
         (ALPHA) Describes a Cloud Pub/Sub subscription.
 
      get-iam-policy
-        (ALPHA) Get the IAM policy for a Cloud Pub/Sub Subscription.
+        (ALPHA) Get the IAM policy for a subscription.
 
      list
         (ALPHA) Lists Cloud Pub/Sub subscriptions.
@@ -59,7 +59,7 @@ COMMANDS
         Pub/Sub API.
 
      set-iam-policy
-        (ALPHA) Set IAM policy for a subscription.
+        (ALPHA) Set the IAM policy for a Cloud Pub/Sub Subscription.
 
      update
         (ALPHA) This feature is part of an invite-only release of the Cloud

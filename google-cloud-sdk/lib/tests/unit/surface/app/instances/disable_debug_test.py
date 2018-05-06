@@ -14,6 +14,7 @@
 
 """Tests for gcloud app instances disable-debug."""
 
+from __future__ import absolute_import
 from googlecloudsdk.api_lib.app import instances_util
 from tests.lib.surface.app import api_test_util
 from tests.lib.surface.app import instances_base
@@ -44,7 +45,7 @@ class InstancesDisableDebugTest(instances_base.InstancesTestBase):
         ('service1', [
             ('v1_flex', ['i1'])])
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'No instances match the given specification\.'):
       self.Run('app instances disable-debug bad')
@@ -58,7 +59,7 @@ class InstancesDisableDebugTest(instances_base.InstancesTestBase):
         ('service1', [
             ('v1_flex', ['i1'])])
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'More than one instance matches the given specification\.'):
       self.Run('app instances disable-debug i1')
@@ -135,7 +136,7 @@ class InstancesDisableDebugTest(instances_base.InstancesTestBase):
         ('service1', [
             ('v1_flex', ['i1'])])
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'No instances match the given specification\.'):
       self.Run('app instances disable-debug default/v1/i1')

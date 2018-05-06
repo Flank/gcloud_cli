@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for 'clusters set-iam-policy' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import base64
 
 from googlecloudsdk.api_lib.container import api_adapter
@@ -40,8 +42,7 @@ class SetIamPolicyTestAlphaV1Alpha1API(parameterized.TestCase,
     policy = self.messages.GoogleIamV1Policy(
         bindings=[
             self.messages.GoogleIamV1Binding(
-                members=[u'user:harry', u'user:hermione'],
-                role=u'dumbledoresarmy')
+                members=['user:harry', 'user:hermione'], role='dumbledoresarmy')
         ],
         etag=base64.b64decode('1234'))
     f = self.Touch(
@@ -57,9 +58,8 @@ class SetIamPolicyTestAlphaV1Alpha1API(parameterized.TestCase,
         }""")
     self.mocked_client.projects.SetIamPolicy.Expect(
         self.messages.ContainerProjectsSetIamPolicyRequest(
-            resource=unicode(
-                api_adapter.ProjectLocationCluster(self.PROJECT_ID, location,
-                                                   self.CLUSTER_NAME), 'utf-8'),
+            resource=api_adapter.ProjectLocationCluster(
+                self.PROJECT_ID, location, self.CLUSTER_NAME),
             googleIamV1SetIamPolicyRequest=self.messages.
             GoogleIamV1SetIamPolicyRequest(policy=policy)), policy)
     self.Run(

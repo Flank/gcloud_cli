@@ -13,8 +13,13 @@
 # limitations under the License.
 """gcloud sdk tests command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.util import completers
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class BetaSubCommandA(base.Command):
@@ -27,7 +32,7 @@ class BetaSubCommandA(base.Command):
     # Choices.
     parser.add_argument(
         '--one-two-three',
-        choices=range(1, 4),
+        choices=list(range(1, 4)),
         type=int,
         help='...four!')
 

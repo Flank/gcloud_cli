@@ -16,6 +16,8 @@
 
 """Unit tests for the arg_parsers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 import datetime
 import os
@@ -31,6 +33,8 @@ from tests.lib import sdk_test_base
 from tests.lib import subtests
 from tests.lib import test_case
 from tests.lib.calliope import util
+
+import six
 
 
 STRICT_DEPRECATION_FORMAT = (
@@ -87,7 +91,7 @@ class RegexpValidatorTest(test_case.TestCase):
 
   def testRegexpNotMatches(self):
     for value in ['a', '12a', '?', '']:
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           arg_parsers.ArgumentTypeError,
           re.escape(('Bad value [{0}]: A foo consists of one or more digits'
                      '').format(value))):
@@ -117,10 +121,9 @@ class CustomFunctionValidatorTest(test_case.TestCase):
   def testFunctionDoesNotReturnTrue(self):
     arg_type = self._EvenType()
     for value in ['3', '13', '3457']:
-      with self.assertRaisesRegexp(arg_parsers.ArgumentTypeError,
-                                   re.escape(
-                                       ('Bad value [{0}]: This is not even!'
-                                        '').format(value))):
+      with self.assertRaisesRegex(
+          arg_parsers.ArgumentTypeError,
+          re.escape('Bad value [{0}]: This is not even!'.format(value))):
         arg_type(value)
 
   def testChainedParserValidValue(self):
@@ -131,7 +134,7 @@ class CustomFunctionValidatorTest(test_case.TestCase):
   def testChainedParserInValidValue(self):
     arg_type = self._CustomIntType()
     for value in ['-13', '0', '2', '3457']:
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           arg_parsers.ArgumentTypeError,
           re.escape('Bad value [{0}]: 1 or 3 must it be.'.format(value))):
         arg_type(value)
@@ -470,62 +473,62 @@ class DiskSizeTest(subtests.Base):
 class RangeTests(test_case.TestCase):
 
   def testSingle(self):
-    self.assertEquals(
+    self.assertEqual(
         arg_parsers.Range(25, 25),
         arg_parsers.Range.Parse('25'))
 
   def testRange(self):
 
-    self.assertEquals(
+    self.assertEqual(
         arg_parsers.Range(25, 100),
         arg_parsers.Range.Parse('25-100'))
 
   def testSingleZero(self):
-    self.assertEquals(
+    self.assertEqual(
         arg_parsers.Range(0, 0),
         arg_parsers.Range.Parse('0'))
 
   def testSingleStr(self):
-    self.assertEquals('25', str(arg_parsers.Range(25, 25)))
+    self.assertEqual('25', six.text_type(arg_parsers.Range(25, 25)))
 
   def testRangeStr(self):
-    self.assertEquals('25-100', str(arg_parsers.Range(25, 100)))
+    self.assertEqual('25-100', six.text_type(arg_parsers.Range(25, 100)))
 
   def testSingleNegative(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         arg_parsers.ArgumentTypeError,
         r'Expected a non-negative integer value or a range of such values '
         r'instead of "-25"'):
       arg_parsers.Range.Parse('-25')
 
   def testBadString(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         arg_parsers.ArgumentTypeError,
         r'Expected a non-negative integer value or a range of such values '
         r'instead of "xyz"'):
       arg_parsers.Range.Parse('xyz')
 
   def testInvertedRange(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         arg_parsers.ArgumentTypeError,
         r'Expected range start 25 smaller or equal to range end 15 in "25-15"'):
       arg_parsers.Range.Parse('25-15')
 
   def testRangeCombine(self):
-    self.assertEquals(
+    self.assertEqual(
         arg_parsers.Range(25, 200),
         arg_parsers.Range(25, 100).Combine(arg_parsers.Range(50, 200)))
-    self.assertEquals(
+    self.assertEqual(
         arg_parsers.Range(25, 200),
         arg_parsers.Range(50, 200).Combine(arg_parsers.Range(25, 100)))
-    self.assertEquals(
+    self.assertEqual(
         arg_parsers.Range(25, 200),
         arg_parsers.Range(25, 100).Combine(arg_parsers.Range(101, 200)))
     with self.assertRaises(arg_parsers.Error):
       arg_parsers.Range(25, 100).Combine(arg_parsers.Range(102, 200))
 
   def testSort(self):
-    self.assertEquals(
+    self.assertEqual(
         [arg_parsers.Range(25, 100),
          arg_parsers.Range(50, 70),
          arg_parsers.Range(50, 71),
@@ -552,8 +555,8 @@ class HostPortTest(subtests.Base):
     self.Run(('localhost', '8000'), 'localhost:8000')
     self.Run(('1.2.3.4', '567'), '1.2.3.4:567')
     self.Run(('1.2.3.4', None), '1.2.3.4')
-    self.Run((u'ουτοπία.δπθ.gr', None), u'ουτοπία.δπθ.gr')
-    self.Run((u'ουτοπία.δπθ.gr', u'422'), u'ουτοπία.δπθ.gr:422')
+    self.Run(('ουτοπία.δπθ.gr', None), 'ουτοπία.δπθ.gr')
+    self.Run(('ουτοπία.δπθ.gr', '422'), 'ουτοπία.δπθ.gr:422')
     self.Run(('foo-bar.com', '8000'), 'foo-bar.com:8000')
 
     self.Run(None, '1:2:3',
@@ -591,7 +594,7 @@ class DayTest(sdk_test_base.SdkBase):
   def testParse(self):
     self.assertEqual(arg_parsers.Day.Parse(''), None)
     self.assertEqual(arg_parsers.Day.Parse('2000-01-02'),
-                     datetime.date(2000, 01, 02))
+                     datetime.date(2000, 0o1, 0o2))
 
     with self.assertRaises(arg_parsers.ArgumentTypeError):
       arg_parsers.Day.Parse('asdf')
@@ -662,9 +665,9 @@ class DatetimeDateTimeTest(subtests.Base):
                                times.TzOffset(-7 * 60)),
              '2015-05-31T11:22:33-0700')
     # Partial date/time
-    self.Run(datetime.datetime(2015, 05, 31, 0, 0, 0, 0, times.LOCAL),
+    self.Run(datetime.datetime(2015, 0o5, 31, 0, 0, 0, 0, times.LOCAL),
              '2015-05-31')
-    self.Run(datetime.datetime(2015, 05, 31, 11, 22, 33, 0, times.LOCAL),
+    self.Run(datetime.datetime(2015, 0o5, 31, 11, 22, 33, 0, times.LOCAL),
              '2015-05-31T11:22:33')
 
 
@@ -825,6 +828,47 @@ class ArgListTest(subtests.Base):
              exception=arg_parsers.ArgumentTypeError(
                  'Invalid delimiter. Please see `gcloud topic escaping` for '
                  'information on escaping list or dictionary flag values.'))
+
+
+# We need to break this out separately because parameterized and subtests don't
+# work well together.
+class ArgListParameterizedTest(parameterized.TestCase):
+
+  @parameterized.parameters(
+      # Standard case
+      (0, None, '[FOO,...]'),
+      # Just a min length
+      (1, None, 'FOO,[FOO,...]'),
+      (2, None, 'FOO,FOO,[FOO,...]'),
+      (3, None, 'FOO,FOO,FOO,[FOO,...]'),
+      # Just a max length
+      (0, 1, '[FOO]'),
+      (0, 2, '[FOO,[FOO]]'),
+      (0, 3, '[FOO,...]'),
+      # Both a min and max length
+      (1, 3, 'FOO,[FOO,[FOO]]'),
+      (1, 4, 'FOO,[FOO,...]'),
+      (2, 3, 'FOO,FOO,[FOO]'),
+      (3, 3, 'FOO,FOO,FOO'),
+  )
+  def testArgListUsage(self, min_length, max_length, expected):
+    arg_list = arg_parsers.ArgList(min_length=min_length, max_length=max_length)
+    self.assertEqual(arg_list.GetUsageMsg(False, 'FOO'), expected)
+
+  @parameterized.parameters(
+      (0, None, '[REALLY_REALLY_LONG_METAVAR,...]'),
+      (1, None, 'REALLY_REALLY_LONG_METAVAR,[...]'),
+      (2, None, 'REALLY_REALLY_LONG_METAVAR,...,[...]'),
+      (3, None, 'REALLY_REALLY_LONG_METAVAR,...,[...]'),
+      (0, 3, '[REALLY_REALLY_LONG_METAVAR,...]'),
+      (1, 3, 'REALLY_REALLY_LONG_METAVAR,[...]'),
+      (2, 3, 'REALLY_REALLY_LONG_METAVAR,...,[...]'),
+      (3, 3, 'REALLY_REALLY_LONG_METAVAR,...,[...]'),
+  )
+  def testArgListUsage_LongMetavar(self, min_length, max_length, expected):
+    arg_list = arg_parsers.ArgList(min_length=min_length, max_length=max_length)
+    self.assertEqual(arg_list.GetUsageMsg(False, 'REALLY_REALLY_LONG_METAVAR'),
+                     expected)
 
 
 class ArgListTokenizeTest(subtests.Base):
@@ -1296,10 +1340,10 @@ class ArgCommandsTest(util.WithTestTool,
         option_strings=None, dest='remainder', metavar='REMAINDER',
         nargs=argparse.REMAINDER)
     namespace = argparse.Namespace()
-    args = ['foo', '--bar', u'Ṳᾔḯ¢◎ⅾℯ', '--', 'stuff', '--after', 'dashes']
+    args = ['foo', '--bar', 'Ṳᾔḯ¢◎ⅾℯ', '--', 'stuff', '--after', 'dashes']
     namespace, args = action.ParseKnownArgs(args, namespace)
     self.assertEqual(namespace.remainder, ['stuff', '--after', 'dashes'])
-    self.assertEqual(args, ['foo', '--bar', u'Ṳᾔḯ¢◎ⅾℯ'])
+    self.assertEqual(args, ['foo', '--bar', 'Ṳᾔḯ¢◎ⅾℯ'])
     self.AssertErrNotContains('WARNING')
 
   def testRemainderActionParseRemainingArgs(self):
@@ -1323,22 +1367,22 @@ class ArgCommandsTest(util.WithTestTool,
     action = arg_parsers.RemainderAction(
         option_strings=None, dest='remainder', metavar='REMAINDER',
         nargs=argparse.REMAINDER)
-    remaining_args = ['foo', u'Ṳᾔḯ¢◎ⅾℯ']
-    args_after_dash = ['what', 'came', '--after', 'the', 'dash', u'Ṳᾔḯ¢◎ⅾℯ']
+    remaining_args = ['foo', 'Ṳᾔḯ¢◎ⅾℯ']
+    args_after_dash = ['what', 'came', '--after', 'the', 'dash', 'Ṳᾔḯ¢◎ⅾℯ']
     original_args = [
-        'foo', '--verbosity', 'debug', u'Ṳᾔḯ¢◎ⅾℯ' '--',
-        'what', 'came', '--after', 'the', 'dash', u'Ṳᾔḯ¢◎ⅾℯ']
+        'foo', '--verbosity', 'debug', 'Ṳᾔḯ¢◎ⅾℯ' '--',
+        'what', 'came', '--after', 'the', 'dash', 'Ṳᾔḯ¢◎ⅾℯ']
     namespace = argparse.Namespace(remainder=args_after_dash)
     try:
       action.ParseRemainingArgs(remaining_args, namespace, original_args)
     except argparse.ArgumentError as e:
-      # Sorry, self.assertRaisesRegexp doesn't handle unicode :(
+      # Sorry, self.assertRaisesRegex doesn't handle unicode :(
       # It uses str(e) instead of unicode(e)
       expected = (
-          u'unrecognized args: Ṳᾔḯ¢◎ⅾℯ\n'
-          u"The '--' argument must be specified between gcloud specific args "
-          u'on the left and REMAINDER on the right.')
-      self.assertEqual(expected, unicode(e))
+          'unrecognized args: Ṳᾔḯ¢◎ⅾℯ\n'
+          "The '--' argument must be specified between gcloud specific args "
+          'on the left and REMAINDER on the right.')
+      self.assertEqual(expected, six.text_type(e))
     else:
       self.fail('Should have raised an argparse.ArgumentError exception.')
 
@@ -1364,7 +1408,7 @@ class ArgCommandsTest(util.WithTestTool,
   def testUnicodeArgError(self):
     with self.AssertRaisesArgumentError():
       self.cli.Execute(['sdk11', 'sdk', 'optional-flags', '--pirates=1234'])
-    self.AssertErrContains(u'--pirates: Invalid choice: \'\\u26201234\'.')
+    self.AssertErrContains('--pirates: Invalid choice: \'\\u26201234\'.')
 
   def testUnicodeArg(self):
     self.cli.Execute(['sdk11', 'sdk', 'optional-flags', '--pirates=123'])

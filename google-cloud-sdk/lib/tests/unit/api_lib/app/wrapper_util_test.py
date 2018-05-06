@@ -203,8 +203,8 @@ class _ParseBooleanTest(test_case.TestCase):
     self.assertFalse(wrapper_util._ParseBoolean('0'))
 
   def testBad(self):
-    self.assertRaisesRegexp(ValueError, "known booleans are 'true', 'yes'",
-                            wrapper_util._ParseBoolean, 'bad')
+    self.assertRaisesRegex(ValueError, "known booleans are 'true', 'yes'",
+                           wrapper_util._ParseBoolean, 'bad')
 
 
 if __name__ == '__main__':

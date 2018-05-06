@@ -109,19 +109,19 @@ class PublicInterfaceTests(NamedConfigTestBase):
     self.AssertExistingConfigs('foo', 'default', 'foo', 'bar')
 
     encoding.SetEncodedValue(os.environ, 'CLOUDSDK_ACTIVE_CONFIG_NAME', 'bar')
-    with self.assertRaisesRegexp(named_configs.NamedConfigError,
-                                 'currently active'):
+    with self.assertRaisesRegex(named_configs.NamedConfigError,
+                                'currently active'):
       named_configs.ConfigurationStore.DeleteConfig('bar')
-    with self.assertRaisesRegexp(named_configs.NamedConfigError,
-                                 'gcloud properties'):
+    with self.assertRaisesRegex(named_configs.NamedConfigError,
+                                'gcloud properties'):
       named_configs.ConfigurationStore.DeleteConfig('foo')
     self.AssertExistingConfigs('bar', 'default', 'foo', 'bar')
 
     encoding.SetEncodedValue(os.environ, 'CLOUDSDK_ACTIVE_CONFIG_NAME', None)
     named_configs.ConfigurationStore.DeleteConfig('bar')
     self.AssertExistingConfigs('foo', 'default', 'foo')
-    with self.assertRaisesRegexp(named_configs.NamedConfigError,
-                                 'does not exist'):
+    with self.assertRaisesRegex(named_configs.NamedConfigError,
+                                'does not exist'):
       named_configs.ConfigurationStore.DeleteConfig('bar')
 
     named_configs.ConfigurationStore.ActivateConfig('default')
@@ -179,8 +179,8 @@ class PublicInterfaceTests(NamedConfigTestBase):
   def testErrors(self):
     self.ClearAllConfigurations()
     files.MakeDir(self.named_config_activator)
-    with self.assertRaisesRegexp(named_configs.NamedConfigFileAccessError,
-                                 re.escape(r'sufficient read permissions')):
+    with self.assertRaisesRegex(named_configs.NamedConfigFileAccessError,
+                                re.escape(r'sufficient read permissions')):
       named_configs.ConfigurationStore.ActiveConfig()
 
     self.ClearAllConfigurations()
@@ -230,13 +230,13 @@ class HelperMethodTests(NamedConfigTestBase):
 
     for s in bad:
       for allow_reserved in [True, False]:
-        with self.assertRaisesRegexp(named_configs.InvalidConfigName,
-                                     r'Invalid name \['):
+        with self.assertRaisesRegex(named_configs.InvalidConfigName,
+                                    r'Invalid name \['):
           named_configs._EnsureValidConfigName(s, allow_reserved=allow_reserved)
 
     named_configs._EnsureValidConfigName('NONE', allow_reserved=True)
-    with self.assertRaisesRegexp(named_configs.InvalidConfigName,
-                                 r'Invalid name \['):
+    with self.assertRaisesRegex(named_configs.InvalidConfigName,
+                                r'Invalid name \['):
       named_configs._EnsureValidConfigName('NONE', allow_reserved=False)
 
   def testFileForConfig(self):
@@ -339,7 +339,7 @@ class FlagStackTests(NamedConfigTestBase):
     ]
     stack = named_configs._FlagOverrideStack()
     for combo in combos:
-      self.assertEquals('foo', stack._FindFlagValue(combo))
+      self.assertEqual('foo', stack._FindFlagValue(combo))
 
     combos = [
         ['foo'],
@@ -348,7 +348,7 @@ class FlagStackTests(NamedConfigTestBase):
         ['asdf', '--configuration'],
     ]
     for combo in combos:
-      self.assertEquals(None, stack._FindFlagValue(combo))
+      self.assertEqual(None, stack._FindFlagValue(combo))
 
 
 class ActivePropertiesFileLoadingTests(NamedConfigTestBase):

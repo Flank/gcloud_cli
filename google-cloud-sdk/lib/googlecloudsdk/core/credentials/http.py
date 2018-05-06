@@ -17,6 +17,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import unicode_literals
 
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import http
@@ -26,13 +27,14 @@ from googlecloudsdk.core.credentials import creds as core_creds
 from googlecloudsdk.core.credentials import store
 
 from oauth2client import client
+import six
 
 
 class Error(exceptions.Error):
   """Exceptions for the http module."""
 
 
-def Http(timeout='unset', enable_resource_quota=True):
+def Http(timeout='unset', enable_resource_quota=True, response_encoding=None):
   """Get an httplib2.Http client for working with the Google API.
 
   Args:
@@ -43,6 +45,7 @@ def Http(timeout='unset', enable_resource_quota=True):
         the quota of the project being operated on. For some APIs we want to use
         gcloud's quota, so you can explicitly disable that behavior by passing
         False here.
+    response_encoding: str, the encoding to use to decode the response.
 
   Returns:
     An authorized httplib2.Http client object, or a regular httplib2.Http object
@@ -51,7 +54,7 @@ def Http(timeout='unset', enable_resource_quota=True):
   Raises:
     c_store.Error: If an error loading the credentials occurs.
   """
-  http_client = http.Http(timeout=timeout)
+  http_client = http.Http(timeout=timeout, response_encoding=response_encoding)
 
   # Wrappers for IAM header injection.
   authority_selector = properties.VALUES.auth.authority_selector.Get()
@@ -140,6 +143,7 @@ def _HandleAuthError(e):
   Raises:
     sore.TokenRefreshError: If an auth error occurs.
   """
-  log.debug('Exception caught during HTTP request: %s', e.message,
+  msg = six.text_type(e)
+  log.debug('Exception caught during HTTP request: %s', msg,
             exc_info=True)
-  raise store.TokenRefreshError(e.message)
+  raise store.TokenRefreshError(msg)

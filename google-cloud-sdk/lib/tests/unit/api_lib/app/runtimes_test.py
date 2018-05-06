@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for runtime fingerprinting and config generation."""
 
+from __future__ import absolute_import
 import contextlib
 import os
 import re
@@ -1533,7 +1534,7 @@ class RuntimeSelectionTests(sdk_test_base.WithLogCapture,
       with self.StartObjectPatch(
           runtime_def[0], 'GenerateConfigData',
           side_effect=ext_runtime.InvalidRuntimeDefinition('message')):
-        with self.assertRaisesRegexp(fingerprinter.ExtRuntimeError, r'message'):
+        with self.assertRaisesRegex(fingerprinter.ExtRuntimeError, r'message'):
           fingerprinter.GenerateConfigData(self.temp_path)
 
   # These tests verify that the correct runtime is selected when there are

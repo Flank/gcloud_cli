@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha monitoring channels describe - describe a notification channel
+
+SYNOPSIS
+    gcloud alpha monitoring channels describe CHANNEL [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describe a notification channel.
+
+POSITIONAL ARGUMENTS
+     CHANNEL - The notification channel to describe. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       CHANNEL
+          The ID of the notification_channel or a fully qualified identifier
+          for the notification_channel.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the monitoring/v3 API. The full documentation for this
+    API can be found at: https://cloud.google.com/monitoring/api/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

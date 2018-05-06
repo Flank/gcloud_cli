@@ -17,10 +17,22 @@ GROUPS
     GROUP is one of the following:
 
      host-types
-        (ALPHA) Read Google Compute Engine sole-tenancy host types.
+        (ALPHA) (DEPRECATED) Read Google Compute Engine sole-tenancy host
+        types.
 
      hosts
-        (ALPHA) Read and manage Google Compute Engine sole-tenancy hosts.
+        (ALPHA) (DEPRECATED) Read and manage Google Compute Engine sole-tenancy
+        hosts.
+
+     node-groups
+        (ALPHA) Read Google Compute Engine sole-tenancy node groups.
+
+     node-templates
+        (ALPHA) Read and manage Google Compute Engine sole-tenancy node
+        templates.
+
+     node-types
+        (ALPHA) Read Google Compute Engine sole-tenancy node types.
 
 NOTES
     This command is an internal implementation detail and may change or

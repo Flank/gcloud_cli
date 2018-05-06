@@ -5,7 +5,7 @@
   "name": "testing",
   "version": "v1",
   "revision": "0",
-  "title": "Google Cloud Testing API",
+  "title": "Cloud Testing API",
   "description": "Allows developers to run automated tests for their mobile applications on Google infrastructure.",
   "ownerDomain": "google.com",
   "ownerName": "Google",
@@ -865,6 +865,10 @@
         "errorMessage": {
           "description": "If the TestState is ERROR, then this string will contain human-readable\ndetails about the error.\n@OutputOnly",
           "type": "string"
+        },
+        "videoRecordingDisabled": {
+          "description": "Indicates that video will not be recorded for this execution either because\nthe user chose to disable it or the device does not support it.\nSee AndroidModel.video_recording_not_supported\n@OutputOnly",
+          "type": "boolean"
         }
       }
     },
@@ -1140,6 +1144,10 @@
           "type": "integer",
           "format": "int32"
         },
+        "videoRecordingNotSupported": {
+          "description": "True if and only if tests with this model DO NOT have video output.\nSee also TestSpecification.disable_video_recording\n@OutputOnly",
+          "type": "boolean"
+        },
         "supportedVersionIds": {
           "description": "The set of Android versions this device supports.\n@OutputOnly",
           "type": "array",
@@ -1213,7 +1221,7 @@
           "format": "int32"
         },
         "month": {
-          "description": "Month of year. Must be from 1 to 12.",
+          "description": "Month of year. Must be from 1 to 12, or 0 if specifying a date without a\nmonth.",
           "type": "integer",
           "format": "int32"
         },

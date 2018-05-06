@@ -38,8 +38,8 @@ class BrowseTest(api_test_util.ApiTestBase):
   def testBrowse_NoProject(self):
     """Test app browse command raises error when core/project unset."""
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app browse')
 
   def testBrowse_NoArgs(self):
@@ -107,8 +107,8 @@ class BrowseTest(api_test_util.ApiTestBase):
                          r'Engine application. Use `gcloud app create` to '
                          r'initialize an App Engine application within the '
                          r'project.')
-    with self.assertRaisesRegexp(app_exceptions.MissingApplicationError,
-                                 missing_app_regex):
+    with self.assertRaisesRegex(app_exceptions.MissingApplicationError,
+                                missing_app_regex):
       self.Run('app browse')
 
   def testBrowse_CustomDomainServiceAndVersion(self):
@@ -123,7 +123,10 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testBrowse_DevShell(self):
     """Test running app browse with specific service and version."""
-    self.StartDictPatch('os.environ', {'DEVSHELL_CLIENT_PORT': '1000'})
+    self.StartDictPatch('os.environ', {
+        'CLOUD_SHELL': 'true',
+        'DEVSHELL_CLIENT_PORT': '1000',
+    })
     self.Run('app browse --service service1 --version v2')
     self.assertEqual(self.open_mock.call_args_list, [
         mock.call('https://v2-dot-service1-dot-{0}.appspot.com'.format(

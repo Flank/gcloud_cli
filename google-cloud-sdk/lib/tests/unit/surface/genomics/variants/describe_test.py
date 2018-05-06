@@ -38,16 +38,16 @@ class DescribeTest(base.GenomicsUnitTest):
     self.mocked_client.variants.Get.Expect(
         request=self.messages.GenomicsVariantsGetRequest(variantId=variant_id),
         response=variant)
-    self.assertEquals(variant, self.RunGenomics(['variants', 'describe',
-                                                 variant_id]))
+    self.assertEqual(variant, self.RunGenomics(['variants', 'describe',
+                                                variant_id]))
 
   def testDescribeNotExists(self):
     variant_id = 'abc123'
     self.mocked_client.variants.Get.Expect(
         request=self.messages.GenomicsVariantsGetRequest(variantId=variant_id),
         exception=self.MakeHttpError(404, 'Variant not found: ' + variant_id))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Variant not found: ' + variant_id):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Variant not found: ' + variant_id):
       self.RunGenomics(['variants', 'describe', variant_id])
 
 

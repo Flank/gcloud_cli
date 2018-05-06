@@ -14,6 +14,8 @@
 
 """Tests for 'clusters describe' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 
 from googlecloudsdk.api_lib.container import api_adapter
@@ -171,6 +173,12 @@ class DescribeTestGA(base.TestBaseV1,
       self.Run(self.clusters_command_base.format(self.ZONE) +
                ' describe {0}'.format(self.CLUSTER_NAME))
 
+  def testDescribeRegional(self):
+    self._TestDescribe(self.REGION)
+
+  def testDescribeWrongRegion(self):
+    self._TestDescribeWrongLocation(self.REGION)
+
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -180,12 +188,6 @@ class DescribeTestBetaV1API(base.BetaTestBase, DescribeTestGA):
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(True)
     self.api_mismatch = True
-
-  def testDescribeRegional(self):
-    self._TestDescribe(self.REGION)
-
-  def testDescribeWrongRegion(self):
-    self._TestDescribeWrongLocation(self.REGION)
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.

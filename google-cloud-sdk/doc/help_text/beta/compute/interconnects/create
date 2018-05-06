@@ -36,6 +36,8 @@ REQUIRED FLAGS
          IT_PRIVATE
             Dedicated private interconnect. (Warning: IT_PRIVATE is deprecated,
             use DEDICATED instead.)
+         PARTNER
+            Partner interconnect. Only available to approved partners.
 
      --link-type=LINK_TYPE
         Type of the link for the interconnect. LINK_TYPE must be (currently

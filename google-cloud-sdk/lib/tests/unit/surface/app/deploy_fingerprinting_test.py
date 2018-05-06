@@ -123,7 +123,7 @@ class GenConfigTest(FingerprintingTestBase):
     self.assertFalse(self.params.custom)
     self.assertTrue(self.params.appinfo)
     self.assertFalse(self.params.appinfo.vm)
-    self.assertEquals(self.params.appinfo.env, 'flex')
+    self.assertEqual(self.params.appinfo.env, 'flex')
 
   def testGenConfigCustomFlag(self):
     self.WriteFile('app.yaml', CUSTOM_APP_YAML)

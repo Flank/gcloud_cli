@@ -64,7 +64,7 @@ class SetServiceAccountTest(e2e_instances_test_base.InstancesTestBase):
                                     self.instance_name))
     result = self.Run('compute instances describe {} --zone {} --format=disable'
                       .format(self.instance_name, self.zone))
-    self.assertEquals(new_service_account, result.serviceAccounts[0].email)
+    self.assertEqual(new_service_account, result.serviceAccounts[0].email)
 
   def testAttemptChangeServiceAccountOnRunningInstance(self):
     self.GetInstanceName()

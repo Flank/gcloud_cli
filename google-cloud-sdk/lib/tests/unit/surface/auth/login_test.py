@@ -11,6 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.auth import exceptions as auth_exceptions
@@ -21,6 +25,7 @@ from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
 from tests.lib import test_case
+
 import mock
 
 
@@ -36,9 +41,9 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_browser = self.StartPatch('webbrowser.get', autospec=True)
     self.mock_browser.return_value.name = 'Chrome'
 
-    mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
-    mock_metadata.return_value.connected = False
-    mock_metadata.return_value.Project = lambda: 'metadata-project'
+    self.mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
+    self.mock_metadata.return_value.connected = False
+    self.mock_metadata.return_value.Project = lambda: 'metadata-project'
     self.StartDictPatch('os.environ', {'DISPLAY': ':1'})
 
     self.expected_scopes = (
@@ -87,8 +92,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=expected_scopes,
         client_id=None, client_secret=None)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testNoAccount(self):
     """Always do the web flow if no account is given."""
@@ -104,8 +109,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testLoginNoCreds(self):
     """The normal case, use the web flow to get new credentials."""
@@ -122,8 +127,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testLoginNoCredsMismatchedCase(self):
     """The normal case, use the web flow to get new credentials.
@@ -143,8 +148,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testLoginWrongAccount(self):
     """Runs the web flow, but you logged in as the wrong user."""
@@ -153,7 +158,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_load.return_value = None  # No creds to start.
     self.mock_webflow.return_value = fake_cred  # Valid cred after flow.
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         auth_exceptions.WrongAccountError,
         r'You attempted to log in as account \[bar@google.com\] but the '
         r'received credentials were for account \[foo@google.com\]\.'):
@@ -164,8 +169,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('junk', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('junk', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testLoginWithValidCreds(self):
     """Account has valid creds but force flow anyway."""
@@ -178,9 +183,9 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_load.assert_called_once_with(
         account='foo@google.com', scopes=self.expected_scopes)
     # Web flow is not run.
-    self.assertEquals(False, self.mock_webflow.called)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual(False, self.mock_webflow.called)
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testLoginWithValidCredsForce(self):
     """When the account already has valid credentials, don't run the flow."""
@@ -192,12 +197,12 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     result = self.Login(account='foo@google.com', more_args=' --force')
     self.assertEqual(fake_cred2, result)
 
-    self.assertEquals(False, self.mock_load.called)
+    self.assertEqual(False, self.mock_load.called)
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testBrowserBlacklist(self):
     """Call it with launch_browser=True, but have it get switched to False."""
@@ -215,8 +220,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=False, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testNoDisplaySet(self):
     """Call it with launch_browser=True, but have it get switched to False."""
@@ -239,8 +244,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=False, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testNoDisplaySetAlternateDisplaySet(self):
     """Call it with launch_browser=True."""
@@ -265,8 +270,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testSetProject(self):
     """Make sure the project gets set."""
@@ -280,9 +285,9 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_load.assert_called_once_with(
         account='foo@google.com', scopes=self.expected_scopes)
     # Web flow is not run.
-    self.assertEquals(False, self.mock_webflow.called)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('newproj', properties.VALUES.core.project.Get())
+    self.assertEqual(False, self.mock_webflow.called)
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('newproj', properties.VALUES.core.project.Get())
 
   def testDoNotActivate(self):
     """Make sure the active account and project do not get set."""
@@ -300,15 +305,15 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('junk', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('junk', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testWebFlowError(self):
     """When an error occurs in the web flow."""
     self.mock_load.return_value = None  # No creds to start.
     self.mock_webflow.side_effect = store.FlowError('flowerror')
 
-    with self.assertRaisesRegexp(store.FlowError, 'flowerror'):
+    with self.assertRaisesRegex(store.FlowError, 'flowerror'):
       self.Login(account='foo@google.com')
     self.AssertErrContains('There was a problem with web authentication.')
 
@@ -317,8 +322,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.assert_called_once_with(
         launch_browser=True, scopes=self.expected_scopes, client_id=None,
         client_secret=None)
-    self.assertEquals('junk', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('junk', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testWarnUserAuthGceVmAnswerYes(self):
     """Warn the user when authenticating on a GCE VM.
@@ -327,8 +332,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     become vulnerable. Test the case where the user wishes to continue
     authentication.
     """
-    mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
-    mock_metadata.return_value.connected = True
+    self.mock_metadata.return_value.connected = True
 
     fake_cred = self.GetFakeCred('foo@google.com')
     self.mock_load.return_value = None  # No creds to start.
@@ -343,8 +347,8 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
         client_secret=None)
     self.mock_load.assert_called_once_with(
         account='foo@google.com', scopes=self.expected_scopes)
-    self.assertEquals('foo@google.com', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual('foo@google.com', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testWarnUserAuthGceVmAnswerNo(self):
     """Warn the user when authenticating on a GCE VM.
@@ -353,8 +357,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     become vulnerable. Test the case where the user wishes to abort
     authentication.
     """
-    mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
-    mock_metadata.return_value.connected = True
+    self.mock_metadata.return_value.connected = True
 
     fake_cred = self.GetFakeCred('foo@google.com')
     self.mock_load.return_value = None  # No creds to start.
@@ -364,26 +367,39 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     result = self.Login(account='foo@google.com')
     self.assertEqual(None, result)
 
-    self.assertEquals(False, self.mock_webflow.called)
-    self.assertEquals('junk', properties.VALUES.core.account.Get())
-    self.assertEquals('junkproj', properties.VALUES.core.project.Get())
+    self.assertEqual(False, self.mock_webflow.called)
+    self.assertEqual('junk', properties.VALUES.core.account.Get())
+    self.assertEqual('junkproj', properties.VALUES.core.project.Get())
 
   def testAlertUserOfDevshellLogin(self):
     fake_cred = self.GetFakeCred('foo@google.com')
     self.mock_load.return_value = None  # No creds to start.
     self.mock_webflow.return_value = fake_cred  # Valid cred after flow.
 
-    os.environ[devshell.DEVSHELL_ENV] = str(1)
-    try:
-      self.WriteInput('n')
-      result = self.Login(account='foo@google.com')
-      self.assertEqual(None, result)
+    self.StartDictPatch('os.environ', {
+        devshell.DEVSHELL_ENV: 'true',
+        devshell.DEVSHELL_CLIENT_PORT: '1000',
+    })
 
-      self.WriteInput('y')
-      result = self.Login(account='foo@google.com')
-      self.assertEqual(fake_cred, result)
-    finally:
-      del os.environ[devshell.DEVSHELL_ENV]
+    self.WriteInput('n')
+    result = self.Login(account='foo@google.com')
+    self.assertEqual(None, result)
+
+    self.WriteInput('y')
+    result = self.Login(account='foo@google.com')
+    self.assertEqual(fake_cred, result)
+
+  def testNoAlertWhenNoDevshellClient(self):
+    fake_cred = self.GetFakeCred('foo@google.com')
+    self.mock_load.return_value = None  # No creds to start.
+    self.mock_webflow.return_value = fake_cred  # Valid cred after flow.
+
+    self.StartDictPatch('os.environ', {
+        devshell.DEVSHELL_ENV: 'true',
+    })
+
+    result = self.Login(account='foo@google.com')
+    self.assertEqual(fake_cred, result)
 
 if __name__ == '__main__':
   test_case.main()

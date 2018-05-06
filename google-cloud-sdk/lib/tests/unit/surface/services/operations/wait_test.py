@@ -14,6 +14,8 @@
 
 """Unit tests for services operations wait command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.services import exceptions
 from tests.lib import test_case
 from tests.lib.surface.services import unit_test_base
@@ -56,7 +58,7 @@ class ServiceManagementOperationsWaitTest(unit_test_base.SV1UnitTestBase):
         )
     )
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.OperationErrorException,
         'The operation with ID operation-12345 resulted in a failure.'):
       self.Run('services operations wait ' + operation_name)

@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud beta dns managed-zones COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Manage your Cloud DNS managed-zones.
+    (BETA) Manage your Cloud DNS managed-zones. See Managing Zones
+    (https://cloud.google.com/dns/zones/) for details.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

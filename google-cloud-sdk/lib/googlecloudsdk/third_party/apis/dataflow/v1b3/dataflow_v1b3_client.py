@@ -24,7 +24,7 @@ class DataflowV1b3(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new dataflow handle."""
     url = url or self.BASE_URL
     super(DataflowV1b3, self).__init__(
@@ -33,7 +33,8 @@ class DataflowV1b3(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.projects_jobs_debug = self.ProjectsJobsDebugService(self)
     self.projects_jobs_messages = self.ProjectsJobsMessagesService(self)
     self.projects_jobs_workItems = self.ProjectsJobsWorkItemsService(self)
@@ -58,7 +59,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def GetConfig(self, request, global_params=None):
-      """Get encoded debug configuration for component. Not cacheable.
+      r"""Get encoded debug configuration for component. Not cacheable.
 
       Args:
         request: (DataflowProjectsJobsDebugGetConfigRequest) input message
@@ -84,7 +85,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def SendCapture(self, request, global_params=None):
-      """Send encoded debug capture data for component.
+      r"""Send encoded debug capture data for component.
 
       Args:
         request: (DataflowProjectsJobsDebugSendCaptureRequest) input message
@@ -120,7 +121,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def List(self, request, global_params=None):
-      """Request the job status.
+      r"""Request the job status.
 
       Args:
         request: (DataflowProjectsJobsMessagesListRequest) input message
@@ -156,7 +157,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def Lease(self, request, global_params=None):
-      """Leases a dataflow WorkItem to run.
+      r"""Leases a dataflow WorkItem to run.
 
       Args:
         request: (DataflowProjectsJobsWorkItemsLeaseRequest) input message
@@ -182,7 +183,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def ReportStatus(self, request, global_params=None):
-      """Reports the status of dataflow WorkItems leased by a worker.
+      r"""Reports the status of dataflow WorkItems leased by a worker.
 
       Args:
         request: (DataflowProjectsJobsWorkItemsReportStatusRequest) input message
@@ -218,7 +219,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def Aggregated(self, request, global_params=None):
-      """List the jobs of a project across all regions.
+      r"""List the jobs of a project across all regions.
 
       Args:
         request: (DataflowProjectsJobsAggregatedRequest) input message
@@ -244,7 +245,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Create(self, request, global_params=None):
-      """Creates a Cloud Dataflow job.
+      r"""Creates a Cloud Dataflow job.
 
       Args:
         request: (DataflowProjectsJobsCreateRequest) input message
@@ -270,7 +271,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      """Gets the state of the specified Cloud Dataflow job.
+      r"""Gets the state of the specified Cloud Dataflow job.
 
       Args:
         request: (DataflowProjectsJobsGetRequest) input message
@@ -296,7 +297,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def GetMetrics(self, request, global_params=None):
-      """Request the job status.
+      r"""Request the job status.
 
       Args:
         request: (DataflowProjectsJobsGetMetricsRequest) input message
@@ -322,7 +323,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      """List the jobs of a project in a given region.
+      r"""List the jobs of a project in a given region.
 
       Args:
         request: (DataflowProjectsJobsListRequest) input message
@@ -348,7 +349,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Update(self, request, global_params=None):
-      """Updates the state of an existing Cloud Dataflow job.
+      r"""Updates the state of an existing Cloud Dataflow job.
 
       Args:
         request: (DataflowProjectsJobsUpdateRequest) input message
@@ -384,7 +385,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def GetConfig(self, request, global_params=None):
-      """Get encoded debug configuration for component. Not cacheable.
+      r"""Get encoded debug configuration for component. Not cacheable.
 
       Args:
         request: (DataflowProjectsLocationsJobsDebugGetConfigRequest) input message
@@ -410,7 +411,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def SendCapture(self, request, global_params=None):
-      """Send encoded debug capture data for component.
+      r"""Send encoded debug capture data for component.
 
       Args:
         request: (DataflowProjectsLocationsJobsDebugSendCaptureRequest) input message
@@ -446,7 +447,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def List(self, request, global_params=None):
-      """Request the job status.
+      r"""Request the job status.
 
       Args:
         request: (DataflowProjectsLocationsJobsMessagesListRequest) input message
@@ -482,7 +483,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def Lease(self, request, global_params=None):
-      """Leases a dataflow WorkItem to run.
+      r"""Leases a dataflow WorkItem to run.
 
       Args:
         request: (DataflowProjectsLocationsJobsWorkItemsLeaseRequest) input message
@@ -508,7 +509,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def ReportStatus(self, request, global_params=None):
-      """Reports the status of dataflow WorkItems leased by a worker.
+      r"""Reports the status of dataflow WorkItems leased by a worker.
 
       Args:
         request: (DataflowProjectsLocationsJobsWorkItemsReportStatusRequest) input message
@@ -544,7 +545,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      """Creates a Cloud Dataflow job.
+      r"""Creates a Cloud Dataflow job.
 
       Args:
         request: (DataflowProjectsLocationsJobsCreateRequest) input message
@@ -570,7 +571,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      """Gets the state of the specified Cloud Dataflow job.
+      r"""Gets the state of the specified Cloud Dataflow job.
 
       Args:
         request: (DataflowProjectsLocationsJobsGetRequest) input message
@@ -596,7 +597,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def GetMetrics(self, request, global_params=None):
-      """Request the job status.
+      r"""Request the job status.
 
       Args:
         request: (DataflowProjectsLocationsJobsGetMetricsRequest) input message
@@ -622,7 +623,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      """List the jobs of a project in a given region.
+      r"""List the jobs of a project in a given region.
 
       Args:
         request: (DataflowProjectsLocationsJobsListRequest) input message
@@ -648,7 +649,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Update(self, request, global_params=None):
-      """Updates the state of an existing Cloud Dataflow job.
+      r"""Updates the state of an existing Cloud Dataflow job.
 
       Args:
         request: (DataflowProjectsLocationsJobsUpdateRequest) input message
@@ -684,7 +685,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      """Creates a Cloud Dataflow job from a template.
+      r"""Creates a Cloud Dataflow job from a template.
 
       Args:
         request: (DataflowProjectsLocationsTemplatesCreateRequest) input message
@@ -710,7 +711,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      """Get the template associated with a template.
+      r"""Get the template associated with a template.
 
       Args:
         request: (DataflowProjectsLocationsTemplatesGetRequest) input message
@@ -736,7 +737,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Launch(self, request, global_params=None):
-      """Launch a template.
+      r"""Launch a template.
 
       Args:
         request: (DataflowProjectsLocationsTemplatesLaunchRequest) input message
@@ -772,7 +773,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def WorkerMessages(self, request, global_params=None):
-      """Send a worker_message to the service.
+      r"""Send a worker_message to the service.
 
       Args:
         request: (DataflowProjectsLocationsWorkerMessagesRequest) input message
@@ -808,7 +809,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      """Creates a Cloud Dataflow job from a template.
+      r"""Creates a Cloud Dataflow job from a template.
 
       Args:
         request: (DataflowProjectsTemplatesCreateRequest) input message
@@ -834,7 +835,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      """Get the template associated with a template.
+      r"""Get the template associated with a template.
 
       Args:
         request: (DataflowProjectsTemplatesGetRequest) input message
@@ -860,7 +861,7 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def Launch(self, request, global_params=None):
-      """Launch a template.
+      r"""Launch a template.
 
       Args:
         request: (DataflowProjectsTemplatesLaunchRequest) input message
@@ -896,7 +897,7 @@ class DataflowV1b3(base_api.BaseApiClient):
           }
 
     def WorkerMessages(self, request, global_params=None):
-      """Send a worker_message to the service.
+      r"""Send a worker_message to the service.
 
       Args:
         request: (DataflowProjectsWorkerMessagesRequest) input message

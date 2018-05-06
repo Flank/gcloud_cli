@@ -13,6 +13,8 @@
 # limitations under the License.
 """Command to describe SSL policies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute.ssl_policies import ssl_policies_utils
 from googlecloudsdk.calliope import base
@@ -23,7 +25,6 @@ from googlecloudsdk.command_lib.compute.ssl_policies import flags
 _SSL_POLICY_ARG = flags.GetSslPolicyArgument()
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Describe(base.DescribeCommand):
   """Describe a Google Compute Engine ssl policy.
 

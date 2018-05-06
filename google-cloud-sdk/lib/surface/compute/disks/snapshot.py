@@ -125,14 +125,17 @@ class SnapshotDisks(base.SilentCommand):
       disk_key_or_none = csek_utils.MaybeLookupKeyMessage(
           csek_keys, disk_ref, client)
 
+      snapshot_message = messages.Snapshot(
+          name=snapshot_ref.Name(), description=args.description,
+          sourceDiskEncryptionKey=disk_key_or_none)
+      if (hasattr(args, 'storage_location') and
+          args.IsSpecified('storage_location')):
+        snapshot_message.storageLocations = [args.storage_location]
+
       if disk_ref.Collection() == 'compute.disks':
         request = messages.ComputeDisksCreateSnapshotRequest(
             disk=disk_ref.Name(),
-            snapshot=messages.Snapshot(
-                name=snapshot_ref.Name(),
-                description=args.description,
-                sourceDiskEncryptionKey=disk_key_or_none
-            ),
+            snapshot=snapshot_message,
             project=disk_ref.project,
             zone=disk_ref.zone,
             guestFlush=args.guest_flush)
@@ -140,14 +143,11 @@ class SnapshotDisks(base.SilentCommand):
       elif disk_ref.Collection() == 'compute.regionDisks':
         request = messages.ComputeRegionDisksCreateSnapshotRequest(
             disk=disk_ref.Name(),
-            snapshot=messages.Snapshot(
-                name=snapshot_ref.Name(),
-                description=args.description,
-                sourceDiskEncryptionKey=disk_key_or_none
-            ),
+            snapshot=snapshot_message,
             project=disk_ref.project,
-            region=disk_ref.region,
-            guestFlush=args.guest_flush)
+            region=disk_ref.region)
+        if hasattr(request, 'guestFlush'):
+          request.guestFlush = args.guest_flush
         requests.append((client.regionDisks, 'CreateSnapshot', request))
 
     errors_to_collect = []
@@ -185,7 +185,8 @@ class SnapshotDisksBeta(SnapshotDisks):
 
   @staticmethod
   def Args(parser):
-    SnapshotDisks.disks_arg = disks_flags.MakeDiskArg(plural=True)
+    SnapshotDisks.disks_arg = disks_flags.MakeDiskArgZonalOrRegional(
+        plural=True)
     _CommonArgs(parser)
 
 
@@ -197,8 +198,8 @@ class SnapshotDisksAlpha(SnapshotDisks):
   def Args(parser):
     SnapshotDisks.disks_arg = disks_flags.MakeDiskArgZonalOrRegional(
         plural=True)
+    flags.AddStorageLocationFlag(parser, 'snapshot')
     _CommonArgs(parser)
 
 
 SnapshotDisks.detailed_help = DETAILED_HELP
-SnapshotDisksBeta.detailed_help = DETAILED_HELP

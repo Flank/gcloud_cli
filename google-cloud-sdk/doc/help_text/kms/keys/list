@@ -57,7 +57,8 @@ EXAMPLES
         $ gcloud kms keys list --keyring fellowship --location global
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys list
         $ gcloud beta kms keys list
 

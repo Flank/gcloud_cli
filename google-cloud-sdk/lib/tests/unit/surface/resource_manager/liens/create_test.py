@@ -73,7 +73,7 @@ class LiensCreateTest(testbase.LiensUnitTestBase):
         'resourcemanager.projects.delete'
     ]
     regex = (r'The required property \[project\] is not currently set')
-    with self.assertRaisesRegexp(properties.RequiredPropertyError, regex):
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
       self.RunLiens('create', *args)
 
   def testCreateLienFails400(self):

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
@@ -21,7 +23,7 @@ from tests.lib.surface.bigtable import base
 class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.cmd = 'instances list'
+    self.cmd = 'bigtable instances list'
     self.svc = self.client.projects_instances.List
     self.msg = self.msgs.BigtableadminProjectsInstancesListRequest(
         parent='projects/' + self.Project())
@@ -33,13 +35,13 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
             name='projects/theprojects/instances/theinstance',
             displayName='thedisplayname',
             state=self.msgs.Instance.StateValueValuesEnum.READY)]))
-    self.RunBT(self.cmd)
+    self.Run(self.cmd)
     self.AssertOutputEquals('NAME         DISPLAY_NAME    STATE\n'
                             'theinstance  thedisplayname  READY\n')
 
   def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.msg):
-      self.RunBT(self.cmd)
+      self.Run(self.cmd)
 
   def testCompletion(self):
     self.svc.Expect(

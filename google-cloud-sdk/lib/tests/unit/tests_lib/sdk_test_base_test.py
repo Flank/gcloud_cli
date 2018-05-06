@@ -49,7 +49,7 @@ class TestRetryDecorator(sdk_test_base.WithOutputCapture):
     self.ThrowValueErrorsThenReturn('a', max_exceptions=2)
 
   def testRetryDefaultThrowValueError(self):
-    with self.assertRaisesRegexp(ValueError, '\'a\', 3'):
+    with self.assertRaisesRegex(ValueError, '\'a\', 3'):
       self.RetryDefaultThrowValueError('a')
 
     self.AssertErrContains('WARNING: Test failure, but will be retried.')
@@ -59,7 +59,7 @@ class TestRetryDecorator(sdk_test_base.WithOutputCapture):
     self.AssertErrNotContains('ValueError: (\'a\', 4)')
 
   def testRetryThrowValueErrorFiveTimes(self):
-    with self.assertRaisesRegexp(ValueError, '\'a\', 5'):
+    with self.assertRaisesRegex(ValueError, '\'a\', 5'):
       self.RetryThrowValueErrorFiveTimes('a')
 
   def testWhy(self):
@@ -73,8 +73,8 @@ class TestRetryDecorator(sdk_test_base.WithOutputCapture):
     self.AssertErrContains(explanation)
 
   def testNoDecorateWithZeroTimes(self):
-    with self.assertRaisesRegexp(ValueError,
-                                 r'Retry requires max_retrials >= 1'):
+    with self.assertRaisesRegex(ValueError,
+                                r'Retry requires max_retrials >= 1'):
       @sdk_test_base.Retry(max_retrials=0)
       def unused_foo(x):
         return x

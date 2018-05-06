@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import unicode_literals
 import os
 import socket
 import threading
@@ -44,7 +45,8 @@ class AuthReferenceServer(threading.Thread):
     else:
       self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    os.environ[devshell.DEVSHELL_ENV] = str(self.port)
+    os.environ[devshell.DEVSHELL_ENV] = 'True'
+    os.environ[devshell.DEVSHELL_CLIENT_PORT] = str(self.port)
     os.environ[devshell.DEVSHELL_ENV_IPV6_ENABLED] = str(self.port)
     self._socket.bind(('localhost', self.port))
     self._socket.listen(0)
@@ -56,6 +58,7 @@ class AuthReferenceServer(threading.Thread):
 
   def Stop(self):
     del os.environ[devshell.DEVSHELL_ENV]
+    del os.environ[devshell.DEVSHELL_CLIENT_PORT]
     del os.environ[devshell.DEVSHELL_ENV_IPV6_ENABLED]
     self._socket.close()
 
@@ -66,8 +69,7 @@ class AuthReferenceServer(threading.Thread):
         try:
           self._socket.settimeout(15)
           s, unused_addr = self._socket.accept()
-          resp_buffer = ''
-          resp_1 = s.recv(6)
+          resp_1 = s.recv(6).decode('utf8')
           if '\n' not in resp_1:
             raise Exception('invalid request data')
           nstr, extra = resp_1.split('\n', 1)
@@ -75,12 +77,12 @@ class AuthReferenceServer(threading.Thread):
           n = int(nstr)
           to_read = n-len(extra)
           if to_read > 0:
-            resp_buffer += s.recv(to_read, socket.MSG_WAITALL)
+            resp_buffer += s.recv(to_read, socket.MSG_WAITALL).decode('utf8')
           if resp_buffer != '[]':
             raise Exception('bad request')
           msg = devshell.MessageToJSON(self.response)
           l = len(msg)
-          s.sendall('%d\n%s' % (l, msg))
+          s.sendall(('%d\n%s' % (l, msg)).encode('utf8'))
         finally:
           if s:
             s.close()

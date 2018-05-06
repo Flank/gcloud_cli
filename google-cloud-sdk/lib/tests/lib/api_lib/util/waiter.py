@@ -14,6 +14,8 @@
 
 """Test support for methods which utilizes waiter module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
 from googlecloudsdk.api_lib.util import waiter
@@ -22,6 +24,8 @@ from googlecloudsdk.core.console import progress_tracker
 from googlecloudsdk.core.util import retry
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class Base(sdk_test_base.WithOutputCapture):
@@ -61,7 +65,7 @@ class CloudOperationsBase(Base):
             ],
         ),
     )
-    for _ in xrange(retries):
+    for _ in range(retries):
       if error_msg:
         response.error = operation_service.client.MESSAGES_MODULE.Status(
             code=1, message=error_msg)

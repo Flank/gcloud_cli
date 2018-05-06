@@ -75,7 +75,7 @@ class PrivateFilesTest(test_case.Base):
       with file_utils.OpenForWritingPrivate(private_path, binary=True) as f:
         f.write('\nhello\n')
       with open(private_path, 'rb') as f:
-        self.assertEquals(b'\nhello\n', f.read())
+        self.assertEqual(b'\nhello\n', f.read())
 
   @test_case.Filters.RunOnlyOnWindows
   def testMakePrivateFile_Text(self):
@@ -84,7 +84,7 @@ class PrivateFilesTest(test_case.Base):
       with file_utils.OpenForWritingPrivate(private_path, binary=False) as f:
         f.write('\nhello\n')
       with open(private_path, 'rb') as f:
-        self.assertEquals(b'\r\nhello\r\n', f.read())
+        self.assertEqual(b'\r\nhello\r\n', f.read())
 
 
 def _ChmodRecursive(root, mode):
@@ -225,7 +225,7 @@ class TemporaryDirectoryTest(test_case.Base):
     self.assertFalse(os.path.exists(t))
 
   def testWithCleanupException(self):
-    with self.assertRaisesRegexp(ValueError, 'Close Error'):
+    with self.assertRaisesRegex(ValueError, 'Close Error'):
       tmp_dir = file_utils.TemporaryDirectory()
       with tmp_dir as t:
         close_mock = self.StartObjectPatch(tmp_dir, 'Close')
@@ -234,7 +234,7 @@ class TemporaryDirectoryTest(test_case.Base):
     file_utils.RmTree(t)
 
   def testWithCleanupExceptionWhileAnotherException(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         RuntimeError,
         re.escape('ValueError: Close Error\n'
                   'while another exception was active '
@@ -310,7 +310,7 @@ class MakeDirTest(test_case.Base):
   def testMakeDirFileExists(self):
     filepath = os.path.join(self.temp_dir.path, 'file')
     self.Touch(self.temp_dir.path, 'file')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         file_utils.Error,
         re.escape(('Could not create directory [{0}]: A file exists at that '
                    'location.\n\n').format(filepath))):
@@ -322,7 +322,7 @@ class MakeDirTest(test_case.Base):
   def testMakeDirBadPermissions(self):
     os.chmod(self.temp_dir.path, stat.S_IREAD)
     try:
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           file_utils.Error,
           re.escape(('Could not create directory [{0}]: Permission denied.\n\n'
                      'Please verify that you have permissions to write to the '
@@ -403,7 +403,7 @@ class WritePermissionsTest(test_case.Base):
         self.assertFalse(file_utils.HasWriteAccessInDir(t))
       finally:
         os.chmod(t, 0o755)
-    with self.assertRaisesRegexp(ValueError, 'is not a directory'):
+    with self.assertRaisesRegex(ValueError, 'is not a directory'):
       file_utils.HasWriteAccessInDir(self.RandomFileName())
 
 
@@ -649,13 +649,13 @@ class SearchOnPathTests(test_case.Base):
 
       path_both = os.pathsep.join([dir1, dir2])
 
-      self.assertEquals([filea1],
-                        file_utils.SearchForExecutableOnPath('filea', dir1))
-      self.assertEquals([], file_utils.SearchForExecutableOnPath('fileb', dir2))
-      self.assertEquals(
+      self.assertEqual([filea1],
+                       file_utils.SearchForExecutableOnPath('filea', dir1))
+      self.assertEqual([], file_utils.SearchForExecutableOnPath('fileb', dir2))
+      self.assertEqual(
           [filea1, filea2],
           file_utils.SearchForExecutableOnPath('filea', path_both))
-      self.assertEquals(
+      self.assertEqual(
           [fileb1],
           file_utils.SearchForExecutableOnPath('fileb', path_both))
 
@@ -686,7 +686,7 @@ class FindOnPathTests(test_case.Base):
 
   def testSingleFile(self):
     file_path = self.Populate(['foo'], True)
-    self.assertEquals(
+    self.assertEqual(
         file_path,
         file_utils.FindExecutableOnPath(file_path, path='.', pathext=('',)))
 
@@ -696,22 +696,22 @@ class FindOnPathTests(test_case.Base):
     self.Populate(['bin', 'foo'], True)
     self.Populate(['bin', 'bar'], True)
     self.Populate(['sbin', 'foo'], True)
-    self.assertEquals(
+    self.assertEqual(
         os.path.join('sbin', 'foo'),
         file_utils.FindExecutableOnPath(
             'foo', path=os.pathsep.join(['sbin', 'bin']), pathext=('',)))
-    self.assertEquals(
+    self.assertEqual(
         os.path.join('bin', 'bar'),
         file_utils.FindExecutableOnPath(
             'bar', path=os.pathsep.join(['sbin', 'bin']), pathext=('',)))
     self.StartEnvPatch({'PATH': os.pathsep.join(['sbin', 'bin'])})
-    self.assertEquals(
+    self.assertEqual(
         os.path.join('sbin', 'foo'),
         file_utils.FindExecutableOnPath('foo', pathext=('',)))
 
   def testSinglePathExt(self):
     self.Populate(['foo.exe'], True)
-    self.assertEquals(
+    self.assertEqual(
         'foo.exe',
         file_utils.FindExecutableOnPath('foo', path='.', pathext=('.exe',)))
     self.assertIsNone(
@@ -722,11 +722,11 @@ class FindOnPathTests(test_case.Base):
     self.Populate(['foo.exe'], True)
     self.Populate(['foo.bat'], True)
     self.Populate(['foo.exe.bat'], True)
-    self.assertEquals(
+    self.assertEqual(
         'foo',
         file_utils.FindExecutableOnPath(
             'foo', path='.', pathext=('', '.exe', '.bat')))
-    self.assertEquals(
+    self.assertEqual(
         'foo.bat',
         file_utils.FindExecutableOnPath(
             'foo', path='.', pathext=('.bat', '.exe', '')))
@@ -740,10 +740,10 @@ class FindOnPathTests(test_case.Base):
     self.StartObjectPatch(
         platforms.OperatingSystem, 'Current',
         return_value=platforms.OperatingSystem.WINDOWS)
-    self.assertEquals(
+    self.assertEqual(
         'foo.exe',
         file_utils.FindExecutableOnPath('foo', path='.'))
-    self.assertEquals(
+    self.assertEqual(
         'bar.cmd',
         file_utils.FindExecutableOnPath('bar', path='.'))
 
@@ -756,10 +756,10 @@ class FindOnPathTests(test_case.Base):
     self.StartObjectPatch(
         platforms.OperatingSystem, 'Current',
         return_value=platforms.OperatingSystem.LINUX)
-    self.assertEquals(
+    self.assertEqual(
         'foo',
         file_utils.FindExecutableOnPath('foo', path='.'))
-    self.assertEquals(
+    self.assertEqual(
         'bar.sh',
         file_utils.FindExecutableOnPath('bar', path='.'))
 
@@ -770,7 +770,7 @@ class FindOnPathTests(test_case.Base):
     self.assertIsNone(
         file_utils.FindExecutableOnPath('foo', path='.', pathext=('',)))
     self.Populate(['foo'], True)
-    self.assertEquals(
+    self.assertEqual(
         'foo',
         file_utils.FindExecutableOnPath('foo', path='.', pathext=('',)))
 
@@ -779,7 +779,7 @@ class FindOnPathTests(test_case.Base):
     os.mkdir('home')
     self.Populate(['usr', 'foo.ext1'], True)
     self.Populate(['home', 'foo.ext2'], True)
-    self.assertEquals(
+    self.assertEqual(
         os.path.join('usr', 'foo.ext1'),
         file_utils.FindExecutableOnPath(
             'foo',
@@ -791,7 +791,7 @@ class FindOnPathTests(test_case.Base):
     os.mkdir('home')
     self.Populate(['program files', 'foo.ext1'], True)
     self.Populate(['home', 'foo.ext2'], True)
-    self.assertEquals(
+    self.assertEqual(
         os.path.join('program files', 'foo.ext1'),
         file_utils.FindExecutableOnPath(
             'foo',
@@ -799,15 +799,15 @@ class FindOnPathTests(test_case.Base):
             pathext=('.ext1', '.ext2')))
 
   def testNoExtensionInExecutableArg(self):
-    with self.assertRaisesRegexp(ValueError, r'must not have an extension'):
+    with self.assertRaisesRegex(ValueError, r'must not have an extension'):
       file_utils.FindExecutableOnPath('foo.exe')
 
   def testNoPathInExecutableArg(self):
-    with self.assertRaisesRegexp(ValueError, r'must not have a path'):
+    with self.assertRaisesRegex(ValueError, r'must not have a path'):
       file_utils.FindExecutableOnPath('bin/foo')
 
   def testNoStringAsPathextArg(self):
-    with self.assertRaisesRegexp(ValueError, r'got a string'):
+    with self.assertRaisesRegex(ValueError, r'got a string'):
       file_utils.FindExecutableOnPath('foo', pathext='x')
 
 
@@ -1104,7 +1104,7 @@ class FileInBinaryModeTest(test_case.Base):
     with open(filename, 'r') as f:
       # ...but _FileInBinaryMode should prevent them.
       with file_utils._FileInBinaryMode(f):
-        self.assertEquals(f.read(), contents)
+        self.assertEqual(f.read(), contents)
 
   def testWriting(self):
     contents = b'foo\nbar\r\nbaz\r\r'
@@ -1120,7 +1120,7 @@ class FileInBinaryModeTest(test_case.Base):
         f.flush()
 
     with open(filename, 'rb') as f:
-      self.assertEquals(f.read(), contents)
+      self.assertEqual(f.read(), contents)
 
   @test_case.Filters.RunOnlyOnWindows('Testing platform-specific syscalls')
   def testCleanupOnWindows(self):
@@ -1131,17 +1131,17 @@ class FileInBinaryModeTest(test_case.Base):
     with open(filename, 'r') as f:
       # The _setmode syscall returns the previous mode. Use this to verify that
       # f is in text mode.
-      self.assertEquals(msvcrt.setmode(f.fileno(), os.O_TEXT), os.O_TEXT)
+      self.assertEqual(msvcrt.setmode(f.fileno(), os.O_TEXT), os.O_TEXT)
       with file_utils._FileInBinaryMode(f):
-        self.assertEquals(msvcrt.setmode(f.fileno(), os.O_BINARY), os.O_BINARY)
+        self.assertEqual(msvcrt.setmode(f.fileno(), os.O_BINARY), os.O_BINARY)
       # verify the mode is reverted outside of _FileInBinaryMode.
-      self.assertEquals(msvcrt.setmode(f.fileno(), os.O_TEXT), os.O_TEXT)
+      self.assertEqual(msvcrt.setmode(f.fileno(), os.O_TEXT), os.O_TEXT)
 
   def testStringIO(self):
     contents = 'foo\nbar\r\nbaz\r\r'
     s = io.StringIO(contents)
     with file_utils._FileInBinaryMode(s):
-      self.assertEquals(s.read(), contents)
+      self.assertEqual(s.read(), contents)
 
 
 class GetFileContentsTest(test_case.Base):
@@ -1162,7 +1162,7 @@ class GetFileContentsTest(test_case.Base):
     # If read in text mode, this fails on Windows due to EOL marker
     # manipulation. See the 'On Windows...' note in the docs for more info:
     # https://docs.python.org/2/tutorial/inputoutput.html#reading-and-writing-files
-    self.assertEquals(contents, b'foo\nbar\r\nbaz\r\r')
+    self.assertEqual(contents, b'foo\nbar\r\nbaz\r\r')
 
   def testFileNotFound(self):
     filename = 'nonexistent'
@@ -1178,7 +1178,7 @@ class GetFileOrStdinContentsTest(test_case.WithInput):
   def testGetStdinBytes(self):
     console_attr.GetConsoleAttr(encoding='utf-8', reset=True)
     self.WriteInput('ÜñîçòÐé')
-    self.assertEquals(
+    self.assertEqual(
         file_utils.ReadStdinBytes(),
         b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n')
 
@@ -1243,7 +1243,7 @@ class WriteFileOrStdoutContentsTest(test_case.Base,
     contents = b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n'
     path = os.path.join(self.dir.path, self.RandomFileName())
     file_utils.WriteFileContents(path, contents, binary=True)
-    self.assertEquals(file_utils.GetFileContents(path, binary=True), contents)
+    self.assertEqual(file_utils.GetFileContents(path, binary=True), contents)
 
   def testFileWritePrivate(self):
     contents = 'abc123'
@@ -1268,16 +1268,16 @@ class GetTreeSizeBytesTest(test_case.Base):
   def testOneFileSize(self):
     contents = 'abc123'
     self.Touch(self.dir.path, contents=contents)
-    self.assertEquals(len(contents),
-                      file_utils.GetTreeSizeBytes(self.dir.path, None))
+    self.assertEqual(len(contents),
+                     file_utils.GetTreeSizeBytes(self.dir.path, None))
 
   def testTwoFilesSize(self):
     contents1 = 'abc123'
     contents2 = 'def4'
     self.Touch(self.dir.path, contents=contents1)
     self.Touch(self.dir.path, contents=contents2)
-    self.assertEquals(len(contents1) + len(contents2),
-                      file_utils.GetTreeSizeBytes(self.dir.path, None))
+    self.assertEqual(len(contents1) + len(contents2),
+                     file_utils.GetTreeSizeBytes(self.dir.path, None))
 
   def testSizeWithNestedDir(self):
     subdir = os.path.join(self.dir.path, 'subdir')
@@ -1286,8 +1286,8 @@ class GetTreeSizeBytesTest(test_case.Base):
     contents2 = 'def4'
     self.Touch(self.dir.path, contents=contents1)
     self.Touch(subdir, contents=contents2)
-    self.assertEquals(len(contents1) + len(contents2),
-                      file_utils.GetTreeSizeBytes(self.dir.path, None))
+    self.assertEqual(len(contents1) + len(contents2),
+                     file_utils.GetTreeSizeBytes(self.dir.path, None))
 
   def testSizeWithFilter(self):
 
@@ -1301,7 +1301,7 @@ class GetTreeSizeBytesTest(test_case.Base):
     self.Touch(self.dir.path, contents=contents1)
     self.Touch(subdir, contents=contents2)
 
-    self.assertEquals(
+    self.assertEqual(
         len(contents1),
         file_utils.GetTreeSizeBytes(self.dir.path, RegexPredicate))
 
@@ -1326,19 +1326,19 @@ class WriteFileAtomicallyTest(test_case.Base, test_case.WithOutputCapture):
     self.AssertFileEquals('', path)
 
   def testWriteMissingContentsError(self):
-    with self.assertRaisesRegexp(ValueError,
-                                 r'Empty file_name \[/fake/path\] '
-                                 r'or contents \[None\].'):
+    with self.assertRaisesRegex(ValueError,
+                                r'Empty file_name \[/fake/path\] '
+                                r'or contents \[None\].'):
       file_utils.WriteFileAtomically('/fake/path', None)
 
   def testWriteBadFilenameError(self):
-    with self.assertRaisesRegexp(ValueError,
-                                 r'Empty file_name \[None\] '
-                                 r'or contents \[\].'):
+    with self.assertRaisesRegex(ValueError,
+                                r'Empty file_name \[None\] '
+                                r'or contents \[\].'):
       file_utils.WriteFileAtomically(None, '')
 
   def testWriteBadContentsError(self):
-    with self.assertRaisesRegexp(TypeError, r'Invalid contents \[\{\}\].'):
+    with self.assertRaisesRegex(TypeError, r'Invalid contents \[\{\}\].'):
       file_utils.WriteFileAtomically('/fake/path', {})
 
   def testDirDoesNotExistSucceeds(self):

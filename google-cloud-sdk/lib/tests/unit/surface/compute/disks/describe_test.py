@@ -20,6 +20,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import cli_test_base
 from tests.lib import completer_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -80,16 +81,20 @@ class CompletionTest(test_base.BaseTest, completer_test_base.CompleterBase):
                        ['disk-1', 'disk-2', 'disk-3'])
 
 
+@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
+                          (base.ReleaseTrack.BETA, 'beta'))
 class RegionalDisksDescribeTest(sdk_test_base.WithFakeAuth,
-                                cli_test_base.CliTestBase):
+                                cli_test_base.CliTestBase,
+                                parameterized.TestCase):
 
-  def SetUp(self):
-    self.mock_client = SetUpMockClient('alpha')
+  def _SetUp(self, track, api_version):
+    self.mock_client = SetUpMockClient(api_version)
     self.addCleanup(self.mock_client.Unmock)
-    self.messages = core_apis.GetMessagesModule('compute', 'alpha')
-    self.track = base.ReleaseTrack.ALPHA
+    self.messages = core_apis.GetMessagesModule('compute', api_version)
+    self.track = track
 
-  def testSimpleCase(self):
+  def testSimpleCase(self, track, api_version):
+    self._SetUp(track, api_version)
     self.mock_client.regionDisks.Get.Expect(
         self.messages.ComputeRegionDisksGetRequest(
             disk='my-disk',

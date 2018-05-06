@@ -78,7 +78,7 @@ class PropertiesTests(sdk_test_base.SdkBase):
     regex = (r'The \[account\] value \[asdf\] is not valid. '
              r'Possible values: \[true, 1, on, yes, y, false, 0, off, no, n, '
              r'\'\', none\]. \(See http://yaml.org/type/bool.html\)')
-    with self.assertRaisesRegexp(properties.InvalidValueError, regex):
+    with self.assertRaisesRegex(properties.InvalidValueError, regex):
       prop.GetBool()
     self.assertEqual(False, prop.GetBool(validate=False))
 
@@ -116,19 +116,19 @@ class PropertiesTests(sdk_test_base.SdkBase):
     self.assertEqual(None, prop.GetBool(validate=True))
 
     # Make sure defaults work.
-    self.assertEquals(
+    self.assertEqual(
         True, properties.VALUES.core.pass_credentials_to_gsutil.GetBool())
     properties.VALUES.core.pass_credentials_to_gsutil.Set(False)
-    self.assertEquals(
+    self.assertEqual(
         False, properties.VALUES.core.pass_credentials_to_gsutil.GetBool())
-    self.assertEquals(
+    self.assertEqual(
         True, properties.VALUES.core.pass_credentials_to_gsutil.default)
     temp_prop = properties._Property('temp_section', 'temp_prop',
                                      default='asdf')
     regex = (r'The \[temp_prop\] value \[asdf\] is not valid. '
              r'Possible values: \[true, 1, on, yes, y, false, 0, off, no, n, '
              r'\'\', none\]. \(See http://yaml.org/type/bool.html\)')
-    with self.assertRaisesRegexp(properties.InvalidValueError, regex):
+    with self.assertRaisesRegex(properties.InvalidValueError, regex):
       temp_prop.GetBool()
     self.assertEqual(False, temp_prop.GetBool(validate=False))
 
@@ -149,17 +149,17 @@ class PropertiesTests(sdk_test_base.SdkBase):
 
   def testCoreBooleanPropertyGetRequired(self):
     prop = properties.VALUES.core.log_http
-    self.assertEquals('False', prop.Get(required=True))
+    self.assertEqual('False', prop.Get(required=True))
 
   def testCoreBooleanPropertyGetBoolRequired(self):
     prop = properties.VALUES.core.log_http
-    self.assertEquals(False, prop.GetBool(required=True))
+    self.assertEqual(False, prop.GetBool(required=True))
 
   def testCoreBooleanPropertyGetIntRequired(self):
     regex = (r'The property \[core.log_http\] must have an integer value: '
              r'\[False\]')
     prop = properties.VALUES.core.log_http
-    with self.assertRaisesRegexp(properties.InvalidValueError, regex):
+    with self.assertRaisesRegex(properties.InvalidValueError, regex):
       prop.GetInt(required=True)
 
   def testNonCoreBooleanPropertyGetRequired(self):
@@ -168,7 +168,7 @@ class PropertiesTests(sdk_test_base.SdkBase):
              r'.*or it can be set temporarily by the environment variable '
              r'\[CLOUDSDK_COMPONENT_MANAGER_SNAPSHOT_URL\]$')
     prop = properties.VALUES.component_manager.snapshot_url
-    with self.assertRaisesRegexp(properties.RequiredPropertyError, regex):
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
       prop.Get(required=True)
 
   def testNonCoreBooleanPropertyGetBoolRequired(self):
@@ -177,7 +177,7 @@ class PropertiesTests(sdk_test_base.SdkBase):
              r'.*or it can be set temporarily by the environment variable '
              r'\[CLOUDSDK_COMPONENT_MANAGER_SNAPSHOT_URL\]$')
     prop = properties.VALUES.component_manager.snapshot_url
-    with self.assertRaisesRegexp(properties.RequiredPropertyError, regex):
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
       prop.GetBool(required=True)
 
   def testNonCoreBooleanPropertyGetIntRequired(self):
@@ -186,22 +186,22 @@ class PropertiesTests(sdk_test_base.SdkBase):
              r'.*or it can be set temporarily by the environment variable '
              r'\[CLOUDSDK_COMPONENT_MANAGER_SNAPSHOT_URL\]$')
     prop = properties.VALUES.component_manager.snapshot_url
-    with self.assertRaisesRegexp(properties.RequiredPropertyError, regex):
+    with self.assertRaisesRegex(properties.RequiredPropertyError, regex):
       prop.GetInt(required=True)
 
   def testHiddenBooleanPropertyGetRequired(self):
     prop = properties.VALUES.app.promote_by_default
-    self.assertEquals('True', prop.Get(required=True))
+    self.assertEqual('True', prop.Get(required=True))
 
   def testHiddenBooleanPropertyGetBoolRequired(self):
     prop = properties.VALUES.app.promote_by_default
-    self.assertEquals(True, prop.GetBool(required=True))
+    self.assertEqual(True, prop.GetBool(required=True))
 
   def testHiddenBooleanPropertyGetIntRequired(self):
     regex = (r'The property \[app.promote_by_default\] must have an integer '
              r'value: \[True\]')
     prop = properties.VALUES.app.promote_by_default
-    with self.assertRaisesRegexp(properties.InvalidValueError, regex):
+    with self.assertRaisesRegex(properties.InvalidValueError, regex):
       prop.GetInt(required=True)
 
   def testHiddenSections(self):
@@ -220,7 +220,7 @@ class PropertiesTests(sdk_test_base.SdkBase):
     self.assertTrue('account' not in all_values['core'])
 
     properties.VALUES.core.account.Set('asdf')
-    self.assertEquals('asdf', properties.VALUES.AllValues()['core']['account'])
+    self.assertEqual('asdf', properties.VALUES.AllValues()['core']['account'])
     all_values = properties.VALUES.AllValues(list_unset=True)
     self.assertTrue(len(all_values) > 1)
     self.assertTrue(len(all_values['core']) > 2)
@@ -264,19 +264,19 @@ class PropertiesTests(sdk_test_base.SdkBase):
     self.assertTrue('snapshot_url' in all_names)
 
   def testArgs(self):
-    self.assertEquals(properties.VALUES.core.project.Get(), None)
+    self.assertEqual(properties.VALUES.core.project.Get(), None)
     properties.VALUES.PushInvocationValues()
     properties.VALUES.SetInvocationValue(
         properties.VALUES.core.project, 'x1', '--project')
-    self.assertEquals(properties.VALUES.core.project.Get(), 'x1')
+    self.assertEqual(properties.VALUES.core.project.Get(), 'x1')
     properties.VALUES.PushInvocationValues()
     properties.VALUES.SetInvocationValue(
         properties.VALUES.core.project, 'x2', '--project')
-    self.assertEquals(properties.VALUES.core.project.Get(), 'x2')
+    self.assertEqual(properties.VALUES.core.project.Get(), 'x2')
     properties.VALUES.PopInvocationValues()
-    self.assertEquals(properties.VALUES.core.project.Get(), 'x1')
+    self.assertEqual(properties.VALUES.core.project.Get(), 'x1')
     properties.VALUES.PopInvocationValues()
-    self.assertEquals(properties.VALUES.core.project.Get(), None)
+    self.assertEqual(properties.VALUES.core.project.Get(), None)
 
   def testAddRemoveCallback(self):
     self.assertIsNone(properties.VALUES.core.project.Get())
@@ -322,8 +322,8 @@ class PropertyFileTests(sdk_test_base.WithOutputCapture):
     properties.PersistProperty(prop, 'magic_value')
 
     # Now after persist we are upgraded to use named configuration.
-    self.assertEquals('default',
-                      named_configs.ConfigurationStore.ActiveConfig().name)
+    self.assertEqual('default',
+                     named_configs.ConfigurationStore.ActiveConfig().name)
 
   def testPersistScopes(self):
     self.StartPropertyPatch(config.Paths, 'sdk_root',
@@ -355,7 +355,7 @@ class PropertyFileTests(sdk_test_base.WithOutputCapture):
       # from Python.
       try:
         os.chmod(self.temp_path, 0o400)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             exceptions.RequiresAdminRightsError,
             'you do not have permission to modify the Google Cloud SDK '
             'installation directory'):
@@ -435,7 +435,7 @@ class PropertyValidatorTests(sdk_test_base.SdkBase, parameterized.TestCase):
         'I am text.'),
   )
   def testInvalidProject(self, exception, message, project_id):
-    with self.assertRaisesRegexp(exception, message):
+    with self.assertRaisesRegex(exception, message):
       properties.PersistProperty(properties.VALUES.core.project, project_id)
 
   def testValidEndpointOverride(self):
@@ -453,7 +453,7 @@ class PropertyValidatorTests(sdk_test_base.SdkBase, parameterized.TestCase):
         'https://',  # empty url
     ]
     for url in invalid_urls:
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           properties.InvalidValueError,
           r'The endpoint_overrides property must be an absolute URI beginning '
           r"with http:// or https:// and ending with a trailing '/'. "
@@ -474,13 +474,13 @@ class PropertyValidatorTests(sdk_test_base.SdkBase, parameterized.TestCase):
     regex = (r'The \[disable_prompts\] value \[str\] is not valid. '
              r'Possible values: \[true, 1, on, yes, y, false, 0, off, no, n, '
              r'\'\', none\]. \(See http://yaml.org/type/bool.html\)')
-    with self.assertRaisesRegexp(properties.InvalidValueError, regex):
+    with self.assertRaisesRegex(properties.InvalidValueError, regex):
       properties.PersistProperty(properties.VALUES.core.disable_prompts, 'str')
 
   def testBadTimeouts(self):
     """Test properties.CloudBuildTimeoutValidator."""
     dur_regexp = (r'could not convert string to float')
-    with self.assertRaisesRegexp(times.DurationSyntaxError, dur_regexp):
+    with self.assertRaisesRegex(times.DurationSyntaxError, dur_regexp):
       properties.VALUES.app.cloud_build_timeout.Set('x1123')
 
   def testGoodTimeouts(self):

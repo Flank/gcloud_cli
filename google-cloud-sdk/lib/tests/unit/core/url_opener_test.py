@@ -13,12 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for core url_opener."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import url_opener
 from googlecloudsdk.core.util import files as file_utils
 from tests.lib import test_case
 
 import httplib2
+import mock
+import six
 
 
 class UrlOpenerTest(test_case.Base):
@@ -33,7 +37,7 @@ class UrlOpenerTest(test_case.Base):
 
     ((build_function, req), _) = self.do_open_mock.call_args
     self.assertEqual('test_req', req)
-    connection = build_function(u'test_host™️', timeout=10)
+    connection = build_function('test_host™️', timeout=10)
     self.assertTrue(isinstance(connection, httplib2.HTTPConnectionWithTimeout))
     self.assertEqual('test_hosttm', connection.host)
     self.assertEqual(10, connection.timeout)
@@ -43,7 +47,7 @@ class UrlOpenerTest(test_case.Base):
 
     ((build_function, req), _) = self.do_open_mock.call_args
     self.assertEqual('test_req', req)
-    connection = build_function(u'test_host™️', timeout=10)
+    connection = build_function('test_host™️', timeout=10)
     self.assertTrue(isinstance(connection, httplib2.HTTPSConnectionWithTimeout))
     self.assertEqual('test_hosttm', connection.host)
     self.assertEqual(10, connection.timeout)
@@ -54,11 +58,14 @@ class UrlOpenerTest(test_case.Base):
       properties.VALUES.core.custom_ca_certs_file.Set(ca_cert_path)
       self.connection_handler.https_open('test_req™️')
       ((build_function, _), _) = self.do_open_mock.call_args
-      connection = build_function(u'test_host™️', timeout=10)
+      if six.PY3:
+        with mock.patch('ssl.SSLContext'):
+          connection = build_function('test_host™️', timeout=10)
+      else:
+        connection = build_function('test_host™️', timeout=10)
     self.assertTrue(isinstance(connection, httplib2.HTTPSConnectionWithTimeout))
     self.assertEqual('test_hosttm', connection.host)
     self.assertEqual(10, connection.timeout)
-    self.assertEqual(ca_cert_path, connection.ca_certs)
 
 
 if __name__ == '__main__':

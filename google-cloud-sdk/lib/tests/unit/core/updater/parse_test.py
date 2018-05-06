@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 import json
 import os
 import time
@@ -22,6 +25,8 @@ from googlecloudsdk.core.updater import snapshots
 from googlecloudsdk.core.util import platforms
 from tests.lib import test_case
 from tests.lib.core.updater import util
+import six
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class ParseTests(util.Base):
@@ -29,18 +34,18 @@ class ParseTests(util.Base):
   def CheckEquality(self, first, second):
     """Checks to see if 2 json schemas are equal."""
     self.assertEqual(type(first), type(second),
-                     msg=u'{0} != {1}'.format(first, second))
+                     msg='{0} != {1}'.format(first, second))
     if isinstance(first, list):
       for i in range(len(first)):
         self.CheckEquality(first[i], second[i])
     elif isinstance(first, dict):
-      for key, v1 in first.iteritems():
+      for key, v1 in six.iteritems(first):
         if key in second:
           self.CheckEquality(v1, second[key])
         elif v1:
           # Only fail if the key is not found and the value is not False, or
           # an empty collection.
-          self.fail(u'Key {key}:{val} not in dictionary: {other}'.format(
+          self.fail('Key {key}:{val} not in dictionary: {other}'.format(
               key=key, val=v1, other=second))
     else:
       self.assertEqual(first, second)
@@ -51,22 +56,25 @@ class ParseTests(util.Base):
     self.assertEqual(3, len(snapshot.components))
     self.assertEqual(snapshot.sdk_definition.LastUpdatedString(), '2000/01/01')
 
-    with open(json_file) as input_file:
+    with io.open(json_file, 'rt') as input_file:
       raw_data = json.load(input_file)
 
-    full_url = unicode(self.URLFromFile(os.path.dirname(json_file),
-                                        raw_data['schema_version']['url']))
+    full_url = six.text_type(
+        self.URLFromFile(os.path.dirname(json_file),
+                         raw_data['schema_version']['url']))
     raw_data['schema_version']['url'] = full_url
-    full_notes = unicode(self.URLFromFile(os.path.dirname(json_file),
-                                          raw_data['release_notes_url']))
+    full_notes = six.text_type(
+        self.URLFromFile(os.path.dirname(json_file),
+                         raw_data['release_notes_url']))
     raw_data['release_notes_url'] = full_notes
-    full_source = unicode(self.URLFromFile(os.path.dirname(json_file),
-                                           'someurl'))
+    full_source = six.text_type(
+        self.URLFromFile(os.path.dirname(json_file),
+                         'someurl'))
     raw_data['components'][1]['data']['source'] = full_source
     # Unknown enums turn into None.
     raw_data['components'][1]['platform'] = {
-        'operating_systems': sorted([u'WINDOWS', None]),
-        'architectures': sorted([u'x86', None]),
+        'operating_systems': [None, 'WINDOWS'],
+        'architectures': [None, 'x86'],
     }
     new_data = snapshot.sdk_definition.ToDictionary()
     self.CheckEquality(raw_data, new_data)
@@ -79,19 +87,22 @@ class ParseTests(util.Base):
     with open(json_file) as input_file:
       raw_data = json.load(input_file)
 
-    full_url = unicode(self.URLFromFile(os.path.dirname(json_file),
-                                        raw_data['schema_version']['url']))
+    full_url = six.text_type(
+        self.URLFromFile(os.path.dirname(json_file),
+                         raw_data['schema_version']['url']))
     raw_data['schema_version']['url'] = full_url
-    full_notes = unicode(self.URLFromFile(os.path.dirname(json_file),
-                                          raw_data['release_notes_url']))
+    full_notes = six.text_type(
+        self.URLFromFile(os.path.dirname(json_file),
+                         raw_data['release_notes_url']))
     raw_data['release_notes_url'] = full_notes
-    full_source = unicode(self.URLFromFile(os.path.dirname(json_file),
-                                           'someurl'))
+    full_source = six.text_type(
+        self.URLFromFile(os.path.dirname(json_file),
+                         'someurl'))
     raw_data['components'][1]['data']['source'] = full_source
     # Unknown enums turn into None.
     raw_data['components'][1]['platform'] = {
-        'operating_systems': sorted([u'WINDOWS', None]),
-        'architectures': sorted([u'x86', None]),
+        'operating_systems': [None, 'WINDOWS'],
+        'architectures': [None, 'x86'],
     }
     new_data = snapshot.sdk_definition.ToDictionary()
     self.CheckEquality(raw_data, new_data)
@@ -173,23 +184,23 @@ class ParseTests(util.Base):
       pass
 
     p = schemas.DictionaryParser(BogusClass, {'b': ['c'], 'd': 'e'})
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         schemas.ParseError,
         r'Required field \[a\] not found while parsing \[.*BogusClass.*\]'):
       p.Parse('a', required=True)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         schemas.ParseError,
         r'Did not expect a list for field \[b\] in component '
         r'\[.*BogusClass.*\]'):
       p.Parse('b', required=True)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         schemas.ParseError,
         r'Expected a list for field \[d\] in component \[.*BogusClass.*\]'):
       p.ParseList('d', required=True)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         schemas.ParseError,
         r'Expected a dict for field \[d\] in component \[.*BogusClass.*\]'):
       p.ParseDict('d', required=True)

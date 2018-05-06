@@ -13,6 +13,8 @@
 # limitations under the License.
 """Command for creating target HTTPS proxies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import target_proxies_utils
 from googlecloudsdk.calliope import base
@@ -35,12 +37,14 @@ class CreateGA(base.CreateCommand):
   for routing the requests. The URL map's job is to map URLs to
   backend services which handle the actual requests. The target
   HTTPS proxy also points to at most 10 SSL certificates used for
-  server-side authentication.
+  server-side authentication. The target HTTPS proxy can be associated with
+  at most one SSL policy.
   """
 
   SSL_CERTIFICATES_ARG = None
   TARGET_HTTPS_PROXY_ARG = None
   URL_MAP_ARG = None
+  SSL_POLICY_ARG = None
 
   @classmethod
   def Args(cls, parser):
@@ -57,15 +61,17 @@ class CreateGA(base.CreateCommand):
         proxy_type='HTTPS')
     cls.URL_MAP_ARG.AddArgument(parser)
 
+    cls.SSL_POLICY_ARG = (
+        ssl_policies_flags.GetSslPolicyArgumentForOtherResource(
+            'HTTPS', required=False))
+    cls.SSL_POLICY_ARG.AddArgument(parser)
+
     parser.add_argument(
         '--description',
         help='An optional, textual description for the target HTTPS proxy.')
     parser.display_info.AddCacheUpdater(flags.TargetHttpsProxiesCompleter)
 
-  def _SendRequests(self,
-                    args,
-                    quic_override=None,
-                    ssl_policy_ref=None):
+  def _SendRequests(self, args, quic_override=None):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
 
@@ -79,6 +85,8 @@ class CreateGA(base.CreateCommand):
         name=target_https_proxy_ref.Name(),
         urlMap=url_map_ref.SelfLink(),
         sslCertificates=[ref.SelfLink() for ref in ssl_cert_refs])
+    ssl_policy_ref = self.SSL_POLICY_ARG.ResolveAsResource(
+        args, holder.resources) if args.ssl_policy else None
 
     if quic_override:
       target_https_proxy.quicOverride = quic_override
@@ -97,7 +105,7 @@ class CreateGA(base.CreateCommand):
     return self._SendRequests(args)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class CreateBeta(CreateGA):
   """Create a target HTTPS proxy.
 
@@ -112,49 +120,9 @@ class CreateBeta(CreateGA):
   at most one SSL policy.
   """
 
-  SSL_POLICY_ARG = None
-
   @classmethod
   def Args(cls, parser):
     super(CreateBeta, cls).Args(parser)
-    cls.SSL_POLICY_ARG = (
-        ssl_policies_flags.GetSslPolicyArgumentForOtherResource(
-            'HTTPS', required=False))
-    cls.SSL_POLICY_ARG.AddArgument(parser)
-
-  def _GetSslPolicy(self, args):
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return self.SSL_POLICY_ARG.ResolveAsResource(
-        args, holder.resources) if args.ssl_policy else None
-
-  def Run(self, args):
-    ssl_policy_ref = self._GetSslPolicy(args)
-    return self._SendRequests(
-        args,
-        quic_override=None,
-        ssl_policy_ref=ssl_policy_ref)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(CreateBeta):
-  """Create a target HTTPS proxy.
-
-    *{command}* is used to create target HTTPS proxies. A target
-  HTTPS proxy is referenced by one or more forwarding rules which
-  define which packets the proxy is responsible for routing. The
-  target HTTPS proxy points to a URL map that defines the rules
-  for routing the requests. The URL map's job is to map URLs to
-  backend services which handle the actual requests. The target
-  HTTPS proxy also points to at most 10 SSL certificates used for
-  server-side authentication. The target HTTPS proxy can be associated with
-  at most one SSL policy.
-  """
-
-  SSL_POLICY_ARG = None
-
-  @classmethod
-  def Args(cls, parser):
-    super(CreateAlpha, cls).Args(parser)
     target_proxies_utils.AddQuicOverrideCreateArgs(parser)
 
   def Run(self, args):
@@ -162,6 +130,4 @@ class CreateAlpha(CreateBeta):
     messages = holder.client.messages
     quic_override = messages.TargetHttpsProxy.QuicOverrideValueValuesEnum(
         args.quic_override)
-
-    ssl_policy_ref = self._GetSslPolicy(args)
-    return self._SendRequests(args, quic_override, ssl_policy_ref)
+    return self._SendRequests(args, quic_override)

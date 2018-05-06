@@ -14,6 +14,9 @@
 
 """Tests of the types module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.util.hooks import types
 from googlecloudsdk.core import properties
 from tests.lib import parameterized

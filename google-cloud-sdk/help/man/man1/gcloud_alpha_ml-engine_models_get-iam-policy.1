@@ -17,9 +17,12 @@ gcloud alpha ml\-engine models get\-iam\-policy \- get the IAM policy for a mode
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Gets the IAM policy for the given model.
-
-Returns an empty policy if the resource does not have a policy set.
+\fB(ALPHA)\fR \fBgcloud alpha ml\-engine models get\-iam\-policy\fR displays the
+IAM policy associated with a model. If formatted as JSON, the output can be
+edited and used as a policy file for set\-iam\-policy. The output includes an
+"etag" field identifying the version emitted and allowing detection of
+concurrent policy updates; see $ {parent} set\-iam\-policy for additional
+details.
 
 
 
@@ -27,10 +30,20 @@ Returns an empty policy if the resource does not have a policy set.
 
 .RS 2m
 .TP 2m
+
+MODEL \- The model for which to display the IAM policy. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: Set the property
+[core/project] or provide the flag [\-\-project] on the command line. This must
+be specified.
+
+.RS 2m
+.TP 2m
 \fIMODEL\fR
-Name of the model.
+The ID of the model or a fully qualified identifier for the model.
 
 
+.RE
 .RE
 .sp
 
@@ -79,12 +92,19 @@ help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBml/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/ml/
+
+
+
 .SH "EXAMPLES"
 
-The following command gets the IAM policy for the model \f5my_model\fR:
+To print the IAM policy for a given model, run:
 
 .RS 2m
-$ gcloud alpha ml\-engine models get\-iam\-policy my_model
+$ gcloud alpha ml\-engine models get\-iam\-policy my\-model
 .RE
 
 

@@ -1,18 +1,27 @@
 NAME
-    gcloud alpha organizations get-iam-policy - get IAM policy for an
+    gcloud alpha organizations get-iam-policy - get the IAM policy for an
         organization
 
 SYNOPSIS
-    gcloud alpha organizations get-iam-policy ORGANIZATION_ID
+    gcloud alpha organizations get-iam-policy ORGANIZATION
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Gets the IAM policy for an organization, given an organization ID.
+    (ALPHA) gcloud alpha organizations get-iam-policy displays the IAM policy
+    associated with an organization. If formatted as JSON, the output can be
+    edited and used as a policy file for set-iam-policy. The output includes an
+    "etag" field identifying the version emitted and allowing detection of
+    concurrent policy updates; see $ gcloud alpha organizations set-iam-policy
+    for additional details.
 
 POSITIONAL ARGUMENTS
-     ORGANIZATION_ID
-        ID for the organization whose policy you want to get.
+     ORGANIZATION - The organization for which to display the IAM policy. This
+     represents a Cloud resource. This must be specified.
+
+       ORGANIZATION
+          The ID of the organization or a fully qualified identifier for the
+          organization.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -45,11 +54,14 @@ GCLOUD WIDE FLAGS
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
-EXAMPLES
-    The following command prints the IAM policy for an organization with the ID
-    123456789:
+API REFERENCE
+    This command uses the cloudresourcemanager/v1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/resource-manager
 
-        $ gcloud alpha organizations get-iam-policy 123456789
+EXAMPLES
+    To print the IAM policy for a given organization, run:
+
+        $ gcloud alpha organizations get-iam-policy my-organization
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

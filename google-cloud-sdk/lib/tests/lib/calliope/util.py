@@ -13,6 +13,8 @@
 # limitations under the License.
 """Various test utilities for calliope."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -157,6 +159,7 @@ class MockCommand(object):
     """
     self._name = name
     self.ai = None
+    self.is_group = False
     self._cli_generator = MockCliGenerator()
 
   def GetAllAvailableFlags(self):

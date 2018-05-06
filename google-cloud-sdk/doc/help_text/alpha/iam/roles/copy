@@ -1,0 +1,61 @@
+NAME
+    gcloud alpha iam roles copy - create a role from an existing role
+
+SYNOPSIS
+    gcloud alpha iam roles copy [--dest-organization=DEST_ORGANIZATION]
+        [--dest-project=DEST_PROJECT] [--destination=DESTINATION]
+        [--source=SOURCE] [--source-organization=SOURCE_ORGANIZATION]
+        [--source-project=SOURCE_PROJECT] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command creates a role from an existing role.
+
+FLAGS
+     --dest-organization=DEST_ORGANIZATION
+        The organization of the destination role.
+
+     --dest-project=DEST_PROJECT
+        The project of the destination role.
+
+     --destination=DESTINATION
+        The destination role id for the new custom role. For example: viewer.
+
+     --source=SOURCE
+        The source role name or id.For curated roles, for example:
+        roles/viewer.For custom roles, for example: viewer.
+
+     --source-organization=SOURCE_ORGANIZATION
+        The organization of the source role if it is an custom role.
+
+     --source-project=SOURCE_PROJECT
+        The project of the source role if it is an custom role.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To create a copy of an existing role into an organization with
+    ORGANIZATION_ID.
+
+        $gcloud alpha iam roles copy --source "roles/viewer" --destination CustomViewer
+         --dest-organization ORGANIZATION_ID
+
+    To create a copy of an existing role into a project with PROJECT_ID.
+
+        $gcloud alpha iam roles copy --source "roles/spanner.databaseAdmin"
+         --destination CustomSpannerDbAdmin --dest-project PROJECT_ID
+
+    To modify the newly created role see the roles update command.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud iam roles copy
+        $ gcloud beta iam roles copy
+

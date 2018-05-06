@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'describe' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
@@ -22,7 +24,7 @@ class DescribeCommandTest(base.BigtableV2TestBase,
                           sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
-    self.cmd = 'instances describe theinstance'
+    self.cmd = 'bigtable instances describe theinstance'
     self.svc = self.client.projects_instances.Get
     self.msg = self.msgs.BigtableadminProjectsInstancesGetRequest(
         name='projects/{0}/instances/theinstance'.format(self.Project()))
@@ -32,7 +34,7 @@ class DescribeCommandTest(base.BigtableV2TestBase,
                     response=self.msgs.Instance(
                         name='projects/theprojects/instances/theinstance',
                         displayName='thedisplayname'))
-    self.RunBT(self.cmd)
+    self.Run(self.cmd)
     self.AssertOutputContains('theinstance')
     self.AssertOutputContains('thedisplayname')
 
@@ -40,13 +42,14 @@ class DescribeCommandTest(base.BigtableV2TestBase,
     self._RunSuccessTest()
 
   def testDescribeByUri(self):
-    self.cmd = ('instances describe https://bigtableadmin.googleapis.com/v2/'
-                'projects/{0}/instances/theinstance'.format(self.Project()))
+    self.cmd = (
+        'bigtable instances describe https://bigtableadmin.googleapis.com/v2/'
+        'projects/{0}/instances/theinstance'.format(self.Project()))
     self._RunSuccessTest()
 
   def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.msg):
-      self.RunBT(self.cmd)
+      self.Run(self.cmd)
 
 
 if __name__ == '__main__':

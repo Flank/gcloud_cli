@@ -14,6 +14,9 @@
 
 """Unit tests for the calliope/display module."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 import copy
 import datetime
 import inspect
@@ -32,6 +35,8 @@ from googlecloudsdk.core.resource import resource_projector
 from tests.lib import calliope_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 _MOCK_RESOURCE = [
@@ -215,7 +220,7 @@ _MOCK_PRINT_RESOURCE = [
 
 def _ResourceGenerator(n):
   for i in range(n):
-    print 'Yield(%d)' % i
+    print('Yield(%d)' % i)
     yield {'index': i}
 
 
@@ -253,11 +258,11 @@ class _MockArgs(object):
   """Mock ArgParse args info, just enough for calliope/display."""
 
   # pylint: disable=redefined-builtin, args.filter and args.format required.
-  def __init__(self, command=None, async=None, filter=None, flatten=None,
+  def __init__(self, command=None, is_async=None, filter=None, flatten=None,
                format=None, limit=None, page_size=None, simple_format=None,
                sort_by=None, uri=None):
     self._command = command
-    self.async = async
+    self.async = is_async
     self.filter = filter
     self.flatten = flatten if flatten is None else flatten.split(',')
     self.format = format
@@ -307,7 +312,7 @@ class _MockCommandWithDisplay(_MockCommand):
 
   def Display(self, unused_args, resource):
     self.display_resource = list(resource)
-    print 'Display().'
+    print('Display().')
 
 
 class _MockCreateCommand(base.CreateCommand):
@@ -380,7 +385,7 @@ class _MockListCommandWithEpilog(_MockListCommand):
   """Mock ListCommand with Epilog()."""
 
   def Epilog(self, resources_were_displayed=True):
-    print 'Epilog({0}).'.format(resources_were_displayed)
+    print('Epilog({0}).'.format(resources_were_displayed))
 
 
 class _MockBypassListCommand(_MockListCommand):
@@ -472,7 +477,7 @@ class DisplayTest(sdk_test_base.WithOutputCapture):
       if columns:
         fmt.append('({0})'.format(','.join([resource_lex.GetKeyName(col.key)
                                             for col in columns])))
-      print 'Print({0}).'.format(''.join(fmt))
+      print('Print({0}).'.format(''.join(fmt)))
 
   def MockUpdateCache(self, obj):
     if obj._uris:
@@ -518,21 +523,21 @@ class DisplayTest(sdk_test_base.WithOutputCapture):
     command, args = _MockCommandArgs(_MockCommandWithDisplay, format='json')
     display.Displayer(command, args, self.mock_resource).Display()
     self.AssertOutputEquals('Print(json).\n')
-    self.AssertErrEquals('INFO: Display format "json".\n')
+    self.AssertErrEquals('INFO: Display format: "json"\n')
     self.assertEqual(self.uri_update_cache_op, None)
 
   def testDescribeCommandDisplay(self):
     command, args = _MockCommandArgs(_MockDescribeCommand)
     display.Displayer(command, args, self.mock_resource).Display()
     self.AssertOutputEquals('Print(default).\n')
-    self.AssertErrEquals('INFO: Display format "default".\n')
+    self.AssertErrEquals('INFO: Display format: "default"\n')
     self.assertEqual(self.uri_update_cache_op, None)
 
   def testCreateCommandDisplay(self):
     command, args = _MockCommandArgs(_MockCreateCommand)
     display.Displayer(command, args, self.mock_resource).Display()
     self.AssertOutputEquals('Print(none).\n')
-    self.AssertErrEquals('INFO: Display format "none".\n')
+    self.AssertErrEquals('INFO: Display format: "none"\n')
     self.assertEqual(self.uri_update_cache_op, 'AddToCacheOp')
     self.assertEqual(self.uris, self.cached_uris)
 
@@ -558,7 +563,7 @@ class DisplayTest(sdk_test_base.WithOutputCapture):
     command, args = _MockCommandArgs(_MockDeleteCommand)
     display.Displayer(command, args, self.mock_resource).Display()
     self.AssertOutputEquals('Print(none).\n')
-    self.AssertErrEquals('INFO: Display format "none".\n')
+    self.AssertErrEquals('INFO: Display format: "none"\n')
     self.assertEqual(self.uri_update_cache_op, 'DeleteFromCacheOp')
     self.assertEqual(self.uris, self.cached_uris)
 
@@ -585,8 +590,8 @@ class DisplayTest(sdk_test_base.WithOutputCapture):
     display.Displayer(command, args, self.mock_resource).Display()
     self.AssertOutputEquals('Print(table(good,async)).\n')
     self.AssertErrEquals("""\
-INFO: Display filter '-status:OBSOLETE'.
-INFO: Display format "table(good,async)".
+INFO: Display filter: "-status:OBSOLETE"
+INFO: Display format: "table(good,async)"
 """)
     self.assertEqual(self.uri_update_cache_op, 'ReplaceCacheOp')
     self.assertEqual(self.uris, self.cached_uris)
@@ -715,7 +720,7 @@ Print(json).
     command, args = _MockCommandArgs(_MockRestoreCommand)
     display.Displayer(command, args, self.mock_resource).Display()
     self.AssertOutputEquals('Print(none).\n')
-    self.AssertErrEquals('INFO: Display format "none".\n')
+    self.AssertErrEquals('INFO: Display format: "none"\n')
     self.assertEqual(self.uri_update_cache_op, 'AddToCacheOp')
     self.assertEqual(self.uris, self.cached_uris)
 
@@ -723,7 +728,7 @@ Print(json).
     command, args = _MockCommandArgs(_MockUpdateCommand)
     display.Displayer(command, args, self.mock_resource).Display()
     self.AssertOutputEquals('Print(none).\n')
-    self.AssertErrEquals('INFO: Display format "none".\n')
+    self.AssertErrEquals('INFO: Display format: "none"\n')
     self.assertEqual(self.uri_update_cache_op, None)
 
   def testCreateCommandWithBypassCache(self):
@@ -854,7 +859,7 @@ resource#3  disk#3#3    100
     args = _MockArgs(flatten='devices[].disks[].name[]', format='disable')
     results = display.Displayer(self._command, args, self._resource).Display()
     self.AssertOutputEquals('')
-    self.assertEquals([
+    self.assertEqual([
         'disk#1#1',
         'disk#1#2',
         'disk#1#3',

@@ -15,6 +15,9 @@
 
 """Various functions to be used to modify a request before it is sent."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.util.apis import arg_utils
 
 
@@ -32,3 +35,10 @@ def SetFieldFromRelativeName(api_field):
     arg_utils.SetFieldInMessage(request, api_field, ref.RelativeName())
     return request
   return Process
+
+
+def SetParentRequestHook(ref, args, request):
+  """Declarative request hook to add relative parent to issued requests."""
+  del args  # Unused
+  request.parent = ref.Parent().RelativeName()
+  return request

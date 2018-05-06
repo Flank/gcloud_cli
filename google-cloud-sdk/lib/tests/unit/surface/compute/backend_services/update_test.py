@@ -1552,7 +1552,7 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [self._backend_services_include_all_custom_cache_key],
         [],
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         backend_services_utils.CacheKeyQueryStringException,
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
@@ -1565,7 +1565,7 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [self._backend_services_include_all_custom_cache_key],
         [],
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         backend_services_utils.CacheKeyQueryStringException,
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
@@ -1794,21 +1794,21 @@ class WithIAPApiTest(UpdateTestBase):
       self._backend_services[0].iap = old_iap
 
   def testInvalidIAPEmpty(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'^Invalid value for \[--iap\]: Must provide value when specifying '
         r'--iap$',
         self.RunUpdate, 'backend-service-1 --iap=""')
 
   def testInvalidIapArgCombinationEnabledDisabled(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Must specify only one '
         'of \\[enabled\\] or \\[disabled\\]$',
         self.RunUpdate, 'backend-service-1 --iap enabled,disabled')
 
   def testInvalidIapArgCombinationEnabledOnlyClientId(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -1816,7 +1816,7 @@ class WithIAPApiTest(UpdateTestBase):
         'backend-service-1 --iap enabled,oauth2-client-id=CLIENTID')
 
   def testInvalidIapArgCombinationEnabledOnlyClientSecret(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -1824,7 +1824,7 @@ class WithIAPApiTest(UpdateTestBase):
         'backend-service-1 --iap enabled,oauth2-client-secret=SECRET')
 
   def testInvalidIapArgCombinationEmptyIdValue(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -1833,7 +1833,7 @@ class WithIAPApiTest(UpdateTestBase):
         '--iap enabled,oauth2-client-id=,oauth2-client-secret=SECRET')
 
   def testInvalidIapArgCombinationEmptySecretValue(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -1842,7 +1842,7 @@ class WithIAPApiTest(UpdateTestBase):
         '--iap enabled,oauth2-client-id=CLIENTID,oauth2-client-secret=')
 
   def testInvalidIapArgInvalidSubArg(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'^Invalid value for \[--iap\]: Invalid sub-argument \'invalid-arg1\'$',
         self.RunUpdate,

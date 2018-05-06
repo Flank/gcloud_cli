@@ -1,0 +1,69 @@
+NAME
+    gcloud alpha dlp text redact - redact potentially sensitive data from text
+        content
+
+SYNOPSIS
+    gcloud alpha dlp text redact --info-types=[INFOTYPE,...]
+        (--content=CONTENT | --content-file=CONTENT_FILE)
+        (--remove-findings | --replace-with-info-type
+          | --replacement-text=REPLACEMENT_TEXT)
+        [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Redacts potentially sensitive data from text content.
+
+REQUIRED FLAGS
+     --info-types=[INFOTYPE,...]
+        Which infoTypes to look for. The values must correspond to InfoType
+        values found in documentation. For more information about valid
+        infoTypes, see InfoTypes Reference
+        (https://cloud.google.com/dlp/docs/infotypes-reference)
+
+     Exactly one of these must be specified:
+
+       --content=CONTENT
+          Text content to redact sensitive data from.
+
+       --content-file=CONTENT_FILE
+          Text file to scan for sensitive data to redact. Can also be a CSV
+          file specifying tabular data. For CSV files, up to 50,000 values per
+          request are allowed. To read from stdin pass '-' as the file name.
+
+     Exactly one of these must be specified:
+
+       --remove-findings
+          If specified, all sensitive data will be removed, instead of
+          replaced.
+
+       --replace-with-info-type
+          If specified, all sensitive data will be replaced with its infoType.
+          For example, 'email:guest@example.com' would become
+          'email:[EMAIL_ADDRESS]'.
+
+       --replacement-text=REPLACEMENT_TEXT
+          Text to replace each sensitive data finding with.
+
+OPTIONAL FLAGS
+     --min-likelihood=MIN_LIKELIHOOD; default="possible"
+        Only return findings equal to or above this threshold. One of:
+        very-unlikely, unlikely, possible, likely, very-likely. The default
+        value is possible. MIN_LIKELIHOOD must be one of: likely, possible,
+        unlikely, very-likely, very-unlikely.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the dlp/v2 API. The full documentation for this API can
+    be found at: https://cloud.google.com/dlp/docs/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

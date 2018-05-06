@@ -28,51 +28,47 @@ class ModulePathTest(test_case.TestCase):
     times = module_util.ImportModule('googlecloudsdk.core.util.times')
     dt = times.GetDateTimeFromTimeStamp(1496293728)
     ts = times.FormatDateTime(dt, tzinfo=times.UTC)
-    self.assertEquals('2017-06-01T05:08:48.000Z', ts)
+    self.assertEqual('2017-06-01T05:08:48.000Z', ts)
 
   def testImportMalformedStandardModule(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         module_util.ImportModuleError,
-        r'Module path \[argcomplete.completers.FilesCompleter] '
-        r'not found: No module named FilesCompleter.'):
+        r'Module path \[argcomplete.completers.FilesCompleter] not found:.*'):
       module_util.ImportModule('argcomplete.completers.FilesCompleter')
 
   def testImportExistingStandardModule(self):
     files_completer = module_util.ImportModule(
         'argcomplete.completers:FilesCompleter')
-    self.assertEquals(argcomplete_completers.FilesCompleter, files_completer)
+    self.assertEqual(argcomplete_completers.FilesCompleter, files_completer)
 
   def testImportNoSuchPackage(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         module_util.ImportModuleError,
-        r'Module path \[scrooglecloudsdk.core.util.times] '
-        r'not found: No module named scrooglecloudsdk.core.util.times.'):
+        r'Module path \[scrooglecloudsdk.core.util.times] not found:.*'):
       module_util.ImportModule('scrooglecloudsdk.core.util.times')
 
   def testImportNoSuchModule(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         module_util.ImportModuleError,
-        r'Module path \[googlecloudsdk.core.futile.times] '
-        r'not found: No module named futile.times.'):
+        r'Module path \[googlecloudsdk.core.futile.times] not found:.*'):
       module_util.ImportModule('googlecloudsdk.core.futile.times')
 
   def testImportNoSuchAttribute(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         module_util.ImportModuleError,
-        r"Module path \[googlecloudsdk.core.util.times:UnKnOwN] "
-        r"not found: 'module' object has no attribute 'UnKnOwN'."):
+        r'Module path \[googlecloudsdk.core.util.times:UnKnOwN] not found:.*'):
       module_util.ImportModule('googlecloudsdk.core.util.times:UnKnOwN')
 
   def testImportNoSuchAttributePath(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         module_util.ImportModuleError,
-        r"Module path \[googlecloudsdk.core.util:FormatDateTime.UnKnOwN] "
-        r"not found: 'module' object has no attribute 'FormatDateTime'."):
+        r'Module path \[googlecloudsdk.core.util:FormatDateTime.UnKnOwN] '
+        r'not found: .*'):
       module_util.ImportModule(
           'googlecloudsdk.core.util:FormatDateTime.UnKnOwN')
 
   def testImportBadForm(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         module_util.ImportModuleError,
         r'Module path \[googlecloudsdk.core.util:FormatDateTime:UnKnOwN] '
         r'must be in the form: '

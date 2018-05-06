@@ -50,7 +50,8 @@ EXAMPLES
     To modify the newly created role see the roles update command.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam roles copy
         $ gcloud beta iam roles copy
 

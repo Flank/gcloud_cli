@@ -5,9 +5,6 @@ NAME
 SYNOPSIS
     gcloud alpha ml-engine models delete MODEL [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (ALPHA) Delete an existing Cloud ML Engine model.
-
 POSITIONAL ARGUMENTS
      MODEL
         Name of the model.
@@ -16,6 +13,13 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To delete all models matching the regular expression vision[0-9]+, run:
+
+        $ gcloud alpha ml-engine models list --uri \
+              --filter 'name ~ vision[0-9]+' |
+              xargs -n 1 gcloud alpha ml-engine models delete
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

@@ -18,12 +18,13 @@ from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core.console import console_attr
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
-from tests.lib.surface.firebase.test import fake_catalogs
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test import test_utils
+from tests.lib.surface.firebase.test.android import commands
+from tests.lib.surface.firebase.test.android import fake_catalogs
+from tests.lib.surface.firebase.test.android import unit_base
 
 
-class TestVersionsDescribeTest(unit_base.TestMockClientTest):
+class TestVersionsDescribeTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
@@ -52,7 +53,7 @@ class TestVersionsDescribeTest(unit_base.TestMockClientTest):
     self.AssertOutputContains('tags:\n- unsupported\n- deprecated')
 
   def testVersionsDescribe_ApiThrowsHttpError(self):
-    err = unit_base.MakeHttpError('Error9', 'Environment catalog failure.')
+    err = test_utils.MakeHttpError('Error9', 'Environment catalog failure.')
     self.ExpectCatalogGetError(err)
 
     with self.assertRaises(calliope_exceptions.HttpException):

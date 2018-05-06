@@ -33,13 +33,13 @@ class ListTest(base.Base, cli_test_base.CliTestBase):
     self.AssertOutputContains('get')
 
   def testListMissingAPI(self):
-    with self.assertRaisesRegexp(registry.UnknownAPIError,
-                                 r'\[x\] does not exist'):
+    with self.assertRaisesRegex(registry.UnknownAPIError,
+                                r'\[x\] does not exist'):
       self.Run('meta apis methods list --api-version=v1 '
                '--collection=x.instances')
 
   def testListMissingVersion(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         registry.UnknownAPIVersionError,
         r'Version \[v12345\] does not exist for API \[compute\].'):
       self.Run(
@@ -48,7 +48,7 @@ class ListTest(base.Base, cli_test_base.CliTestBase):
 
   def testListNoDefault(self):
     self.MockAPIs(('something', 'v1', False))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         registry.NoDefaultVersionError,
         r'API \[something\] does not have a default version.'):
       self.Run('meta apis methods list --collection=something.projects.foo')

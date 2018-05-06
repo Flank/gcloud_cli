@@ -99,7 +99,7 @@ class InstanceGroupManagersResizeTest(test_base.BaseTest):
     )
 
   def testNegativeSize(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         'argument --size: Value must be greater than or equal to 0; '
         'received: -3'):

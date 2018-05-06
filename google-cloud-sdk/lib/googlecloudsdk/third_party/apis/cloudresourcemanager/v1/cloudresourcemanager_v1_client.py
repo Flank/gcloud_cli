@@ -24,7 +24,7 @@ class CloudresourcemanagerV1(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new cloudresourcemanager handle."""
     url = url or self.BASE_URL
     super(CloudresourcemanagerV1, self).__init__(
@@ -33,7 +33,8 @@ class CloudresourcemanagerV1(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.folders = self.FoldersService(self)
     self.liens = self.LiensService(self)
     self.operations = self.OperationsService(self)
@@ -51,7 +52,7 @@ class CloudresourcemanagerV1(base_api.BaseApiClient):
           }
 
     def ClearOrgPolicy(self, request, global_params=None):
-      """Clears a `Policy` from a resource.
+      r"""Clears a `Policy` from a resource.
 
       Args:
         request: (CloudresourcemanagerFoldersClearOrgPolicyRequest) input message
@@ -77,7 +78,7 @@ class CloudresourcemanagerV1(base_api.BaseApiClient):
     )
 
     def GetEffectiveOrgPolicy(self, request, global_params=None):
-      """Gets the effective `Policy` on a resource. This is the result of merging.
+      r"""Gets the effective `Policy` on a resource. This is the result of merging.
 `Policies` in the resource hierarchy. The returned `Policy` will not have
 an `etag`set because it is a computed `Policy` across multiple resources.
 
@@ -105,7 +106,7 @@ an `etag`set because it is a computed `Policy` across multiple resources.
     )
 
     def GetOrgPolicy(self, request, global_params=None):
-      """Gets a `Policy` on a resource.
+      r"""Gets a `Policy` on a resource.
 
 If no `Policy` is set on the resource, a `Policy` is returned with default
 values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
@@ -136,7 +137,7 @@ values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
     )
 
     def ListAvailableOrgPolicyConstraints(self, request, global_params=None):
-      """Lists `Constraints` that could be applied on the specified resource.
+      r"""Lists `Constraints` that could be applied on the specified resource.
 
       Args:
         request: (CloudresourcemanagerFoldersListAvailableOrgPolicyConstraintsRequest) input message
@@ -162,7 +163,7 @@ values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
     )
 
     def ListOrgPolicies(self, request, global_params=None):
-      """Lists all the `Policies` set for a particular resource.
+      r"""Lists all the `Policies` set for a particular resource.
 
       Args:
         request: (CloudresourcemanagerFoldersListOrgPoliciesRequest) input message
@@ -188,7 +189,7 @@ values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
     )
 
     def SetOrgPolicy(self, request, global_params=None):
-      """Updates the specified `Policy` on the resource. Creates a new `Policy` for.
+      r"""Updates the specified `Policy` on the resource. Creates a new `Policy` for.
 that `Constraint` on the resource if one does not exist.
 
 Not supplying an `etag` on the request `Policy` results in an unconditional
@@ -228,7 +229,7 @@ write of the `Policy`.
           }
 
     def Create(self, request, global_params=None):
-      """Create a Lien which applies to the resource denoted by the `parent` field.
+      r"""Create a Lien which applies to the resource denoted by the `parent` field.
 
 Callers of this method will require permission on the `parent` resource.
 For example, applying to `projects/1234` requires permission
@@ -260,7 +261,7 @@ NOTE: Some resources may limit the number of Liens which may be applied.
     )
 
     def Delete(self, request, global_params=None):
-      """Delete a Lien by `name`.
+      r"""Delete a Lien by `name`.
 
 Callers of this method will require permission on the `parent` resource.
 For example, a Lien with a `parent` of `projects/1234` requires permission
@@ -290,7 +291,7 @@ For example, a Lien with a `parent` of `projects/1234` requires permission
     )
 
     def List(self, request, global_params=None):
-      """List all Liens applied to the `parent` resource.
+      r"""List all Liens applied to the `parent` resource.
 
 Callers of this method will require permission on the `parent` resource.
 For example, a Lien with a `parent` of `projects/1234` requires permission
@@ -330,7 +331,7 @@ For example, a Lien with a `parent` of `projects/1234` requires permission
           }
 
     def Get(self, request, global_params=None):
-      """Gets the latest state of a long-running operation.  Clients can use this.
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
 method to poll the operation result at intervals as recommended by the API
 service.
 
@@ -368,7 +369,7 @@ service.
           }
 
     def ClearOrgPolicy(self, request, global_params=None):
-      """Clears a `Policy` from a resource.
+      r"""Clears a `Policy` from a resource.
 
       Args:
         request: (CloudresourcemanagerOrganizationsClearOrgPolicyRequest) input message
@@ -394,7 +395,7 @@ service.
     )
 
     def Get(self, request, global_params=None):
-      """Fetches an Organization resource identified by the specified resource name.
+      r"""Fetches an Organization resource identified by the specified resource name.
 
       Args:
         request: (CloudresourcemanagerOrganizationsGetRequest) input message
@@ -420,7 +421,7 @@ service.
     )
 
     def GetEffectiveOrgPolicy(self, request, global_params=None):
-      """Gets the effective `Policy` on a resource. This is the result of merging.
+      r"""Gets the effective `Policy` on a resource. This is the result of merging.
 `Policies` in the resource hierarchy. The returned `Policy` will not have
 an `etag`set because it is a computed `Policy` across multiple resources.
 
@@ -448,7 +449,7 @@ an `etag`set because it is a computed `Policy` across multiple resources.
     )
 
     def GetIamPolicy(self, request, global_params=None):
-      """Gets the access control policy for an Organization resource. May be empty.
+      r"""Gets the access control policy for an Organization resource. May be empty.
 if no such policy or resource exists. The `resource` field should be the
 organization's resource name, e.g. "organizations/123".
 
@@ -476,7 +477,7 @@ organization's resource name, e.g. "organizations/123".
     )
 
     def GetOrgPolicy(self, request, global_params=None):
-      """Gets a `Policy` on a resource.
+      r"""Gets a `Policy` on a resource.
 
 If no `Policy` is set on the resource, a `Policy` is returned with default
 values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
@@ -507,7 +508,7 @@ values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
     )
 
     def ListAvailableOrgPolicyConstraints(self, request, global_params=None):
-      """Lists `Constraints` that could be applied on the specified resource.
+      r"""Lists `Constraints` that could be applied on the specified resource.
 
       Args:
         request: (CloudresourcemanagerOrganizationsListAvailableOrgPolicyConstraintsRequest) input message
@@ -533,7 +534,7 @@ values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
     )
 
     def ListOrgPolicies(self, request, global_params=None):
-      """Lists all the `Policies` set for a particular resource.
+      r"""Lists all the `Policies` set for a particular resource.
 
       Args:
         request: (CloudresourcemanagerOrganizationsListOrgPoliciesRequest) input message
@@ -559,7 +560,7 @@ values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
     )
 
     def Search(self, request, global_params=None):
-      """Searches Organization resources that are visible to the user and satisfy.
+      r"""Searches Organization resources that are visible to the user and satisfy.
 the specified filter. This method returns Organizations in an unspecified
 order. New Organizations do not necessarily appear at the end of the
 results.
@@ -588,7 +589,7 @@ results.
     )
 
     def SetIamPolicy(self, request, global_params=None):
-      """Sets the access control policy on an Organization resource. Replaces any.
+      r"""Sets the access control policy on an Organization resource. Replaces any.
 existing policy. The `resource` field should be the organization's resource
 name, e.g. "organizations/123".
 
@@ -616,7 +617,7 @@ name, e.g. "organizations/123".
     )
 
     def SetOrgPolicy(self, request, global_params=None):
-      """Updates the specified `Policy` on the resource. Creates a new `Policy` for.
+      r"""Updates the specified `Policy` on the resource. Creates a new `Policy` for.
 that `Constraint` on the resource if one does not exist.
 
 Not supplying an `etag` on the request `Policy` results in an unconditional
@@ -646,7 +647,7 @@ write of the `Policy`.
     )
 
     def TestIamPermissions(self, request, global_params=None):
-      """Returns permissions that a caller has on the specified Organization.
+      r"""Returns permissions that a caller has on the specified Organization.
 The `resource` field should be the organization's resource name,
 e.g. "organizations/123".
 
@@ -684,7 +685,7 @@ e.g. "organizations/123".
           }
 
     def ClearOrgPolicy(self, request, global_params=None):
-      """Clears a `Policy` from a resource.
+      r"""Clears a `Policy` from a resource.
 
       Args:
         request: (CloudresourcemanagerProjectsClearOrgPolicyRequest) input message
@@ -710,7 +711,7 @@ e.g. "organizations/123".
     )
 
     def Create(self, request, global_params=None):
-      """Request that a new Project be created. The result is an Operation which.
+      r"""Request that a new Project be created. The result is an Operation which.
 can be used to track the creation process. It is automatically deleted
 after a few hours, so there is no need to call DeleteOperation.
 
@@ -743,7 +744,7 @@ polling at the 5th second with an exponential backoff.
     )
 
     def Delete(self, request, global_params=None):
-      """Marks the Project identified by the specified.
+      r"""Marks the Project identified by the specified.
 `project_id` (for example, `my-project-123`) for deletion.
 This method will only affect the Project if the following criteria are met:
 
@@ -792,7 +793,7 @@ The caller must have modify permissions for this Project.
     )
 
     def Get(self, request, global_params=None):
-      """Retrieves the Project identified by the specified.
+      r"""Retrieves the Project identified by the specified.
 `project_id` (for example, `my-project-123`).
 
 The caller must have read permissions for this Project.
@@ -821,7 +822,7 @@ The caller must have read permissions for this Project.
     )
 
     def GetAncestry(self, request, global_params=None):
-      """Gets a list of ancestors in the resource hierarchy for the Project.
+      r"""Gets a list of ancestors in the resource hierarchy for the Project.
 identified by the specified `project_id` (for example, `my-project-123`).
 
 The caller must have read permissions for this Project.
@@ -850,7 +851,7 @@ The caller must have read permissions for this Project.
     )
 
     def GetEffectiveOrgPolicy(self, request, global_params=None):
-      """Gets the effective `Policy` on a resource. This is the result of merging.
+      r"""Gets the effective `Policy` on a resource. This is the result of merging.
 `Policies` in the resource hierarchy. The returned `Policy` will not have
 an `etag`set because it is a computed `Policy` across multiple resources.
 
@@ -878,7 +879,7 @@ an `etag`set because it is a computed `Policy` across multiple resources.
     )
 
     def GetIamPolicy(self, request, global_params=None):
-      """Returns the IAM access control policy for the specified Project.
+      r"""Returns the IAM access control policy for the specified Project.
 Permission is denied if the policy or the resource does not exist.
 
       Args:
@@ -905,7 +906,7 @@ Permission is denied if the policy or the resource does not exist.
     )
 
     def GetOrgPolicy(self, request, global_params=None):
-      """Gets a `Policy` on a resource.
+      r"""Gets a `Policy` on a resource.
 
 If no `Policy` is set on the resource, a `Policy` is returned with default
 values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
@@ -936,7 +937,7 @@ values including `POLICY_TYPE_NOT_SET` for the `policy_type oneof`. The
     )
 
     def List(self, request, global_params=None):
-      """Lists Projects that are visible to the user and satisfy the.
+      r"""Lists Projects that are visible to the user and satisfy the.
 specified filter. This method returns Projects in an unspecified order.
 New Projects do not necessarily appear at the end of the list.
 
@@ -964,7 +965,7 @@ New Projects do not necessarily appear at the end of the list.
     )
 
     def ListAvailableOrgPolicyConstraints(self, request, global_params=None):
-      """Lists `Constraints` that could be applied on the specified resource.
+      r"""Lists `Constraints` that could be applied on the specified resource.
 
       Args:
         request: (CloudresourcemanagerProjectsListAvailableOrgPolicyConstraintsRequest) input message
@@ -990,7 +991,7 @@ New Projects do not necessarily appear at the end of the list.
     )
 
     def ListOrgPolicies(self, request, global_params=None):
-      """Lists all the `Policies` set for a particular resource.
+      r"""Lists all the `Policies` set for a particular resource.
 
       Args:
         request: (CloudresourcemanagerProjectsListOrgPoliciesRequest) input message
@@ -1016,7 +1017,7 @@ New Projects do not necessarily appear at the end of the list.
     )
 
     def SetIamPolicy(self, request, global_params=None):
-      """Sets the IAM access control policy for the specified Project. Replaces.
+      r"""Sets the IAM access control policy for the specified Project. Replaces.
 any existing policy.
 
 The following constraints apply when using `setIamPolicy()`:
@@ -1079,7 +1080,7 @@ roles.
     )
 
     def SetOrgPolicy(self, request, global_params=None):
-      """Updates the specified `Policy` on the resource. Creates a new `Policy` for.
+      r"""Updates the specified `Policy` on the resource. Creates a new `Policy` for.
 that `Constraint` on the resource if one does not exist.
 
 Not supplying an `etag` on the request `Policy` results in an unconditional
@@ -1109,7 +1110,7 @@ write of the `Policy`.
     )
 
     def TestIamPermissions(self, request, global_params=None):
-      """Returns permissions that a caller has on the specified Project.
+      r"""Returns permissions that a caller has on the specified Project.
 
       Args:
         request: (CloudresourcemanagerProjectsTestIamPermissionsRequest) input message
@@ -1135,7 +1136,7 @@ write of the `Policy`.
     )
 
     def Undelete(self, request, global_params=None):
-      """Restores the Project identified by the specified.
+      r"""Restores the Project identified by the specified.
 `project_id` (for example, `my-project-123`).
 You can only use this method for a Project that has a lifecycle state of
 DELETE_REQUESTED.
@@ -1167,7 +1168,7 @@ The caller must have modify permissions for this Project.
     )
 
     def Update(self, request, global_params=None):
-      """Updates the attributes of the Project identified by the specified.
+      r"""Updates the attributes of the Project identified by the specified.
 `project_id` (for example, `my-project-123`).
 
 The caller must have modify permissions for this Project.

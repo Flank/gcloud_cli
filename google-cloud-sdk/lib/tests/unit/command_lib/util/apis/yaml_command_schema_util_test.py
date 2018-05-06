@@ -14,12 +14,16 @@
 
 """Tests for the yaml command schema."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema_util as util
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.command_lib.util.apis import fake_messages as fm
+
+import six
 
 
 class CompleterStub(object):
@@ -65,30 +69,30 @@ class CommandSchemaUtilTests(test_case.TestCase, parameterized.TestCase):
     self.assertEqual(h.kwargs, {'foo': 'a', 'bar': 'b'})
     self.assertEqual(h.GetHook(), CompleterStub)
 
-    with self.assertRaisesRegexp(util.InvalidSchemaError,
-                                 r'Invalid Python hook: \[foo\].'):
+    with self.assertRaisesRegex(util.InvalidSchemaError,
+                                r'Invalid Python hook: \[foo\].'):
       util.ImportPythonHook('foo')
-    with self.assertRaisesRegexp(util.InvalidSchemaError,
-                                 r'Invalid Python hook: \[a:b:c:d\].'):
+    with self.assertRaisesRegex(util.InvalidSchemaError,
+                                r'Invalid Python hook: \[a:b:c:d\].'):
       util.ImportPythonHook('a:b:c:d')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         r'Invalid Python hook: \[{}:CompleterStub:asdf\]'
         r'. Args must be in the form'.format(CompleterStub.__module__)):
       util.ImportPythonHook(
           CompleterStub.__module__ + ':CompleterStub:asdf')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         r'Could not import Python hook: \[foo:bar\]. Module path \[foo:bar\] '
-        r'not found: No module named foo.'):
+        r'not found: No module named \'?foo\'?.'):
       util.ImportPythonHook('foo:bar')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         r"Could not import Python hook: \[googlecloudsdk:bar\]. Module path "
-        r"\[googlecloudsdk:bar\] not found: 'module' object has no attribute "
-        r"'bar'."):
+        r"\[googlecloudsdk:bar\] not found: "
+        r"('module' object|module 'googlecloudsdk') has no attribute 'bar'."):
       util.ImportPythonHook('googlecloudsdk:bar')
 
   @parameterized.parameters(
@@ -108,7 +112,7 @@ class CommandSchemaUtilTests(test_case.TestCase, parameterized.TestCase):
       (None, None),
       ('str', str),
       ('int', int),
-      ('long', long),
+      ('long', long if six.PY2 else int),
       ('float', float),
       ('bool', bool),
       (CompleterStub.__module__ + ':CompleterStub', CompleterStub),
@@ -139,19 +143,19 @@ class CommandSchemaUtilTests(test_case.TestCase, parameterized.TestCase):
   def testErrors(self):
     data = {'spec': [{'api_field': 'message1', 'arg_name': 'a'}]}
     arg_dict = util.ArgDict.FromData(data)
-    with self.assertRaisesRegexp(util.InvalidSchemaError,
-                                 'Unknown type for field: message1'):
+    with self.assertRaisesRegex(util.InvalidSchemaError,
+                                'Unknown type for field: message1'):
       arg_dict.GenerateType(fm.FakeMessage)
 
     data['flatten'] = True
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         'Flattened ArgDicts must have exactly two items in the spec.'):
       util.ArgDict.FromData(data)
 
     data['spec'].append({'api_field': 'message2', 'arg_name': 'b'})
     arg_dict = util.ArgDict.FromData(data)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         'Unknown type for field: message1'):
       arg_dict.GenerateType(fm.FakeMessage)

@@ -11,7 +11,7 @@ gcloud alpha compute tpus \- list, create, and delete Cloud TPUs
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute tpus\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute tpus\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,6 +29,27 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBaccelerator\-types\fR
+\fB(ALPHA)\fR List or Describe Available Cloud TPU accelerator types.
+
+.TP 2m
+\fBlocations\fR
+\fB(ALPHA)\fR List or Describe Available Cloud TPU Locations.
+
+.TP 2m
+\fBversions\fR
+\fB(ALPHA)\fR Explore Available Tensorflow versions for Cloud TPUs.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 
@@ -50,6 +71,18 @@ help\fR for details.
 .TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List Cloud TPUs.
+
+.TP 2m
+\fBreimage\fR
+\fB(ALPHA)\fR Reimages the OS on a Cloud TPU.
+
+.TP 2m
+\fBstart\fR
+\fB(ALPHA)\fR Start a Cloud TPU.
+
+.TP 2m
+\fBstop\fR
+\fB(ALPHA)\fR Stop a Cloud TPU.
 
 
 .RE

@@ -63,7 +63,7 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
     result = self.Run("""
         compute routers update my-router --region us-central1 --async
         """)
-    self.assertEquals('operation-X', result.name)
+    self.assertEqual('operation-X', result.name)
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for router [my-router] '
@@ -132,13 +132,13 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
 
     error_msg = ('--add/remove-advertisement flags are not compatible with '
                  '--set-advertisement flags.')
-    with self.assertRaisesRegexp(parser_errors.ArgumentError, error_msg):
+    with self.assertRaisesRegex(parser_errors.ArgumentError, error_msg):
       self.Run("""
           compute routers update my-router --region us-central1
           --set-advertisement-groups=ALL_SUBNETS
           --add-advertisement-groups=ALL_SUBNETS
           """)
-    with self.assertRaisesRegexp(parser_errors.ArgumentError, error_msg):
+    with self.assertRaisesRegex(parser_errors.ArgumentError, error_msg):
       self.Run("""
           compute routers update my-router --region us-central1
           --set-advertisement-ranges=10.10.10.10/30

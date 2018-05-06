@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the project-info update command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -21,8 +23,8 @@ from tests.lib.surface.compute import test_base
 class ProjectInfoUpdateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testSetDefaultNetworkTier_noParameterSpecified(self):
     with self.AssertRaisesArgumentErrorRegexp(
@@ -37,11 +39,11 @@ class ProjectInfoUpdateTest(test_base.BaseTest):
         """)
 
     self.CheckRequests([
-        (self.compute_alpha.projects, 'SetDefaultNetworkTier',
+        (self.compute_beta.projects, 'SetDefaultNetworkTier',
          self.messages.ComputeProjectsSetDefaultNetworkTierRequest(
              project='my-project',
-             projectsSetDefaultNetworkTierRequest=self.
-             messages.ProjectsSetDefaultNetworkTierRequest(
+             projectsSetDefaultNetworkTierRequest=self.messages.
+             ProjectsSetDefaultNetworkTierRequest(
                  networkTier=self.messages.ProjectsSetDefaultNetworkTierRequest.
                  NetworkTierValueValuesEnum.PREMIUM)))
     ],)
@@ -52,11 +54,11 @@ class ProjectInfoUpdateTest(test_base.BaseTest):
         """)
 
     self.CheckRequests([
-        (self.compute_alpha.projects, 'SetDefaultNetworkTier',
+        (self.compute_beta.projects, 'SetDefaultNetworkTier',
          self.messages.ComputeProjectsSetDefaultNetworkTierRequest(
              project='my-project',
-             projectsSetDefaultNetworkTierRequest=self.
-             messages.ProjectsSetDefaultNetworkTierRequest(
+             projectsSetDefaultNetworkTierRequest=self.messages.
+             ProjectsSetDefaultNetworkTierRequest(
                  networkTier=self.messages.ProjectsSetDefaultNetworkTierRequest.
                  NetworkTierValueValuesEnum.STANDARD)))
     ],)

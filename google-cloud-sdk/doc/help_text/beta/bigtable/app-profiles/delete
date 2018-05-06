@@ -1,0 +1,37 @@
+NAME
+    gcloud beta bigtable app-profiles delete - delete a Bigtable app-profile
+
+SYNOPSIS
+    gcloud beta bigtable app-profiles delete
+        (APP_PROFILE : --instance=INSTANCE) [--force] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Delete a Bigtable app-profile.
+
+POSITIONAL ARGUMENTS
+     APP PROFILE - The app profile to delete. The arguments in this group can
+     be used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
+
+       APP_PROFILE
+          The ID of the app-profile or a fully qualified identifier for the
+          app-profile. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --instance=INSTANCE
+          The Cloud Bigtable instance for the app-profile.
+
+FLAGS
+     --force
+        Ignore warnings and force delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

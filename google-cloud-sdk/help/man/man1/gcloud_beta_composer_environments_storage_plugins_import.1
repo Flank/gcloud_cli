@@ -1,0 +1,186 @@
+
+.TH "GCLOUD_BETA_COMPOSER_ENVIRONMENTS_STORAGE_PLUGINS_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta composer environments storage plugins import \- imports plugins from local storage or Cloud Storage into an environment
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta composer environments storage plugins import\fR \fB\-\-source\fR=\fISOURCE\fR (\fB\-\-environment\fR=\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR If the SOURCE is a directory, it and its contents are imported
+recursively. Colliding files in the environment's Cloud Storage bucket will be
+overwritten. If a file exists in the bucket but is not present in the SOURCE, it
+is not removed.
+
+The SOURCE path can contain wildcards. See \f5gsutil help wildcards\fR.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+Path to a local directory/file or Cloud Storage bucket/object to be imported
+into the plugins/ subdirectory in the environment's Cloud Storage bucket. Cloud
+Storage paths must begin with 'gs://'.
+
+.TP 2m
+
+ENVIRONMENT \- The environment into whose Cloud Storage bucket to import
+plugins.. The arguments in this group can be used to specify the attributes of
+this resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: Set the property
+[core/project] or provide the flag [\-\-project] on the command line. This must
+be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-environment\fR=\fIENVIRONMENT\fR
+The ID of the environment or a fully qualified identifier for the environment.
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The Cloud location for the environment.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+An optional subdirectory under the plugins/ directory in the environment's Cloud
+Storage bucket into which to import files. May contain forward slashes to
+delimit multiple levels of subdirectory nesting, but should not contain leading
+or trailing slashes. If the DESTINATION does not exist, it will be created.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+Suppose the '/foo' directory in the local filesystem has the following
+structure:
+
+.RS 2m
+foo
+|
++\-\- subdir1
+|   |
+|   +\-\- file1.txt
+|   +\-\- file2.txt
+|
++\-\- subdir2
+|   |
+|   +\-\- file3.txt
+|   +\-\- file4.txt
+.RE
+
+And the environment \f5myenv\fR's Cloud Storage bucket has the following
+structure:
+
+.RS 2m
+gs://the\-bucket
+|
++\-\- plugins
+|   |
+|   +\-\- foo
+|   |   |
+|   |   +\-\- subdir1
+|   |   |   |
+|   |   |   +\-\- bar.txt
+.RE
+
+The following command:
+
+.RS 2m
+gcloud beta composer environments storage plugins import myenv \-\-source /foo
+.RE
+
+would result in the following structure in \f5myenv\fR's Cloud Storage bucket:
+
+.RS 2m
+gs://the\-bucket
+|
++\-\- plugins
+|   |
+|   +\-\- foo
+|   |   |
+|   |   +\-\- subdir1
+|   |   |   |
+|   |   |   +\-\- bar.txt
+|   |   |   +\-\- file1.txt
+|   |   |   +\-\- file2.txt
+|   |   |
+|   |   +\-\- subdir2
+|   |   |   |
+|   |   |   +\-\- file3.txt
+|   |   |   +\-\- file4.txt
+.RE
+
+If instead we had run
+
+.RS 2m
+gcloud beta composer environments storage plugins import myenv \-\-source /foo \-\-destination bar
+.RE
+
+the resulting bucket structure would be the following:
+
+.RS 2m
+gs://the\-bucket
+|
++\-\- plugins
+|   |
+|   +\-\- foo
+|   |   |
+|   |   +\-\- subdir1
+|   |   |   |
+|   |   |   +\-\- bar.txt
+|   |
+|   +\-\- bar
+|   |   |
+|   |   +\-\- foo
+|   |   |   |
+|   |   |   +\-\- subdir1
+|   |   |   |   |
+|   |   |   |   +\-\- file1.txt
+|   |   |   |   +\-\- file2.txt
+|   |   |   |
+|   |   |   +\-\- subdir2
+|   |   |   |   |
+|   |   |   |   +\-\- file3.txt
+|   |   |   |   +\-\- file4.txt
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

@@ -603,7 +603,7 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -        RUNNABLE
         normalize_space=True)
 
   def testCloneBinLogInvalidArgs(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ArgumentError,
         'Both --bin-log-file-name and --bin-log-position must be specified'):
       self.Run("""
@@ -611,7 +611,7 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -        RUNNABLE
                --bin-log-file-name bin.log
                clone-instance-7 clone-instance-7a
                """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ArgumentError,
         'Both --bin-log-file-name and --bin-log-position must be specified'):
       self.Run("""

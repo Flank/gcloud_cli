@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for 'gcloud category-manager taxonomies list'."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import resources
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -90,7 +92,7 @@ class TaxonomiesListIntTest(base.CategoryManagerUnitTestBase):
 
   def _VerifyCorrectOutput(self):
     """Test that listing taxonomies emits the anticipated taxonomy fields."""
-    output = self.stdout.getvalue()
+    output = str(self.stdout.getvalue())
     for taxonomy in self.taxonomies:
       self.assertIn(taxonomy.name, output)
       self.assertIn(taxonomy.displayName, output)

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the firewall-rules describe subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core import resources
@@ -162,7 +164,7 @@ class AlphaFirewallRulesDescribeTest(FirewallRulesDescribeTest):
         [(self.compute_alpha.firewalls, 'Get',
           self.messages.ComputeFirewallsGetRequest(
               firewall='my-firewall', project='my-project'))],)
-    self.assertMultiLineEqual(self.stdout.getvalue(),
+    self.assertMultiLineEqual(self.GetOutput(),
                               textwrap.dedent("""\
             denied:
             - IPProtocol: tcp

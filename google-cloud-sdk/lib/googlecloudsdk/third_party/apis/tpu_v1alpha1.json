@@ -151,6 +151,10 @@
           "description": "The canonical id for this location. For example: `\"us-east1\"`.",
           "type": "string"
         },
+        "displayName": {
+          "description": "The friendly name for this location, typically a nearby city name.\nFor example, \"Tokyo\".",
+          "type": "string"
+        },
         "labels": {
           "description": "Cross-service attributes for the location. For example\n\n    {\"cloud.googleapis.com\/region\": \"us-east1\"}",
           "type": "object",
@@ -308,7 +312,9 @@
             "TPU node is undergoing reimaging.",
             "TPU node is being deleted.",
             "TPU node is being repaired and may be unusable. Details can be\nfound in the `help_description` field.",
-            "7 - Reserved. Was SUSPENDED.\nTPU node is stopped."
+            "7 - Reserved. Was SUSPENDED.\nTPU node is stopped.",
+            "TPU node is currently stopping.",
+            "TPU node is currently starting."
           ],
           "type": "string",
           "enum": [
@@ -319,7 +325,9 @@
             "REIMAGING",
             "DELETING",
             "REPAIRING",
-            "STOPPED"
+            "STOPPED",
+            "STOPPING",
+            "STARTING"
           ]
         },
         "healthDescription": {
@@ -600,7 +608,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Get information about a location."
+              "description": "Gets information about a location."
             }
           }
           ,

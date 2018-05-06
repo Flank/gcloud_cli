@@ -11,7 +11,7 @@ gcloud compute target\-ssl\-proxies create \- create a target SSL proxy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute target\-ssl\-proxies create\fR \fINAME\fR \fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute target\-ssl\-proxies create\fR \fINAME\fR \fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -22,7 +22,8 @@ proxies. A target SSL proxy is referenced by one or more forwarding rules which
 define which packets the proxy is responsible for routing. The target SSL proxy
 points to a backend service which handle the actual requests. The target SSL
 proxy also points to at most 10 SSL certificates used for server\-side
-authentication.
+authentication. The target SSL proxy can be associated with at most one SSL
+policy.
 
 
 
@@ -45,7 +46,7 @@ The name of the target SSL proxy to create.
 A backend service that will be used for connections to the target SSL proxy.
 
 .TP 2m
-\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...]
+\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
 References to at most 10 SSL certificate resources that are used for
 server\-side authentication. The first SSL certificate in this list is
 considered the primary SSL certificate associated with the load balancer. The
@@ -76,8 +77,16 @@ No proxy header is added.
 \fBPROXY_V1\fR
 Enables PROXY protocol (version 1) for passing client connection information.
 
-
 .RE
+.sp
+.TP 2m
+\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR
+A reference to an SSL policy resource that defines the server\-side support for
+SSL features and affects the connections between clients and the SSL proxy load
+balancer. The SSL policy must exist and cannot be deleted while referenced by a
+target SSL proxy.
+
+
 .RE
 .sp
 

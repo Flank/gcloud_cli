@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import store
@@ -69,7 +72,7 @@ acct3
     properties.PersistProperty(properties.VALUES.core.account, None)
     self.mock_accounts.return_value = []
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[accounts\]: No credentials available to revoke.'):
       self.Run('auth revoke')
@@ -78,7 +81,7 @@ acct3
     accts = ['acct1', 'acct2', 'acct3']
     self.mock_accounts.return_value = accts
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.UnknownArgumentException,
         r'Unknown value for \[accounts\]: foo'):
       self.Run('auth revoke foo')

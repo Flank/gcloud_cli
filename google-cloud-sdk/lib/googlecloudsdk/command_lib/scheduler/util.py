@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Utilities for "gcloud scheduler" commands."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import base64
 
 from apitools.base.py import extra_types
@@ -20,6 +23,7 @@ from googlecloudsdk.api_lib.app import region_util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.command_lib.tasks import app
+from googlecloudsdk.core.util import http_encoding
 
 
 _PUBSUB_MESSAGE_URL = 'type.googleapis.com/google.pubsub.v1.PubsubMessage'
@@ -33,7 +37,14 @@ def _GetSchedulerMessages():
   return apis.GetMessagesModule('cloudscheduler', 'v1alpha1')
 
 
-def ModifyCreatePubsubJobRequest(location_ref, args, create_job_req):
+def ModifyCreateJobRequest(job_ref, args, create_job_req):
+  """Change the job.name field to a relative name."""
+  del args  # Unused in ModifyCreateJobRequest
+  create_job_req.job.name = job_ref.RelativeName()
+  return create_job_req
+
+
+def ModifyCreatePubsubJobRequest(job_ref, args, create_job_req):
   """Add the pubsubMessage field to the given request.
 
   Because the Cloud Scheduler API has a reference to a PubSub message, but
@@ -41,8 +52,7 @@ def ModifyCreatePubsubJobRequest(location_ref, args, create_job_req):
   insert it into the request.
 
   Args:
-    location_ref: Resource reference to the Location where the job will be
-        created (unused)
+    job_ref: Resource reference to the job to be created (unused)
     args: argparse namespace with the parsed arguments from the command line. In
         particular, we expect args.message_body and args.attributes (optional)
         to be AdditionalProperty types.
@@ -53,14 +63,14 @@ def ModifyCreatePubsubJobRequest(location_ref, args, create_job_req):
     CloudschedulerProjectsLocationsJobsCreateRequest: the given request but with
         the job.pubsubTarget.pubsubMessage field populated.
   """
-  # Unused in ModifyCreatePubsubJobRequest; API will assign a name
-  del location_ref
+  ModifyCreateJobRequest(job_ref, args, create_job_req)
+  # Unused in ModifyCreatePubsubJobRequest; already populated
   pubsub_message_type = create_job_req.job.pubsubTarget.PubsubMessageValue
   props = [
       pubsub_message_type.AdditionalProperty(
           key='@type',
           value=extra_types.JsonValue(string_value=_PUBSUB_MESSAGE_URL)),
-      args.message_body
+      args.message_body or args.message_body_from_file
   ]
   if args.attributes:
     props.append(args.attributes)
@@ -89,13 +99,18 @@ def ParseMessageBody(message_body):
 
   # First, put into a PubsubMessage to make sure we've got the general format
   # right.
-  pubsub_message = pubsub_messages.PubsubMessage(data=message_body)
+  pubsub_message = pubsub_messages.PubsubMessage(
+      data=http_encoding.Encode(message_body))
 
   pubsub_message_type = scheduler_messages.PubsubTarget.PubsubMessageValue
   encoded_data = base64.urlsafe_b64encode(pubsub_message.data)
   return pubsub_message_type.AdditionalProperty(
       key='data',
       value=extra_types.JsonValue(string_value=encoded_data))
+
+
+def ParseMessageBodyFromFile(path):
+  return ParseMessageBody(arg_parsers.BufferedFileInput()(path))
 
 
 def ParseAttributes(attributes):
@@ -149,17 +164,17 @@ def HeaderType(string):
   return {header: value}
 
 
-def HeaderProcessor(value):
-  """Convert dict into HeadersValue."""
+def GetHeaderProcessor(message_type):
+  """Gets a hook to convert a dict into a HeadersValue for the given message."""
   scheduler_messages = _GetSchedulerMessages()
-  props = []
-  for key, value in sorted(value.items()):
-    props.append(
-        scheduler_messages.AppEngineHttpTarget.HeadersValue.AdditionalProperty(
-            key=key,
-            value=value))
-  return scheduler_messages.AppEngineHttpTarget.HeadersValue(
-      additionalProperties=props)
+  header_type = getattr(scheduler_messages, message_type).HeadersValue
+  def HeaderProcessor(value):
+    """Convert dict into HeadersValue."""
+    props = []
+    for key, value in sorted(value.items()):
+      props.append(header_type.AdditionalProperty(key=key, value=value))
+    return header_type(additionalProperties=props)
+  return HeaderProcessor
 
 
 _MORE_REGIONS_AVAILABLE_WARNING = """\
@@ -172,7 +187,8 @@ create an app using the following command:
 
 
 VALID_REGIONS = [
-    region_util.Region('us-central1', True, True),
+    region_util.Region('us-central', True, True),
+    region_util.Region('europe-west', True, True),
 ]
 
 

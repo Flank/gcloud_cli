@@ -20,6 +20,7 @@ from tests.lib.surface.dns import base
 
 
 @parameterized.named_parameters(
+    ('GA', calliope_base.ReleaseTrack.GA, 'v1'),
     ('Beta', calliope_base.ReleaseTrack.BETA, 'v1beta2'),
 )
 class ManagedZonesUpdateTest(base.DnsMockMultiTrackTest):

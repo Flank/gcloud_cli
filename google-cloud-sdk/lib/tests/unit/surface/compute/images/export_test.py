@@ -27,8 +27,8 @@ from tests.lib.surface.compute import test_base
 class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
     self.mocked_cloudbuild_v1 = mock.Client(
         core_apis.GetClientClass('cloudbuild', 'v1'),
@@ -144,7 +144,6 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
     self.mocked_crm_v1.projects.GetIamPolicy.Expect(
         self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
             resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
         ),
         response=self.permissions,
     )
@@ -172,7 +171,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
     self.PrepareMocks(daisy_step)
 
     self.Run("""
-             compute images export {0}
+             compute images export --image {0}
              --destination-uri {1}
              """.format(self.image_name, self.destination_uri))
 
@@ -195,8 +194,31 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
     self.PrepareMocks(daisy_step)
 
     self.Run("""
-             compute images export {0}
+             compute images export --image {0}
              --destination-uri {1} --export-format=vmdk
+             """.format(self.image_name, self.destination_uri))
+
+    self.AssertOutputContains("""\
+        Here is some streamed
+        data for you to print
+        """, normalize_space=True)
+
+  def testImageProject(self):
+    export_workflow = ('../workflows/export/image_export.wf.json')
+    daisy_step = self.cloudbuild_v1_messages.BuildStep(
+        args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-variables=source_image=projects/debian-cloud/global/images/{0},'
+              'destination={1}'
+              .format(self.image_name, self.destination_uri),
+              export_workflow,],
+        name=self.daisy_builder,
+    )
+
+    self.PrepareMocks(daisy_step)
+
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1} --image-project debian-cloud
              """.format(self.image_name, self.destination_uri))
 
     self.AssertOutputContains("""\
@@ -206,7 +228,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
 
   def testMissingImage(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'argument IMAGE_NAME: Must be specified'):
+        'Exactly one of (--image | --image-family) must be specified.'):
       self.Run("""
                compute images export --destination-uri {0}
                """.format(self.destination_uri))
@@ -215,7 +237,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --destination-uri: Must be specified'):
       self.Run("""
-               compute images export {0}
+               compute images export --image {0}
                """.format(self.image_name))
 
 if __name__ == '__main__':

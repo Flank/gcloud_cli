@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """deployments stop command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.deployment_manager import dm_api_util
@@ -22,7 +24,6 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.deployment_manager import dm_util
 from googlecloudsdk.command_lib.deployment_manager import dm_write
 from googlecloudsdk.command_lib.deployment_manager import flags
-from googlecloudsdk.core import log
 
 # Number of seconds (approximately) to wait for stop operation to complete.
 OPERATION_TIMEOUT = 20 * 60  # 20 mins
@@ -90,7 +91,7 @@ class Stop(base.Command, dm_base.DmCommand):
           self.client,
           self.messages,
           dm_base.GetProject(),
-          args.deployment_name) or ''
+          args.deployment_name) or b''
     try:
       operation = self.client.deployments.Stop(
           self.messages.DeploymentmanagerDeploymentsStopRequest(
@@ -109,14 +110,14 @@ class Stop(base.Command, dm_base.DmCommand):
     else:
       op_name = operation.name
       try:
-        dm_write.WaitForOperation(self.client,
-                                  self.messages,
-                                  op_name,
-                                  'stop',
-                                  dm_base.GetProject(),
-                                  timeout=OPERATION_TIMEOUT)
-        log.status.Print('Stop operation ' + op_name
-                         + ' completed successfully.')
+        operation = dm_write.WaitForOperation(
+            self.client,
+            self.messages,
+            op_name,
+            'stop',
+            dm_base.GetProject(),
+            timeout=OPERATION_TIMEOUT)
+        dm_util.LogOperationStatus(operation, 'Stop')
       except apitools_exceptions.HttpError as error:
         raise exceptions.HttpException(error, dm_api_util.HTTP_ERROR_FORMAT)
       try:

@@ -14,6 +14,8 @@
 
 """Tests for the 'report error' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.error_reporting import util
@@ -94,7 +96,7 @@ class ReportTest(base.ErrorReportingTestBase):
             reportedErrorEvent=self.error_event),
         self.api_messages.ReportErrorEventResponse())
     self.RunCmd(COMMAND_WITH_MESSAGE + ' --project '+ PROJECT)
-    self.assertEquals(properties.VALUES.core.project.Get(
+    self.assertEqual(properties.VALUES.core.project.Get(
         required=True), PROJECT)
 
   def testRunReportVersionProvided(self):

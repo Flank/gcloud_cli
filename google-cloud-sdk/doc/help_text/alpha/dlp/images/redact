@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha dlp images redact - redact potentially sensitive data from
+        image content
+
+SYNOPSIS
+    gcloud alpha dlp images redact IMAGE --info-types=[INFOTYPE,...]
+        [--include-quote] [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
+        [--redact-all-text] [--redact-color=REDACT_COLOR]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Redact potentially sensitive data from image content.
+
+POSITIONAL ARGUMENTS
+     IMAGE
+        Image file to search for sensitive info. The file type must be one of
+        PNG, JPEG, SVG, or BMP.
+
+REQUIRED FLAGS
+     --info-types=[INFOTYPE,...]
+        Which infoTypes to look for. The values must correspond to InfoType
+        values found in documentation. For more information about valid
+        infoTypes, see InfoTypes Reference
+        (https://cloud.google.com/dlp/docs/infotypes-reference)
+
+OPTIONAL FLAGS
+     --include-quote
+        If True, the server will attempt to filter out profanities, replacing
+        all but the initial character in each filtered word with asterisks,
+        e.g. \"f**\".
+
+     --min-likelihood=MIN_LIKELIHOOD; default="possible"
+        Only return findings equal to or above this threshold. One of:
+        very-unlikely, unlikely, possible, likely, very-likely. The default
+        value is possible. MIN_LIKELIHOOD must be one of: likely, possible,
+        unlikely, very-likely, very-unlikely.
+
+     --redact-all-text
+        If specified, all text info in the image will be removed, whether it is
+        detected as sensitive or not.
+
+     --redact-color=REDACT_COLOR
+        The color to use when redacting content from an image. If not
+        specified, the default value is black. Colors should be specified as a
+        string of r,g,b float values in the interval [0,1] representing the
+        amount of red, green, and blue in the color, respectively. For example,
+        black = 0,0,0, red = 1.0,0,0, white = 1.0,1.0,1.0, and so on.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the dlp/v2 API. The full documentation for this API can
+    be found at: https://cloud.google.com/dlp/docs/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

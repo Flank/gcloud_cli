@@ -18,8 +18,12 @@ POSITIONAL ARGUMENTS
         start with gs://.
 
 REQUIRED FLAGS
-     --catalog=CATALOG
-        The catalog to add ReferenceImages to.
+     CATALOG - The catalog to add ReferenceImages to. This represents a Cloud
+     resource. This must be specified.
+
+       --catalog=CATALOG
+          The ID of the catalog or a fully qualified identifier for the
+          catalog.
 
      --product-id=PRODUCT_ID
         The product ID to associate this ReferenceImage to. Product Id is

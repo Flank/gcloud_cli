@@ -40,7 +40,7 @@ COMMANDS
         (ALPHA) Show metadata for a project.
 
      get-iam-policy
-        (ALPHA) Get IAM policy for a project.
+        (ALPHA) Get the IAM policy for a project.
 
      list
         (ALPHA) List projects accessible by the active account.

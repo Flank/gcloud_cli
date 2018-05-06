@@ -14,6 +14,8 @@
 
 """Tests of the java module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import subprocess
 
 from googlecloudsdk.command_lib.util import java
@@ -70,8 +72,8 @@ class JavaTests(sdk_test_base.WithOutputCapture):
 
     check_out_mock.return_value = 'version "1.8.'
 
-    self.assertEquals(java.RequireJavaInstalled('foo'),
-                      '/path/to/java')
+    self.assertEqual(java.RequireJavaInstalled('foo'),
+                     '/path/to/java')
 
   def testJava8Error(self):
     check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
@@ -87,8 +89,8 @@ class JavaTests(sdk_test_base.WithOutputCapture):
     check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
     check_out_mock.return_value = 'version "9.0.1"'
 
-    self.assertEquals(java.RequireJavaInstalled('foo', min_version=7),
-                      '/path/to/java')
+    self.assertEqual(java.RequireJavaInstalled('foo', min_version=7),
+                     '/path/to/java')
 
   def testJava9InstalledAndOnPath_JustMajorVersion(self):
     find_exec_mock = self.StartObjectPatch(files, 'FindExecutableOnPath')
@@ -97,8 +99,8 @@ class JavaTests(sdk_test_base.WithOutputCapture):
     check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
     check_out_mock.return_value = 'version "9"'
 
-    self.assertEquals(java.RequireJavaInstalled('foo', min_version=7),
-                      '/path/to/java')
+    self.assertEqual(java.RequireJavaInstalled('foo', min_version=7),
+                     '/path/to/java')
 
   def testJava9InstalledAndOnPath_JustMajorVersionWithPrelease(self):
     find_exec_mock = self.StartObjectPatch(files, 'FindExecutableOnPath')
@@ -107,8 +109,8 @@ class JavaTests(sdk_test_base.WithOutputCapture):
     check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
     check_out_mock.return_value = 'version "9-internal"'
 
-    self.assertEquals(java.RequireJavaInstalled('foo', min_version=7),
-                      '/path/to/java')
+    self.assertEqual(java.RequireJavaInstalled('foo', min_version=7),
+                     '/path/to/java')
 
   def testJava9InstalledAndOnPath_JustMajorMinorSecurityVersion(self):
     find_exec_mock = self.StartObjectPatch(files, 'FindExecutableOnPath')
@@ -117,8 +119,8 @@ class JavaTests(sdk_test_base.WithOutputCapture):
     check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
     check_out_mock.return_value = 'version "9.1.3"'
 
-    self.assertEquals(java.RequireJavaInstalled('foo', min_version=7),
-                      '/path/to/java')
+    self.assertEqual(java.RequireJavaInstalled('foo', min_version=7),
+                     '/path/to/java')
 
   def testJava10InstalledAndOnPath_JustMajor(self):
     find_exec_mock = self.StartObjectPatch(files, 'FindExecutableOnPath')
@@ -127,5 +129,5 @@ class JavaTests(sdk_test_base.WithOutputCapture):
     check_out_mock = self.StartObjectPatch(subprocess, 'check_output')
     check_out_mock.return_value = 'version "10"'
 
-    self.assertEquals(java.RequireJavaInstalled('foo', min_version=7),
-                      '/path/to/java')
+    self.assertEqual(java.RequireJavaInstalled('foo', min_version=7),
+                     '/path/to/java')

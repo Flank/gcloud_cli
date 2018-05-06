@@ -1,0 +1,133 @@
+
+.TH "GCLOUD_ALPHA_KMS_KEYS_GET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha kms keys get\-iam\-policy \- get the IAM policy for a key
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha kms keys get\-iam\-policy\fR (\fIKEY\fR\ :\ \fB\-\-keyring\fR=\fIKEYRING\fR\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha kms keys get\-iam\-policy\fR displays the IAM
+policy associated with a key. If formatted as JSON, the output can be edited and
+used as a policy file for set\-iam\-policy. The output includes an "etag" field
+identifying the version emitted and allowing detection of concurrent policy
+updates; see $ gcloud alpha kms keys set\-iam\-policy for additional details.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+KEY \- The key for which to display the IAM policy. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: Set the property [core/project] or provide the flag
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIKEY\fR
+The ID of the key or a fully qualified identifier for the key. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+The containing keyring.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of the key.
+
+
+.RE
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates True then that item is listed. For more details and
+examples of filter expressions run $ gcloud topic filters. This flag interacts
+with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+A comma\-separated list of resource field key names to sort by. The default
+order is ascending. Prefix a field with ``~'' for descending order on that
+field. This flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudkms/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/kms/
+
+
+
+.SH "EXAMPLES"
+
+To print the IAM policy for a given cluster, run:
+
+.RS 2m
+$ gcloud alpha kms keys get\-iam\-policy \-\-keyring=my\-key\-ring \e
+    \-\-location=my\-location my\-key
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud kms keys get\-iam\-policy
+$ gcloud beta kms keys get\-iam\-policy
+.RE
+

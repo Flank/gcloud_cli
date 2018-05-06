@@ -11,7 +11,7 @@ gcloud compute firewall\-rules create \- create a Google Compute Engine firewall
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute firewall\-rules create\fR \fINAME\fR (\fB\-\-action\fR=\fIACTION\fR\ |\ \fB\-\-allow\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-source\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute firewall\-rules create\fR \fINAME\fR (\fB\-\-action\fR=\fIACTION\fR\ |\ \fB\-\-allow\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-direction\fR=\fIDIRECTION\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]] [\fB\-\-source\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=\fIEMAIL\fR,[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -48,7 +48,7 @@ specified, the flag \f5\-\-rules\fR must also be specified. \fIACTION\fR must be
 one of: \fBALLOW\fR, \fBDENY\fR.
 
 .TP 2m
-\fB\-\-allow\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]
+\fB\-\-allow\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]
 A list of protocols and ports whose traffic will be allowed.
 
 The protocols allowed over this connection. This can be the (case\-sensitive)
@@ -132,7 +132,7 @@ rules: lower priority values imply higher precedence. DENY rules take precedence
 over ALLOW rules having equal priority.
 
 .TP 2m
-\fB\-\-rules\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]
+\fB\-\-rules\fR=\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],[...]
 A list of protocols and ports to which the firewall rule will apply.
 
 PROTOCOL is the IP protocol whose traffic will be checked. PROTOCOL can be
@@ -142,17 +142,18 @@ http://www.iana.org/assignments/protocol\-numbers/protocol\-numbers.xhtml
 
 A port or port range can be specified after PROTOCOL to which the firewall rule
 apply on traffic through specific ports. If no port or port range is specified,
-connections through all ranges are applied. For example, the following will
-create a rule that blocks TCP traffic through port 80 and ICMP traffic:
+connections through all ranges are applied. TCP and UDP rules must include a
+port or port range.
+
+If specified, the flag \-\-action must also be specified.
+
+For example, the following will create a rule that blocks TCP traffic through
+port 80 and ICMP traffic:
 
 .RS 2m
 $ gcloud compute firewall\-rules create MY\-RULE \-\-action deny \e
     \-\-rules tcp:80,icmp
 .RE
-
-TCP and UDP rules must include a port or port range.
-
-If specified, the flag \-\-action must also be specified.
 
 .TP 2m
 \fB\-\-source\-ranges\fR=\fICIDR_RANGE\fR,[\fICIDR_RANGE\fR,...]
@@ -237,8 +238,8 @@ To create a firewall rule allowing incoming TCP traffic on port 8080, run:
 
 .RS 2m
 $ gcloud compute firewall\-rules create FooService \-\-allow tcp:8080 \e
-  \-\-description "Allow incoming traffic on TCP port 8080"
-  \-\-direction INGRESS
+    \-\-description "Allow incoming traffic on TCP port 8080" \e
+    \-\-direction INGRESS
 .RE
 
 To create a firewall rule that allows TCP traffic through port 80 and determines
@@ -247,8 +248,8 @@ connections, run:
 
 .RS 2m
 $ gcloud compute firewall\-rules create "tcp\-rule" \-\-allow tcp:80 \e
-  \-\-source\-ranges="10.0.0.0/22,10.0.0.0/14" \e
-  \-\-description="Narrowing TCP traffic"
+    \-\-source\-ranges="10.0.0.0/22,10.0.0.0/14" \e
+    \-\-description="Narrowing TCP traffic"
 .RE
 
 To list existing firewall rules, run:

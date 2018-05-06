@@ -37,9 +37,9 @@ class RecordSetsTransactionExecuteTest(base.DnsMockTest):
     with self.assertRaises(ToolException) as context:
       self.Run(
           'dns record-sets transaction execute -z {0}'.format(test_zone.name))
-      self.assertEquals(context.exception.message,
-                        'transaction not found at [{0}]'.format(
-                            transaction_util.DEFAULT_PATH))
+      self.assertEqual(context.exception.message,
+                       'transaction not found at [{0}]'.format(
+                           transaction_util.DEFAULT_PATH))
 
   def testTransactionExecuteEmpty(self):
     shutil.copyfile(
@@ -93,9 +93,9 @@ class RecordSetsTransactionExecuteBetaTest(base.DnsMockBetaTest):
     with self.assertRaises(ToolException) as context:
       self.Run(
           'dns record-sets transaction execute -z {0}'.format(test_zone.name))
-      self.assertEquals(context.exception.message,
-                        'transaction not found at [{0}]'.format(
-                            transaction_util.DEFAULT_PATH))
+      self.assertEqual(context.exception.message,
+                       'transaction not found at [{0}]'.format(
+                           transaction_util.DEFAULT_PATH))
 
   def testTransactionExecuteEmpty(self):
     shutil.copyfile(

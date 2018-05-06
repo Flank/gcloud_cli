@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for the store API."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as apitools_mock
 
 from googlecloudsdk.api_lib.category_manager import store as store_api
@@ -47,7 +49,7 @@ class StoreTest(sdk_test_base.WithFakeAuth):
         expected)
     org_ref = resources.REGISTRY.Create(
         'cloudresourcemanager.organizations', organizationsId='123456789')
-    actual = store_api.GetTaxonomyStoreFromOrgRef(org_ref)
+    actual = store_api.GetTaxonomyStoreFromOrgResource(org_ref)
     self.assertEqual(expected, actual)
 
   def testGetIamPolicy(self):
@@ -59,7 +61,7 @@ class StoreTest(sdk_test_base.WithFakeAuth):
     response = store_api.GetIamPolicy(
         resources.REGISTRY.Create(
             'categorymanager.taxonomyStores', taxonomyStoresId='111'))
-    self.assertEquals(policy, response)
+    self.assertEqual(policy, response)
 
   def testSetIamPolicy(self):
     policy = self._GetTestIamPolicy()
@@ -71,7 +73,7 @@ class StoreTest(sdk_test_base.WithFakeAuth):
     response = store_api.SetIamPolicy(
         resources.REGISTRY.Create(
             'categorymanager.taxonomyStores', taxonomyStoresId='111'), policy)
-    self.assertEquals(policy, response)
+    self.assertEqual(policy, response)
 
 
 if __name__ == '__main__':

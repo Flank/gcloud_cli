@@ -1,0 +1,65 @@
+NAME
+    gcloud alpha kms keys set-iam-policy - set the IAM policy for a key
+
+SYNOPSIS
+    gcloud alpha kms keys set-iam-policy
+        (KEY : --keyring=KEYRING --location=LOCATION) POLICY_FILE
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Sets the IAM policy for the given key as defined in a JSON or YAML
+    file.
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
+
+POSITIONAL ARGUMENTS
+     KEY - The key whose IAM policy to update. The arguments in this group can
+     be used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
+
+       KEY
+          The ID of the key or a fully qualified identifier for the key. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --keyring=KEYRING
+          The containing keyring.
+
+       --location=LOCATION
+          The location of the key.
+
+     POLICY_FILE
+        Path to a local JSON or YAML formatted file containing a valid policy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudkms/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/kms/
+
+EXAMPLES
+    The following command will read am IAM policy defined in a JSON file
+    'policy.json' and set it for the key frodo with the keyring fellowship and
+    location global:
+
+    $ gcloud alpha kms keys set-iam-policy frodo policy.json \        --keyring fellowship --location global
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keys set-iam-policy
+        $ gcloud beta kms keys set-iam-policy
+

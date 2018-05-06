@@ -41,7 +41,8 @@ COMMANDS
         Set the IAM policy for a keyring.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keyrings
         $ gcloud beta kms keyrings
 

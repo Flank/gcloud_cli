@@ -60,7 +60,8 @@ COMMANDS
         Update the metadata of an IAM service account.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam service-accounts
         $ gcloud beta iam service-accounts
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise build cancelation."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -186,7 +188,7 @@ Cancelled [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/987-6
         exception=http_error.MakeHttpError(code=400, message='Invalid argument')
     )
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.HttpException, 'Invalid argument'):
       self._Run(['container', 'builds', 'cancel', '123-456-789'])
 
@@ -199,7 +201,7 @@ Cancelled [https://cloudbuild.googleapis.com/v1/projects/my-project/builds/987-6
         exception=http_error.MakeHttpError(code=404)
     )
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.HttpException, 'Resource not found'):
       self._Run(['container', 'builds', 'cancel', '123-456-789'])
 

@@ -11,8 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for googlecloudsdk.command_lib.util.args.repeated."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.util.args import repeated
+from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.calliope import util
@@ -31,29 +37,29 @@ class CachedResultTest(test_case.TestCase):
   def testGet_OnlyCallsOnce(self):
     values = [1]
     result = repeated.CachedResult(values.pop)
-    self.assertEquals(result.Get(), 1)
-    self.assertEquals(result.Get(), 1)
+    self.assertEqual(result.Get(), 1)
+    self.assertEqual(result.Get(), 1)
 
   def testGet_FromFunc(self):
     values = [1, 2]
     result = repeated.CachedResult.FromFunc(values.pop, 0)
-    self.assertEquals(result.Get(), 1)
-    self.assertEquals(result.Get(), 1)
+    self.assertEqual(result.Get(), 1)
+    self.assertEqual(result.Get(), 1)
 
   def testGetAttrThunk(self):
     values = [1, 2]
     result = repeated.CachedResult.FromFunc(Obj, values, 3)
-    self.assertEquals(result.GetAttrThunk('value_1')(), [1])
-    self.assertEquals(result.GetAttrThunk('value_2')(), [2])
-    self.assertEquals(result.GetAttrThunk('value_3')(), [3])
+    self.assertEqual(result.GetAttrThunk('value_1')(), [1])
+    self.assertEqual(result.GetAttrThunk('value_2')(), [2])
+    self.assertEqual(result.GetAttrThunk('value_3')(), [3])
 
   def testGetAttrThunk_Transform(self):
     values = [1, 2]
     result = repeated.CachedResult.FromFunc(Obj, values, 3)
     negate = lambda x: -x
-    self.assertEquals(result.GetAttrThunk('value_1', negate)(), [-1])
-    self.assertEquals(result.GetAttrThunk('value_2', negate)(), [-2])
-    self.assertEquals(result.GetAttrThunk('value_3', negate)(), [-3])
+    self.assertEqual(result.GetAttrThunk('value_1', negate)(), [-1])
+    self.assertEqual(result.GetAttrThunk('value_2', negate)(), [-2])
+    self.assertEqual(result.GetAttrThunk('value_3', negate)(), [-3])
 
 
 class AddAndParseArgs(test_case.WithOutputCapture, parameterized.TestCase):
@@ -111,8 +117,44 @@ class AddAndParseArgs(test_case.WithOutputCapture, parameterized.TestCase):
     args, _ = self.parser.parse_known_args(flag_value.split(' '))
 
     after = repeated.ParsePrimitiveArgs(args, 'bars', result.Get)
-    self.assertEquals(after, expected)
+    self.assertEqual(after, expected)
 
+  def _ParseResource(self, name):
+    return resources.REGISTRY.Parse(
+        name, params={'projectsId': 'fake-project'},
+        collection='pubsub.projects.topics')
+
+  @parameterized.named_parameters(
+      ('Add', ['a'], '--add-bars b', ['a', 'b']),
+      ('AddStartsEmpty', [], '--add-bars a,b', ['a', 'b']),
+      ('AddNoop', ['a', 'b', 'c'], '--add-bars a,b', None),
+      ('AddPartialNoop', ['a'], '--add-bars a,b', ['a', 'b']),
+      ('AddNothing', ['a'], '--add-bars ', None),
+      ('Remove', ['a', 'b', 'c'], '--remove-bars a,b', ['c']),
+      ('RemoveNoop', [], '--remove-bars a,b', None),
+      ('RemovePartialNoop', ['a', 'c'], '--remove-bars a,b', ['c']),
+      ('RemoveRemoveNothing', ['a'], '--remove-bars ', None),
+      ('SetBars', None, '--set-bars a,b', ['a', 'b']),
+      ('SetBarsEmpty', None, '--set-bars ', []),
+      ('ClearBars', None, '--clear-bars', []),
+      ('AddWithRelativeName', ['a'],
+       '--add-bars projects/fake-project/topics/b', ['a', 'b']),
+  )
+  def testParseResourceName(self, before, flag_value, expected):
+    if before is None:
+      result = repeated.CachedResult([].pop)
+    else:
+      before = ['projects/fake-project/topics/' + b for b in before]
+      result = repeated.CachedResult([before].pop)
+
+    args, _ = self.parser.parse_known_args(flag_value.split(' '))
+
+    after = repeated.ParseResourceNameArgs(
+        args, 'bars', result.Get, self._ParseResource)
+
+    if expected:
+      expected = ['projects/fake-project/topics/' + e for e in expected]
+    self.assertEqual(after, expected)
 
 if __name__ == '__main__':
   test_case.main()

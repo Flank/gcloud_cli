@@ -17,9 +17,9 @@ gcloud alpha compute sign\-url \- sign specified URL for use with Cloud CDN Sign
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute sign\-url\fR is used to generate a signed
-URL for the specified URL and optionally validate the response by sending a
-request to the signed URL.
+\fB(ALPHA)\fR \fBgcloud alpha compute sign\-url\fR generates a signed URL for
+the specified URL and optionally validates the response by sending a request to
+the signed URL.
 
 Cloud CDN Signed URLs give you a way to serve responses from the globally
 distributed CDN cache, even if the request needs to be authorized.
@@ -126,5 +126,9 @@ This command is currently in ALPHA and may change without notice. Usually, users
 of ALPHA commands and flags need to apply for access, agree to applicable terms,
 and have their projects whitelisted. Contact Google or sign up on a product's
 page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute sign\-url
+.RE
 

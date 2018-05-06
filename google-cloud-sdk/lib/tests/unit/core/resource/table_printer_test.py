@@ -17,7 +17,8 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import StringIO
+
+import io
 import sys
 import textwrap
 
@@ -319,10 +320,8 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         """.format((_ZERO_WIDTH_SPACE + _SOFT_HYPHEN) * 20)))
 
   def _RenderAsMarkdown(self, text):
-    # TODO(b/74017079): Use io.StringIO here. Will need to update
-    # render_document to work with unicode correctly.
-    orig = StringIO.StringIO(text)
-    rendered_text = StringIO.StringIO()
+    orig = io.StringIO(text)
+    rendered_text = io.StringIO()
     render_document.RenderDocument('text',
                                    orig,
                                    out=rendered_text,
@@ -1484,10 +1483,10 @@ class TablePrinterAttributeTest(resource_printer_test_base.Base):
 
   def testTablePrinterUnicodeKeys(self):
     resource_printer.Print(self.unicode_key_resource,
-                           'table[box](ħɇȺđ, ∂αтα, ẗäïḷ)')
+                           'table[box](ħɇȺđ, ∂αтα, täïḷ)')
     self.AssertOutputEquals(textwrap.dedent("""\
         ┌──────┬──────┬──────┐
-        │ ĦɆȺĐ │ ∂ΑТΑ │ ẗÄÏḶ │
+        │ ĦɆȺĐ │ ∂ΑТΑ │ TÄÏḶ │
         ├──────┼──────┼──────┤
         │ zero │ :\u200b\u00ad:   │ ZERO │
         │ one  │ :Ü:  │ ONE  │
@@ -1497,12 +1496,12 @@ class TablePrinterAttributeTest(resource_printer_test_base.Base):
 
   def testTablePrinterUnicodeKeysAndTitleBox(self):
     resource_printer.Print(self.unicode_key_resource,
-                           'table[box,title="東京"](ħɇȺđ, ∂αтα, ẗäïḷ)')
+                           'table[box,title="東京"](ħɇȺđ, ∂αтα, täïḷ)')
     self.AssertOutputEquals(textwrap.dedent("""\
         ┌────────────────────┐
         │        東京        │
         ├──────┬──────┬──────┤
-        │ ĦɆȺĐ │ ∂ΑТΑ │ ẗÄÏḶ │
+        │ ĦɆȺĐ │ ∂ΑТΑ │ TÄÏḶ │
         ├──────┼──────┼──────┤
         │ zero │ :\u200b\u00ad:   │ ZERO │
         │ one  │ :Ü:  │ ONE  │
@@ -1512,10 +1511,10 @@ class TablePrinterAttributeTest(resource_printer_test_base.Base):
 
   def testTablePrinterUnicodeKeysAndTitleNoBox(self):
     resource_printer.Print(self.unicode_key_resource,
-                           'table[title="東京"](ħɇȺđ, ∂αтα, ẗäïḷ)')
+                           'table[title="東京"](ħɇȺđ, ∂αтα, täïḷ)')
     self.AssertOutputEquals(textwrap.dedent("""\
               東京
-        ĦɆȺĐ  ∂ΑТΑ  ẗÄÏḶ
+        ĦɆȺĐ  ∂ΑТΑ  TÄÏḶ
         zero  :\u200b\u00ad:    ZERO
         one   :Ü:   ONE
         two   :車:  TWO

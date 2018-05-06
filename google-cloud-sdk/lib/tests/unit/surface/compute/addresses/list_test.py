@@ -15,6 +15,7 @@
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.addresses import flags
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
@@ -331,6 +332,63 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         ],
         cli=self.cli,
     )
+
+
+class AddressesListAlphaTest(AddressesListTest):
+
+  def _GetInternalAddressesForTest(self):
+    return [
+        self.messages.Address(
+            address='10.240.10.11',
+            name='address-3',
+            region=('https://www.googleapis.com/compute/v1/projects/my-project/'
+                    'regions/region-1'),
+            selfLink=(
+                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'regions/region-1/addresses/address-3'),
+            addressType=self.messages.Address.AddressTypeValueValuesEnum.
+            INTERNAL,
+            purpose=self.messages.Address.PurposeValueValuesEnum.GCE_ENDPOINT,
+            subnetwork=(
+                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'regions/us-east1/subnetworks/fancy'),
+            status=self.messages.Address.StatusValueValuesEnum.RESERVED),
+        self.messages.Address(
+            name='range-1',
+            address='10.23.22.0',
+            prefixLength=24,
+            selfLink=(
+                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'global/addresses/range-1'),
+            addressType=self.messages.Address.AddressTypeValueValuesEnum.
+            INTERNAL,
+            purpose=self.messages.Address.PurposeValueValuesEnum.VPC_PEERING,
+            network=(
+                'https://www.googleapis.com/compute/v1/projects/my-project/'
+                'global/networks/default'),
+            status=self.messages.Address.StatusValueValuesEnum.RESERVED)
+    ]
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    super(AddressesListAlphaTest, self).SetUp()
+
+  def testTableOutput(self):
+    command = 'compute addresses list'
+    return_value = (
+        test_resources.ADDRESSES + test_resources.GLOBAL_ADDRESSES +
+        self._GetInternalAddressesForTest())
+    output = ("""\
+        NAME             ADDRESS/RANGE  TYPE     PURPOSE      NETWORK REGION   SUBNET STATUS
+        address-1        23.251.134.124                               region-1        IN_USE
+        address-2        23.251.134.125                               region-1        RESERVED
+        global-address-1 23.251.134.126                                               IN_USE
+        global-address-2 23.251.134.127                                               RESERVED
+        address-3        10.240.10.11   INTERNAL GCE_ENDPOINT         region-1 fancy  RESERVED
+        range-1          10.23.22.0/24  INTERNAL VPC_PEERING  default                 RESERVED
+        """)
+    self.RequestAggregate(command, return_value, output)
 
 
 if __name__ == '__main__':

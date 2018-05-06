@@ -25,9 +25,9 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
 
   def testUpdateMissingNameOrLabels(self):
     address_ref = self._GetAddressRef('address-1', region='us-central1')
-    with self.assertRaisesRegexp(calliope_exceptions.RequiredArgumentException,
-                                 'At least one of --update-labels or '
-                                 '--remove-labels must be specified.'):
+    with self.assertRaisesRegex(calliope_exceptions.RequiredArgumentException,
+                                'At least one of --update-labels or '
+                                '--remove-labels must be specified.'):
       self.Run('compute addresses update {0} --region {1}'
                .format(address_ref.Name(), address_ref.region))
 

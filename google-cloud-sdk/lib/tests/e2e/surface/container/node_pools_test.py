@@ -14,6 +14,8 @@
 
 """Integration tests for container node pools."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from tests.lib import e2e_utils
@@ -28,27 +30,33 @@ class NodePoolsTest(base.IntegrationTestBase):
   # so we run this test only in bundle.
   # TODO(b/67013344): Remove DoNotRunOnWindows after fix the tests on windows.
   @sdk_test_base.Filters.RunOnlyInBundle
-  def testNodePoolsUpdate(self):
-    self.cluster_name = e2e_utils.GetResourceNameGenerator(
-        prefix='container-test-pool').next()
+  def NodePoolsUpdate(self, location_flag):
+    self.cluster_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='container-test-pool'))
 
     # Cluster deleted in "TeadDown" method of base class.
     logging.info('Creating %s', self.cluster_name)
-    self.Run('container clusters create {0} --zone={1} --num-nodes=1 '
+    self.Run('container clusters create {0} {1} --num-nodes=1 '
              '--timeout={2}'
-             .format(self.cluster_name, self.ZONE, self.TIMEOUT))
+             .format(self.cluster_name, location_flag, self.TIMEOUT))
     self.AssertErrContains('Created')
     self.AssertOutputContains(self.cluster_name)
     self.AssertOutputContains('RUNNING')
     logging.info('Enabling auto-upgrade')
-    self.Run('container node-pools update default-pool --cluster={0} '
-             '--zone={1} --enable-autoupgrade --timeout={2}'
-             .format(self.cluster_name, self.ZONE, self.TIMEOUT))
+    self.Run('container node-pools update default-pool --cluster={0} {1} '
+             '--enable-autoupgrade --timeout={2}'
+             .format(self.cluster_name, location_flag, self.TIMEOUT))
     self.AssertErrContains('Updated')
     node_pool = self.Run('container node-pools describe default-pool '
-                         '--cluster={0} --zone={1}'
-                         .format(self.cluster_name, self.ZONE))
+                         '--cluster={0} {1}'
+                         .format(self.cluster_name, location_flag))
     self.assertTrue(node_pool.management.autoUpgrade)
+
+  def testNodePoolsUpdateZone(self):
+    self.NodePoolsUpdate('--zone=' + self.ZONE)
+
+  def testNodePoolsUpdateRegion(self):
+    self.NodePoolsUpdate('--region=' + self.REGION)
 
 
 if __name__ == '__main__':

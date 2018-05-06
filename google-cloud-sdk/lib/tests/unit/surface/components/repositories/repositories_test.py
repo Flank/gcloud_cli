@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.updater import snapshots
@@ -198,13 +201,13 @@ BAR         Unknown
     self.CheckRepos(None)
 
   def testAddRemoveErrors(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         update_manager.NoRegisteredRepositoriesError,
         'You have no registered repositories.'):
       self.Run('components repositories remove')
     self.CheckRepos([])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         update_manager.NoRegisteredRepositoriesError,
         'You have no registered repositories.'):
       self.Run('components repositories remove FOO')

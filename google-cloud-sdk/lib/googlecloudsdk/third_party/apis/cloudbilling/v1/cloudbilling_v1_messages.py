@@ -13,7 +13,7 @@ package = 'cloudbilling'
 
 
 class AggregationInfo(_messages.Message):
-  """Represents the aggregation level and interval for pricing of a single
+  r"""Represents the aggregation level and interval for pricing of a single
   SKU.
 
   Enums:
@@ -29,7 +29,7 @@ class AggregationInfo(_messages.Message):
   """
 
   class AggregationIntervalValueValuesEnum(_messages.Enum):
-    """AggregationIntervalValueValuesEnum enum type.
+    r"""AggregationIntervalValueValuesEnum enum type.
 
     Values:
       AGGREGATION_INTERVAL_UNSPECIFIED: <no description>
@@ -41,7 +41,7 @@ class AggregationInfo(_messages.Message):
     MONTHLY = 2
 
   class AggregationLevelValueValuesEnum(_messages.Enum):
-    """AggregationLevelValueValuesEnum enum type.
+    r"""AggregationLevelValueValuesEnum enum type.
 
     Values:
       AGGREGATION_LEVEL_UNSPECIFIED: <no description>
@@ -57,14 +57,86 @@ class AggregationInfo(_messages.Message):
   aggregationLevel = _messages.EnumField('AggregationLevelValueValuesEnum', 3)
 
 
+class AuditConfig(_messages.Message):
+  r"""Specifies the audit configuration for a service. The configuration
+  determines which permission types are logged, and what identities, if any,
+  are exempted from logging. An AuditConfig must have one or more
+  AuditLogConfigs.  If there are AuditConfigs for both `allServices` and a
+  specific service, the union of the two AuditConfigs is used for that
+  service: the log_types specified in each AuditConfig are enabled, and the
+  exempted_members in each AuditLogConfig are exempted.  Example Policy with
+  multiple AuditConfigs:      {       "audit_configs": [         {
+  "service": "allServices"           "audit_log_configs": [             {
+  "log_type": "DATA_READ",               "exempted_members": [
+  "user:foo@gmail.com"               ]             },             {
+  "log_type": "DATA_WRITE",             },             {
+  "log_type": "ADMIN_READ",             }           ]         },         {
+  "service": "fooservice.googleapis.com"           "audit_log_configs": [
+  {               "log_type": "DATA_READ",             },             {
+  "log_type": "DATA_WRITE",               "exempted_members": [
+  "user:bar@gmail.com"               ]             }           ]         }
+  ]     }  For fooservice, this policy enables DATA_READ, DATA_WRITE and
+  ADMIN_READ logging. It also exempts foo@gmail.com from DATA_READ logging,
+  and bar@gmail.com from DATA_WRITE logging.
+
+  Fields:
+    auditLogConfigs: The configuration for logging of each type of permission.
+    service: Specifies a service that will be enabled for audit logging. For
+      example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
+      `allServices` is a special value that covers all services.
+  """
+
+  auditLogConfigs = _messages.MessageField('AuditLogConfig', 1, repeated=True)
+  service = _messages.StringField(2)
+
+
+class AuditLogConfig(_messages.Message):
+  r"""Provides the configuration for logging a type of permissions. Example:
+  {       "audit_log_configs": [         {           "log_type": "DATA_READ",
+  "exempted_members": [             "user:foo@gmail.com"           ]
+  },         {           "log_type": "DATA_WRITE",         }       ]     }
+  This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+  foo@gmail.com from DATA_READ logging.
+
+  Enums:
+    LogTypeValueValuesEnum: The log type that this config enables.
+
+  Fields:
+    exemptedMembers: Specifies the identities that do not cause logging for
+      this type of permission. Follows the same format of Binding.members.
+    logType: The log type that this config enables.
+  """
+
+  class LogTypeValueValuesEnum(_messages.Enum):
+    r"""The log type that this config enables.
+
+    Values:
+      LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
+      ADMIN_READ: Admin reads. Example: CloudIAM getIamPolicy
+      DATA_WRITE: Data writes. Example: CloudSQL Users create
+      DATA_READ: Data reads. Example: CloudSQL Users list
+    """
+    LOG_TYPE_UNSPECIFIED = 0
+    ADMIN_READ = 1
+    DATA_WRITE = 2
+    DATA_READ = 3
+
+  exemptedMembers = _messages.StringField(1, repeated=True)
+  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
+
+
 class BillingAccount(_messages.Message):
-  """A billing account in [Google Cloud
-  Console](https://console.cloud.google.com/). You can assign a billing
-  account to one or more projects.
+  r"""A billing account in [GCP Console](https://console.cloud.google.com/).
+  You can assign a billing account to one or more projects.
 
   Fields:
     displayName: The display name given to the billing account, such as `My
-      Billing Account`. This name is displayed in the Google Cloud Console.
+      Billing Account`. This name is displayed in the GCP Console.
+    masterBillingAccount: If this account is a
+      [subaccount](https://cloud.google.com/billing/docs/concepts), then this
+      will be the resource name of the master billing account that it is being
+      resold through. Otherwise this will be empty.  > This field is currently
+      in > [Beta](https://cloud.google.com/terms/launch-stages).
     name: The resource name of the billing account. The resource name has the
       form `billingAccounts/{billing_account_id}`. For example,
       `billingAccounts/012345-567890-ABCDEF` would be the resource name for
@@ -76,12 +148,38 @@ class BillingAccount(_messages.Message):
   """
 
   displayName = _messages.StringField(1)
-  name = _messages.StringField(2)
-  open = _messages.BooleanField(3)
+  masterBillingAccount = _messages.StringField(2)
+  name = _messages.StringField(3)
+  open = _messages.BooleanField(4)
+
+
+class Binding(_messages.Message):
+  r"""Associates `members` with a `role`.
+
+  Fields:
+    members: Specifies the identities requesting access for a Cloud Platform
+      resource. `members` can have the following values:  * `allUsers`: A
+      special identifier that represents anyone who is    on the internet;
+      with or without a Google account.  * `allAuthenticatedUsers`: A special
+      identifier that represents anyone    who is authenticated with a Google
+      account or a service account.  * `user:{emailid}`: An email address that
+      represents a specific Google    account. For example, `alice@gmail.com`
+      .   * `serviceAccount:{emailid}`: An email address that represents a
+      service    account. For example, `my-other-
+      app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
+      that represents a Google group.    For example, `admins@example.com`.
+      * `domain:{domain}`: A Google Apps domain name that represents all the
+      users of that domain. For example, `google.com` or `example.com`.
+    role: Role that is assigned to `members`. For example, `roles/viewer`,
+      `roles/editor`, or `roles/owner`. Required
+  """
+
+  members = _messages.StringField(1, repeated=True)
+  role = _messages.StringField(2)
 
 
 class Category(_messages.Message):
-  """Represents the category hierarchy of a SKU.
+  r"""Represents the category hierarchy of a SKU.
 
   Fields:
     resourceFamily: The type of product the SKU refers to. Example: "Compute",
@@ -99,8 +197,20 @@ class Category(_messages.Message):
   usageType = _messages.StringField(4)
 
 
+class CloudbillingBillingAccountsGetIamPolicyRequest(_messages.Message):
+  r"""A CloudbillingBillingAccountsGetIamPolicyRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See the operation documentation for the appropriate value for this
+      field.
+  """
+
+  resource = _messages.StringField(1, required=True)
+
+
 class CloudbillingBillingAccountsGetRequest(_messages.Message):
-  """A CloudbillingBillingAccountsGetRequest object.
+  r"""A CloudbillingBillingAccountsGetRequest object.
 
   Fields:
     name: The resource name of the billing account to retrieve. For example,
@@ -111,9 +221,16 @@ class CloudbillingBillingAccountsGetRequest(_messages.Message):
 
 
 class CloudbillingBillingAccountsListRequest(_messages.Message):
-  """A CloudbillingBillingAccountsListRequest object.
+  r"""A CloudbillingBillingAccountsListRequest object.
 
   Fields:
+    filter: Options for how to filter the returned billing accounts. Currently
+      this only supports filtering for
+      [subaccounts](https://cloud.google.com/billing/docs/concepts) under a
+      single provided reseller billing account. (e.g.
+      "master_billing_account=billingAccounts/012345-678901-ABCDEF"). Boolean
+      algebra and other fields are not currently supported.  > This field is
+      currently in > [Beta](https://cloud.google.com/terms/launch-stages).
     pageSize: Requested page size. The maximum page size is 100; this is also
       the default.
     pageToken: A token identifying a page of results to return. This should be
@@ -121,12 +238,29 @@ class CloudbillingBillingAccountsListRequest(_messages.Message):
       call. If unspecified, the first page of results is returned.
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
+  filter = _messages.StringField(1)
+  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(3)
+
+
+class CloudbillingBillingAccountsPatchRequest(_messages.Message):
+  r"""A CloudbillingBillingAccountsPatchRequest object.
+
+  Fields:
+    billingAccount: A BillingAccount resource to be passed as the request
+      body.
+    name: The name of the billing account resource to be updated.
+    updateMask: The update mask applied to the resource. Only "display_name"
+      is currently supported.
+  """
+
+  billingAccount = _messages.MessageField('BillingAccount', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
 
 
 class CloudbillingBillingAccountsProjectsListRequest(_messages.Message):
-  """A CloudbillingBillingAccountsProjectsListRequest object.
+  r"""A CloudbillingBillingAccountsProjectsListRequest object.
 
   Fields:
     name: The resource name of the billing account associated with the
@@ -145,8 +279,38 @@ class CloudbillingBillingAccountsProjectsListRequest(_messages.Message):
   pageToken = _messages.StringField(3)
 
 
+class CloudbillingBillingAccountsSetIamPolicyRequest(_messages.Message):
+  r"""A CloudbillingBillingAccountsSetIamPolicyRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See the operation documentation for the appropriate value for this
+      field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class CloudbillingBillingAccountsTestIamPermissionsRequest(_messages.Message):
+  r"""A CloudbillingBillingAccountsTestIamPermissionsRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See the operation documentation for the appropriate value for
+      this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
 class CloudbillingProjectsGetBillingInfoRequest(_messages.Message):
-  """A CloudbillingProjectsGetBillingInfoRequest object.
+  r"""A CloudbillingProjectsGetBillingInfoRequest object.
 
   Fields:
     name: The resource name of the project for which billing information is
@@ -157,7 +321,7 @@ class CloudbillingProjectsGetBillingInfoRequest(_messages.Message):
 
 
 class CloudbillingProjectsUpdateBillingInfoRequest(_messages.Message):
-  """A CloudbillingProjectsUpdateBillingInfoRequest object.
+  r"""A CloudbillingProjectsUpdateBillingInfoRequest object.
 
   Fields:
     name: The resource name of the project associated with the billing
@@ -172,7 +336,7 @@ class CloudbillingProjectsUpdateBillingInfoRequest(_messages.Message):
 
 
 class CloudbillingServicesListRequest(_messages.Message):
-  """A CloudbillingServicesListRequest object.
+  r"""A CloudbillingServicesListRequest object.
 
   Fields:
     pageSize: Requested page size. Defaults to 5000.
@@ -186,7 +350,7 @@ class CloudbillingServicesListRequest(_messages.Message):
 
 
 class CloudbillingServicesSkusListRequest(_messages.Message):
-  """A CloudbillingServicesSkusListRequest object.
+  r"""A CloudbillingServicesSkusListRequest object.
 
   Fields:
     currencyCode: The ISO 4217 currency code for the pricing info in the
@@ -220,7 +384,7 @@ class CloudbillingServicesSkusListRequest(_messages.Message):
 
 
 class ListBillingAccountsResponse(_messages.Message):
-  """Response message for `ListBillingAccounts`.
+  r"""Response message for `ListBillingAccounts`.
 
   Fields:
     billingAccounts: A list of billing accounts.
@@ -235,7 +399,7 @@ class ListBillingAccountsResponse(_messages.Message):
 
 
 class ListProjectBillingInfoResponse(_messages.Message):
-  """Request message for `ListProjectBillingInfoResponse`.
+  r"""Request message for `ListProjectBillingInfoResponse`.
 
   Fields:
     nextPageToken: A token to retrieve the next page of results. To retrieve
@@ -251,7 +415,7 @@ class ListProjectBillingInfoResponse(_messages.Message):
 
 
 class ListServicesResponse(_messages.Message):
-  """Response message for `ListServices`.
+  r"""Response message for `ListServices`.
 
   Fields:
     nextPageToken: A token to retrieve the next page of results. To retrieve
@@ -266,7 +430,7 @@ class ListServicesResponse(_messages.Message):
 
 
 class ListSkusResponse(_messages.Message):
-  """Response message for `ListSkus`.
+  r"""Response message for `ListSkus`.
 
   Fields:
     nextPageToken: A token to retrieve the next page of results. To retrieve
@@ -281,7 +445,7 @@ class ListSkusResponse(_messages.Message):
 
 
 class Money(_messages.Message):
-  """Represents an amount of money with its currency type.
+  r"""Represents an amount of money with its currency type.
 
   Fields:
     currencyCode: The 3-letter currency code defined in ISO 4217.
@@ -300,8 +464,50 @@ class Money(_messages.Message):
   units = _messages.IntegerField(3)
 
 
+class Policy(_messages.Message):
+  r"""Defines an Identity and Access Management (IAM) policy. It is used to
+  specify access control policies for Cloud Platform resources.   A `Policy`
+  consists of a list of `bindings`. A `binding` binds a list of `members` to a
+  `role`, where the members can be user accounts, Google groups, Google
+  domains, and service accounts. A `role` is a named list of permissions
+  defined by IAM.  **JSON Example**      {       "bindings": [         {
+  "role": "roles/owner",           "members": [
+  "user:mike@example.com",             "group:admins@example.com",
+  "domain:google.com",             "serviceAccount:my-other-
+  app@appspot.gserviceaccount.com"           ]         },         {
+  "role": "roles/viewer",           "members": ["user:sean@example.com"]
+  }       ]     }  **YAML Example**      bindings:     - members:       -
+  user:mike@example.com       - group:admins@example.com       -
+  domain:google.com       - serviceAccount:my-other-
+  app@appspot.gserviceaccount.com       role: roles/owner     - members:
+  - user:sean@example.com       role: roles/viewer   For a description of IAM
+  and its features, see the [IAM developer's
+  guide](https://cloud.google.com/iam/docs).
+
+  Fields:
+    auditConfigs: Specifies cloud audit logging configuration for this policy.
+    bindings: Associates a list of `members` to a `role`. `bindings` with no
+      members will result in an error.
+    etag: `etag` is used for optimistic concurrency control as a way to help
+      prevent simultaneous updates of a policy from overwriting each other. It
+      is strongly suggested that systems make use of the `etag` in the read-
+      modify-write cycle to perform policy updates in order to avoid race
+      conditions: An `etag` is returned in the response to `getIamPolicy`, and
+      systems are expected to put that etag in the request to `setIamPolicy`
+      to ensure that their change will be applied to the same version of the
+      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
+      the existing policy is overwritten blindly.
+    version: Deprecated.
+  """
+
+  auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
+  bindings = _messages.MessageField('Binding', 2, repeated=True)
+  etag = _messages.BytesField(3)
+  version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+
+
 class PricingExpression(_messages.Message):
-  """Expresses a mathematical pricing formula. For Example:-  `usage_unit:
+  r"""Expresses a mathematical pricing formula. For Example:-  `usage_unit:
   GBy` `tiered_rates:`    `[start_usage_amount: 20, unit_price: $10]`
   `[start_usage_amount: 100, unit_price: $5]`  The above expresses a pricing
   formula where the first 20GB is free, the next 80GB is priced at $10 per GB
@@ -344,7 +550,7 @@ class PricingExpression(_messages.Message):
 
 
 class PricingInfo(_messages.Message):
-  """Represents the pricing information for a SKU at a single point of time.
+  r"""Represents the pricing information for a SKU at a single point of time.
 
   Fields:
     aggregationInfo: Aggregation Info. This can be left unspecified if the
@@ -374,7 +580,7 @@ class PricingInfo(_messages.Message):
 
 
 class ProjectBillingInfo(_messages.Message):
-  """Encapsulation of billing information for a Cloud Console project. A
+  r"""Encapsulation of billing information for a GCP Console project. A
   project has at most one associated billing account at a time (but a billing
   account can be assigned to multiple projects).
 
@@ -403,7 +609,7 @@ class ProjectBillingInfo(_messages.Message):
 
 
 class Service(_messages.Message):
-  """Encapsulates a single service in Google Cloud Platform.
+  r"""Encapsulates a single service in Google Cloud Platform.
 
   Fields:
     displayName: A human readable display name for this service.
@@ -417,8 +623,26 @@ class Service(_messages.Message):
   serviceId = _messages.StringField(3)
 
 
+class SetIamPolicyRequest(_messages.Message):
+  r"""Request message for `SetIamPolicy` method.
+
+  Fields:
+    policy: REQUIRED: The complete policy to be applied to the `resource`. The
+      size of the policy is limited to a few 10s of KB. An empty policy is a
+      valid policy but certain Cloud Platform services (such as Projects)
+      might reject them.
+    updateMask: OPTIONAL: A FieldMask specifying which fields of the policy to
+      modify. Only the fields in the mask will be modified. If no mask is
+      provided, the following default mask is used: paths: "bindings, etag"
+      This field is only used by Cloud IAM.
+  """
+
+  policy = _messages.MessageField('Policy', 1)
+  updateMask = _messages.StringField(2)
+
+
 class Sku(_messages.Message):
-  """Encapsulates a single SKU in Google Cloud Platform
+  r"""Encapsulates a single SKU in Google Cloud Platform
 
   Fields:
     category: The category hierarchy of this SKU, purely for organizational
@@ -447,7 +671,7 @@ class Sku(_messages.Message):
 
 
 class StandardQueryParameters(_messages.Message):
-  """Query parameters accepted by all methods.
+  r"""Query parameters accepted by all methods.
 
   Enums:
     FXgafvValueValuesEnum: V1 error format.
@@ -476,7 +700,7 @@ class StandardQueryParameters(_messages.Message):
   """
 
   class AltValueValuesEnum(_messages.Enum):
-    """Data format for response.
+    r"""Data format for response.
 
     Values:
       json: Responses with Content-Type of application/json
@@ -488,7 +712,7 @@ class StandardQueryParameters(_messages.Message):
     proto = 2
 
   class FXgafvValueValuesEnum(_messages.Enum):
-    """V1 error format.
+    r"""V1 error format.
 
     Values:
       _1: v1 error format
@@ -513,8 +737,32 @@ class StandardQueryParameters(_messages.Message):
   upload_protocol = _messages.StringField(14)
 
 
+class TestIamPermissionsRequest(_messages.Message):
+  r"""Request message for `TestIamPermissions` method.
+
+  Fields:
+    permissions: The set of permissions to check for the `resource`.
+      Permissions with wildcards (such as '*' or 'storage.*') are not allowed.
+      For more information see [IAM
+      Overview](https://cloud.google.com/iam/docs/overview#permissions).
+  """
+
+  permissions = _messages.StringField(1, repeated=True)
+
+
+class TestIamPermissionsResponse(_messages.Message):
+  r"""Response message for `TestIamPermissions` method.
+
+  Fields:
+    permissions: A subset of `TestPermissionsRequest.permissions` that the
+      caller is allowed.
+  """
+
+  permissions = _messages.StringField(1, repeated=True)
+
+
 class TierRate(_messages.Message):
-  """The price rate indicating starting usage and its corresponding price.
+  r"""The price rate indicating starting usage and its corresponding price.
 
   Fields:
     startUsageAmount: Usage is priced at this rate only after this amount.

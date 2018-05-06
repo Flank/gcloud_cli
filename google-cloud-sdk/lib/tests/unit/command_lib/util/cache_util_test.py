@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for the command_lib.util.cache_util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.meta import cache_util as meta_cache_util
 from googlecloudsdk.command_lib.util import cache_util
 from googlecloudsdk.core import resources
@@ -45,19 +48,19 @@ class CacheResourceTest(test_case.TestCase):
     with meta_cache_util.GetCache('resource://') as cache:
       # No args set; uses key as argument
       self.assertTrue(refs['a'])
-      self.assertEquals(GetResource(cache, 'a').RelativeName(),
-                        'projects/p/zones/a')
+      self.assertEqual(GetResource(cache, 'a').RelativeName(),
+                       'projects/p/zones/a')
       self.assertFalse(refs['a'])
-      self.assertEquals(GetResource(cache, 'a').RelativeName(),
-                        'projects/p/zones/a')
+      self.assertEqual(GetResource(cache, 'a').RelativeName(),
+                       'projects/p/zones/a')
       # Args set
-      self.assertEquals(GetResource(cache, 'c', args=('b',)).RelativeName(),
-                        'projects/p/zones/b1')
-      self.assertEquals(GetResource(cache, 'c').RelativeName(),
-                        'projects/p/zones/b1')
+      self.assertEqual(GetResource(cache, 'c', args=('b',)).RelativeName(),
+                       'projects/p/zones/b1')
+      self.assertEqual(GetResource(cache, 'c').RelativeName(),
+                       'projects/p/zones/b1')
       cache.Invalidate()  # After invalidating, call the function again
-      self.assertEquals(GetResource(cache, 'c', args=('b',)).RelativeName(),
-                        'projects/p/zones/b2')
+      self.assertEqual(GetResource(cache, 'c', args=('b',)).RelativeName(),
+                       'projects/p/zones/b2')
 
 if __name__ == '__main__':
   calliope_test_base.main()

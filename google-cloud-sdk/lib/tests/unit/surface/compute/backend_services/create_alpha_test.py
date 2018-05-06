@@ -76,7 +76,7 @@ class WithHealthcheckApiTest(CreateTestBase):
 
   def testDefaultRegional(self):
     properties.VALUES.core.default_regional_backend_service.Set(True)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         flags.UnderSpecifiedResourceError,
         r'.*Underspecified resource \[my-backend-service]\. Specify '
         r'one of the \[--global, --region] flags\..*'):
@@ -571,14 +571,14 @@ class WithIAPApiTest(CreateTestBase):
         oauth2ClientSecret='SECRET'))
 
   def testInvalidIAPEmpty(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'^Invalid value for \[--iap\]: Must provide value when specifying '
         r'--iap$',
         self.Run, self._create_service_cmd_line + ' --iap=""')
 
   def testInvalidIapArgCombinationEnabledDisabled(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Must specify only one '
         'of \\[enabled\\] or \\[disabled\\]$',
@@ -586,7 +586,7 @@ class WithIAPApiTest(CreateTestBase):
         self._create_service_cmd_line + ' --iap enabled,disabled')
 
   def testInvalidIapArgCombinationEnabledOnlyClientId(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -595,7 +595,7 @@ class WithIAPApiTest(CreateTestBase):
         ' --iap enabled,oauth2-client-id=CLIENTID')
 
   def testInvalidIapArgCombinationEnabledOnlyClientSecret(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -604,7 +604,7 @@ class WithIAPApiTest(CreateTestBase):
         ' --iap enabled,oauth2-client-secret=SECRET')
 
   def testInvalidIapArgCombinationEmptyIdValue(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -613,7 +613,7 @@ class WithIAPApiTest(CreateTestBase):
         ' --iap enabled,oauth2-client-id=,oauth2-client-secret=SECRET')
 
   def testInvalidIapArgCombinationEmptySecretValue(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -622,7 +622,7 @@ class WithIAPApiTest(CreateTestBase):
         ' --iap enabled,oauth2-client-id=CLIENTID,oauth2-client-secret=')
 
   def testInvalidIapArgInvalidSubArg(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'^Invalid value for \[--iap\]: Invalid sub-argument \'invalid-arg1\'$',
         self.Run,
@@ -823,7 +823,7 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
               project='my-project'))],)
 
   def testEnableWhitelistWithExcludeQueryString(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         backend_services_utils.CacheKeyQueryStringException,
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
@@ -836,7 +836,7 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
     self.CheckRequests()
 
   def testEnableBlacklistWithExcludeQueryString(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         backend_services_utils.CacheKeyQueryStringException,
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
@@ -1154,7 +1154,7 @@ class WithFailoverPolicyApiTest(CreateTestBase):
             failoverRatio=0.5))
 
   def testCannotSpecifyFailoverPolicyForGlobalBackendService(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--global\\]: cannot specify failover policies'
         ' for global backend services.', self.Run,
@@ -1165,7 +1165,7 @@ class WithFailoverPolicyApiTest(CreateTestBase):
         ' --connection-drain-on-failover')
 
   def testInvalidLoadBalancingSchemeWithInternalFailoverOptions(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--load-balancing-scheme\\]: can only specify '
         '--connection-drain-on-failover or --drop-traffic-if-unhealthy'
@@ -1174,7 +1174,7 @@ class WithFailoverPolicyApiTest(CreateTestBase):
         ' --drop-traffic-if-unhealthy')
 
   def testInvalidProtocolWithConnectionDrainOnFailover(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--protocol\\]: can only specify '
         '--connection-drain-on-failover if the protocol is TCP.',

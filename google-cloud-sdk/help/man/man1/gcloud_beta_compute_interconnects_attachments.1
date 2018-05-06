@@ -11,7 +11,7 @@ gcloud beta compute interconnects attachments \- read and manipulate Google Comp
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute interconnects attachments\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute interconnects attachments\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,6 +29,23 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdedicated\fR
+\fB(BETA)\fR Create or manipulate dedicated interconnect attachments.
+
+.TP 2m
+\fBpartner\fR
+\fB(BETA)\fR Create or manipulate partner interconnect attachments.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 

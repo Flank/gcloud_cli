@@ -14,6 +14,8 @@
 
 """Base classes for all dataflow tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -22,6 +24,7 @@ from googlecloudsdk.core.util import times
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
+import six
 
 MESSAGE_MODULE = core_apis.GetMessagesModule('dataflow', 'v1b3')
 
@@ -129,8 +132,9 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
     location = location or DEFAULT_REGION
 
     params_list = []
-    for k, v in parameters.iteritems() if parameters else {}:
-      params_list.append(params_value.AdditionalProperty(key=k, value=v))
+    for k, v in sorted(six.iteritems(parameters)) if parameters else {}:
+      params_list.append(params_value.AdditionalProperty(
+          key=six.text_type(k), value=six.text_type(v)))
 
     body = run_job_req_body(
         gcsPath=gcs_location,
@@ -146,7 +150,7 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
 
     self.mocked_client.projects_locations_templates.Create.Expect(
         request=run_job_req_class(
-            projectId=self.Project(),
+            projectId=six.text_type(self.Project()),
             createJobFromTemplateRequest=body,
             location=location),
         response=job)

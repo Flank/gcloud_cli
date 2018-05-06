@@ -2,11 +2,13 @@ NAME
     gcloud alpha genomics pipelines run - defines and runs a pipeline
 
 SYNOPSIS
-    gcloud alpha genomics pipelines run --pipeline-file=PIPELINE_FILE
-        [--disk-size=DISK_SIZE] [--inputs=[NAME=VALUE,...]]
-        [--inputs-from-file=[NAME=FILE,...]] [--logging=LOGGING]
-        [--memory=MEMORY] [--outputs=[NAME=VALUE,...]] [--preemptible]
-        [--labels=[KEY=VALUE,...]]
+    gcloud alpha genomics pipelines run [--command-line=COMMAND_LINE]
+        [--cpus=CPUS] [--disk-size=DISK_SIZE]
+        [--docker-image=DOCKER_IMAGE; default="google/cloud-sdk"]
+        [--inputs=[NAME=VALUE,...]] [--inputs-from-file=[NAME=FILE,...]]
+        [--logging=LOGGING] [--memory=MEMORY] [--outputs=[NAME=VALUE,...]]
+        [--preemptible] [--labels=[KEY=VALUE,...]]
+        [--pipeline-file=PIPELINE_FILE] [--regions=[REGION,...]]
         [--service-account-email=SERVICE_ACCOUNT_EMAIL; default="default"]
         [--service-account-scopes=[SCOPE,...]] [--zones=[ZONE,...]]
         [GCLOUD_WIDE_FLAG ...]
@@ -15,41 +17,23 @@ DESCRIPTION
     (ALPHA) A pipeline is a transformation of a set of inputs to a set of
     outputs. Supports docker-based commands.
 
-REQUIRED FLAGS
-     --pipeline-file=PIPELINE_FILE
-        A YAML or JSON file containing a Pipeline object. See
-        https://cloud.google.com/genomics/reference/rest/v1alpha2/pipelines#Pipeline
-
-            YAML Example:
-              name: hello world
-
-            inputParameters:
-            - name: greeting
-              defaultValue: Hello
-            - name: object
-              defaultValue: World
-
-            outputParameters:
-            - name: outputFile
-              localCopy:
-                path: /data/output/greeting.txt
-                disk: boot
-
-            resources:
-              minimumCpuCores: 1
-              minimumRamGb: 1
-              preemptible: true
-
-            docker:
-              imageName: ubuntu
-              cmd: >
-                echo "${greeting} ${object}" > /data/output/greeting.txt
-
 COMMONLY USED FLAGS
+     --command-line=COMMAND_LINE
+        v2alpha1 only. Command line to run with /bin/sh in the specified docker
+        image. Cannot be used with --pipeline-file.
+
+     --cpus=CPUS
+        The minimum number of CPUs to run the pipeline. Overrides any value
+        specified in the pipeline-file.
+
      --disk-size=DISK_SIZE
         The disk size(s) in GB, specified as a comma-separated list of pairs of
         disk name and size. For example: --disk-size "name:size,name2:size2".
         Overrides any values specified in the pipeline-file.
+
+     --docker-image=DOCKER_IMAGE; default="google/cloud-sdk"
+        v2alpha1 only. A docker image to run. Requires --command-line to be
+        specified and cannot be used with --pipeline-file.
 
      --inputs=[NAME=VALUE,...]
         Map of input PipelineParameter names to values. Used to pass literal
@@ -91,19 +75,45 @@ OTHER FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+     --pipeline-file=PIPELINE_FILE
+        A YAML or JSON file containing a v2alpha1 or v1alpha2 Pipeline object.
+        See
+        https://cloud.google.com/genomics/reference/rest/v2alpha1/pipelines#Pipeline
+
+     --regions=[REGION,...]
+        v2alpha1 only. List of Compute Engine regions the pipeline can run in.
+
+        If no regions are specified with the regions flag, then regions in the
+        pipeline definition file will be used.
+
+        If no regions are specified in the pipeline definition, then the
+        default region in your local client configuration is used.
+
+        At least one region or region must be specified.
+
+        For more information on default regions, see
+        https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_region_in_your_local_client
+
      --service-account-email=SERVICE_ACCOUNT_EMAIL; default="default"
         The service account used to run the pipeline. If unspecified, defaults
         to the Compute Engine service account for your project.
 
      --service-account-scopes=[SCOPE,...]
         List of additional scopes to be made available for this service
-        account. The following scopes are always requested:
+        account. The following scopes are always requested for v1alpha2
+        requests:
 
             https://www.googleapis.com/auth/compute
             https://www.googleapis.com/auth/devstorage.full_control
             https://www.googleapis.com/auth/genomics
             https://www.googleapis.com/auth/logging.write
             https://www.googleapis.com/auth/monitoring.write
+
+            For v2alpha1 requests, only the following scopes are always
+            requested:
+
+            https://www.googleapis.com/auth/devstorage.read_write
+            https://www.googleapis.com/auth/genomics
 
      --zones=[ZONE,...]
         List of Compute Engine zones the pipeline can run in.
@@ -114,7 +124,9 @@ OTHER FLAGS
         If no zones are specified in the pipeline definition, then the default
         zone in your local client configuration is used.
 
-        If you have no default zone, then the pipeline may run in any zone.
+        If you have no default zone, then v1alpha2 pipelines may run in any
+        zone. For v2alpha1 pipelines at least one zone or region must be
+        specified.
 
         For more information on default zones, see
         https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_region_in_your_local_client

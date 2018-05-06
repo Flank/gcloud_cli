@@ -43,7 +43,7 @@ class DeleteTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsVariantsetsGetRequest(variantSetId='500'),
         response=self.messages.VariantSet(id='5000', name='foo'))
     self.WriteInput('n\n')
-    with self.assertRaisesRegexp(GenomicsError, 'Deletion aborted by user.'):
+    with self.assertRaisesRegex(GenomicsError, 'Deletion aborted by user.'):
       self.RunGenomics(['variantsets', 'delete', '500'])
     self.AssertErrContains(
         'Deleting variant set 500: "foo" will also delete all')
@@ -66,8 +66,8 @@ class DeleteTest(base.GenomicsUnitTest):
     self.mocked_client.variantsets.Get.Expect(
         request=self.messages.GenomicsVariantsetsGetRequest(variantSetId='500'),
         exception=self.MakeHttpError(404, 'VariantSet not found: 500'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'VariantSet not found: 500'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'VariantSet not found: 500'):
       self.RunGenomics(['variantsets', 'delete', '500'],
                        ['--quiet'])
 

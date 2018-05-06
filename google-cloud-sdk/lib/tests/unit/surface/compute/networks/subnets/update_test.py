@@ -74,13 +74,6 @@ class SubnetsUpdateTest(test_base.BaseTest):
           ))],
     )
 
-
-class SubnetsUpdateTestBeta(SubnetsUpdateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-
   def testAddSecondaryRanges(self):
     subnetwork_resource = {
         'name':
@@ -301,8 +294,8 @@ class SubnetsUpdateTestBeta(SubnetsUpdateTest):
         [self.messages.Subnetwork(**subnetwork_resource)],
         [],
     ])
-    with self.assertRaisesRegexp(calliope_exceptions.UnknownArgumentException,
-                                 r'Subnetwork does not have a range range9'):
+    with self.assertRaisesRegex(calliope_exceptions.UnknownArgumentException,
+                                r'Subnetwork does not have a range range9'):
       self.Run("""
           compute networks subnets update subnet-1
             --remove-secondary-ranges range1,range9
@@ -310,11 +303,11 @@ class SubnetsUpdateTestBeta(SubnetsUpdateTest):
           """)
 
 
-class SubnetsUpdateTestAlpha(SubnetsUpdateTestBeta, parameterized.TestCase):
+class SubnetsUpdateTestBeta(SubnetsUpdateTest, parameterized.TestCase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
   @parameterized.named_parameters(('Enabled', '--enable-flow-logs', True),
                                   ('Disabled', '--no-enable-flow-logs', False))
@@ -349,6 +342,13 @@ class SubnetsUpdateTestAlpha(SubnetsUpdateTestBeta, parameterized.TestCase):
              region='us-central2',
              subnetwork='subnet-1',
              subnetworkResource=subnetwork_resource))])
+
+
+class SubnetsUpdateTestAlpha(SubnetsUpdateTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
 
 
 if __name__ == '__main__':

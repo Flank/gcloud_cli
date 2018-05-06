@@ -42,7 +42,8 @@ EXAMPLES
             --keyring fellowship --key frodo
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys versions destroy
         $ gcloud beta kms keys versions destroy
 

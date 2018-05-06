@@ -17,6 +17,7 @@
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
@@ -26,11 +27,13 @@ from tests.lib.apitools import http_error
 class _Base(cli_test_base.CliTestBase):
 
   def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
     self.messages = core_apis.GetMessagesModule('genomics', 'v1')
+    self.messages_v2 = core_apis.GetMessagesModule('genomics', 'v2alpha1')
 
   def RunGenomics(self, command, gcloud_args=None):
     gcloud_args = gcloud_args or []
-    return super(_Base, self).Run(gcloud_args + ['alpha', 'genomics'] + command)
+    return super(_Base, self).Run(gcloud_args + ['genomics'] + command)
 
 
 class GenomicsIntegrationTest(_Base, e2e_base.WithServiceAuth):
@@ -71,6 +74,13 @@ class GenomicsUnitTest(sdk_test_base.WithFakeAuth, _Base):
             'genomics', 'v1alpha2', no_http=True))
     self.mocked_client_v1a2.Mock()
     self.addCleanup(self.mocked_client_v1a2.Unmock)
+
+    self.mocked_client_v2 = mock.Client(
+        core_apis.GetClientClass('genomics', 'v2alpha1'),
+        real_client=core_apis.GetClientInstance(
+            'genomics', 'v2alpha1', no_http=True))
+    self.mocked_client_v2.Mock()
+    self.addCleanup(self.mocked_client_v2.Unmock)
 
   def MakeHttpError(self, status_code, message='', failing_url=''):
     return http_error.MakeHttpError(code=status_code, message=message,

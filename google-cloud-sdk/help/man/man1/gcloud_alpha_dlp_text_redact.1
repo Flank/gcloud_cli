@@ -1,0 +1,111 @@
+
+.TH "GCLOUD_ALPHA_DLP_TEXT_REDACT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dlp text redact \- redact potentially sensitive data from text content
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dlp text redact\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] (\fB\-\-content\fR=\fICONTENT\fR\ |\ \fB\-\-content\-file\fR=\fICONTENT_FILE\fR) (\fB\-\-remove\-findings\fR\ |\ \fB\-\-replace\-with\-info\-type\fR\ |\ \fB\-\-replacement\-text\fR=\fIREPLACEMENT_TEXT\fR) [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Redacts potentially sensitive data from text content.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
+Which infoTypes to look for. The values must correspond to InfoType values found
+in documentation. For more information about valid infoTypes, see InfoTypes
+Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-content\fR=\fICONTENT\fR
+Text content to redact sensitive data from.
+
+.TP 2m
+\fB\-\-content\-file\fR=\fICONTENT_FILE\fR
+Text file to scan for sensitive data to redact. Can also be a CSV file
+specifying tabular data. For CSV files, up to 50,000 values per request are
+allowed. To read from stdin pass '\-' as the file name.
+
+.RE
+.sp
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-findings\fR
+If specified, all sensitive data will be removed, instead of replaced.
+
+.TP 2m
+\fB\-\-replace\-with\-info\-type\fR
+If specified, all sensitive data will be replaced with its infoType. For
+example, 'email:guest@example.com' would become 'email:[EMAIL_ADDRESS]'.
+
+.TP 2m
+\fB\-\-replacement\-text\fR=\fIREPLACEMENT_TEXT\fR
+Text to replace each sensitive data finding with.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR; default="possible"
+Only return findings equal to or above this threshold. One of:
+\f5very\-unlikely\fR, \f5unlikely\fR, \f5possible\fR, \f5likely\fR,
+\f5very\-likely\fR. The default value is \f5possible\fR. \fIMIN_LIKELIHOOD\fR
+must be one of: \fBlikely\fR, \fBpossible\fR, \fBunlikely\fR,
+\fBvery\-likely\fR, \fBvery\-unlikely\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdlp/v2\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/dlp/docs/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

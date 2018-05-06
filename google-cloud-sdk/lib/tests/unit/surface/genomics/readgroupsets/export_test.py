@@ -40,7 +40,7 @@ class ExportTest(base.GenomicsUnitTest):
     self.mocked_client.readgroupsets.Export.Expect(
         request=self._MakeExportRequest('1000', 'gs://mybucket/foo.bam'),
         response=operation)
-    self.assertEquals(
+    self.assertEqual(
         operation, self.RunGenomics(['readgroupsets', 'export', '1000',
                                      '--export-uri', 'gs://mybucket/foo.bam']))
     self.AssertOutputContains(operation.name)
@@ -52,7 +52,7 @@ class ExportTest(base.GenomicsUnitTest):
                                         'gs://mybucket/foo.bam',
                                         reference_names=['*', '1', '2']),
         response=operation)
-    self.assertEquals(operation, self.RunGenomics(
+    self.assertEqual(operation, self.RunGenomics(
         ['readgroupsets', 'export', '1000', '--export-uri',
          'gs://mybucket/foo.bam', '--reference-names', '*,1,2']))
     self.AssertOutputContains(operation.name)
@@ -79,8 +79,8 @@ class ExportTest(base.GenomicsUnitTest):
         exception=self.MakeHttpError(
             404, 'Read group set not found: 1000')
     )
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Read group set not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Read group set not found: 1000'):
       self.RunGenomics(['readgroupsets', 'export', '1000',
                         '--export-uri', 'gs://mybucket/reads.bam'])
 

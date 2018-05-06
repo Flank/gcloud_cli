@@ -82,7 +82,7 @@ class IamPolicyTest(base.MlBetaPlatformTestBase):
     response = models_util.SetIamPolicy(self.models_client, 'myModel',
                                         policy_file)
 
-    self.assertEquals(response, policy)
+    self.assertEqual(response, policy)
     set_iam_policy.assert_called_once_with(self.model_ref,
                                            policy,
                                            'bindings,etag,version')
@@ -95,7 +95,7 @@ class IamPolicyTest(base.MlBetaPlatformTestBase):
 
     response = models_util.GetIamPolicy(self.models_client, 'myModel')
 
-    self.assertEquals(response, policy)
+    self.assertEqual(response, policy)
     get_iam_policy.assert_called_once_with(self.model_ref)
 
   def testAddIamPolicyBinding(self):

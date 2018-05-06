@@ -14,6 +14,7 @@
 
 """Tests for gcloud app services."""
 
+from __future__ import absolute_import
 import re
 
 from googlecloudsdk.api_lib.app import service_util
@@ -38,8 +39,8 @@ class ServicesListTest(api_test_util.ApiTestBase):
   def testList_NoProject(self):
     """Test `gcloud app services list` command raises with unset project."""
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app services list')
 
   def testList_NoResponse(self):
@@ -79,7 +80,7 @@ class ServicesDescribeTest(api_test_util.ApiTestBase):
 
   def testDescribe_NoServiceSpecified(self):
     """Test describe command with missing argument."""
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         'argument SERVICE: Must be specified.'):
       self.Run('app services describe')
@@ -140,15 +141,15 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
         code=400, message=('The default service cannot be deleted.'))
     self.ExpectDeleteServiceRequest(self.Project(), 'default',
                                     exception=exception)
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 'The default service cannot be deleted'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                'The default service cannot be deleted'):
       self.Run('app services delete default')
 
   def testDelete_OneServiceNotFound(self):
     """Test `services delete` command fails where service is not found."""
     self.ExpectListServicesRequest(self.Project(), {'service1': {}})
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         service_util.ServicesNotFoundError,
         re.escape('The following service was not found: [badservice]\n\n'
                   'All services: [service1]')):
@@ -177,7 +178,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
     self.ExpectDeleteServiceRequest(self.Project(), 'service1')
     self.ExpectDeleteServiceRequest(self.Project(), 'service2',
                                     exception=exception)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.escape('Issue deleting service: [service2]')):
       self.Run('app services delete service1 service2')
@@ -193,7 +194,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
                                     exception=exception)
     self.ExpectDeleteServiceRequest(self.Project(), 'service2',
                                     exception=exception)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         (r'Issue deleting services: \[service[12], service[12]\]')):
       self.Run('app services delete service1 service2')
@@ -209,7 +210,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
                                     exception=exc_nf)
     self.ExpectDeleteServiceRequest(self.Project(), 'service2',
                                     exception=exc_c)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         (r'Issue deleting services: \[service[12], service[12]\]\n\n'
          r'\[service[12]\]: (?:Resource not found|'
@@ -223,7 +224,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
     self.ExpectListServicesRequest(self.Project(),
                                    {'service1': {}, 'service2': {}})
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         (r'The following services were not found: '
          r'\[service[34], service[34]\]\n\n'
@@ -251,7 +252,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
     self.ExpectDeleteVersionRequest(self.Project(), 'service1', 'version1',
                                     exception=exception)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error, re.escape(
             'Issue deleting version: [service1/version1]\n\n'
             '[service1/version1]: Resource not found')):
@@ -281,7 +282,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
     self.ExpectDeleteVersionRequest(self.Project(), 'service2', 'version1',
                                     exception=exception)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.escape(
             'Issue deleting version: [service2/version1]\n\n'
@@ -299,7 +300,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
     self.ExpectDeleteVersionRequest(self.Project(), 'service2', 'version1',
                                     exception=exception)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         r'Issue deleting versions: '
         r'\[service[12]/version1, service[12]/version1\]\n\n'
@@ -310,7 +311,7 @@ class ServicesDeleteTest(api_test_util.ApiTestBase):
   def testDelete_OneResourcePath(self):
     """Test delete command fails with project/service format."""
     self.ExpectListServicesRequest(self.Project(), {'service1': {}})
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.escape('The following service was not found: [{0}/service1]\n\n'
                   'All services: [service1]'.format(self.Project()))):
@@ -339,7 +340,7 @@ class SetTrafficTest(api_test_util.ApiTestBase):
   def testOneServiceOneVersionZeroSum(self):
     """Test `set-traffic` command errors when splits add to 0."""
     self.ExpectListServicesRequest(self.Project(), self.services)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         service_util.ServicesSplitTrafficError,
         'Cannot set traffic split to zero'):
       self.Run('app services set-traffic service1 --splits v1=0')
@@ -431,7 +432,7 @@ class SetTrafficTest(api_test_util.ApiTestBase):
   def testResourcePath(self):
     """Test `set-traffic` command fails using project/service format."""
     self.ExpectListServicesRequest(self.Project(), self.services)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         service_util.ServicesNotFoundError,
         re.escape('The following service was not found: [{}/service1]'
                   '\n\nAll services: [service1, service2, service3]'
@@ -465,8 +466,8 @@ class BrowseTest(api_test_util.ApiTestBase):
   def testBrowse_NoProject(self):
     """Test `app services browse` fails with no project set."""
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app services browse default')
 
   def testBrowse_NoArgs(self):

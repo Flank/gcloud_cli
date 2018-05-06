@@ -20,10 +20,13 @@ interface and provides generators for a yaml command spec. The schema for the
 spec can be found in yaml_command_schema.yaml.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.protorpclite import messages as apitools_messages
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import command_loading
+from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.command_lib.util.apis import arg_marshalling
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.command_lib.util.apis import registry
@@ -84,6 +87,9 @@ class CommandBuilder(object):
     elif (self.spec.command_type ==
           yaml_command_schema.CommandType.GET_IAM_POLICY):
       command = self._GenerateGetIamPolicyCommand()
+    elif (self.spec.command_type ==
+          yaml_command_schema.CommandType.SET_IAM_POLICY):
+      command = self._GenerateSetIamPolicyCommand()
     elif self.spec.command_type == yaml_command_schema.CommandType.GENERIC:
       command = self._GenerateGenericCommand()
     else:
@@ -114,7 +120,7 @@ class CommandBuilder(object):
 
       def Run(self_, args):
         unused_ref, response = self._CommonRun(args)
-        return self._HandleResponse(response)
+        return self._HandleResponse(response, args)
 
     return Command
 
@@ -149,7 +155,7 @@ class CommandBuilder(object):
       def Run(self_, args):
         self._RegisterURIFunc(args)
         unused_ref, response = self._CommonRun(args)
-        return self._HandleResponse(response)
+        return self._HandleResponse(response, args)
 
     return Command
 
@@ -188,9 +194,9 @@ class CommandBuilder(object):
               .format(yaml_command_schema.NAME_FORMAT_KEY),
               extract_resource_result=False)
           if args.async:
-            return self._HandleResponse(response)
+            return self._HandleResponse(response, args)
 
-        response = self._HandleResponse(response)
+        response = self._HandleResponse(response, args)
         log.DeletedResource(ref.Name(), kind=self.resource_type)
         return response
 
@@ -234,9 +240,9 @@ class CommandBuilder(object):
               args, ref, response,
               request_string=request_string)
           if args.async:
-            return self._HandleResponse(response)
+            return self._HandleResponse(response, args)
 
-        response = self._HandleResponse(response)
+        response = self._HandleResponse(response, args)
         log.CreatedResource(ref.Name() if ref else None,
                             kind=self.resource_type)
         return response
@@ -271,7 +277,7 @@ class CommandBuilder(object):
         ref = self.arg_generator.GetRequestResourceRef(args)
         response = self._WaitForOperation(
             ref, resource_ref=None, extract_resource_result=False)
-        response = self._HandleResponse(response)
+        response = self._HandleResponse(response, args)
         return response
 
     return Command
@@ -292,6 +298,7 @@ class CommandBuilder(object):
     # pylint: disable=protected-access, The linter gets confused about 'self'
     # and thinks we are accessing something protected.
     class Command(base.ListCommand):
+      """Get IAM policy command closure."""
 
       @staticmethod
       def Args(parser):
@@ -299,8 +306,62 @@ class CommandBuilder(object):
         base.URI_FLAG.RemoveFromParser(parser)
 
       def Run(self_, args):
-        unused_ref, response = self._CommonRun(args)
-        return self._HandleResponse(response)
+        _, response = self._CommonRun(args)
+        return self._HandleResponse(response, args)
+
+    return Command
+
+  def _GenerateSetIamPolicyCommand(self):
+    """Generates a set-iam-policy command.
+
+    A set-iam-policy command takes a resource argument, a policy to set on that
+    resource, and an API method to call to set the policy on the resource. The
+    result is returned using the default output format.
+
+    Returns:
+      calliope.base.Command, The command that implements the spec.
+    """
+
+    # pylint: disable=no-self-argument, The class closure throws off the linter
+    # a bit. We want to use the generator class, not the class being generated.
+    # pylint: disable=protected-access, The linter gets confused about 'self'
+    # and thinks we are accessing something protected.
+    class Command(base.Command):
+      """Set IAM policy command closure."""
+
+      @staticmethod
+      def Args(parser):
+        self._CommonArgs(parser)
+        iam_util.AddArgForPolicyFile(parser)
+        base.URI_FLAG.RemoveFromParser(parser)
+
+      def Run(self_, args):
+        """Called when command is executed."""
+        # Default Policy message and set IAM request message field names
+        policy_type_name = 'Policy'
+        policy_request_path = 'setIamPolicyRequest'
+
+        # Use Policy message and set IAM request field name overrides for API's
+        # with non-standard naming (if provided)
+        if self.spec.iam:
+          policy_type_name = (self.spec.iam.message_type_overrides['policy'] or
+                              policy_type_name)
+          policy_request_path = (self.spec.iam.set_iam_policy_request_path or
+                                 policy_request_path)
+
+        policy_field_path = policy_request_path + '.policy'
+        policy_type = self.method.GetMessageByName(policy_type_name)
+        if not policy_type:
+          raise ValueError('Policy type [{}] not found.'.format(
+              policy_type_name))
+        policy, update_mask = iam_util.ParsePolicyFileWithUpdateMask(
+            args.policy_file, policy_type)
+
+        self.spec.request.static_fields[policy_field_path] = policy
+        self._SetPolicyUpdateMask(update_mask)
+        ref, response = self._CommonRun(args)
+        iam_util.LogSetIamPolicy(ref.Name(), self.resource_type)
+        return self._HandleResponse(response, args)
 
     return Command
 
@@ -337,7 +398,7 @@ class CommandBuilder(object):
                 yaml_command_schema.NAME_FORMAT_KEY)
           response = self._HandleAsync(
               args, ref, response, request_string=request_string)
-        return self._HandleResponse(response)
+        return self._HandleResponse(response, args)
 
     return Command
 
@@ -389,7 +450,8 @@ class CommandBuilder(object):
     else:
       request = self.arg_generator.CreateRequest(
           args, self.spec.request.static_fields,
-          self.spec.request.resource_method_params)
+          self.spec.request.resource_method_params,
+          use_relative_name=self.spec.request.use_relative_name)
       for hook in self.spec.request.modify_request_hooks:
         request = hook(ref, args, request)
 
@@ -397,6 +459,35 @@ class CommandBuilder(object):
                                 limit=self.arg_generator.Limit(args),
                                 page_size=self.arg_generator.PageSize(args))
     return ref, response
+
+  def _SetPolicyUpdateMask(self, update_mask):
+    """Set Field Mask on SetIamPolicy request message.
+
+    If the API supports update_masks then adds the update_mask to the
+    SetIamPolicy request (via static fields).
+    Args:
+      update_mask: str, comma separated string listing the Policy fields to be
+        updated.
+    """
+    # Standard names for SetIamPolicyRequest message and set IAM request
+    # field name
+
+    set_iam_policy_request = 'SetIamPolicyRequest'
+    policy_request_path = 'setIamPolicyRequest'
+
+    # Use SetIamPolicyRequest message and set IAM request field name overrides
+    # for API's with non-standard naming (if provided)
+    if self.spec.iam:
+      overrides = self.spec.iam.message_type_overrides
+      set_iam_policy_request = (overrides['set_iam_policy_request']
+                                or set_iam_policy_request)
+      policy_request_path = (self.spec.iam.set_iam_policy_request_path
+                             or policy_request_path)
+
+    mask_field_path = '{}.updateMask'.format(policy_request_path)
+    update_request = self.method.GetMessageByName(set_iam_policy_request)
+    if hasattr(update_request, 'updateMask'):
+      self.spec.request.static_fields[mask_field_path] = update_mask
 
   def _HandleAsync(self, args, resource_ref, operation,
                    request_string, extract_resource_result=True):
@@ -442,11 +533,12 @@ class CommandBuilder(object):
     return waiter.WaitFor(
         poller, operation_ref, self._Format(progress_string, resource_ref))
 
-  def _HandleResponse(self, response):
+  def _HandleResponse(self, response, args=None):
     """Process the API response.
 
     Args:
       response: The apitools message object containing the API response.
+      args: argparse.Namespace, The parsed args.
 
     Raises:
       core.exceptions.Error: If an error was detected and extracted from the
@@ -471,6 +563,8 @@ class CommandBuilder(object):
         raise exceptions.Error(str(error))
     if self.spec.response.result_attribute:
       response = _GetAttribute(response, self.spec.response.result_attribute)
+    for hook in self.spec.response.modify_response_hooks:
+      response = hook(response, args)
     return response
 
   def _FindPopulatedAttribute(self, obj, attributes):

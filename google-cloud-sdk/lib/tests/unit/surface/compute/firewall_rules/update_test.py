@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the firewall-rules update subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import firewalls_utils
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
@@ -39,10 +41,10 @@ class FirewallRulesUpdateTest(test_base.BaseTest):
   def AssertRaisesArgumentValidationExceptionRegexp(
       self, expected_regexp, callable_obj=None, *args, **kwargs):
     if callable_obj is None:
-      return self.assertRaisesRegexp(
+      return self.assertRaisesRegex(
           firewalls_utils.ArgumentValidationError, expected_regexp)
 
-    return self.assertRaisesRegexp(
+    return self.assertRaisesRegex(
         firewalls_utils.ArgumentValidationError, expected_regexp, callable_obj,
         *args, **kwargs)
 
@@ -531,6 +533,32 @@ class BetaFirewallRulesUpdateTest(FirewallRulesUpdateTest):
 
       self.CheckRequests(get_request, update_request)
 
+  def testDisabled(self):
+    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=False)
+
+    self.Run("""
+        compute firewall-rules update firewall-1 --disabled
+        """)
+    self.CheckFirewallRequest(destinationRanges=['0.0.0.0/0'], disabled=True)
+
+  def testEnabled(self):
+    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=True)
+
+    self.Run("""
+        compute firewall-rules update firewall-1 --no-disabled
+        """)
+    self.CheckFirewallRequest(destinationRanges=['0.0.0.0/0'], disabled=False)
+
+  def testDisabledUnspecified(self):
+    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=True)
+
+    self.Run("""
+        compute firewall-rules update firewall-1 --target-tags tgt
+        """)
+    # Request should not have disabled set.
+    self.CheckFirewallRequest(
+        destinationRanges=['0.0.0.0/0'], targetTags=['tgt'])
+
 
 class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):
 
@@ -573,32 +601,6 @@ class AlphaFirewallRulesUpdateTest(BetaFirewallRulesUpdateTest):
                              project='my-project'))]
 
       self.CheckRequests(get_request, update_request)
-
-  def testDisabled(self):
-    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=False)
-
-    self.Run("""
-        compute firewall-rules update firewall-1 --disabled
-        """)
-    self.CheckFirewallRequest(destinationRanges=['0.0.0.0/0'], disabled=True)
-
-  def testEnabled(self):
-    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=True)
-
-    self.Run("""
-        compute firewall-rules update firewall-1 --no-disabled
-        """)
-    self.CheckFirewallRequest(destinationRanges=['0.0.0.0/0'], disabled=False)
-
-  def testDisabledUnspecified(self):
-    self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], disabled=True)
-
-    self.Run("""
-        compute firewall-rules update firewall-1 --target-tags tgt
-        """)
-    # Request should not have disabled set.
-    self.CheckFirewallRequest(
-        destinationRanges=['0.0.0.0/0'], targetTags=['tgt'])
 
   def testEnableLogging(self):
     self.SetNextGetResult(destinationRanges=['0.0.0.0/0'], enableLogging=False)

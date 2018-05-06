@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud dns managed-zones COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Manage your Cloud DNS managed-zones.
+    Manage your Cloud DNS managed-zones. See Managing Zones
+    (https://cloud.google.com/dns/zones/) for details.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -26,6 +27,9 @@ COMMANDS
 
      list
         View the list of all your managed-zones.
+
+     update
+        Update an existing Cloud DNS managed-zone.
 
 EXAMPLES
     To create a managed-zone, run:

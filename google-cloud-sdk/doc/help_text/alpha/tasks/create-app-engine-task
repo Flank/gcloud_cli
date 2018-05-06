@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha tasks create-app-engine-task
         [--header=HEADER_FIELD: HEADER_VALUE] [--id=TASK_ID] [--method=METHOD]
-        [--queue=QUEUE] [--routing=KEY:VALUE,[KEY:VALUE,...]]
+        [--queue=QUEUE] [--routing=KEY:VALUE,[...]]
         [--schedule-time=SCHEDULE_TIME] [--url=URL]
         [--payload-content=PAYLOAD_CONTENT | --payload-file=PAYLOAD_FILE]
         [GCLOUD_WIDE_FLAG ...]
@@ -38,7 +38,7 @@ FLAGS
      --queue=QUEUE
         The queue the task belongs to.
 
-     --routing=KEY:VALUE,[KEY:VALUE,...]
+     --routing=KEY:VALUE,[...]
         The route to be used for this task. KEY must be at least one of:
         [service, version, instance]. Any missing keys will use the default.
 

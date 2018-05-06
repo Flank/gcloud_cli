@@ -1,0 +1,170 @@
+
+.TH "GCLOUD_BETA_COMPOSER_ENVIRONMENTS_STORAGE_DAGS_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta composer environments storage dags export \- exports DAGs from an environment into local storage or Cloud Storage
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta composer environments storage dags export\fR \fB\-\-destination\fR=\fIDESTINATION\fR (\fB\-\-environment\fR=\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-source\fR=\fISOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR If the SOURCE is a directory, it and its contents are are exported
+recursively. If no SOURCE is provided, the entire contents of the environment's
+DAGs directory will be exported. Colliding files in the DESTINATION will be
+overwritten. If a file exists in the DESTINATION but there is no corresponding
+file to overwrite it, it is untouched.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+The path to an existing local directory or a Cloud Storage bucket/directory into
+which to export files.
+
+.TP 2m
+
+ENVIRONMENT \- The environment from whose Cloud Storage bucket to export DAGs..
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: Set the property
+[core/project] or provide the flag [\-\-project] on the command line. This must
+be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-environment\fR=\fIENVIRONMENT\fR
+The ID of the environment or a fully qualified identifier for the environment.
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The Cloud location for the environment.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+An optional relative path to a file or directory to be exported from the dags/
+subdirectory in the environment's Cloud Storage bucket.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+Suppose the environment \f5myenv\fR's Cloud Storage bucket has the following
+structure:
+
+.RS 2m
+gs://the\-bucket
+|
++\-\- dags
+|   |
+|   +\-\- file1.py
+|   +\-\- file2.py
+|   |
+|   +\-\- subdir1
+|   |   |
+|   |   +\-\- file3.py
+|   |   +\-\- file4.py
+.RE
+
+And the local directory '/foo' has the following structure:
+
+.RS 2m
+/foo
+|
++\-\- file1.py
++\-\- fileX.py
+|   |
+|   +\-\- subdir1
+|   |   |
+|   |   +\-\- file3.py
+|   |   +\-\- fileY.py
+.RE
+
+The following command:
+
+.RS 2m
+gcloud beta composer environments storage dags export myenv \-\-destination /foo
+.RE
+
+would result in the following structure in the local '/foo' directory:
+
+.RS 2m
+/foo
+|
++\-\- file1.py
++\-\- file2.py
++\-\- fileX.py
+|   |
+|   +\-\- subdir1
+|   |   |
+|   |   +\-\- file3.py
+|   |   +\-\- file4.py
+|   |   +\-\- fileY.py
+.RE
+
+The local files '/foo/file1.py' and '/foo/subdir1/file3.py' will be overwritten
+with the contents of the corresponding files in the Cloud Storage bucket.
+
+If instead we had run
+
+.RS 2m
+gcloud beta composer environments storage dags export myenv \-\-source subdir1/file3.py \-\-destination /foo
+.RE
+
+the resulting local directory structure would be the following:
+
+.RS 2m
+/foo
+|
++\-\- file1.py
++\-\- file3.py
++\-\- fileX.py
+|   |
+|   +\-\- subdir1
+|   |   |
+|   |   +\-\- file3.py
+|   |   +\-\- fileY.py
+.RE
+
+No local files would be overwritten since
+\'gs://the\-bucket/dags/subdir1/file3.py' was written to '/foo/file3.py' instead
+of 'foo/subdir1/file3.py'.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

@@ -13,7 +13,8 @@
 # limitations under the License.
 """Tests of the 'import' command."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.datastore import admin_api
 from googlecloudsdk.api_lib.datastore import operations
@@ -22,6 +23,7 @@ from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.datastore import base
+import six.moves.http_client
 
 
 class ImportTest(base.DatastoreCommandUnitTest):
@@ -76,18 +78,18 @@ class ImportTest(base.DatastoreCommandUnitTest):
 
     actual = self.RunImportTest(
         labels=labels, kinds=kinds, namespaces=namespaces, input_url=input_url)
-    self.assertEquals(operation_name, actual.name)
+    self.assertEqual(operation_name, actual.name)
 
   def testImportFailureThrowsToolHttpException(self):
     input_url = 'gs://gcs_bucket/gcs_file'
     request = admin_api.GetImportEntitiesRequest(self.Project(), input_url)
 
     exception = http_error.MakeHttpError(
-        httplib.BAD_REQUEST, 'error_message', url='fake url')
+        six.moves.http_client.BAD_REQUEST, 'error_message', url='fake url')
 
     self.mock_datastore_v1.projects.Import.Expect(request, exception=exception)
 
-    with self.assertRaisesRegexp(exceptions.HttpException, 'error_message'):
+    with self.assertRaisesRegex(exceptions.HttpException, 'error_message'):
       self.RunImportTest(input_url=input_url)
 
   def RunImportTest(self,

@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import json
 import os
 
@@ -64,8 +67,8 @@ class ConfigureDockerTest(sdk_test_base.WithFakeAuth,
         cred_utils.Configuration, 'ReadFromDisk'
     ).side_effect = client_lib.InvalidDockerConfigError(
         'Could not compare Docker client version:[No such file or directory]')
-    with self.assertRaisesRegexp(client_lib.DockerError,
-                                 'No such file or directory'):
+    with self.assertRaisesRegex(client_lib.DockerError,
+                                'No such file or directory'):
       self.WriteInput('Y\n')
       self.Run('auth configure-docker')
 
@@ -78,14 +81,44 @@ class ConfigureDockerTest(sdk_test_base.WithFakeAuth,
     self.assertEqual(cred_utils.GetGcloudCredentialHelperConfig(),
                      config_info.contents)
 
-  def testCloudSDKNotOnPath(self):
-    self.StartObjectPatch(files, 'SearchForExecutableOnPath', return_value=[])
+  def testDockerNotOnPath(self):
+
+    def executable_on_path(binary):
+      if binary == 'docker':
+        return False
+      return True
+
+    self.StartObjectPatch(
+        files, 'SearchForExecutableOnPath', side_effect=executable_on_path)
     self._WriteTestDockerConfig('{}')
     self.WriteInput('Y\n')
     self.Run('auth configure-docker')
-    self.AssertErrMatches(r'WARNING: gcloud not in system PATH.\n'
-                          r'gcloud Docker Credential Helper can be configured '
-                          r'but it will not work until this is corrected.')
+    self.AssertErrContains(
+        'WARNING: `docker` not in system PATH.\n'
+        '`docker` and `docker-credential-gcloud` need to be in the same PATH '
+        'in order to work correctly together.\n'
+        'gcloud\'s Docker credential helper can be configured but '
+        'it will not work until this is corrected.')
+    config_info = cred_utils.Configuration.ReadFromDisk()
+    self.assertEqual(cred_utils.GetGcloudCredentialHelperConfig(),
+                     config_info.contents)
+
+  def testDockerCredentialGcloudNotOnPath(self):
+
+    def executable_on_path(binary):
+      if binary == 'docker-credential-gcloud':
+        return False
+      return True
+
+    self.StartObjectPatch(
+        files, 'SearchForExecutableOnPath', side_effect=executable_on_path)
+    self._WriteTestDockerConfig('{}')
+    self.WriteInput('Y\n')
+    self.Run('auth configure-docker')
+    self.AssertErrContains(
+        'WARNING: `docker-credential-gcloud` not in system PATH.\n'
+        'gcloud\'s Docker credential helper can be configured but '
+        'it will not work until this is corrected.')
     config_info = cred_utils.Configuration.ReadFromDisk()
     self.assertEqual(cred_utils.GetGcloudCredentialHelperConfig(),
                      config_info.contents)
@@ -116,9 +149,9 @@ class ConfigureDockerTest(sdk_test_base.WithFakeAuth,
     self.StartObjectPatch(
         files,
         'WriteFileAtomically').side_effect = IOError('File Write Error FOO')
-    with self.assertRaisesRegexp(client_lib.DockerError,
-                                 r'Error writing Docker configuration to disk: '
-                                 r'File Write Error FOO'):
+    with self.assertRaisesRegex(client_lib.DockerError,
+                                r'Error writing Docker configuration to disk: '
+                                r'File Write Error FOO'):
       self.WriteInput('Y\n')
       self.Run('auth configure-docker')
 

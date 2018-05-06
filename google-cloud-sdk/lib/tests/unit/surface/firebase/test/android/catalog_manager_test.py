@@ -15,11 +15,11 @@
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.firebase.test.android import catalog_manager
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import fake_catalogs
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test.android import fake_catalogs
+from tests.lib.surface.firebase.test.android import unit_base
 
 
-class AndroidCatalogManagerTests(unit_base.TestMockClientTest):
+class AndroidCatalogManagerTests(unit_base.AndroidMockClientTest):
   """Unit tests for api_lib/test/android/catalog_manager.py."""
 
   def testDimensionDefaults(self):

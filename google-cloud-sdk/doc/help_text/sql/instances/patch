@@ -3,9 +3,10 @@ NAME
 
 SYNOPSIS
     gcloud sql instances patch INSTANCE [--activation-policy=ACTIVATION_POLICY]
-        [--[no-]assign-ip] [--async] [--cpu=CPU] [--diff]
-        [--[no-]enable-bin-log] [--[no-]enable-database-replication]
-        [--follow-gae-app=FOLLOW_GAE_APP] [--gce-zone=GCE_ZONE]
+        [--[no-]assign-ip] [--async] [--availability-type=AVAILABILITY_TYPE]
+        [--cpu=CPU] [--diff] [--[no-]enable-bin-log]
+        [--[no-]enable-database-replication] [--follow-gae-app=FOLLOW_GAE_APP]
+        [--gce-zone=GCE_ZONE]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
         [--maintenance-window-any]
         [--maintenance-window-day=MAINTENANCE_WINDOW_DAY]
@@ -43,6 +44,17 @@ FLAGS
 
      --async
         Do not wait for the operation to complete.
+
+     --availability-type=AVAILABILITY_TYPE
+        Specifies level of availability. Only applies to PostgreSQL instances.
+        AVAILABILITY_TYPE must be one of:
+
+         regional
+            Provides high availability and is recommended for production
+            instances; instance automatically fails over to another zone within
+            your selected region.
+         zonal
+            Provides no failover capability. This is the default.
 
      --cpu=CPU
         A whole number value indicating how many cores are desired in the

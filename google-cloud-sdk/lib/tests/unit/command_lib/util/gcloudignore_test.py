@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for googlecloudsdk.command_lib.util.gcloudignore."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 import ntpath
 import os
@@ -283,7 +287,7 @@ class PatternTest(parameterized.TestCase, test_case.TestCase):
       ('\\]', ']'),
   )
   def testUnescape(self, escaped, unescaped):
-    self.assertEquals(gcloudignore._Unescape(escaped), unescaped)
+    self.assertEqual(gcloudignore._Unescape(escaped), unescaped)
 
   @parameterized.parameters(
       ('', ''),
@@ -302,7 +306,7 @@ class PatternTest(parameterized.TestCase, test_case.TestCase):
       ('\\ \\ f\\!oo', '  f\\!oo'),
   )
   def testHandleSpaces(self, original, stripped):
-    self.assertEquals(gcloudignore._HandleSpaces(original), stripped)
+    self.assertEqual(gcloudignore._HandleSpaces(original), stripped)
 
 
 class FileChooserTest(parameterized.TestCase, test_case.Base):
@@ -311,7 +315,7 @@ class FileChooserTest(parameterized.TestCase, test_case.Base):
     file_chooser = gcloudignore.FileChooser.FromString(text)
     self.assertEqual(file_chooser.IsIncluded(path, is_dir=is_dir), result)
 
-    with tempfile.NamedTemporaryFile(delete=False) as f:
+    with tempfile.NamedTemporaryFile(delete=False, mode='wt+') as f:
       self.addCleanup(os.unlink, f.name)
       f.write(text)
     file_chooser = gcloudignore.FileChooser.FromFile(f.name)
@@ -368,15 +372,16 @@ class FileChooserTest(parameterized.TestCase, test_case.Base):
 
   @parameterized.parameters(
       ('foo/\n!foo/bar', os.path.join('foo', 'bar'), False),
+      ('foo/*\n!foo/', 'foo/bar', False),
       # This example only includes foo/bar and its contents
       ('/*\n!/foo\n/foo/*\n!foo/bar', 'foo', True),
       ('/*\n!/foo\n/foo/*\n!foo/bar', 'qux', False),
       ('/*\n!/foo\n/foo/*\n!foo/bar', os.path.join('foo', 'bar'), True),
       ('/*\n!/foo\n/foo/*\n!foo/bar', os.path.join('foo', 'bar', 'baz'), True),
       ('/*\n!/foo\n/foo/*\n!foo/bar', os.path.join('foo', 'baz'), False),
-      # Because of the '*', the root directory is excluded and nothing can get
-      # re-included.
-      ('*\n!/foo\n/foo/*\n!foo/bar', os.path.join('foo', 'bar'), False),
+      # The '*' matches also in sub-dirs
+      ('*\n!foo', 'foo', True),
+      ('*\n!/foo\n/foo/*\n!foo/bar', os.path.join('foo', 'bar'), True),
       ('*\n!/foo\n/foo/*\n!foo/bar', os.path.join('foo', 'bar', 'baz'), False),
   )
   def testIsIncluded_ParentDirectoryExcluded(self, text, path, result):
@@ -411,7 +416,7 @@ class FileChooserRecursiveTest(parameterized.TestCase,
       ignore_file_path = os.path.join(temp_path, ignore_file)
       file_chooser = gcloudignore.FileChooser.FromFile(ignore_file_path,
                                                        recurse=recurse)
-    self.assertEquals(file_chooser.IsIncluded(path), result)
+    self.assertEqual(file_chooser.IsIncluded(path), result)
 
   def testFromString_Recursive(self):
     with _TempDir() as temp_path:
@@ -463,8 +468,8 @@ class FileChooserGetIncludedFilesTest(test_case.Base):
                    os.path.basename(file_), contents=contents, makedirs=True)
       file_chooser = gcloudignore.FileChooser.FromFile(
           os.path.join(temp_path, 'gcloudignore'))
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        expected_files)
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       expected_files)
 
   def testGetIncludedFiles_SkipDirs(self):
     files = {
@@ -478,9 +483,9 @@ class FileChooserGetIncludedFilesTest(test_case.Base):
                    os.path.basename(file_), contents=contents, makedirs=True)
       file_chooser = gcloudignore.FileChooser.FromFile(
           os.path.join(temp_path, 'gcloudignore'))
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path,
-                                                          include_dirs=False)),
-                        expected_files)
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path,
+                                                         include_dirs=False)),
+                       expected_files)
 
   def testGetIncludedFiles_SkipsUnincludedDirectories(self):
     old_join = os.path.join
@@ -493,8 +498,8 @@ class FileChooserGetIncludedFilesTest(test_case.Base):
                  makedirs=True)
       file_chooser = gcloudignore.FileChooser.FromString('foo/')
       with mock.patch.object(os.path, 'join', side_effect=_FakeJoin):
-        self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                          set([]))
+        self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                         set([]))
 
   def testGetIncludedFiles_DoesntSkipReincludedDirectories(self):
     files = {
@@ -512,8 +517,8 @@ class FileChooserGetIncludedFilesTest(test_case.Base):
                    os.path.basename(file_), contents=contents, makedirs=True)
       file_chooser = gcloudignore.FileChooser.FromFile(
           os.path.join(temp_path, 'gcloudignore'))
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        expected_files)
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       expected_files)
 
   @test_case.Filters.DoNotRunOnWindows(
       'Symlinks don\'t work on Windows without binary extensions to Python.')
@@ -534,8 +539,8 @@ class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):
       file_chooser = gcloudignore.GetFileChooserForDir(
           temp_path, default_ignore_file='foo')
       self.assertTrue(file_chooser)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['foo', 'bar']))
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['foo', 'bar']))
 
   def testGetFileChooserForDir_GcloudignoreFile(self):
     with _TempDir() as temp_path:
@@ -543,16 +548,16 @@ class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):
       self.Touch(temp_path, 'foo')
       self.Touch(temp_path, 'bar')
       file_chooser = gcloudignore.GetFileChooserForDir(temp_path)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['.gcloudignore', 'bar']))
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['.gcloudignore', 'bar']))
 
   def testGetFileChooserForDir_Gitfiles(self):
     with _TempDir() as temp_path:
       self.Touch(os.path.join(temp_path, '.git'), 'git-metadata', makedirs=True)
       self.Touch(temp_path, 'foo')
       file_chooser = gcloudignore.GetFileChooserForDir(temp_path)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['foo']))
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['foo']))
       self.assertTrue(os.path.exists(os.path.join(temp_path, '.gcloudignore')))
 
   def testGetFileChooserForDir_Gitignore(self):
@@ -562,8 +567,8 @@ class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):
       self.Touch(temp_path, 'bar')
       self.Touch(temp_path, '.gitignore', contents='foo')
       file_chooser = gcloudignore.GetFileChooserForDir(temp_path)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['bar']))
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['bar']))
       self.assertTrue(os.path.exists(os.path.join(temp_path, '.gcloudignore')))
 
   def testGetFileChooserForDir_GitignoreDoNotWrite(self):
@@ -574,8 +579,8 @@ class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):
       self.Touch(temp_path, '.gitignore', contents='foo')
       file_chooser = gcloudignore.GetFileChooserForDir(temp_path,
                                                        write_on_disk=False)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['bar']))
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['bar']))
       self.assertFalse(os.path.exists(os.path.join(temp_path, '.gcloudignore')))
 
   @test_case.Filters.DoNotRunOnWindows(
@@ -587,12 +592,12 @@ class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):
       self.Touch(temp_path, 'bar')
       self.Touch(temp_path, '.gitignore', contents='foo')
       try:
-        os.chmod(temp_path, 0555)
+        os.chmod(temp_path, 0o555)
         file_chooser = gcloudignore.GetFileChooserForDir(temp_path)
       finally:
-        os.chmod(temp_path, 0777)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['bar']))
+        os.chmod(temp_path, 0o777)
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['bar']))
       self.assertFalse(os.path.exists(os.path.join(temp_path, '.gcloudignore')))
 
   def testGetFileChooserForDir_GcloudignoreTrumpsGitignore(self):
@@ -602,8 +607,8 @@ class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):
       self.Touch(temp_path, 'foo')
       self.Touch(temp_path, 'bar')
       file_chooser = gcloudignore.GetFileChooserForDir(temp_path)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['.gcloudignore', '.gitignore', 'bar']))
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['.gcloudignore', '.gitignore', 'bar']))
 
   def testGetFileChooserForDir_DisableGcloudignore(self):
     properties.VALUES.gcloudignore.enabled.Set(False)
@@ -612,8 +617,8 @@ class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):
       self.Touch(temp_path, 'foo')
       self.Touch(temp_path, 'bar')
       file_chooser = gcloudignore.GetFileChooserForDir(temp_path)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['.gcloudignore', 'bar', 'foo']))
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['.gcloudignore', 'bar', 'foo']))
 
   def testGetFileChooserForDir_DontIncludeGitignore(self):
     with _TempDir() as temp_path:
@@ -624,8 +629,8 @@ class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):
           temp_path,
           default_ignore_file='\n'.join(['.gitignore', '.gcloudignore']),
           include_gitignore=False)
-      self.assertEquals(set(file_chooser.GetIncludedFiles(temp_path)),
-                        set(['foo', 'bar']))
+      self.assertEqual(set(file_chooser.GetIncludedFiles(temp_path)),
+                       set(['foo', 'bar']))
 
 
 if __name__ == '__main__':

@@ -13,11 +13,11 @@
 # limitations under the License.
 
 """Testing resources for DNS."""
-from googlecloudsdk.api_lib.util import apis
+from tests.lib.surface.dns import util
 
 
 def GetMessages():
-  return apis.GetMessagesModule("dns", "v1beta2")
+  return util.GetMessages("v1beta2")
 
 
 def GetManagedZones():
@@ -50,8 +50,9 @@ def GetManagedZones():
   ]
 
 
-def GetManagedZoneBeforeCreation():
-  m = GetMessages()
+def GetManagedZoneBeforeCreation(api_version="v1beta2"):
+  m = util.GetMessages(api_version)
+  nonexistence = m.ManagedZoneDnsSecConfig.NonExistenceValueValuesEnum.nsec3
   return m.ManagedZone(
       creationTime=None,
       description="Zone!",
@@ -60,7 +61,7 @@ def GetManagedZoneBeforeCreation():
           defaultKeySpecs=[
           ],
           kind=u"dns#managedZoneDnsSecConfig",
-          nonExistence=None,
+          nonExistence=nonexistence,
           state=m.ManagedZoneDnsSecConfig.StateValueValuesEnum.on,
       ),
       kind=u"dns#managedZone",

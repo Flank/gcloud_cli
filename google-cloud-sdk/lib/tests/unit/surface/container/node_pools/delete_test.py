@@ -14,6 +14,8 @@
 
 """Tests for 'node-pools delete' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -56,6 +58,9 @@ class DeleteTestGA(base.TestBaseV1,
 
   def testDeleteNodePool(self):
     self._TestDeleteNodePool(self.ZONE)
+
+  def testDeleteRegionalNodePool(self):
+    self._TestDeleteNodePool(self.REGION)
 
   def testDeleteNodePoolAsync(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -124,7 +129,6 @@ class DeleteTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, DeleteTestAlphaV1API,
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(False)
 
-  def testDeleteRegionalNodePool(self):
-    self._TestDeleteNodePool(self.REGION)
+
 if __name__ == '__main__':
   test_case.main()

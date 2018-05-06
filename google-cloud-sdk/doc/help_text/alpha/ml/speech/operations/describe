@@ -9,8 +9,12 @@ DESCRIPTION
     (ALPHA) Get information about a long-running speech recognition operation.
 
 POSITIONAL ARGUMENTS
-     OPERATION
-        The ID of the operation to describe.
+     OPERATION - The ID of the operation to describe. This represents a Cloud
+     resource. This must be specified.
+
+       OPERATION
+          The ID of the operation or a fully qualified identifier for the
+          operation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

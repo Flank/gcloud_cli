@@ -18,12 +18,13 @@ from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core.console import console_attr
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
-from tests.lib.surface.firebase.test import fake_catalogs
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test import test_utils
+from tests.lib.surface.firebase.test.android import commands
+from tests.lib.surface.firebase.test.android import fake_catalogs
+from tests.lib.surface.firebase.test.android import unit_base
 
 
-class TestModelsDescribeTest(unit_base.TestMockClientTest):
+class TestModelsDescribeTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
@@ -49,7 +50,7 @@ class TestModelsDescribeTest(unit_base.TestMockClientTest):
     self.AssertOutputContains('name: Universe T3')
 
   def testModelsDescribe_ApiThrowsHttpError(self):
-    err = unit_base.MakeHttpError('ErrorXYZ', 'Environment catalog failure.')
+    err = test_utils.MakeHttpError('ErrorXYZ', 'Environment catalog failure.')
     self.ExpectCatalogGetError(err)
 
     with self.assertRaises(calliope_exceptions.HttpException):

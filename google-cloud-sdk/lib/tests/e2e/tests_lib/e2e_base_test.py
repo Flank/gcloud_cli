@@ -29,7 +29,7 @@ class AuthTests(cli_test_base.CliTestBase):
       self.AssertOutputContains('us-central1')
 
   def testNoAuth(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         store.TokenRefreshError,
         'There was a problem refreshing your current auth tokens'):
       with e2e_base.RefreshTokenAuth('fake-token'):

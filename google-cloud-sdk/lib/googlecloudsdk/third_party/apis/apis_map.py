@@ -130,6 +130,14 @@ MAP = {
             default_version=True
         ),
     },
+    'binaryauthorization': {
+        'v1alpha1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.binaryauthorization.v1alpha1',
+            client_classpath='binaryauthorization_v1alpha1_client.BinaryauthorizationV1alpha1',
+            messages_modulepath='binaryauthorization_v1alpha1_messages',
+            default_version=True
+        ),
+    },
     'bio': {
         'v1': APIDef(
             class_path='googlecloudsdk.third_party.apis.bio.v1',
@@ -272,17 +280,11 @@ MAP = {
             default_version=True
         ),
     },
-    'clouduseraccounts': {
-        'alpha': APIDef(
-            class_path='googlecloudsdk.third_party.apis.clouduseraccounts.alpha',
-            client_classpath='clouduseraccounts_alpha_client.ClouduseraccountsAlpha',
-            messages_modulepath='clouduseraccounts_alpha_messages',
-            default_version=False
-        ),
-        'beta': APIDef(
-            class_path='googlecloudsdk.third_party.apis.clouduseraccounts.beta',
-            client_classpath='clouduseraccounts_beta_client.ClouduseraccountsBeta',
-            messages_modulepath='clouduseraccounts_beta_messages',
+    'composer': {
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.composer.v1beta1',
+            client_classpath='composer_v1beta1_client.ComposerV1beta1',
+            messages_modulepath='composer_v1beta1_messages',
             default_version=True
         ),
     },
@@ -398,6 +400,14 @@ MAP = {
             default_version=True
         ),
     },
+    'dlp': {
+        'v2': APIDef(
+            class_path='googlecloudsdk.third_party.apis.dlp.v2',
+            client_classpath='dlp_v2_client.DlpV2',
+            messages_modulepath='dlp_v2_messages',
+            default_version=True
+        ),
+    },
     'dns': {
         'v1': APIDef(
             class_path='googlecloudsdk.third_party.apis.dns.v1',
@@ -488,6 +498,14 @@ MAP = {
             default_version=True
         ),
     },
+    'monitoring': {
+        'v3': APIDef(
+            class_path='googlecloudsdk.third_party.apis.monitoring.v3',
+            client_classpath='monitoring_v3_client.MonitoringV3',
+            messages_modulepath='monitoring_v3_messages',
+            default_version=True
+        ),
+    },
     'oslogin': {
         'v1': APIDef(
             class_path='googlecloudsdk.third_party.apis.oslogin.v1',
@@ -513,6 +531,20 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.pubsub.v1',
             client_classpath='pubsub_v1_client.PubsubV1',
             messages_modulepath='pubsub_v1_messages',
+            default_version=True
+        ),
+    },
+    'redis': {
+        'v1alpha1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.redis.v1alpha1',
+            client_classpath='redis_v1alpha1_client.RedisV1alpha1',
+            messages_modulepath='redis_v1alpha1_messages',
+            default_version=False
+        ),
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.redis.v1beta1',
+            client_classpath='redis_v1beta1_client.RedisV1beta1',
+            messages_modulepath='redis_v1beta1_messages',
             default_version=True
         ),
     },
@@ -545,6 +577,14 @@ MAP = {
             class_path='googlecloudsdk.third_party.apis.servicenetworking.v1alpha',
             client_classpath='servicenetworking_v1alpha_client.ServicenetworkingV1alpha',
             messages_modulepath='servicenetworking_v1alpha_messages',
+            default_version=True
+        ),
+    },
+    'serviceusage': {
+        'v1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.serviceusage.v1beta1',
+            client_classpath='serviceusage_v1beta1_client.ServiceusageV1beta1',
+            messages_modulepath='serviceusage_v1beta1_messages',
             default_version=True
         ),
     },
@@ -586,6 +626,12 @@ MAP = {
             client_classpath='speech_v1_client.SpeechV1',
             messages_modulepath='speech_v1_messages',
             default_version=True
+        ),
+        'v1p1beta1': APIDef(
+            class_path='googlecloudsdk.third_party.apis.speech.v1p1beta1',
+            client_classpath='speech_v1p1beta1_client.SpeechV1p1beta1',
+            messages_modulepath='speech_v1p1beta1_messages',
+            default_version=False
         ),
     },
     'sqladmin': {

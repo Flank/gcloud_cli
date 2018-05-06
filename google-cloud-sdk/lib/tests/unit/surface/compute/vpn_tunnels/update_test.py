@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for VPN tunnels update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 import textwrap
 
@@ -29,9 +31,9 @@ class UpdateLabelsTestBeta(
     self.vpn_tunnel_ref = self._GetVpnTunnelRef('gw-1', region='us-central1')
 
   def testUpdateMissingNameOrLabels(self):
-    with self.assertRaisesRegexp(exceptions.RequiredArgumentException,
-                                 'At least one of --update-labels or '
-                                 '--remove-labels must be specified.'):
+    with self.assertRaisesRegex(exceptions.RequiredArgumentException,
+                                'At least one of --update-labels or '
+                                '--remove-labels must be specified.'):
       self.Run('compute vpn-tunnels update {0} --region {1}'.format(
           self.vpn_tunnel_ref.Name(), self.vpn_tunnel_ref.region))
 
@@ -43,7 +45,7 @@ class UpdateLabelsTestBeta(
                                                                'value4'))
 
     vpn_tunnel = self._MakeVpnTunnelProto(
-        labels=vpn_tunnel_labels, fingerprint='fingerprint-42')
+        labels=vpn_tunnel_labels, fingerprint=b'fingerprint-42')
     updated_vpn_tunnel = self._MakeVpnTunnelProto(labels=edited_labels)
 
     operation_ref = self._GetOperationRef('operation-1', 'us-central1')
@@ -51,7 +53,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
     self._ExpectLabelsSetRequest(self.vpn_tunnel_ref, edited_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(self.vpn_tunnel_ref, updated_vpn_tunnel)
 
@@ -68,7 +70,7 @@ class UpdateLabelsTestBeta(
     edited_labels = ()
 
     vpn_tunnel = self._MakeVpnTunnelProto(
-        labels=vpn_tunnel_labels, fingerprint='fingerprint-42')
+        labels=vpn_tunnel_labels, fingerprint=b'fingerprint-42')
     updated_vpn_tunnel = self._MakeVpnTunnelProto(labels=edited_labels)
 
     operation_ref = self._GetOperationRef('operation-1', 'us-central1')
@@ -76,7 +78,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
     self._ExpectLabelsSetRequest(self.vpn_tunnel_ref, edited_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(self.vpn_tunnel_ref, updated_vpn_tunnel)
 
@@ -88,14 +90,14 @@ class UpdateLabelsTestBeta(
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     vpn_tunnel = self._MakeVpnTunnelProto(
-        labels=(), fingerprint='fingerprint-42')
+        labels=(), fingerprint=b'fingerprint-42')
     updated_vpn_tunnel = self._MakeVpnTunnelProto(labels=update_labels)
     operation_ref = self._GetOperationRef('operation-1', 'us-central1')
     operation = self._MakeOperationMessage(operation_ref, self.vpn_tunnel_ref)
 
     self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
     self._ExpectLabelsSetRequest(self.vpn_tunnel_ref, update_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(self.vpn_tunnel_ref, updated_vpn_tunnel)
 
@@ -107,7 +109,7 @@ class UpdateLabelsTestBeta(
 
   def testRemoveWithNoLabelsOnVpnTunnel(self):
     vpn_tunnel = self._MakeVpnTunnelProto(
-        labels={}, fingerprint='fingerprint-42')
+        labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
 
@@ -122,7 +124,7 @@ class UpdateLabelsTestBeta(
     update_labels = copy.deepcopy(vpn_tunnel_labels)
 
     vpn_tunnel = self._MakeVpnTunnelProto(
-        labels=vpn_tunnel_labels, fingerprint='fingerprint-42')
+        labels=vpn_tunnel_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
 

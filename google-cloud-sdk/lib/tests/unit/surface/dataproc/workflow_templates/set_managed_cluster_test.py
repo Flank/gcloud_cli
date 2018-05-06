@@ -14,10 +14,13 @@
 """Test of the 'workflow-template set-managed-cluster' command."""
 
 import copy
+import textwrap
+
 from apitools.base.py import encoding
 
 from googlecloudsdk import calliope
 
+from googlecloudsdk.core import properties
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
 
@@ -264,3 +267,43 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                    expiration_time='2017-08-25T00:00:00-07:00')
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(workflow_template, result)
+
+  def testSetManagedClusterAutoZone(self):
+    properties.VALUES.dataproc.region.Set('us-test1')
+    template_name = self.WorkflowTemplateName(region='us-test1')
+    workflow_template = self.MakeWorkflowTemplate(name=template_name)
+    managed_cluster = self.MakeManagedCluster(
+        clusterName=workflow_template.id, region='us-test1', zoneUri='')
+    self.ExpectCallSetManagedCluster(
+        workflow_template=workflow_template, managed_cluster=managed_cluster)
+    result = self.RunDataproc(
+        'workflow-templates set-managed-cluster {template} --zone=""'.format(
+            template=workflow_template.id))
+    self.AssertMessagesEqual(workflow_template, result)
+
+  def testSetManagedClusterOmitZone_globalRegion(self):
+    self.MockCompute()
+    self.ExpectListZones()
+    self.WriteInput('3\n')  # us-central1-a
+
+    template_name = self.WorkflowTemplateName()
+    workflow_template = self.MakeWorkflowTemplate(name=template_name)
+    managed_cluster = self.MakeManagedCluster(
+        clusterName=workflow_template.id, zoneUri='')
+    self.ExpectCallSetManagedCluster(
+        workflow_template=workflow_template, managed_cluster=managed_cluster)
+    result = self.RunDataproc(
+        'workflow-templates set-managed-cluster {template} --zone=""'.format(
+            template=workflow_template.id))
+    self.AssertMessagesEqual(workflow_template, result)
+    self.AssertErrEquals(
+        textwrap.dedent("""\
+        For the following cluster:
+         - [test-workflow-template]
+        choose a zone:
+         [1] europe-west1-a
+         [2] europe-west1-b (DELETED)
+         [3] us-central1-a (DEPRECATED)
+         [4] us-central1-b
+        Please enter your numeric choice:  \n\
+        """))

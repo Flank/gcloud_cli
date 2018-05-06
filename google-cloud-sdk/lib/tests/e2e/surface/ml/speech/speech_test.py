@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """e2e tests for ml speech command group."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 from googlecloudsdk.calliope import base
@@ -23,8 +27,8 @@ class SpeechTests(e2e_base.WithServiceAuth):
   """E2E tests for ml speech command group."""
 
   def SetUp(self):
-    self.testdata = self.Resource('tests', 'unit', 'api_lib', 'ml', 'speech',
-                                  'testdata', 'sample.flac')
+    self.testdata = self.Resource('tests', 'unit', 'command_lib', 'ml',
+                                  'speech', 'testdata', 'sample.flac')
     self.track = base.ReleaseTrack.GA
 
   def testRecognize(self):

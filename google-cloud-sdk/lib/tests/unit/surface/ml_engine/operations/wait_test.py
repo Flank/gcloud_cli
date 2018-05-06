@@ -33,7 +33,7 @@ class WaitTestBase(object):
 
   def testWait_DoneAlready(self):
     self._ExpectGetOp('opId', done=True)
-    self.assertEquals(
+    self.assertEqual(
         self.Run('ml-engine operations wait opId'),
         self.msgs.GoogleLongrunningOperation(name='opId', done=True))
 
@@ -41,7 +41,7 @@ class WaitTestBase(object):
     for _ in range(self.NUM_POLLS):
       self._ExpectGetOp('opId', done=False)
     self._ExpectGetOp('opId', done=True)
-    self.assertEquals(
+    self.assertEqual(
         self.Run('ml-engine operations wait opId'),
         self.msgs.GoogleLongrunningOperation(name='opId', done=True))
 

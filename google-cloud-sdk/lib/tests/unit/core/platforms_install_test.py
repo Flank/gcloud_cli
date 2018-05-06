@@ -14,9 +14,9 @@
 
 """Unit tests for the platforms_install module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
-import StringIO
-import sys
 
 from googlecloudsdk.core import platforms_install
 from googlecloudsdk.core import properties
@@ -28,8 +28,11 @@ from tests.lib import sdk_test_base
 from tests.lib import subtests
 from tests.lib import test_case
 
+from six.moves import builtins
 
-class PlatformsInstallTest(test_case.WithOutputCapture,
+
+class PlatformsInstallTest(test_case.WithInput,
+                           test_case.WithOutputCapture,
                            sdk_test_base.SdkBase):
 
   def SetUp(self):
@@ -40,9 +43,6 @@ class PlatformsInstallTest(test_case.WithOutputCapture,
                     return_value=self.home_path)
     self.StartEnvPatch(
         {'ENV': '', 'HOME': self.home_path, 'SHELL': '/bin/bash'})
-    self.stdin = StringIO.StringIO()
-    self.saved_stdin = sys.stdin
-    sys.stdin = self.stdin
     # Need to mock this because in a test environment it returns False by
     # default.
     self.can_prompt_mock = self.StartObjectPatch(console_io, 'CanPrompt',
@@ -51,20 +51,15 @@ class PlatformsInstallTest(test_case.WithOutputCapture,
                           return_value=True)
 
   def TearDown(self):
-    self.stdin.close()
-    sys.stdin = self.saved_stdin
     properties.VALUES.core.disable_prompts.Set(False)
 
   def SetAnswers(self, *answers):
-    for answer in answers:
-      self.stdin.write(answer + '\n')
-    self.stdin.seek(0)
+    self.WriteInput(*answers)
     return len(answers)
 
   def testNoPromptWhenRcPathSpecifiedNoUpdate(self):
     os_mock = self.StartObjectPatch(platforms.OperatingSystem, 'Current')
     os_mock.return_value = platforms.OperatingSystem.LINUX
-
     rc_path = self.Touch(directory=self.temp_path,
                          name='.bashrc', contents='# Empty\n')
     platforms_install.UpdateRC(
@@ -523,7 +518,9 @@ if [ -f '{path}' ]; then source '{path}'; fi
   def testFailWhenRcPathCannotBeWritten(self):
     os_mock = self.StartObjectPatch(platforms.OperatingSystem, 'Current')
     os_mock.return_value = platforms.OperatingSystem.LINUX
-    open_mock = self.StartPatch('__builtin__.open', side_effect=IOError)
+    open_mock = self.StartObjectPatch(builtins,
+                                      'open',
+                                      side_effect=IOError)
     rc_path = os.path.join(self.temp_path, 'temp_subdir', '.bashrc')
     platforms_install.UpdateRC(
         completion_update=False,

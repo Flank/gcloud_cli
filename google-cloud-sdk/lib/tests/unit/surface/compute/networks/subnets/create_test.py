@@ -199,18 +199,11 @@ class SubnetsCreateTest(test_base.BaseTest):
               project='my-project'))],)
 
 
-class SubnetsCreateTestBeta(SubnetsCreateTest):
+class SubnetsCreateTestBeta(SubnetsCreateTest, parameterized.TestCase):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi('beta')
-
-
-class SubnetsCreateTestAlpha(SubnetsCreateTestBeta, parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
 
   @parameterized.named_parameters(('Enabled', '--enable-flow-logs', True),
                                   ('Disabled', '--no-enable-flow-logs', False),
@@ -235,6 +228,13 @@ class SubnetsCreateTestAlpha(SubnetsCreateTestBeta, parameterized.TestCase):
                   enableFlowLogs=enable_flow_logs),
               region='us-central1',
               project='my-project'))],)
+
+
+class SubnetsCreateTestAlpha(SubnetsCreateTestBeta):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
 
 
 if __name__ == '__main__':

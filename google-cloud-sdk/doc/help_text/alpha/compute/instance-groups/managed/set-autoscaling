@@ -9,7 +9,7 @@ SYNOPSIS
           [utilization-target=UTILIZATION-TARGET],
           [utilization-target-type=UTILIZATION-TARGET-TYPE]]
         [--description=DESCRIPTION] [--max-num-replicas=MAX_NUM_REPLICAS]
-        [--min-num-replicas=MIN_NUM_REPLICAS]
+        [--min-num-replicas=MIN_NUM_REPLICAS] [--mode=MODE]
         [--queue-scaling-acceptable-backlog-per-instance=QUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE]
         [--queue-scaling-cloud-pub-sub=[subscription=SUBSCRIPTION],
           [topic=TOPIC]]
@@ -73,6 +73,27 @@ FLAGS
 
      --min-num-replicas=MIN_NUM_REPLICAS
         Minimum number of replicas Autoscaler will set.
+
+     --mode=MODE
+        Set the mode of an autoscaler for a managed instance group.
+
+        You can turn off or restrict MIG activities without changing MIG
+        configuration and then having to restore it later. MIG configuration
+        persists while the activities are turned off or restricted, and the
+        activities pick it up when they are turned on again or when the
+        restrictions are lifted.
+
+        MODE must be one of:
+
+         off
+            to turn off autoscaling, while keeping the new configuration.
+         on
+            to permit autoscaling to scale up and down (default for new
+            autoscalers).
+         only-down
+            to permit autoscaling to scale only down and not up.
+         only-up
+            to permit autoscaling to scale only up and not down.
 
      --queue-scaling-acceptable-backlog-per-instance=QUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE
         Queue-based scaling target: autoscaler will aim to assure that average
@@ -153,7 +174,7 @@ FLAGS
 
        --region=REGION
           The region of the managed instance group to operate on. If not
-          specified, you will be prompted to select a region.
+          specified, you may be prompted to select a region.
 
           A list of regions can be fetched by running:
 

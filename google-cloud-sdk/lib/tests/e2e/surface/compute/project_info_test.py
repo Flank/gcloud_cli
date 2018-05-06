@@ -40,7 +40,7 @@ class ProjectInfoTests(e2e_base.WithServiceAuth):
       result = self.Run('compute project-info describe')
     for item in result.commonInstanceMetadata.items:
       if item.key == metadata_key:
-        self.assertEquals(item.value, self.TEST_VALUE)
+        self.assertEqual(item.value, self.TEST_VALUE)
         break
     else:
       self.fail('Metadata key [{}] not found'.format(metadata_key))

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise build fetching."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -134,7 +136,7 @@ timeout: 600.000s
         exception=http_error.MakeHttpError(code=404)
     )
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.HttpException, 'Resource not found'):
       self._Run(['container', 'builds', 'describe', '123-456-789'])
 

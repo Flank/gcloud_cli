@@ -7,7 +7,7 @@ SYNOPSIS
         --source-uris=SOURCE_URIS,[SOURCE_URIS,...]
         --variantset-id=VARIANTSET_ID
         [--file-format=FILE_FORMAT; default="vcf"]
-        [--info-merge-config=INFO_MERGE_CONFIG,[INFO_MERGE_CONFIG,...]]
+        [--info-merge-config=INFO_MERGE_CONFIG,[...]]
         [--normalize-reference-names] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -27,7 +27,7 @@ OPTIONAL FLAGS
         Set the file format of the --source-uris. FILE_FORMAT must be one of:
         complete-genomics, vcf.
 
-     --info-merge-config=INFO_MERGE_CONFIG,[INFO_MERGE_CONFIG,...]
+     --info-merge-config=INFO_MERGE_CONFIG,[...]
         A mapping between VCF INFO field keys and the operations to be
         performed on them. Valid operations include: IGNORE_NEW - By default,
         variant info fields are persisted if the variant does not yet exist in

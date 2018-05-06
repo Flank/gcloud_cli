@@ -14,7 +14,9 @@
 
 """A collection of CLI walkers."""
 
-import cStringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 import os
 
 from googlecloudsdk.calliope import arg_parsers
@@ -116,7 +118,7 @@ class DevSiteGenerator(walker.Walker):
     command = node.GetPath()
     if is_group:
       directory = os.path.join(self._directory, *command[1:])
-      files.MakeDir(directory, mode=0755)
+      files.MakeDir(directory, mode=0o755)
     else:
       directory = os.path.join(self._directory, *command[1:-1])
 
@@ -127,7 +129,7 @@ class DevSiteGenerator(walker.Walker):
       md = markdown.Markdown(node)
       render_document.RenderDocument(style='devsite',
                                      title=' '.join(command),
-                                     fin=cStringIO.StringIO(md),
+                                     fin=io.StringIO(md),
                                      out=f)
     _UpdateTOC()
     return parent
@@ -179,7 +181,7 @@ class HelpTextGenerator(walker.Walker):
     command = node.GetPath()
     if is_group:
       directory = os.path.join(self._directory, *command[1:])
-      files.MakeDir(directory, mode=0755)
+      files.MakeDir(directory, mode=0o755)
     else:
       directory = os.path.join(self._directory, *command[1:-1])
 
@@ -187,7 +189,7 @@ class HelpTextGenerator(walker.Walker):
     path = os.path.join(directory, 'GROUP' if is_group else command[-1])
     with open(path, 'w') as f:
       md = markdown.Markdown(node)
-      render_document.RenderDocument(style='text', fin=cStringIO.StringIO(md),
+      render_document.RenderDocument(style='text', fin=io.StringIO(md),
                                      out=f)
     return parent
 
@@ -235,7 +237,7 @@ class DocumentGenerator(walker.Walker):
       md = markdown.Markdown(node)
       render_document.RenderDocument(style=self._style,
                                      title=' '.join(command),
-                                     fin=cStringIO.StringIO(md),
+                                     fin=io.StringIO(md),
                                      out=f)
     return parent
 

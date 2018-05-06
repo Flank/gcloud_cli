@@ -1,0 +1,26 @@
+NAME
+    gcloud beta tasks - manage Cloud Tasks queues and tasks
+
+SYNOPSIS
+    gcloud beta tasks GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Manage Cloud Tasks queues and tasks.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     queues
+        (BETA) Manage Cloud Tasks queues.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha tasks
+

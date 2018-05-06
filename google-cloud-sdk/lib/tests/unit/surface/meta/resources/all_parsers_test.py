@@ -22,7 +22,8 @@ class AllParsersTest(cli_test_base.CliTestBase):
   def testAllParsers(self):
     # Get the list of all collections.
     collections = self.Run('meta apis collections list --format=disable '
-                           '--flatten=full_name')
+                           '--flatten=full_name '
+                           '--filter=enable_uri_parsing:true')
 
     # Generate a list of example URIs, one per collection.
     uris = []
@@ -37,7 +38,7 @@ class AllParsersTest(cli_test_base.CliTestBase):
 
     # The list should be empty. Comparing against [] displays each failed URI
     # along with its error message.
-    self.assertEquals([], sorted(errors))
+    self.assertEqual([], sorted(errors))
 
 
 if __name__ == '__main__':

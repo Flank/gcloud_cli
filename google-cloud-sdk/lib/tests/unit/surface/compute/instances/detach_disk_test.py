@@ -15,6 +15,8 @@
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.calliope import base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -255,6 +257,169 @@ class InstancesDetachDiskTest(test_base.BaseTest):
           'DetachDisk',
           messages.ComputeInstancesDetachDiskRequest(
               deviceName='device-2',
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
+
+def _GetInstanceWithRegionalDiskMessages(messages_, compute_uri):
+  return [messages_.Instance(
+      name='my-instance',
+      disks=[
+          messages_.AttachedDisk(
+              deviceName='device-1',
+              source=(compute_uri + '/projects/'
+                      'my-project/regions/us-central1/disks/disk-1')),
+          messages_.AttachedDisk(
+              deviceName='device-2',
+              source=(compute_uri + '/projects/'
+                      'my-project/regions/us-central1/disks/disk-2')),
+          messages_.AttachedDisk(
+              deviceName='device-4',
+              source=(compute_uri + '/projects/'
+                      'my-project/zones/us-central1-a/disks/disk-4')),
+      ])]
+
+
+@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
+                          (base.ReleaseTrack.BETA, 'beta'))
+class InstancesDetachDiskWithRegions(test_base.BaseTest,
+                                     parameterized.TestCase):
+
+  def _SetUp(self, track, api_version):
+    self.SelectApi(api_version)
+    self.track = track
+    self.make_requests.side_effect = iter([
+        _GetInstanceWithRegionalDiskMessages(self.messages, self.compute_uri),
+        [],
+    ])
+
+  def testWithDeviceThatExists(self, track, api_version):
+    self._SetUp(track, api_version)
+    self.Run("""
+        compute instances detach-disk my-instance
+          --device-name device-2
+          --disk-scope regional
+          --zone us-central1-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+
+        [(self.compute.instances,
+          'DetachDisk',
+          self.messages.ComputeInstancesDetachDiskRequest(
+              deviceName='device-2',
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
+  def testWithDeviceThatDoesNotExist(self, track, api_version):
+    self._SetUp(track, api_version)
+    with self.AssertRaisesToolExceptionRegexp(
+        r'No disk with device name \[device-3\] is attached to instance '
+        r'\[my-instance\] in zone \[us-central1-a\].'):
+      self.Run("""
+          compute instances detach-disk my-instance
+            --device-name device-3
+            --disk-scope regional
+            --zone us-central1-a
+          """)
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
+  def testWithDiskThatExists(self, track, api_version):
+    self._SetUp(track, api_version)
+    self.Run("""
+        compute instances detach-disk my-instance
+          --disk disk-2
+          --disk-scope regional
+          --zone us-central1-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+
+        [(self.compute.instances,
+          'DetachDisk',
+          self.messages.ComputeInstancesDetachDiskRequest(
+              deviceName='device-2',
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
+  def testWithDiskThatDoesNotExist(self, track, api_version):
+    self._SetUp(track, api_version)
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Disk \[disk-3\] is not attached to instance \[my-instance\] in zone '
+        r'\[us-central1-a\].'):
+      self.Run("""
+          compute instances detach-disk my-instance
+            --disk disk-3
+            --disk-scope regional
+            --zone us-central1-a
+          """)
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
+
+class InstancesDetachDiskTestAlpha(test_base.BaseTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = base.ReleaseTrack.ALPHA
+    self.make_requests.side_effect = iter([
+        _GetInstanceWithRegionalDiskMessages(self.messages, self.compute_uri),
+        [],
+    ])
+
+  def testWithZonalDevice(self):
+    """Ensures that `gcloud alpha` can still work with zonal disks."""
+    self.Run("""
+        compute instances detach-disk my-instance
+          --disk disk-4
+          --zone us-central1-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute.instances,
+          'Get',
+          self.messages.ComputeInstancesGetRequest(
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+
+        [(self.compute.instances,
+          'DetachDisk',
+          self.messages.ComputeInstancesDetachDiskRequest(
+              deviceName='device-4',
               instance='my-instance',
               project='my-project',
               zone='us-central1-a'))],

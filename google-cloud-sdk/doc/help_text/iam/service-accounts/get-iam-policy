@@ -64,7 +64,8 @@ EXAMPLES
             my-iam-account@somedomain.com
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam service-accounts get-iam-policy
         $ gcloud beta iam service-accounts get-iam-policy
 

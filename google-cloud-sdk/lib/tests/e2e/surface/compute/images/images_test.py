@@ -15,6 +15,7 @@
 
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.core import exceptions as core_exceptions
 from tests.lib.surface.compute import e2e_images_test_base
 
 
@@ -105,12 +106,51 @@ class ImagesTest(e2e_images_test_base.ImagesTestBase):
     disk_name = self._CreateDiskWithInstance()
     image_name = self._GetImageName()
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ToolException,
         'The disk resource.*is already being used by.*'):
       self.Run(
           'compute images create {0} --source-disk {1} --source-disk-zone {2} '
           .format(image_name, disk_name, self.zone))
+
+  def testExport(self):
+    image_name = self._CreateImage()
+    destination_uri = 'gs://bucketthatdoesnotexistasdf1234567890/image.tar.gz'
+    # This should fail quickly, since the destination-uri doesn't exist, but
+    # a timeout is added just in case. This test checks to make sure that
+    # Daisy is called with the correct workflow.
+    with self.assertRaisesRegex(
+        core_exceptions.Error,
+        'completed with status'):
+      self.Run(
+          """
+          compute images export --image {0} --destination-uri {1}
+          --timeout 30s --quiet
+          """.format(image_name, destination_uri))
+
+    self.AssertNewOutputContains('[Daisy] Running workflow "image-export"')
+
+  def testImport(self):
+    image_name = self._GetImageName()
+    source_image = self._CreateImage()
+    # Pass in a dummy translate workflow, so that Daisy will throw an error.
+    # This allows us to confirm that Daisy was called as expected without
+    # having Daisy attempt to actually import files and create resources.
+    dummy_workflow = 'dummy.wf.json'
+    with self.assertRaisesRegex(
+        core_exceptions.Error,
+        'completed with status'):
+      self.Run(
+          """
+          compute images import {0} --source-image {1}
+          --custom-workflow {2} --timeout 10s --quiet
+          """.format(image_name, source_image, dummy_workflow))
+
+    self.AssertNewOutputContainsAll(
+        ['[Daisy] Running workflow "import-from-image"',
+         ('error populating step "translate-disk": open '
+          '/workflows/image_import/{0}: no such file or directory'
+          .format(dummy_workflow))])
 
 
 class ImagesBetaTest(e2e_images_test_base.ImagesTestBase):
@@ -141,7 +181,7 @@ class ImagesBetaTest(e2e_images_test_base.ImagesTestBase):
     disk_name = self._CreateDiskWithInstance()
     image_name = self._GetImageName()
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ToolException,
         'The disk resource.*is already being used by.*'):
       self.Run(

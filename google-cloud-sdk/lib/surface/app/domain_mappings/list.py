@@ -13,6 +13,7 @@
 # limitations under the License.
 """Surface for listing all domain mapping for an app."""
 
+from __future__ import absolute_import
 from googlecloudsdk.api_lib.app.api import appengine_domains_api_client as api_client
 from googlecloudsdk.calliope import base
 
@@ -61,6 +62,6 @@ class ListBeta(List):
         table(
           id:sort=1,
           ssl_settings.certificate_id:label=SSL_CERTIFICATE_ID,
-          ssl_settings.sslManagementType.encode('utf-8').sub('^$', 'AUTOMATIC'):label=SSL_MANAGEMENT_TYPE,
+          ssl_settings.sslManagementType.yesno(no='AUTOMATIC'):label=SSL_MANAGEMENT_TYPE,
           ssl_settings.pending_managed_certificate_id:label=PENDING_AUTO_CERT)
         """)

@@ -17,6 +17,7 @@ import textwrap
 
 from googlecloudsdk.api_lib.compute import csek_utils
 from googlecloudsdk.calliope import base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -354,7 +355,7 @@ class InstancesCreateWithCsekKey(test_base.BaseTest):
   def testWithKeyFileRsaWrapped(self):
     csek_key_file = self.WriteKeyFile(include_rsa_encrypted=True)
 
-    with self.assertRaisesRegexp(csek_utils.BadKeyTypeException, re.escape(
+    with self.assertRaisesRegex(csek_utils.BadKeyTypeException, re.escape(
         'Invalid key type [rsa-encrypted]: this feature is only allowed in the '
         'alpha and beta versions of this command.')):
       self.Run("""
@@ -394,6 +395,7 @@ class InstancesCreateWithCsekKeyBeta(test_base.BaseTest):
                   type=(msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
                   diskEncryptionKey=msgs.CustomerEncryptionKey(
                       rsaEncryptedKey=test_base.SAMPLE_WRAPPED_CSEK_KEY)),
+              forceAttach=False,
               instance='instance-1',
               project='my-project',
               zone='central2-a'))],
@@ -403,13 +405,17 @@ class InstancesCreateWithCsekKeyBeta(test_base.BaseTest):
     self.assertFalse(self.GetOutput())
 
 
-class InstancesAttachDiskWithRegions(test_base.BaseTest):
+@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
+                          (base.ReleaseTrack.BETA, 'beta'))
+class InstancesAttachDiskWithRegions(test_base.BaseTest,
+                                     parameterized.TestCase):
 
-  def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = base.ReleaseTrack.ALPHA
+  def _SetUp(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
 
-  def testRegionalDisk(self):
+  def testRegionalDisk(self, track, api_version):
+    self._SetUp(track, api_version)
     self.Run("""
         compute instances attach-disk instance-1
           --zone central2-a
@@ -437,7 +443,8 @@ class InstancesAttachDiskWithRegions(test_base.BaseTest):
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
 
-  def testRegionalDiskForceAttach(self):
+  def testRegionalDiskForceAttach(self, track, api_version):
+    self._SetUp(track, api_version)
     self.Run("""
         compute instances attach-disk instance-1
           --zone central2-a

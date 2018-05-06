@@ -11,7 +11,7 @@ gcloud container clusters update \- update cluster settings for an existing cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -40,6 +40,18 @@ The name of the cluster to update.
 Exactly one of these must be specified:
 
 .RS 2m
+.TP 2m
+\fB\-\-complete\-credential\-rotation\fR
+Complete the IP and credential rotation for this cluster. For example:
+
+.RS 2m
+$ gcloud container clusters update example\-cluster \e
+    \-\-complete\-credential\-rotation
+.RE
+
+This causes the cluster to stop serving its old IP, return to a single IP, and
+invalidate old credentials.
+
 .TP 2m
 \fB\-\-complete\-ip\-rotation\fR
 Complete the IP rotation for this cluster. For example:
@@ -70,10 +82,19 @@ instead, create or update your cluster with the option
 
 .TP 2m
 \fB\-\-enable\-master\-authorized\-networks\fR
-Allow only Authorized Networks (specified by the
-\f5\-\-master\-authorized\-networks\fR flag) and Google Compute Engine Public
-IPs to connect to Kubernetes master through HTTPS. By default public internet
-(0.0.0.0/0) is allowed to connect to Kubernetes master through HTTPS.
+Allow only specified set of CIDR blocks (specified by the
+\f5\-\-master\-authorized\-networks\fR flag) to connect to Kubernetes master
+through HTTPS. Besides these blocks, the following have access as well:
+
+.RS 2m
+1) The private network the cluster connects to if
+`\-\-private\-cluster` is specified.
+2) Google Compute Engine Public IPs if `\-\-private\-cluster` is not
+specified.
+.RE
+
+When disabled, public internet (0.0.0.0/0) is allowed to connect to Kubernetes
+master through HTTPS.
 
 .TP 2m
 \fB\-\-enable\-network\-policy\fR
@@ -115,9 +136,12 @@ metrics will be exported from the cluster)
 .TP 2m
 \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]
 The set of zones in which the specified node footprint should be replicated. All
-zones must be in the same region as the cluster's primary zone, specified by the
-\-\-zone flag. \-\-node\-locations must contain the primary zone. If
-node\-locations is not specified, all nodes will be in the primary zone.
+zones must be in the same region as the cluster's master(s), specified by the
+\f5\-\-zone\fR or \f5\-\-region\fR flag. Additionally, for zonal clusters,
+\f5\-\-node\-locations\fR must contain the cluster's primary zone. If not
+specified, all nodes will be in the cluster's primary zone (for zonal clusters)
+or spread across three randomly chosen zones within the cluster's region (for
+regional clusters).
 
 Note that \f5NUM_NODES\fR nodes will be created in each zone, such that if you
 specify \f5\-\-num\-nodes=4\fR and choose two locations, 8 nodes will be
@@ -147,6 +171,18 @@ Set the basic auth password to the specified value, keeping the existing
 username.
 
 .TP 2m
+\fB\-\-start\-credential\-rotation\fR
+Start the rotation of IP and credentials for this cluster. For example:
+
+.RS 2m
+$ gcloud container clusters update example\-cluster \e
+    \-\-start\-credential\-rotation
+.RE
+
+This causes the cluster to serve on two IPs, and will initiate a node upgrade to
+point to the new IP.
+
+.TP 2m
 \fB\-\-start\-ip\-rotation\fR
 Start the rotation of this cluster to a new IP. For example:
 
@@ -162,7 +198,7 @@ point to the new IP.
 \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]
 Cluster addons to enable or disable. Options are
 HorizontalPodAutoscaling=ENABLED|DISABLED HttpLoadBalancing=ENABLED|DISABLED
-KubernetesDashboard=ENABLED|DISABLED
+KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -218,10 +254,10 @@ Don't wait for the operation to complete.
 
 .TP 2m
 \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]
-The list of external networks (up to 10) that are allowed to connect to
-Kubernetes master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30).
-Can not be specified unless \f5\-\-enable\-master\-authorized\-networks\fR is
-also specified.
+The list of CIDR blocks (up to 20) that are allowed to connect to Kubernetes
+master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Can not be
+specified unless \f5\-\-enable\-master\-authorized\-networks\fR is also
+specified.
 
 .TP 2m
 \fB\-\-node\-pool\fR=\fINODE_POOL\fR

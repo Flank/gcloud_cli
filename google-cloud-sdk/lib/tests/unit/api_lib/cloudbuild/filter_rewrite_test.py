@@ -14,6 +14,8 @@
 
 """Unit tests for the cloudbuild filter expression rewrite module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudbuild import filter_rewrite
 from googlecloudsdk.core.util import times
 from tests.lib import subtests

@@ -11,7 +11,7 @@ gcloud alpha ml vision suggest\-crop \- suggest a bounding box in an image
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml vision suggest\-crop\fR \fIIMAGE_PATH\fR [\fB\-\-aspect\-ratios\fR=[\fIASPECT_RATIOS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml vision suggest\-crop\fR \fIIMAGE_PATH\fR [\fB\-\-aspect\-ratios\fR=[\fIASPECT_RATIOS\fR,...]] [\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR;\ default="builtin/stable"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -44,6 +44,11 @@ Vision. If you provide a URL, it must be in Google Cloud Storage format
 A list of aspect ratio hints for the suggested bounding box. Aspect ratios may
 be specified either as a decimal number (ex. 1.333) or as a ratio of width to
 height (ex 4:3).
+
+.TP 2m
+\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR; default="builtin/stable"
+The model version to use for the feature. Supported values include
+"builtin/stable" and "builtin/latest".
 
 
 .RE

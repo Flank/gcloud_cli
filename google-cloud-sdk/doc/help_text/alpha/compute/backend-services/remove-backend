@@ -4,9 +4,12 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute backend-services remove-backend BACKEND_SERVICE_NAME
-        --instance-group=INSTANCE_GROUP [--global | --region=REGION]
-        [--instance-group-region=INSTANCE_GROUP_REGION
-          | --instance-group-zone=INSTANCE_GROUP_ZONE] [GCLOUD_WIDE_FLAG ...]
+        ([--instance-group=INSTANCE_GROUP
+          : --instance-group-region=INSTANCE_GROUP_REGION
+          | --instance-group-zone=INSTANCE_GROUP_ZONE]
+          | [--network-endpoint-group=NETWORK_ENDPOINT_GROUP
+          : --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
+        [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute backend-services remove-backend is used to
@@ -21,8 +24,86 @@ POSITIONAL ARGUMENTS
         The name of the backend service to operate on.
 
 REQUIRED FLAGS
-     --instance-group=INSTANCE_GROUP
-        The name of the instance group to remove from the backend service.
+     Exactly one of these must be specified:
+
+       Instance Group
+
+         --instance-group=INSTANCE_GROUP
+            The name of the instance group to remove from the backend service.
+            This flag must be specified if any of the other arguments in this
+            group are specified.
+
+         At most one of these may be specified:
+
+           --instance-group-region=INSTANCE_GROUP_REGION
+              The region of the instance group to remove from the backend
+              service. If not specified, you may be prompted to select a
+              region.
+
+              To avoid prompting when this flag is omitted, you can set the
+              compute/region property:
+
+                  $ gcloud config set compute/region REGION
+
+              A list of regions can be fetched by running:
+
+                  $ gcloud compute regions list
+
+              To unset the property, run:
+
+                  $ gcloud config unset compute/region
+
+              Alternatively, the region can be stored in the environment
+              variable CLOUDSDK_COMPUTE_REGION.
+
+           --instance-group-zone=INSTANCE_GROUP_ZONE
+              The zone of the instance group to remove from the backend
+              service. If not specified and the compute/zone property isn't
+              set, you may be prompted to select a zone.
+
+              To avoid prompting when this flag is omitted, you can set the
+              compute/zone property:
+
+                  $ gcloud config set compute/zone ZONE
+
+              A list of zones can be fetched by running:
+
+                  $ gcloud compute zones list
+
+              To unset the property, run:
+
+                  $ gcloud config unset compute/zone
+
+              Alternatively, the zone can be stored in the environment variable
+              CLOUDSDK_COMPUTE_ZONE.
+
+       Network Endpoint Group
+
+         --network-endpoint-group=NETWORK_ENDPOINT_GROUP
+            The name of the network endpoint group to remove from the backend
+            service. This flag must be specified if any of the other arguments
+            in this group are specified.
+
+         --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
+            The zone of the network endpoint group to remove from the backend
+            service. If not specified and the compute/zone property isn't set,
+            you may be prompted to select a zone.
+
+            To avoid prompting when this flag is omitted, you can set the
+            compute/zone property:
+
+                $ gcloud config set compute/zone ZONE
+
+            A list of zones can be fetched by running:
+
+                $ gcloud compute zones list
+
+            To unset the property, run:
+
+                $ gcloud config unset compute/zone
+
+            Alternatively, the zone can be stored in the environment variable
+            CLOUDSDK_COMPUTE_ZONE.
 
 OPTIONAL FLAGS
      At most one of these may be specified:
@@ -33,49 +114,6 @@ OPTIONAL FLAGS
        --region=REGION
           The region of the backend service to operate on. Overrides the
           default compute/region property value for this command invocation.
-
-     At most one of these may be specified:
-
-       --instance-group-region=INSTANCE_GROUP_REGION
-          The region of the instance group to remove from the backend service.
-          If not specified, you will be prompted to select a region.
-
-          To avoid prompting when this flag is omitted, you can set the
-          compute/region property:
-
-              $ gcloud config set compute/region REGION
-
-          A list of regions can be fetched by running:
-
-              $ gcloud compute regions list
-
-          To unset the property, run:
-
-              $ gcloud config unset compute/region
-
-          Alternatively, the region can be stored in the environment variable
-          CLOUDSDK_COMPUTE_REGION.
-
-       --instance-group-zone=INSTANCE_GROUP_ZONE
-          The zone of the instance group to remove from the backend service. If
-          not specified and the compute/zone property isn't set, you will be
-          prompted to select a zone.
-
-          To avoid prompting when this flag is omitted, you can set the
-          compute/zone property:
-
-              $ gcloud config set compute/zone ZONE
-
-          A list of zones can be fetched by running:
-
-              $ gcloud compute zones list
-
-          To unset the property, run:
-
-              $ gcloud config unset compute/zone
-
-          Alternatively, the zone can be stored in the environment variable
-          CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Test of the 'clusters list' command."""
+
+from apitools.base.py import encoding
+
+from googlecloudsdk.api_lib.dataproc import constants
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
@@ -53,9 +57,43 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
     self.ExpectListClusters(clusters)
     self.RunDataproc('clusters list', output_format='')
     self.AssertOutputContains(
-        'NAME WORKER_COUNT STATUS ZONE', normalize_space=True)
+        'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE',
+        normalize_space=True)
+    # Preemptible worker count is 0
     self.AssertOutputContains(
         'test-cluster-1 2 RUNNING us-central1-a', normalize_space=True)
+
+  def testListClustersOutput_singleNode(self):
+    dataproc_properties = encoding.DictToMessage({
+        constants.ALLOW_ZERO_WORKERS_PROPERTY: 'true'
+    }, self.messages.SoftwareConfig.PropertiesValue)
+    clusters = [
+        self.MakeRunningCluster(
+            clusterName=name, properties=dataproc_properties, workerConfig=None)
+        for name in self.CLUSTER_NAMES
+    ]
+    self.ExpectListClusters(clusters)
+    self.RunDataproc('clusters list', output_format='')
+    self.AssertOutputContains(
+        'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE',
+        normalize_space=True)
+    # Worker and preemptible worker counts are 0
+    self.AssertOutputContains(
+        'test-cluster-1 RUNNING us-central1-a', normalize_space=True)
+
+  def testListClustersOutput_preemptibleWorkers(self):
+    clusters = [
+        self.MakeRunningCluster(
+            clusterName=name, secondaryWorkerConfigNumInstances=4)
+        for name in self.CLUSTER_NAMES
+    ]
+    self.ExpectListClusters(clusters)
+    self.RunDataproc('clusters list', output_format='')
+    self.AssertOutputContains(
+        'NAME WORKER_COUNT PREEMPTIBLE_WORKER_COUNT STATUS ZONE',
+        normalize_space=True)
+    self.AssertOutputContains(
+        'test-cluster-1 2 4 RUNNING us-central1-a', normalize_space=True)
 
   def testListClustersFilter(self):
     self.ExpectListClusters(self.clusters, list_filter='labels.k1:v1')

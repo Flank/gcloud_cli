@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise the 'gcloud kms encrypt' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import exceptions
@@ -26,35 +28,35 @@ class KeysEncryptTest(base.KmsMockTest):
     self.key_name = self.project_name.Descendant('global/my_kr/my_key')
 
   def testEncrypt(self):
-    pt_path = self.Touch(self.temp_path, name='plaintext', contents='foo bar')
+    pt_path = self.Touch(self.temp_path, name='plaintext', contents=b'foo bar')
     ct_path = self.Touch(self.temp_path, name='ciphertext')
 
     self.kms.projects_locations_keyRings_cryptoKeys.Encrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysEncryptRequest(
             name=self.key_name.RelativeName(),
-            encryptRequest=self.messages.EncryptRequest(plaintext='foo bar')),
+            encryptRequest=self.messages.EncryptRequest(plaintext=b'foo bar')),
         response=self.messages.EncryptResponse(
-            name=self.key_name.RelativeName(), ciphertext='encrypted foo bar'))
+            name=self.key_name.RelativeName(), ciphertext=b'encrypted foo bar'))
 
     self.Run('kms encrypt --location={0} --keyring={1} --key={2} '
              '--plaintext-file={3} --ciphertext-file={4}'.format(
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id, pt_path, ct_path))
 
-    self.AssertFileExistsWithContents('encrypted foo bar', ct_path)
+    self.AssertBinaryFileEquals(b'encrypted foo bar', ct_path)
 
   def testEncryptWithNonPrimaryVersion(self):
     version_name = self.project_name.Descendant('global/my_kr/my_key/2')
 
-    pt_path = self.Touch(self.temp_path, name='plaintext', contents='foo bar')
+    pt_path = self.Touch(self.temp_path, name='plaintext', contents=b'foo bar')
     ct_path = self.Touch(self.temp_path, name='ciphertext')
 
     self.kms.projects_locations_keyRings_cryptoKeys.Encrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysEncryptRequest(
             name=version_name.RelativeName(),
-            encryptRequest=self.messages.EncryptRequest(plaintext='foo bar')),
+            encryptRequest=self.messages.EncryptRequest(plaintext=b'foo bar')),
         response=self.messages.EncryptResponse(
-            name=version_name.RelativeName(), ciphertext='encrypted foo bar'))
+            name=version_name.RelativeName(), ciphertext=b'encrypted foo bar'))
 
     self.Run('kms encrypt --location={0} --keyring={1} --key={2} '
              '--plaintext-file={3} --ciphertext-file={4} --version={5}'.format(
@@ -62,21 +64,21 @@ class KeysEncryptTest(base.KmsMockTest):
                  version_name.crypto_key_id, pt_path, ct_path,
                  version_name.version_id))
 
-    self.AssertFileExistsWithContents('encrypted foo bar', ct_path)
+    self.AssertBinaryFileEquals(b'encrypted foo bar', ct_path)
 
   def testEncryptWithAad(self):
-    pt_path = self.Touch(self.temp_path, name='plaintext', contents='foo bar')
-    aad_path = self.Touch(self.temp_path, name='aad', contents='authed data')
+    pt_path = self.Touch(self.temp_path, name='plaintext', contents=b'foo bar')
+    aad_path = self.Touch(self.temp_path, name='aad', contents=b'authed data')
     ct_path = self.Touch(self.temp_path, name='ciphertext')
 
     self.kms.projects_locations_keyRings_cryptoKeys.Encrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysEncryptRequest(
             name=self.key_name.RelativeName(),
             encryptRequest=self.messages.EncryptRequest(
-                plaintext='foo bar',
-                additionalAuthenticatedData='authed data')),
+                plaintext=b'foo bar',
+                additionalAuthenticatedData=b'authed data')),
         response=self.messages.EncryptResponse(
-            name=self.key_name.RelativeName(), ciphertext='encrypted foo bar'))
+            name=self.key_name.RelativeName(), ciphertext=b'encrypted foo bar'))
 
     self.Run('kms encrypt --location={0} --keyring={1} --key={2} '
              '--plaintext-file={3} --ciphertext-file={4} '
@@ -84,18 +86,17 @@ class KeysEncryptTest(base.KmsMockTest):
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id, pt_path, ct_path, aad_path))
 
-    self.AssertFileExistsWithContents('encrypted foo bar', ct_path)
+    self.AssertBinaryFileEquals(b'encrypted foo bar', ct_path)
 
   def testEncryptStdio(self):
-    self.WriteInput('foo bar')
+    self.WriteBinaryInput(b'foo bar')
 
     self.kms.projects_locations_keyRings_cryptoKeys.Encrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysEncryptRequest(
             name=self.key_name.RelativeName(),
-            # WriteInput appends the \n.
-            encryptRequest=self.messages.EncryptRequest(plaintext='foo bar\n')),
+            encryptRequest=self.messages.EncryptRequest(plaintext=b'foo bar')),
         response=self.messages.EncryptResponse(
-            name=self.key_name.RelativeName(), ciphertext='encrypted foo bar'))
+            name=self.key_name.RelativeName(), ciphertext=b'encrypted foo bar'))
 
     self.Run(
         'kms encrypt --location={0} --keyring={1} --key={2} --plaintext-file=- '
@@ -103,25 +104,25 @@ class KeysEncryptTest(base.KmsMockTest):
                                      self.key_name.key_ring_id,
                                      self.key_name.crypto_key_id))
 
-    self.AssertOutputEquals('encrypted foo bar')
+    self.AssertOutputBytesEquals(b'encrypted foo bar')
 
   def testEncryptMissingPlaintextFile(self):
     pt_path = os.path.join(self.temp_path, 'file-that-does-not-exist')
     ct_path = self.Touch(self.temp_path, name='ciphertext')
 
-    with self.assertRaisesRegexp(exceptions.BadFileException,
-                                 'Failed to read plaintext file.*No such file'):
+    with self.assertRaisesRegex(exceptions.BadFileException,
+                                'Failed to read plaintext file.*No such file'):
       self.Run('kms encrypt --location={0} --keyring={1} --key={2} '
                '--plaintext-file={3} --ciphertext-file={4}'.format(
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id, pt_path, ct_path))
 
   def testEncryptMissingAadFile(self):
-    pt_path = self.Touch(self.temp_path, name='plaintext', contents='foo bar')
+    pt_path = self.Touch(self.temp_path, name='plaintext', contents=b'foo bar')
     aad_path = os.path.join(self.temp_path, 'file-that-does-not-exist')
     ct_path = self.Touch(self.temp_path, name='ciphertext')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         'Failed to read additional authenticated data file.*No such file'):
       self.Run(
@@ -132,18 +133,18 @@ class KeysEncryptTest(base.KmsMockTest):
                  self.key_name.crypto_key_id, pt_path, ct_path, aad_path))
 
   def testEncryptUnwritableOutput(self):
-    pt_path = self.Touch(self.temp_path, name='plaintext', contents='foo bar')
+    pt_path = self.Touch(self.temp_path, name='plaintext', contents=b'foo bar')
     ct_path = os.path.join(self.temp_path, 'nested', 'nonexistent', 'file')
 
     self.kms.projects_locations_keyRings_cryptoKeys.Encrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysEncryptRequest(
             name=self.key_name.RelativeName(),
-            encryptRequest=self.messages.EncryptRequest(plaintext='foo bar')),
+            encryptRequest=self.messages.EncryptRequest(plaintext=b'foo bar')),
         response=self.messages.EncryptResponse(
-            name=self.key_name.RelativeName(), ciphertext='encrypted foo bar'))
+            name=self.key_name.RelativeName(), ciphertext=b'encrypted foo bar'))
 
-    with self.assertRaisesRegexp(exceptions.BadFileException,
-                                 'No such file or directory'):
+    with self.assertRaisesRegex(exceptions.BadFileException,
+                                'No such file or directory'):
       self.Run('kms encrypt --location={0} --keyring={1} --key={2} '
                '--plaintext-file={3} --ciphertext-file={4}'.format(
                    self.key_name.location_id, self.key_name.key_ring_id,
@@ -168,11 +169,11 @@ class KeysEncryptTest(base.KmsMockTest):
                    self.key_name.crypto_key_id, file_path))
 
   def testEncryptTooLarge(self):
-    contents = 'a' * 65537  # API limit is 65536
+    contents = b'a' * 65537  # API limit is 65536
     pt_path = self.Touch(self.temp_path, name='plaintext', contents=contents)
     ct_path = self.Touch(self.temp_path, name='ciphertext')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         r'is larger than the maximum size of 65536 bytes.'):
       self.Run('kms encrypt --location={0} --keyring={1} --key={2} '
@@ -183,7 +184,7 @@ class KeysEncryptTest(base.KmsMockTest):
   def testRejectPlaintextAndAadFromStdin(self):
     ct_path = self.Touch(self.temp_path, name='ciphertext')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'--plaintext-file.*--additional-authenticated-data-file'):
       self.Run('kms encrypt --location={0} --keyring={1} --key={2} '

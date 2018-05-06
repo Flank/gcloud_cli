@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for `gcloud iot devices configs describe`."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -25,7 +30,7 @@ class ConfigsDescribeTest(base.CloudIotBase):
 
   def testDescribe(self, track):
     self.track = track
-    device_config = self.messages.DeviceConfig(binaryData='a')
+    device_config = self.messages.DeviceConfig(binaryData=b'a')
     self._ExpectGet(config=device_config)
 
     results = self.Run(
@@ -40,7 +45,7 @@ class ConfigsDescribeTest(base.CloudIotBase):
   def testDescribe_Output(self, track):
     self.track = track
     device_config = self.messages.DeviceConfig(
-        binaryData='a',
+        binaryData=b'a',
         cloudUpdateTime='2017-01-01T00:00Z',
         deviceAckTime='2016-01-01T00:00Z',
         version=42

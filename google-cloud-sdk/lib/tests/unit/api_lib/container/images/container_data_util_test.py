@@ -32,7 +32,7 @@ class ContainerDataUtilTest(test_case.TestCase):
         img_name.registry, img_name.repository, img_name.digest)
 
     # Assert that ContainerData's __str__ contains the starting digest.
-    self.assertEquals(_IMAGE_STR, cdata.image_summary.fully_qualified_digest)
+    self.assertEqual(_IMAGE_STR, cdata.image_summary.fully_qualified_digest)
 
 
 if __name__ == '__main__':

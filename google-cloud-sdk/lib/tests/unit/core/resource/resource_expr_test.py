@@ -163,6 +163,10 @@ class ResourceExprTest(test_case.Base):
     expr = self.backend.ExprLT(['i'], self.Operand('1'))
     self.assertFalse(expr.Evaluate(R))
 
+  def testExprLtNonelt(self):
+    expr = self.backend.ExprLT(['e'], self.Operand('3'))
+    self.assertTrue(expr.Evaluate(R))
+
   def testExprLElt(self):
     expr = self.backend.ExprLE(['i'], self.Operand('3'))
     self.assertTrue(expr.Evaluate(R))
@@ -183,6 +187,10 @@ class ResourceExprTest(test_case.Base):
     expr = self.backend.ExprEQ(['i'], self.Operand('2'))
     self.assertTrue(expr.Evaluate(R))
 
+  def testExprEQNonene(self):
+    expr = self.backend.ExprEQ(['e'], self.Operand('2'))
+    self.assertFalse(expr.Evaluate(R))
+
   def testExprNEne(self):
     expr = self.backend.ExprNE(['i'], self.Operand('1'))
     self.assertTrue(expr.Evaluate(R))
@@ -190,6 +198,10 @@ class ResourceExprTest(test_case.Base):
   def testExprNEeq(self):
     expr = self.backend.ExprNE(['i'], self.Operand('2'))
     self.assertFalse(expr.Evaluate(R))
+
+  def testExprNENonene(self):
+    expr = self.backend.ExprNE(['e'], self.Operand('2'))
+    self.assertTrue(expr.Evaluate(R))
 
   def testExprGElt(self):
     expr = self.backend.ExprGE(['i'], self.Operand('3'))
@@ -214,6 +226,10 @@ class ResourceExprTest(test_case.Base):
   def testExprGTgt(self):
     expr = self.backend.ExprGT(['i'], self.Operand('1'))
     self.assertTrue(expr.Evaluate(R))
+
+  def testExprGTNonelt(self):
+    expr = self.backend.ExprGT(['e'], self.Operand('3'))
+    self.assertFalse(expr.Evaluate(R))
 
   # Unanchored RE match.
 

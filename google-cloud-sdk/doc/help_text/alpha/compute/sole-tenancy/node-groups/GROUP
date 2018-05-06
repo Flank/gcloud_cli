@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha compute sole-tenancy node-groups - read Google Compute Engine
+        sole-tenancy node groups
+
+SYNOPSIS
+    gcloud alpha compute sole-tenancy node-groups COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Read Google Compute Engine sole-tenancy node groups.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Creates a Google Compute Engine node group.
+
+     delete
+        (ALPHA) Deletes a Google Compute Engine node group.
+
+     describe
+        (ALPHA) Describes a Google Compute Engine node group.
+
+     list
+        (ALPHA) List Google Compute Engine node groups.
+
+     update
+        (ALPHA) Updates a Google Compute Engine node group.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

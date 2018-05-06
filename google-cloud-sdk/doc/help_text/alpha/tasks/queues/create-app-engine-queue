@@ -9,16 +9,18 @@ SYNOPSIS
         [--max-doublings=MAX_DOUBLINGS]
         [--max-retry-duration=MAX_RETRY_DURATION]
         [--max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND]
-        [--min-backoff=MIN_BACKOFF]
-        [--routing-override=KEY:VALUE,[KEY:VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+        [--min-backoff=MIN_BACKOFF] [--routing-override=KEY:VALUE,[...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) An App Engine queue is a push queue sent to an App Engine endpoint.
     The flags available to this command represent the fields of an App Engine
     queue that are mutable.
 
-    For more information about the different queue target types, see:
-    https://cloud.google.com/cloud-tasks/docs/queue-types
+    If you have early access to Cloud Tasks, refer to the following guide for
+    more information about the different queue target types:
+    https://cloud.google.com/cloud-tasks/docs/queue-types. For access, sign up
+    here: https://goo.gl/Ya0AZd
 
 POSITIONAL ARGUMENTS
      APP_ENGINE_QUEUE_ID
@@ -61,7 +63,7 @@ FLAGS
         The minimum amount of time to wait before retrying a task after it
         fails. Must be a string that ends in 's', such as "5s".
 
-     --routing-override=KEY:VALUE,[KEY:VALUE,...]
+     --routing-override=KEY:VALUE,[...]
         If provided, the specified route is used for all tasks in the queue, no
         matter what is set is at the task-level.
 

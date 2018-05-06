@@ -415,7 +415,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    with self.assertRaisesRegexp(Exception, base.OP_FAILED_REGEXP):
+    with self.assertRaisesRegex(Exception, base.OP_FAILED_REGEXP):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck')
 
@@ -437,7 +437,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         FunctionsError,
         'Error creating a ZIP archive.*{0}'.format(error_message_for_zip)):
       self.Run(
@@ -463,7 +463,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
     # Remove credentials.
     self.FakeAuthSetCredentialsPresent(False)
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_AUTH_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_AUTH_REGEXP):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck')
 
@@ -508,7 +508,7 @@ class FunctionsDeployArgumentValidationTest(FunctionsDeployTestBase):
 
   def testMissingTriggerResource(self):
     self.MockUnpackedSourcesDirSize()
-    with self.assertRaisesRegexp(FunctionsError, (
+    with self.assertRaisesRegex(FunctionsError, (
         r'You must provide --trigger-resource when using '
         r'--trigger-event=providers/cloud.pubsub/eventTypes/topic.publish')):
       self.Run(
@@ -518,7 +518,7 @@ class FunctionsDeployArgumentValidationTest(FunctionsDeployTestBase):
 
   def testInvalidTriggerResource(self):
     self.MockUnpackedSourcesDirSize()
-    with self.assertRaisesRegexp(ArgumentTypeError, 'Invalid value.*@'):
+    with self.assertRaisesRegex(ArgumentTypeError, 'Invalid value.*@'):
       self.Run(
           'functions deploy my-test '
           '--trigger-event providers/cloud.pubsub/eventTypes/topic.publish '
@@ -569,7 +569,7 @@ class FunctionsDeployWithoutProjectTest(base.FunctionsTestBase):
   def testDeployNoProject(self):
     self.MockUnpackedSourcesDirSize()
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_PROJECT_REGEXP):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck')
 
@@ -581,7 +581,7 @@ class FunctionsAlphaTests(FunctionsDeployTestBase):
 
   def testInvalidTriggerResourceProjectResource(self):
     self.MockUnpackedSourcesDirSize()
-    with self.assertRaisesRegexp(properties.InvalidProjectError, '@'):
+    with self.assertRaisesRegex(properties.InvalidProjectError, '@'):
       self.Run(
           'functions deploy my-test '
           '--trigger-event providers/firebase.auth/eventTypes/user.create '

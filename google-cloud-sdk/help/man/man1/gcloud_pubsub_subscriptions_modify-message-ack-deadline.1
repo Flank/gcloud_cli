@@ -11,7 +11,7 @@ gcloud pubsub subscriptions modify\-message\-ack\-deadline \- modifies the ACK d
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud pubsub subscriptions modify\-message\-ack\-deadline\fR \fISUBSCRIPTION\fR \fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR [\fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud pubsub subscriptions modify\-message\-ack\-deadline\fR \fISUBSCRIPTION\fR \fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR \fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,10 +27,20 @@ processing was interrupted.
 
 .RS 2m
 .TP 2m
+
+SUBSCRIPTION \- Name of the subscription messages belong to. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: Set the property
+[core/project] or provide the flag [\-\-project] on the command line. This must
+be specified.
+
+.RS 2m
+.TP 2m
 \fISUBSCRIPTION\fR
-Name of the subscription messages belong to.
+The ID of the subscription or a fully qualified identifier for the subscription.
 
 
+.RE
 .RE
 .sp
 
@@ -42,13 +52,6 @@ Name of the subscription messages belong to.
 The number of seconds the system will wait for a subscriber to acknowledge
 receiving a message before re\-attempting delivery.
 
-
-.RE
-.sp
-
-.SH "OPTIONAL FLAGS"
-
-.RS 2m
 .TP 2m
 \fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]
 One or more ACK_ID to modify the deadline for.

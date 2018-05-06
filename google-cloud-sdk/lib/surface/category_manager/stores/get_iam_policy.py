@@ -13,6 +13,8 @@
 # limitations under the License.
 """Category manager stores get-iam-policy-binding command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.category_manager import flags
 from googlecloudsdk.command_lib.category_manager import iam_lib
@@ -38,5 +40,5 @@ class GetIamPolicy(base.ListCommand):
     Returns:
       Status of command execution.
     """
-    org_ref = args.CONCEPTS.organization_id.Parse()
-    return iam_lib.GetOrgIamPolicy(org_ref)
+    org_resource = args.CONCEPTS.organization_id.Parse()
+    return iam_lib.GetOrgIamPolicy(org_resource)

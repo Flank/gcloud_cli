@@ -141,7 +141,7 @@ class OpensslEncryptionUtilsTest(test_case.TestCase):
     self.assertEqual(stripped_key, expected_output)
 
     bad_key = STATIC_PUBLIC_KEY.strip('-')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         openssl_encryption_utils.OpenSSLException,
         ('The following key does not appear to be in PEM format:')):
       stripped_key = openssl_encryption_utils.StripKey(bad_key)
@@ -199,8 +199,8 @@ class OpensslEncryptionUtilsTest(test_case.TestCase):
     error_msg = 'openssl returned an error'
     subprocess_mock.side_effect = OSError(1, error_msg)
 
-    with self.assertRaisesRegexp(openssl_encryption_utils.OpenSSLException,
-                                 error_msg):
+    with self.assertRaisesRegex(openssl_encryption_utils.OpenSSLException,
+                                error_msg):
       openssl_args = ['genrsa', 'foo']
       self.crypt.RunOpenSSL(openssl_args)
 
@@ -212,8 +212,8 @@ class OpensslEncryptionUtilsTest(test_case.TestCase):
     mock_communicate.returncode.return_value = 1
     subprocess_mock.return_value = mock_communicate
 
-    with self.assertRaisesRegexp(openssl_encryption_utils.OpenSSLException,
-                                 'This is stderr'):
+    with self.assertRaisesRegex(openssl_encryption_utils.OpenSSLException,
+                                'This is stderr'):
       openssl_args = ['rsautil', '-decrypt']
       self.crypt.RunOpenSSL(openssl_args)
 

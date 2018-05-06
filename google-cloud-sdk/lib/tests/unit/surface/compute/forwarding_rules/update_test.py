@@ -29,9 +29,9 @@ class UpdateLabelsTestBeta(
   def testUpdateMissingNameOrLabels(self):
     forwarding_rule_ref = self._GetForwardingRuleRef(
         'fr-1', region='us-central1')
-    with self.assertRaisesRegexp(calliope_exceptions.RequiredArgumentException,
-                                 'At least one of --update-labels or '
-                                 '--remove-labels must be specified.'):
+    with self.assertRaisesRegex(calliope_exceptions.RequiredArgumentException,
+                                'At least one of --update-labels or '
+                                '--remove-labels must be specified.'):
       self.Run('compute forwarding-rules update {0} --region {1}'
                .format(forwarding_rule_ref.Name(), forwarding_rule_ref.region))
 

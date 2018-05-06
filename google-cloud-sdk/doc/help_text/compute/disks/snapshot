@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud compute disks snapshot DISK_NAME [DISK_NAME ...] [--async]
         [--csek-key-file=FILE] [--description=DESCRIPTION] [--guest-flush]
-        [--snapshot-names=SNAPSHOT_NAME,[SNAPSHOT_NAME,...]] [--zone=ZONE]
+        [--snapshot-names=SNAPSHOT_NAME,[...]] [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -43,7 +43,7 @@ FLAGS
         prepare for the snapshot process. Currently only supported on Windows
         instances using the Volume Shadow Copy Service (VSS).
 
-     --snapshot-names=SNAPSHOT_NAME,[SNAPSHOT_NAME,...]
+     --snapshot-names=SNAPSHOT_NAME,[...]
         Names to assign to the snapshots. Without this option, the name of each
         snapshot will be a random, 16-character hexadecimal number that starts
         with a letter. The values of this option run parallel to the disks
@@ -57,7 +57,7 @@ FLAGS
 
      --zone=ZONE
         The zone of the disks to operate on. If not specified and the
-        compute/zone property isn't set, you will be prompted to select a zone.
+        compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

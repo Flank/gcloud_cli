@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.compute.containers_utils."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import containers_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions
@@ -51,7 +53,7 @@ class ContainersUtilsTest(sdk_test_base.WithTempCWD, test_case.TestCase):
         ),
     ]
     cos_image_link = containers_utils._SelectNewestCosImage(images)
-    self.assertEquals('link-3', cos_image_link)
+    self.assertEqual('link-3', cos_image_link)
 
   def testSelectNoCosImage(self):
     m = self.messages
@@ -67,7 +69,7 @@ class ContainersUtilsTest(sdk_test_base.WithTempCWD, test_case.TestCase):
             selfLink='link-3'
         ),
     ]
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         r'Could not find COS \(Cloud OS\) for release family '
         r'\'' + self.cos_prefix + '\''):
@@ -136,15 +138,15 @@ _MY_ENV_= asdf  # Not a comment
     file_content = 'asdf'
 
     # File doesn't exist
-    with self.assertRaisesRegexp(exceptions.BadFileException,
-                                 '.*env_vars.corrupted.*'):
+    with self.assertRaisesRegex(exceptions.BadFileException,
+                                '.*env_vars.corrupted.*'):
       containers_utils._ReadDictionary(file_name)
 
     with open(file_name, 'w') as f:
       f.write(file_content)
 
     # File has wrong format
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         '.*Syntax error in env_vars.corrupted:0: Expected VAR=VAL, got asdf.*'
     ):
@@ -158,11 +160,15 @@ _MY_ENV_= asdf  # Not a comment
       f.write(file_content)
 
     # File has wrong format
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         'Syntax error in env_vars.malformed:0 Variable name cannot contain '
         'whitespaces, got "key "'):
       containers_utils._ReadDictionary(file_name)
+
+  def testDumpYamlHasDisclaimer(self):
+    self.assertTrue('# DISCLAIMER' in containers_utils.DumpYaml({}))
+
 
 if __name__ == '__main__':
   test_case.main()

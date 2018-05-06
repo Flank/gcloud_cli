@@ -14,6 +14,8 @@
 
 """Unit tests for the parser_extensions module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.calliope import parser_errors
@@ -37,7 +39,7 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
     args = self.parser.parse_args([])
     self.assertEqual('DEFAULT-FLAG', args.flag)
     self.assertEqual('DEFAULT-POSITIONAL', args.positional)
-    self.assertEquals({}, args._specified_args)
+    self.assertEqual({}, args._specified_args)
     if not args.IsSpecified('flag'):
       args.flag = 'RUN-FLAG'
     if not args.IsSpecified('positional'):
@@ -48,7 +50,7 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
     args = self.parser.parse_args(['--flag=CMD-FLAG'])
     self.assertEqual('CMD-FLAG', args.flag)
     self.assertEqual('DEFAULT-POSITIONAL', args.positional)
-    self.assertEquals({'flag': '--flag'}, args._specified_args)
+    self.assertEqual({'flag': '--flag'}, args._specified_args)
     if not args.IsSpecified('flag'):
       args.flag = 'RUN-FLAG'
     if not args.IsSpecified('positional'):
@@ -59,7 +61,7 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
     args = self.parser.parse_args(['CMD-POSITIONAL'])
     self.assertEqual('DEFAULT-FLAG', args.flag)
     self.assertEqual('CMD-POSITIONAL', args.positional)
-    self.assertEquals({'positional': 'POSITIONAL'}, args._specified_args)
+    self.assertEqual({'positional': 'POSITIONAL'}, args._specified_args)
     if not args.IsSpecified('flag'):
       args.flag = 'RUN-FLAG'
     if not args.IsSpecified('positional'):
@@ -70,8 +72,8 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
     args = self.parser.parse_args(['--flag=CMD-FLAG', 'CMD-POSITIONAL'])
     self.assertEqual('CMD-FLAG', args.flag)
     self.assertEqual('CMD-POSITIONAL', args.positional)
-    self.assertEquals({'flag': '--flag', 'positional': 'POSITIONAL'},
-                      args._specified_args)
+    self.assertEqual({'flag': '--flag', 'positional': 'POSITIONAL'},
+                     args._specified_args)
     if not args.IsSpecified('flag'):
       args.flag = 'RUN-FLAG'
     if not args.IsSpecified('positional'):
@@ -86,21 +88,21 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
 
     args = self.parser.parse_args([])
     self.assertEqual(['DEFAULT-POSITIONAL'], args.positional)
-    self.assertEquals({}, args._specified_args)
+    self.assertEqual({}, args._specified_args)
     if not args.IsSpecified('positional'):
       args.positional = ['RUN-POSITIONAL']
     self.assertEqual(['RUN-POSITIONAL'], args.positional)
 
     args = self.parser.parse_args(['CMD-POSITIONAL-1'])
     self.assertEqual(['CMD-POSITIONAL-1'], args.positional)
-    self.assertEquals({'positional': 'POSITIONAL:1'}, args._specified_args)
+    self.assertEqual({'positional': 'POSITIONAL:1'}, args._specified_args)
     if not args.IsSpecified('positional'):
       args.positional = ['RUN-POSITIONAL']
     self.assertEqual(['CMD-POSITIONAL-1'], args.positional)
 
     args = self.parser.parse_args(['CMD-POSITIONAL-1', 'CMD-POSITIONAL-2'])
     self.assertEqual(['CMD-POSITIONAL-1', 'CMD-POSITIONAL-2'], args.positional)
-    self.assertEquals({'positional': 'POSITIONAL:2'}, args._specified_args)
+    self.assertEqual({'positional': 'POSITIONAL:2'}, args._specified_args)
     if not args.IsSpecified('positional'):
       args.positional = ['RUN-POSITIONAL']
     self.assertEqual(['CMD-POSITIONAL-1', 'CMD-POSITIONAL-2'], args.positional)
@@ -156,7 +158,7 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
   def testConcepts(self):
     handler = mock.MagicMock()
     self.parser.add_concepts(handler)
-    with self.assertRaisesRegexp(AttributeError, 'two runtime handlers'):
+    with self.assertRaisesRegex(AttributeError, 'two runtime handlers'):
       self.parser.add_concepts(handler)
     args = self.parser.parse_args([])
     concepts = args.CONCEPTS

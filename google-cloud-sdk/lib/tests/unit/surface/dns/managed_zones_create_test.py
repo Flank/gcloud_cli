@@ -95,6 +95,7 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
 """.format(self.api_version, self.Project()))
 
   @parameterized.named_parameters(
+      ('GA', calliope_base.ReleaseTrack.GA, 'v1'),
       ('Beta', calliope_base.ReleaseTrack.BETA, 'v1beta2'),
   )
   def testCreateLabels(self, track, api_version):
@@ -127,29 +128,23 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
 """.format(self.api_version, self.Project()))
 
   @parameterized.named_parameters(
+      ('GA', calliope_base.ReleaseTrack.GA, 'v1'),
       ('Beta', calliope_base.ReleaseTrack.BETA, 'v1beta2'),
   )
   def testCreateDnssec(self, track, api_version):
     self.SetUpForTrack(track, api_version)
 
-    test_zone = util_beta.GetManagedZoneBeforeCreation()
+    test_zone = util_beta.GetManagedZoneBeforeCreation(api_version)
     zone_create_request = self.messages.DnsManagedZonesCreateRequest(
         managedZone=test_zone,
         project=self.Project())
     self.client.managedZones.Create.Expect(
         zone_create_request, test_zone)
-    self.client.managedZones.Create.Expect(
-        zone_create_request, test_zone)
 
-    self.Run(
-        'dns managed-zones create {0} --dns-name {1} '
-        '--description {2} --format=disable  --dnssec-state=on'.format(
-            test_zone.name,
-            test_zone.dnsName[:-1],
-            test_zone.description))
     result = self.Run(
         'dns managed-zones create {0} --dns-name {1} '
-        '--description {2} --format=disable --dnssec-state=on'.format(
+        '--description {2} --format=disable --dnssec-state=on '
+        '--denial-of-existence=nsec3'.format(
             test_zone.name,
             test_zone.dnsName,
             test_zone.description))

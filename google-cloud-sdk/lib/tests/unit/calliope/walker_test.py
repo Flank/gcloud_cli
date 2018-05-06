@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for the CLI tree walker."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import cli as calliope
@@ -35,10 +38,10 @@ class WalkerTest(sdk_test_base.WithOutputCapture, sdk_test_base.SdkBase):
     class VisitGenerator(walker.Walker):
 
       def Visit(self, node, parent, is_group):
-        print 'node=%s parent=%s is_group=%s' % (node.name, parent, is_group)
+        print('node=%s parent=%s is_group=%s' % (node.name, parent, is_group))
         return node.name
 
-    print 'top=%s' % VisitGenerator(self.cli).Walk()
+    print('top=%s' % VisitGenerator(self.cli).Walk())
     self.AssertOutputContains("""\
 node=test parent=None is_group=True
 node=cfg parent=test is_group=True
@@ -63,7 +66,6 @@ node=subcommand parent=newstylegroup is_group=False
 node=recommand parent=test is_group=False
 node=requiredargcommand parent=test is_group=False
 node=simple_command parent=test is_group=False
-node=static_recommand parent=test is_group=False
 node=unsetprop parent=test is_group=False
 top=test
 """)
@@ -72,10 +74,10 @@ top=test
     class VisitGenerator(walker.Walker):
 
       def Visit(self, node, parent, is_group):
-        print 'node=%s parent=%s is_group=%s' % (node.name, parent, is_group)
+        print('node=%s parent=%s is_group=%s' % (node.name, parent, is_group))
         return node.name
 
-    print 'top=%s' % VisitGenerator(self.cli).Walk(restrict=['test.cfg'])
+    print('top=%s' % VisitGenerator(self.cli).Walk(restrict=['test.cfg']))
     self.AssertOutputContains("""\
 node=test parent=None is_group=True
 node=cfg parent=test is_group=True
@@ -89,10 +91,10 @@ top=test
     class VisitGenerator(walker.Walker):
 
       def Visit(self, node, parent, is_group):
-        print 'node=%s parent=%s is_group=%s' % (node.name, parent, is_group)
+        print('node=%s parent=%s is_group=%s' % (node.name, parent, is_group))
         return node.name
 
-    print 'top=%s' % VisitGenerator(self.cli, restrict=['test.cfg']).Walk()
+    print('top=%s' % VisitGenerator(self.cli, restrict=['test.cfg']).Walk())
     self.AssertOutputContains("""\
 node=cfg parent=None is_group=True
 node=get parent=cfg is_group=False
@@ -105,10 +107,10 @@ top=cfg
     class VisitGenerator(walker.Walker):
 
       def Visit(self, node, parent, is_group):
-        print 'node=%s parent=%s is_group=%s' % (node.name, parent, is_group)
+        print('node=%s parent=%s is_group=%s' % (node.name, parent, is_group))
         return node.name
 
-    print 'top=%s' % VisitGenerator(self.cli).Walk(restrict=['notfound'])
+    print('top=%s' % VisitGenerator(self.cli).Walk(restrict=['notfound']))
     self.AssertOutputContains("""\
 node=test parent=None is_group=True
 top=test
@@ -129,10 +131,10 @@ class WalkerHiddenTest(sdk_test_base.WithOutputCapture, sdk_test_base.SdkBase):
     class VisitGenerator(walker.Walker):
 
       def Visit(self, node, parent, is_group):
-        print 'node=%s parent=%s is_group=%s' % (node.name, parent, is_group)
+        print('node=%s parent=%s is_group=%s' % (node.name, parent, is_group))
         return node.name
 
-    print 'top=%s' % VisitGenerator(self.cli).Walk()
+    print('top=%s' % VisitGenerator(self.cli).Walk())
     self.AssertOutputContains("""\
 node=test parent=None is_group=True
 node=internal parent=test is_group=True
@@ -153,10 +155,10 @@ top=test
     class VisitGenerator(walker.Walker):
 
       def Visit(self, node, parent, is_group):
-        print 'node=%s parent=%s is_group=%s' % (node.name, parent, is_group)
+        print('node=%s parent=%s is_group=%s' % (node.name, parent, is_group))
         return node.name
 
-    print 'top=%s' % VisitGenerator(self.cli).Walk(hidden=True)
+    print('top=%s' % VisitGenerator(self.cli).Walk(hidden=True))
     self.AssertOutputContains("""\
 node=test parent=None is_group=True
 node=internal parent=test is_group=True

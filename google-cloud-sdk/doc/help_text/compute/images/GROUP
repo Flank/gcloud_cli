@@ -34,6 +34,12 @@ COMMANDS
      describe-from-family
         Describe the latest image from an image family.
 
+     export
+        Export a Google Compute Engine image.
+
+     import
+        Import a Google Compute Engine image.
+
      list
         List Google Compute Engine images.
 

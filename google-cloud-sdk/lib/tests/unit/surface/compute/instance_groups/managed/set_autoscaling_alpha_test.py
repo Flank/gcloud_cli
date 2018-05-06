@@ -218,7 +218,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
       yield
     self.make_requests.side_effect = MakeRequests
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         'Could not fetch resource:'):
       self.Run('compute instance-groups managed set-autoscaling group-1 '
@@ -242,7 +242,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
                '--max-num-replicas -10 --zone zone-1')
 
   def testAssertsMaxSizeGreaterThanMinSize(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--max-num-replicas\]: can\'t be less than min '
         r'num replicas\.'):
@@ -267,7 +267,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
                '--target-cpu-utilization 1.1')
 
   def testAssertsCustomMetricSpecificationComplete(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--custom-metric-utilization\]: metric not '
         r'present\.'):
@@ -277,7 +277,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
                'utilization-target-type=GAUGE')
 
   def testAssertsCustomMetricTargetPositive(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for '
         r'\[--custom-metric-utilization utilization-target\]: less than 0\.'):
@@ -385,7 +385,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
           'projects/aaaa/resource_name',
           'projects/my-project/{0}s/what/resource_name'.format(bad_resource),
           'projects/my-project/{0}s/invalid-chars-&*)(I('.format(bad_resource)):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             exceptions.InvalidArgumentException, r'.*'):
           self.Run('compute instance-groups managed set-autoscaling group-1 '
                    '--max-num-replicas 10 --zone zone-1 '
@@ -606,7 +606,7 @@ class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):
       yield
     self.make_requests.side_effect = MakeRequests
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         'Could not fetch resource:'):
       self.Run("""
@@ -639,7 +639,7 @@ class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):
           """)
 
   def testAssertsMaxSizeGreaterThanMinSize(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--max-num-replicas\]: can\'t be less than min '
         r'num replicas\.'):
@@ -670,7 +670,7 @@ class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):
           """)
 
   def testAssertsCustomMetricSpecificationComplete(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--custom-metric-utilization\]: metric not '
         r'present\.'):
@@ -682,7 +682,7 @@ class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):
            """)
 
   def testAssertsCustomMetricTargetPositive(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for '
         r'\[--custom-metric-utilization utilization-target\]: less than 0\.'):

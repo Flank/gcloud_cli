@@ -391,7 +391,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
     self.AssertOutputEquals(expected_output)
 
   def testUserNameAndInstanceNameMatch(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         utils.InvalidUserError,
         r'User \[instance-1\] cannot be created on instance \[instance-1\].'):
       self.Run("""
@@ -456,7 +456,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
     windows_key_entry = self.windows_key_entry.format(
         EMAIL, self.expire_on, EXPONENT, MODULUS, USERNAME)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         utils.InstanceNotReadyError,
         'The instance may not be ready for use.'):
       self.Run("""
@@ -477,7 +477,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
         [messages.SerialPortOutput(contents='')],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         utils.WrongInstanceTypeError,
         'This Windows instance appears to be too old'):
       self.Run("""
@@ -727,7 +727,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
         [self.GetInstanceMessage()],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         utils.TimeoutError,
         'Did not receive password in a reasonable amount of time'):
       self.Run("""
@@ -739,7 +739,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
   def testNoOpenSSL(self):
     self.find_executable.return_value = None
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         utils.MissingDependencyError,
         'Your platform does not support OpenSSL'):
       self.Run("""

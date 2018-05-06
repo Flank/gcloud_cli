@@ -47,7 +47,8 @@ COMMANDS
         Encrypt a plaintext file using a key.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms
         $ gcloud beta kms
 

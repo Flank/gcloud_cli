@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Test of the 'pubsub subscriptions {}' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.pubsub import util
@@ -83,7 +87,7 @@ class SubscriptionsModifyMessageAckDeadlineTest(base.CloudPubsubTestBase,
     result = self.Run('pubsub subscriptions modify-message-ack-deadline subs2 '
                       '--ack-ids 123456 --ack-deadline 600')
 
-    self.assertEquals(result, self.msgs.Empty())
+    self.assertEqual(result, self.msgs.Empty())
 
   def testSubscriptionsModifyAckDeadlineNoDeprecatedArgs(self):
     with self.AssertRaisesExceptionMatches(
@@ -91,6 +95,12 @@ class SubscriptionsModifyMessageAckDeadlineTest(base.CloudPubsubTestBase,
         'unrecognized arguments: ACKID1'):
       self.Run('pubsub subscriptions modify-message-ack-deadline subs1 ACKID1 '
                '--ack-ids  123456 --ack-deadline 600')
+
+  def testSubscriptionsModifyAckDeadlineNoAckIds(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --ack-ids: Must be specified.'):
+      self.Run('pubsub subscriptions modify-message-ack-deadline subs1 '
+               '--ack-deadline 600')
 
 
 @parameterized.parameters(

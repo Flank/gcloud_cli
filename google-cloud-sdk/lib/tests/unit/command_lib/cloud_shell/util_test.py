@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import base64
 import os
 from apitools.base.py import extra_types
@@ -48,12 +50,6 @@ class PrepareEnvironmentTest(cli_test_base.CliTestBase,
     self.operations_messages = apis.GetMessagesModule('cloudshell', 'v1')
 
     # TODO(b/72457554): factor out the following to share with compute ssh tests
-    self.StartObjectPatch(
-        ssh.Keys,
-        'GetPublicKey',
-        autospec=True,
-        return_value=ssh.Keys.PublicKey('ssh-rsa', KEY_CONTENT,
-                                        'me@my-computer'))
     self.env = ssh.Environment(ssh.Suite.OPENSSH)
     self.env.ssh = 'ssh'
     self.env.ssh_term = 'ssh'

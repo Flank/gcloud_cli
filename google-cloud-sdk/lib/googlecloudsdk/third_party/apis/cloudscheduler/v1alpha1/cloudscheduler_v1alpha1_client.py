@@ -24,7 +24,7 @@ class CloudschedulerV1alpha1(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new cloudscheduler handle."""
     url = url or self.BASE_URL
     super(CloudschedulerV1alpha1, self).__init__(
@@ -33,7 +33,8 @@ class CloudschedulerV1alpha1(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.projects_locations_jobs = self.ProjectsLocationsJobsService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
@@ -49,7 +50,7 @@ class CloudschedulerV1alpha1(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      """Creates a job.
+      r"""Creates a job.
 
       Args:
         request: (CloudschedulerProjectsLocationsJobsCreateRequest) input message
@@ -76,7 +77,7 @@ class CloudschedulerV1alpha1(base_api.BaseApiClient):
     )
 
     def Delete(self, request, global_params=None):
-      """Deletes a job.
+      r"""Deletes a job.
 
       Args:
         request: (CloudschedulerProjectsLocationsJobsDeleteRequest) input message
@@ -103,7 +104,7 @@ class CloudschedulerV1alpha1(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      """Gets a job.
+      r"""Gets a job.
 
       Args:
         request: (CloudschedulerProjectsLocationsJobsGetRequest) input message
@@ -121,7 +122,7 @@ class CloudschedulerV1alpha1(base_api.BaseApiClient):
         method_id=u'cloudscheduler.projects.locations.jobs.get',
         ordered_params=[u'name'],
         path_params=[u'name'],
-        query_params=[u'responseView'],
+        query_params=[],
         relative_path=u'v1alpha1/{+name}',
         request_field='',
         request_type_name=u'CloudschedulerProjectsLocationsJobsGetRequest',
@@ -130,13 +131,7 @@ class CloudschedulerV1alpha1(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      """Lists jobs.
-
-ListJobsRequest.filter can be used to specify a subset of
-jobs. ListJobsRequest.response_view controls the subset of
-information returned. By default response_view is
-Job.View.BASIC; not all information is returned by default
-due to performance considerations.
+      r"""Lists jobs.
 
       Args:
         request: (CloudschedulerProjectsLocationsJobsListRequest) input message
@@ -154,7 +149,7 @@ due to performance considerations.
         method_id=u'cloudscheduler.projects.locations.jobs.list',
         ordered_params=[u'parent'],
         path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken', u'responseView'],
+        query_params=[u'pageSize', u'pageToken'],
         relative_path=u'v1alpha1/{+parent}/jobs',
         request_field='',
         request_type_name=u'CloudschedulerProjectsLocationsJobsListRequest',
@@ -163,19 +158,16 @@ due to performance considerations.
     )
 
     def Run(self, request, global_params=None):
-      """Forces a job to run now.
+      r"""Forces a job to run now.
 
 When this method is called, Cloud Scheduler will immediately attempt the
-job. The attempt will be counted in the job's Job.total_attempt_count.
-
-The job's existing schedule is not modified, so the job
-will also be attempted according to its normal schedule.
+job.
 
       Args:
         request: (CloudschedulerProjectsLocationsJobsRunRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (Empty) The response message.
+        (Job) The response message.
       """
       config = self.GetMethodConfig('Run')
       return self._RunMethod(
@@ -191,7 +183,7 @@ will also be attempted according to its normal schedule.
         relative_path=u'v1alpha1/{+name}:run',
         request_field=u'runJobRequest',
         request_type_name=u'CloudschedulerProjectsLocationsJobsRunRequest',
-        response_type_name=u'Empty',
+        response_type_name=u'Job',
         supports_download=False,
     )
 
@@ -206,7 +198,7 @@ will also be attempted according to its normal schedule.
           }
 
     def Get(self, request, global_params=None):
-      """Get information about a location.
+      r"""Gets information about a location.
 
       Args:
         request: (CloudschedulerProjectsLocationsGetRequest) input message
@@ -233,7 +225,7 @@ will also be attempted according to its normal schedule.
     )
 
     def List(self, request, global_params=None):
-      """Lists information about the supported locations for this service.
+      r"""Lists information about the supported locations for this service.
 
       Args:
         request: (CloudschedulerProjectsLocationsListRequest) input message

@@ -19,6 +19,8 @@ A detailed description of auth.
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import unicode_literals
+
 import datetime
 import json
 import os
@@ -38,6 +40,7 @@ import httplib2
 from oauth2client import client
 from oauth2client.contrib import gce as oauth2client_gce
 from oauth2client.contrib import reauth_errors
+import six
 
 
 GOOGLE_OAUTH2_PROVIDER_AUTHORIZATION_URI = (
@@ -373,10 +376,12 @@ def Refresh(credentials, http_client=None):
     TokenRefreshError: If the credentials fail to refresh.
     TokenRefreshReauthError: If the credentials fail to refresh due to reauth.
   """
+  response_encoding = None if six.PY2 else 'utf-8'
   try:
-    credentials.refresh(http_client or http.Http())
+    credentials.refresh(http_client or
+                        http.Http(response_encoding=response_encoding))
   except (client.AccessTokenRefreshError, httplib2.ServerNotFoundError) as e:
-    raise TokenRefreshError(e.message)
+    raise TokenRefreshError(six.text_type(e))
   except reauth_errors.ReauthError as e:
     raise TokenRefreshReauthError(e.message)
 

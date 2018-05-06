@@ -14,6 +14,8 @@
 
 """Get Server Config."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container import container_command_util
 from googlecloudsdk.command_lib.container import flags
@@ -28,7 +30,7 @@ class GetServerConfig(base.Command):
 
   def __init__(self, *args, **kwargs):
     super(GetServerConfig, self).__init__(*args, **kwargs)
-    self.location_get = container_command_util.GetZone
+    self.location_get = container_command_util.GetZoneOrRegion
 
   @staticmethod
   def Args(parser):
@@ -39,7 +41,7 @@ class GetServerConfig(base.Command):
         which you can register arguments.  See the public argparse documentation
         for its capabilities.
     """
-    flags.AddZoneFlag(parser)
+    flags.AddZoneAndRegionFlags(parser, region_hidden=True)
 
   def Run(self, args):
     adapter = self.context['api_adapter']

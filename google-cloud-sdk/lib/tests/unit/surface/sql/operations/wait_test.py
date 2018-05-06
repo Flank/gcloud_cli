@@ -238,7 +238,7 @@ NAME                                  TYPE         START                        
     self.StartPatch('googlecloudsdk.core.util.retry.Retryer.RetryOnResult',
                     side_effect=retry.WaitException('forced timeout',
                                                     False, None))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.OperationError,
         'Operation .* is taking longer than expected. You can continue waiting '
         'for the operation by running `gcloud beta sql operations wait .*`'):

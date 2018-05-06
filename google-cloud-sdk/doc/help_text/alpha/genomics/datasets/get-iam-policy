@@ -1,18 +1,27 @@
 NAME
-    gcloud alpha genomics datasets get-iam-policy - get IAM policy for a
+    gcloud alpha genomics datasets get-iam-policy - get the IAM policy for a
         dataset
 
 SYNOPSIS
-    gcloud alpha genomics datasets get-iam-policy ID [--filter=EXPRESSION]
+    gcloud alpha genomics datasets get-iam-policy DATASET [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) This command gets the IAM policy for a dataset, given a dataset ID.
+    (ALPHA) gcloud alpha genomics datasets get-iam-policy displays the IAM
+    policy associated with a dataset. If formatted as JSON, the output can be
+    edited and used as a policy file for set-iam-policy. The output includes an
+    "etag" field identifying the version emitted and allowing detection of
+    concurrent policy updates; see $ {parent} set-iam-policy for additional
+    details.
 
 POSITIONAL ARGUMENTS
-     ID
-        The ID of the dataset.
+     DATASET - The dataset for which to display the IAM policy. This represents
+     a Cloud resource. This must be specified.
+
+       DATASET
+          The ID of the dataset or a fully qualified identifier for the
+          dataset.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -44,6 +53,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the genomics/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/genomics
+
+EXAMPLES
+    To print the IAM policy for a given dataset, run:
+
+        $ gcloud alpha genomics datasets get-iam-policy my-dataset
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

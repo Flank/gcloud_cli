@@ -3,7 +3,11 @@ NAME
 
 SYNOPSIS
     gcloud dns managed-zones create ZONE_NAME --description=DESCRIPTION
-        --dns-name=DNS_NAME [GCLOUD_WIDE_FLAG ...]
+        --dns-name=DNS_NAME [--denial-of-existence=DENIAL_OF_EXISTENCE]
+        [--dnssec-state=DNSSEC_STATE] [--ksk-algorithm=KSK_ALGORITHM]
+        [--ksk-key-length=KSK_KEY_LENGTH] [--labels=[KEY=VALUE,...]]
+        [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     This command creates a Cloud DNS managed-zone.
@@ -18,6 +22,40 @@ REQUIRED FLAGS
 
      --dns-name=DNS_NAME
         The DNS name suffix that will be managed with the created zone.
+
+OPTIONAL FLAGS
+     --denial-of-existence=DENIAL_OF_EXISTENCE
+        Requires DNSSEC enabled. DENIAL_OF_EXISTENCE must be one of: nsec,
+        nsec3.
+
+     --dnssec-state=DNSSEC_STATE
+        The DNSSEC state for this managed zone. DNSSEC_STATE must be one of:
+
+         off
+            Disable DNSSEC for the managed zone.
+         on
+            Enable DNSSEC for the managed zone.
+         transfer
+            Enable DNSSEC and allow transferring a signed zone in or out.
+
+     --ksk-algorithm=KSK_ALGORITHM
+        String mnemonic specifying the DNSSEC algorithm of the key-signing key.
+        Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,
+        RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384
+
+     --ksk-key-length=KSK_KEY_LENGTH
+        Length of the key-signing key in bits. Requires DNSSEC enabled.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --zsk-algorithm=ZSK_ALGORITHM
+        String mnemonic specifying the DNSSEC algorithm of the zone-signing
+        key. Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,
+        RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384
+
+     --zsk-key-length=ZSK_KEY_LENGTH
+        Length of the zone-signing key in bits. Requires DNSSEC enabled.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

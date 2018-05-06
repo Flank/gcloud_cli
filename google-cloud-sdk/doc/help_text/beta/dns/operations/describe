@@ -28,5 +28,8 @@ EXAMPLES
         $ gcloud beta dns operations describe 1234 --zone my_zone
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dns operations describe
 

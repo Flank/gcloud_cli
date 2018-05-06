@@ -14,6 +14,8 @@
 
 """Base for Services V1 unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import time
 
 from apitools.base.py import encoding
@@ -23,6 +25,7 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class SV1UnitTestBase(sdk_test_base.WithFakeAuth,
@@ -115,3 +118,62 @@ class SV1UnitTestBase(sdk_test_base.WithFakeAuth,
             response=response,
         )
     )
+
+
+NETWORK_URL_FORMAT = 'projects/%s/global/networks/%s'
+
+
+class SNV1alphaUnitTestBase(sdk_test_base.WithFakeAuth,
+                            sdk_test_base.WithLogCapture,
+                            cli_test_base.CliTestBase):
+  """Base class for service networking unit tests."""
+
+  PROJECT_NAME = 'fake-project'
+  PROJECT_NUMBER = 12481632
+  DEFAULT_SERVICE_NAME = 'service-name.googleapis.com'
+
+  def PreSetUp(self):
+    self.services_messages = core_apis.GetMessagesModule(
+        'servicenetworking', 'v1alpha')
+
+  def SetUp(self):
+    properties.VALUES.core.project.Set(self.PROJECT_NAME)
+
+    # Mock out the service networking API
+    self.mocked_client = mock.Client(
+        core_apis.GetClientClass('servicenetworking', 'v1alpha'),
+        real_client=core_apis.GetClientInstance(
+            'servicenetworking', 'v1alpha', no_http=True))
+    self.mocked_client.Mock()
+    self.addCleanup(self.mocked_client.Unmock)
+
+  def ExpectPeerApiCall(self, network, ranges, operation, error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services.Peer.Expect(
+        self.services_messages.ServicenetworkingServicesPeerRequest(
+            name='services/%s' % self.DEFAULT_SERVICE_NAME,
+            peerSharedNetworkRequest=self.services_messages.
+            PeerSharedNetworkRequest(
+                network=NETWORK_URL_FORMAT % (self.PROJECT_NUMBER, network),
+                reservedPeeringRange=ranges)),
+        op,
+        exception=error)
+
+  def ExpectOperation(self, name, poll_count=2, error=None):
+    for _ in range(poll_count):
+      op = self.services_messages.Operation(name=name, done=False)
+      self.mocked_client.operations.Get.Expect(
+          request=self.services_messages.ServicenetworkingOperationsGetRequest(
+              name=name),
+          response=op)
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=name, done=True)
+    self.mocked_client.operations.Get.Expect(
+        self.services_messages.ServicenetworkingOperationsGetRequest(name=name),
+        op,
+        exception=error)

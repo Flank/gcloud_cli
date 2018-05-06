@@ -5,13 +5,13 @@
 
 .SH "NAME"
 .HP
-gcloud alpha tasks queues set\-iam\-policy \- set IAM policy for a queue
+gcloud alpha tasks queues set\-iam\-policy \- set the IAM policy for a queue
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks queues set\-iam\-policy\fR \fIQUEUE\fR \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks queues set\-iam\-policy\fR (\fIQUEUE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,13 +31,29 @@ value will replace any existing policy for the queue.
 
 .RS 2m
 .TP 2m
-\fIQUEUE\fR
-The queue to set the IAM policy for.
 
+QUEUE \- The queue for which to set the IAM policy. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: Set the property [core/project] or provide the flag
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIQUEUE\fR
+The ID of the queue or a fully qualified identifier for the queue. This
+positional must be specified if any of the other arguments in this group are
+specified.
 
 .TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location name.
+
+.RE
+.sp
+.TP 2m
 \fIPOLICY_FILE\fR
-JSON or YAML file containing the IAM policy.
+Path to a local JSON or YAML formatted file containing a valid policy.
 
 
 .RE
@@ -52,18 +68,10 @@ help\fR for details.
 
 
 
-.SH "EXAMPLES"
+.SH "API REFERENCE"
 
-The following command will read an IAM policy defined in a JSON file
-\'policy.json' and set it for a queue with identifier 'my\-queue'
-
-.RS 2m
-$ gcloud alpha tasks queues set\-iam\-policy my\-queue policy.json
-.RE
-
-
-See https://cloud.google.com/iam/docs/managing\-policies for details of the
-policy file format and contents.
+This command uses the \fBcloudtasks/v2beta2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/cloud\-tasks/
 
 
 
@@ -73,5 +81,9 @@ This command is currently in ALPHA and may change without notice. Usually, users
 of ALPHA commands and flags need to apply for access, agree to applicable terms,
 and have their projects whitelisted. Contact Google or sign up on a product's
 page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta tasks queues set\-iam\-policy
+.RE
 

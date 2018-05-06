@@ -46,6 +46,8 @@ Example usage:
 
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 import copy
 import re
@@ -55,6 +57,9 @@ from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.util import times
+
+import six
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 __all__ = ['Duration', 'BinarySize']
@@ -182,7 +187,7 @@ def _ValueParser(scales, default_unit, lower_bound=None, upper_bound=None,
 
   def UnitsByMagnitude(suggested_binary_size_scales=None):
     """Returns a list of the units in scales sorted by magnitude."""
-    scale_items = sorted(scales.iteritems(),
+    scale_items = sorted(six.iteritems(scales),
                          key=lambda value: (value[1], value[0]))
     if suggested_binary_size_scales is None:
       return [key for key, _ in scale_items]
@@ -310,7 +315,7 @@ def CustomFunctionValidator(fn, description, parser=None):
       if fn(parsed_value):
         return parsed_value
     encoded_value = console_attr.SafeText(value)
-    formatted_err = u'Bad value [{0}]: {1}'.format(encoded_value, description)
+    formatted_err = 'Bad value [{0}]: {1}'.format(encoded_value, description)
     raise ArgumentTypeError(formatted_err)
 
   return Parse
@@ -516,8 +521,9 @@ class Day(object):
       return times.ParseDateTime(s, '%Y-%m-%d').date()
     except times.Error as e:
       raise ArgumentTypeError(
-          _GenerateErrorMessage(u'Failed to parse date: {0}'.format(unicode(e)),
-                                user_input=s))
+          _GenerateErrorMessage(
+              'Failed to parse date: {0}'.format(six.text_type(e)),
+              user_input=s))
 
 
 class Datetime(object):
@@ -533,7 +539,7 @@ class Datetime(object):
     except times.Error as e:
       raise ArgumentTypeError(
           _GenerateErrorMessage(
-              u'Failed to parse date/time: {0}'.format(unicode(e)),
+              'Failed to parse date/time: {0}'.format(six.text_type(e)),
               user_input=s))
 
 
@@ -752,12 +758,64 @@ class ArgList(ArgType):
 
     return arg_list
 
+  _MAX_METAVAR_LENGTH = 30  # arbitrary, but this is pretty long
+
   def GetUsageMsg(self, is_custom_metavar, metavar):
-    is_custom_metavar = is_custom_metavar
-    msg = '[{metavar},...]'.format(metavar=metavar)
-    if self.min_length:
-      msg = ','.join([metavar]*self.min_length+[msg])
-    return msg
+    """Get a specially-formatted metavar for the ArgList to use in help.
+
+    An example is worth 1,000 words:
+
+    >>> ArgList().GetUsageMetavar('FOO')
+    '[FOO,...]'
+    >>> ArgList(min_length=1).GetUsageMetavar('FOO')
+    'FOO,[FOO,...]'
+    >>> ArgList(max_length=2).GetUsageMetavar('FOO')
+    'FOO,[FOO]'
+    >>> ArgList(max_length=3).GetUsageMetavar('FOO')  # One, two, many...
+    'FOO,[FOO,...]'
+    >>> ArgList(min_length=2, max_length=2).GetUsageMetavar('FOO')
+    'FOO,FOO'
+    >>> ArgList().GetUsageMetavar('REALLY_VERY_QUITE_LONG_METAVAR')
+    'REALLY_VERY_QUITE_LONG_METAVAR,[...]'
+
+    Args:
+      is_custom_metavar: unused in GetUsageMsg
+      metavar: string, the base metavar to turn into an ArgList metavar
+
+    Returns:
+      string, the ArgList usage metavar
+    """
+    del is_custom_metavar  # Unused in GetUsageMsg
+
+    required = ','.join([metavar] * self.min_length)
+
+    if self.max_length:
+      num_optional = self.max_length - self.min_length
+    else:
+      num_optional = None
+
+    # Use the "1, 2, many" approach to counting
+    if num_optional == 0:
+      optional = ''
+    elif num_optional == 1:
+      optional = '[{}]'.format(metavar)
+    elif num_optional == 2:
+      optional = '[{0},[{0}]]'.format(metavar)
+    else:
+      optional = '[{0},...]'.format(metavar)
+
+    msg = ','.join(filter(None, [required, optional]))
+
+    if len(msg) < self._MAX_METAVAR_LENGTH:
+      return msg
+
+    # With long metavars, only put it in once.
+    if self.min_length == 0:
+      return '[{},...]'.format(metavar)
+    if self.min_length == 1:
+      return '{},[...]'.format(metavar)
+    else:
+      return '{},...,[...]'.format(metavar)
 
 
 class ArgDict(ArgList):
@@ -809,7 +867,7 @@ class ArgDict(ArgList):
       if len(op) != 1:
         raise ArgumentTypeError(
             'Operator [{}] must be one character.'.format(op))
-    ops = ''.join(operators.keys())
+    ops = ''.join(six.iterkeys(operators))
     key_op_value_pattern = '([^{ops}]+)([{ops}]?)(.*)'.format(
         ops=re.escape(ops))
     self.key_op_value = re.compile(key_op_value_pattern, re.DOTALL)
@@ -874,7 +932,7 @@ class ArgDict(ArgList):
       return super(ArgDict, self).GetUsageMsg(is_custom_metavar, metavar)
 
     msg_list = []
-    spec_list = sorted(self.spec.iteritems())
+    spec_list = sorted(six.iteritems(self.spec))
 
     # First put the spec keys with no value followed by those that expect a
     # value
@@ -987,7 +1045,7 @@ class UpdateAction(argparse.Action):
       # Get the existing arg value (if any)
       items = copy.copy(argparse._ensure_value(namespace, self.dest, {}))
       # Merge the new key/value pair(s) in
-      for k, v in values.iteritems():
+      for k, v in six.iteritems(values):
         if k in items:
           v = self.onduplicatekey_handler(self, k, items[k], v)
         items[k] = v
@@ -1135,8 +1193,8 @@ class RemainderAction(argparse._StoreAction):  # pylint: disable=protected-acces
     remaining_args = remaining_args[:split_index]
 
     if pass_through_args:
-      msg = (u'unrecognized args: {args}\n' + self.explanation).format(
-          args=u' '.join(pass_through_args))
+      msg = ('unrecognized args: {args}\n' + self.explanation).format(
+          args=' '.join(pass_through_args))
       raise parser_errors.UnrecognizedArgumentsError(msg)
     self(None, namespace, pass_through_args)
     return namespace, remaining_args

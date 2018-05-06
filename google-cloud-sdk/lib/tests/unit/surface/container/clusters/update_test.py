@@ -13,8 +13,11 @@
 # limitations under the License.
 """Test of the 'clusters' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
+from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container import constants
@@ -45,8 +48,8 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
         flags='--monitoring-service=monitoring.googleapis.com')
 
   def testUpdateLoggingNone(self):
-    name = u'tosetloggingservice'
-    logging_service = u'none'
+    name = 'tosetloggingservice'
+    logging_service = 'none'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetLoggingService(
         name,
@@ -59,8 +62,8 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def testUpdateLoggingGoogle(self):
-    name = u'tosetloggingservice'
-    logging_service = u'logging.googleapis.com'
+    name = 'tosetloggingservice'
+    logging_service = 'logging.googleapis.com'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetLoggingService(
         name,
@@ -73,8 +76,8 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def testUpdateLoggingInvalid(self):
-    name = u'tosetloggingservice'
-    logging_service = u'fancyloggingservice.net'
+    name = 'tosetloggingservice'
+    logging_service = 'fancyloggingservice.net'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetLoggingService(
         name,
@@ -195,6 +198,22 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
         flags='--enable-master-authorized-networks '
         '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 ')
 
+  def testEnableMasterAuthorizedNetworksWithMaxSourceRanges(self):
+    cidr_blocks = []
+    msgs_cidr_blocks = []
+    for i in range(1, api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS + 1):
+      cidr = '10.0.0.%d/32' % i
+      cidr_blocks.append(cidr)
+      msgs_cidr_blocks.append(self.msgs.CidrBlock(cidrBlock=cidr))
+    desired = self.msgs.MasterAuthorizedNetworksConfig(
+        enabled=True,
+        cidrBlocks=msgs_cidr_blocks)
+
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredMasterAuthorizedNetworksConfig=desired),
+        flags='--enable-master-authorized-networks '
+        '--master-authorized-networks=' + ','.join(cidr_blocks))
+
   def testDisableMasterAuthorizedNetworks(self):
     desired = self.msgs.MasterAuthorizedNetworksConfig(enabled=False)
     self._TestUpdate(
@@ -202,7 +221,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
         flags='--no-enable-master-authorized-networks ')
 
   def testInvalidMasterAuthorizedNetworksWithoutEnable(self):
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     with self.assertRaises(c_util.Error):
       self.Run(
@@ -218,12 +237,13 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
           '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32 ')
 
   def testInvalidMasterAuthorizedNetworksTooManyCIDRs(self):
-    with self.AssertRaisesArgumentError():
+    cidr_blocks = []
+    for i in range(1, api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS + 2):
+      cidr_blocks.append('10.0.0.%d/32' % i)
+    with self.AssertRaisesArgumentErrorRegexp('too many args'):
       self.Run(
           self.clusters_command_base.format(self.ZONE) + ' update clustername '
-          '--master-authorized-networks=10.0.0.1/32,10.0.0.2/32,10.0.0.3/32,'
-          '10.0.0.4/32,10.0.0.5/32,10.0.0.6/32,10.0.0.7/32,10.0.0.8/32,'
-          '10.0.0.9/32,10.0.0.10/32,10.0.0.11/32 ')
+          '--master-authorized-networks=' + ','.join(cidr_blocks))
 
   def testEnableLegacyAbac(self):
     self._TestLegacyAbac(
@@ -236,7 +256,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
         flags='--no-enable-legacy-authorization ')
 
   def _TestLegacyAbac(self, enabled, flags):
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectLegacyAbac(
         cluster_name=name,
@@ -251,7 +271,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testStartIpRotation(self):
     """Correctly handle the success case, and persist the updated config."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     original_ip = '123.45.67.89'
     updated_ip = '98.76.54.32'
     original_ca = 'CA1'
@@ -272,6 +292,31 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self.assertTrue(c_config.server == 'https://' + updated_ip)
     self.assertTrue(c_config.ca_data == updated_ca)
 
+  def testStartCredentialRotation(self):
+    """Correctly handle the success case, and persist the updated config."""
+
+    name = 'tobeupdated'
+    original_ip = '123.45.67.89'
+    updated_ip = '98.76.54.32'
+    original_ca = 'CA1'
+    updated_ca = 'CA1.CA2'
+    self._TestIpRotation(
+        response='y',
+        before=self._RunningCluster(
+            name=name, endpoint=original_ip, ca_data=original_ca))
+    self.ExpectStartIpRotation(
+        cluster_name=name,
+        rotate_credentials=True,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self._TestIpRotationSuccess(
+        name=name,
+        flag='--start-credential-rotation',
+        after=self._RunningCluster(
+            name=name, endpoint=updated_ip, ca_data=updated_ca))
+    c_config = c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID)
+    self.assertTrue(c_config.server == 'https://' + updated_ip)
+    self.assertTrue(c_config.ca_data == updated_ca)
+
   def testStartIpRotationAborted(self):
     """Correctly handle a user aborting the command at the prompt."""
 
@@ -280,7 +325,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testStartIpRotationPersistEnvVarError(self):
     """Correctly handle environment variable errors persisting config."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.assertEqual(self.tmp_home.path, os.environ['HOME'])
     self.StartDictPatch('os.environ',
                         {'HOME': '', 'HOMEDRIVE': '', 'HOMEPATH': '',
@@ -295,7 +340,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testStartIpRotationPersistHttpError(self):
     """Correctly handle HTTP errors retrieving the cluster to persist config."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self._TestIpRotation(response='y')
     self.ExpectStartIpRotation(
         cluster_name=name,
@@ -311,7 +356,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testStartIpRotationError(self):
     """Correctly handle errors from the GKE API."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self._TestIpRotation(response='y')
     self.ExpectStartIpRotation(
         cluster_name=name,
@@ -328,7 +373,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testCompleteIpRotation(self):
     """Correctly handle the success case, and persist the updated config."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     original_ca = 'CA1.CA2'
     updated_ca = 'CA2'
     self._TestIpRotation(
@@ -344,6 +389,25 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     c_config = c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID)
     self.assertTrue(c_config.ca_data == updated_ca)
 
+  def testCompleteCredentialRotation(self):
+    """Correctly handle the success case, and persist the updated config."""
+
+    name = 'tobeupdated'
+    original_ca = 'CA1.CA2'
+    updated_ca = 'CA2'
+    self._TestIpRotation(
+        response='y',
+        before=self._RunningCluster(name=name, ca_data=original_ca))
+    self.ExpectCompleteIpRotation(
+        cluster_name=name,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self._TestIpRotationSuccess(
+        name=name,
+        flag='--complete-credential-rotation',
+        after=self._RunningCluster(name=name, ca_data=updated_ca))
+    c_config = c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID)
+    self.assertTrue(c_config.ca_data == updated_ca)
+
   def testCompleteIpRotationAborted(self):
     """Correctly handle a user aborting the command at the prompt."""
 
@@ -352,7 +416,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testCompleteIpRotationPersistEnvVarError(self):
     """Correctly handle environment variable errors persisting config."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.assertEqual(self.tmp_home.path, os.environ['HOME'])
     self.StartDictPatch('os.environ',
                         {'HOME': '', 'HOMEDRIVE': '', 'HOMEPATH': '',
@@ -366,7 +430,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
   def testCompleteIpRotationPersistHttpError(self):
     """Correctly handle HTTP errors retrieving the cluster to persist config."""
-    name = u'tobeupdated'
+    name = 'tobeupdated'
 
     self._TestIpRotation(response='y')
     self.ExpectCompleteIpRotation(
@@ -382,7 +446,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
   def testCompleteIpRotationError(self):
     """Correctly handle errors from the GKE API."""
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self._TestIpRotation(response='y')
     self.ExpectCompleteIpRotation(
         cluster_name=name,
@@ -406,7 +470,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     properties.VALUES.core.disable_prompts.Set(False)
     self.WriteInput(response)
     if not before:
-      before = self._RunningCluster(name=u'tobeupdated')
+      before = self._RunningCluster(name='tobeupdated')
     self.ExpectGetCluster(before)
 
   def _TestIpRotationSuccess(self, name, flag, after=None,
@@ -415,7 +479,8 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
     Args:
       name: The name of the cluster being updated.
-      flag: Either '--start-ip-rotation' or '--complete-ip-rotation',
+      flag: One of '--start-ip-rotation', '--complete-ip-rotation',
+        '--start-credential-rotation', or '--complete-credential-rotation',
         depending on which operation is being tested.
       after: The cluster to return after the rotation operation.
       after_exception: The error to throw on the GetCluster call after the
@@ -423,7 +488,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     """
     self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
     if not after:
-      after = self._RunningCluster(name=u'tobeupdated')
+      after = self._RunningCluster(name='tobeupdated')
     self.ExpectGetCluster(after, after_exception)
     self.Run(
         self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
@@ -437,7 +502,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
       flag: Either '--start-ip-rotation' or '--complete-ip-rotation',
         depending on which operation is being tested.
     """
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self._TestIpRotation(response='n')
     self.ClearOutput()
     self.ClearErr()
@@ -463,7 +528,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testSetPasswordError(self):
     """Correctly handle errors from the GKE API."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     password = '1234567890abcdef'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetMasterAuth(
@@ -488,7 +553,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testGeneratePasswordError(self):
     """Correctly handle errors from the GKE API."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetMasterAuth(
         cluster_name=name,
@@ -535,7 +600,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
       '--no-enable-basic-auth --password=""',
   )
   def testDisableBasicAuthWithPassword(self, flags):
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     with self.assertRaises(c_util.Error):
       self.Run(
@@ -558,7 +623,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testSetUsernameError(self):
     """Correctly handle errors from the GKE API."""
 
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     username = 'person'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetMasterAuth(
@@ -578,7 +643,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self._TestUpdateAsync(update, flags)
 
   def _TestUpdateNoAsync(self, update, flags):
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectUpdateCluster(
         cluster_name=name,
@@ -595,7 +660,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
              cluster=name, zone=self.ZONE, project=self.PROJECT_ID))
 
   def _TestUpdateAsync(self, update, flags):
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectUpdateCluster(
         cluster_name=name,
@@ -605,7 +670,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
              ' update {0} {1} --async'.format(name, flags))
 
   def _TestUpdateMasterAuth(self, action, update, password, flags):
-    name = u'tosetmasterauth'
+    name = 'tosetmasterauth'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetMasterAuth(
         cluster_name=name,
@@ -639,7 +704,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
             self.msgs.SetLabelsRequest.ResourceLabelsValue.
             AdditionalProperty(key='k', value='v')
         ],)
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name), zone=location)
     self.ExpectGetCluster(self._RunningCluster(name=name), zone=location)
     self.ExpectSetLabels(
@@ -669,7 +734,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
             self.msgs.SetLabelsRequest.ResourceLabelsValue.
             AdditionalProperty(key='k', value='v')
         ],)
-    name = u'tobeupdatedsame'
+    name = 'tobeupdatedsame'
     cluster_kwargs = {
         'name':
             name,
@@ -695,7 +760,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
   def _TestUpdateLabelsToEmpty(self):
     desired = self.msgs.SetLabelsRequest.ResourceLabelsValue()
-    name = u'tobeupdatedempty'
+    name = 'tobeupdatedempty'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetLabels(
@@ -710,7 +775,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def _TestRemoveLabels(self):
-    name = u'toberemoved'
+    name = 'toberemoved'
     cluster_kwargs = {
         'name':
             name,
@@ -742,7 +807,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def _TestRemoveAllLabels(self):
-    name = u'alltoberemoved'
+    name = 'alltoberemoved'
     cluster_kwargs = {
         'name':
             name,
@@ -770,7 +835,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def _TestRemoveNoLabels(self):
-    name = u'nonetoberemoved'
+    name = 'nonetoberemoved'
     cluster_kwargs = {
         'name':
             name,
@@ -804,7 +869,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
     self.AssertErrContains('Updating {cluster}'.format(cluster=name))
 
   def _TestRemoveFromClusterWithNoLabels(self):
-    name = u'toberemovednolabels'
+    name = 'toberemovednolabels'
     cluster_kwargs = {'name': name}
     self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
     self.ExpectGetCluster(self._RunningCluster(**cluster_kwargs))
@@ -816,7 +881,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
                              .format(name))
 
   def _TestRemoveNonExistentLabel(self):
-    name = u'toberemovednonexistentlabel'
+    name = 'toberemovednonexistentlabel'
     cluster_kwargs = {
         'name':
             name,
@@ -837,7 +902,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
   def testSetNetworkPolicySuccess(self):
     """Correctly handle the success case."""
-    name = u'tosetnetworkpolicy'
+    name = 'tosetnetworkpolicy'
     self.WriteInput('y')
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetNetworkPolicy(
@@ -851,7 +916,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
   def testSetNetworkPolicyAbort(self):
     """Correctly handle the success case."""
-    name = u'tosetnetworkpolicy'
+    name = 'tosetnetworkpolicy'
     self.WriteInput('n')
     self.ExpectGetCluster(self._RunningCluster(name=name))
     with self.assertRaises(console_io.OperationCancelledError):
@@ -862,7 +927,7 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
   def testSetMaintenancePolicy(self):
     """Correctly handle the success case."""
-    name = u'tosetmaintenancewindow'
+    name = 'tosetmaintenancewindow'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectSetMaintenanceWindow(
         cluster_name=name,
@@ -989,7 +1054,7 @@ class UpdateTestAlphaV1API(base.AlphaTestBase, UpdateTestBetaV1API):
     self.api_mismatch = True
 
   def testEnableAutoprovisioning(self):
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     with self.assertRaises(c_util.Error):
       self.Run(
@@ -1073,7 +1138,7 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
     self._TestUpdate(update=update, flags=flags)
 
   def testEnableAutoprovisioningNoLimitsInvalid(self):
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     with self.assertRaises(c_util.Error):
       self.Run(
@@ -1083,7 +1148,7 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
                            ' to enable autoprovisioning.')
 
   def testEnableAutoprovisioningAcceleratorTypeMismatch(self):
-    name = u'tobeupdated'
+    name = 'tobeupdated'
     self.ExpectGetCluster(self._RunningCluster(name=name))
     with self.assertRaises(c_util.Error):
       self.Run(

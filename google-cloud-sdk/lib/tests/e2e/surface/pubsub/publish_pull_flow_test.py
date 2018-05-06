@@ -11,13 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Integration tests for CPS topic and subscription publish/pull flows."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import random
 import time
 
 from tests.lib import e2e_utils
 from tests.lib import test_case
 from tests.lib.surface.pubsub import e2e_base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class PubsubIntegrationTest(e2e_base.CloudPubsubTestBase):
@@ -36,7 +43,7 @@ class PubsubIntegrationTest(e2e_base.CloudPubsubTestBase):
     messages = []
     random.seed(time.time())
 
-    for _ in xrange(3):
+    for _ in range(3):
       rmsg = random.randint(0, 20)
       self.Run(
           'pubsub topics publish {0} --message msg_{1} --attribute k1=v1,k2=v2'
@@ -64,13 +71,13 @@ class PubsubIntegrationTest(e2e_base.CloudPubsubTestBase):
     from the subscription.
     """
     id_gen = e2e_utils.GetResourceNameGenerator(prefix='cpstest')
-    topic_name = id_gen.next()
-    subscription_name = id_gen.next()
+    topic_name = next(id_gen)
+    subscription_name = next(id_gen)
 
-    with self._CreateTopic(topic_name):
-      with self._CreateSubscription(topic_name, subscription_name):
-        messages = self._PublishMessages(topic_name)
-        self._PullMessages(subscription_name, messages)
+    with self._CreateTopic(topic_name), \
+         self._CreateSubscription(topic_name, subscription_name):
+      messages = self._PublishMessages(topic_name)
+      self._PullMessages(subscription_name, messages)
 
 
 if __name__ == '__main__':

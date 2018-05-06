@@ -2,10 +2,11 @@ NAME
     gcloud alpha compute images export - export a Google Compute Engine image
 
 SYNOPSIS
-    gcloud alpha compute images export IMAGE_NAME
-        --destination-uri=DESTINATION_URI [--async]
-        [--export-format=EXPORT_FORMAT] [--log-location=LOG_LOCATION]
-        [--timeout=TIMEOUT; default="2h"] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute images export --destination-uri=DESTINATION_URI
+        (--image=IMAGE | --image-family=IMAGE_FAMILY) [--async]
+        [--export-format=EXPORT_FORMAT] [--image-project=IMAGE_PROJECT]
+        [--log-location=LOG_LOCATION] [--timeout=TIMEOUT; default="2h"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute images export exports Virtual Disk images from
@@ -17,14 +18,20 @@ DESCRIPTION
     The --export-format flag will export the image to a format supported by
     QEMU using qemu-img. Valid formats include vmdk, vhdx, vpc, vdi, and qcow2.
 
-POSITIONAL ARGUMENTS
-     IMAGE_NAME
-        The name of the disk image to export.
-
 REQUIRED FLAGS
      --destination-uri=DESTINATION_URI
         The Google Cloud Storage URI destination for the exported virtual disk
         file.
+
+     Exactly one of these must be specified:
+
+       --image=IMAGE
+          The name of the disk image to export.
+
+       --image-family=IMAGE_FAMILY
+          The family of the disk image to be exported. When a family is used
+          instead of an image, the latest non-deprecated image associated with
+          that family is used.
 
 OPTIONAL FLAGS
      --async
@@ -33,6 +40,17 @@ OPTIONAL FLAGS
 
      --export-format=EXPORT_FORMAT
         Specify the format to export to, such as vmdk, vhdx, vpc, or qcow2.
+
+     --image-project=IMAGE_PROJECT
+        The project against which all image and image family references will be
+        resolved. It is best practice to define image-project.
+        * If specifying one of our public images, image-project must be
+          provided.
+        * If there are several of the same image-family value in multiple
+          projects, image-project must be specified to clarify the image to be
+          used.
+        * If not specified and either image or image-family is provided, the
+          current default project is used.
 
      --log-location=LOG_LOCATION
         Directory in Google Cloud Storage to hold build logs. If not set,
@@ -54,5 +72,8 @@ NOTES
     users of ALPHA commands and flags need to apply for access, agree to
     applicable terms, and have their projects whitelisted. Contact Google or
     sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud compute images export
+        $ gcloud beta compute images export
 

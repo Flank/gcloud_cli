@@ -31,21 +31,21 @@ class RegenTest(cli_test_base.CliTestBase):
 
   def testMissingConfig(self):
     config_file = os.path.join(self.temp_path, 'DOES_NOT_EXIST')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         regen_utils.ConfigFileError,
         ur'{} Not found'.format(re.escape(config_file))):
       self.Run(u'meta apis regen compute/v1 --config {}'.format(config_file))
 
   def testBadConfig(self):
     config_file = self.Touch(self.temp_path, 'blank')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         regen_utils.ConfigFileError,
         ur'{} does not have format of gcloud api config file'
         .format(re.escape(config_file))):
       self.Run(u'meta apis regen compute/v1 --config {}'.format(config_file))
 
   def testRegenMissingAPI(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         regen_utils.UnknownApi,
         ur'api \[asdfasdf/v1\] not found in "apis" section of {}. '
         ur'Use \[gcloud meta apis list\] to see available apis.'

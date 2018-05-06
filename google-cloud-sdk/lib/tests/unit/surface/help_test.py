@@ -18,35 +18,35 @@ from tests.lib import cli_test_base
 class HelpTest(cli_test_base.CliTestBase):
 
   def testHelpGroupHFlag(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('-h')
     self.AssertOutputContains('Usage: gcloud [optional flags]')
 
   def testHelpCommandHFlag(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('info -h')
     self.AssertOutputContains('Usage: gcloud info [optional flags]')
 
   def testHelpGroupHelpFlag(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('--help')
     self.AssertOutputContains('gcloud - manage Google Cloud Platform resources '
                               'and developer workflow')
 
   def testHelpCommandHelpFlag(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('info --help')
     self.AssertOutputContains('gcloud info - display information about the '
                               'current gcloud environment')
 
   def testHelpGroupHelp(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('help')
     self.AssertOutputContains('gcloud - manage Google Cloud Platform resources '
                               'and developer workflow')
 
   def testHelpCommandHelp(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('help info')
     self.AssertOutputContains('gcloud info - display information about the '
                               'current gcloud environment')
@@ -57,7 +57,7 @@ class HelpTest(cli_test_base.CliTestBase):
       self.Run('junk -h')
 
   def testHelpBadSecondCommandUnknownHFlag(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('info junk -h')
     self.AssertOutputContains('Usage: gcloud info [optional flags]')
 
@@ -67,7 +67,7 @@ class HelpTest(cli_test_base.CliTestBase):
       self.Run('junk --help')
 
   def testHelpBadSecondCommandUnknownHelpFlag(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('info junk --help')
     self.AssertOutputContains('gcloud info - display information about the '
                               'current gcloud environment')
@@ -78,7 +78,7 @@ class HelpTest(cli_test_base.CliTestBase):
       self.Run('help junk')
 
   def testHelpBadSecondCommandUnknownHelp(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('help info junk')
     self.AssertOutputContains('gcloud info - display information about the '
                               'current gcloud environment')

@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha ml speech recognize AUDIO --language-code=LANGUAGE_CODE
         [--encoding=ENCODING; default="encoding-unspecified"]
-        [--filter-profanity] [--hints=[HINTS,...]]
+        [--filter-profanity] [--hints=[HINTS,...]] [--include-word-confidence]
         [--include-word-time-offsets]
         [--max-alternatives=MAX_ALTERNATIVES; default=1]
         [--sample-rate=SAMPLE_RATE] [GCLOUD_WIDE_FLAG ...]
@@ -50,6 +50,10 @@ OPTIONAL FLAGS
         used to add additional words to the vocabulary of the recognizer. See
         https://cloud.google.com/speech/limits#content.
 
+     --include-word-confidence
+        Include a list of words and the confidence for those words in the top
+        result.
+
      --include-word-time-offsets
         If True, the top result includes a list of words with the start and end
         time offsets (timestamps) for those words. If False, no word-level time
@@ -71,8 +75,8 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 API REFERENCE
-    This command uses the speech/v1 API. The full documentation for this API
-    can be found at: https://cloud.google.com/speech/
+    This command uses the speech/v1p1beta1 API. The full documentation for this
+    API can be found at: https://cloud.google.com/speech/
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

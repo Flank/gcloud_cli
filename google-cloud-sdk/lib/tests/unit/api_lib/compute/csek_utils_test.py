@@ -53,26 +53,26 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
         project='proj1')
 
   def testBadUriPattern(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         r'Invalid value for \[uri\] pattern: \[foo\]'):
       csek_utils.UriPattern('foo')
 
   def testParseFailEmptyString(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         'No JSON object could be decoded'):
       csek_utils.CsekKeyStore._ParseAndValidate('')
 
   def testParseFailNotArray(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         'Key file\'s top-level element must be a JSON list.'):
       csek_utils.CsekKeyStore._ParseAndValidate('{ }')
 
   def testParseFailShortKey(self):
     disk = self._MakeDiskRef()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         r'Key should contain 44 characters \(including padding\), '
         r'but is \[4\] characters long.'):
@@ -84,7 +84,7 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
 
   def testParseFailKeyNotBase64UrlChars(self):
     disk = self._MakeDiskRef()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         r'Base64 encoded strings contain only'):
       csek_utils.CsekKeyStore._ParseAndValidate('''
@@ -95,7 +95,7 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
 
   def testParseFailBadPadding(self):
     disk = self._MakeDiskRef()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         r'Bad padding.  Keys should end with an \'=\' character.'):
       csek_utils.CsekKeyStore._ParseAndValidate('''
@@ -106,7 +106,7 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
 
   def testParseFaileBadKeyType(self):
     disk = self._MakeDiskRef()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         r'Invalid key type \[rAW\]'):
       csek_utils.CsekKeyStore(
@@ -118,7 +118,7 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
 
   def testParseOkEmpty(self):
     mks = csek_utils.CsekKeyStore('[]')
-    self.assertEquals(len(mks), 0)
+    self.assertEqual(len(mks), 0)
 
   def testExerciseSingletonFileRawKey(self):
     disk1 = self._MakeDiskRef(DISK1_NAME, 'v1')
@@ -131,17 +131,17 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
              "key": "abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA=",
              "key-type": "raw" }} ]
         """.format(disk1))
-    self.assertEquals(len(mks), 1)
-    self.assertEquals(
+    self.assertEqual(len(mks), 1)
+    self.assertEqual(
         mks.LookupKey(disk1).key_material,
         'abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA=')
-    self.assertEquals(
+    self.assertEqual(
         mks.LookupKey(disk1_alpha).key_material,
         'abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA=')
-    self.assertEquals(
+    self.assertEqual(
         mks.LookupKey(disk1_beta).key_material,
         'abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA=')
-    self.assertEquals(mks.LookupKey(disk2), None)
+    self.assertEqual(mks.LookupKey(disk2), None)
 
   def testExerciseSingletonFileWrappedKeyAllowed(self):
     disk1 = self._MakeDiskRef(DISK1_NAME)
@@ -153,13 +153,13 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
              "key-type": "rsa-encrypted" }} ]
         """.format(disk1, SAMPLE_WRAPPED_KEY),
         allow_rsa_encrypted=True)
-    self.assertEquals(len(mks), 1)
-    self.assertEquals(mks.LookupKey(disk1).key_material, SAMPLE_WRAPPED_KEY)
-    self.assertEquals(mks.LookupKey(disk2), None)
+    self.assertEqual(len(mks), 1)
+    self.assertEqual(mks.LookupKey(disk1).key_material, SAMPLE_WRAPPED_KEY)
+    self.assertEqual(mks.LookupKey(disk2), None)
 
   def testExerciseSingletonFileWrappedKeyNotAllowed(self):
     disk = self._MakeDiskRef()
-    with self.assertRaisesRegexp(csek_utils.BadKeyTypeException, re.escape(
+    with self.assertRaisesRegex(csek_utils.BadKeyTypeException, re.escape(
         'Invalid key type [rsa-encrypted]: this feature is only allowed in the '
         'alpha and beta versions of this command.')):
       csek_utils.CsekKeyStore(
@@ -172,8 +172,8 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
   def testExerciseBadKeyInFileWithTwoEntries(self):
     disk1 = self._MakeDiskRef(DISK1_NAME, 'v1')
     disk2 = self._MakeDiskRef(DISK2_NAME, 'v1')
-    with self.assertRaisesRegexp(csek_utils.InvalidKeyException,
-                                 disk2.RelativeName()):
+    with self.assertRaisesRegex(csek_utils.InvalidKeyException,
+                                disk2.RelativeName()):
       csek_utils.CsekKeyStore(
           """
           [ {{ "uri": "{0}",

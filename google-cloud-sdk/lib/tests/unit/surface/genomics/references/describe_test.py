@@ -34,7 +34,7 @@ class DescribeTest(base.GenomicsUnitTest):
     self.mocked_client.references.Get.Expect(
         request=self.messages.GenomicsReferencesGetRequest(referenceId=ref.id),
         response=ref)
-    self.assertEquals(ref, self.RunGenomics(['references', 'describe', ref.id]))
+    self.assertEqual(ref, self.RunGenomics(['references', 'describe', ref.id]))
 
     self.AssertOutputContains(ref.id)
     self.AssertOutputContains(str(ref.length))
@@ -49,8 +49,8 @@ class DescribeTest(base.GenomicsUnitTest):
     self.mocked_client.references.Get.Expect(
         request=self.messages.GenomicsReferencesGetRequest(referenceId='1000',),
         exception=self.MakeHttpError(404, 'Reference not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Reference not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Reference not found: 1000'):
       self.RunGenomics(['references', 'describe', '1000'])
 
 if __name__ == '__main__':

@@ -30,6 +30,7 @@ class RemoteCompletionTest(base.DnsMockTest, cli_test_base.CliTestBase):
         self.messages.ManagedZonesListResponse(
             managedZones=util.GetManagedZones()[:1]))
 
+  @test_case.Filters.skip('Update resource args & add completion', 'b/78003303')
   def testDescribeCompletion(self):
     self.RunCompletion('dns managed-zones describe m',
                        ['mz'])

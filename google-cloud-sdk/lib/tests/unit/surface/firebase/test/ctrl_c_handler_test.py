@@ -18,13 +18,13 @@ import signal
 from googlecloudsdk.api_lib.firebase.test import ctrl_c_handler
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test.android import unit_base
 
 
 MATRIX_ID = 'matrix99'
 
 
-class CancellableTestSectionTests(unit_base.TestMockClientTest):
+class CancellableTestSectionTests(unit_base.AndroidMockClientTest):
 
   @test_case.Filters.DoNotRunOnWindows
   def testCancellableTestSectionWithSigint(self):

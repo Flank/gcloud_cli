@@ -13,6 +13,7 @@
 # limitations under the License.
 """Unit tests for source_files_util module."""
 
+from __future__ import absolute_import
 import re
 
 from googlecloudsdk.api_lib.app import util
@@ -74,18 +75,18 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
         util_mock.assert_called_once_with(self.temp_path, skip_files_regex)
         gcloud_mock.assert_not_called()
 
-  def testSkipFilesAndGcloudignoreNewRuntimeNoError(self):
-    """.gcloudignore and skip_files on Node Standard does not error out."""
+  def testSkipFilesAndGcloudignoreNewRuntimeRaisesError(self):
+    """.gcloudignore and skip_files on Node Standard should error out."""
     self.Touch(self.temp_path, '.gcloudignore')
-    source_files_util.GetSourceFileIterator(
-        self.temp_path, re.compile(r'.'), True, 'nodejs8',
-        util.Environment.STANDARD)
+    with self.assertRaises(source_files_util.SkipFilesError):
+      source_files_util.GetSourceFileIterator(
+          self.temp_path, re.compile(r'.'), True, 'nodejs8',
+          util.Environment.STANDARD)
 
   def testSkipFilesAndGcloudignoreOldRuntimeRaisesError(self):
     """.gcloudignore and skip_files on Python2.7 Standard should error out."""
     self.Touch(self.temp_path, '.gcloudignore')
-    with self.assertRaises(
-        source_files_util.SkipFilesGcloudignoreConflictError):
+    with self.assertRaises(source_files_util.SkipFilesError):
       source_files_util.GetSourceFileIterator(
           self.temp_path, re.compile(r'.'), True, 'python27',
           util.Environment.STANDARD)

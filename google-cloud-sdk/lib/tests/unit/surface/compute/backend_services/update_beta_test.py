@@ -286,6 +286,90 @@ class WithHealthcheckApiTest(BetaUpdateTestBase):
       self.RunUpdate('my-backend-service --health-checks foo '
                      '--https-health-checks bar')
 
+  def testWithUpdateCustomRequestHeaders(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._backend_services[0]],
+        [],
+    ])
+
+    self.RunUpdate(
+        'backend-service-1 --global --custom-request-header \'test: \' '
+        '--custom-request-header \'another: {client_country}\'')
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  description='my backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-1'),
+                  timeoutSec=30,
+                  customRequestHeaders=['test: ', 'another: {client_country}']),
+              project='my-project'))],
+    )
+
+  def testWithClearingCustomRequestHeaders(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.BackendService(
+                backends=[],
+                description='my backend service',
+                healthChecks=[
+                    ('https://www.googleapis.com/compute/beta/projects/'
+                     'my-project/global/httpHealthChecks/my-health-check')
+                ],
+                name='backend-service-1',
+                portName='http',
+                protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                selfLink=(
+                    'https://www.googleapis.com/compute/beta/projects/'
+                    'my-project/global/backendServices/backend-service-1'),
+                timeoutSec=30,
+                customRequestHeaders=['test: '])
+        ],
+        [],
+    ])
+    self.RunUpdate('backend-service-1 --no-custom-request-headers')
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  description='my backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-1'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
 
 class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(
     BetaUpdateTestBase):
@@ -601,21 +685,21 @@ class WithIAPApiTest(BetaUpdateTestBase):
       self._backend_services[0].iap = old_iap
 
   def testInvalidIAPEmpty(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'^Invalid value for \[--iap\]: Must provide value when specifying '
         r'--iap$',
         self.RunUpdate, 'backend-service-1 --iap=""')
 
   def testInvalidIapArgCombinationEnabledDisabled(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Must specify only one '
         'of \\[enabled\\] or \\[disabled\\]$',
         self.RunUpdate, 'backend-service-1 --iap enabled,disabled')
 
   def testInvalidIapArgCombinationEnabledOnlyClientId(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -623,7 +707,7 @@ class WithIAPApiTest(BetaUpdateTestBase):
         'backend-service-1 --iap enabled,oauth2-client-id=CLIENTID')
 
   def testInvalidIapArgCombinationEnabledOnlyClientSecret(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -631,7 +715,7 @@ class WithIAPApiTest(BetaUpdateTestBase):
         'backend-service-1 --iap enabled,oauth2-client-secret=SECRET')
 
   def testInvalidIapArgCombinationEmptyIdValue(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -640,7 +724,7 @@ class WithIAPApiTest(BetaUpdateTestBase):
         '--iap enabled,oauth2-client-id=,oauth2-client-secret=SECRET')
 
   def testInvalidIapArgCombinationEmptySecretValue(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -649,7 +733,7 @@ class WithIAPApiTest(BetaUpdateTestBase):
         '--iap enabled,oauth2-client-id=CLIENTID,oauth2-client-secret=')
 
   def testInvalidIapArgInvalidSubArg(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'^Invalid value for \[--iap\]: Invalid sub-argument \'invalid-arg1\'$',
         self.RunUpdate,
@@ -1141,7 +1225,7 @@ class WithCustomCacheKeysApiUpdateTest(BetaUpdateTestBase):
         [self._backend_services_include_all_custom_cache_key],
         [],
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         backend_services_utils.CacheKeyQueryStringException,
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
@@ -1154,7 +1238,7 @@ class WithCustomCacheKeysApiUpdateTest(BetaUpdateTestBase):
         [self._backend_services_include_all_custom_cache_key],
         [],
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         backend_services_utils.CacheKeyQueryStringException,
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
@@ -1349,6 +1433,113 @@ class SetSecurityPolicyTest(BetaUpdateTestBase):
               project='my-project',
               securityPolicyReference=messages.SecurityPolicyReference(
                   securityPolicy=self.my_policy.SelfLink())))],)
+
+
+class WithCdnSignedUrlApiUpdateTest(BetaUpdateTestBase):
+  """Tests CDN Signed URL update flags."""
+
+  def SetUp(self):
+    self.make_requests.side_effect = iter([
+        [self._backend_services[0]],
+        [],
+    ])
+
+  def CheckRequestMadeWithCdnPolicy(self, expected_message):
+    """Verifies the request was made with the expected CDN policy."""
+    messages = self.messages
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  cdnPolicy=expected_message,
+                  description='my backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-1'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
+  def testSetValidCacheMaxAge(self):
+    """Tests updating backend service with a valid cache max age."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 456789
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=456789))
+
+  def testUpdateWithCacheMaxAgeZero(self):
+    """Tests updating backend service with a cache max age of 0."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 0
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=0))
+
+  def testUpdateWithCacheMaxAgeSeconds(self):
+    """Tests updating backend service with a cache max age in seconds."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 7890s
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=7890))
+
+  def testUpdateWithCacheMaxAgeMinutes(self):
+    """Tests updating backend service with a cache max age in minutes."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 234m
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=234 * 60))
+
+  def testUpdateWithCacheMaxAgeHours(self):
+    """Tests updating backend service with a cache max age in hours."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 38h
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=38 * 60 *
+                                              60))
+
+  def testUpdateWithCacheMaxAgeDays(self):
+    """Tests updating backend service with a cache max age in days."""
+    self.RunUpdate("""
+        backend-service-1 --signed-url-cache-max-age 99d
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=99 * 24 *
+                                              60 * 60))
+
+  def testSetInvalidCacheMaxAge(self):
+    """Tests updating backend service with an invalid cache max age."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --signed-url-cache-max-age: given value must be of the form '
+        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
+        r'invalid-value'):
+      self.RunUpdate("""
+          backend-service-1 --signed-url-cache-max-age invalid-value
+          """)
+
+  def testSetCacheMaxAgeNegative(self):
+    """Tests updating backend service with a negative cache max age."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --signed-url-cache-max-age: given value must be of the form '
+        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+      self.RunUpdate("""
+          backend-service-1 --signed-url-cache-max-age -1
+          """)
 
 
 if __name__ == '__main__':

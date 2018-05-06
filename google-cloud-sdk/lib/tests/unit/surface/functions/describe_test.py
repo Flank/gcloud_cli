@@ -115,7 +115,7 @@ class FunctionsGetTest(base.FunctionsTestBase,
     # Remove credentials.
     self.FakeAuthSetCredentialsPresent(False)
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_AUTH_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_AUTH_REGEXP):
       self.Run('functions describe my-test')
 
 
@@ -126,7 +126,7 @@ class FunctionsGetWithoutProjectTest(base.FunctionsTestBase):
 
   def testGetNoProject(self):
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_PROJECT_REGEXP):
       self.Run('functions describe my-test')
 
 if __name__ == '__main__':

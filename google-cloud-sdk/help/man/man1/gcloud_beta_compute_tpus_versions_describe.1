@@ -1,0 +1,83 @@
+
+.TH "GCLOUD_BETA_COMPUTE_TPUS_VERSIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute tpus versions describe \- describe a Tensorflow version available for Cloud TPUs
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute tpus versions describe\fR (\fIVERSION\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Get details on a Tensorflow version.
+
+To get a list of available Tesnorflow versions for your location run:
+
+.RS 2m
+$ gcloud beta compute tpus versions list
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+VERSION \- The Tensorflow version you want to describe. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: Set the property [core/project] or provide the
+flag [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIVERSION\fR
+The ID of the tensorflowversion or a fully qualified identifier for the
+tensorflowversion. This positional must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The compute/zone of the Cloud TPU.
+
+If not specified, will use \f5default\fR compute/zone.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBtpu/v1alpha1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/tpu/
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha compute tpus versions describe
+.RE
+

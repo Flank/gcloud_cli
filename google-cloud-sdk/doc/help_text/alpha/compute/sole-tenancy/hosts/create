@@ -8,7 +8,14 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create Google Compute Engine sole-tenancy hosts.
+    (ALPHA) (DEPRECATED) (REMOVED) Create Google Compute Engine sole-tenancy
+    hosts.
+
+    New host creation is disabled. Please use gcloud alpha compute sole-tenancy
+    node-groups instead.
+
+    This command group is deprecated. Please use gcloud alpha compute
+    sole-tenancy node-groups instead.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
@@ -24,7 +31,7 @@ FLAGS
 
      --zone=ZONE
         The zone of the hosts to create. If not specified and the compute/zone
-        property isn't set, you will be prompted to select a zone.
+        property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

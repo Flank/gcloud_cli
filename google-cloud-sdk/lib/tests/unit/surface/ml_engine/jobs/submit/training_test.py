@@ -96,7 +96,7 @@ class TrainTestBase(object):
     try:
       yield
     except exc_type as err:
-      self.assertEquals(err.exit_code, exit_code)
+      self.assertEqual(err.exit_code, exit_code)
     else:
       self.fail('Should have raised googlecloudsdk.exceptions.Error')
 
@@ -108,8 +108,8 @@ class TrainTestBase(object):
     ])
 
   def _ExpectCreate(self, scale_tier=None, runtime_version=None,
-                    job_dir='gs://job-bucket/job-prefix', args=None,
-                    labels=None):
+                    python_version=None, job_dir='gs://job-bucket/job-prefix',
+                    args=None, labels=None):
     self.client.projects_jobs.Create.Expect(
         self._MakeCreateRequest(
             self.short_msgs.Job(
@@ -122,6 +122,7 @@ class TrainTestBase(object):
                     region='us-central1',
                     jobDir=job_dir,
                     runtimeVersion=runtime_version,
+                    pythonVersion=python_version,
                     args=args or [])),
             parent='projects/{}'.format(self.Project())),
         self.short_msgs.Job(
@@ -132,7 +133,8 @@ class TrainTestBase(object):
                 scaleTier=scale_tier,
                 region='us-central1',
                 jobDir=job_dir,
-                runtimeVersion=runtime_version),
+                runtimeVersion=runtime_version,
+                pythonVersion=python_version),
             state=self.state_enum.QUEUED,
             labels=labels,
             startTime='2016-01-01T00:00:00Z')
@@ -345,6 +347,33 @@ class TrainTestBase(object):
         '    --job-dir gs://job-bucket/job-prefix '
         '    --region us-central1 '
         '    --runtime-version 0.12')
+
+    self.upload_mock.assert_called_once_with(
+        packages=[], package_path='stuff/',
+        staging_location=self.staging_location)
+    self.AssertErrContains("""\
+        Job [my_job] submitted successfully.
+        Your job is still active. \
+        You may view the status of your job with the command
+
+          $ gcloud ml-engine jobs describe my_job
+
+        or continue streaming the logs with the command
+
+          $ gcloud ml-engine jobs stream-logs my_job
+        """, normalize_space=True)
+
+  def testTrain_AsyncPythonVersion(self):
+    self._ExpectCreate(python_version='2.7')
+
+    self.Run(
+        'ml-engine jobs submit training my_job '
+        '    --module-name my_module '
+        '    --package-path stuff/ '
+        '    --staging-bucket gs://bucket '
+        '    --job-dir gs://job-bucket/job-prefix '
+        '    --region us-central1 '
+        '    --python-version 2.7')
 
     self.upload_mock.assert_called_once_with(
         packages=[], package_path='stuff/',

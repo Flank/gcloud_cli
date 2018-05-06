@@ -30,7 +30,7 @@ class InstanceConfigsClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstanceConfigsGetRequest(
             name=ref.RelativeName()),
         response=response)
-    self.assertEquals(instance_configs.Get('cfgId'), response)
+    self.assertEqual(instance_configs.Get('cfgId'), response)
 
   def testList(self):
     config_list = [self.msgs.InstanceConfig()]

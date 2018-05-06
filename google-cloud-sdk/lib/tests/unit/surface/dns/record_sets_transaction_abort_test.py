@@ -30,9 +30,9 @@ class RecordSetsTransactionAbortTest(base.DnsMockTest):
     with self.assertRaises(ToolException) as context:
       self.Run(
           'dns record-sets transaction abort -z {0}'.format(test_zone.name))
-      self.assertEquals(context.exception.message,
-                        'transaction not found at [{0}]'.format(
-                            transaction_util.DEFAULT_PATH))
+      self.assertEqual(context.exception.message,
+                       'transaction not found at [{0}]'.format(
+                           transaction_util.DEFAULT_PATH))
 
   def testTransactionAbort(self):
     open(transaction_util.DEFAULT_PATH, 'w').close()
@@ -51,9 +51,9 @@ class RecordSetsTransactionAbortBetaTest(base.DnsMockBetaTest):
     with self.assertRaises(ToolException) as context:
       self.Run(
           'dns record-sets transaction abort -z {0}'.format(test_zone.name))
-      self.assertEquals(context.exception.message,
-                        'transaction not found at [{0}]'.format(
-                            transaction_util.DEFAULT_PATH))
+      self.assertEqual(context.exception.message,
+                       'transaction not found at [{0}]'.format(
+                           transaction_util.DEFAULT_PATH))
 
   def testTransactionAbort(self):
     open(transaction_util.DEFAULT_PATH, 'w').close()

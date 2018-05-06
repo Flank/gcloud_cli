@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core.updater import schemas
 from googlecloudsdk.core.updater import snapshots
 from googlecloudsdk.core.util import platforms
@@ -39,8 +41,8 @@ class SnapshotsTests(util.Base):
   def testURLs(self):
     snapshot = self.CreateSnapshotFromStrings(1, 'a', '')
     url = self.URLFromFile(self.CreateTempSnapshotFileFromSnapshot(snapshot))
-    with self.assertRaisesRegexp(snapshots.URLFetchError,
-                                 '(additional component repository)'):
+    with self.assertRaisesRegex(snapshots.URLFetchError,
+                                '(additional component repository)'):
       snapshot.FromURLs(url, 'file://junk')
     junk = self.URLFromFile(self.Touch(self.temp_path, contents='asdfasdf'))
     with self.assertRaises(snapshots.MalformedSnapshotError):
@@ -54,8 +56,8 @@ class SnapshotsTests(util.Base):
             version=None, gcloud_rel_path=None, post_processing_command=None,
             components=[a], notifications={}))
     # Invalid dependency should be removed
-    self.assertEquals(set(['a']),
-                      snapshot.DependencyClosureForComponents(['a']))
+    self.assertEqual(set(['a']),
+                     snapshot.DependencyClosureForComponents(['a']))
 
   def testGetDependencies(self):
     snapshot = self.CreateSnapshotFromStrings(
@@ -373,16 +375,16 @@ class SnapshotsTests(util.Base):
         platforms.Platform(platforms.OperatingSystem.WINDOWS, None))
 
     # We only include the size of b in the size of a.
-    self.assertEquals(
+    self.assertEqual(
         1, snapshot.GetEffectiveComponentSize('a', platform_filter=None))
     # c is a regular component with data just return its size.
-    self.assertEquals(
+    self.assertEqual(
         2, snapshot.GetEffectiveComponentSize('c', platform_filter=None))
     # asdf does not exist.  It has no size.
-    self.assertEquals(
+    self.assertEqual(
         0, snapshot.GetEffectiveComponentSize('asdf', platform_filter=None))
     # f does not match this platform.  It has no size.
-    self.assertEquals(
+    self.assertEqual(
         0, snapshot.GetEffectiveComponentSize('f', platform_filter=None))
 
 

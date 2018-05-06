@@ -28,9 +28,10 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      Attestation parameters. At most one of these may be specified:
 
-       --public-key-file=PUBLIC_KEY_FILE
-          Path to file containing the public key to store. This flag must be
-          specified if any of the other arguments in this group are specified.
+       v1 (BUILD_DETAILS) attestation parameters.
+
+         --public-key-file=PUBLIC_KEY_FILE
+            Path to file containing the public key to store.
 
        v2 (ATTESTATION_AUTHORITY) attestation parameters.
 

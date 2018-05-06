@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """e2e tests for Cloud Storage parallel file operations."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import filecmp
 
 import os
@@ -64,15 +66,25 @@ class UploadDownloadTest(e2e_base.WithServiceAuth):
         download_path = os.path.join(self.temp_path, 'download_file')
         self.storage_client.CopyFileFromGCS(bucket, self.object_path,
                                             download_path)
+
+        # Now download again using ReadObject, the in-memory version of
+        # CopyFileFromGCS
+        object_ref = storage_util.ObjectReference(bucket, self.object_path)
+        stream = self.storage_client.ReadObject(object_ref)
+
+    # Check regular file download
     self.AssertFileExists(download_path)
     actual_contents = self.GetFileContents(download_path, encoding='utf-8')
     self.assertEqual(contents, actual_contents)
+
+    # Check stream download
+    self.assertEqual(stream.getvalue().decode('utf-8'), contents)
 
   def testCopyFileToAndFromGcs(self):
     self._TestUploadAndDownload('test file content.')
 
   def testCopyFileToAndFromGcs_NonAscii(self):
-    self._TestUploadAndDownload(u'\u0394')
+    self._TestUploadAndDownload('\u0394')
 
   @test_case.Filters.skip('Flaky.', 'b/38446187')
   def testCopyFileToAndFromGcs_LargeFile(self):

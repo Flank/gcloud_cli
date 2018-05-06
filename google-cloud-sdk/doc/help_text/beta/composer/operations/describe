@@ -1,0 +1,34 @@
+NAME
+    gcloud beta composer operations describe - get details about an
+        asynchronous operation
+
+SYNOPSIS
+    gcloud beta composer operations describe (OPERATION : --location=LOCATION)
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Get details about an asynchronous operation.
+
+POSITIONAL ARGUMENTS
+     OPERATION - The operation to describe. The arguments in this group can be
+     used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
+
+       OPERATION
+          The ID of the operation or a fully qualified identifier for the
+          operation. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          The Cloud location for the operation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

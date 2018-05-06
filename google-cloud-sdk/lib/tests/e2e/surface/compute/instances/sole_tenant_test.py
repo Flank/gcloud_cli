@@ -15,6 +15,7 @@
 
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -49,6 +50,7 @@ class SoleTenantTest(e2e_instances_test_base.InstancesTestBase):
     for name, res_type, scope in self._created_resources[::-1]:
       self.CleanUpResource(name, res_type, scope=scope)
 
+  @test_case.Filters.skip('Failing', 'b/77953407')
   def testCreateInstanceOnSoleTenancyHost(self):
     host = self._CreateHost()
     name = self._name_generator.next()

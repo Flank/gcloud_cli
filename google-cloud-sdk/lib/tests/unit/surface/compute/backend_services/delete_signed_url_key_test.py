@@ -18,11 +18,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute import backend_services_test_base
 
 
-class BackendServiceDeleteSignedUrlKeyTest(
+class BackendServiceDeleteSignedUrlKeyTestBeta(
     backend_services_test_base.BackendServicesTestBase):
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
   def testWithKeyNameArg(self):
     """Tests deleting a key is successful."""
@@ -50,6 +50,13 @@ class BackendServiceDeleteSignedUrlKeyTest(
         'argument --key-name: Must be specified.'):
       self.RunBackendServices('delete-signed-url-key ' +
                               backend_service_ref.Name())
+
+
+class BackendServiceDeleteSignedUrlKeyTestAlpha(
+    BackendServiceDeleteSignedUrlKeyTestBeta):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

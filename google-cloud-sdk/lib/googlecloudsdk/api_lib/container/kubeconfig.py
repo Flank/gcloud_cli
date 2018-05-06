@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Utilities for loading and parsing kubeconfig."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.core import config
@@ -66,9 +68,9 @@ class Kubeconfig(object):
     Raises:
       Error: don't have the permission to open kubeconfig file.
     """
-    self._data['clusters'] = self.clusters.values()
-    self._data['users'] = self.users.values()
-    self._data['contexts'] = self.contexts.values()
+    self._data['clusters'] = list(self.clusters.values())
+    self._data['users'] = list(self.users.values())
+    self._data['contexts'] = list(self.contexts.values())
     # We use os.open here to explicitly set file mode 0600.
     # the flags passed should mimic behavior of open(self._filename, 'w'),
     # which does write with truncate and creates file if not existing.
@@ -169,15 +171,16 @@ def Cluster(name, server, ca_path=None, ca_data=None):
   }
 
 
-def User(name, token=None, username=None, password=None, auth_provider=None,
-         cert_path=None, cert_data=None, key_path=None, key_data=None):
+def User(name,
+         auth_provider=None,
+         cert_path=None,
+         cert_data=None,
+         key_path=None,
+         key_data=None):
   """Generate and return a user kubeconfig object.
 
   Args:
     name: str, nickname for this user entry.
-    token: str, bearer token.
-    username: str, basic auth user.
-    password: str, basic auth password.
     auth_provider: str, authentication provider.
     cert_path: str, path to client certificate file.
     cert_data: str, base64 encoded client certificate data.
@@ -187,21 +190,15 @@ def User(name, token=None, username=None, password=None, auth_provider=None,
     dict, valid kubeconfig user entry.
 
   Raises:
-    Error: if no auth info is provided (token or username AND password)
+    Error: if no auth info is provided (auth_provider or cert AND key)
   """
   # TODO(b/70856999) Figure out what the correct behavior for client certs is.
-  if (not auth_provider and not token and not cert_path and not cert_data and
-      (not username or not password)):
-    raise Error('either auth_provider, token or username & password must be'
-                ' provided')
+  if not (auth_provider or (cert_path and key_path) or
+          (cert_data and key_data)):
+    raise Error('either auth_provider or cert & key must be provided')
   user = {}
   if auth_provider:
     user['auth-provider'] = _AuthProvider(name=auth_provider)
-  elif token:
-    user['token'] = token
-  else:
-    user['username'] = username
-    user['password'] = password
 
   if cert_path and cert_data:
     raise Error('cannot specify both cert_path and cert_data')

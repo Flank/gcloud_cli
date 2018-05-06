@@ -10,7 +10,7 @@ DESCRIPTION
     (ALPHA) This command describes a Cloud Product Search ReferenceImage.
 
 POSITIONAL ARGUMENTS
-     REFERENCE_IMAGE - The reference-image to describe. The arguments in this
+     REFERENCE IMAGE - The reference-image to describe. The arguments in this
      group can be used to specify the attributes of this resource. This must be
      specified.
 

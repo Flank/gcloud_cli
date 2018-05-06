@@ -52,8 +52,8 @@ class UpdateTest(base.GenomicsUnitTest):
                 variantSetIds=['123'],),
             callSetId='1000',),
         exception=self.MakeHttpError(404, 'Callset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Callset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Callset not found: 1000'):
       self.RunGenomics(['callsets', 'update', '1000',
                         '--name', 'callset-name-new'])
 

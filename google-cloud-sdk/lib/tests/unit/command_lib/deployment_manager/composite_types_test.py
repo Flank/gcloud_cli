@@ -14,6 +14,8 @@
 
 """Tests for DM composite_types command_lib."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.deployment_manager import exceptions
@@ -35,12 +37,12 @@ class CompositeTypeCommandTest(unit_test_base.CompositeTypesUnitTestBase):
     template_path = self.GetTestFilePath('simple.jinja')
     actual_template = composite_types.TemplateContentsFor(self.messages,
                                                           template_path)
-    self.assertEquals(self.GetExpectedSimpleTemplate(), actual_template)
+    self.assertEqual(self.GetExpectedSimpleTemplate(), actual_template)
 
   def testTemplateContentsFor_NotTemplate(self):
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 'No path or name for a config, template, or '
-                                 'composite type was specified.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                'No path or name for a config, template, or '
+                                'composite type was specified.'):
       composite_types.TemplateContentsFor(self.messages, '')
 
   def testTemplateFlagFileTypeSuccess(self):
@@ -49,7 +51,7 @@ class CompositeTypeCommandTest(unit_test_base.CompositeTypesUnitTestBase):
 
   def testTemplateFlagFileTypeFailure(self):
     for value in ['boo.pi', '123.jnja']:
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           arg_parsers.ArgumentTypeError,
           re.escape('Bad value [{0}]: must be a python (".py") or jinja '
                     '(".jinja") file'.format(value))):

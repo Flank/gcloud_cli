@@ -14,6 +14,7 @@
 
 """Flags and helpers for the compute forwarding-rules commands."""
 
+from __future__ import absolute_import
 import textwrap
 
 from googlecloudsdk.calliope import arg_parsers
@@ -386,12 +387,12 @@ def AddPortsAndPortRange(parser):
       """)
 
 
-def AddNetworkTier(parser, include_alpha, for_update):
+def AddNetworkTier(parser, supports_network_tier_flag, for_update):
   """Adds network tier flag."""
 
   # This arg is a string simulating enum NetworkTier because one of the
   # option SELECT is hidden since it's not advertised to all customers.
-  if include_alpha:
+  if supports_network_tier_flag:
     if for_update:
       parser.add_argument(
           '--network-tier',

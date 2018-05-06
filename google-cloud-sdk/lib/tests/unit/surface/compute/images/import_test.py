@@ -13,60 +13,18 @@
 # limitations under the License.
 """Tests for the images import subcommand."""
 
-import uuid
-
-from apitools.base.py import encoding
-from apitools.base.py.testing import mock as client_mocker
-
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core import properties
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resources import InvalidResourceException
-from tests.lib import e2e_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
+from tests.lib.surface.compute import daisy_test_base
 
 
-class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
+class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-
-    self.mocked_cloudbuild_v1 = client_mocker.Client(
-        core_apis.GetClientClass('cloudbuild', 'v1'),
-    )
-    self.mocked_cloudbuild_v1.Mock()
-    self.addCleanup(self.mocked_cloudbuild_v1.Unmock)
-    self.cloudbuild_v1_messages = core_apis.GetMessagesModule(
-        'cloudbuild', 'v1')
-
-    self.mocked_storage_v1 = client_mocker.Client(
-        core_apis.GetClientClass('storage', 'v1'))
-    self.mocked_storage_v1.Mock()
-    self.addCleanup(self.mocked_storage_v1.Unmock)
-    self.storage_v1_messages = core_apis.GetMessagesModule(
-        'storage', 'v1')
-
-    self.mocked_crm_v1 = client_mocker.Client(
-        core_apis.GetClientClass('cloudresourcemanager', 'v1'))
-    self.mocked_crm_v1.Mock()
-    self.addCleanup(self.mocked_crm_v1.Unmock)
-    self.crm_v1_messages = core_apis.GetMessagesModule(
-        'cloudresourcemanager', 'v1')
-
-    self.mocked_servicemanagement_v1 = client_mocker.Client(
-        core_apis.GetClientClass('servicemanagement', 'v1'))
-    self.mocked_servicemanagement_v1.Mock()
-    self.addCleanup(self.mocked_servicemanagement_v1.Unmock)
-    self.servicemanagement_v1_messages = core_apis.GetMessagesModule(
-        'servicemanagement', 'v1')
-
-    self.uuid_mock = self.StartObjectPatch(uuid, 'uuid4')
-    self.uuid_mock.return_value = uuid.UUID('12345678123456781234567812345678')
-
-    properties.VALUES.core.project.Set('my-project')
-    self._statuses = self.cloudbuild_v1_messages.Build.StatusValueValuesEnum
 
     self.source_disk = 'gs://31dd/source-image.vmdk'
     self.https_source_disk = ('https://storage.googleapis.com/'
@@ -86,7 +44,7 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
               self.import_workflow,],
         name=self.daisy_builder,
     )
-    self.daisy_import_and_translate_step = self.cloudbuild_v1_messages.BuildStep(  # pylint: disable=line-too-long
+    self.daisy_import_translate_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
               ('-variables=image_name={0},'
                'source_disk_file={1},'
@@ -97,90 +55,7 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
         name=self.daisy_builder,
     )
 
-    self.project = self.crm_v1_messages.Project(
-        projectId='my-project', projectNumber=123456)
-    admin_permissions_binding = self.crm_v1_messages.Binding(
-        members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
-        role='roles/compute.admin')
-    iam_permissions_binding = self.crm_v1_messages.Binding(
-        members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
-        role='roles/iam.serviceAccountActor')
-    self.permissions = self.crm_v1_messages.Policy(
-        bindings=[admin_permissions_binding, iam_permissions_binding])
-    self.services = self.servicemanagement_v1_messages.ListServicesResponse(
-        services=[self.servicemanagement_v1_messages.ManagedService(
-            serviceName='cloudbuild.googleapis.com')]
-    )
-
-  def testCommonCase(self):
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_and_translate_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_and_translate_step],
-        tags=['gce-daisy'],
-        status=self._statuses.SUCCESS,
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
-
+  def AddStorageRewriteMock(self):
     self.mocked_storage_v1.objects.Rewrite.Expect(
         self.storage_v1_messages.StorageObjectsRewriteRequest(
             destinationBucket='my-project-daisy-bkt',
@@ -199,13 +74,9 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
         ),
     )
 
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
+  def testCommonCase(self):
+    self.PrepareDaisyMocks(self.daisy_import_translate_step)
+    self.AddStorageRewriteMock()
 
     self.Run("""
              compute images import {0}
@@ -218,104 +89,13 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
         """, normalize_space=True)
 
   def testCommonCaseNoTranslate(self):
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_step],
-        status=self._statuses.SUCCESS,
-        tags=['gce-daisy'],
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
-
-    self.mocked_storage_v1.objects.Rewrite.Expect(
-        self.storage_v1_messages.StorageObjectsRewriteRequest(
-            destinationBucket='my-project-daisy-bkt',
-            destinationObject=('tmpimage/12345678-1234-5678-1234-567812345678'
-                               '-source-image.vmdk'),
-            sourceBucket='31dd',
-            sourceObject='source-image.vmdk',
-        ),
-        response=self.storage_v1_messages.RewriteResponse(
-            resource=self.storage_v1_messages.Object(
-                bucket='my-project-daisy-bkt',
-                name='source-image.vmdk',
-                generation=123,
-            ),
-            done=True,
-        ),
-    )
+    self.PrepareDaisyMocks(self.daisy_import_step)
+    self.AddStorageRewriteMock()
 
     self.Run("""
              compute images import {0}
              --source-file {1}
-             --no-translate
+             --data-disk
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
@@ -331,105 +111,13 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
     https://storage.googleapis.com/bucket/image.vmdk and translate it to
     gs://bucket/image.vmdk automatically.
     """
-
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_step],
-        status=self._statuses.SUCCESS,
-        tags=['gce-daisy'],
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
-
-    self.mocked_storage_v1.objects.Rewrite.Expect(
-        self.storage_v1_messages.StorageObjectsRewriteRequest(
-            destinationBucket='my-project-daisy-bkt',
-            destinationObject=('tmpimage/12345678-1234-5678-1234-567812345678'
-                               '-source-image.vmdk'),
-            sourceBucket='31dd',
-            sourceObject='source-image.vmdk',
-        ),
-        response=self.storage_v1_messages.RewriteResponse(
-            resource=self.storage_v1_messages.Object(
-                bucket='my-project-daisy-bkt',
-                name='source-image.vmdk',
-                generation=123,
-            ),
-            done=True,
-        ),
-    )
+    self.PrepareDaisyMocks(self.daisy_import_step)
+    self.AddStorageRewriteMock()
 
     self.Run("""
              compute images import {0}
              --source-file {1}
-             --no-translate
+             --data-disk
              """.format(self.image_name, self.https_source_disk))
 
     self.AssertOutputContains("""\
@@ -452,95 +140,25 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
       self.Run("""
                compute images import {0}
                --source-file {1}
-               --no-translate
+               --data-disk
                """.format(self.image_name,
                           'https://example.com/not-a-gcs-bucket/file.vmdk'))
 
   def testTranslateFromImage(self):
-    import_workflow = (
-        '../workflows/image_import/ubuntu/translate_ubuntu_1604.wf.json')
+    target_workflow = '../workflows/image_import/import_from_image.wf.json'
+    translate_workflow = 'ubuntu/translate_ubuntu_1604.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-variables=image_name={0},source_image=global/images/{1}'
-              .format(self.destination_image, self.source_image),
-              import_workflow,],
+              ('-variables=image_name={0},'
+               'translate_workflow={1},'
+               'source_image=global/images/{2}').format(
+                   self.destination_image,
+                   translate_workflow,
+                   self.source_image),
+              target_workflow,],
         name=self.daisy_builder,
     )
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[daisy_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[daisy_step],
-        status=self._statuses.SUCCESS,
-        tags=['gce-daisy'],
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
+    self.PrepareDaisyMocks(daisy_step)
 
     self.Run("""
              compute images import --source-image {0}
@@ -553,94 +171,25 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
         """, normalize_space=True)
 
   def testTranslateWithCustomWorkflow(self):
-    import_workflow = (
-        '../workflows/image_import/ubuntu/translate_ubuntu_1604.wf.json')
+    target_workflow = '../workflows/image_import/import_from_image.wf.json'
+    translate_workflow = 'ubuntu/translate_ubuntu_1604_custom.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
-              '-variables=image_name={0},source_image=global/images/{1}'
-              .format(self.destination_image, self.source_image),
-              import_workflow,],
+              ('-variables=image_name={0},'
+               'translate_workflow={1},'
+               'source_image=global/images/{2}').format(
+                   self.destination_image,
+                   translate_workflow,
+                   self.source_image),
+              target_workflow,],
         name=self.daisy_builder,
     )
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[daisy_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
 
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[daisy_step],
-        status=self._statuses.SUCCESS,
-        tags=['gce-daisy'],
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
+    self.PrepareDaisyMocks(daisy_step)
 
     self.Run("""
              compute images import --source-image {0}
-             --custom-workflow ubuntu/translate_ubuntu_1604.wf.json
+             --custom-workflow ubuntu/translate_ubuntu_1604_custom.wf.json
              {1}
              """.format(self.source_image, self.destination_image))
 
@@ -650,83 +199,8 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
         """, normalize_space=True)
 
   def testAsync(self):
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_and_translate_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_and_translate_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
-
-    self.mocked_storage_v1.objects.Rewrite.Expect(
-        self.storage_v1_messages.StorageObjectsRewriteRequest(
-            destinationBucket='my-project-daisy-bkt',
-            destinationObject=('tmpimage/12345678-1234-5678-1234-567812345678'
-                               '-source-image.vmdk'),
-            sourceBucket='31dd',
-            sourceObject='source-image.vmdk',
-        ),
-        response=self.storage_v1_messages.RewriteResponse(
-            resource=self.storage_v1_messages.Object(
-                bucket='my-project-daisy-bkt',
-                name='source-image.vmdk',
-                generation=123,
-            ),
-            done=True,
-        ),
-    )
+    self.PrepareDaisyMocks(self.daisy_import_translate_step, async_flag=True)
+    self.AddStorageRewriteMock()
 
     self.Run("""
              compute images import {0}
@@ -738,104 +212,13 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
                            'v1/projects/my-project/builds/1234]')
 
   def testTimeoutFlag(self):
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_step],
-        tags=['gce-daisy'],
-        timeout='60s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_step],
-        tags=['gce-daisy'],
-        status=self._statuses.SUCCESS,
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='60s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
-
-    self.mocked_storage_v1.objects.Rewrite.Expect(
-        self.storage_v1_messages.StorageObjectsRewriteRequest(
-            destinationBucket='my-project-daisy-bkt',
-            destinationObject=('tmpimage/12345678-1234-5678-1234-567812345678'
-                               '-source-image.vmdk'),
-            sourceBucket='31dd',
-            sourceObject='source-image.vmdk',
-        ),
-        response=self.storage_v1_messages.RewriteResponse(
-            resource=self.storage_v1_messages.Object(
-                bucket='my-project-daisy-bkt',
-                name='source-image.vmdk',
-                generation=123,
-            ),
-            done=True,
-        ),
-    )
+    self.PrepareDaisyMocks(self.daisy_import_step, timeout='60s')
+    self.AddStorageRewriteMock()
 
     self.Run("""
              compute images import {0}
              --source-file {1} --timeout 1m
-             --no-translate
+             --data-disk
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
@@ -844,105 +227,14 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
         """, normalize_space=True)
 
   def testLogLocation(self):
-    log_location = 'gs://foo/bar'
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_step],
-        tags=['gce-daisy'],
-        logsBucket=log_location,
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_step],
-        tags=['gce-daisy'],
-        status=self._statuses.SUCCESS,
-        logsBucket=log_location,
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/foo/bar/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
-
-    self.mocked_storage_v1.objects.Rewrite.Expect(
-        self.storage_v1_messages.StorageObjectsRewriteRequest(
-            destinationBucket='my-project-daisy-bkt',
-            destinationObject=('tmpimage/12345678-1234-5678-1234-567812345678'
-                               '-source-image.vmdk'),
-            sourceBucket='31dd',
-            sourceObject='source-image.vmdk',
-        ),
-        response=self.storage_v1_messages.RewriteResponse(
-            resource=self.storage_v1_messages.Object(
-                bucket='my-project-daisy-bkt',
-                name='source-image.vmdk',
-                generation=123,
-            ),
-            done=True,
-        ),
-    )
+    log_location = 'foo/bar'
+    self.PrepareDaisyMocks(self.daisy_import_step, log_location=log_location)
+    self.AddStorageRewriteMock()
 
     self.Run("""
              compute images import {0}
-             --source-file {1} --log-location {2}
-             --no-translate
+             --source-file {1} --log-location gs://{2}
+             --data-disk
              """.format(self.image_name, self.source_disk, log_location))
 
     self.AssertOutputContains("""\
@@ -954,7 +246,6 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
     missing_permissions = self.crm_v1_messages.Policy(
         bindings=[],
     )
-
     self.mocked_crm_v1.projects.Get.Expect(
         self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
             projectId='my-project',
@@ -973,7 +264,6 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
     self.mocked_crm_v1.projects.GetIamPolicy.Expect(
         self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
             resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
         ),
         response=missing_permissions,
     )
@@ -1012,25 +302,6 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
                """.format(self.image_name, self.source_disk))
 
   def testAddMissingPermissions(self):
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_and_translate_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_and_translate_step],
-        tags=['gce-daisy'],
-        status=self._statuses.SUCCESS,
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
     admin_permissions_binding = self.crm_v1_messages.Binding(
         members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
         role='roles/compute.admin',
@@ -1039,59 +310,13 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
     missing_permissions = self.crm_v1_messages.Policy(
         bindings=[admin_permissions_binding],
     )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
+    self.PrepareDaisyMocks(self.daisy_import_translate_step,
+                           permissions=missing_permissions)
+    self.AddStorageRewriteMock()
 
     self.mocked_crm_v1.projects.GetIamPolicy.Expect(
         self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
             resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=missing_permissions,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
         ),
         response=self.permissions,
     )
@@ -1106,6 +331,114 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
         response=self.permissions,
     )
 
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --quiet
+             --os ubuntu-1604
+             """.format(self.image_name, self.source_disk))
+
+    self.AssertOutputContains("""\
+        Here is some streamed
+        data for you to print
+        """, normalize_space=True)
+
+  def testUploadLocalFile(self):
+    mocked_run_gsutil_command = self.StartPatch(
+        'googlecloudsdk.api_lib.storage.storage_util.RunGsutilCommand',
+        return_value=0)
+
+    self.PrepareDaisyMocks(self.daisy_import_step)
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1}
+             --data-disk
+             """.format(self.image_name, self.local_source_disk))
+
+    self.AssertOutputContains("""\
+        Here is some streamed
+        data for you to print
+        """, normalize_space=True)
+
+    # Expect exactly one call to "gsutil cp <local file> <GCS URI>".
+    mocked_run_gsutil_command.assert_called_once_with(
+        'cp', [self.local_source_disk, self.copied_source])
+
+  def testUploadLocalFileWithSpacesInPath(self):
+    """The same as the last test, except with spaces in the file path."""
+    mocked_run_gsutil_command = self.StartPatch(
+        'googlecloudsdk.api_lib.storage.storage_util.RunGsutilCommand',
+        return_value=0)
+
+    self.PrepareDaisyMocks(self.daisy_import_step)
+
+    path_with_spaces = './my cool directory/source image.vmdk'
+    self.Run("""
+             compute images import {0}
+             --source-file "{1}"
+             --data-disk
+             """.format(self.image_name, path_with_spaces))
+
+    self.AssertOutputContains("""\
+        Here is some streamed
+        data for you to print
+        """, normalize_space=True)
+
+    # Expect exactly one call to "gsutil cp <local file> <GCS URI>".
+    mocked_run_gsutil_command.assert_called_once_with(
+        'cp', [path_with_spaces, self.copied_source])
+
+  def testWarnOnOva(self):
+    source_disk = 'gs://31dd/source-image.ova'
+    copied_source = ('gs://my-project-daisy-bkt/tmpimage/12345678-'
+                     '1234-5678-1234-567812345678-source-image.ova')
+    daisy_import_translate_step = self.cloudbuild_v1_messages.BuildStep(
+        args=['-gcs_path=gs://my-project-daisy-bkt/',
+              ('-variables=image_name={0},'
+               'source_disk_file={1},'
+               'translate_workflow={2}').format(
+                   self.image_name, copied_source,
+                   'ubuntu/translate_ubuntu_1604.wf.json'),
+              '../workflows/image_import/import_and_translate.wf.json'],
+        name=self.daisy_builder,
+    )
+    self.PrepareDaisyMocks(daisy_import_translate_step)
+
+    self.mocked_storage_v1.objects.Rewrite.Expect(
+        self.storage_v1_messages.StorageObjectsRewriteRequest(
+            destinationBucket='my-project-daisy-bkt',
+            destinationObject=('tmpimage/12345678-1234-5678-1234-567812345678'
+                               '-source-image.ova'),
+            sourceBucket='31dd',
+            sourceObject='source-image.ova',
+        ),
+        response=self.storage_v1_messages.RewriteResponse(
+            resource=self.storage_v1_messages.Object(
+                bucket='my-project-daisy-bkt',
+                name='source-image.ova',
+                generation=123,
+            ),
+            done=True,
+        ),
+    )
+
+    self.Run("""
+             compute images import {0}
+             --source-file {1} --os ubuntu-1604
+             """.format(self.image_name, source_disk))
+
+    self.AssertErrContains('The specified input file may contain more than '
+                           'one virtual disk.')
+    self.AssertOutputContains("""\
+        Here is some streamed
+        data for you to print
+        """, normalize_space=True)
+
+  def testGcloudBailsWhenFileUploadFails(self):
+    mocked_run_gsutil_command = self.StartPatch(
+        'googlecloudsdk.api_lib.storage.storage_util.RunGsutilCommand')
+    mocked_run_gsutil_command.return_value = 1
+
     self.mocked_storage_v1.buckets.Insert.Expect(
         self.storage_v1_messages.StorageBucketsInsertRequest(
             bucket=self.storage_v1_messages.Bucket(
@@ -1114,6 +447,32 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
         ),
         response='foo',
     )
+
+    with self.assertRaises(exceptions.FailedSubCommand):
+      self.Run("""
+               compute images import {0}
+               --source-file {1}
+               --data-disk
+               """.format(self.image_name, self.local_source_disk))
+
+    mocked_run_gsutil_command.assert_called_once_with(
+        'cp', [self.local_source_disk, self.copied_source])
+
+    self.AssertErrContains('Failed to upload file.')
+
+  def testDaisyUsesZoneFlag(self):
+    import_and_translate_step_with_zone = self.cloudbuild_v1_messages.BuildStep(  # pylint: disable=line-too-long
+        args=['-zone=us-west1-c',
+              '-gcs_path=gs://my-project-daisy-bkt/',
+              ('-variables=image_name={0},'
+               'source_disk_file={1},'
+               'translate_workflow={2}').format(
+                   self.image_name, self.copied_source,
+                   'ubuntu/translate_ubuntu_1604.wf.json'),
+              '../workflows/image_import/import_and_translate.wf.json'],
+        name=self.daisy_builder,
+    )
+    self.PrepareDaisyMocks(import_and_translate_step_with_zone)
 
     self.mocked_storage_v1.objects.Rewrite.Expect(
         self.storage_v1_messages.StorageObjectsRewriteRequest(
@@ -1135,206 +494,14 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
 
     self.Run("""
              compute images import {0}
-             --source-file {1} --quiet
-             --os ubuntu-1604
+             --source-file {1} --os ubuntu-1604
+             --zone us-west1-c
              """.format(self.image_name, self.source_disk))
 
     self.AssertOutputContains("""\
         Here is some streamed
         data for you to print
         """, normalize_space=True)
-
-  def testUploadLocalFile(self):
-    mocked_run_gsutil_command = self.StartPatch(
-        'googlecloudsdk.api_lib.storage.storage_util.RunGsutilCommand')
-
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_step],
-        status=self._statuses.SUCCESS,
-        tags=['gce-daisy'],
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
-
-    self.Run("""
-             compute images import {0}
-             --source-file {1}
-             --no-translate
-             """.format(self.image_name, self.local_source_disk))
-
-    self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
-        """, normalize_space=True)
-
-    # Expect exactly one call to "gsutil cp <local file> <GCS URI>".
-    mocked_run_gsutil_command.assert_called_once_with(
-        'cp', [self.local_source_disk, self.copied_source])
-
-  def testUploadLocalFileWithSpacesInPath(self):
-    """The same as the last test, except with spaces in the file path."""
-    mocked_run_gsutil_command = self.StartPatch(
-        'googlecloudsdk.api_lib.storage.storage_util.RunGsutilCommand')
-
-    buildin = self.cloudbuild_v1_messages.Build(
-        steps=[self.daisy_import_step],
-        tags=['gce-daisy'],
-        timeout='7200s',
-    )
-
-    buildout = self.cloudbuild_v1_messages.Build(
-        id='1234',
-        projectId='my-project',
-        steps=[self.daisy_import_step],
-        status=self._statuses.SUCCESS,
-        tags=['gce-daisy'],
-        logsBucket='gs://my-project_cloudbuild/logs',
-        timeout='7200s',
-    )
-    op_metadata = self.cloudbuild_v1_messages.BuildOperationMetadata(
-        build=buildout,
-    )
-
-    self.AddHTTPResponse(
-        'https://storage.googleapis.com/my-project_cloudbuild/'
-        'logs/log-1234.txt',
-        request_headers={'Range': 'bytes=0-'}, status=200,
-        body='Here is some streamed\ndata for you to print\n')
-
-    self.mocked_cloudbuild_v1.projects_builds.Create.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsCreateRequest(
-            build=buildin,
-            projectId='my-project',
-        ),
-        response=self.cloudbuild_v1_messages.Operation(
-            metadata=encoding.JsonToMessage(
-                self.cloudbuild_v1_messages.Operation.MetadataValue,
-                encoding.MessageToJson(op_metadata)))
-    )
-
-    self.mocked_cloudbuild_v1.projects_builds.Get.Expect(
-        self.cloudbuild_v1_messages.CloudbuildProjectsBuildsGetRequest(
-            id='1234',
-            projectId='my-project',
-        ),
-        response=buildout,
-    )
-
-    self.mocked_crm_v1.projects.Get.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetRequest(
-            projectId='my-project',
-        ),
-        response=self.project,
-    )
-
-    self.mocked_servicemanagement_v1.services.List.Expect(
-        self.servicemanagement_v1_messages.ServicemanagementServicesListRequest(
-            consumerId='project:my-project',
-            pageSize=100,
-        ),
-        response=self.services,
-    )
-
-    self.mocked_crm_v1.projects.GetIamPolicy.Expect(
-        self.crm_v1_messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource='my-project',
-            getIamPolicyRequest=self.crm_v1_messages.GetIamPolicyRequest(),
-        ),
-        response=self.permissions,
-    )
-
-    self.mocked_storage_v1.buckets.Insert.Expect(
-        self.storage_v1_messages.StorageBucketsInsertRequest(
-            bucket=self.storage_v1_messages.Bucket(
-                name='my-project-daisy-bkt'),
-            project='my-project',
-        ),
-        response='foo',
-    )
-
-    path_with_spaces = './my cool directory/source image.vmdk'
-    self.Run("""
-             compute images import {0}
-             --source-file "{1}"
-             --no-translate
-             """.format(self.image_name, path_with_spaces))
-
-    self.AssertOutputContains("""\
-        Here is some streamed
-        data for you to print
-        """, normalize_space=True)
-
-    # Expect exactly one call to "gsutil cp <local file> <GCS URI>".
-    mocked_run_gsutil_command.assert_called_once_with(
-        'cp', [path_with_spaces, self.copied_source])
 
   def testMissingSource(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -1345,7 +512,7 @@ class ImagesCreateTest(e2e_base.WithMockHttp, test_base.BaseTest):
 
   def testMissingNoTranslateOrOsFlags(self):
     with self.AssertRaisesArgumentErrorMatches(
-        ('Exactly one of (--custom-workflow | --os | --no-translate) '
+        ('Exactly one of (--custom-workflow | --data-disk | --os) '
          'must be specified.')):
       self.Run("""
                compute images import --source-file {0} {1}

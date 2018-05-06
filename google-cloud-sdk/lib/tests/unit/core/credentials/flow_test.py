@@ -14,7 +14,9 @@
 
 """Tests for googlecloudsdk.core.credentials.flow."""
 
-from httplib import ResponseNotReady
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import socket
 import sys
 import webbrowser
@@ -24,6 +26,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import mock
+import six
 
 
 class FlowTest(test_case.WithInput, sdk_test_base.WithOutputCapture):
@@ -53,12 +56,13 @@ class FlowTest(test_case.WithInput, sdk_test_base.WithOutputCapture):
     self.AssertErrContains(self._AUTH_URL)
     webflow_mock.step2_exchange.assert_called_with(
         self._AUTH_CODE, http=http_mock)
-    self.assertEquals(cred, self._CREDENTIALS)
+    self.assertEqual(cred, self._CREDENTIALS)
 
   def testFlowResponseNotReady(self):
     webflow_mock = mock.Mock()
     webflow_mock.step1_get_authorize_url.return_value = self._AUTH_URL
-    webflow_mock.step2_exchange.side_effect = ResponseNotReady()
+    webflow_mock.step2_exchange.side_effect = (
+        six.moves.http_client.ResponseNotReady())
 
     http_mock = mock.Mock()
     self.WriteInput(self._AUTH_CODE)
@@ -89,7 +93,7 @@ class FlowTest(test_case.WithInput, sdk_test_base.WithOutputCapture):
         launch_browser=True,
         http=http_mock)
 
-    self.assertEquals(server_side_effect.attempt, 2)
+    self.assertEqual(server_side_effect.attempt, 2)
     webflow_mock.step1_get_authorize_url.assert_called_with()
     webbrowser_open_mock.assert_called_with(
         self._AUTH_URL, new=1, autoraise=True)
@@ -97,11 +101,11 @@ class FlowTest(test_case.WithInput, sdk_test_base.WithOutputCapture):
     self.AssertErrContains(self._AUTH_URL)
     webflow_mock.step2_exchange.assert_called_with(
         self._AUTH_CODE, http=http_mock)
-    self.assertEquals(cred, self._CREDENTIALS)
+    self.assertEqual(cred, self._CREDENTIALS)
 
   def testFlowWithMacChromeBrowser(self):
     self.StartObjectPatch(sys, 'platform', 'darwin')
-    reload(webbrowser)
+    six.moves.reload_module(webbrowser)
     webflow_mock = self._mockWebflow()
     http_mock = mock.Mock()
     http_server_mock = mock.Mock()
@@ -141,7 +145,7 @@ class FlowTest(test_case.WithInput, sdk_test_base.WithOutputCapture):
     self.AssertErrContains(self._AUTH_URL)
     webflow_mock.step2_exchange.assert_called_with(
         self._AUTH_CODE, http=http_mock)
-    self.assertEquals(cred, self._CREDENTIALS)
+    self.assertEqual(cred, self._CREDENTIALS)
 
 
 if __name__ == '__main__':

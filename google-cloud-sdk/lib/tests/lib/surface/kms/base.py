@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base classes and helpers for all gcloud kms tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from apitools.base.py.testing import mock

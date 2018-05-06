@@ -57,7 +57,7 @@ class EntriesWriteTest(base.LoggingTestBase):
 
   def testWriteInvalidJson(self):
     expected = r'Invalid JSON value: .*'
-    with self.assertRaisesRegexp(util.InvalidJSONValueError, expected):
+    with self.assertRaisesRegex(util.InvalidJSONValueError, expected):
       # Missing closing bracket.
       self.RunLogging('write my-log \'{"message": "my-payload"\' '
                       '--payload-type=json')

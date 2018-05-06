@@ -18,6 +18,8 @@ This should only be called by api_lib.util.apis, core.resources, gcloud meta
 commands, and module tests.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis_util
 from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.core import properties
@@ -61,7 +63,7 @@ def _GetVersions(api_name):
   version_map = apis_map.MAP.get(api_name, None)
   if version_map is None:
     raise apis_util.UnknownAPIError(api_name)
-  return version_map.keys()
+  return list(version_map.keys())
 
 
 def _GetApiDef(api_name, api_version):
@@ -141,6 +143,9 @@ def _GetClientInstance(api_name, api_version, no_http=False,
   Returns:
     base_api.BaseApiClient, An instance of the specified API client.
   """
+  # TODO(b/77278279): Decide whether we should always set this or not.
+  encoding = None if six.PY2 else 'utf8'
+
   # pylint: disable=g-import-not-at-top
   if no_http:
     http_client = None
@@ -148,7 +153,8 @@ def _GetClientInstance(api_name, api_version, no_http=False,
     # Import http only when needed, as it depends on credential infrastructure
     # which is not needed in all cases.
     from googlecloudsdk.core.credentials import http
-    http_client = http.Http(enable_resource_quota=enable_resource_quota)
+    http_client = http.Http(enable_resource_quota=enable_resource_quota,
+                            response_encoding=encoding)
 
   client_class = _GetClientClass(api_name, api_version)
   client_instance = client_class(
@@ -229,4 +235,6 @@ def _GetApiCollections(api_name, api_version):
           collection.collection_name,
           collection.path,
           collection.flat_paths,
-          collection.params)
+          collection.params,
+          collection.enable_uri_parsing,
+      )

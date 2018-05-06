@@ -17,7 +17,7 @@ gcloud alpha compute tpus list \- list Cloud TPUs
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR List Cloud TPUs.
+\fB(ALPHA)\fR List Cloud TPUs
 
 
 
@@ -25,11 +25,21 @@ gcloud alpha compute tpus list \- list Cloud TPUs
 
 .RS 2m
 .TP 2m
+
+ZONE \- The compute/zone of the Cloud TPU. If not specified, will use
+\f5default\fR compute/zone. This represents a Cloud resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: Set the property [core/project] or provide the
+flag [\-\-project] on the command line.
+
+
+.RS 2m
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
-The zone of the tpu to list. List TPUs from this zone. If not specified, will
-list TPUs in \f5default\fR compute/zone.
+The ID of the location or a fully qualified identifier for the location.
 
 
+.RE
 .RE
 .sp
 
@@ -79,6 +89,13 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBtpu/v1alpha1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/tpu/
 
 
 

@@ -16,16 +16,19 @@
 
 """Tests for the encoding  module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import sys
 
 from googlecloudsdk.core.util import encoding
 from tests.lib import test_case
+import six
 
 
 _ASCII = 'Unicode'
 _CP500 = _ASCII.encode('cp500')
-_ISO_8859_1 = '\xdc\xf1\xee\xe7\xf2\xd0\xe9'  # ÜñîçòÐé
-_UNICODE = u'Ṳᾔḯ¢◎ⅾℯ'
+_ISO_8859_1 = b'\xdc\xf1\xee\xe7\xf2\xd0\xe9'  # ÜñîçòÐé
+_UNICODE = 'Ṳᾔḯ¢◎ⅾℯ'
 _UTF8 = _UNICODE.encode('utf8')
 
 
@@ -108,9 +111,11 @@ class EncodingGetSetEncodedValueTests(test_case.Base):
     value = 'ascii'
     encoding.SetEncodedValue(d, 'foo', value)
     raw = d['foo']
-    self.assertFalse(isinstance(raw, unicode))
+    # If we're in python 3, the raw value is not encoded. In python 2, the raw
+    # value is encoded.
+    self.assertEqual(six.PY3, isinstance(raw, six.text_type))
     actual = encoding.GetEncodedValue(d, 'foo')
-    self.assertTrue(isinstance(actual, unicode))
+    self.assertTrue(isinstance(actual, six.text_type))
     self.assertEqual(value, actual)
 
     actual = encoding.GetEncodedValue(d, 'bar')
@@ -123,12 +128,14 @@ class EncodingGetSetEncodedValueTests(test_case.Base):
     self.StartObjectPatch(sys, 'getfilesystemencoding').return_value = 'utf8'
     d = {}
     self.assertEqual(d, {})
-    value = u'Ṳᾔḯ¢◎ⅾℯ'
+    value = 'Ṳᾔḯ¢◎ⅾℯ'
     encoding.SetEncodedValue(d, 'foo', value)
     raw = d['foo']
-    self.assertFalse(isinstance(raw, unicode))
+    # If we're in python 3, the raw value is not encoded. In python 2, the raw
+    # value is encoded.
+    self.assertEqual(six.PY3, isinstance(raw, six.text_type))
     actual = encoding.GetEncodedValue(d, 'foo')
-    self.assertTrue(isinstance(actual, unicode))
+    self.assertTrue(isinstance(actual, six.text_type))
     self.assertEqual(value, actual)
 
 

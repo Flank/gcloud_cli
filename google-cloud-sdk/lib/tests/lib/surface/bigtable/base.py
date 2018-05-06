@@ -14,6 +14,8 @@
 
 """Base class for all bigtable tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from apitools.base.py.testing import mock
@@ -26,7 +28,9 @@ from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
 
 
-class BigtableV2TestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
+class BigtableV2TestBase(sdk_test_base.WithFakeAuth,
+                         sdk_test_base.WithLogCapture,
+                         cli_test_base.CliTestBase):
   """Base class for Bigtable command unit tests hitting the v2 API."""
 
   def SetUp(self):
@@ -37,9 +41,6 @@ class BigtableV2TestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.msgs = core_apis.GetMessagesModule('bigtableadmin', 'v2')
-
-  def RunBT(self, command):
-    self.Run('bigtable ' + command)
 
   @contextlib.contextmanager
   def AssertHttpResponseError(self, svc, msg):

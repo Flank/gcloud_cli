@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import logging
 
 from googlecloudsdk.api_lib.util import exceptions
@@ -21,6 +24,8 @@ from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
+
+import six
 
 
 class HttpExceptionFormatTest(cli_test_base.CliTestBase):
@@ -84,20 +89,20 @@ url: <>
         url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
         content={
             'stuff': [
-                u'Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'),
+                'Ṳᾔḯ¢◎ⅾℯ',
             ],
             'debugInfo': {
                 'stackTrace': [
-                    u'file-1:line-1: Ṳᾔḯ¢◎ⅾℯ call-1'.encode('utf8'),
-                    u'file-2:line-2: Ṳᾔḯ¢◎ⅾℯ call-2'.encode('utf8'),
+                    'file-1:line-1: Ṳᾔḯ¢◎ⅾℯ call-1',
+                    'file-2:line-2: Ṳᾔḯ¢◎ⅾℯ call-2',
                 ],
                 'message': [
-                    u'Memory fault: Ṳᾔḯ¢◎ⅾℯ dumped'.encode('utf8'),
+                    'Memory fault: Ṳᾔḯ¢◎ⅾℯ dumped',
                 ],
             },
         },
-        message=u'A Ṳᾔḯ¢◎ⅾℯ error somewhere. Try and find it.'.encode('utf8'),
-        reason=u'A Ṳᾔḯ¢◎ⅾℯ error somewhere. Find and try it.'.encode('utf8'),
+        message='A Ṳᾔḯ¢◎ⅾℯ error somewhere. Try and find it.',
+        reason='A Ṳᾔḯ¢◎ⅾℯ error somewhere. Find and try it.',
     )
     exc = exceptions.HttpException(err, self._ERROR_FORMAT_ALL)
 
@@ -108,7 +113,7 @@ url: <>
     # needed. The raw JSON values are checked in this test because the they are
     # always preserved in the payload. That way the caller can debug
     # dump/decode/parse bugs using the original raw encoding.
-    expected = u"""api_name: <mock>
+    expected = """api_name: <mock>
 api_version: <v1>
 content: <debugInfo:
   message:
@@ -147,7 +152,7 @@ status_description: <A \u1e72\u1f94\u1e2f\xa2\u25ce\u217e\u212f error somewhere.
 status_message: <A \u1e72\u1f94\u1e2f\xa2\u25ce\u217e\u212f error somewhere. Try and find it.>
 url: <https://mock.googleapis.com/v1/projects/your-stuff/junk/mine>
 """
-    actual = unicode(exc)
+    actual = six.text_type(exc)
     self.maxDiff = None
     self.assertEqual(expected, actual)
 
@@ -472,7 +477,7 @@ stuff:
         url='https://mock.googleapis.com/v1/projects/your-stuff/junk/mine',
         content={
             'stuff': [
-                u'Ṳᾔḯ¢◎ⅾℯ',
+                'Ṳᾔḯ¢◎ⅾℯ',
             ],
             'debugInfo': {
                 'stackTrace': [
@@ -488,7 +493,7 @@ stuff:
     exc = exceptions.HttpException(
         err,
         'Error [{status_code}] {status_message}{url?\n{?}}{.stuff?\n{?}}')
-    self.assertEqual(u'''\
+    self.assertEqual('''\
 Error [400] Invalid request.
 https://mock.googleapis.com/v1/projects/your-stuff/junk/mine
 - "\\u1E72\\u1F94\\u1E2F\\xA2\\u25CE\\u217E\\u212F"''', exc.message)

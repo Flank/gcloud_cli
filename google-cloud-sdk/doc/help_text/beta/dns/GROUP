@@ -25,8 +25,11 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     dns-keys
+        (BETA) Manage Cloud DNS DNSKEY records.
+
      dnskeys
-        (BETA) Manage your Cloud DNS DnsKeys.
+        (BETA) (DEPRECATED) Manage Cloud DNS DNSKEY records.
 
      managed-zones
         (BETA) Manage your Cloud DNS managed-zones.

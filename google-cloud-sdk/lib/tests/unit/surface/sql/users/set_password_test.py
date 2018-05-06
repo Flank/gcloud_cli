@@ -67,7 +67,7 @@ class UsersSetPasswordTest(base.SqlMockTestBeta):
 
     result = self.Run('sql users set-password --instance my_instance '
                       'my_username my_host --password my_password --async')
-    self.assertEquals(result.name, 'op_name')
+    self.assertEqual(result.name, 'op_name')
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
 

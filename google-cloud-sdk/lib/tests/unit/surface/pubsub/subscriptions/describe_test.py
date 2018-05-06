@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'pubsub subscriptions describe' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
@@ -36,7 +40,7 @@ class SubscriptionsDescribeTest(base.CloudPubsubTestBase):
 
     result = self.Run('pubsub subscriptions describe subs1')
 
-    self.assertEquals(result, subscription)
+    self.assertEqual(result, subscription)
 
   def testSubscriptionsDescribeFullUri(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -49,7 +53,7 @@ class SubscriptionsDescribeTest(base.CloudPubsubTestBase):
     result = self.Run(
         'pubsub subscriptions describe {}'.format(sub_ref.SelfLink()))
 
-    self.assertEquals(result, subscription)
+    self.assertEqual(result, subscription)
 
 
 if __name__ == '__main__':

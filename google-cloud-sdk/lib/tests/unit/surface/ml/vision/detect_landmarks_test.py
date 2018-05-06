@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """beta ml vision tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import textwrap
 
@@ -23,12 +27,12 @@ from tests.lib.surface.ml.vision import base as vision_base
 
 
 @parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA),
-    ('Beta', base.ReleaseTrack.BETA),
-    ('GA', base.ReleaseTrack.GA))
-class DetectLandmarksTest(vision_base.MlVisionTestBase):
+    ('Alpha', base.ReleaseTrack.ALPHA, 'builtin/stable'),
+    ('Beta', base.ReleaseTrack.BETA, 'builtin/stable'),
+    ('GA', base.ReleaseTrack.GA, None))
+class DetectLandmarksCommonTest(vision_base.MlVisionTestBase):
 
-  def testDetectLandmarks_Success(self, track):
+  def testDetectLandmarks_Success(self, track, model):
     """Test `gcloud vision detect-landmarks` runs & displays correctly."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
@@ -36,7 +40,8 @@ class DetectLandmarksTest(vision_base.MlVisionTestBase):
         path_to_image,
         self.messages.Feature.TypeValueValuesEnum.LANDMARK_DETECTION,
         'landmarkAnnotations',
-        results=['Charon', 'Styx'])
+        results=['Charon', 'Styx'],
+        model=model)
     self.Run('ml vision detect-landmarks {path}'.format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
         {
@@ -57,7 +62,7 @@ class DetectLandmarksTest(vision_base.MlVisionTestBase):
         }
         """))
 
-  def testDetectLandmarks_LocalPath(self, track):
+  def testDetectLandmarks_LocalPath(self, track, model):
     """Test `gcloud vision detect-landmarks` with a local image path."""
     self.track = track
     tempdir = self.CreateTempDir()
@@ -67,8 +72,8 @@ class DetectLandmarksTest(vision_base.MlVisionTestBase):
         self.messages.Feature.TypeValueValuesEnum.LANDMARK_DETECTION,
         'landmarkAnnotations',
         results=['Charon', 'Styx'],
-        contents=bytes('image')
-    )
+        contents=b'image',
+        model=model)
     self.Run('ml vision detect-landmarks {path}'.format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
         {
@@ -89,7 +94,7 @@ class DetectLandmarksTest(vision_base.MlVisionTestBase):
         }
         """))
 
-  def testDetectLandmarks_MaxResults(self, track):
+  def testDetectLandmarks_MaxResults(self, track, model):
     """Test `gcloud vision detect-landmarks` with --max-results flag."""
     self.track = track
     path_to_image = 'https://example.com/fake-file'
@@ -98,11 +103,12 @@ class DetectLandmarksTest(vision_base.MlVisionTestBase):
         self.messages.Feature.TypeValueValuesEnum.LANDMARK_DETECTION,
         'landmarkAnnotations',
         max_results=4,
-        results=['Charon', 'Styx'])
+        results=['Charon', 'Styx'],
+        model=model)
     self.Run('ml vision detect-landmarks {path} '
              '--max-results 4'.format(path=path_to_image))
 
-  def testDetectLandmarks_Error(self, track):
+  def testDetectLandmarks_Error(self, track, model):
     """Test `gcloud vision detect-landmarks` when error is raised."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
@@ -110,10 +116,29 @@ class DetectLandmarksTest(vision_base.MlVisionTestBase):
         path_to_image,
         self.messages.Feature.TypeValueValuesEnum.LANDMARK_DETECTION,
         'landmarkAnnotations',
-        error_message='Not found.')
+        error_message='Not found.',
+        model=model)
     with self.AssertRaisesExceptionMatches(exceptions.Error,
                                            'Code: [400] Message: [Not found.]'):
       self.Run('ml vision detect-landmarks {path}'.format(path=path_to_image))
+
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA),
+    ('Beta', base.ReleaseTrack.BETA))
+class DetectLandmarksAlphaBetaTest(vision_base.MlVisionTestBase):
+
+  def testDetectLandmarks_ModelVersion(self, track):
+    self.track = track
+    path_to_image = 'https://example.com/fake-file'
+    self._ExpectEntityAnnotationRequest(
+        path_to_image,
+        self.messages.Feature.TypeValueValuesEnum.LANDMARK_DETECTION,
+        'landmarkAnnotations',
+        results=['Charon', 'Styx'],
+        model='builtin/latest')
+    self.Run('ml vision detect-landmarks {path} '
+             '--model-version builtin/latest'.format(path=path_to_image))
 
 
 if __name__ == '__main__':

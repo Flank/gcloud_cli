@@ -25,8 +25,14 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     dns-keys
+        Manage Cloud DNS DNSKEY records.
+
      managed-zones
         Manage your Cloud DNS managed-zones.
+
+     operations
+        Manage your Cloud DNS operations.
 
      project-info
         View Cloud DNS related information for a project.

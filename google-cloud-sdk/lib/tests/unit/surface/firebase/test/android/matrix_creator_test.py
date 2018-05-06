@@ -15,12 +15,13 @@
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test import test_utils
+from tests.lib.surface.firebase.test.android import unit_base
 
 TESTING_V1_MESSAGES = apis.GetMessagesModule('testing', 'v1')
 
 
-class MatrixCreatorTests(unit_base.TestMockClientTest):
+class MatrixCreatorTests(unit_base.AndroidMockClientTest):
   """Unit tests for api_lib/test/android/matrix_creator.MatrixCreator."""
 
   def testMatrixCreator_ValidateTestMatrixRequest_NoHistoryId(self):
@@ -58,7 +59,13 @@ class MatrixCreatorTests(unit_base.TestMockClientTest):
             'coverageFile': '/sdcard/tempDir'
         },
         obb_files=['gs://sea/hawks.obb', 'r/wilson.obb'],
-        timeout=321)
+        timeout=321,
+        additional_apks=['gs://sea/apk1.apk', 'r/apk2.apk'],
+        other_files={
+            'gs://sea/file1': '/sdcard/dir1',
+            'r/file2': '/sdcard/dir2'
+        },
+    )
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('id-3')
 
@@ -73,14 +80,27 @@ class MatrixCreatorTests(unit_base.TestMockClientTest):
     self.assertIsNotNone(spec.testSetup.account)
     self.assertIsNotNone(spec.testSetup.account.googleAuto)
 
-    obb_files = spec.testSetup.filesToPush
-    self.assertEqual(len(obb_files), 2)
-    self.assertEqual(obb_files[0].obbFile.obb.gcsPath,
-                     'gs://gatorade/2015-02-24/hawks.obb')
-    self.assertEqual(obb_files[1].obbFile.obb.gcsPath,
-                     'gs://gatorade/2015-02-24/wilson.obb')
-    self.assertEqual(obb_files[0].obbFile.obbFileName, 'hawks.obb')
-    self.assertEqual(obb_files[1].obbFile.obbFileName, 'wilson.obb')
+    files_to_push = spec.testSetup.filesToPush
+    self.assertEqual(len(files_to_push), 4)
+    self.assertIn(
+        self._BuildObbDeviceFile(
+            'hawks.obb', 'gs://gatorade/2015-02-24/hawks.obb'), files_to_push)
+    self.assertIn(
+        self._BuildObbDeviceFile(
+            'wilson.obb', 'gs://gatorade/2015-02-24/wilson.obb'), files_to_push)
+    self.assertIn(
+        self._BuildRegularDeviceFile('gs://gatorade/2015-02-24/file1',
+                                     '/sdcard/dir1'), files_to_push)
+    self.assertIn(
+        self._BuildRegularDeviceFile('gs://gatorade/2015-02-24/file2',
+                                     '/sdcard/dir2'), files_to_push)
+
+    additional_apks = spec.testSetup.additionalApks
+    self.assertEqual(len(additional_apks), 2)
+    self.assertEqual(additional_apks[0].location.gcsPath,
+                     'gs://gatorade/2015-02-24/apk1.apk')
+    self.assertEqual(additional_apks[1].location.gcsPath,
+                     'gs://gatorade/2015-02-24/apk2.apk')
 
     environment_variables = spec.testSetup.environmentVariables
     self.assertEqual(len(environment_variables), 2)
@@ -178,8 +198,9 @@ class MatrixCreatorTests(unit_base.TestMockClientTest):
 
     obb_files = spec.testSetup.filesToPush
     self.assertEqual(len(obb_files), 1)
-    self.assertEqual(obb_files[0].obbFile.obb.gcsPath, 'gs://tin/pail/bar.obb')
-    self.assertEqual(obb_files[0].obbFile.obbFileName, 'bar.obb')
+    self.assertEqual(
+        self._BuildObbDeviceFile('bar.obb', 'gs://tin/pail/bar.obb'),
+        obb_files[0])
 
   def testMatrixCreator_ValidateTestMatrixRequest_Fields(self):
     args = self.NewTestArgs(
@@ -263,7 +284,7 @@ class MatrixCreatorTests(unit_base.TestMockClientTest):
     creator = self.CreateMatrixCreator(self.args)
     self.testing_client.projects_testMatrices.Create.Expect(
         request=creator._BuildTestMatrixRequest('id-6'),
-        exception=unit_base.MakeHttpError(
+        exception=test_utils.MakeHttpError(
             'zergFailure', 'Simulated failure to create test execution.'))
 
     # An HttpError from the rpc should be converted to an HttpException
@@ -311,6 +332,22 @@ class MatrixCreatorTests(unit_base.TestMockClientTest):
     creator = self.CreateMatrixCreator(self.args)
     spec = creator._BuildGenericTestSpec()
     self.assertEqual(spec.disablePerformanceMetrics, False)
+
+  def _BuildObbDeviceFile(self, obb_file_name, obb_gcs_path):
+    """Build a DeviceFile with ObbFile."""
+    return TESTING_V1_MESSAGES.DeviceFile(
+        obbFile=TESTING_V1_MESSAGES.ObbFile(
+            obbFileName=obb_file_name,
+            obb=TESTING_V1_MESSAGES.FileReference(gcsPath=obb_gcs_path)))
+
+  def _BuildRegularDeviceFile(self, regular_file_gcs_path,
+                              regular_file_device_path):
+    """Build a DeviceFile with RegularFile."""
+    return TESTING_V1_MESSAGES.DeviceFile(
+        regularFile=TESTING_V1_MESSAGES.RegularFile(
+            content=TESTING_V1_MESSAGES.FileReference(
+                gcsPath=regular_file_gcs_path),
+            devicePath=regular_file_device_path))
 
 
 if __name__ == '__main__':

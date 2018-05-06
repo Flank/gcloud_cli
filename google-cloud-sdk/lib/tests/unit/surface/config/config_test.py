@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.calliope import exceptions
@@ -44,7 +47,7 @@ class ConfigTest(cli_test_base.CliTestBase):
     else:
       values = (properties_file.PropertiesFile(
           [config.Paths().installation_properties_path]).AllProperties())
-    self.assertEquals(value, values.get(section, {}).get(name, None))
+    self.assertEqual(value, values.get(section, {}).get(name, None))
 
   def testSetUnsetList(self):
     self.Run('config set core/account foo')
@@ -126,7 +129,7 @@ class ConfigTest(cli_test_base.CliTestBase):
 
   def testGetValueWithInvalidProperty(self):
     # Test Invalid Property
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         r'Section \[core\] has no property \[log_htt\]\.'):
       self.Run('config get-value core/log_htt')
@@ -140,9 +143,9 @@ class ConfigTest(cli_test_base.CliTestBase):
 
   def testGetValueWithSection(self):
     # Test for Section with No Property
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'You cannot call get-value on a SECTION/. '
-                                 'Did you mean `gcloud config list SECTION`?'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'You cannot call get-value on a SECTION/. '
+                                'Did you mean `gcloud config list SECTION`?'):
       self.Run('config get-value core/')
 
   def testGetValueWithMissingArgs(self):
@@ -153,14 +156,14 @@ class ConfigTest(cli_test_base.CliTestBase):
 
   def testGetValueWithEmptyArgs(self):
     # Test for /
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'You cannot call get-value on a SECTION/.'
-                                 ' Did you mean `gcloud config list SECTION`?'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'You cannot call get-value on a SECTION/.'
+                                ' Did you mean `gcloud config list SECTION`?'):
       self.Run('config get-value /')
 
   def testGetValueWithInvalidSection(self):
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Section "foobar" does not exist.'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Section "foobar" does not exist.'):
       self.Run('config get-value foobar/test')
 
   def testGetValueWithInvalidValue(self):
@@ -195,19 +198,19 @@ class ConfigTest(cli_test_base.CliTestBase):
     self.Run('config set core/account foo')
     self.Run('config set core/project bar')
     result = self.Run('config list core/account')
-    self.assertEquals(1, len(result))
+    self.assertEqual(1, len(result))
     core = result['core']
     self.assertIn('account', core)
     self.assertNotIn('project', core)
 
     result = self.Run('config list account')
-    self.assertEquals(1, len(result))
+    self.assertEqual(1, len(result))
     core = result['core']
     self.assertIn('account', core)
     self.assertNotIn('project', core)
 
     result = self.Run('config list core/')
-    self.assertEquals(1, len(result))
+    self.assertEqual(1, len(result))
     core = result['core']
     self.assertIn('account', core)
     self.assertIn('project', core)
@@ -237,7 +240,7 @@ class ConfigTest(cli_test_base.CliTestBase):
     self.AssertErrContains('Your active configuration is: [foo]')
 
   def testPropertyAllExclusive(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         'cannot take both a property name and the `--all` flag'):
       self.Run('config list core/foo --all')
@@ -255,9 +258,9 @@ class ConfigTest(cli_test_base.CliTestBase):
                          ['app/', 'auth/', 'account'])
 
       # Complete only sections.
-      self.RunCompletion(
-          'config {0} co'.format(verb),
-          ['component_manager/', 'compute/', 'container/', 'core/'])
+      self.RunCompletion('config {0} co'.format(verb), [
+          'component_manager/', 'composer/', 'compute/', 'container/', 'core/'
+      ])
 
       # Complete properties under a section.
       self.RunCompletion('config {0} component_manager'.format(verb),
@@ -296,7 +299,7 @@ class ConfigTest(cli_test_base.CliTestBase):
 
   def testConfigSetFailNone(self):
     self.Run('config configurations activate NONE')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         named_configs.ReadOnlyConfigurationError,
         r'Properties in configuration \[NONE\] cannot be set.'):
       self.Run('config set core/account badger')
@@ -308,7 +311,7 @@ class ConfigTest(cli_test_base.CliTestBase):
     with open(os.path.join(self.global_config_path, 'properties'), 'w') as f:
       f.write('[container]\ncluster = my_cluster\n')
 
-    self.assertEquals((), tuple(self.Run('config configurations list')))
+    self.assertEqual((), tuple(self.Run('config configurations list')))
 
     self.Run('config set core/account mushroom')
     self.Run('config set core/project portobello')

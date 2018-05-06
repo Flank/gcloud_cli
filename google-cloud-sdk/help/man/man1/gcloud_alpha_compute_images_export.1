@@ -11,7 +11,7 @@ gcloud alpha compute images export \- export a Google Compute Engine image
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute images export\fR \fIIMAGE_NAME\fR \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR [\fB\-\-async\fR] [\fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute images export\fR \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR) [\fB\-\-async\fR] [\fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,17 +29,6 @@ QEMU using qemu\-img. Valid formats include \f5vmdk\fR, \f5vhdx\fR, \f5vpc\fR,
 
 
 
-.SH "POSITIONAL ARGUMENTS"
-
-.RS 2m
-.TP 2m
-\fIIMAGE_NAME\fR
-The name of the disk image to export.
-
-
-.RE
-.sp
-
 .SH "REQUIRED FLAGS"
 
 .RS 2m
@@ -47,7 +36,22 @@ The name of the disk image to export.
 \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR
 The Google Cloud Storage URI destination for the exported virtual disk file.
 
+.TP 2m
 
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-image\fR=\fIIMAGE\fR
+The name of the disk image to export.
+
+.TP 2m
+\fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR
+The family of the disk image to be exported. When a family is used instead of an
+image, the latest non\-deprecated image associated with that family is used.
+
+
+.RE
 .RE
 .sp
 
@@ -64,6 +68,24 @@ operation to complete.
 Specify the format to export to, such as \f5vmdk\fR, \f5vhdx\fR, \f5vpc\fR, or
 \f5qcow2\fR.
 
+.TP 2m
+\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR
+The project against which all image and image family references will be
+resolved. It is best practice to define image\-project.
+.RS 2m
+.IP "\(em" 2m
+If specifying one of our public images, image\-project must be provided.
+.IP "\(em" 2m
+If there are several of the same image\-family value in multiple projects,
+image\-project must be specified to clarify the image to be used.
+.IP "\(em" 2m
+If not specified and either image or image\-family is provided, the current
+default project is used.
+.RE
+.RE
+.sp
+
+.RS 2m
 .TP 2m
 \fB\-\-log\-location\fR=\fILOG_LOCATION\fR
 Directory in Google Cloud Storage to hold build logs. If not set,
@@ -95,5 +117,10 @@ This command is currently in ALPHA and may change without notice. Usually, users
 of ALPHA commands and flags need to apply for access, agree to applicable terms,
 and have their projects whitelisted. Contact Google or sign up on a product's
 page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud compute images export
+$ gcloud beta compute images export
+.RE
 

@@ -528,7 +528,7 @@ class UploadPythonPackagesTest(base.MlBetaPlatformTestBase):
         [(packages[0], 'package.tar.gz'), (packages[1], 'package2.whl')],
         self.bucket_ref, 'job_name')
     self.build_packages_mock.assert_not_called()
-    self.assertEquals(
+    self.assertEqual(
         storage_paths,
         [
             'gs://bucket/job_name/DEADBEEF/package.tar.gz',
@@ -546,7 +546,7 @@ class UploadPythonPackagesTest(base.MlBetaPlatformTestBase):
         [(packages[0], 'package.tar.gz'), (packages[1], 'package2.whl')],
         self.bucket_ref, '')
     self.build_packages_mock.assert_not_called()
-    self.assertEquals(
+    self.assertEqual(
         storage_paths,
         [
             'gs://bucket/DEADBEEF/package.tar.gz',
@@ -574,7 +574,7 @@ class UploadPythonPackagesTest(base.MlBetaPlatformTestBase):
 
     self.upload_mock.assert_not_called()
     self.build_packages_mock.assert_not_called()
-    self.assertEquals(storage_paths, packages)
+    self.assertEqual(storage_paths, packages)
 
   def testUploadPythonPackages_SourcePackage(self):
     package_path = os.path.join('/path/to/package-root/package_name')

@@ -92,7 +92,7 @@ class InstancesMoveTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
             --format=disable
           """.format(client.url, self.Project()))
 
-    self.assertEquals('operation-X', result.name)
+    self.assertEqual('operation-X', result.name)
 
     self.AssertOutputEquals('')
     self.AssertErrEquals(
@@ -105,7 +105,7 @@ class InstancesMoveTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
   def testZonePrompt_NonInteractive(self):
     with self.Client() as client:
       self.ExpectMoveInstance(client)
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           compute_flags.UnderSpecifiedResourceError,
           r'Underspecified resource \[instance-1\]. '
           r'Specify the \[--zone\] flag.'):

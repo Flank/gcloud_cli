@@ -16,8 +16,12 @@ DESCRIPTION
     Storage.
 
 POSITIONAL ARGUMENTS
-     CATALOG
-        The catalog to delete.
+     CATALOG - The catalog to delete. This represents a Cloud resource. This
+     must be specified.
+
+       CATALOG
+          The ID of the catalog or a fully qualified identifier for the
+          catalog.
 
 REQUIRED FLAGS
      --product-id=PRODUCT_ID

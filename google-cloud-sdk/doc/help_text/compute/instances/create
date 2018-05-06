@@ -16,13 +16,13 @@ SYNOPSIS
         [--local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE]]
         [--machine-type=MACHINE_TYPE] [--maintenance-policy=MAINTENANCE_POLICY]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
-        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]]
+        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
         [--network-interface=[PROPERTY=VALUE,...]] [--preemptible]
         [--private-network-ip=PRIVATE_NETWORK_IP]
         [--no-require-csek-key-create] [--no-restart-on-failure]
-        [--subnet=SUBNET] [--tags=TAG,[TAG,...]] [--zone=ZONE]
-        [--address=ADDRESS | --no-address]
+        [--source-instance-template=SOURCE_INSTANCE_TEMPLATE] [--subnet=SUBNET]
+        [--tags=TAG,[TAG,...]] [--zone=ZONE] [--address=ADDRESS | --no-address]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
           : --custom-extensions]
         [--image-project=IMAGE_PROJECT --image=IMAGE
@@ -205,7 +205,7 @@ FLAGS
             Same as startup-script except that the script contents are pulled
             from a publicly-accessible location on the web.
 
-     --metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]
+     --metadata-from-file=KEY=LOCAL_FILE_PATH,[...]
         Same as --metadata except that the value for the entry will be read
         from a local file. This is useful for values that are too large such as
         startup-script contents.
@@ -309,6 +309,13 @@ FLAGS
         Engine. This does not affect terminations performed by the user.
         Enabled by default, use --no-restart-on-failure to disable.
 
+     --source-instance-template=SOURCE_INSTANCE_TEMPLATE
+        The name of the instance template that the instance will be created
+        from.
+
+        Users can also override machine type and labels. Values of other flags
+        will be ignored and --source-instance-template will be used instead.
+
      --subnet=SUBNET
         Specifies the subnet that the instances will be part of. If --network
         is also specified subnet must be a subnetwork of network specified by
@@ -330,7 +337,7 @@ FLAGS
 
      --zone=ZONE
         The zone of the instances to create. If not specified and the
-        compute/zone property isn't set, you will be prompted to select a zone.
+        compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:
@@ -497,12 +504,6 @@ FLAGS
 
               taskqueue
                 - https://www.googleapis.com/auth/taskqueue
-
-              useraccounts-ro
-                - https://www.googleapis.com/auth/cloud.useraccounts.readonly
-
-              useraccounts-rw
-                - https://www.googleapis.com/auth/cloud.useraccounts
 
               userinfo-email
                 - https://www.googleapis.com/auth/userinfo.email

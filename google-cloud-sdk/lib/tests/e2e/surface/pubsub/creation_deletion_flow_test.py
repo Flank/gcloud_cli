@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Integration tests for topic, subscription, and snapshot creation/deletion."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.pubsub import util
 from tests.lib import e2e_utils
@@ -27,24 +32,24 @@ class PubsubIntegrationTest(e2e_base.CloudPubsubTestBase):
 
   def testCreationUpdateDeletionFlow(self):
     id_gen = e2e_utils.GetResourceNameGenerator(prefix='cpstest')
-    topic_name = id_gen.next()
-    subscription_name = id_gen.next()
-    snapshot_name = id_gen.next()
+    topic_name = next(id_gen)
+    subscription_name = next(id_gen)
+    snapshot_name = next(id_gen)
 
     with self._CreateTopic(topic_name), \
          self._CreateSubscription(topic_name, subscription_name, 20) as sub, \
          self._CreateSnapshot(topic_name, subscription_name, snapshot_name):
-      self.assertEquals(20, sub.ackDeadlineSeconds)
+      self.assertEqual(20, sub.ackDeadlineSeconds)
       result = self.ClearAndRun('subscriptions update {0} --ack-deadline=40'
                                 ' --format=disable'.format(subscription_name))
       sub_ref = util.ParseSubscription(subscription_name, self.Project())
       self.AssertErrEquals(
           'Updated subscription [{}].\n'.format(sub_ref.RelativeName()))
-      self.assertEquals(40, result.ackDeadlineSeconds)
+      self.assertEqual(40, result.ackDeadlineSeconds)
 
       result = self.ClearAndRun('snapshots describe {}'.format(snapshot_name))
       snapshot_ref = util.ParseSnapshot(snapshot_name, self.Project())
-      self.assertEquals(result.name, snapshot_ref.RelativeName())
+      self.assertEqual(result.name, snapshot_ref.RelativeName())
 
 
 if __name__ == '__main__':

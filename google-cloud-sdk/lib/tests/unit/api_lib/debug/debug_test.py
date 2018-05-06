@@ -14,6 +14,8 @@
 
 """Tests for the debug API wrapper module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import threading
 
 from apitools.base.py.testing import mock as api_mock
@@ -25,6 +27,7 @@ from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
+import six
 
 # Some tests could potentially wait forever if the test is broken.
 # GLOBAL_MAX_WAIT provides an upper limit in such cases. It should never be
@@ -68,7 +71,7 @@ class _DebugMockApiTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     return self.debug_messages.Debuggee.LabelsValue(additionalProperties=[
         self.debug_messages.Debuggee.LabelsValue.AdditionalProperty(
             key=k, value=v)
-        for k, v  in labelmap.iteritems()])
+        for k, v  in six.iteritems(labelmap)])
 
   def MakeDebuggees(self, label_formats, start_index=0, count=10,
                     description_format=None):
@@ -79,7 +82,7 @@ class _DebugMockApiTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       label_properties = [
           self.debug_messages.Debuggee.LabelsValue.AdditionalProperty(
               key=key, value=value.format(i))
-          for key, value in label_formats.iteritems()]
+          for key, value in six.iteritems(label_formats)]
       result.append(
           debug.Debuggee(self.debug_messages.Debuggee(
               project='12345', id=debuggee_id, description=description,
@@ -103,7 +106,7 @@ class _DebugMockApiTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             additionalProperties=[
                 self.debug_messages.Debuggee.LabelsValue.AdditionalProperty(
                     key=key, value=value.format(i))
-                for key, value in label_formats.iteritems()])
+                for key, value in six.iteritems(label_formats)])
       result.append(self.debug_messages.Breakpoint(
           id=breakpoint_id, location=location, action=action, labels=labels))
     return result
@@ -188,13 +191,13 @@ class FunctionalTests(_DebugMockApiTest):
         ('a=$0 100', ['abc']))
 
   def testSplitLogExpressionsUnbalancedRight(self):
-    with self.assertRaisesRegexp(errors.InvalidLogFormatException,
-                                 'too many'):
+    with self.assertRaisesRegex(errors.InvalidLogFormatException,
+                                'too many'):
       debug.SplitLogExpressions('a={abc}}')
 
   def testSplitLogExpressionsUnbalancedLeft(self):
-    with self.assertRaisesRegexp(errors.InvalidLogFormatException,
-                                 'too many'):
+    with self.assertRaisesRegex(errors.InvalidLogFormatException,
+                                'too many'):
       debug.SplitLogExpressions('a={{a}')
 
   def testMergeLogExpressionsSimple(self):
@@ -871,7 +874,7 @@ class BreakpointTest(_DebugTestWithDebuggee):
         response=self.debug_messages.ListBreakpointsResponse(
             breakpoints=breakpoints))
     expected = [self.debuggee.AddTargetInfo(breakpoints[i*2])
-                for i in range(0, len(breakpoints)/2)]
+                for i in range(0, len(breakpoints)//2)]
     response = self.debuggee.ListBreakpoints([], resource_ids=[
         'https://clouddebugger.googleapis.com/v2/debugger/'
         'debuggees/{0}/breakpoints/{1}'.format(self.debuggee.target_id, b.id)
@@ -942,7 +945,7 @@ class BreakpointTest(_DebugTestWithDebuggee):
                 clientVersion=debug.DebugObject.CLIENT_VERSION)),
         response=self.debug_messages.ListBreakpointsResponse(
             breakpoints=breakpoints))
-    with self.assertRaisesRegexp(errors.NoMatchError, 'No breakpoint'):
+    with self.assertRaisesRegex(errors.NoMatchError, 'No breakpoint'):
       self.debuggee.ListBreakpoints(['not_there', 'me_either'])
 
   def testListMatchingSnapshotsNoMatch(self):
@@ -956,7 +959,7 @@ class BreakpointTest(_DebugTestWithDebuggee):
                 clientVersion=debug.DebugObject.CLIENT_VERSION)),
         response=self.debug_messages.ListBreakpointsResponse(
             breakpoints=breakpoints))
-    with self.assertRaisesRegexp(errors.NoMatchError, 'No snapshot'):
+    with self.assertRaisesRegex(errors.NoMatchError, 'No snapshot'):
       self.debuggee.ListBreakpoints(
           ['not_there', 'me_either'],
           restrict_to_type=self.debuggee.SNAPSHOT_TYPE)
@@ -972,7 +975,7 @@ class BreakpointTest(_DebugTestWithDebuggee):
                 clientVersion=debug.DebugObject.CLIENT_VERSION)),
         response=self.debug_messages.ListBreakpointsResponse(
             breakpoints=breakpoints))
-    with self.assertRaisesRegexp(errors.NoMatchError, 'No logpoint'):
+    with self.assertRaisesRegex(errors.NoMatchError, 'No logpoint'):
       self.debuggee.ListBreakpoints(
           ['not_there', 'me_either'],
           restrict_to_type=self.debuggee.LOGPOINT_TYPE)
@@ -1087,18 +1090,18 @@ class BreakpointTest(_DebugTestWithDebuggee):
     self.assertEqual(response, self.debuggee.AddTargetInfo(breakpoint))
 
   def testCreateLogpointNoLocationFailure(self):
-    with self.assertRaisesRegexp(errors.InvalidLocationException,
-                                 'location must not be empty'):
+    with self.assertRaisesRegex(errors.InvalidLocationException,
+                                'location must not be empty'):
       self.debuggee.CreateLogpoint('', 'dummy text')
 
   def testCreateLogpointBadLocationFailure(self):
-    with self.assertRaisesRegexp(errors.InvalidLocationException,
-                                 'must be of the form'):
+    with self.assertRaisesRegex(errors.InvalidLocationException,
+                                'must be of the form'):
       self.debuggee.CreateLogpoint('bogus_location', 'dummy text')
 
   def testCreateLogpointNoFormatFailure(self):
-    with self.assertRaisesRegexp(errors.InvalidLogFormatException,
-                                 'log format string must not be empty'):
+    with self.assertRaisesRegex(errors.InvalidLogFormatException,
+                                'log format string must not be empty'):
       self.debuggee.CreateLogpoint('a:1', '')
 
   def testCreateLogpointRemoteFailure(self):
@@ -1265,7 +1268,7 @@ class BreakpointMultiWaitTest(_DebugTestWithDebuggee):
 
     def TearDown(self):
       unsatisfied = [(key, value + 1)
-                     for key, value in self._response_map.iteritems()
+                     for key, value in six.iteritems(self._response_map)
                      if value >= 0]
       if unsatisfied:
         raise UnsatisfiedExpectationError(unsatisfied)
@@ -1280,7 +1283,8 @@ class BreakpointMultiWaitTest(_DebugTestWithDebuggee):
 
     def __call__(self, request):
       if request.breakpointId not in self._response_map:
-        raise UnexpectedIdError(request.breakpointId, self._response_map.keys())
+        raise UnexpectedIdError(request.breakpointId,
+                                list(self._response_map.keys()))
       with self._map_lock:
         value = self._response_map[request.breakpointId]
         response = self._parent.debug_messages.GetBreakpointResponse(

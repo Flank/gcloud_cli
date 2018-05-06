@@ -11,8 +11,12 @@ DESCRIPTION
     analysis.
 
 POSITIONAL ARGUMENTS
-     OPERATION_ID
-        ID for the operation to poll until complete.
+     OPERATION ID - ID for the operation to poll until complete. This
+     represents a Cloud resource. This must be specified.
+
+       OPERATION_ID
+          The ID of the operation or a fully qualified identifier for the
+          operation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

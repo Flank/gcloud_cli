@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha redis instances - manage Cloud Memorystore Redis instances
+
+SYNOPSIS
+    gcloud alpha redis instances COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud Memorystore Redis instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Memorystore Redis instance.
+
+     delete
+        (ALPHA) Delete a Redis instance.
+
+     describe
+        (ALPHA) Show metadata for a Memorystore Redis instance.
+
+     list
+        (ALPHA) List Memorystore Redis instances.
+
+     update
+        (ALPHA) Update Memorystore Redis instances.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta redis instances
+

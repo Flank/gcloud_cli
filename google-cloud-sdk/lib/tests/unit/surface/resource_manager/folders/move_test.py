@@ -49,13 +49,14 @@ class FoldersMoveTest(testbase.FoldersUnitTestBase):
 
   def testMoveAsync(self):
     self.SetUpFolderMove(
-        self.TEST_FOLDER_WITH_FOLDER_PARENT, self.TEST_FOLDER, async=True)
+        self.TEST_FOLDER_WITH_FOLDER_PARENT, self.TEST_FOLDER,
+        is_async=True)
     self.assertEqual(
-        self.DoCommand(async=True),
+        self.DoCommand(is_async=True),
         operations.OperationsMessages().Operation(
             done=False, name=TEST_OPERATION_NAME))
 
-  def SetUpFolderMove(self, original, moved, async=False):
+  def SetUpFolderMove(self, original, moved, is_async=False):
     response_value = operations.ToOperationResponse(moved)
     test_move_operation = operations.OperationsMessages().Operation(
         done=False, name=TEST_OPERATION_NAME)
@@ -65,7 +66,7 @@ class FoldersMoveTest(testbase.FoldersUnitTestBase):
         moveFolderRequest=folders.FoldersMessages().MoveFolderRequest(
             destinationParent=moved.parent))
     self.mock_folders.Move.Expect(expected_move_request, test_move_operation)
-    if not async:
+    if not is_async:
       test_move_operation_done = operations.OperationsMessages().Operation(
           done=True, name=TEST_OPERATION_NAME, response=response_value)
       self.mock_operations.Get.Expect(
@@ -78,7 +79,7 @@ class FoldersMoveTest(testbase.FoldersUnitTestBase):
     ).CloudresourcemanagerOperationsGetRequest(operationsId=expected_id)
 
   def DoCommand(self, use_org_parent=True, use_folder_parent=False,
-                async=False):
+                is_async=False):
     folder_parent_args = [
         '--folder',
         folders.FolderNameToId(self.TEST_FOLDER_WITH_FOLDER_PARENT.parent)
@@ -86,7 +87,7 @@ class FoldersMoveTest(testbase.FoldersUnitTestBase):
     org_parent_args = [
         '--organization', self.TEST_FOLDER.parent[len('organizations/'):]
     ] if use_org_parent else []
-    async_args = ['--async'] if async else []
+    async_args = ['--async'] if is_async else []
     all_args = folder_parent_args + org_parent_args + async_args
     return self.RunFolders('move',
                            folders.FolderNameToId(self.TEST_FOLDER.name),

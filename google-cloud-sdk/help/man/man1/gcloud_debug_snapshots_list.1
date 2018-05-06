@@ -11,7 +11,7 @@ gcloud debug snapshots list \- list debug snapshots
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud debug snapshots list\fR [\fIID\fR\ ...] [\fB\-\-all\-users\fR] [\fB\-\-include\-inactive\fR=\fIINCLUDE_INACTIVE\fR;\ default=300] [\fB\-\-location\fR=\fILOCATION\-REGEXP\fR] [\fB\-\-target\fR=(\fIID\fR|\fIDESCRIPTION_REGEXP\fR)] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud debug snapshots list\fR [\fIID\fR\ ...] [\fB\-\-all\-users\fR] [\fB\-\-include\-inactive\fR=\fIINCLUDE_INACTIVE\fR;\ default=300] [\fB\-\-location\fR=\fILOCATION\-REGEXP\fR] [\fB\-\-target\fR=(\fIID\fR|\fIDESCRIPTION_REGEXP\fR)] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -85,14 +85,6 @@ with other flags that are applied in this order: \fB\-\-flatten\fR,
 The maximum number of resources to list. The default is \fBunlimited\fR. This
 flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
-
-.TP 2m
-\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
-Some services group resource list output into pages. This flag specifies the
-maximum number of resources per page. The default is determined by the service
-if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
-be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
-service.
 
 .TP 2m
 \fB\-\-sort\-by\fR=[\fIFIELD\fR,...]

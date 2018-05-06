@@ -51,7 +51,7 @@ class InitTest(sdk_test_base.BundledBase,
       for part in path:
         self.assertIn(part, cfg)
         cfg = cfg[part]
-      self.assertEquals(value, cfg)
+      self.assertEqual(value, cfg)
 
   def AssertActiveConfig(self, name):
     configurations = self.Run(

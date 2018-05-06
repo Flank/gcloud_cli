@@ -45,8 +45,8 @@ class UpdateTest(base.GenomicsUnitTest):
             variantSet=self.messages.VariantSet(name='name-new'),
             variantSetId='1000',),
         exception=self.MakeHttpError(404, 'Variant set not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Variant set not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Variant set not found: 1000'):
       self.RunGenomics(['variantsets', 'update', '1000', '--name', 'name-new'])
 
 

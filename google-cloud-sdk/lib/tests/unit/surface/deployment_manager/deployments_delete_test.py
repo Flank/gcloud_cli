@@ -14,10 +14,13 @@
 
 """Unit tests for deployments delete command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.deployment_manager import exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 DEPLOYMENT_NAME = 'deployment-name'
 
@@ -77,6 +80,57 @@ class DeploymentsDeleteTest(unit_test_base.DmV2UnitTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains(
         'Delete operation operation-12345-67890 completed successfully.')
+
+  def testDeploymentsDelete_WithWarning(self):
+    operation_name = 'operation-12345-67890'
+    self.mocked_client.deployments.Delete.Expect(
+        request=self.messages.DeploymentmanagerDeploymentsDeleteRequest(
+            project=self.Project(),
+            deployment=DEPLOYMENT_NAME,
+            deletePolicy=(
+                self.messages.DeploymentmanagerDeploymentsDeleteRequest.
+                DeletePolicyValueValuesEnum('ABANDON')),
+        ),
+        response=self.messages.Operation(
+            name=operation_name,
+            operationType='delete',
+            status='PENDING',
+        ))
+    for _ in range(2):
+      # Operation is pending for a while
+      self.mocked_client.operations.Get.Expect(
+          request=self.messages.DeploymentmanagerOperationsGetRequest(
+              project=self.Project(),
+              operation=operation_name,
+          ),
+          response=self.messages.Operation(
+              name=operation_name,
+              operationType='delete',
+              status='PENDING',
+          ))
+    for _ in range(2):
+      # Operation complete: one 'DONE' response to end poll, one for delete
+      # command error checking.
+      self.mocked_client.operations.Get.Expect(
+          request=self.messages.DeploymentmanagerOperationsGetRequest(
+              project=self.Project(),
+              operation=operation_name,
+          ),
+          response=self.messages.Operation(
+              name=operation_name,
+              operationType='delete',
+              status='DONE',
+              warnings=[
+                  self.messages.Operation.WarningsValueListEntry(
+                      message='warning')
+              ]))
+    self.WriteInput('y\n')
+    self.Run('deployment-manager deployments delete ' + DEPLOYMENT_NAME +
+             ' --delete-policy ABANDON')
+    self.AssertOutputEquals('')
+    self.AssertErrContains('WARNING: Delete operation operation-12345-67890 '
+                           'completed with warnings:')
+    self.AssertErrContains('message: warning')
 
   def testDeploymentsDelete_Async(self):
     operation_name = 'operation-12345-67890'
@@ -205,8 +259,8 @@ class DeploymentsDeleteTest(unit_test_base.DmV2UnitTestBase):
 
   def testDeploymentsDelete_PromptNo(self):
     self.WriteInput('n\n')
-    with self.assertRaisesRegexp(exceptions.OperationError,
-                                 'Deletion aborted by user.'):
+    with self.assertRaisesRegex(exceptions.OperationError,
+                                'Deletion aborted by user.'):
       self.Run('deployment-manager deployments delete ' + DEPLOYMENT_NAME)
     self.AssertErrContains(DEPLOYMENT_NAME)
     self.AssertErrContains('The following deployments will be deleted')

@@ -1,0 +1,93 @@
+
+.TH "GCLOUD_ALPHA_IAM_ROLES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha iam roles delete \- delete a custom role from an organization or a project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha iam roles delete\fR \fIROLE_ID\fR [\fB\-\-organization\fR=\fIORGANIZATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command deletes a role.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The role specified does not exist.
+.IP "\(bu" 2m
+The active user does not have permission to access the given role.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIROLE_ID\fR
+The id of the custom role to delete. For example: CustomRole. You must also
+specify the \f5\-\-organization\fR or \f5\-\-project\fR flag.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION\fR
+The organization of the role you want to delete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a role of an organization, run:
+
+.RS 2m
+$ gcloud alpha iam roles delete \-\-organization 1234567 viewer
+.RE
+
+To delete a role of a project, run:
+
+.RS 2m
+$ gcloud alpha iam roles delete \-\-project myproject viewer
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud iam roles delete
+$ gcloud beta iam roles delete
+.RE
+

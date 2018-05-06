@@ -41,20 +41,20 @@ class InstancesTest(e2e_instances_test_base.InstancesTestBase):
 
   def testCustomInstanceCreationErrors(self):
     self.GetInstanceName()
-    with self.assertRaisesRegexp(exceptions.ToolException,
-                                 r'Memory size for a 2 vCPU instance must be '
-                                 'between'):
+    with self.assertRaisesRegex(exceptions.ToolException,
+                                r'Memory size for a 2 vCPU instance must be '
+                                'between'):
       self.Run('compute instances create {0} --custom-cpu 2 '
                '--custom-memory 14 --zone {1}'.format(self.instance_name,
                                                       self.zone))
-    with self.assertRaisesRegexp(exceptions.ToolException,
-                                 r'Memory should be a multiple of 256MiB'):
+    with self.assertRaisesRegex(exceptions.ToolException,
+                                r'Memory should be a multiple of 256MiB'):
       self.Run('compute instances create {0} '
                '--custom-cpu 2 --custom-memory '
                '3000MiB --zone {1}'.format(self.instance_name, self.zone))
-    with self.assertRaisesRegexp(exceptions.ToolException,
-                                 r'Number of vCPUs should be an even number if '
-                                 'greater than 1'):
+    with self.assertRaisesRegex(exceptions.ToolException,
+                                r'Number of vCPUs should be an even number if '
+                                'greater than 1'):
       self.Run('compute instances create {0} '
                '--custom-cpu 3 --custom-memory '
                '10 --zone {1}'.format(self.instance_name, self.zone))
@@ -81,7 +81,7 @@ class InstancesTest(e2e_instances_test_base.InstancesTestBase):
 
   def testImprovedMissingmachineTypeErrorMessage(self):
     self.GetInstanceName()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ToolException,
         r'Use `gcloud compute machine-types list --zones` to see the available '
         r'machine  types.'):

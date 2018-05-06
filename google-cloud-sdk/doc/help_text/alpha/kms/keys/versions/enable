@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha kms keys versions enable - enable a given version
+
+SYNOPSIS
+    gcloud alpha kms keys versions enable VERSION [--key=KEY]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Enables the specified version within the given key.
+
+    Only a version which is Disabled can be Enabled.
+
+POSITIONAL ARGUMENTS
+     VERSION
+        Name of the version to enable.
+
+FLAGS
+     --key=KEY
+        The containing key.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command enables version 3 of key frodo within keyring
+    fellowship and location us-east1:
+
+        $ gcloud alpha kms keys versions enable 3 --location us-east1 \
+            --keyring fellowship --key frodo
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keys versions enable
+        $ gcloud beta kms keys versions enable
+

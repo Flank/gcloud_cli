@@ -54,7 +54,8 @@ class NetworkPeeringTest(e2e_test_base.BaseTest):
     for (network_name, subnetwork_name,
          subnet_range) in zip(self.network_names, self.subnetwork_names,
                               self.SUBNET_RANGES):
-      self.Run('compute networks create {0} --mode custom'.format(network_name))
+      self.Run('compute networks create {0} --subnet-mode custom'.format(
+          network_name))
       self.AssertNewOutputContains(network_name)
       self.Run('compute networks subnets create {0} --network {1} '
                '--region {2} --range {3}'.format(subnetwork_name, network_name,

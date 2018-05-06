@@ -91,7 +91,7 @@ class ResourcePrinterTest(resource_printer_test_base.Base):
     self.AssertOutputEquals('')
 
   def testUnknownFormat(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resource_printer.UnknownFormatError,
         r'Format must be one of .* received \[UnKnOwN\]'):
       resource_printer.Printer('UnKnOwN')

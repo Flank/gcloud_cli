@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for target VPN gateways labels."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import base
@@ -26,10 +28,10 @@ class TargetVpnGatewaysLabelsTest(e2e_test_base.BaseTest):
   def SetUp(self):
     self.track = base.ReleaseTrack.ALPHA
 
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-network').next()
-    self.target_vpn_gateway_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-target-vpn-gateway').next()
+    self.network_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-compute-test-network'))
+    self.target_vpn_gateway_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-compute-test-target-vpn-gateway'))
 
   def RunCompute(self, *cmd):
     return self.Run(('compute',) + cmd)

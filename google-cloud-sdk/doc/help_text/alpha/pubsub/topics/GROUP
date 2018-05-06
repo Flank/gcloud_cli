@@ -28,7 +28,7 @@ COMMANDS
         (ALPHA) Describes a Cloud Pub/Sub topic.
 
      get-iam-policy
-        (ALPHA) Get the IAM policy for a Cloud Pub/Sub Topic.
+        (ALPHA) Get the IAM policy for a topic.
 
      list
         (ALPHA) Lists Cloud Pub/Sub topics within a project.
@@ -46,7 +46,7 @@ COMMANDS
         (ALPHA) Remove IAM policy binding for a topic.
 
      set-iam-policy
-        (ALPHA) Set IAM policy for a topic.
+        (ALPHA) Set the IAM policy for a Cloud Pub/Sub Topic.
 
      update
         (ALPHA) This feature is part of an invite-only release of the Cloud

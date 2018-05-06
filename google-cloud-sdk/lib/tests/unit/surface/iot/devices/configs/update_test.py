@@ -11,11 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for `gcloud iot config update`."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core.util import http_encoding
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
@@ -71,7 +79,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
 
   def testUpdate(self, track):
     self.track = track
-    self._ExpectModifyConfig('abcd')
+    self._ExpectModifyConfig(http_encoding.Encode('abcd'))
 
     result = self.Run(
         'iot devices configs update '
@@ -81,7 +89,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
         '    --config-data abcd')
 
     expected_config = self.messages.DeviceConfig(
-        binaryData='abcd',
+        binaryData=http_encoding.Encode('abcd'),
         version=1
     )
     self.assertEqual(result, expected_config)
@@ -89,7 +97,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
 
   def testUpdate_EmptyData(self, track):
     self.track = track
-    self._ExpectModifyConfig('')
+    self._ExpectModifyConfig(http_encoding.Encode(''))
 
     result = self.Run(
         'iot devices configs update '
@@ -99,14 +107,14 @@ class ConfigsUpdateTest(base.CloudIotBase):
         '    --config-data ""')
 
     expected_config = self.messages.DeviceConfig(
-        binaryData='',
+        binaryData=http_encoding.Encode(''),
         version=1
     )
     self.assertEqual(result, expected_config)
 
   def testUpdate_FromFile(self, track):
     self.track = track
-    data = ''.join(map(chr, range(256)))
+    data = bytes(range(256))
     self._ExpectModifyConfig(data)
     data_file = self.Touch(self.temp_path, 'data', contents=data)
 
@@ -125,7 +133,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
 
   def testUpdate_Version(self, track):
     self.track = track
-    self._ExpectModifyConfig('abcd', version=10)
+    self._ExpectModifyConfig(http_encoding.Encode('abcd'), version=10)
 
     result = self.Run(
         'iot devices configs update '
@@ -136,14 +144,14 @@ class ConfigsUpdateTest(base.CloudIotBase):
         '    --version-to-update 10')
 
     expected_config = self.messages.DeviceConfig(
-        binaryData='abcd',
+        binaryData=http_encoding.Encode('abcd'),
         version=10
     )
     self.assertEqual(result, expected_config)
 
   def testUpdate_RelativeName(self, track):
     self.track = track
-    self._ExpectModifyConfig('abcd')
+    self._ExpectModifyConfig(http_encoding.Encode('abcd'))
 
     device_name = ('projects/{}/'
                    'locations/us-central1/'
@@ -155,7 +163,7 @@ class ConfigsUpdateTest(base.CloudIotBase):
         '    --device {} '.format(device_name))
 
     expected_config = self.messages.DeviceConfig(
-        binaryData='abcd',
+        binaryData=http_encoding.Encode('abcd'),
         version=1
     )
     self.assertEqual(result, expected_config)

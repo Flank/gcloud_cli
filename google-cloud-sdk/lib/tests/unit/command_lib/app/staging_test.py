@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import
 import os
 import re
 import tempfile
@@ -201,8 +202,8 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
     expected_pattern = (
         re.escape(self._ERROR_MESSAGE.format(command=command, code=1)) +
         '\n\n' + self._OUTPUT_PATTERN)
-    with self.assertRaisesRegexp(staging.StagingCommandFailedError,
-                                 expected_pattern):
+    with self.assertRaisesRegex(staging.StagingCommandFailedError,
+                                expected_pattern):
       self.stager.Stage('app.yaml', 'dir', 'intercal',
                         util.Environment.FLEX)
     self.exec_mock.assert_called_once_with(
@@ -312,8 +313,8 @@ class StagerRealExecutableTest(sdk_test_base.WithLogCapture):
     self.AssertLogMatches(self._SUCCESS_OUTPUT_PATTERN)
 
   def testStage_Failure(self):
-    with self.assertRaisesRegexp(staging.StagingCommandFailedError,
-                                 self._FAILURE_PATTERN):
+    with self.assertRaisesRegex(staging.StagingCommandFailedError,
+                                self._FAILURE_PATTERN):
       self.stager.Stage('app.yaml', '.', 'failure',
                         util.Environment.FLEX)
 
@@ -378,10 +379,10 @@ class NoopCommandTest(sdk_test_base.WithLogCapture):
     result = command.Run(self.staging_area, self.descriptor, self.app_dir)
 
     self.assertIsNone(result)
-    self.assertEquals(os.listdir(self.staging_area), [],
-                      'NoopCommand should not modify the staging area.')
-    self.assertEquals(os.listdir(self.app_dir), [],
-                      'NoopCommand should not modify the app directory.')
+    self.assertEqual(os.listdir(self.staging_area), [],
+                     'NoopCommand should not modify the staging area.')
+    self.assertEqual(os.listdir(self.app_dir), [],
+                     'NoopCommand should not modify the app directory.')
 
   def testEnsureInstalled(self):
     """Tests that EnsureInstalled does nothing."""
@@ -389,10 +390,10 @@ class NoopCommandTest(sdk_test_base.WithLogCapture):
 
     command.EnsureInstalled()
 
-    self.assertEquals(os.listdir(self.staging_area), [],
-                      'NoopCommand should not modify the staging area.')
-    self.assertEquals(os.listdir(self.app_dir), [],
-                      'NoopCommand should not modify the app directory.')
+    self.assertEqual(os.listdir(self.staging_area), [],
+                     'NoopCommand should not modify the staging area.')
+    self.assertEqual(os.listdir(self.app_dir), [],
+                     'NoopCommand should not modify the app directory.')
 
   def testGetPath(self):
     """Tests that GetPath does nothing."""
@@ -422,9 +423,9 @@ class ExecutableCommandTest(sdk_test_base.WithLogCapture):
 
     result = command.Run(self.staging_area, self.descriptor, self.app_dir)
 
-    self.assertEquals(os.path.dirname(result), self.staging_area,
-                      'The result of Run should be a temporary directory in '
-                      'the staging area.')
+    self.assertEqual(os.path.dirname(result), self.staging_area,
+                     'The result of Run should be a temporary directory in '
+                     'the staging area.')
     self.exec_mock.assert_called_once_with(
         [self.path, self.descriptor, self.app_dir, result],
         no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
@@ -437,33 +438,33 @@ class ExecutableCommandTest(sdk_test_base.WithLogCapture):
 
     command.EnsureInstalled()
 
-    self.assertEquals(set(os.listdir(self.temp_path)),
-                      set(['staging', 'app_dir']),
-                      'EnsureInstalled should not modify the temp dir.')
-    self.assertEquals(os.listdir(self.staging_area), [],
-                      'EnsureInstalled should not modify the staging area.')
-    self.assertEquals(os.listdir(self.app_dir), [],
-                      'EnsureInstalled should not modify the app directory.')
+    self.assertEqual(set(os.listdir(self.temp_path)),
+                     set(['staging', 'app_dir']),
+                     'EnsureInstalled should not modify the temp dir.')
+    self.assertEqual(os.listdir(self.staging_area), [],
+                     'EnsureInstalled should not modify the staging area.')
+    self.assertEqual(os.listdir(self.app_dir), [],
+                     'EnsureInstalled should not modify the app directory.')
 
   def testGetPath(self):
     command = staging.ExecutableCommand(self.path)
 
     result = command.GetPath()
 
-    self.assertEquals(result, self.path)
+    self.assertEqual(result, self.path)
 
   def testGetFromInput_OnPath(self):
     self.StartObjectPatch(files, 'FindExecutableOnPath', return_value=self.path)
 
     command = staging.ExecutableCommand.FromInput('my-command')
 
-    self.assertEquals(command.GetPath(), self.path)
+    self.assertEqual(command.GetPath(), self.path)
 
   def testGetFromInput_FileExists(self):
     path = self.Touch(self.temp_path, 'my-command')
     command = staging.ExecutableCommand.FromInput(path)
 
-    self.assertEquals(command.GetPath(), path)
+    self.assertEqual(command.GetPath(), path)
 
   def testGetFromInput_FileDoesNotExist(self):
     with self.assertRaises(staging.StagingCommandNotFoundError):

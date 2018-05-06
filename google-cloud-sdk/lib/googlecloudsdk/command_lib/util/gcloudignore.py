@@ -25,8 +25,12 @@ A typical use would be:
     print 'uploading {}'.format(f)
     # actually do the upload, too
 """
-import collections
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import fnmatch
+import io
 import os
 import re
 
@@ -37,6 +41,8 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 
+import six
+from six.moves import map  # pylint: disable=redefined-builtin
 
 IGNORE_FILE_NAME = '.gcloudignore'
 GIT_FILES = ['.git', '.gitignore']
@@ -331,28 +337,18 @@ class FileChooser(object):
     Returns:
       bool, whether the file should be uploaded
     """
-    path_prefixes = _GetPathPrefixes(path)
-    path_prefix_map = collections.OrderedDict(
-        [(prefix, Match.NO_MATCH) for prefix in path_prefixes])
-    for pattern in self.patterns:
-      parent_match = Match.NO_MATCH
-      for path_prefix in path_prefix_map:
-        if parent_match is not Match.NO_MATCH:
-          match = parent_match
-        else:
-          # All prefixes except the path itself are directories.
-          is_prefix_dir = path_prefix != path or is_dir
-          match = pattern.Matches(path_prefix, is_dir=is_prefix_dir)
+    path_prefixes = _GetPathPrefixes(path)[1:]  # root dir can't be matched
+    for path_prefix in path_prefixes:
+      prefix_match = Match.NO_MATCH
+      for pattern in self.patterns:
+        is_prefix_dir = path_prefix != path or is_dir
+        match = pattern.Matches(path_prefix, is_dir=is_prefix_dir)
         if match is not Match.NO_MATCH:
-          path_prefix_map[path_prefix] = match
-        parent_match = match
-        if path_prefix_map[path_prefix] is Match.IGNORE:
-          parent_match = Match.IGNORE
-
-    included = path_prefix_map[path] is not Match.IGNORE
-    if not included:
-      log.debug('Skipping file [{}]'.format(path))
-    return included
+          prefix_match = match
+      if prefix_match is Match.IGNORE:
+        log.debug('Skipping file [{}]'.format(path))
+        return False
+    return True
 
   def GetIncludedFiles(self, upload_directory, include_dirs=True):
     """Yields the files in the given directory that this FileChooser includes.
@@ -453,7 +449,7 @@ class FileChooser(object):
     try:
       return cls.FromFile(included_path, recurse - 1).patterns
     except BadFileError as err:
-      raise BadIncludedFileError(err.message)
+      raise BadIncludedFileError(six.text_type(err))
 
   @classmethod
   def FromFile(cls, ignore_file_path, recurse=1):
@@ -475,7 +471,7 @@ class FileChooser(object):
       FileChooser.
     """
     try:
-      with open(ignore_file_path, 'rb') as f:
+      with io.open(ignore_file_path, 'rt') as f:
         text = f.read()
     except IOError as err:
       raise BadFileError(

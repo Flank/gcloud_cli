@@ -3,7 +3,9 @@ NAME
 
 SYNOPSIS
     gcloud beta ml vision suggest-crop IMAGE_PATH
-        [--aspect-ratios=[ASPECT_RATIOS,...]] [GCLOUD_WIDE_FLAG ...]
+        [--aspect-ratios=[ASPECT_RATIOS,...]]
+        [--model-version=MODEL_VERSION; default="builtin/stable"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Returns the coordinates of a bounding box that surrounds the
@@ -22,6 +24,10 @@ FLAGS
         A list of aspect ratio hints for the suggested bounding box. Aspect
         ratios may be specified either as a decimal number (ex. 1.333) or as a
         ratio of width to height (ex 4:3).
+
+     --model-version=MODEL_VERSION; default="builtin/stable"
+        The model version to use for the feature. Supported values include
+        "builtin/stable" and "builtin/latest".
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

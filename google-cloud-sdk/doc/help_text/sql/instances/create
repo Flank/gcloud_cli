@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud sql instances create INSTANCE
         [--activation-policy=ACTIVATION_POLICY] [--assign-ip] [--async]
         [--authorized-gae-apps=APP,[APP,...]]
-        [--authorized-networks=NETWORK,[NETWORK,...]] [--no-backup]
+        [--authorized-networks=NETWORK,[NETWORK,...]]
+        [--availability-type=AVAILABILITY_TYPE] [--no-backup]
         [--backup-start-time=BACKUP_START_TIME] [--cpu=CPU]
         [--database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
         [--database-version=DATABASE_VERSION; default="MYSQL_5_6"]
@@ -53,6 +54,17 @@ FLAGS
         The list of external networks that are allowed to connect to the
         instance. Specified in CIDR notation, also known as 'slash' notation
         (e.g. 192.168.100.0/24).
+
+     --availability-type=AVAILABILITY_TYPE
+        Specifies level of availability. Only applies to PostgreSQL instances.
+        AVAILABILITY_TYPE must be one of:
+
+         regional
+            Provides high availability and is recommended for production
+            instances; instance automatically fails over to another zone within
+            your selected region.
+         zonal
+            Provides no failover capability. This is the default.
 
      --backup
         Enables daily backup. Enabled by default, use --no-backup to disable.

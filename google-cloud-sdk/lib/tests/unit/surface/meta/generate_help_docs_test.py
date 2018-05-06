@@ -115,8 +115,8 @@ class GenerateHelpDocsDirTest(cli_test_base.CliTestBase):
   def testGenerateHelpDocsHelpTextUpdateTestChanges(self):
     self.update.return_value = True
     update_help_text_dir = '/doc/help_text'
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 'Help text files must be updated.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                'Help text files must be updated.'):
       self.Run(['meta', 'generate-help-docs',
                 '--update-help-text-dir=' + update_help_text_dir,
                 '--test'])

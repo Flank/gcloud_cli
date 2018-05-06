@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'node-pools create' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 
 from googlecloudsdk.api_lib.container import util as c_util
@@ -77,6 +79,9 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
 
   def testCreateDefaults(self):
     self._TestCreateDefaults(self.ZONE)
+
+  def testCreateDefaultsRegional(self):
+    self._TestCreateDefaults(self.REGION)
 
   def testCreateDefaultsJsonOutput(self):
     self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
@@ -232,7 +237,8 @@ Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
   def testServiceAccountCloudPlatformScope(self):
     pool_kwargs = {
         'serviceAccount': 'my-sa',
-        'oauthScopes': ['https://www.googleapis.com/auth/cloud-platform'],
+        'oauthScopes': ['https://www.googleapis.com/auth/cloud-platform',
+                        'https://www.googleapis.com/auth/userinfo.email'],
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
@@ -890,9 +896,6 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API):
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),
         normalize_space=True)
-
-  def testCreateDefaultsRegional(self):
-    self._TestCreateDefaults(self.REGION)
 
   @parameterized.parameters(
       (1, 'notatype', 'fs'),

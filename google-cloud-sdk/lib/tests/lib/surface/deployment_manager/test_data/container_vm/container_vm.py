@@ -31,6 +31,8 @@
 """Creates a Container VM with the provided Container manifest.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import yaml
 
 

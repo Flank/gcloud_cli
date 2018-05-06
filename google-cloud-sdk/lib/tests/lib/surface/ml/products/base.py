@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Base class for all ml products tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
@@ -20,6 +24,8 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class ResourceUtils(object):
@@ -44,7 +50,7 @@ class ResourceUtils(object):
     return encoding.PyValueToMessage(
         self.messages.Operation.ResponseValue, {
             '@type': ('type.googleapis.com/google.cloud.alpha_vision.v1alpha1.'
-                      'ImportCatalogsResponse'),
+                      'GoogleCloudVisionV1alpha1ImportCatalogsResponse'),
             'refImages': [
                 encoding.MessageToJson(x) for x in self.MakeRefImageList(10)
             ],
@@ -72,9 +78,9 @@ class ResourceUtils(object):
   def MakeRefImageList(self, num=3):
     """Build a list of ReferenceImage messages."""
     image_list = []
-    for i in xrange(0, num):
+    for i in range(0, num):
       image_list.append(
-          self.messages.ReferenceImage(
+          self.messages.GoogleCloudVisionV1alpha1ReferenceImage(
               imageUri='gs://fake-bucket/myimage-{}'.format(i),
               productCategory='test-category',
               productId='abc123',
@@ -85,17 +91,18 @@ class ResourceUtils(object):
   def MakeCatalogList(self, num=3):
     """Build a list of Catalog messages."""
     catalog_list = []
-    for i in xrange(0, num):
-      catalog_list.append(self.messages.Catalog(
+    for i in range(0, num):
+      catalog_list.append(self.messages.GoogleCloudVisionV1alpha1Catalog(
           name='productSearch/catalogs/{}'.format(i)))
     return catalog_list
 
   def ExpectCreateCatalog(self, name='productSearch/catalogs/12345',
                           error=None):
     """Create Expected Request for a Catalog Create Operation."""
-    expected_catalog = self.messages.Catalog(name=name)
+    expected_catalog = self.messages.GoogleCloudVisionV1alpha1Catalog(name=name)
     self.product_client.productSearch_catalogs.Create.Expect(
-        self.messages.Catalog(), expected_catalog, exception=error)
+        self.messages.GoogleCloudVisionV1alpha1Catalog(),
+        expected_catalog, exception=error)
 
     return expected_catalog
 
@@ -103,7 +110,7 @@ class ResourceUtils(object):
                           error=None):
     """Create Expected Request for a Catalog Delete Operation."""
 
-    expected_catalog = self.messages.Catalog(name=name)
+    expected_catalog = self.messages.GoogleCloudVisionV1alpha1Catalog(name=name)
     self.product_client.productSearch_catalogs.Delete.Expect(
         self.messages.AlphaVisionProductSearchCatalogsDeleteRequest(name=name),
         expected_catalog.name,
@@ -117,7 +124,7 @@ class ResourceUtils(object):
                                 response_value=None,
                                 error_json=None):
     """Get Expectaion for Long Running Operation."""
-    for _ in xrange(poll_count):
+    for _ in range(poll_count):
       in_progress_op = self.GetTestOperation(
           op_name, is_done=False)
       self.search_client.OperationsService.Get.Expect(
@@ -155,12 +162,13 @@ class ResourceUtils(object):
       catalog_name='productSearch/catalogs/12345',
       name='productSearch/catalogs/12345/referenceImages/6789', error=None):
     """Create Expection for ReferenceImage Create Operation."""
-    expected_image = self.messages.ReferenceImage(
+    expected_image = self.messages.GoogleCloudVisionV1alpha1ReferenceImage(
         name=name, imageUri=image_uri, productCategory=product_category,
         productId=product_id, boundingPoly=bounding_poly)
 
     expected_request = (self.ImageShortMessage('CreateRequest')(
-        parent=catalog_name, referenceImage=expected_image))
+        parent=catalog_name,
+        googleCloudVisionV1alpha1ReferenceImage=expected_image))
     self.product_client.productSearch_catalogs_referenceImages.Create.Expect(
         expected_request, expected_image, exception=error)
 
@@ -171,7 +179,7 @@ class ResourceUtils(object):
       product_category='test-category', product_id='abc123', bounding_poly=None,
       name='productSearch/catalogs/12345/referenceImages/6789', error=None):
     """Create Expection for ReferenceImage Delete Operation."""
-    expected_image = self.messages.ReferenceImage(
+    expected_image = self.messages.GoogleCloudVisionV1alpha1ReferenceImage(
         name=name, imageUri=image_uri, productCategory=product_category,
         productId=product_id, boundingPoly=bounding_poly)
 
@@ -186,7 +194,7 @@ class ResourceUtils(object):
       product_category='test-category', product_id='abc123', bounding_poly=None,
       name='productSearch/catalogs/12345/referenceImages/6789', error=None):
     """Create Expection for ReferenceImage Describe Operation."""
-    expected_image = self.messages.ReferenceImage(
+    expected_image = self.messages.GoogleCloudVisionV1alpha1ReferenceImage(
         name=name, imageUri=image_uri, productCategory=product_category,
         productId=product_id, boundingPoly=bounding_poly)
 
@@ -204,7 +212,8 @@ class ResourceUtils(object):
         productId=product_id)
     self.product_client.productSearch_catalogs_referenceImages.List.Expect(
         expected_request,
-        self.messages.ListReferenceImagesResponse(referenceImages=ref_images))
+        self.messages.GoogleCloudVisionV1alpha1ListReferenceImagesResponse(
+            referenceImages=ref_images))
     return ref_images
 
 

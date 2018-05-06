@@ -42,7 +42,7 @@ class ListTest(base.GenomicsUnitTest):
                                                          pageSize=128,),
         response=self.messages.SearchReadGroupSetsResponse(readGroupSets=
                                                            read_group_sets))
-    self.assertEquals(read_group_sets, list(self.RunGenomics(
+    self.assertEqual(read_group_sets, list(self.RunGenomics(
         ['readgroupsets', 'list', '123', '--name', 'rgset'])))
 
   def testReadGroupSetsList_EmptyList(self):
@@ -52,7 +52,7 @@ class ListTest(base.GenomicsUnitTest):
                                                                      '456'],
                                                          pageSize=128,),
         response=self.messages.SearchReadGroupSetsResponse())
-    self.assertEquals([], list(self.RunGenomics(
+    self.assertEqual([], list(self.RunGenomics(
         ['readgroupsets', 'list', '123', '456', '--name', 'nonexistent'])))
 
   def testReadGroupSetsList_Limit_InvalidLow(self):
@@ -83,7 +83,7 @@ class ListTest(base.GenomicsUnitTest):
         response=self.messages.SearchReadGroupSetsResponse(readGroupSets=
                                                            read_group_sets))
 
-    self.assertEquals(read_group_sets[:3], list(self.RunGenomics(
+    self.assertEqual(read_group_sets[:3], list(self.RunGenomics(
         ['readgroupsets', 'list', '123', '--name', 'foo', '--limit', '3'])))
 
   def testInaccessibleDataset(self):
@@ -93,8 +93,8 @@ class ListTest(base.GenomicsUnitTest):
         exception=self.MakeHttpError(403,
                                      'Permission denied; need GET permission'))
 
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Permission denied; need GET permission'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Permission denied; need GET permission'):
       list(self.RunGenomics(['readgroupsets', 'list', '123']))
 
 if __name__ == '__main__':

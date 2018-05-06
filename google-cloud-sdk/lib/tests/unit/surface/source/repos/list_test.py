@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'source list' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
@@ -65,7 +67,7 @@ class ListTest(base.SourceSdkTest):
         self.messages.ListReposResponse(repos=[]))
     result = self.RunSourceRepos(['list', '--format=disable'])
     result = list(result)  # Consume iterator and get a real list
-    self.assertEquals([], result)
+    self.assertEqual([], result)
 
   def testListReturnsBackendList(self):
     repo_list = [
@@ -78,7 +80,7 @@ class ListTest(base.SourceSdkTest):
 
     result = self.RunSourceRepos(['list', '--format=disable'])
     result = list(result)  # Consume iterator and get a real list
-    self.assertEquals(repo_list, result)
+    self.assertEqual(repo_list, result)
 
   def testDisplay(self):
     repo_list = [

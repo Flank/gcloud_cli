@@ -4,6 +4,7 @@ NAME
 SYNOPSIS
     gcloud beta compute instances attach-disk INSTANCE_NAME --disk=DISK
         [--csek-key-file=FILE] [--device-name=DEVICE_NAME]
+        [--disk-scope=DISK_SCOPE; default="zonal"] [--force-attach]
         [--mode=MODE; default="rw"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -44,6 +45,24 @@ OPTIONAL FLAGS
         An optional name that indicates the disk name the guest operating
         system will see. (Note: Device name does not correspond to mounted
         volume name)
+
+     --disk-scope=DISK_SCOPE; default="zonal"
+        The scope of the disk. DISK_SCOPE must be one of:
+
+         regional
+            The disk specified in --disk is interpreted as a regional disk in
+            the same region as the instance. Ignored if a full URI is provided
+            to the --disk flag.
+         zonal
+            The disk specified in --disk is interpreted as a zonal disk in the
+            same zone as the instance. Ignored if a full URI is provided to the
+            --disk flag.
+
+     --force-attach
+        Attach the disk to the instance even if it is currently attached to
+        another instance. The attachment will succeed even if detaching from
+        the previous instance fails at first. The server will continue trying
+        to detach the disk from the previous instance in the background.
 
      --mode=MODE; default="rw"
         Specifies the mode of the disk. MODE must be one of:

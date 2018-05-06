@@ -262,7 +262,7 @@ class InstancesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
   def testLimitWithVeryLargeValue(self):
     with self.AssertRaisesArgumentErrorRegexp(
         r'--limit: Value must be less than or equal to '
-        r'{0}; received: 10000000000000000000000'.format(sys.maxint)):
+        r'{0}; received: 10000000000000000000000'.format(sys.maxsize)):
       self.Run("""
           compute instances list --uri --limit 10000000000000000000000
           """)

@@ -14,6 +14,8 @@
 
 """Integration tests for Type Registry commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import log
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
@@ -90,10 +92,10 @@ class TypeRegistryIntegrationTest(e2e_base.WithServiceAuth):
   """Tests basic functionality of the Service Registry client."""
 
   def SetUp(self):
-    self.type_provider_name = e2e_utils.GetResourceNameGenerator(
-        prefix='type-registry-integ-tp').next()
-    self.composite_type_name = e2e_utils.GetResourceNameGenerator(
-        prefix='type-registry-integ-ct').next()
+    self.type_provider_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='type-registry-integ-tp'))
+    self.composite_type_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='type-registry-integ-ct'))
     self.type_provider_options = self.FilePathFor(
         'type_providers/simple_dummy_config.yaml')
     self.composite_type_template = self.FilePathFor(

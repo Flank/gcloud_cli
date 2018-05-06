@@ -1,9 +1,9 @@
 NAME
-    gcloud alpha tasks queues set-iam-policy - set IAM policy for a queue
+    gcloud alpha tasks queues set-iam-policy - set the IAM policy for a queue
 
 SYNOPSIS
-    gcloud alpha tasks queues set-iam-policy QUEUE POLICY_FILE
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha tasks queues set-iam-policy (QUEUE : --location=LOCATION)
+        POLICY_FILE [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command replaces the existing IAM policy for a queue, given a
@@ -15,30 +15,38 @@ DESCRIPTION
     contain an etag value will replace any existing policy for the queue.
 
 POSITIONAL ARGUMENTS
-     QUEUE
-        The queue to set the IAM policy for.
+     QUEUE - The queue for which to set the IAM policy. The arguments in this
+     group can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: Set the property [core/project] or
+     provide the flag [--project] on the command line. This must be specified.
+
+       QUEUE
+          The ID of the queue or a fully qualified identifier for the queue.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --location=LOCATION
+          The location name.
 
      POLICY_FILE
-        JSON or YAML file containing the IAM policy.
+        Path to a local JSON or YAML formatted file containing a valid policy.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
-EXAMPLES
-    The following command will read an IAM policy defined in a JSON file
-    'policy.json' and set it for a queue with identifier 'my-queue'
-
-        $ gcloud alpha tasks queues set-iam-policy my-queue policy.json
-
-    See https://cloud.google.com/iam/docs/managing-policies for details of the
-    policy file format and contents.
+API REFERENCE
+    This command uses the cloudtasks/v2beta2 API. The full documentation for
+    this API can be found at: https://cloud.google.com/cloud-tasks/
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,
     users of ALPHA commands and flags need to apply for access, agree to
     applicable terms, and have their projects whitelisted. Contact Google or
     sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta tasks queues set-iam-policy
 

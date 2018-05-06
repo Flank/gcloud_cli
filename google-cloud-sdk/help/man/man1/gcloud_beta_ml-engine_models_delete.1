@@ -15,12 +15,6 @@ gcloud beta ml\-engine models delete \- delete an existing Cloud ML Engine model
 
 
 
-.SH "DESCRIPTION"
-
-\fB(BETA)\fR Delete an existing Cloud ML Engine model.
-
-
-
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
@@ -38,6 +32,18 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete all models matching the regular expression \f5vision[0\-9]+\fR, run:
+
+.RS 2m
+$ gcloud beta ml\-engine models list \-\-uri \e
+      \-\-filter 'name ~ vision[0\-9]+' |
+      xargs \-n 1 gcloud beta ml\-engine models delete
+.RE
 
 
 

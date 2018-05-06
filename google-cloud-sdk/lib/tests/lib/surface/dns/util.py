@@ -20,9 +20,9 @@ def GetMessages(api_version="v1"):
   return apis.GetMessagesModule("dns", api_version)
 
 
-def GetManagedZones():
+def GetManagedZones(api_version="v1"):
   return [
-      GetMessages().ManagedZone(
+      GetMessages(api_version).ManagedZone(
           creationTime=u"2014-10-20T20:06:50.077Z",
           description=u"My zone!",
           dnsName=u"zone.com.",
@@ -34,7 +34,7 @@ def GetManagedZones():
               u"ns-cloud-e2.googledomains.com.",
               u"ns-cloud-e3.googledomains.com.",
               u"ns-cloud-e4.googledomains.com."]),
-      GetMessages().ManagedZone(
+      GetMessages(api_version).ManagedZone(
           creationTime=u"2014-10-21T20:06:50.077Z",
           description=u"My zone 1!",
           dnsName=u"zone1.com.",

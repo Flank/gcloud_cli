@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.auth import refresh_token
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import store
@@ -27,8 +30,8 @@ class RefreshTokenTests(sdk_test_base.SdkBase):
     refresh_token.ActivateCredentials('my-account', 'my-refresh-token')
     self.assertEqual('my-account', properties.VALUES.core.account.Get())
 
-    self.assertEquals('my-refresh-token',
-                      refresh_token.GetForAccount('my-account'))
+    self.assertEqual('my-refresh-token',
+                     refresh_token.GetForAccount('my-account'))
 
 
 if __name__ == '__main__':

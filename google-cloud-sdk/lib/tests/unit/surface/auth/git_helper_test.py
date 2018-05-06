@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import subprocess
 
 from googlecloudsdk.api_lib.auth import exceptions as auth_exceptions
@@ -60,7 +63,7 @@ class GitHelperTest(sdk_test_base.WithFakeAuth,
 
   def testGitCredHelperBadProtocol(self):
     self.WriteInput('protocol=junk\nhost=source.developers.google.com\n')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         auth_exceptions.GitCredentialHelperError,
         r'Invalid protocol \[junk\].  "https" expected.'):
       self.Run('auth git-helper get')
@@ -68,7 +71,7 @@ class GitHelperTest(sdk_test_base.WithFakeAuth,
 
   def testGitCredHelperExtraSpaces(self):
     self.WriteInput(' protocol=https\nhost=source.developers.google.com\n')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         auth_exceptions.GitCredentialHelperError,
         'Required key "protocol" missing.'):
       self.Run('auth git-helper get')
@@ -76,7 +79,7 @@ class GitHelperTest(sdk_test_base.WithFakeAuth,
 
   def testGitCredHelperBadDomain(self):
     self.WriteInput('protocol=https\nhost=junk.com\n')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         auth_exceptions.GitCredentialHelperError,
         r'Unknown host \[junk.com\].'):
       self.Run('auth git-helper get')
@@ -85,7 +88,7 @@ class GitHelperTest(sdk_test_base.WithFakeAuth,
   def testGitCredHelperBadMethod(self):
     self.FakeAuthSetCredentialsPresent(False)
     self.WriteInput('protocol=https\nhost=source.developers.google.com\n')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         auth_exceptions.GitCredentialHelperError,
         r'Unexpected method \[junk\]. One of \[get, store\] expected.'):
       self.Run('auth git-helper junk')
@@ -103,7 +106,7 @@ class GitHelperTest(sdk_test_base.WithFakeAuth,
     self.AssertErrEquals('')
 
   def testNoIgnoreUnknownMethod(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         auth_exceptions.GitCredentialHelperError,
         r'Unexpected method \[junk]\. One of \[get, store] expected\.'):
       self.Run('auth git-helper junk')
@@ -112,7 +115,7 @@ class GitHelperTest(sdk_test_base.WithFakeAuth,
 
   def testNoIgnoreUnknownHost(self):
     self.WriteInput('protocol=https\nhost=slashdot.org\n')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         auth_exceptions.GitCredentialHelperError,
         r'Unknown host \[slashdot.org]\.'):
       self.Run('auth git-helper get')

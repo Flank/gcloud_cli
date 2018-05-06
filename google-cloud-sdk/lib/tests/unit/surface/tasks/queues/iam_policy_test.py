@@ -15,6 +15,8 @@
 """IAM tests for `gcloud tasks queues`."""
 
 from apitools.base.py import encoding
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.tasks import test_base
 
@@ -34,8 +36,7 @@ class AddIamPolicyBindingTest(test_base.CloudTasksTestBase):
         etag='etag')
     self.queues_service.GetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
-            resource=self.queue_name,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=self.queue_name),
         response=self.messages.Policy(etag='etag'))
     self.queues_service.SetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesSetIamPolicyRequest(
@@ -62,8 +63,7 @@ class AddIamPolicyBindingTest(test_base.CloudTasksTestBase):
         etag='etag')
     self.queues_service.GetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
-            resource=queue_name,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=queue_name),
         response=self.messages.Policy(etag='etag'))
     self.queues_service.SetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesSetIamPolicyRequest(
@@ -96,8 +96,7 @@ class RemoveIamPolicyBindingTest(test_base.CloudTasksTestBase):
     expected_new_policy = self.messages.Policy(etag='etag')
     self.queues_service.GetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
-            resource=self.queue_name,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=self.queue_name),
         response=original_policy)
     self.queues_service.SetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesSetIamPolicyRequest(
@@ -125,8 +124,7 @@ class RemoveIamPolicyBindingTest(test_base.CloudTasksTestBase):
     expected_new_policy = self.messages.Policy(etag='etag')
     self.queues_service.GetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
-            resource=queue_name,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=queue_name),
         response=original_policy)
     self.queues_service.SetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesSetIamPolicyRequest(
@@ -143,6 +141,8 @@ class RemoveIamPolicyBindingTest(test_base.CloudTasksTestBase):
     self.assertEqual(actual_new_policy, expected_new_policy)
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class GetIamPolicyTest(test_base.CloudTasksTestBase):
 
   def SetUp(self):
@@ -150,23 +150,25 @@ class GetIamPolicyTest(test_base.CloudTasksTestBase):
         'projects/other-project/locations/us-central1/queues/my-queue')
     self.admin_role = 'roles/cloudtasks.queueAdmin'
 
-  def testGetIamPolicy(self):
+  def testGetIamPolicy(self, track):
+    self.track = track
     expected_policy = self.messages.Policy(
         bindings=[self.messages.Binding(
             role=self.admin_role, members=['user:test-user@google.com'])],
         etag='etag')
     self.queues_service.GetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
-            resource=self.queue_name,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=self.queue_name),
         response=expected_policy)
 
     actual_policy = self.Run(
-        'tasks queues get-iam-policy {}'.format(self.queue_name))
+        'tasks queues get-iam-policy {}'.format(self.queue_name),
+        track=calliope_base.ReleaseTrack.ALPHA)
 
     self.assertEqual(actual_policy, expected_policy)
 
-  def testGetIamPolicy_Location(self):
+  def testGetIamPolicy_Location(self, track):
+    self.track = track
     queue_id = 'my-queue'
     queue_name = (
         'projects/fake-project/locations/us-central2/queues/{}'.format(
@@ -177,8 +179,7 @@ class GetIamPolicyTest(test_base.CloudTasksTestBase):
         etag='etag')
     self.queues_service.GetIamPolicy.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
-            resource=queue_name,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=queue_name),
         response=expected_policy)
 
     actual_policy = self.Run(
@@ -188,6 +189,8 @@ class GetIamPolicyTest(test_base.CloudTasksTestBase):
     self.assertEqual(actual_policy, expected_policy)
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class SetIamPolicyTest(test_base.CloudTasksTestBase):
 
   def SetUp(self):
@@ -195,7 +198,8 @@ class SetIamPolicyTest(test_base.CloudTasksTestBase):
         'projects/other-project/locations/us-central1/queues/my-queue')
     self.admin_role = 'roles/cloudtasks.queueAdmin'
 
-  def testSetIamPolicy(self):
+  def testSetIamPolicy(self, track):
+    self.track = track
     expected_policy = self.messages.Policy(
         bindings=[self.messages.Binding(
             role=self.admin_role, members=['user:test-user@google.com'])])
@@ -214,7 +218,8 @@ class SetIamPolicyTest(test_base.CloudTasksTestBase):
 
     self.assertEqual(actual_policy, expected_policy)
 
-  def testSetIamPolicy_Location(self):
+  def testSetIamPolicy_Location(self, track):
+    self.track = track
     queue_id = 'my-queue'
     queue_name = (
         'projects/fake-project/locations/us-central2/queues/{}'.format(

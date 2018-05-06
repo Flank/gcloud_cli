@@ -28,7 +28,7 @@ class GenerateCommandTest(calliope_test_base.CalliopeTestBase):
         'https://www.googleapis.com/compute/v1/projects/my-project-1/'
         'zones/my-zone-1/instances/my-instance-1'
     ]
-    self.assertEquals(expected, actual)
+    self.assertEqual(expected, actual)
 
   def testGenerateOneReturn(self):
     actual = self.Run('meta resources generate --format=disable '
@@ -37,7 +37,7 @@ class GenerateCommandTest(calliope_test_base.CalliopeTestBase):
         'https://www.googleapis.com/compute/v1/projects/my-project-1/'
         'zones/my-zone-1/instances/my-instance-1',
     ]
-    self.assertEquals(expected, actual)
+    self.assertEqual(expected, actual)
 
   def testGenerateTwoReturn(self):
     actual = self.Run('meta resources generate --format=disable '
@@ -48,7 +48,7 @@ class GenerateCommandTest(calliope_test_base.CalliopeTestBase):
         'https://www.googleapis.com/compute/v1/projects/my-project-2/'
         'zones/my-zone-2/instances/my-instance-2',
     ]
-    self.assertEquals(expected, actual)
+    self.assertEqual(expected, actual)
 
   def testGenerateThreeJson(self):
     self.Run('meta resources generate --format=json '

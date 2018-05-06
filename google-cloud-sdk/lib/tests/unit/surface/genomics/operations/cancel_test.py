@@ -70,7 +70,7 @@ class CancelTest(base.GenomicsUnitTest):
   def testOperationsCancelAborted(self):
     self.WriteInput('n\n')
     self.expectGetRequest()
-    with self.assertRaisesRegexp(GenomicsError, 'Cancel aborted by user.'):
+    with self.assertRaisesRegex(GenomicsError, 'Cancel aborted by user.'):
       self.RunGenomics(['operations', 'cancel', 'operation-name'])
 
     # Check that the operation is emitted before the prompt
@@ -104,7 +104,7 @@ class CancelTest(base.GenomicsUnitTest):
             name='operations/operation-name'),
         exception=self.MakeHttpError(
             404, 'Operation not found: operations/operation-name'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.HttpException,
         'Operation not found: operations/operation-name'):
       self.RunGenomics(['operations', 'cancel', 'operation-name'], ['--quiet'])

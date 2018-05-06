@@ -44,11 +44,11 @@ class LookupBundleTests(sdk_test_base.BundledBase):
 
   def testLookupCompletion(self):
     lookup.Complete()
-    self.assertEquals('--help', self.completions_value)
+    self.assertEqual('--help', self.completions_value)
 
   def testGcloudPyCompletionEntryPoint(self):
     gcloud.main()
-    self.assertEquals('--help', self.completions_value)
+    self.assertEqual('--help', self.completions_value)
 
 
 if __name__ == '__main__':

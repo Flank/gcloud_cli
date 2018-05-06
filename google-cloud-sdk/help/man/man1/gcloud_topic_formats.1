@@ -29,6 +29,10 @@ resource\-keys. For details run $ gcloud topic resource\-keys.
 To list a subset of resource keys in a resource, use projections. For details
 run $ gcloud topic projections.
 
+To work through an interactive tutorial about using the filter and format flags
+instead, see:
+https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud\-shell\-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
+
 
 
 .SH "Formats"
@@ -48,12 +52,13 @@ A format expression has 3 parts:
 \fB[\fR [no\-]\fIattribute\-name\fR[=\fIvalue\fR] [, ... ] \fB]\fR
 .TP 2m
 \fIPROJECTION\fR
-\fB(\fR \fIresource\-key\fR [, ...] \fB)\fR \fINAME\fR is required,
-\fIATTRIBUTES\fR are optional, and \fIPROJECTIONS\fR may be required for some
-formats. Unknown attribute names are silently ignored.
+\fB(\fR \fIresource\-key\fR [, ...] \fB)\fR
 
 .RE
 .sp
+\fINAME\fR is required, \fIATTRIBUTES\fR are optional, and \fIPROJECTIONS\fR may
+be required for some formats. Unknown attribute names are silently ignored.
+
 Each \fBgcloud\fR \fBlist\fR command has a default format expression. The
 \fB\-\-format\fR flag can alter or replace the default. For example,
 

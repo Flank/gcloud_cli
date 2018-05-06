@@ -87,14 +87,25 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self._manifest = {'schemaVersion': 2,
                       'manifests': []}
 
-  def AddTag(self, src_image, dest_image):
-    self.Run(['container', 'images', 'add-tag', src_image, dest_image, '-q'])
+  def AddTag(self, src_image, *dest_images):
+    cmd = (['container', 'images', 'add-tag', src_image] + list(dest_images) +
+           ['-q'])
+    self.Run(cmd)
 
   def testManifestSchema1AddTagToTag(self):
     self.InitManifest(1)
     self.AddTag(_GetImageName('tag1'), _GetImageName('tag3'))
     self.assertIn(_GetImageName('tag3'), self._added_tags)
     self.AssertErrContains(_GetImageName('tag3'))
+
+  def testManifestSchema1AddMultipleTagsToTag(self):
+    self.InitManifest(1)
+    self.AddTag(
+        _GetImageName('tag1'), _GetImageName('tag3'), _GetImageName('tag5'))
+    self.assertIn(_GetImageName('tag3'), self._added_tags)
+    self.assertIn(_GetImageName('tag5'), self._added_tags)
+    self.AssertErrContains(_GetImageName('tag3'))
+    self.AssertErrContains(_GetImageName('tag5'))
 
   def testManifestSchema1AddTagToDigest(self):
     self.InitManifest(1)
@@ -122,6 +133,15 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.assertIn(_GetImageName('tag3'), self._added_tags)
     self.AssertErrContains(_GetImageName('tag3'))
 
+  def testManifestSchema2AddMultipleTagsToTag(self):
+    self.InitManifest(2)
+    self.AddTag(
+        _GetImageName('tag1'), _GetImageName('tag3'), _GetImageName('tag5'))
+    self.assertIn(_GetImageName('tag3'), self._added_tags)
+    self.assertIn(_GetImageName('tag5'), self._added_tags)
+    self.AssertErrContains(_GetImageName('tag3'))
+    self.AssertErrContains(_GetImageName('tag5'))
+
   def testManifestSchema2AddTagToDigest(self):
     self.InitManifest(2)
     self.AddTag(_GetDigestName('a'*64), _GetImageName('tag3'))
@@ -147,6 +167,15 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.AddTag(_GetImageName('tag1'), _GetImageName('tag3'))
     self.assertIn(_GetImageName('tag3'), self._added_tags)
     self.AssertErrContains(_GetImageName('tag3'))
+
+  def testManifestListAddMultipleTagsToTag(self):
+    self.InitManifestList()
+    self.AddTag(
+        _GetImageName('tag1'), _GetImageName('tag3'), _GetImageName('tag5'))
+    self.assertIn(_GetImageName('tag3'), self._added_tags)
+    self.assertIn(_GetImageName('tag5'), self._added_tags)
+    self.AssertErrContains(_GetImageName('tag3'))
+    self.AssertErrContains(_GetImageName('tag5'))
 
   def testManifestListAddTagToDigest(self):
     self.InitManifestList()

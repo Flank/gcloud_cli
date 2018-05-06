@@ -47,8 +47,8 @@ class ListTest(base.GenomicsUnitTest):
         request=self.messages.SearchReadsRequest(readGroupSetIds=['123'],
                                                  pageSize=512,),
         response=self.messages.SearchReadsResponse(alignments=alignments),)
-    self.assertEquals(alignments,
-                      list(self.RunGenomics(['reads', 'list', '123'])))
+    self.assertEqual(alignments,
+                     list(self.RunGenomics(['reads', 'list', '123'])))
 
   def testReadsListReferenceOnly(self):
     alignments = [
@@ -59,9 +59,9 @@ class ListTest(base.GenomicsUnitTest):
                                                  referenceName='X',
                                                  pageSize=512,),
         response=self.messages.SearchReadsResponse(alignments=alignments),)
-    self.assertEquals(alignments,
-                      list(self.RunGenomics(['reads', 'list', '123',
-                                             '--reference-name', 'X'])))
+    self.assertEqual(alignments,
+                     list(self.RunGenomics(['reads', 'list', '123',
+                                            '--reference-name', 'X'])))
 
   def testReadsListRange(self):
     alignments = [self._MakeMappedRead('17', 7, 'q', 'ACTG')]
@@ -72,10 +72,10 @@ class ListTest(base.GenomicsUnitTest):
                                                  start=1,
                                                  end=10,),
         response=self.messages.SearchReadsResponse(alignments=alignments))
-    self.assertEquals(alignments,
-                      list(self.RunGenomics(['reads', 'list', '123',
-                                             '--reference-name', '17',
-                                             '--start', '1', '--end', '10'])))
+    self.assertEqual(alignments,
+                     list(self.RunGenomics(['reads', 'list', '123',
+                                            '--reference-name', '17',
+                                            '--start', '1', '--end', '10'])))
 
   def testReadsList_EmptyList(self):
     self.mocked_client.reads.Search.Expect(
@@ -83,9 +83,9 @@ class ListTest(base.GenomicsUnitTest):
                                                  referenceName='empty',
                                                  pageSize=512,),
         response=self.messages.SearchReadsResponse())
-    self.assertEquals([],
-                      list(self.RunGenomics(['reads', 'list', '123',
-                                             '--reference-name', 'empty'])))
+    self.assertEqual([],
+                     list(self.RunGenomics(['reads', 'list', '123',
+                                            '--reference-name', 'empty'])))
 
   def testReadsList_Limit_InvalidLow(self):
     with self.AssertRaisesArgumentErrorRegexp(
@@ -110,10 +110,10 @@ class ListTest(base.GenomicsUnitTest):
                                                  pageSize=3,),
         response=self.messages.SearchReadsResponse(alignments=alignments))
 
-    self.assertEquals(alignments[0:3],
-                      list(self.RunGenomics(['reads', 'list', '123',
-                                             '--reference-name', '*',
-                                             '--limit', '3'])))
+    self.assertEqual(alignments[0:3],
+                     list(self.RunGenomics(['reads', 'list', '123',
+                                            '--reference-name', '*',
+                                            '--limit', '3'])))
 
   def testInaccessibleReadGroupSet(self):
     self.mocked_client.reads.Search.Expect(
@@ -122,7 +122,7 @@ class ListTest(base.GenomicsUnitTest):
         exception=self.MakeHttpError(403,
                                      'Permission denied; need GET permission'))
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.HttpException,
         'Permission denied; need GET permission'):
       list(self.RunGenomics(['reads', 'list', '123']))

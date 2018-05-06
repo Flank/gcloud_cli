@@ -160,9 +160,10 @@ class ExecutionError(Exception):
     """
     super(ExecutionError, self).__init__(msg)
     self.result = result
+    self.msg = msg
 
   def __str__(self):
-    return self.message + '\n' + six.text_type(self.result)
+    return self.msg + '\n' + six.text_type(self.result)
 
 
 class TimeoutError(ExecutionError):
@@ -180,7 +181,7 @@ class TimeoutError(ExecutionError):
   def __str__(self):
     if self.result:
       return super(TimeoutError, self).__str__()
-    return self.message
+    return self.msg
 
 
 class ExecutionResult(object):

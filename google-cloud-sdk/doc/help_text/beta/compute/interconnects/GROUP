@@ -40,7 +40,10 @@ COMMANDS
         (BETA) List Google Compute Engine interconnects.
 
      patch
-        (BETA) Patch a Google Compute Engine interconnect.
+        (BETA) (DEPRECATED) Update a Google Compute Engine interconnect.
+
+     update
+        (BETA) Update a Google Compute Engine interconnect.
 
 NOTES
     This command is currently in BETA and may change without notice. These

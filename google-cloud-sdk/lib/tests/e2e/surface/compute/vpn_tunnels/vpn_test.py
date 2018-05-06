@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for creating/deleting vpn tunnels."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 import logging
 
@@ -24,8 +26,8 @@ from tests.lib.surface.compute import e2e_test_base
 class VpnTest(e2e_test_base.BaseTest):
 
   def UniqueName(self, name):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='compute-vpn-test-' + name).next()
+    return next(e2e_utils.GetResourceNameGenerator(
+        prefix='compute-vpn-test-' + name))
 
   def SetUp(self):
     self.vpn_gateway_names_used = []

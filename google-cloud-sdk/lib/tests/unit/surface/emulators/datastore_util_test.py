@@ -49,7 +49,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
                 dict(legacy=legacy))
 
     expected = os.path.join(cloud_sdk_mock.return_value, 'platform', gcd_dir)
-    self.assertEquals(expected, datastore_util.GetGCDRoot(args))
+    self.assertEqual(expected, datastore_util.GetGCDRoot(args))
 
     os_isdir_mock.return_value = False
     with self.assertRaises(datastore_util.NoGCDError):
@@ -72,9 +72,9 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
                 dict(legacy=legacy))
 
     gcd_executable = os.path.join(gcd_root_mock.return_value, gcd_exec)
-    self.assertEquals(execution_utils.ArgsForExecutableTool(gcd_executable,
-                                                            'args'),
-                      datastore_util.ArgsForGCDEmulator(['args'], args))
+    self.assertEqual(execution_utils.ArgsForExecutableTool(gcd_executable,
+                                                           'args'),
+                     datastore_util.ArgsForGCDEmulator(['args'], args))
 
   @test_case.Filters.RunOnlyOnWindows
   def testArgsForLegacyGCDEmulatorWindows(self):
@@ -94,8 +94,8 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
                 dict(legacy=legacy))
 
     gcd_executable = os.path.join(gcd_root_mock.return_value, gcd_exec)
-    self.assertEquals(execution_utils.ArgsForCMDTool(gcd_executable, 'args'),
-                      datastore_util.ArgsForGCDEmulator(['args'], args))
+    self.assertEqual(execution_utils.ArgsForCMDTool(gcd_executable, 'args'),
+                     datastore_util.ArgsForGCDEmulator(['args'], args))
 
   def testPrepareLegacyGCDDataDir(self):
     self._DoTestPrepareGCDDataDir(True)

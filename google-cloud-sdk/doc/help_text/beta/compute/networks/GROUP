@@ -37,9 +37,6 @@ COMMANDS
      list
         (BETA) List Google Compute Engine networks.
 
-     switch-mode
-        (BETA) (DEPRECATED) Switch the mode of a Google Compute Engine network.
-
      update
         (BETA) Update a Google Compute Engine network.
 

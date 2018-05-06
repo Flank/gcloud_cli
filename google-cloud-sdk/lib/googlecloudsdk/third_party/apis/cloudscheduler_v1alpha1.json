@@ -21,6 +21,7 @@
   "baseUrl": "https://cloudscheduler.googleapis.com/",
   "batchPath": "batch",
   "version_module": true,
+  "fullyEncodeReservedExpansion": true,
   "parameters": {
     "access_token": {
       "type": "string",
@@ -150,6 +151,10 @@
           "description": "The canonical id for this location. For example: `\"us-east1\"`.",
           "type": "string"
         },
+        "displayName": {
+          "description": "The friendly name for this location, typically a nearby city name.\nFor example, \"Tokyo\".",
+          "type": "string"
+        },
         "labels": {
           "description": "Cross-service attributes for the location. For example\n\n    {\"cloud.googleapis.com\/region\": \"us-east1\"}",
           "type": "object",
@@ -180,15 +185,14 @@
           }
         },
         "nextPageToken": {
-          "description": "A token to retrieve next page of results. Pass this value in the\nListJobsRequest.page_token field in the subsequent call to\nJobQueues.ListJobs to retrieve the next page of results.\nIf this is empty it indicates that there are no more results\nthrough which to paginate.\n\nFor JSON requests, the value of this field must be\nbase64-encoded.\n\nThe page token is valid for only 2 hours.",
-          "type": "string",
-          "format": "byte"
+          "description": "A token to retrieve next page of results. Pass this value in the\nListJobsRequest.page_token field in the subsequent call to\nCloudScheduler.ListJobs to retrieve the next page of results.\nIf this is empty it indicates that there are no more results\nthrough which to paginate.\n\nThe page token is valid for only 2 hours.",
+          "type": "string"
         }
       }
     },
     "Job": {
       "id": "Job",
-      "description": "Configuration for a job.",
+      "description": "Configuration for a job.\nThe maximum allowed size for a job is 100KB.",
       "type": "object",
       "properties": {
         "name": {
@@ -196,7 +200,7 @@
           "type": "string"
         },
         "description": {
-          "description": "A human-readable description for the job.",
+          "description": "A human-readable description for the job. This string must not contain\nmore than 500 characters.",
           "type": "string"
         },
         "pubsubTarget": {
@@ -206,6 +210,10 @@
         "appEngineHttpTarget": {
           "description": "App Engine Http target.",
           "$ref": "AppEngineHttpTarget"
+        },
+        "httpTarget": {
+          "description": "Http target.",
+          "$ref": "HttpTarget"
         },
         "schedule": {
           "description": "Specifies a schedule of start times. This can be used to\nspecify complicated and time-zone-aware schedules.\n\nA scheduled start time will be skipped if the previous\nexecution has not ended when its scheduled time occurs.\n\nIf RetryConfig.retry_count > 0 and a job attempt fails,\nthe job will be a total of tried RetryConfig.retry_count\ntimes, with exponential backoff, until the next scheduled start\ntime.",
@@ -217,7 +225,7 @@
           "format": "google-datetime"
         },
         "jobState": {
-          "description": "Output only. State of the job. For example: running, paused, or disabled.",
+          "description": "Output only. State of the job. For example: enabled, paused, or disabled.",
           "enumDescriptions": [
             "Unspecified state.",
             "The job is executing normally.",
@@ -238,6 +246,11 @@
         },
         "nextScheduleTime": {
           "description": "Output only. The next time the job is scheduled. Note that this may be a\nretry of a previously failed execution or the next execution time\naccording to the schedule.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "lastAttemptTime": {
+          "description": "Output only. The started time of the last completed job attempt.",
           "type": "string",
           "format": "google-datetime"
         },
@@ -279,7 +292,9 @@
             "HTTP Get",
             "HTTP Head",
             "HTTP Put",
-            "HTTP Delete"
+            "HTTP Delete",
+            "HTTP Patch",
+            "HTTP Options"
           ],
           "type": "string",
           "enum": [
@@ -288,7 +303,9 @@
             "GET",
             "HEAD",
             "PUT",
-            "DELETE"
+            "DELETE",
+            "PATCH",
+            "OPTIONS"
           ]
         },
         "appEngineRouting": {
@@ -306,8 +323,8 @@
             "type": "string"
           }
         },
-        "payload": {
-          "description": "Payload.\n\nThe payload will be sent as the HTTP message body. A message\nbody, and thus a payload, is allowed only if the HTTP method is\nPOST or PUT. It is an error to set a data payload on a job with\nan incompatible HttpMethod.",
+        "body": {
+          "description": "Body.\n\nHTTP request body. A request body is allowed only if the HTTP method is\nPOST or PUT. It will result in an error to set body on a job with\nan incompatible HttpMethod.",
           "type": "string",
           "format": "byte"
         }
@@ -331,8 +348,55 @@
           "type": "string"
         },
         "host": {
-          "description": "Output only.\n\nThe host that the job is sent to. For more information about how App\nEngine requests are routed, see\n[here](\/appengine\/docs\/standard\/python\/how-requests-are-routed).\n\nThe host is constructed as:\n\n\n* `host = [application_domain_name]`<\/br>\n  `| [service] + '.' + [application_domain_name]`<\/br>\n  `| [version] + '.' + [application_domain_name]`<\/br>\n  `| [version_dot_service]+ '.' + [application_domain_name]`<\/br>\n  `| [instance] + '.' + [application_domain_name]`<\/br>\n  `| [instance_dot_service] + '.' + [application_domain_name]`<\/br>\n  `| [instance_dot_version] + '.' + [application_domain_name]`<\/br>\n  `| [instance_dot_version_dot_service] + '.' + [application_domain_name]`\n\n* `application_domain_name` = The domain name of the app, for\n  example <app-id>.appspot.com, which is associated with the\n  job's project ID.\n\n* `service =` AppEngineRouting.service\n\n* `version =` AppEngineRouting.version\n\n* `version_dot_service =`\n  AppEngineRouting.version `+ '.' +` AppEngineRouting.service\n\n* `instance =` AppEngineRouting.instance\n\n* `instance_dot_service =`\n  AppEngineRouting.instance `+ '.' +` AppEngineRouting.service\n\n* `instance_dot_version =`\n  AppEngineRouting.instance `+ '.' +` AppEngineRouting.version\n\n* `instance_dot_version_dot_service =`\n  AppEngineRouting.instance `+ '.' +`\n  AppEngineRouting.version `+ '.' +` AppEngineRouting.service\n\nIf AppEngineRouting.service is empty, then the job will be sent\nto the service which is the default service when the job is attempted.\n\nIf AppEngineRouting.version is empty, then the job will be sent\nto the version which is the default version when the job is attempted.\n\nIf AppEngineRouting.instance is empty, then the job will be sent\nto an instance which is available when the job is attempted.\n\nWhen AppEngineRouting.service is \"default\",\nAppEngineRouting.version is \"default\", and\nAppEngineRouting.instance is empty, AppEngineRouting.host is\nshortened to just the `application_domain_name`.\n\nIf AppEngineRouting.service, AppEngineRouting.version, or\nAppEngineRouting.instance is invalid, then the job will be sent\nto the default version of the default service when the job is attempted.",
+          "description": "Output only. The host that the job is sent to.\n\nFor more information about how App Engine requests are routed, see\n[here](\/appengine\/docs\/standard\/python\/how-requests-are-routed).\n\nThe host is constructed as:\n\n\n* `host = [application_domain_name]`<\/br>\n  `| [service] + '.' + [application_domain_name]`<\/br>\n  `| [version] + '.' + [application_domain_name]`<\/br>\n  `| [version_dot_service]+ '.' + [application_domain_name]`<\/br>\n  `| [instance] + '.' + [application_domain_name]`<\/br>\n  `| [instance_dot_service] + '.' + [application_domain_name]`<\/br>\n  `| [instance_dot_version] + '.' + [application_domain_name]`<\/br>\n  `| [instance_dot_version_dot_service] + '.' + [application_domain_name]`\n\n* `application_domain_name` = The domain name of the app, for\n  example <app-id>.appspot.com, which is associated with the\n  job's project ID.\n\n* `service =` AppEngineRouting.service\n\n* `version =` AppEngineRouting.version\n\n* `version_dot_service =`\n  AppEngineRouting.version `+ '.' +` AppEngineRouting.service\n\n* `instance =` AppEngineRouting.instance\n\n* `instance_dot_service =`\n  AppEngineRouting.instance `+ '.' +` AppEngineRouting.service\n\n* `instance_dot_version =`\n  AppEngineRouting.instance `+ '.' +` AppEngineRouting.version\n\n* `instance_dot_version_dot_service =`\n  AppEngineRouting.instance `+ '.' +`\n  AppEngineRouting.version `+ '.' +` AppEngineRouting.service\n\nIf AppEngineRouting.service is empty, then the job will be sent\nto the service which is the default service when the job is attempted.\n\nIf AppEngineRouting.version is empty, then the job will be sent\nto the version which is the default version when the job is attempted.\n\nIf AppEngineRouting.instance is empty, then the job will be sent\nto an instance which is available when the job is attempted.\n\nWhen AppEngineRouting.service is \"default\",\nAppEngineRouting.version is \"default\", and\nAppEngineRouting.instance is empty, AppEngineRouting.host is\nshortened to just the `application_domain_name`.\n\nIf AppEngineRouting.service, AppEngineRouting.version, or\nAppEngineRouting.instance is invalid, then the job will be sent\nto the default version of the default service when the job is attempted.",
           "type": "string"
+        }
+      }
+    },
+    "HttpTarget": {
+      "id": "HttpTarget",
+      "description": "Http target. The job will be pushed to the job handler by means of\nan HTTP request via an HttpTarget.http_method such as HTTP\nPOST, HTTP GET, etc. The job is acknowledged by means of an HTTP\nresponse code in the range [200 - 299]. A failure to receive a response\nconstitutes a failed execution.",
+      "type": "object",
+      "properties": {
+        "url": {
+          "description": "Required.\n\nThe full url path that the request will be sent to. This string\nmust begin with either \"http:\/\/\" or \"https:\/\/\". Some examples of\nvalid values for HttpTarget.url are:\n`http:\/\/acme.com` and `https:\/\/acme.com\/sales:8080`. Cloud Scheduler will\nencode some characters for safety and compatibility. The maximum allowed\nURL length is 2083 characters after encoding.",
+          "type": "string"
+        },
+        "httpMethod": {
+          "description": "Which HTTP method to use for the request. The default is POST.",
+          "enumDescriptions": [
+            "HTTP method unspecified",
+            "HTTP Post",
+            "HTTP Get",
+            "HTTP Head",
+            "HTTP Put",
+            "HTTP Delete",
+            "HTTP Patch",
+            "HTTP Options"
+          ],
+          "type": "string",
+          "enum": [
+            "HTTP_METHOD_UNSPECIFIED",
+            "POST",
+            "GET",
+            "HEAD",
+            "PUT",
+            "DELETE",
+            "PATCH",
+            "OPTIONS"
+          ]
+        },
+        "headers": {
+          "description": "The user can specify HTTP request headers to send with the Job's\nHTTP request. This map contains the header field names and\nvalues. Repeated headers are not supported, but a header value can\ncontain commas. These headers represent a subset of the headers\nthat will accompany the Job's HTTP request. Some HTTP request\nheaders will be ignored or replaced. A partial list of headers that\nwill be ignored or replaced is below:\n- Host: This will be computed by Cloud Scheduler and derived from\nHttpTarget.url.\n- Content-Length: This will be computed by Cloud Scheduler.\n- User-Agent: This will be populated by Cloud Scheduler.\n- X-Google-*: Google internal use only.\n- X-AppEngine-*: Google internal use only.\n\nThe total size of headers must be less than 80KB.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "body": {
+          "description": "HTTP request body. A request body is allowed only if the HTTP\nmethod is POST, PUT, or PATCH. It will result in  an error to set\nbody on a job with an incompatible HttpMethod.",
+          "type": "string",
+          "format": "byte"
         }
       }
     },
@@ -341,8 +405,8 @@
       "description": "Scheduler schedule in an English-like format.",
       "type": "object",
       "properties": {
-        "timezone": {
-          "description": "Specifies the time zone to be used in interpreting\nScheduleSpec.schedule. The value of this field must be a\ntime zone name from the tz database:\nhttp:\/\/en.wikipedia.org\/wiki\/Tz_database.\n\nNote that some timezones include a includes a provision for\ndaylight savings time. The rules for daylight saving time are\ndetermined by the chosen tz. For UTC use the string \"utc\". If a\ntimezone is not specified, the default will be in UTC (also known\nas GMT).",
+        "timeZone": {
+          "description": "Specifies the time zone to be used in interpreting\nSchedule.schedule. The value of this field must be a\ntime zone name from the tz database:\nhttp:\/\/en.wikipedia.org\/wiki\/Tz_database.\n\nNote that some time zones include a provision for\ndaylight savings time. The rules for daylight saving time are\ndetermined by the chosen tz. For UTC use the string \"utc\". If a\ntime zone is not specified, the default will be in UTC (also known\nas GMT).",
           "type": "string"
         },
         "schedule": {
@@ -380,31 +444,31 @@
     },
     "RetryConfig": {
       "id": "RetryConfig",
-      "description": "Settings that determine the retry behavior.\n\nBy default, if a job does not complete successfully (meaning that\nan acknowledgement is not received from the handler before the\n[deadline](\/appengine\/docs\/python\/taskqueue\/push\/#the_task_deadline),\nthen it will be retried with exponential backoff according to the settings\nin RetryConfig.",
+      "description": "Settings that determine the retry behavior.\n\nBy default, if a job does not complete successfully (meaning that\nan acknowledgement is not received from the handler, then it will be retried\nwith exponential backoff according to the settings in RetryConfig.",
       "type": "object",
       "properties": {
         "retryCount": {
-          "description": "It determines the total number  attempts that the system will make to\ndeliver a job using the exponential backoff procedure described above.\n\nThe default value of retry_count is zero.\n\nIf retry_count is zero, a job attempt will *not* be retried if\nit fails. Instead the Cloud Scheduler system will wait for the\nnext scheduled execution time.\n\nIf retry_count is set to a non-zero number then Cloud Scheduler\nwill retry failed attempts, using exponential backoff,\nretry_count times, or until the next scheduled execution time,\nwhichever comes first.\n\nValue greater than 5 and negative values are not allowed.",
+          "description": "It determines the  number attempts that the system will make to run a\njob using the exponential backoff procedure described above.\n\nThe default value of retry_count is zero.\n\nIf retry_count is zero, a job attempt will *not* be retried if\nit fails. Instead the Cloud Scheduler system will wait for the\nnext scheduled execution time.\n\nIf retry_count is set to a non-zero number then Cloud Scheduler\nwill retry failed attempts, using exponential backoff,\nretry_count times, or until the next scheduled execution time,\nwhichever comes first.\n\nValue greater than 5 and negative values are not allowed.",
           "type": "integer",
           "format": "int32"
         },
-        "jobAgeLimit": {
-          "description": "The time limit for retrying a failed job, measured from when the\njob was first run. If specified with RetryConfig.retry_count,\nthe job will be retried until both limits are reached.\n\nThe default value for job_age_limit is zero, which means job age is\nunlimited.",
+        "maxRetryDuration": {
+          "description": "The time limit for retrying a failed job, measured from time when an\nexecution was first attempted. If specified with\nRetryConfig.retry_count, the job will be retried until both limits are\nreached.\n\nThe default value for max_retry_duration is zero, which means retry\nduration is unlimited.",
           "type": "string",
           "format": "google-duration"
         },
-        "minBackoffSeconds": {
-          "description": "The minimum amount of time to wait before retrying a task after\nit fails.\n\nThe default value of this field is 0.1 seconds.",
+        "minBackoffDuration": {
+          "description": "The minimum amount of time to wait before retrying a job after\nit fails.\n\nThe default value of this field is 5 seconds.",
           "type": "string",
           "format": "google-duration"
         },
-        "maxBackoffSeconds": {
-          "description": "The maximum amount of time to wait before retrying a task after\nit fails.\n\nThe default value of this field is 1 hour.",
+        "maxBackoffDuration": {
+          "description": "The maximum amount of time to wait before retrying a job after\nit fails.\n\nThe default value of this field is 1 hour.",
           "type": "string",
           "format": "google-duration"
         },
         "maxDoublings": {
-          "description": "The maximum number of times that the interval between failed job\nretries will be doubled before the increase becomes constant. The\nconstant is: 2**(max_doublings - 1) *\nRetryConfig.min_backoff_seconds.\n\nThe default value of this field is 16.",
+          "description": "The time between retries will double `max_doublings` times.\n\nA job's retry interval starts at\nmin_backoff_duration, then doubles\n`max_doublings` times, then increases linearly, and finally\nretries retries at intervals of\nmax_backoff_duration up to\nretry_count times.\n\nFor example, if min_backoff_duration is\n10s, max_backoff_duration is 300s, and\n`max_doublings` is 3, then the a job will first be retried in 10s. The\nretry interval will double three times, and then increase linearly by\n2^3 * 10s.  Finally, the job will retry at intervals of\nmax_backoff_duration until the job has\nbeen attempted retry_count times. Thus, the\nrequests will retry at 10s, 20s, 40s, 80s, 160s, 240s, 300s, 300s, ....\n\nThe default value of this field is 5.",
           "type": "integer",
           "format": "int32"
         }
@@ -522,7 +586,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Get information about a location."
+              "description": "Gets information about a location."
             }
           }
           ,
@@ -542,16 +606,6 @@
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
                       "type": "string"
                     },
-                    "responseView": {
-                      "description": "The response_view specifies which subset of the Job will be\nreturned.\n\nBy default response_view is Job.View.BASIC; not all\ninformation is retrieved by default because some data, such as\npayloads, might be desirable to return only when needed because\nof its large size or because of the sensitivity of data that it\ncontains.\n\nAuthorization for Job.View.FULL requires\n`cloudscheduler.jobs.fullView`\n[Google IAM](https:\/\/cloud.google.com\/iam\/) permission on the\nJob.name resource.",
-                      "location": "query",
-                      "type": "string",
-                      "enum": [
-                        "VIEW_UNSPECIFIED",
-                        "BASIC",
-                        "FULL"
-                      ]
-                    },
                     "pageSize": {
                       "description": "Requested page size. Fewer jobs than requested might be returned.\n\nThe maximum page size is 500. If unspecified, the page size will\nbe the maximum. Fewer jobs than requested might be returned,\neven if more jobs exist; use next_page_token to determine if more\njobs exist.",
                       "location": "query",
@@ -559,10 +613,9 @@
                       "format": "int32"
                     },
                     "pageToken": {
-                      "description": "A token identifying a page of results the server will return. To\nrequest the first page results, page_token must be empty. To\nrequest the next page of results, page_token must be the value of\nListJobsResponse.next_page_token returned from the previous\ncall to CloudScheduler.ListJobs. It is an error to switch the\nvalue of ListJobsRequest.filter or\nListJobsRequest.order_by while iterating through pages.\n\nFor JSON requests, the value of this field must be\nbase64-encoded.",
+                      "description": "A token identifying a page of results the server will return. To\nrequest the first page results, page_token must be empty. To\nrequest the next page of results, page_token must be the value of\nListJobsResponse.next_page_token returned from the previous\ncall to CloudScheduler.ListJobs. It is an error to switch the\nvalue of ListJobsRequest.filter or\nListJobsRequest.order_by while iterating through pages.",
                       "location": "query",
-                      "type": "string",
-                      "format": "byte"
+                      "type": "string"
                     }
                   },
                   "parameterOrder": [
@@ -574,7 +627,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Lists jobs.\n\nListJobsRequest.filter can be used to specify a subset of\njobs. ListJobsRequest.response_view controls the subset of\ninformation returned. By default response_view is\nJob.View.BASIC; not all information is returned by default\ndue to performance considerations."
+                  "description": "Lists jobs."
                 },
                 "get": {
                   "id": "cloudscheduler.projects.locations.jobs.get",
@@ -588,16 +641,6 @@
                       "required": true,
                       "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/jobs\/[^\/]+$",
                       "type": "string"
-                    },
-                    "responseView": {
-                      "description": "The response_view specifies which subset of the Job will be\nreturned.\n\nBy default ListJobsRequest.response_view is\nJob.View.BASIC; not all\ninformation is retrieved by default because some data, such as\npayloads, might be desirable to return only when needed because\nof its large size or because of the sensitivity of data that it\ncontains.\n\nAuthorization for Job.View.FULL requires\n`cloudscheduler.jobs.fullView`\n[Google IAM](https:\/\/cloud.google.com\/iam\/) permission on the\nJob.name resource.",
-                      "location": "query",
-                      "type": "string",
-                      "enum": [
-                        "VIEW_UNSPECIFIED",
-                        "BASIC",
-                        "FULL"
-                      ]
                     }
                   },
                   "parameterOrder": [
@@ -685,12 +728,12 @@
                     "$ref": "RunJobRequest"
                   },
                   "response": {
-                    "$ref": "Empty"
+                    "$ref": "Job"
                   },
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "Forces a job to run now.\n\nWhen this method is called, Cloud Scheduler will immediately attempt the\njob. The attempt will be counted in the job's Job.total_attempt_count.\n\nThe job's existing schedule is not modified, so the job\nwill also be attempted according to its normal schedule."
+                  "description": "Forces a job to run now.\n\nWhen this method is called, Cloud Scheduler will immediately attempt the\njob."
                 }
               }
             }

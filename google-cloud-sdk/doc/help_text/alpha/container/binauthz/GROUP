@@ -21,6 +21,13 @@ GROUPS
      attestations
         (ALPHA) Create and manage Google Binary Authorization attestations.
 
+     authorities
+        (ALPHA) Create and manage Google Binary Authorization Attestation
+        Authorities.
+
+     policy
+        (ALPHA) Create and manage Google Binary Authorization policy.
+
 COMMANDS
     COMMAND is one of the following:
 

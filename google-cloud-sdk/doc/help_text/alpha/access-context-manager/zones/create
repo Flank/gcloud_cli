@@ -27,7 +27,7 @@ POSITIONAL ARGUMENTS
 REQUIRED FLAGS
      --resources=[RESOURCES,...]
         Comma-separated list of resources (currently only projects, in the form
-        project/<projectnumber>) in this zone.
+        projects/<projectnumber>) in this zone.
 
      --title=TITLE
         Short human-readable title for the access zone.

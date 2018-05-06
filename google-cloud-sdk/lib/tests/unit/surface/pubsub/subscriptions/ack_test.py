@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Test of the 'pubsub subscriptions ack' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.pubsub import util
@@ -41,7 +45,7 @@ class SubscriptionsAckTest(base.CloudPubsubTestBase):
     result = self.Run(
         'pubsub subscriptions ack subs1 --ack-ids="ACKID1,ACKID2"')
 
-    self.assertEquals(result, self.msgs.Empty())
+    self.assertEqual(result, self.msgs.Empty())
     self.AssertErrContains('Acked the messages with the following ackIds: '
                            '[ACKID1,ACKID2]')
 
@@ -58,7 +62,7 @@ class SubscriptionsAckTest(base.CloudPubsubTestBase):
         'pubsub subscriptions ack {} --ack-ids="ACKID1,ACKID2"'
         .format(sub_ref.SelfLink()))
 
-    self.assertEquals(result, self.msgs.Empty())
+    self.assertEqual(result, self.msgs.Empty())
     self.AssertErrContains('Acked the messages with the following ackIds: '
                            '[ACKID1,ACKID2]')
 
@@ -90,9 +94,14 @@ class SubscriptionsAckGATest(base.CloudPubsubTestBase):
     result = self.Run(
         'pubsub subscriptions ack subs1 --ack-ids="ACKID1,ACKID2"')
 
-    self.assertEquals(result, self.msgs.Empty())
+    self.assertEqual(result, self.msgs.Empty())
     self.AssertErrContains('Acked the messages with the following ackIds: '
                            '[ACKID1,ACKID2]')
+
+  def testSubscriptionsAcknowledgeNoAckIds(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --ack-ids: Must be specified.'):
+      self.Run('pubsub subscriptions ack subs1')
 
 
 class SubscriptionsAckBetaTest(SubscriptionsAckTest):
@@ -114,7 +123,7 @@ class SubscriptionsAckBetaTest(SubscriptionsAckTest):
     result = self.Run(
         'pubsub subscriptions ack subs1 ACKID1 ACKID2')
 
-    self.assertEquals(result, self.msgs.Empty())
+    self.assertEqual(result, self.msgs.Empty())
     self.AssertErrContains('Acked the messages with the following ackIds: '
                            '[ACKID1,ACKID2]')
     self.AssertErrContains('Positional argument `ACK_ID` is deprecated. '
@@ -135,8 +144,8 @@ class SubscriptionsAckBetaTest(SubscriptionsAckTest):
 
     self.AssertErrContains('Acked the messages with the following ackIds: '
                            '[ACKID1,ACKID2]')
-    self.assertEquals(result['ackIds'], ['ACKID1', 'ACKID2'])
-    self.assertEquals(result['subscriptionId'], sub_ref.RelativeName())
+    self.assertEqual(result['ackIds'], ['ACKID1', 'ACKID2'])
+    self.assertEqual(result['subscriptionId'], sub_ref.RelativeName())
 
   def testSubscriptionsAcknowledgeMutuallyExlusiveArgs(self):
     with self.AssertRaisesExceptionMatches(

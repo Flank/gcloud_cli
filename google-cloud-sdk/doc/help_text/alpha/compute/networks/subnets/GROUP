@@ -29,7 +29,7 @@ COMMANDS
         (ALPHA) Expand the IP range of a Google Compute Engine subnetwork.
 
      get-iam-policy
-        (ALPHA) Get the IAM Policy for a Google Compute Engine subnetwork.
+        (ALPHA) Get the IAM policy for a Google Compute Engine subnetwork.
 
      list
         (ALPHA) List Google Compute Engine subnetworks.

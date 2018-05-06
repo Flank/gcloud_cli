@@ -27,6 +27,9 @@ GROUPS
      operations
         (ALPHA) Manage Cloud Spanner operations.
 
+     rows
+        (ALPHA) Manage the rows in Cloud Spanner databases.
+
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,
     users of ALPHA commands and flags need to apply for access, agree to

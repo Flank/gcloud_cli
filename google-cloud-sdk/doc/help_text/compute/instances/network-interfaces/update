@@ -1,0 +1,70 @@
+NAME
+    gcloud compute instances network-interfaces update - update a Google
+        Compute Engine virtual machine network interface
+
+SYNOPSIS
+    gcloud compute instances network-interfaces update INSTANCE_NAME
+        [--aliases=ALIASES]
+        [--network-interface=NETWORK_INTERFACE; default="nic0"] [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute instances network-interfaces update updates network
+    interfaces of a Google Compute Engine virtual machine. For example:
+
+        $ gcloud compute instances network-interfaces update \
+            example-instance --zone us-central1-a --aliases r1:172.16.0.1/32
+
+    sets 172.16.0.1/32 from range r1 of the default interface's subnetwork as
+    the interface's alias IP.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAME
+        The name of the instance to operate on.
+
+FLAGS
+     --aliases=ALIASES
+        The IP alias ranges to allocate for this interface. If there are
+        multiple IP alias ranges, they are separated by semicolons.
+
+        For example:
+
+            --aliases="10.128.1.0/24;r1:/32"
+
+     --network-interface=NETWORK_INTERFACE; default="nic0"
+        The name of the network interface to update.
+
+     --zone=ZONE
+        The zone of the instance to operate on. If not specified, you may be
+        prompted to select a zone. gcloud will attempt to identify the zone by
+        searching for resources in your project. If the zone cannot be
+        determined, you will then be prompted with all Google Cloud Platform
+        zones.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute instances network-interfaces update
+        $ gcloud beta compute instances network-interfaces update
+

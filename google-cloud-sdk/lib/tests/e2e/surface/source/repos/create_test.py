@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the source repos create, delete, and describe commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
@@ -25,7 +27,7 @@ class CreateTest(base.SourceIntegrationTest):
 
   def testCreate(self):
     properties.VALUES.core.user_output_enabled.Set(True)
-    repo_name = e2e_utils.GetResourceNameGenerator(prefix='createtest').next()
+    repo_name = next(e2e_utils.GetResourceNameGenerator(prefix='createtest'))
     self.RunSourceRepos(['create', repo_name, '--format=default'])
     try:
       self.AssertErrContains('Created [createtest', normalize_space=True)

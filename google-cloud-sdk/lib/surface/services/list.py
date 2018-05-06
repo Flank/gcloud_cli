@@ -14,6 +14,8 @@
 
 """services list command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import list_pager
 
 from googlecloudsdk.api_lib.services import services_util
@@ -67,7 +69,7 @@ class List(base.ListCommand):
 
     parser.display_info.AddFormat("""
           table(
-            serviceName:label=NAME,
+            serviceName:label=NAME:sort=1,
             serviceConfig.title
           )
         """)

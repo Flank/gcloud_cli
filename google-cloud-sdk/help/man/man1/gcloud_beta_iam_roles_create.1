@@ -65,7 +65,9 @@ The permissions of the role you want to create. Use commas to separate them.
 
 .TP 2m
 \fB\-\-stage\fR=\fISTAGE\fR
-The state of the role you want to create.
+The state of the role you want to create. This represents a role's lifecycle
+phase: \f5ALPHA\fR, \f5BETA\fR, \f5GA\fR, \f5DEPRECATED\fR, \f5DISABLED\fR,
+\f5EAP\fR.
 
 .TP 2m
 \fB\-\-title\fR=\fITITLE\fR
@@ -108,10 +110,11 @@ $ gcloud beta iam roles create editor \-\-project myproject \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud iam roles create
+$ gcloud alpha iam roles create
 .RE
 

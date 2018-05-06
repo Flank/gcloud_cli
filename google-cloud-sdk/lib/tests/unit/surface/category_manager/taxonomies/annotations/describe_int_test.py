@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for 'gcloud category-manager annotations describe'."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
@@ -74,14 +76,14 @@ class AnnotationsDescribeIntTest(base.CategoryManagerUnitTestBase):
     actual_annotation = self.Run(
         'category-manager taxonomies annotations describe ' +
         self.project_annotation.RelativeName())
-    self.assertEquals(actual_annotation, self.expected_project_annotation)
+    self.assertEqual(actual_annotation, self.expected_project_annotation)
 
   def testDescribeProjectAnnotationWithPositionalAndFlag(self):
     self._ExpectGetProjectAnnotation(self.expected_project_annotation)
     args = '{} --taxonomy {}'.format(self.annotation_id, self.taxonomy_id)
     actual_annotation = self.Run(
         'category-manager taxonomies annotations describe ' + args)
-    self.assertEquals(actual_annotation, self.expected_project_annotation)
+    self.assertEqual(actual_annotation, self.expected_project_annotation)
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
   def testDescribeTaxonomyStoreAnnotationUsingName(self):
@@ -90,8 +92,8 @@ class AnnotationsDescribeIntTest(base.CategoryManagerUnitTestBase):
     actual_annotation = self.Run(
         'category-manager taxonomies annotations describe ' +
         self.taxonomy_store_annotation.Name())
-    self.assertEquals(actual_annotation,
-                      self.expected_taxonomy_store_annotation)
+    self.assertEqual(actual_annotation,
+                     self.expected_taxonomy_store_annotation)
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
   def testDescribeTaxonomyStoreAnnotationWithPositionalAndFlag(self):
@@ -101,8 +103,8 @@ class AnnotationsDescribeIntTest(base.CategoryManagerUnitTestBase):
         self.annotation_id, self.taxonomy_id, self.taxonomy_store_id)
     actual_annotation = self.Run(
         'category-manager taxonomies annotations describe ' + args)
-    self.assertEquals(actual_annotation,
-                      self.expected_taxonomy_store_annotation)
+    self.assertEqual(actual_annotation,
+                     self.expected_taxonomy_store_annotation)
 
 
 if __name__ == '__main__':

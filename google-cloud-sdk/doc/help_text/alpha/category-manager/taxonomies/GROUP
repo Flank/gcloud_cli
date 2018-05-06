@@ -25,6 +25,9 @@ GROUPS
 COMMANDS
     COMMAND is one of the following:
 
+     create
+        (ALPHA) Create a taxonomy in a project.
+
      delete
         (ALPHA) Delete a taxonomy and all of its annotations.
 
@@ -33,6 +36,9 @@ COMMANDS
 
      list
         (ALPHA) List taxonomies.
+
+     update
+        (ALPHA) Update the description of a taxonomy.
 
 NOTES
     This command is an internal implementation detail and may change or

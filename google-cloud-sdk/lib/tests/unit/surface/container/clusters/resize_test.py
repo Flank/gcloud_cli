@@ -14,6 +14,8 @@
 
 """Test of the 'clusters resize' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -185,6 +187,10 @@ class ResizeTestGA(base.TestBaseV1,
     self.AssertErrContains('No node pool named \'bar\' in {0}'.format(
         cluster.name))
 
+  def testResizeMoreNodesRegional(self):
+    self.WriteInput('y\ny')
+    self._TestResizeMoreNodes(self.REGION)
+
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -194,10 +200,6 @@ class ResizeTestBetaV1API(base.BetaTestBase, ResizeTestGA):
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(True)
     self.api_mismatch = True
-
-  def testResizeMoreNodesRegional(self):
-    self.WriteInput('y\ny')
-    self._TestResizeMoreNodes(self.REGION)
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.

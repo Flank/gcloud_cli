@@ -26,7 +26,7 @@ class SubnetsListUsableTest(cli_test_base.CliTestBase,
                             sdk_test_base.WithFakeAuth):
   """Unit tests for 'subnets list-usable' fake auth and mocks."""
 
-  api_version = 'alpha'
+  api_version = 'beta'
 
   COMPUTE_API_BASE = 'https://www.googleapis.com/compute/v1/projects/'
   COMPUTE_DISCOVERY_URL = (
@@ -40,7 +40,7 @@ class SubnetsListUsableTest(cli_test_base.CliTestBase,
     properties.VALUES.compute.use_new_list_usable_subnets_api.Set(True)
     properties.VALUES.core.project.Set(self.PROJECT_ID)
     api_name = 'compute'
-    api_version = 'alpha'
+    api_version = 'beta'
     self.mock_client = mock.Client(
         apis.GetClientClass(api_name, api_version),
         real_client=apis.GetClientInstance(api_name, api_version, no_http=True))

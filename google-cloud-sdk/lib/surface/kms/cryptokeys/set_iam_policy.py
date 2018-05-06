@@ -13,6 +13,8 @@
 # limitations under the License.
 """Set the IAM policy for a CryptoKey."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudkms import base as cloudkms_base
 from googlecloudsdk.api_lib.cloudkms import iam
 from googlecloudsdk.calliope import base
@@ -48,8 +50,8 @@ class SetIamPolicy(base.Command):
   def Run(self, args):
     messages = cloudkms_base.GetMessagesModule()
 
-    policy = iam_util.ParseYamlorJsonPolicyFile(args.policy_file,
-                                                messages.Policy)
+    policy, unused_mask = iam_util.ParseYamlOrJsonPolicyFile(args.policy_file,
+                                                             messages.Policy)
 
     crypto_key_ref = flags.ParseCryptoKeyName(args)
     result = iam.SetCryptoKeyIamPolicy(crypto_key_ref, policy)

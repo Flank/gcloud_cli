@@ -14,6 +14,8 @@
 
 """Tests for 'node-pools get' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -54,6 +56,9 @@ class GetTestGA(base.TestBaseV1,
 
   def testGetNodePool(self):
     self._TestGetNodePool(self.ZONE)
+
+  def testGetRegionalNodePool(self):
+    self._TestGetNodePool(self.REGION)
 
   def testGetHttpError(self):
     self.ExpectGetNodePool(self.NODE_POOL_NAME, exception=self.HttpError())
@@ -99,9 +104,6 @@ class GetTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, GetTestAlphaV1API,
 
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(False)
-
-  def testGetRegionalNodePool(self):
-    self._TestGetNodePool(self.REGION)
 
 
 if __name__ == '__main__':

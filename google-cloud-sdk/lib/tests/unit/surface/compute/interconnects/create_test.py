@@ -218,6 +218,34 @@ class InterconnectsCreateBetaTest(test_base.BaseTest):
     self.CheckInterconnectRequest(description='this is my interconnect')
     self.AssertOutputEquals('')
 
+  def testCreateInterconnect_partner(self):
+    self.ExpectInterconnectRequest(interconnectType=self.messages.Interconnect.
+                                   InterconnectTypeValueValuesEnum.PARTNER)
+
+    self.Run('compute interconnects create my-interconnect '
+             '--interconnect-type PARTNER '
+             '--location my-location --link-type LINK_TYPE_ETHERNET_10G_LR '
+             '--requested-link-count 5 --admin-enabled '
+             '--customer-name customer-name')
+
+    self.CheckInterconnectRequest(interconnectType=self.messages.Interconnect.
+                                  InterconnectTypeValueValuesEnum.PARTNER)
+    self.AssertOutputEquals('')
+
+  def testCreateInterconnect_private(self):
+    self.ExpectInterconnectRequest()
+
+    self.Run('compute interconnects create my-interconnect '
+             '--interconnect-type IT_PRIVATE '
+             '--location my-location --link-type LINK_TYPE_ETHERNET_10G_LR '
+             '--requested-link-count 5 --admin-enabled '
+             '--customer-name customer-name')
+
+    self.CheckInterconnectRequest()
+    self.AssertOutputEquals('')
+    self.AssertErrEquals('WARNING: IT_PRIVATE will be deprecated for '
+                         'interconnect-type. Please use DEDICATED instead.\n')
+
 
 class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):
 
@@ -238,20 +266,6 @@ class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):
               project='my-project',
               interconnect=self.CreateTestInterconnectMessage(**kwargs)))])
 
-  def testCreateInterconnect_private(self):
-    self.ExpectInterconnectRequest()
-
-    self.Run('compute interconnects create my-interconnect '
-             '--interconnect-type IT_PRIVATE '
-             '--location my-location --link-type LINK_TYPE_ETHERNET_10G_LR '
-             '--requested-link-count 5 --admin-enabled '
-             '--customer-name customer-name')
-
-    self.CheckInterconnectRequest()
-    self.AssertOutputEquals('')
-    self.AssertErrEquals('WARNING: IT_PRIVATE will be deprecated for '
-                         'interconnect-type. Please use DEDICATED instead.\n')
-
   def testCreateInterconnect_dedicated(self):
     self.ExpectInterconnectRequest(interconnectType=self.messages.Interconnect.
                                    InterconnectTypeValueValuesEnum.DEDICATED)
@@ -266,20 +280,6 @@ class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):
                                   InterconnectTypeValueValuesEnum.DEDICATED)
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
-
-  def testCreateInterconnect_partner(self):
-    self.ExpectInterconnectRequest(interconnectType=self.messages.Interconnect.
-                                   InterconnectTypeValueValuesEnum.PARTNER)
-
-    self.Run('compute interconnects create my-interconnect '
-             '--interconnect-type PARTNER '
-             '--location my-location --link-type LINK_TYPE_ETHERNET_10G_LR '
-             '--requested-link-count 5 --admin-enabled '
-             '--customer-name customer-name')
-
-    self.CheckInterconnectRequest(interconnectType=self.messages.Interconnect.
-                                  InterconnectTypeValueValuesEnum.PARTNER)
-    self.AssertOutputEquals('')
 
 
 if __name__ == '__main__':

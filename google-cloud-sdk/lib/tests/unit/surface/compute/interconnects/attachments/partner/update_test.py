@@ -156,3 +156,12 @@ class InterconnectAttachmentsProviderUpdateAlphaTest(test_base.BaseTest):
                   labelFingerprint='abcd',
                   adminEnabled=False)))],
     )
+
+
+class InterconnectAttachmentsProviderUpdateBetaTest(
+    InterconnectAttachmentsProviderUpdateAlphaTest):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.message_version = self.compute_beta

@@ -54,8 +54,9 @@ EXAMPLES
             --role='roles/editor'
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud kms keyrings remove-iam-policy-binding
+        $ gcloud alpha kms keyrings remove-iam-policy-binding
 

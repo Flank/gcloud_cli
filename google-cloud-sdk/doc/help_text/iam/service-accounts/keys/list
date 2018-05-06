@@ -69,7 +69,8 @@ EXAMPLES
             --created-before 2015-07-19T12:00:00Z
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam service-accounts keys list
         $ gcloud beta iam service-accounts keys list
 

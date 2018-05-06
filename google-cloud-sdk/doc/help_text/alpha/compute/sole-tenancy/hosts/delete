@@ -7,9 +7,14 @@ SYNOPSIS
         [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute sole-tenancy hosts delete deletes one or more
-    Google Compute Engine sole-tenancy hosts. Hosts can be deleted only if they
-    are not being used by any virtual machine instances.
+    (ALPHA) (DEPRECATED) Delete Google Compute Engine sole-tenancy hosts.
+
+    This command group is deprecated. Please use gcloud alpha compute
+    sole-tenancy node-groups instead.
+
+    gcloud alpha compute sole-tenancy hosts delete deletes one or more Google
+    Compute Engine sole-tenancy hosts. Hosts can be deleted only if they are
+    not being used by any virtual machine instances.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
@@ -18,7 +23,7 @@ POSITIONAL ARGUMENTS
 FLAGS
      --zone=ZONE
         The zone of the hosts to delete. If not specified and the compute/zone
-        property isn't set, you will be prompted to select a zone.
+        property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

@@ -47,11 +47,12 @@ def GetTestProjectWithLongNameAndMatchingId():
       name=u'AbcdefghijkLMNOpqrstuvwxyz ')  # needs to be at least 24 characters
 
 
-def GetTestActiveProject():
+def GetTestActiveProject(prefix=False):
   messages = projects_util.GetMessages()
   return messages.Project(
       lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-      projectId=u'feisty-catcher-644',
+      projectId=(
+          u'projects/feisty-catcher-644' if prefix else u'feisty-catcher-644'),
       projectNumber=925276746377,
       name=u'My Project 5')
 
@@ -118,25 +119,20 @@ def GetTestIamPolicy(clear_fields=None):
       auditConfigs=[
           messages.AuditConfig(
               auditLogConfigs=[
-                  messages.AuditLogConfig(
-                      logType=messages.AuditLogConfig.LogTypeValueValuesEnum
-                      .ADMIN_READ)
+                  messages.AuditLogConfig(logType=messages.AuditLogConfig.
+                                          LogTypeValueValuesEnum.ADMIN_READ)
               ],
               service=u'allServices')
       ],
       bindings=[
           messages.Binding(
-              members=[
-                  u'serviceAccount:123hash@developer.gserviceaccount.com'
-              ],
+              members=[u'serviceAccount:123hash@developer.gserviceaccount.com'],
               role=u'roles/editor'),
           messages.Binding(
-              members=[
-                  u'user:tester@gmail.com', u'user:slick@gmail.com'
-              ],
+              members=[u'user:tester@gmail.com', u'user:slick@gmail.com'],
               role=u'roles/owner')
       ],
-      etag='<< Unique versioning etag bytefield >>',
+      etag=b'<< Unique versioning etag bytefield >>',
       version=0)
 
   for field in clear_fields:

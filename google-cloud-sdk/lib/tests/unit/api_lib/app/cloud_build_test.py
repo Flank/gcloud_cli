@@ -355,21 +355,21 @@ class CloudBuildTest(test_case.TestCase):
   def testFixUpBuild_InvalidBuild(self):
     basic_build = cloud_build.GetDefaultBuild(self._OUTPUT_IMAGE)
     basic_build.source = self.messages.Source()
-    with self.assertRaisesRegexp(cloud_build.InvalidBuildError, re.escape(
+    with self.assertRaisesRegex(cloud_build.InvalidBuildError, re.escape(
         'Field [source] was provided, but should not have been. '
         'You may be using an improper Cloud Build pipeline.')):
       cloud_build.FixUpBuild(basic_build, self.object_ref)
 
     basic_build = cloud_build.GetDefaultBuild(self._OUTPUT_IMAGE)
     basic_build.timeout = '100s'
-    with self.assertRaisesRegexp(cloud_build.InvalidBuildError, re.escape(
+    with self.assertRaisesRegex(cloud_build.InvalidBuildError, re.escape(
         'Field [timeout] was provided, but should not have been. '
         'You may be using an improper Cloud Build pipeline.')):
       cloud_build.FixUpBuild(basic_build, self.object_ref)
 
     basic_build = cloud_build.GetDefaultBuild(self._OUTPUT_IMAGE)
     basic_build.logsBucket = 'bucket'
-    with self.assertRaisesRegexp(cloud_build.InvalidBuildError, re.escape(
+    with self.assertRaisesRegex(cloud_build.InvalidBuildError, re.escape(
         'Field [logsBucket] was provided, but should not have been. '
         'You may be using an improper Cloud Build pipeline.')):
       cloud_build.FixUpBuild(basic_build, self.object_ref)

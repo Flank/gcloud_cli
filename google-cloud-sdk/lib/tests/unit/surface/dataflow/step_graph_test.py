@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for step_graph."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.dataflow import exceptions
 from googlecloudsdk.api_lib.dataflow import step_graph
 from tests.lib import cli_test_base
@@ -22,36 +24,36 @@ from tests.lib import test_case
 class StepGraphTest(cli_test_base.CliTestBase):
 
   def testSplitStep(self):
-    self.assertEquals([''], step_graph._SplitStep(''))
-    self.assertEquals(['Transform'], step_graph._SplitStep('Transform'))
-    self.assertEquals(['Transform', 'Step'],
-                      step_graph._SplitStep('Transform/Step'))
-    self.assertEquals(['A', 'B', 'C'], step_graph._SplitStep('A/B/C'))
+    self.assertEqual([''], step_graph._SplitStep(''))
+    self.assertEqual(['Transform'], step_graph._SplitStep('Transform'))
+    self.assertEqual(['Transform', 'Step'],
+                     step_graph._SplitStep('Transform/Step'))
+    self.assertEqual(['A', 'B', 'C'], step_graph._SplitStep('A/B/C'))
 
-    self.assertEquals(['A', 'B(some/path)', 'C'],
-                      step_graph._SplitStep('A/B(some/path)/C'))
+    self.assertEqual(['A', 'B(some/path)', 'C'],
+                     step_graph._SplitStep('A/B(some/path)/C'))
 
   def testUnflattenStepsToClustersTwoLeaves(self):
     root = step_graph._UnflattenStepsToClusters(self._Steps(['Foo', 'Bar']))
-    self.assertEquals(2, len(root.Children()))
+    self.assertEqual(2, len(root.Children()))
     self.assertTrue(root.IsRoot())
     self.assertFalse(root.IsLeaf())
     self.assertFalse(root.IsSingleton())
 
     key1, cluster1 = root.Children()[0]
     key2, cluster2 = root.Children()[1]
-    self.assertEquals('Bar', key1)
+    self.assertEqual('Bar', key1)
     self.assertTrue(cluster1.IsLeaf())
     self.assertFalse(cluster1.IsRoot())
     self.assertFalse(cluster1.IsSingleton())
-    self.assertEquals('Foo', key2)
+    self.assertEqual('Foo', key2)
     self.assertTrue(cluster2.IsLeaf())
     self.assertFalse(cluster2.IsRoot())
     self.assertFalse(cluster2.IsSingleton())
 
   def testSplitStepAcuumulatesMismatched(self):
     user_name = 'bad/step)'
-    self.assertEquals(['bad', ['step)', '/']], step_graph._SplitStep(user_name))
+    self.assertEqual(['bad', ['step)', '/']], step_graph._SplitStep(user_name))
 
   def testUnsupportedGraphvizName(self):
     name = 'bad-name\\\\'
@@ -64,43 +66,43 @@ class StepGraphTest(cli_test_base.CliTestBase):
     root = step_graph._UnflattenStepsToClusters(
         self._Steps(['A/B', 'A/C', 'D/E']))
 
-    self.assertEquals(2, len(root.Children()))
+    self.assertEqual(2, len(root.Children()))
     self.assertTrue(root.IsRoot())
     self.assertFalse(root.IsLeaf())
     self.assertFalse(root.IsSingleton())
 
     key_a, cluster_a = root.Children()[0]
     key_d, cluster_d = root.Children()[1]
-    self.assertEquals('A', key_a)
+    self.assertEqual('A', key_a)
     self.assertFalse(cluster_a.IsLeaf())
     self.assertFalse(cluster_a.IsRoot())
 
     self.assertFalse(cluster_a.IsSingleton())
 
-    self.assertEquals(2, len(cluster_a.Children()))
+    self.assertEqual(2, len(cluster_a.Children()))
     key_ab, cluster_ab = cluster_a.Children()[0]
     key_ac, cluster_ac = cluster_a.Children()[1]
-    self.assertEquals('B', key_ab)
-    self.assertEquals('A/B', cluster_ab.Name())
-    self.assertEquals('B', cluster_ab.Name(relative_to=cluster_a))
+    self.assertEqual('B', key_ab)
+    self.assertEqual('A/B', cluster_ab.Name())
+    self.assertEqual('B', cluster_ab.Name(relative_to=cluster_a))
     self.assertTrue(cluster_ab.IsLeaf())
     self.assertFalse(cluster_ab.IsRoot())
     self.assertFalse(cluster_ab.IsSingleton())
 
-    self.assertEquals('C', key_ac)
+    self.assertEqual('C', key_ac)
     self.assertTrue(cluster_ac.IsLeaf())
     self.assertFalse(cluster_ac.IsRoot())
     self.assertFalse(cluster_ac.IsSingleton())
 
-    self.assertEquals('D', key_d)
+    self.assertEqual('D', key_d)
     self.assertFalse(cluster_d.IsLeaf())
     self.assertFalse(cluster_d.IsRoot())
     self.assertTrue(cluster_d.IsSingleton())
-    self.assertEquals(1, len(cluster_d.Children()))
+    self.assertEqual(1, len(cluster_d.Children()))
 
     key_de, cluster_de = cluster_d.Children()[0]
 
-    self.assertEquals('E', key_de)
+    self.assertEqual('E', key_de)
     self.assertTrue(cluster_de.IsLeaf())
     self.assertFalse(cluster_de.IsRoot())
     self.assertFalse(cluster_de.IsSingleton())
@@ -163,14 +165,14 @@ class StepGraphTest(cli_test_base.CliTestBase):
     self.assertIn(self._Edge('"s3"', '"myStep"', '"out3"', 'solid'), result)
 
   def testOutputGraphvizClustersSimple(self):
-    self.assertEquals("""\
+    self.assertEqual("""\
 "s0" [label="A", tooltip="A", style=filled, fillcolor=white];
 "s1" [label="B", tooltip="B", style=filled, fillcolor=white];
 "s2" [label="C", tooltip="C", style=filled, fillcolor=white];
 """, self._GetNodes(['A', 'B', 'C']))
 
   def testOutputGraphvizClustersNesting(self):
-    self.assertEquals("""\
+    self.assertEqual("""\
 subgraph "cluster A" {
 style=filled;
 bgcolor=white;

@@ -25,8 +25,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.command_lib.compute.instances import flags as instances_flags
-from googlecloudsdk.command_lib.compute.maintenance_policies import flags as maintenance_flags
-from googlecloudsdk.command_lib.compute.maintenance_policies import util as maintenance_util
+from googlecloudsdk.command_lib.compute.sole_tenancy import flags as sole_tenancy_flags
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
@@ -66,7 +65,7 @@ def _CommonArgs(parser,
                 enable_regional=False,
                 support_local_ssd_size=False,
                 enable_kms=False,
-                enable_maintenance_policies=False):
+                support_sole_tenancy=False):
   """Register parser args common to all tracks."""
   metadata_utils.AddMetadataArgs(parser)
   instances_flags.AddDiskArgs(parser, enable_regional, enable_kms=enable_kms)
@@ -105,8 +104,9 @@ def _CommonArgs(parser,
     instances_flags.AddPublicDnsArgs(parser, instance=True)
   if support_network_tier:
     instances_flags.AddNetworkTierArgs(parser, instance=True)
-  if enable_maintenance_policies:
-    maintenance_flags.AddResourceMaintenancePolicyArgs(parser, 'added to')
+  if support_sole_tenancy:
+    sole_tenancy_flags.AddNodeAffinityFlagToParser(parser)
+    sole_tenancy_flags.AddSoleTenancyArgsToParser(parser)
 
   labels_util.AddCreateLabelsFlags(parser)
   instances_flags.AddMinCpuPlatformArgs(parser, release_track)
@@ -133,6 +133,7 @@ class Create(base.CreateCommand):
   _support_kms = False
   _support_network_tier = False
   _support_public_dns = False
+  _support_node_affinity = False
 
   @classmethod
   def Args(cls, parser):
@@ -143,13 +144,19 @@ class Create(base.CreateCommand):
         support_network_tier=cls._support_network_tier,
         enable_kms=cls._support_kms,
     )
+    cls.SOURCE_INSTANCE_TEMPLATE = (
+        instances_flags.MakeSourceInstanceTemplateArg())
+    cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
 
   def Collection(self):
     return 'compute.instances'
 
   def GetSourceInstanceTemplate(self, args, resources):
     """Get sourceInstanceTemplate value as required by API."""
-    return None
+    if not args.IsSpecified('source_instance_template'):
+      return None
+    ref = self.SOURCE_INSTANCE_TEMPLATE.ResolveAsResource(args, resources)
+    return ref.SelfLink()
 
   def BuildShieldedVMConfigMessage(self, messages, args):
     # Set the default values for ShieledVmConfig parameters
@@ -355,7 +362,8 @@ class Create(base.CreateCommand):
                                                   base.ReleaseTrack.BETA]
     csek_keys = csek_utils.CsekKeyStore.FromArgs(args, allow_rsa_encrypted)
     scheduling = instance_utils.GetScheduling(
-        args, compute_client, skip_defaults)
+        args, compute_client, skip_defaults,
+        support_node_affinity=self._support_node_affinity)
     tags = instance_utils.GetTags(args, compute_client)
     labels = instance_utils.GetLabels(args, compute_client)
     metadata = instance_utils.GetMetadata(args, compute_client, skip_defaults)
@@ -416,16 +424,6 @@ class Create(base.CreateCommand):
           args, resource_parser, instance_ref)
       if sole_tenancy_host:
         instance.host = sole_tenancy_host
-
-      resource_maintenance_policies = getattr(
-          args, 'resource_maintenance_policies', None)
-      if resource_maintenance_policies:
-        maintenance_policy_ref = maintenance_util.ParseMaintenancePolicy(
-            resource_parser,
-            args.resource_maintenance_policies,
-            project=instance_ref.project,
-            region=maintenance_util.GetRegionFromZone(instance_ref.zone))
-        instance.maintenancePolicies = [maintenance_policy_ref.SelfLink()]
 
       request = compute_client.messages.ComputeInstancesInsertRequest(
           instance=instance,
@@ -503,13 +501,14 @@ class CreateBeta(Create):
   """Create Google Compute Engine virtual machine instances."""
 
   _support_kms = False
-  _support_network_tier = False
+  _support_network_tier = True
   _support_public_dns = False
+  _support_node_affinity = False
 
   def _GetNetworkInterfaces(
       self, args, client, holder, instance_refs, skip_defaults):
-    return instance_utils.GetNetworkInterfaces(
-        args, client, holder, instance_refs, skip_defaults)
+    return instance_utils.GetNetworkInterfacesBeta(args, client, holder,
+                                                   instance_refs, skip_defaults)
 
   @classmethod
   def Args(cls, parser):
@@ -518,17 +517,12 @@ class CreateBeta(Create):
         release_track=base.ReleaseTrack.BETA,
         support_public_dns=cls._support_public_dns,
         support_network_tier=cls._support_network_tier,
+        enable_regional=True,
         enable_kms=cls._support_kms,
     )
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
-
-  def GetSourceInstanceTemplate(self, args, resources):
-    if not args.IsSpecified('source_instance_template'):
-      return None
-    ref = self.SOURCE_INSTANCE_TEMPLATE.ResolveAsResource(args, resources)
-    return ref.SelfLink()
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -538,6 +532,7 @@ class CreateAlpha(CreateBeta):
   _support_kms = True
   _support_network_tier = True
   _support_public_dns = True
+  _support_node_affinity = True
 
   def _GetNetworkInterfaces(
       self, args, client, holder, instance_refs, skip_defaults):
@@ -546,10 +541,7 @@ class CreateAlpha(CreateBeta):
 
   @classmethod
   def Args(cls, parser):
-    parser.add_argument(
-        '--sole-tenancy-host',
-        hidden=True,
-        help='THIS ARGUMENT NEEDS HELP TEXT.')
+
     _CommonArgs(
         parser,
         release_track=base.ReleaseTrack.ALPHA,
@@ -558,7 +550,7 @@ class CreateAlpha(CreateBeta):
         enable_regional=True,
         support_local_ssd_size=True,
         enable_kms=cls._support_kms,
-        enable_maintenance_policies=True)
+        support_sole_tenancy=True)
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)

@@ -14,6 +14,8 @@
 
 """Unit tests for the resource cache module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.core import config
@@ -104,7 +106,7 @@ class CompletionCacheTest(core_completer_test_base.CoreCompleterBase):
   @test_case.Filters.SkipOnWindows('winerror 32 on TearDown', 'b/24905560')
   def testCacheNoCreateNotFound(self):
     self.DeleteCache()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.CacheNotFound,
         r'Persistent cache \[.*resource.cache\] not found.'):
       self.cache = resource_cache.ResourceCache(create=False)

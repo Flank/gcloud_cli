@@ -12,18 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the docker client lib command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import errno
 import json
 import os
 import subprocess
 import sys
-import urlparse
 
 from distutils import version as distutils_version
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.docker import client_lib
 from tests.lib import sdk_test_base
 import mock
+
+from six.moves import urllib
+
 
 _TEST_DOCKER_VERSION = distutils_version.LooseVersion('1.13')
 
@@ -52,7 +56,7 @@ class ClientLibTest(sdk_test_base.WithFakeAuth):
     self.call_mock.side_effect = OSError(errno.ENOENT,
                                          'No such file or directory', 'foo')
 
-    with self.assertRaisesRegexp(exceptions.Error, 'not installed'):
+    with self.assertRaisesRegex(exceptions.Error, 'not installed'):
       client_lib.Execute(['ps', '-a'])
 
     self.assertTrue(self.call_mock.called)
@@ -107,23 +111,23 @@ class ClientLibTest(sdk_test_base.WithFakeAuth):
 
   def testGetDockerVersionNotFound(self):
     self.process_mock.returncode = 1
-    with self.assertRaisesRegexp(client_lib.DockerError,
-                                 'could not retrieve Docker client version'):
+    with self.assertRaisesRegex(client_lib.DockerError,
+                                'could not retrieve Docker client version'):
       client_lib.GetDockerVersion()
 
   def testGetNormalizedURL(self):
     input_url = 'http://gcr.io'
-    expected_url = urlparse.urlparse(input_url)
+    expected_url = urllib.parse.urlparse(input_url)
     self.assertEqual(expected_url, client_lib.GetNormalizedURL(input_url))
 
   def testGetNormalizedURLFromLocalHost(self):
     input_url = 'localhost'
-    expected_url = urlparse.urlparse('http://localhost')
+    expected_url = urllib.parse.urlparse('http://localhost')
     self.assertEqual(expected_url, client_lib.GetNormalizedURL(input_url))
 
   def testGetNormalizedURLNoScheme(self):
     input_url = 'gcr.io'
-    expected_url = urlparse.urlparse('https://gcr.io')
+    expected_url = urllib.parse.urlparse('https://gcr.io')
     self.assertEqual(expected_url, client_lib.GetNormalizedURL(input_url))
 
   def testReadConfigurationFile(self):
@@ -144,9 +148,9 @@ class ClientLibTest(sdk_test_base.WithFakeAuth):
     test_path = self.Touch(self.test_dir,
                            'test_config.json',
                            contents)
-    with self.assertRaisesRegexp(client_lib.InvalidDockerConfigError,
-                                 r'Docker configuration file \[.*\] '
-                                 r'could not be read as JSON'):
+    with self.assertRaisesRegex(client_lib.InvalidDockerConfigError,
+                                r'Docker configuration file \[.*\] '
+                                r'could not be read as JSON'):
       client_lib.ReadConfigurationFile(test_path)
 
   def testReadConfigurationFilePathNotFound(self):
@@ -156,6 +160,6 @@ class ClientLibTest(sdk_test_base.WithFakeAuth):
     self.assertTrue(path_mock.called)
 
   def testReadConfigurationFileMissingPath(self):
-    with self.assertRaisesRegexp(ValueError,
-                                 'Docker configuration file path is empty'):
+    with self.assertRaisesRegex(ValueError,
+                                'Docker configuration file path is empty'):
       client_lib.ReadConfigurationFile(None)

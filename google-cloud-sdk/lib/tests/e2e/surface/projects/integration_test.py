@@ -45,18 +45,18 @@ class ProjectIntegrationTest(base.ProjectsTestBase, e2e_base.WithServiceAuth):
     expected = self.getIntegrationTestingProject()
     matching_projects = [p for p in projects
                          if self.compareProjects(expected, p)]
-    self.assertEquals(1, len(matching_projects), 'projects list command should '
-                      'contain exactly one cloud-sdk-integration-testing '
-                      'project. We received {0}'.format(projects))
+    self.assertEqual(1, len(matching_projects), 'projects list command should '
+                     'contain exactly one cloud-sdk-integration-testing '
+                     'project. We received {0}'.format(projects))
 
   def testListProjectsFilterMatch(self):
     filter_expr = ('(lifecycleState=ACTIVE AND '
                    '(projectId=cloud-sdk-integration-testing))')
     result = self.RunProjects('list', '--filter', filter_expr)
     projects = list(result)
-    self.assertEquals(1, len(projects), 'projects list command should '
-                      'contain exactly one cloud-sdk-integration-testing '
-                      'project. We received {0}'.format(projects))
+    self.assertEqual(1, len(projects), 'projects list command should '
+                     'contain exactly one cloud-sdk-integration-testing '
+                     'project. We received {0}'.format(projects))
 
   def testListProjectsFilterNoMatch(self):
     filter_expr = ('projectId=cloud-sdk-integration-testing AND '
@@ -66,7 +66,7 @@ class ProjectIntegrationTest(base.ProjectsTestBase, e2e_base.WithServiceAuth):
     expected = self.getIntegrationTestingProject()
     matching_projects = [p for p in projects
                          if self.compareProjects(expected, p)]
-    self.assertEquals(0, len(matching_projects))
+    self.assertEqual(0, len(matching_projects))
 
   def testDescribeProject(self):
     result = self.RunProjects('describe', 'cloud-sdk-integration-testing')

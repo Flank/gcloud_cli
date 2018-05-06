@@ -18,26 +18,24 @@ from __future__ import absolute_import
 
 import re
 
-from gslib.boto_translation import S3_DELETE_MARKER_GUID
 from gslib.cloud_api import NotFoundException
 from gslib.command import Command
 from gslib.command_argument import CommandArgument
 from gslib.cs_api_map import ApiSelector
 from gslib.exception import CommandException
-from gslib.ls_helper import ENCRYPTED_FIELDS
-from gslib.ls_helper import LsHelper
-from gslib.ls_helper import UNENCRYPTED_FULL_LISTING_FIELDS
 from gslib.storage_url import ContainsWildcard
 from gslib.storage_url import StorageUrlFromString
-from gslib.translation_helper import AclTranslation
-from gslib.translation_helper import LabelTranslation
-from gslib.util import InsistAscii
-from gslib.util import ListingStyle
-from gslib.util import MakeHumanReadable
-from gslib.util import NO_MAX
-from gslib.util import PrintFullInfoAboutObject
-from gslib.util import UTF8
-
+from gslib.utils.constants import NO_MAX
+from gslib.utils.constants import S3_DELETE_MARKER_GUID
+from gslib.utils.constants import UTF8
+from gslib.utils.ls_helper import ENCRYPTED_FIELDS
+from gslib.utils.ls_helper import LsHelper
+from gslib.utils.ls_helper import PrintFullInfoAboutObject
+from gslib.utils.ls_helper import UNENCRYPTED_FULL_LISTING_FIELDS
+from gslib.utils.text_util import InsistAscii
+from gslib.utils.translation_helper import AclTranslation
+from gslib.utils.translation_helper import LabelTranslation
+from gslib.utils.unit_util import MakeHumanReadable
 
 # Regex that assists with converting JSON timestamp to ls-style output.
 # This excludes timestamp fractional seconds, for example:
@@ -203,31 +201,32 @@ _DETAILED_HELP_TEXT = ("""
             Lifecycle configuration:      None
             Requester Pays enabled:       True
             Labels:                       None
+            Default KMS key:              None
             Time created:                 Thu, 14 Jan 2016 19:25:17 GMT
             Time updated:                 Thu, 08 Jun 2017 21:17:59 GMT
             Metageneration:               1
             ACL:
-    [
-      {
-        "entity": "project-owners-867489160491",
-        "projectTeam": {
-          "projectNumber": "867489160491",
-          "team": "owners"
-        },
-        "role": "OWNER"
-      }
-    ]
+              [
+                {
+                  "entity": "project-owners-867489160491",
+                  "projectTeam": {
+                    "projectNumber": "867489160491",
+                    "team": "owners"
+                  },
+                  "role": "OWNER"
+                }
+              ]
             Default ACL:
-    [
-      {
-        "entity": "project-owners-867489160491",
-        "projectTeam": {
-          "projectNumber": "867489160491",
-          "team": "owners"
-        },
-        "role": "OWNER"
-      }
-    ]
+              [
+                {
+                  "entity": "project-owners-867489160491",
+                  "projectTeam": {
+                    "projectNumber": "867489160491",
+                    "team": "owners"
+                  },
+                  "role": "OWNER"
+                }
+              ]
 
   Note that some fields above (time created, time updated, metageneration) are
   not available with the (non-default) XML API.
@@ -266,6 +265,13 @@ _DETAILED_HELP_TEXT = ("""
 
   -e          Include ETag in long listing (-l) output.
 """)
+
+
+class ListingStyle(object):
+  """Enum class for specifying listing style."""
+  SHORT = 'SHORT'
+  LONG = 'LONG'
+  LONG_LONG = 'LONG_LONG'
 
 
 class LsCommand(Command):
@@ -335,6 +341,11 @@ class LsCommand(Command):
           bucket.labels, pretty_print=True)
     else:
       fields['labels'] = 'None'
+    if bucket.encryption and bucket.encryption.defaultKmsKeyName:
+      fields['default_kms_key'] = bucket.encryption.defaultKmsKeyName
+    else:
+      fields['default_kms_key'] = 'None'
+    fields['encryption_config'] = 'Present' if bucket.encryption else 'None'
     # Fields not available in all APIs (e.g. the XML API)
     if bucket.metageneration:
       fields['metageneration'] = bucket.metageneration
@@ -378,7 +389,8 @@ class LsCommand(Command):
            '\tCORS configuration: \t\t{cors_config}\n'
            '\tLifecycle configuration:\t{lifecycle_config}\n'
            '\tRequester Pays enabled:\t\t{requester_pays}\n'
-           '\tLabels:\t\t\t\t{labels}\n' +
+           '\tLabels:\t\t\t\t{labels}\n'
+           '\tDefault KMS key:\t\t{default_kms_key}\n' +
            time_created_line +
            time_updated_line +
            metageneration_line +
@@ -487,6 +499,7 @@ class LsCommand(Command):
                          'billing',
                          'cors',
                          'defaultObjectAcl',
+                         'encryption',
                          'labels',
                          'location',
                          'logging',
@@ -527,11 +540,12 @@ class LsCommand(Command):
 
         if listing_style == ListingStyle.SHORT:
           # ls helper by default readies us for a short listing.
-          ls_helper = LsHelper(self.WildcardIterator, self.logger,
-                               all_versions=self.all_versions,
-                               print_bucket_header_func=print_bucket_header,
-                               should_recurse=self.recursion_requested,
-                               list_subdir_contents=self.list_subdir_contents)
+          listing_helper = LsHelper(
+              self.WildcardIterator, self.logger,
+              all_versions=self.all_versions,
+              print_bucket_header_func=print_bucket_header,
+              should_recurse=self.recursion_requested,
+              list_subdir_contents=self.list_subdir_contents)
         elif listing_style == ListingStyle.LONG:
           bucket_listing_fields = ['name', 'timeCreated', 'updated', 'size']
           if self.all_versions:
@@ -539,31 +553,34 @@ class LsCommand(Command):
           if self.include_etag:
             bucket_listing_fields.append('etag')
 
-          ls_helper = LsHelper(self.WildcardIterator, self.logger,
-                               print_object_func=self._PrintLongListing,
-                               print_dir_func=_PrintPrefixLong,
-                               print_bucket_header_func=print_bucket_header,
-                               all_versions=self.all_versions,
-                               should_recurse=self.recursion_requested,
-                               fields=bucket_listing_fields,
-                               list_subdir_contents=self.list_subdir_contents)
+          listing_helper = LsHelper(
+              self.WildcardIterator, self.logger,
+              print_object_func=self._PrintLongListing,
+              print_dir_func=_PrintPrefixLong,
+              print_bucket_header_func=print_bucket_header,
+              all_versions=self.all_versions,
+              should_recurse=self.recursion_requested,
+              fields=bucket_listing_fields,
+              list_subdir_contents=self.list_subdir_contents)
 
         elif listing_style == ListingStyle.LONG_LONG:
           # List all fields
           bucket_listing_fields = (UNENCRYPTED_FULL_LISTING_FIELDS +
                                    ENCRYPTED_FIELDS)
-          ls_helper = LsHelper(self.WildcardIterator, self.logger,
-                               print_object_func=PrintFullInfoAboutObject,
-                               print_dir_func=_PrintPrefixLong,
-                               print_bucket_header_func=print_bucket_header,
-                               all_versions=self.all_versions,
-                               should_recurse=self.recursion_requested,
-                               fields=bucket_listing_fields,
-                               list_subdir_contents=self.list_subdir_contents)
+          listing_helper = LsHelper(
+              self.WildcardIterator, self.logger,
+              print_object_func=PrintFullInfoAboutObject,
+              print_dir_func=_PrintPrefixLong,
+              print_bucket_header_func=print_bucket_header,
+              all_versions=self.all_versions,
+              should_recurse=self.recursion_requested,
+              fields=bucket_listing_fields,
+              list_subdir_contents=self.list_subdir_contents)
         else:
           raise CommandException('Unknown listing style: %s' % listing_style)
 
-        exp_dirs, exp_objs, exp_bytes = ls_helper.ExpandUrlAndPrint(storage_url)
+        exp_dirs, exp_objs, exp_bytes = (
+            listing_helper.ExpandUrlAndPrint(storage_url))
         if storage_url.IsObject() and exp_objs == 0 and exp_dirs == 0:
           got_nomatch_errors = True
         total_bytes += exp_bytes

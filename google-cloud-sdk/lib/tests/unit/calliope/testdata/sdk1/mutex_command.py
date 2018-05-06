@@ -13,16 +13,19 @@
 # limitations under the License.
 """This is a command for testing."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
 class MutexArgCommand(base.Command):
 
   def Run(self, args):
-    print args.flag1a
-    print args.flag1b
-    print args.flag2a
-    print args.flag2b
+    print(args.flag1a)
+    print(args.flag1b)
+    print(args.flag2a)
+    print(args.flag2b)
 
   @staticmethod
   def Args(parser):

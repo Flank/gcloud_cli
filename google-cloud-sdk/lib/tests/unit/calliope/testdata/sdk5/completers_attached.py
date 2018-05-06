@@ -13,6 +13,8 @@
 # limitations under the License.
 """This is a command for testing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.config import completers as config_completers
 from googlecloudsdk.command_lib.util import completers

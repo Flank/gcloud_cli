@@ -14,6 +14,8 @@
 
 """Basic unit tests for DmV2 util library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.deployment_manager import dm_api_util
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -22,6 +24,9 @@ from googlecloudsdk.core.resource import resource_printer
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+import six
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 MANIFEST_NAME = 'manifest-1459974826470'
@@ -72,46 +77,46 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def testExtractManifestName(self):
     deployment_response = self.messages.Deployment(manifest=MANIFEST_URL)
-    self.assertEquals(MANIFEST_NAME,
-                      dm_api_util.ExtractManifestName(deployment_response))
+    self.assertEqual(MANIFEST_NAME,
+                     dm_api_util.ExtractManifestName(deployment_response))
 
   def testExtractManifestName_Update(self):
     deployment_response = self.messages.Deployment(
         manifest='no/no',
         update={'manifest': MANIFEST_URL})
-    self.assertEquals(MANIFEST_NAME,
-                      dm_api_util.ExtractManifestName(deployment_response))
+    self.assertEqual(MANIFEST_NAME,
+                     dm_api_util.ExtractManifestName(deployment_response))
 
   def testExtractManifestName_NoManifest(self):
     deployment_response = self.messages.Deployment()
-    self.assertEquals(None,
-                      dm_api_util.ExtractManifestName(deployment_response))
+    self.assertEqual(None,
+                     dm_api_util.ExtractManifestName(deployment_response))
 
   def testFlattenLayoutOutput_Simple(self):
     outputs = [{'name': 'foo', 'finalValue': 'bar'},
                {'name': ' Constantinople', 'finalValue': 'Istanbul'}]
-    self.assertEquals(outputs,
-                      dm_api_util.FlattenLayoutOutputs(
-                          yaml.dump({
-                              'outputs': outputs
-                          })))
+    self.assertEqual(outputs,
+                     dm_api_util.FlattenLayoutOutputs(
+                         yaml.dump({
+                             'outputs': outputs
+                         })))
 
   def testFlattenLayoutOutput_ExtraField(self):
     outputs = [{'name': 'foo', 'finalValue': 'bar', 'value': 'bar'}]
     expected = [{'name': 'foo', 'finalValue': 'bar'}]
-    self.assertEquals(expected,
-                      dm_api_util.FlattenLayoutOutputs(
-                          yaml.dump({
-                              'outputs': outputs
-                          })))
+    self.assertEqual(expected,
+                     dm_api_util.FlattenLayoutOutputs(
+                         yaml.dump({
+                             'outputs': outputs
+                         })))
 
   def testFlattenLayout_Empty(self):
-    self.assertEquals([], dm_api_util.FlattenLayoutOutputs(yaml.dump('')))
-    self.assertEquals([],
-                      dm_api_util.FlattenLayoutOutputs(
-                          yaml.dump({
-                              'resources': []
-                          })))
+    self.assertEqual([], dm_api_util.FlattenLayoutOutputs(yaml.dump('')))
+    self.assertEqual([],
+                     dm_api_util.FlattenLayoutOutputs(
+                         yaml.dump({
+                             'resources': []
+                         })))
 
   def testFlattenLayoutOutput_List(self):
     outputs = [{'name': 'foo', 'finalValue': [1, 2]},
@@ -126,20 +131,20 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                 {'name': 'russia[1]', 'finalValue': ['Saint Petersburg',
                                                      'Petrograd', 'Leningrad',
                                                      'Saint Petersburg']}]
-    self.assertEquals(expected,
-                      dm_api_util.FlattenLayoutOutputs(
-                          yaml.dump({
-                              'outputs': outputs
-                          })))
+    self.assertEqual(expected,
+                     dm_api_util.FlattenLayoutOutputs(
+                         yaml.dump({
+                             'outputs': outputs
+                         })))
 
   def testFlattenLayoutOutput_Dict(self):
     outputs = [{'name': 'foobar', 'finalValue': {'a': 1}}]
     expected = [{'name': 'foobar[a]', 'finalValue': 1}]
-    self.assertEquals(expected,
-                      dm_api_util.FlattenLayoutOutputs(
-                          yaml.dump({
-                              'outputs': outputs
-                          })))
+    self.assertEqual(expected,
+                     dm_api_util.FlattenLayoutOutputs(
+                         yaml.dump({
+                             'outputs': outputs
+                         })))
 
     multiple_outputs = [{'name': 'foobar', 'finalValue': {'a': 1, 'b': 2}}]
     multiple_result = dm_api_util.FlattenLayoutOutputs(
@@ -156,11 +161,11 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     nested = [{'name': 'a', 'finalValue': {'b': {'c': 'd'}}}]
     nested_expected = [{'name': 'a[b]', 'finalValue': {'c': 'd'}}]
-    self.assertEquals(nested_expected,
-                      dm_api_util.FlattenLayoutOutputs(
-                          yaml.dump({
-                              'outputs': nested
-                          })))
+    self.assertEqual(nested_expected,
+                     dm_api_util.FlattenLayoutOutputs(
+                         yaml.dump({
+                             'outputs': nested
+                         })))
 
   def testPrintTable(self):
     header = ['aField', 'bField', 'cField']
@@ -170,10 +175,10 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     ]
     dm_api_util.PrintTable(header, resources)
     output = self.GetOutput().strip().split('\n')
-    self.assertEquals(3, len(output))  # two lines of output plus header line
-    self.assertEquals(header, output[0].split())
+    self.assertEqual(3, len(output))  # two lines of output plus header line
+    self.assertEqual(header, output[0].split())
     for i in range(2):
-      self.assertEquals(sorted(resources[i].values()), output[i+1].split())
+      self.assertEqual(sorted(resources[i].values()), output[i+1].split())
     self.assertFalse(self.GetErr())
 
   def testPrintTableMissingFields(self):
@@ -185,10 +190,10 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     ]
     dm_api_util.PrintTable(header, resources)
     output = self.GetOutput().strip().split('\n')
-    self.assertEquals(3, len(output))  # two lines of output plus header line
-    self.assertEquals(header, output[0].split())
+    self.assertEqual(3, len(output))  # two lines of output plus header line
+    self.assertEqual(header, output[0].split())
     for i in range(2):
-      self.assertEquals(sorted(resources[i].values()), output[i+1].split())
+      self.assertEqual(sorted(resources[i].values()), output[i+1].split())
     self.assertFalse(self.GetErr())
 
   def testPrettyPrint_Json(self):
@@ -205,7 +210,7 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             )
         ),
     )
-    self.assertEquals(
+    self.assertEqual(
         resource_printer.Print([resource], 'json'),
         dm_api_util.PrettyPrint(resource))  # json is default
 
@@ -223,7 +228,7 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             )
         ),
     )
-    self.assertEquals(
+    self.assertEqual(
         resource_printer.Print([resource], 'yaml'),
         dm_api_util.PrettyPrint(resource, print_format='yaml'))
 
@@ -241,7 +246,7 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             )
         ),
     )
-    self.assertEquals(
+    self.assertEqual(
         resource_printer.Print([resource], 'text'),
         dm_api_util.PrettyPrint(resource, print_format='text'))
 
@@ -250,29 +255,29 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def testParseStrings_String(self):
     s = 'foo'
-    self.assertEquals(s,
-                      dm_api_util.StringPropertyParser().ParseStringsAndWarn(s))
+    self.assertEqual(s,
+                     dm_api_util.StringPropertyParser().ParseStringsAndWarn(s))
     self.AssertErrContains(self. _DEPRECATION_WARNING)
 
   def testParseStrings_Int(self):
     s = '3'
-    self.assertEquals(s,
-                      dm_api_util.StringPropertyParser().ParseStringsAndWarn(s))
+    self.assertEqual(s,
+                     dm_api_util.StringPropertyParser().ParseStringsAndWarn(s))
     self.AssertErrContains(self. _DEPRECATION_WARNING)
 
   def testParseStrings_Bool(self):
     s = 'true'
-    self.assertEquals(s,
-                      dm_api_util.StringPropertyParser().ParseStringsAndWarn(s))
+    self.assertEqual(s,
+                     dm_api_util.StringPropertyParser().ParseStringsAndWarn(s))
     self.AssertErrContains(self. _DEPRECATION_WARNING)
 
   def testParseYaml_String(self):
     s = 'foo'
-    self.assertEquals(s, dm_api_util.ParseAsYaml(s))
+    self.assertEqual(s, dm_api_util.ParseAsYaml(s))
     self.AssertErrNotContains(self. _DEPRECATION_WARNING)
 
   def testParseYaml_Int(self):
-    self.assertEquals(3, dm_api_util.ParseAsYaml('3'))
+    self.assertEqual(3, dm_api_util.ParseAsYaml('3'))
     self.AssertErrNotContains(self. _DEPRECATION_WARNING)
 
   def testParseYaml_Bool(self):
@@ -283,53 +288,53 @@ class DmV2UtilTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def testParseYaml_IntAsString(self):
     result = dm_api_util.ParseAsYaml('"foo"')
-    self.assertEquals('foo', result)
-    self.assertTrue(isinstance(result, basestring))
+    self.assertEqual('foo', result)
+    self.assertTrue(isinstance(result, six.string_types))
     self.AssertErrNotContains(self. _DEPRECATION_WARNING)
 
   def testGetActionResourceIntent(self):
-    self.assertEquals('none/NOT_RUN',
-                      dm_api_util.GetActionResourceIntent('none', ['DELETE']))
-    self.assertEquals('none', dm_api_util.GetActionResourceIntent('none', None))
-    self.assertEquals('/NOT_RUN',
-                      dm_api_util.GetActionResourceIntent('', ['DELETE']))
-    self.assertEquals('', dm_api_util.GetActionResourceIntent('', None))
-    self.assertEquals('PATCH/TO_RUN',
-                      dm_api_util.GetActionResourceIntent(
-                          'PATCH', ['UPDATE_ALWAYS', 'DELETE']))
-    self.assertEquals('PATCH/NOT_RUN',
-                      dm_api_util.GetActionResourceIntent('PATCH', ['CREATE']))
-    self.assertEquals('PATCH', dm_api_util.GetActionResourceIntent(
+    self.assertEqual('none/NOT_RUN',
+                     dm_api_util.GetActionResourceIntent('none', ['DELETE']))
+    self.assertEqual('none', dm_api_util.GetActionResourceIntent('none', None))
+    self.assertEqual('/NOT_RUN',
+                     dm_api_util.GetActionResourceIntent('', ['DELETE']))
+    self.assertEqual('', dm_api_util.GetActionResourceIntent('', None))
+    self.assertEqual('PATCH/TO_RUN',
+                     dm_api_util.GetActionResourceIntent(
+                         'PATCH', ['UPDATE_ALWAYS', 'DELETE']))
+    self.assertEqual('PATCH/NOT_RUN',
+                     dm_api_util.GetActionResourceIntent('PATCH', ['CREATE']))
+    self.assertEqual('PATCH', dm_api_util.GetActionResourceIntent(
         'PATCH', None))
-    self.assertEquals('UPDATE/TO_RUN',
-                      dm_api_util.GetActionResourceIntent(
-                          'UPDATE', ['UPDATE_ON_CHANGE', 'DELETE']))
-    self.assertEquals('UPDATE/NOT_RUN',
-                      dm_api_util.GetActionResourceIntent('UPDATE', ['CREATE']))
-    self.assertEquals('UPDATE',
-                      dm_api_util.GetActionResourceIntent('UPDATE', None))
-    self.assertEquals('DELETE/TO_RUN',
-                      dm_api_util.GetActionResourceIntent(
-                          'DELETE', ['UPDATE_ON_CHANGE', 'DELETE']))
-    self.assertEquals('DELETE/NOT_RUN',
-                      dm_api_util.GetActionResourceIntent(
-                          'DELETE', ['UPDATE_ALWAYS']))
-    self.assertEquals('DELETE',
-                      dm_api_util.GetActionResourceIntent('DELETE', None))
-    self.assertEquals('CREATE_OR_ACQUIRE/TO_RUN',
-                      dm_api_util.GetActionResourceIntent(
-                          'CREATE_OR_ACQUIRE', ['UPDATE_ON_CHANGE', 'CREATE']))
-    self.assertEquals('CREATE_OR_ACQUIRE/NOT_RUN',
-                      dm_api_util.GetActionResourceIntent(
-                          'CREATE_OR_ACQUIRE', ['DELETE']))
-    self.assertEquals('CREATE_OR_ACQUIRE',
-                      dm_api_util.GetActionResourceIntent(
-                          'CREATE_OR_ACQUIRE', None))
-    self.assertEquals('ACQUIRE/NOT_RUN',
-                      dm_api_util.GetActionResourceIntent(
-                          'ACQUIRE', ['UPDATE_ON_CHANGE', 'CREATE']))
-    self.assertEquals('ACQUIRE',
-                      dm_api_util.GetActionResourceIntent('ACQUIRE', None))
+    self.assertEqual('UPDATE/TO_RUN',
+                     dm_api_util.GetActionResourceIntent(
+                         'UPDATE', ['UPDATE_ON_CHANGE', 'DELETE']))
+    self.assertEqual('UPDATE/NOT_RUN',
+                     dm_api_util.GetActionResourceIntent('UPDATE', ['CREATE']))
+    self.assertEqual('UPDATE',
+                     dm_api_util.GetActionResourceIntent('UPDATE', None))
+    self.assertEqual('DELETE/TO_RUN',
+                     dm_api_util.GetActionResourceIntent(
+                         'DELETE', ['UPDATE_ON_CHANGE', 'DELETE']))
+    self.assertEqual('DELETE/NOT_RUN',
+                     dm_api_util.GetActionResourceIntent(
+                         'DELETE', ['UPDATE_ALWAYS']))
+    self.assertEqual('DELETE',
+                     dm_api_util.GetActionResourceIntent('DELETE', None))
+    self.assertEqual('CREATE_OR_ACQUIRE/TO_RUN',
+                     dm_api_util.GetActionResourceIntent(
+                         'CREATE_OR_ACQUIRE', ['UPDATE_ON_CHANGE', 'CREATE']))
+    self.assertEqual('CREATE_OR_ACQUIRE/NOT_RUN',
+                     dm_api_util.GetActionResourceIntent(
+                         'CREATE_OR_ACQUIRE', ['DELETE']))
+    self.assertEqual('CREATE_OR_ACQUIRE',
+                     dm_api_util.GetActionResourceIntent(
+                         'CREATE_OR_ACQUIRE', None))
+    self.assertEqual('ACQUIRE/NOT_RUN',
+                     dm_api_util.GetActionResourceIntent(
+                         'ACQUIRE', ['UPDATE_ON_CHANGE', 'CREATE']))
+    self.assertEqual('ACQUIRE',
+                     dm_api_util.GetActionResourceIntent('ACQUIRE', None))
 
 
 if __name__ == '__main__':

@@ -23,7 +23,7 @@ from tests.lib.surface.compute import e2e_test_base
 from tests.lib.surface.compute import resource_managers
 
 
-class SnapshotsTest(e2e_test_base.BaseTest):
+class _SnapshotsTestBase(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.disk_names_used = []
@@ -57,52 +57,26 @@ class SnapshotsTest(e2e_test_base.BaseTest):
         prefix='gcloud-compute-test-snapshot').next()
     self.snapshot_names_used.append(self.snapshot_name)
 
-  def testSnapshots(self):
-    instance_parameters = e2e_resource_managers.ResourceParameters(
-        prefix_ref=self._GetInstanceRef())
-    with resource_managers.Instance(self.Run, instance_parameters):
-      self.GetResourceName()
-      self._TestCreateSnapshot()
-      self._TestCreateDiskFromSnapshot()
-      self._TestCreateInstanceFromDisk()
-      self._TestDeleteSnapshot()
-    self._TestDeleteDisks()
-
-  def testWindowsVssSnapshot(self):
-    instance_ref = self._GetInstanceRef()
-    extra_creation_flags = [
-        ('--image-project', 'windows-cloud'),
-        ('--image-family', 'windows-2012-r2'),
-    ]
-    instance_parameters = e2e_resource_managers.ResourceParameters(
-        prefix_ref=instance_ref, extra_creation_flags=extra_creation_flags)
-    with resource_managers.Instance(self.Run, instance_parameters) as instance:
-      instance_name = instance.ref.Name()
-      self.GetResourceName()
-      # Create Windows Instance and wait for it to boot
-      message = 'Instance setup finished.'
-      booted = self.WaitForBoot(instance_name, message, retries=10,
-                                polling_interval=60)
-      self.assertTrue(booted, msg='Timed out waiting for Windows to boot.')
-      # Snapshot Instance with VSS
-      self.Run('compute disks snapshot {0} --snapshot-names {1}'
-               ' --zone {2} --guest-flush'
-               .format(instance_name, self.snapshot_name, self.zone))
-      # Check that snapshot exists
-      self.Run('compute snapshots describe {0}'.format(self.snapshot_name))
-      self.AssertNewOutputContains('name: {0}'.format(self.snapshot_name),
-                                   reset=False)
-      self.AssertNewOutputContains('status: READY')
-
-  def _TestCreateSnapshot(self):
+  def _TestCreateSnapshot(self, use_storage_location=False):
     # Create disk first
     self.Run('compute disks create {0} --image debian-8 --zone {1}'
              .format(self.disk1_name, self.zone))
-    self.Run('compute disks snapshot {0} --snapshot-names {1} --zone {2}'
-             .format(self.disk1_name, self.snapshot_name, self.zone))
+    if use_storage_location:
+      self.Run('compute disks snapshot {0} --snapshot-names {1} --zone {2} '
+               '--storage-location {3}'.format(self.disk1_name,
+                                               self.snapshot_name, self.zone,
+                                               self.storage_location))
+    else:
+      self.Run('compute disks snapshot {0} --snapshot-names {1} --zone {2}'
+               .format(self.disk1_name, self.snapshot_name, self.zone))
+
     self.Run('compute snapshots describe {0}'.format(self.snapshot_name))
     self.AssertNewOutputContains('name: {0}'.format(self.snapshot_name),
                                  reset=False)
+    if use_storage_location:
+      self.AssertNewOutputContains("""storageLocations:
+                                   - {0}""".format(self.storage_location),
+                                   reset=False, normalize_space=True)
     self.AssertNewOutputContains('status: READY')
 
   def _TestCreateDiskFromSnapshot(self):
@@ -157,6 +131,60 @@ class SnapshotsTest(e2e_test_base.BaseTest):
     self.Run('compute disks list')
     self.AssertNewOutputNotContains(self.disk1_name, reset=False)
     self.AssertNewOutputNotContains(self.disk2_name)
+
+
+class SnapshotsTestGA(_SnapshotsTestBase):
+
+  def testSnapshots(self):
+    instance_parameters = e2e_resource_managers.ResourceParameters(
+        prefix_ref=self._GetInstanceRef())
+    with resource_managers.Instance(self.Run, instance_parameters):
+      self.GetResourceName()
+      self._TestCreateSnapshot()
+      self._TestCreateDiskFromSnapshot()
+      self._TestCreateInstanceFromDisk()
+      self._TestDeleteSnapshot()
+    self._TestDeleteDisks()
+
+  def testWindowsVssSnapshot(self):
+    instance_ref = self._GetInstanceRef()
+    extra_creation_flags = [
+        ('--image-project', 'windows-cloud'),
+        ('--image-family', 'windows-2012-r2'),
+    ]
+    instance_parameters = e2e_resource_managers.ResourceParameters(
+        prefix_ref=instance_ref, extra_creation_flags=extra_creation_flags)
+    with resource_managers.Instance(self.Run, instance_parameters) as instance:
+      instance_name = instance.ref.Name()
+      self.GetResourceName()
+      # Create Windows Instance and wait for it to boot
+      message = 'Instance setup finished.'
+      booted = self.WaitForBoot(instance_name, message, retries=10,
+                                polling_interval=60)
+      self.assertTrue(booted, msg='Timed out waiting for Windows to boot.')
+      # Snapshot Instance with VSS
+      self.Run('compute disks snapshot {0} --snapshot-names {1}'
+               ' --zone {2} --guest-flush'
+               .format(instance_name, self.snapshot_name, self.zone))
+      # Check that snapshot exists
+      self.Run('compute snapshots describe {0}'.format(self.snapshot_name))
+      self.AssertNewOutputContains('name: {0}'.format(self.snapshot_name),
+                                   reset=False)
+      self.AssertNewOutputContains('status: READY')
+
+
+class SnapshotsTestAlpha(_SnapshotsTestBase):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.ALPHA
+    self.storage_location = 'us-west1'
+
+  def testStorageLocation(self):
+    instance_parameters = e2e_resource_managers.ResourceParameters(
+        prefix_ref=self._GetInstanceRef())
+    with resource_managers.Instance(self.Run, instance_parameters):
+      self.GetResourceName()
+      self._TestCreateSnapshot(use_storage_location=True)
 
 
 class SnapshotsLabelsTest(e2e_test_base.BaseTest):

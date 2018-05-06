@@ -14,6 +14,9 @@
 
 """DynamicPositionalAction test command."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.core import log
@@ -85,5 +88,5 @@ class DynamiArgs(base.Command):
     for name in [
         'additional', 'extra', 'flags', 'name'] + args.flags.split(','):
       if hasattr(args, name):
-        print '{}={}'.format(name, getattr(args, name))
+        print('{}={}'.format(name, getattr(args, name)))
     return None

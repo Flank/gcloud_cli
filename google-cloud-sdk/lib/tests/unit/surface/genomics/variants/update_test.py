@@ -31,10 +31,10 @@ class UpdateTest(base.GenomicsUnitTest):
                                                            variantId=
                                                            variant_id),
         response=variant)
-    self.assertEquals(variant, self.RunGenomics(['variants', 'update',
-                                                 variant_id,
-                                                 '--names',
-                                                 'foo,bar']))
+    self.assertEqual(variant, self.RunGenomics(['variants', 'update',
+                                                variant_id,
+                                                '--names',
+                                                'foo,bar']))
 
   def testUpdateNotExists(self):
     variant_id = 'abc123'
@@ -44,8 +44,8 @@ class UpdateTest(base.GenomicsUnitTest):
             variant=self.messages.Variant(names=['foo', 'bar']),
             variantId=variant_id),
         exception=self.MakeHttpError(404, 'Variant not found: ' + variant_id))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Variant not found: ' + variant_id):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Variant not found: ' + variant_id):
       self.RunGenomics(['variants', 'update', variant_id, '--names', 'foo,bar'])
 
 

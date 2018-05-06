@@ -51,7 +51,7 @@ class ProjectsApiTest(sdk_test_base.WithFakeAuth):
         self.messages.ListProjectsResponse(projects=[test_project]))
     results_generator = projects_api.List()
     results = [x for x in results_generator]
-    self.assertEquals([test_project], results)
+    self.assertEqual([test_project], results)
 
   def testListFilter(self):
     test_project = util.GetTestActiveProject()
@@ -62,7 +62,7 @@ class ProjectsApiTest(sdk_test_base.WithFakeAuth):
         self.messages.ListProjectsResponse(projects=[test_project]))
     results_generator = projects_api.List(filter='id:foo')
     results = [x for x in results_generator]
-    self.assertEquals([test_project], results)
+    self.assertEqual([test_project], results)
 
   def testGet(self):
     test_project = util.GetTestActiveProject()

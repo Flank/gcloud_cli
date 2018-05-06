@@ -33,7 +33,7 @@ class ExportTest(base.GenomicsUnitTest):
             bigqueryTable='bqtable'))
     resp = self.messages.Operation(done=True)
     self.mocked_client.variantsets.Export.Expect(request=req, response=resp)
-    self.assertEquals(resp, self.RunGenomics(['variantsets',
+    self.assertEqual(resp, self.RunGenomics(['variantsets',
                                               'export',
                                               '123',
                                               'bqtable',
@@ -56,7 +56,7 @@ class ExportTest(base.GenomicsUnitTest):
             bigqueryTable='bqtable'))
     resp = self.messages.Operation(done=True)
     self.mocked_client.variantsets.Export.Expect(request=req, response=resp)
-    self.assertEquals(resp, self.RunGenomics(['variantsets',
+    self.assertEqual(resp, self.RunGenomics(['variantsets',
                                               'export',
                                               '123',
                                               'bqtable',
@@ -76,7 +76,7 @@ class ExportTest(base.GenomicsUnitTest):
             bigqueryTable='bqtable'))
     resp = self.messages.Operation(done=True)
     self.mocked_client.variantsets.Export.Expect(request=req, response=resp)
-    self.assertEquals(resp, self.RunGenomics(['variantsets',
+    self.assertEqual(resp, self.RunGenomics(['variantsets',
                                               'export',
                                               '123',
                                               'bqtable',

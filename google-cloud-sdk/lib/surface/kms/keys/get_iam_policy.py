@@ -13,11 +13,14 @@
 # limitations under the License.
 """Fetch the IAM policy for a key."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudkms import iam
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.kms import flags
 
 
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class GetIamPolicy(base.ListCommand):
   """Get the IAM policy for a key.
 

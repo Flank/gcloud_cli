@@ -1,0 +1,205 @@
+
+.TH "GCLOUD_ALPHA_MONITORING_POLICIES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha monitoring policies create \- create a new alerting policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha monitoring policies create\fR \fB\-\-notification\-channels\fR=[\fINOTIFICATION_CHANNELS\fR,...] [\fB\-\-aggregation\fR=\fIAGGREGATION\fR\ \fB\-\-condition\-display\-name\fR=\fICONDITION_DISPLAY_NAME\fR\ \fB\-\-condition\-filter\fR=\fICONDITION_FILTER\fR\ \fB\-\-duration\fR=\fIDURATION\fR\ \fB\-\-if\fR=\fIIF_VALUE\fR\ \fB\-\-trigger\-count\fR=\fITRIGGER_COUNT\fR\ |\ \fB\-\-trigger\-percent\fR=\fITRIGGER_PERCENT\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR\ \fB\-\-no\-enabled\fR\ \fB\-\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR;\ default="text/markdown"\ \fB\-\-documentation\fR=\fIDOCUMENTATION\fR\ |\ \fB\-\-documentation\-from\-file\fR=\fIDOCUMENTATION_FROM_FILE\fR] [\fB\-\-policy\fR=\fIPOLICY\fR\ |\ \fB\-\-policy\-from\-file\fR=\fIPOLICY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Creates a new alerting policy. An alert policy can be specified as
+a JSON/YAML value passed in as a string through the \f5\-\-policy\fR flag or as
+a file through the \f5\-\-policy\-from\-file\fR flag. A basic policy can also be
+specified through command line flags. If a policy is specified through
+\f5\-\-policy\fR or \f5\-\-policy\-from\-file\fR, and additional flags are
+supplied, the flags will override the policy's settings and a specified
+condition will be appended to the list of conditions.
+
+For information about the JSON/YAML format of an alerting policy:
+https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
+
+\fBNote:\fR When specifying the Channel as a YAML/JSON, the use of
+\f5channelLabels\fR as an alternative name for \f5labels\fR is supported.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+NOTIFICATION CHANNELS \- Names of one or more Notification Channels to be added
+to the policy. These should be the resource names (not the display name) of the
+channels. Acceptable formats are:
+.RS 2m
+.IP "\(em" 2m
+Channel Name: \f5my\-channel\fR
+.RS 2m
+.IP "\(bu" 2m
+The project specified through \f5\-\-project\fR or the default project defined
+by the \f5core/project\fR property will be used, in that order.
+.RE
+.sp
+.IP "\(em" 2m
+Channel Relative Name: \f5projects/my\-project/notificationChannels/channel\-id0
+.IP "\(em" 2m
+Channel URI:
+https://monitoring.googleapis.com/v3/projects/my\-project/notificationChannels/channel\-id0
+This represents a Cloud resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute: Set
+the property [core/project] or provide the flag [\-\-project] on the command
+line.
+.RE
+.RE
+.sp
+
+
+.RS 2m
+.TP 2m
+\fB\-\-notification\-channels\fR=[\fINOTIFICATION_CHANNELS\fR,...]
+The ID of the Notification Channel or a fully qualified identifier for the
+Notification Channel.
+
+.TP 2m
+
+Condition Settings. This will add a condition to the created policy. If any
+conditions are already specified, this condition will be appended.
+
+.RS 2m
+.TP 2m
+\fB\-\-aggregation\fR=\fIAGGREGATION\fR
+Specifies an Aggregation message as a JSON/YAML value to be applied to the
+condition. For more information about the format:
+https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
+
+.TP 2m
+\fB\-\-condition\-display\-name\fR=\fICONDITION_DISPLAY_NAME\fR
+The display name for the condition.
+
+.TP 2m
+\fB\-\-condition\-filter\fR=\fICONDITION_FILTER\fR
+Specifies the "filter" in a metric absence or metric threshold condition.
+
+.TP 2m
+\fB\-\-duration\fR=\fIDURATION\fR
+The duration (e.g. "60s", "2min", etc.) that the condition must hold in order to
+trigger as true.
+
+.TP 2m
+\fB\-\-if\fR=\fIIF_VALUE\fR
+One of "absent", "< THRESHOLD", "> THRESHOLD" where "THRESHOLD" is an integer or
+float.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-trigger\-count\fR=\fITRIGGER_COUNT\fR
+The absolute number of time series that must fail the predicate for the
+condition to be triggered.
+
+.TP 2m
+\fB\-\-trigger\-percent\fR=\fITRIGGER_PERCENT\fR
+The percentage of time series that must fail the predicate for the condition to
+be triggered.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Policy Settings. If any of these are specified, they will overwrite fields in
+the \fR\-\-policy\f5 or \fR\-\-policy\-from\-file\f5 flags if specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+The display name for the Alert Policy.
+
+.TP 2m
+\fB\-\-enabled\fR
+If the policy is enabled. Enabled by default, use \fB\-\-no\-enabled\fR to
+disable.
+
+.TP 2m
+\fB\-\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to add. If the policy was given as a JSON/YAML
+object from a string or file, this flag will replace the labels value in the
+given policy.
+
+.TP 2m
+
+Documentation
+
+.RS 2m
+.TP 2m
+\fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR; default="text/markdown"
+The MIME type that should be used with \fR\-\-documentation\f5 or
+\fR\-\-documentation\-from\-file\f5. Currently, only "text/markdown" is
+supported.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-documentation\fR=\fIDOCUMENTATION\fR
+The documentation to be included with the policy.
+
+.TP 2m
+\fB\-\-documentation\-from\-file\fR=\fIDOCUMENTATION_FROM_FILE\fR
+The path to a file containing the documentation to be included with the policy.
+
+.RE
+.RE
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-policy\fR=\fIPOLICY\fR
+The policy as a string. In either JSON or YAML format.
+
+.TP 2m
+\fB\-\-policy\-from\-file\fR=\fIPOLICY_FROM_FILE\fR
+The path to a JSON or YAML file containing the policy.
+
+
+\fR
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

@@ -14,11 +14,15 @@
 
 """Unit tests for service-management enable command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.services import exceptions
 from googlecloudsdk.api_lib.util import exceptions as api_lib_exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class ServicesEnableTest(unit_test_base.SV1UnitTestBase):

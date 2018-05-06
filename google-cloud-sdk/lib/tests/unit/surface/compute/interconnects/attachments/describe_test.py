@@ -87,18 +87,18 @@ class InterconnectsDescribeTest(test_base.BaseTest):
                              project='my-project',
                              region='us-central1',
                              interconnectAttachment='my-attachment1'))],)
-    self.assertEquals(result.description, 'description')
-    self.assertEquals(result.interconnect,
-                      self.compute_uri + '/projects/my-project/global/'
-                      'interconnects/my-interconnect1')
-    self.assertEquals(result.name, 'my-attachment1')
-    self.assertEquals(result.region, 'us-central1')
-    self.assertEquals(result.router,
-                      self.compute_uri + '/projects/my-project/regions/'
-                      'us-central1/routers/my-router1')
-    self.assertEquals(result.selfLink,
-                      self.compute_uri + '/projects/my-project/regions/'
-                      'us-central1/interconnectAttachments/my-attachment1')
+    self.assertEqual(result.description, 'description')
+    self.assertEqual(result.interconnect,
+                     self.compute_uri + '/projects/my-project/global/'
+                     'interconnects/my-interconnect1')
+    self.assertEqual(result.name, 'my-attachment1')
+    self.assertEqual(result.region, 'us-central1')
+    self.assertEqual(result.router,
+                     self.compute_uri + '/projects/my-project/regions/'
+                     'us-central1/routers/my-router1')
+    self.assertEqual(result.selfLink,
+                     self.compute_uri + '/projects/my-project/regions/'
+                     'us-central1/interconnectAttachments/my-attachment1')
 
   def testSimpleCaseWithUri(self):
     self.make_requests.side_effect = iter([
@@ -122,18 +122,18 @@ class InterconnectsDescribeTest(test_base.BaseTest):
                              project='my-project',
                              region='us-central1',
                              interconnectAttachment='my-attachment1'))],)
-    self.assertEquals(result.description, 'description')
-    self.assertEquals(result.interconnect,
-                      self.compute_uri + '/projects/my-project/global/'
-                      'interconnects/my-interconnect1')
-    self.assertEquals(result.name, 'my-attachment1')
-    self.assertEquals(result.region, 'us-central1')
-    self.assertEquals(result.router,
-                      self.compute_uri + '/projects/my-project/regions/'
-                      'us-central1/routers/my-router1')
-    self.assertEquals(result.selfLink,
-                      self.compute_uri + '/projects/my-project/regions/'
-                      'us-central1/interconnectAttachments/my-attachment1')
+    self.assertEqual(result.description, 'description')
+    self.assertEqual(result.interconnect,
+                     self.compute_uri + '/projects/my-project/global/'
+                     'interconnects/my-interconnect1')
+    self.assertEqual(result.name, 'my-attachment1')
+    self.assertEqual(result.region, 'us-central1')
+    self.assertEqual(result.router,
+                     self.compute_uri + '/projects/my-project/regions/'
+                     'us-central1/routers/my-router1')
+    self.assertEqual(result.selfLink,
+                     self.compute_uri + '/projects/my-project/regions/'
+                     'us-central1/interconnectAttachments/my-attachment1')
 
   def testWithRegionPrompt(self):
     self.StartPatch(
@@ -168,19 +168,19 @@ class InterconnectsDescribeTest(test_base.BaseTest):
               region='us-central1',
               interconnectAttachment='my-attachment1'))],
     )
-    self.assertEquals(result.description, 'description')
-    self.assertEquals(result.interconnect,
-                      'https://www.googleapis.com/compute/' + self.api_version +
-                      '/projects/my-project/global/'
-                      'interconnects/my-interconnect1')
-    self.assertEquals(result.name, 'my-attachment1')
-    self.assertEquals(result.region, 'us-central1')
-    self.assertEquals(result.router,
-                      self.compute_uri + '/projects/my-project/regions/'
-                      'us-central1/routers/my-router1')
-    self.assertEquals(result.selfLink,
-                      self.compute_uri + '/projects/my-project/regions/'
-                      'us-central1/interconnectAttachments/my-attachment1')
+    self.assertEqual(result.description, 'description')
+    self.assertEqual(result.interconnect,
+                     'https://www.googleapis.com/compute/' + self.api_version +
+                     '/projects/my-project/global/'
+                     'interconnects/my-interconnect1')
+    self.assertEqual(result.name, 'my-attachment1')
+    self.assertEqual(result.region, 'us-central1')
+    self.assertEqual(result.router,
+                     self.compute_uri + '/projects/my-project/regions/'
+                     'us-central1/routers/my-router1')
+    self.assertEqual(result.selfLink,
+                     self.compute_uri + '/projects/my-project/regions/'
+                     'us-central1/interconnectAttachments/my-attachment1')
     self.AssertErrContains(
         textwrap.dedent("""\
           For the following interconnect attachment:

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for target tcp proxies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import e2e_utils
@@ -22,8 +24,8 @@ from tests.lib.surface.compute import e2e_test_base
 class TcpProxyTest(e2e_test_base.BaseTest):
 
   def UniqueName(self, name):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='compute-tcp-proxy-test-' + name).next()
+    return next(e2e_utils.GetResourceNameGenerator(
+        prefix='compute-tcp-proxy-test-' + name))
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -37,8 +39,8 @@ class TcpProxyTest(e2e_test_base.BaseTest):
     name = self.UniqueName('tcp-hc')
     result = self.Run('compute health-checks create tcp {0}'.format(name))
     result_list = list(result)
-    self.assertEquals(1, len(result_list))
-    self.assertEquals(name, result_list[0].name)
+    self.assertEqual(1, len(result_list))
+    self.assertEqual(name, result_list[0].name)
     self.health_check_names.append(name)
     return name
 
@@ -48,8 +50,8 @@ class TcpProxyTest(e2e_test_base.BaseTest):
                       '--global '
                       '--protocol TCP '
                       '--health-checks {1}'.format(name, health_check_name))
-    self.assertEquals(1, len(result))
-    self.assertEquals(name, result[0].name)
+    self.assertEqual(1, len(result))
+    self.assertEqual(name, result[0].name)
     self.backend_service_names.append(name)
     return name
 
@@ -62,8 +64,8 @@ class TcpProxyTest(e2e_test_base.BaseTest):
     result = self.Run('compute target-tcp-proxies create {0} '
                       '--backend-service {1}'.format(target_name, bs_name))
     result_list = list(result)
-    self.assertEquals(1, len(result_list))
-    self.assertEquals(target_name, result_list[0].name)
+    self.assertEqual(1, len(result_list))
+    self.assertEqual(target_name, result_list[0].name)
     self.target_tcp_proxy_names.append(target_name)
 
     # Create forwarding rule for the target tcp proxy.
@@ -71,8 +73,8 @@ class TcpProxyTest(e2e_test_base.BaseTest):
     result = self.Run('compute forwarding-rules create {0} --global '
                       '--target-tcp-proxy {1} --ports 443 '.format(
                           fr_name, target_name))
-    self.assertEquals(1, len(result))
-    self.assertEquals(fr_name, result[0].name)
+    self.assertEqual(1, len(result))
+    self.assertEqual(fr_name, result[0].name)
     self.forwarding_rule_names.append(fr_name)
 
     # Update the target tcp proxy.
@@ -87,7 +89,7 @@ class TcpProxyTest(e2e_test_base.BaseTest):
                       '--proxy-header PROXY_V1'.format(target_name))
     result = self.Run('compute target-tcp-proxies describe {0}'.format(
         target_name))
-    self.assertEquals('PROXY_V1', str(result.proxyHeader))
+    self.assertEqual('PROXY_V1', str(result.proxyHeader))
 
   def TearDown(self):
     for name in self.forwarding_rule_names:

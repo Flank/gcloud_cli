@@ -4,8 +4,8 @@ NAME
 SYNOPSIS
     gcloud beta compute firewall-rules update NAME
         [--allow=[PROTOCOL[:PORT[-PORT]],...]] [--description=DESCRIPTION]
-        [--destination-ranges=[CIDR_RANGE,...]] [--priority=PRIORITY]
-        [--rules=[PROTOCOL[:PORT[-PORT]],...]]
+        [--destination-ranges=[CIDR_RANGE,...]] [--disabled]
+        [--priority=PRIORITY] [--rules=[PROTOCOL[:PORT[-PORT]],...]]
         [--source-ranges=[CIDR_RANGE,...]]
         [--source-service-accounts=[EMAIL,...]] [--source-tags=[TAG,...]]
         [--target-service-accounts=[EMAIL,...]] [--target-tags=[TAG,...]]
@@ -15,7 +15,9 @@ DESCRIPTION
     (BETA) gcloud beta compute firewall-rules update is used to update firewall
     rules that allow/deny incoming/outgoing traffic. The firewall rule will
     only be updated for arguments that are specifically passed. Other
-    attributes will remain unaffected.
+    attributes will remain unaffected. The action flag (whether to allow or
+    deny matching traffic) cannot be defined when updating a firewall rule; use
+    gcloud compute firewall-rules delete to remove the rule instead.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -71,6 +73,14 @@ FLAGS
             $ gcloud beta compute firewall-rules update MY-RULE \
                 --destination-ranges
 
+     --disabled
+        Use this flag to disable a firewall rule and stop it from being
+        enforced in the network. In the case of disabled firewall rules, the
+        associated network behaves as if the firewall rule did not exist. To
+        enable a disabled rule instead, use:
+
+            $ gcloud beta compute firewall-rules update MY-RULE --no-disabled
+
      --priority=PRIORITY
         This is an integer between 0 and 65535, both inclusive. When NOT
         specified, the value assumed is 1000. Relative priority determines
@@ -89,12 +99,6 @@ FLAGS
         A port or port range can be specified after PROTOCOL to which the
         firewall rule apply on traffic through specific ports. If no port or
         port range is specified, connections through all ranges are applied.
-        For example, the following will create a rule that blocks TCP traffic
-        through port 80 and ICMP traffic:
-
-            $ gcloud beta compute firewall-rules update MY-RULE --action deny \
-                --rules tcp:80,icmp
-
         TCP and UDP rules must include a port or port range.
 
         Setting this will override the current values.

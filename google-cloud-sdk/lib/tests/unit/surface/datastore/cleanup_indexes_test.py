@@ -14,6 +14,8 @@
 
 """Tests of the datastore cleanup-indexes command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from __future__ import with_statement
 
 from googlecloudsdk.calliope import exceptions
@@ -30,7 +32,7 @@ class IndexTests(test_util.AppTestBase, test_util.WithAppData,
 
   def testCleanNoIndexFile(self):
     f = self.WriteApp('app.yaml', service='default')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         'You must provide the path to a valid index.yaml file.'):
       self.Run('--quiet datastore cleanup-indexes ' + f)

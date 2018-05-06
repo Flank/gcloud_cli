@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Common classes and functions for firewall rules."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 import enum
@@ -212,17 +214,15 @@ def AddCommonArgs(parser,
 
   disabled_help = """\
       Use this flag to disable a firewall rule and stop it from being enforced
-      in the network. Disabled firewall rules are not enforced, and the
-      associated network behaves as if the firewall rule did not exist. Use
+      in the network. In the case of disabled firewall rules, the associated
+      network behaves as if the firewall rule did not exist. To enable a
+      disabled rule instead, use:
 
-       $ gcloud alpha compute firewall-rules update MY-RULE --no-disabled
+       $ {parent_command} update MY-RULE --no-disabled
 
-      to enable a disabled rule.
       """
   if not for_update:
-    disabled_help += """\
-        If omitted firewall rule is considered enabled.
-    """
+    disabled_help += """If omitted firewall rule is considered enabled."""
   if with_disabled:
     parser.add_argument(
         '--disabled', action='store_true', default=None, help=disabled_help)
@@ -258,11 +258,6 @@ def AddArgsForEgress(parser, ruleset_parser, for_update=False):
       A port or port range can be specified after PROTOCOL to which the
       firewall rule apply on traffic through specific ports. If no port
       or port range is specified, connections through all ranges are applied.
-      For example, the following will create a rule that blocks TCP
-      traffic through port 80 and ICMP traffic:
-
-        $ {command} MY-RULE --action deny --rules tcp:80,icmp
-
       TCP and UDP rules must include a port or port range.
       """
   if for_update:
@@ -272,6 +267,11 @@ def AddArgsForEgress(parser, ruleset_parser, for_update=False):
   else:
     rules_help += """
       If specified, the flag --action must also be specified.
+
+      For example, the following will create a rule that blocks TCP
+      traffic through port 80 and ICMP traffic:
+
+        $ {command} MY-RULE --action deny --rules tcp:80,icmp
       """
   parser.add_argument(
       '--rules',

@@ -44,7 +44,7 @@ class DeleteTest(base.GenomicsUnitTest):
   def testDatasetsDeleteCancel(self):
     self.WriteInput('n\n')
     self.expectGetRequest()
-    with self.assertRaisesRegexp(GenomicsError, 'Deletion aborted by user.'):
+    with self.assertRaisesRegex(GenomicsError, 'Deletion aborted by user.'):
       self.RunGenomics(['datasets', 'delete', '1000'])
     self.AssertErrContains(
         'Deleting dataset 1000 (dataset-name) will delete all objects')
@@ -65,8 +65,8 @@ class DeleteTest(base.GenomicsUnitTest):
     self.mocked_client.datasets.Delete.Expect(
         request=self.messages.GenomicsDatasetsDeleteRequest(datasetId='1000'),
         exception=self.MakeHttpError(404, 'Dataset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Dataset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Dataset not found: 1000'):
       self.RunGenomics(['datasets', 'delete', '1000'],
                        ['--quiet'])
 

@@ -71,7 +71,11 @@ class BillingAccountsCompletionTest(base.BillingMockTest,
             'beta', 'billing', 'accounts', 'list', '--uri', '--quiet',
             '--format=disable',
         ],
-        expected_completions=['000000-000000-000000', '000000-000000-000001'],
+        expected_completions=[
+            '000000-000000-000000',
+            '111111-111111-111111',
+            '222222-222222-222222',
+        ],
         cli=self.cli,
     )
 

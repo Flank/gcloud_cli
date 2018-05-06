@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud container clusters create NAME [--additional-zones=ZONE,[ZONE,...]]
-        [--async] [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
+        [--addons=[ADDON,...]] [--async]
+        [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
         [--cluster-version=CLUSTER_VERSION]
         [--create-subnetwork=[KEY=VALUE,...]] [--disk-size=DISK_SIZE]
@@ -22,7 +23,6 @@ SYNOPSIS
         [--preemptible] [--services-ipv4-cidr=CIDR]
         [--services-secondary-range-name=NAME] [--subnetwork=SUBNETWORK]
         [--tags=TAG,[TAG,...]] [--zone=ZONE, -z ZONE]
-        [--addons=[ADDON,...] | --disable-addons=[DISABLE_ADDON,...]]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--enable-master-authorized-networks
           --master-authorized-networks=NETWORK,[NETWORK,...]]
@@ -57,6 +57,15 @@ FLAGS
 
         This flag is deprecated. Use --node-locations=PRIMARY_ZONE,[ZONE,...]
         instead.
+
+     --addons=[ADDON,...]
+        Default set of addons includes HttpLoadBalancing,
+        HorizontalPodAutoscaling. Addons
+        (https://cloud.google.com/kubernetes-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
+        are additional Kubernetes cluster components. Addons specified by this
+        flag will be enabled. The others will be disabled. ADDON must be one
+        of: HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
+        Istio, NetworkPolicy.
 
      --async
         Don't wait for the operation to complete.
@@ -154,8 +163,8 @@ FLAGS
      --enable-ip-alias
         Enable use of alias IPs
         (https://cloud.google.com/compute/docs/alias-ip/) for pod IPs. This
-        will create two new subnetworks, one for the instance and pod IPs, and
-        another to reserve space for the services range.
+        will create two secondary ranges, one for the pod IPs and another to
+        reserve space for the services range.
 
      --enable-kubernetes-alpha
         Enable Kubernetes alpha features on this cluster. Selecting this option
@@ -219,7 +228,21 @@ FLAGS
         information.
 
      --machine-type=MACHINE_TYPE, -m MACHINE_TYPE
-        The type of machine to use for nodes. Defaults to n1-standard-1.
+        The type of machine to use for nodes. Defaults to n1-standard-1. The
+        list of predefined machine types is available using the following
+        command:
+
+            $ gcloud compute machine-types list
+
+        You can also specify custom machine types with the string
+        "custom-CPUS-RAM" where ``CPUS`` is the number of virtual CPUs and
+        ``RAM`` is the amount of RAM in MiB.
+
+        For example, to create a node pool using custom machines with 2 vCPUs
+        and 12 GiB of RAM:
+
+            $ gcloud container clusters create high-mem-pool \
+                --machine-type=custom-2-12288
 
      --maintenance-window=MAINTENANCE_WINDOW
         Set a time of day when you prefer maintenance to start on this cluster.
@@ -271,9 +294,11 @@ FLAGS
      --node-locations=ZONE,[ZONE,...]
         The set of zones in which the specified node footprint should be
         replicated. All zones must be in the same region as the cluster's
-        primary zone, specified by the --zone flag. --node-locations must
-        contain the primary zone. If node-locations is not specified, all nodes
-        will be in the primary zone.
+        master(s), specified by the --zone or --region flag. Additionally, for
+        zonal clusters, --node-locations must contain the cluster's primary
+        zone. If not specified, all nodes will be in the cluster's primary zone
+        (for zonal clusters) or spread across three randomly chosen zones
+        within the cluster's region (for regional clusters).
 
         Note that NUM_NODES nodes will be created in each zone, such that if
         you specify --num-nodes=4 and choose two locations, 8 nodes will be
@@ -328,7 +353,8 @@ FLAGS
         (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
         be chosen automatically from the available space in the network.
 
-        If unspecified, the services CIDR range will use automatic defaults.
+        If unspecified, the services CIDR range will be chosen with a default
+        mask size.
 
         Can not be specified unless '--enable-ip-alias' is also specified.
 
@@ -364,26 +390,6 @@ FLAGS
         The compute zone (e.g. us-central1-a) for the cluster. Overrides the
         default compute/zone property value for this command invocation.
 
-     At most one of these may be specified:
-
-       --addons=[ADDON,...]
-          Default set of addons includes HttpLoadBalancing,
-          HorizontalPodAutoscaling. Addons
-          (https://cloud.google.com/kubernetes-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
-          are additional Kubernetes cluster components. Addons specified by
-          this flag will be enabled. The others will be disabled. ADDON must be
-          one of: HttpLoadBalancing, HorizontalPodAutoscaling,
-          KubernetesDashboard, Istio.
-
-       --disable-addons=[DISABLE_ADDON,...]
-          (DEPRECATED) List of cluster addons to disable. Options are
-          HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-          Istio
-
-          This flag is deprecated. Use --addons instead. DISABLE_ADDON must be
-          one of: HttpLoadBalancing, HorizontalPodAutoscaling,
-          KubernetesDashboard, Istio.
-
      Cluster autoscaling
 
        --enable-autoscaling
@@ -409,15 +415,22 @@ FLAGS
      Master Authorized Networks
 
        --enable-master-authorized-networks
-          Allow only Authorized Networks (specified by the
-          --master-authorized-networks flag) and Google Compute Engine Public
-          IPs to connect to Kubernetes master through HTTPS. By default public
-          internet (0.0.0.0/0) is allowed to connect to Kubernetes master
-          through HTTPS.
+          Allow only specified set of CIDR blocks (specified by the
+          --master-authorized-networks flag) to connect to Kubernetes master
+          through HTTPS. Besides these blocks, the following have access as
+          well:
+
+              1) The private network the cluster connects to if
+              `--private-cluster` is specified.
+              2) Google Compute Engine Public IPs if `--private-cluster` is not
+              specified.
+
+          When disabled, public internet (0.0.0.0/0) is allowed to connect to
+          Kubernetes master through HTTPS.
 
        --master-authorized-networks=NETWORK,[NETWORK,...]
-          The list of external networks (up to 10) that are allowed to connect
-          to Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
+          The list of CIDR blocks (up to 20) that are allowed to connect to
+          Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
           1.2.3.4/30). Can not be specified unless
           --enable-master-authorized-networks is also specified.
 
@@ -447,9 +460,9 @@ FLAGS
 
        --service-account=SERVICE_ACCOUNT
           The Google Cloud Platform Service Account to be used by the node VMs.
-          If a service account is specified, the cloud-platform scope is used.
-          If no Service Account is specified, the project default service
-          account is used.
+          If a service account is specified, the cloud-platform and
+          userinfo.email scopes are used. If no Service Account is specified,
+          the project default service account is used.
 
        Scopes options.
 

@@ -34,8 +34,7 @@ class ProjectsRemoveIamPolicyBindingTest(base.ProjectsUnitTestBase):
 
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=test_project.projectId),
         start_policy)
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(

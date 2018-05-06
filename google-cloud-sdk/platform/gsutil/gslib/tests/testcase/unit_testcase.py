@@ -22,18 +22,19 @@ import sys
 import tempfile
 
 import boto
+from gslib import project_id
 from gslib import wildcard_iterator
 from gslib.boto_translation import BotoTranslation
 from gslib.cloud_api_delegator import CloudApiDelegator
 from gslib.command_runner import CommandRunner
 from gslib.cs_api_map import ApiMapConstants
 from gslib.cs_api_map import ApiSelector
+from gslib.discard_messages_queue import DiscardMessagesQueue
 from gslib.tests.mock_logging_handler import MockLoggingHandler
 from gslib.tests.testcase import base
 import gslib.tests.util as util
 from gslib.tests.util import unittest
 from gslib.tests.util import WorkingDirectory
-from gslib.util import DiscardMessagesQueue
 
 
 class GsutilApiUnitTestClassMapFactory(object):
@@ -74,6 +75,9 @@ class GsUtilUnitTestCase(base.GsUtilTestCase):
     cls.command_runner = CommandRunner(
         bucket_storage_uri_class=cls.mock_bucket_storage_uri,
         gsutil_api_class_map_factory=cls.mock_gsutil_api_class_map_factory)
+    # Ensure unit tests don't fail if no default_project_id is defined in the
+    # boto config file.
+    project_id.UNIT_TEST_PROJECT_ID = 'mock-project-id-for-unit-tests'
 
   def setUp(self):
     super(GsUtilUnitTestCase, self).setUp()

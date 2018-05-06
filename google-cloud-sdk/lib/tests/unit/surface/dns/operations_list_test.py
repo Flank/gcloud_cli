@@ -13,16 +13,23 @@
 # limitations under the License.
 """Tests that exercise the 'gcloud dns operations list' command."""
 
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.dns import base
-from tests.lib.surface.dns import util_beta
+from tests.lib.surface.dns import util
 
 
-class OperationsListBetaTest(base.DnsMockBetaTest):
+@parameterized.named_parameters(
+    ('Beta', calliope_base.ReleaseTrack.BETA, 'v1beta2'),
+    ('GA', calliope_base.ReleaseTrack.GA, 'v1'),
+)
+class OperationsListTest(base.DnsMockMultiTrackTest):
 
-  def testZoneZeroOperationsList(self):
-    messages = self.messages_beta
-    self.mocked_dns_client.managedZoneOperations.List.Expect(
+  def testZoneZeroOperationsList(self, track, api_version):
+    self.SetUpForTrack(track, api_version)
+    messages = self.messages
+    self.client.managedZoneOperations.List.Expect(
         messages.DnsManagedZoneOperationsListRequest(project=self.Project(),
                                                      maxResults=100,
                                                      managedZone=u'my-zone'),
@@ -30,13 +37,14 @@ class OperationsListBetaTest(base.DnsMockBetaTest):
     self.Run('dns operations list --zones my-zone')
     self.AssertErrContains('Listed 0 items.')
 
-  def testZoneMultipleOperationsList(self):
-    messages = self.messages_beta
-    test_zones = util_beta.GetManagedZones()
-    self.mocked_dns_client.managedZoneOperations.List.Expect(
+  def testZoneMultipleOperationsList(self, track, api_version):
+    self.SetUpForTrack(track, api_version)
+    messages = self.messages
+    test_zones = util.GetManagedZones(api_version)
+    self.client.managedZoneOperations.List.Expect(
         messages.DnsManagedZoneOperationsListRequest(project=self.Project(),
                                                      maxResults=100,
-                                                     managedZone=u'my-zone'),
+                                                     managedZone=u'mz'),
         messages.ManagedZoneOperationsListResponse(operations=[
             messages.Operation(
                 id='1',
@@ -46,6 +54,12 @@ class OperationsListBetaTest(base.DnsMockBetaTest):
                     oldValue=test_zones[0],
                     newValue=test_zones[0]),
                 type='update',),
+        ]))
+    self.client.managedZoneOperations.List.Expect(
+        messages.DnsManagedZoneOperationsListRequest(project=self.Project(),
+                                                     maxResults=100,
+                                                     managedZone=u'mz1'),
+        messages.ManagedZoneOperationsListResponse(operations=[
             messages.Operation(
                 id='2',
                 startTime='2015-10-05T15:00:00Z',
@@ -55,7 +69,7 @@ class OperationsListBetaTest(base.DnsMockBetaTest):
                     newValue=test_zones[1]),
                 type='delete',),
         ]))
-    self.Run('dns operations list --zones my-zone')
+    self.Run('dns operations list --zones mz,mz1')
     self.AssertOutputContains("""\
 ZONE_NAME ID START_TIME           USER               TYPE
 mz        1  2015-10-02T15:00:00Z cloud-dns-system   update

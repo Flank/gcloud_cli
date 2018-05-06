@@ -97,7 +97,7 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_ZONE.
 
      --next-hop-vpn-tunnel-region=NEXT_HOP_VPN_TUNNEL_REGION
-        The region of the next hop vpn tunnel. If not specified, you will be
+        The region of the next hop vpn tunnel. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the

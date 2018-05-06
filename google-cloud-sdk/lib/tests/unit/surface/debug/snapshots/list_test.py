@@ -14,6 +14,8 @@
 
 """Tests for the 'debug targets list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from googlecloudsdk.api_lib.debug import debug
@@ -36,7 +38,7 @@ class ListTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):
     list_mock.assert_called_once_with(
         None, resource_ids=[], include_all_users=False, include_inactive=True,
         restrict_to_type=debug.Debugger.SNAPSHOT_TYPE)
-    self.assertEquals([], list(result))
+    self.assertEqual([], list(result))
 
   def testList(self):
     snapshots = [

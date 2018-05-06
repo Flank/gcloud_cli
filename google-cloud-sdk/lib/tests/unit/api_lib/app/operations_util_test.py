@@ -39,7 +39,7 @@ class CollectOpErrorsTest(test_case.TestCase):
     # Raised error must serialize to the same as the original http exception
     err_str = re.escape(str(http_exception))
     method = mock.Mock(side_effect=http_err)
-    with self.assertRaisesRegexp(operations_util.MiscOperationError, err_str):
+    with self.assertRaisesRegex(operations_util.MiscOperationError, err_str):
       operations_util.CallAndCollectOpErrors(method, 'positional', param=123)
 
   def testMethodFailsWithOperationError(self):
@@ -48,7 +48,7 @@ class CollectOpErrorsTest(test_case.TestCase):
     # Raised error must serialize to the same as the original op error
     err_str = re.escape(str(operation_err))
     method = mock.Mock(side_effect=operation_err)
-    with self.assertRaisesRegexp(operations_util.MiscOperationError, err_str):
+    with self.assertRaisesRegex(operations_util.MiscOperationError, err_str):
       operations_util.CallAndCollectOpErrors(method, 'positional', param=123)
 
   def testMethodFailsWithUnrelatedError(self):

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration test for the 'dataflow jobs describe' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.dataflow import apis
 from googlecloudsdk.command_lib.dataflow import dataflow_util
 from tests.lib import test_case

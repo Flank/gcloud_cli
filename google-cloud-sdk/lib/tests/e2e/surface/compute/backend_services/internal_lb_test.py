@@ -117,10 +117,10 @@ class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
         self._BackendService(backend_service, health_check, region)) as (
             _, _, _, backend_services):
       # Check that created backend services matches intended one.
-      self.assertEquals(1, len(backend_services))
-      self.assertEquals(backend_service, backend_services[0].name)
-      self.assertEquals('INTERNAL',
-                        str(backend_services[0].loadBalancingScheme))
+      self.assertEqual(1, len(backend_services))
+      self.assertEqual(backend_service, backend_services[0].name)
+      self.assertEqual('INTERNAL',
+                       str(backend_services[0].loadBalancingScheme))
       self.assertTrue(backend_services[0].region.endswith(region))
 
       # Check that we can list it.
@@ -147,9 +147,9 @@ class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
           '--region', region, '--instance-group', instance_group,
           '--instance-group-zone', zone,
           '--description', 'initial-test backend')
-      self.assertEquals(1, len(backend))
-      self.assertEquals('initial-test backend',
-                        backend[0].backends[0].description)
+      self.assertEqual(1, len(backend))
+      self.assertEqual('initial-test backend',
+                       backend[0].backends[0].description)
 
       # Make sure backend is there.
       bs = self.RunCompute('backend-services', 'describe', backend_service,
@@ -164,14 +164,14 @@ class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
           '--region', region, '--instance-group', instance_group,
           '--instance-group-zone', zone,
           '--description', 'updated-test backend')
-      self.assertEquals('updated-test backend',
-                        backend_update[0].backends[0].description)
+      self.assertEqual('updated-test backend',
+                       backend_update[0].backends[0].description)
 
       # Make sure backend update worked.
       # TODO(b/35870200): this seems to be eventually consistent.
       # bs = self.RunCompute('backend-services', 'describe', backend_service,
       #                     '--region', region)
-      # self.assertEquals('updated-test backend',
+      # self.assertEqual('updated-test backend',
       #                   backend[0]['backends'][0]['description'])
 
       # Remove Backend.
@@ -209,8 +209,8 @@ class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
                     region, backend_service)))
 
     # Check that delete worked
-    with self.assertRaisesRegexp(exceptions.ToolException,
-                                 'Could not fetch resource'):
+    with self.assertRaisesRegex(exceptions.ToolException,
+                                'Could not fetch resource'):
       self.RunCompute('backend-services', 'describe', backend_service,
                       '--region', region)
 

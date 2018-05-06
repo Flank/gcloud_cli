@@ -37,7 +37,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
         response=response)
     job_ref = resources.REGISTRY.Parse('opId', collection='ml.projects.jobs',
                                        params={'projectsId': self.Project()})
-    self.assertEquals(self.jobs_client.Cancel(job_ref), response)
+    self.assertEqual(self.jobs_client.Cancel(job_ref), response)
 
   def testGet(self):
     response = self.short_msgs.Job(jobId='opName')
@@ -47,7 +47,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
         response=response)
     job_ref = resources.REGISTRY.Parse('opId', collection='ml.projects.jobs',
                                        params={'projectsId': self.Project()})
-    self.assertEquals(self.jobs_client.Get(job_ref), response)
+    self.assertEqual(self.jobs_client.Get(job_ref), response)
 
   def testList(self):
     response_items = [
@@ -61,7 +61,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
             jobs=response_items))
     project_ref = resources.REGISTRY.Parse(self.Project(),
                                            collection='ml.projects')
-    self.assertEquals(list(self.jobs_client.List(project_ref)), response_items)
+    self.assertEqual(list(self.jobs_client.List(project_ref)), response_items)
 
   def testCreate(self):
     job = self.short_msgs.Job(jobId='my_job')
@@ -72,7 +72,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
         response=job)
     project_ref = resources.REGISTRY.Parse(self.Project(),
                                            collection='ml.projects')
-    self.assertEquals(job, self.jobs_client.Create(project_ref, job))
+    self.assertEqual(job, self.jobs_client.Create(project_ref, job))
 
   def testBuildTrainingJobWithYaml(self):
     test_yaml = u"""
@@ -93,7 +93,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
         region='us-east1')
 
     scale_tier_enum = self.short_msgs.TrainingInput.ScaleTierValueValuesEnum
-    self.assertEquals(
+    self.assertEqual(
         result,
         self.short_msgs.Job(
             jobId='the_real_job',
@@ -116,7 +116,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
         region='us-east1',
         runtime_version='0.12')
 
-    self.assertEquals(
+    self.assertEqual(
         result,
         self.short_msgs.Job(
             jobId='the_real_job',
@@ -136,7 +136,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
         trainer_uri=['gs://bucket/program.tar.gz'],
         region='us-east1')
 
-    self.assertEquals(
+    self.assertEqual(
         result,
         self.short_msgs.Job(
             jobId='the_real_job',
@@ -158,7 +158,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
 
     prediction_input_class = self.short_msgs.PredictionInput
     data_formats = prediction_input_class.DataFormatValueValuesEnum
-    self.assertEquals(
+    self.assertEqual(
         result,
         self.short_msgs.Job(
             jobId='my_job',
@@ -181,7 +181,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
 
     prediction_input_class = self.short_msgs.PredictionInput
     data_formats = prediction_input_class.DataFormatValueValuesEnum
-    self.assertEquals(
+    self.assertEqual(
         result,
         self.short_msgs.Job(
             jobId='my_job',
@@ -202,7 +202,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
         region='us-central1')
 
     data_formats = self.short_msgs.PredictionInput.DataFormatValueValuesEnum
-    self.assertEquals(
+    self.assertEqual(
         result,
         self.short_msgs.Job(
             jobId='my_job',
@@ -225,7 +225,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
 
     prediction_input_class = self.short_msgs.PredictionInput
     data_formats = prediction_input_class.DataFormatValueValuesEnum
-    self.assertEquals(
+    self.assertEqual(
         result,
         self.short_msgs.Job(
             jobId='my_job',
@@ -249,7 +249,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
 
     prediction_input_class = self.short_msgs.PredictionInput
     data_formats = prediction_input_class.DataFormatValueValuesEnum
-    self.assertEquals(
+    self.assertEqual(
         result,
         self.short_msgs.Job(
             jobId='my_job',

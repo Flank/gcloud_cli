@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for `datastore export` command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.datastore import e2e_base
 

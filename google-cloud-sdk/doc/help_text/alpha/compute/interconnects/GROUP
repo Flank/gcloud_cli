@@ -39,8 +39,8 @@ COMMANDS
      list
         (ALPHA) List Google Compute Engine interconnects.
 
-     patch
-        (ALPHA) Patch a Google Compute Engine interconnect.
+     update
+        (ALPHA) Update a Google Compute Engine interconnect.
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

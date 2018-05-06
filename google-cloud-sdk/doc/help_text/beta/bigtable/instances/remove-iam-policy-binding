@@ -1,0 +1,50 @@
+NAME
+    gcloud beta bigtable instances remove-iam-policy-binding - remove an IAM
+        policy binding from a Cloud Spanner instance
+
+SYNOPSIS
+    gcloud beta bigtable instances remove-iam-policy-binding INSTANCE
+        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Remove an IAM policy binding from a Cloud Spanner instance.
+
+POSITIONAL ARGUMENTS
+     INSTANCE - The instance to remove the IAM policy binding from. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
+
+       INSTANCE
+          The ID of the instance or a fully qualified identifier for the
+          instance.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

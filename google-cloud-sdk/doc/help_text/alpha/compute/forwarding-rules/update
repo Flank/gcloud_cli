@@ -69,7 +69,7 @@ FLAGS
 
        --region=REGION
           The region of the forwarding rule to operate on. If not specified,
-          you will be prompted to select a region.
+          you may be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:

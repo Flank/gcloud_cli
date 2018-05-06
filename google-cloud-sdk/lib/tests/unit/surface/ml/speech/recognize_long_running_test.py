@@ -13,13 +13,16 @@
 # limitations under the License.
 """gcloud ml speech recognize-long-running unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import json
 
 from apitools.base.py import encoding
-from googlecloudsdk.api_lib.ml.speech import exceptions as speech_exceptions
 from googlecloudsdk.api_lib.util import exceptions
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.ml.speech import util
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -27,7 +30,7 @@ from tests.lib.apitools import http_error
 from tests.lib.surface.ml.speech import base as speech_base
 
 
-LONG_RUNNING_RESPONSE = ('type.googleapis.com/google.cloud.speech.v1.'
+LONG_RUNNING_RESPONSE = ('type.googleapis.com/google.cloud.speech.{version}.'
                          'LongRunningRecognizeResponse')
 
 
@@ -38,13 +41,19 @@ LONG_RUNNING_RESPONSE = ('type.googleapis.com/google.cloud.speech.v1.'
 class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
   """Class to test `gcloud ml speech recognize-long-running`."""
 
+  _VERSIONS_FOR_RELEASE_TRACKS = {
+      calliope_base.ReleaseTrack.ALPHA: 'v1p1beta1',
+      calliope_base.ReleaseTrack.BETA: 'v1',
+      calliope_base.ReleaseTrack.GA: 'v1'
+  }
+
   def SetUp(self):
-    self.long_file = self.Resource('tests', 'unit', 'api_lib', 'ml', 'speech',
-                                   'testdata', 'sample.raw')
+    self.long_file = self.Resource('tests', 'unit', 'command_lib', 'ml',
+                                   'speech', 'testdata', 'sample.raw')
 
   def testBasicOutput_Async(self, track):
     """Test recognize-long-running command basic output with --async flag."""
-    self.track = track
+    self.SetUpForTrack(track)
     self._ExpectLongRunningRecognizeRequest(
         uri='gs://bucket/object',
         language='en-US',
@@ -64,7 +73,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   def testWithNoDefaults_Async(self, track):
     """Test recognize-long-running command with all flags set."""
-    self.track = track
+    self.SetUpForTrack(track)
     self._ExpectLongRunningRecognizeRequest(
         uri='gs://bucket/object',
         language='es-ES',
@@ -85,7 +94,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   def testWithLocalFile_Async(self, track):
     """Test recognize-long-running command with local content."""
-    self.track = track
+    self.SetUpForTrack(track)
     with open(self.long_file, 'rb') as audio_file:
       contents = audio_file.read()
     self._ExpectLongRunningRecognizeRequest(
@@ -104,7 +113,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   def testResults_Sync(self, track):
     """Test recognize-long-running command waits for operation results."""
-    self.track = track
+    self.SetUpForTrack(track)
     self._ExpectLongRunningRecognizeRequest(
         uri='gs://bucket/object',
         language='en-US',
@@ -116,7 +125,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
     )
     self._ExpectPollOperationRequests('12345', 3, results=['Hello world.'])
     expected = {
-        '@type': LONG_RUNNING_RESPONSE,
+        '@type': LONG_RUNNING_RESPONSE.format(version=self.version),
         'results': [{'alternatives': [{'confidence': 0.8,
                                        'transcript': 'Hello world.'}]}]}
     self.Run('ml speech recognize-long-running gs://bucket/object '
@@ -125,7 +134,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   def testWithNoDefaults_Sync(self, track):
     """Test recognize-long-running command with all flags set except --async."""
-    self.track = track
+    self.SetUpForTrack(track)
     self._ExpectLongRunningRecognizeRequest(
         uri='gs://bucket/object',
         language='es-ES',
@@ -138,7 +147,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
     )
     self._ExpectPollOperationRequests('12345', 3, results=['Hola.'])
     expected = {
-        '@type': LONG_RUNNING_RESPONSE,
+        '@type': LONG_RUNNING_RESPONSE.format(version=self.version),
         'results': [{'alternatives': [{'confidence': 0.8,
                                        'transcript': 'Hola.'}]}]}
     self.Run('ml speech recognize-long-running gs://bucket/object '
@@ -148,7 +157,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   def testWithLocalFile_Sync(self, track):
     """Test recognize-long-running command with local source (synchronous)."""
-    self.track = track
+    self.SetUpForTrack(track)
     with open(self.long_file, 'rb') as audio_file:
       contents = audio_file.read()
     self._ExpectLongRunningRecognizeRequest(
@@ -162,7 +171,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
     )
     self._ExpectPollOperationRequests('12345', 3, results=['Hello world.'])
     expected = {
-        '@type': LONG_RUNNING_RESPONSE,
+        '@type': LONG_RUNNING_RESPONSE.format(version=self.version),
         'results': [{'alternatives': [{'confidence': 0.8,
                                        'transcript': 'Hello world.'}]}]}
     self.Run('ml speech recognize-long-running {} --language-code en-US '
@@ -171,7 +180,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   def testRaisesError(self, track):
     """Test recognize-long-running command raises HttpException on error."""
-    self.track = track
+    self.SetUpForTrack(track)
     error = http_error.MakeDetailedHttpError(code=400, message='Error message',
                                              details=self.sample_error_details)
     self._ExpectLongRunningRecognizeRequest(
@@ -183,13 +192,13 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
         encoding=None,
         error=error
     )
-    with self.assertRaisesRegexp(exceptions.HttpException, r'Error message'):
+    with self.assertRaisesRegex(exceptions.HttpException, r'Error message'):
       self.Run('ml speech recognize-long-running gs://bucket/object '
                '--language-code en-US --sample-rate 16000')
 
   def testRaisesOperationError(self, track):
     """Test recognize-long-running command if operation contains error."""
-    self.track = track
+    self.SetUpForTrack(track)
     self._ExpectLongRunningRecognizeRequest(
         uri='gs://bucket/object',
         language='en-US',
@@ -201,20 +210,20 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
     )
     self._ExpectPollOperationRequests(
         '12345', 3, error_json={'code': 400, 'message': 'Message.'})
-    with self.assertRaisesRegexp(waiter.OperationError,
-                                 r'Message.'):
+    with self.assertRaisesRegex(waiter.OperationError,
+                                r'Message.'):
       self.Run('ml speech recognize-long-running gs://bucket/object '
                '--language-code en-US --sample-rate 16000')
 
   def testMissingRequiredAudioFilePositional(self, track):
-    self.track = track
+    self.SetUpForTrack(track)
     with self.AssertRaisesArgumentErrorMatches(
         'argument AUDIO: Must be specified.'):
       self.Run('ml speech recognize-long-running --language-code en-US '
                '--sample-rate 16000')
 
   def testMissingRequiredLanguageFlag(self, track):
-    self.track = track
+    self.SetUpForTrack(track)
     with self.AssertRaisesArgumentErrorMatches(
         '--language-code must be specified'):
       self.Run('ml speech recognize-long-running gs://bucket/object '
@@ -222,7 +231,7 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   def testInvalidFlagValues(self, track):
     """Test recognize-long-running command exits if invalid flag value given."""
-    self.track = track
+    self.SetUpForTrack(track)
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run('ml speech recognize-long-running gs://bucket/object '
                '--language-code en-US --sample-rate 16000 '
@@ -241,12 +250,51 @@ class RecognizeLongRunningTest(speech_base.MlSpeechTestBase):
 
   def testAudioError(self, track):
     """Test recognize-long-running raises AudioException with invalid audio."""
-    self.track = track
+    self.SetUpForTrack(track)
     audio_path = self.long_file + 'x'
-    with self.AssertRaisesExceptionMatches(speech_exceptions.AudioException,
+    with self.AssertRaisesExceptionMatches(util.AudioException,
                                            '[{}]'.format(audio_path)):
       self.Run('ml speech recognize-long-running {} --language-code en-US '
                '--sample-rate 16000'.format(self.long_file + 'x'))
+
+
+class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
+                                            parameterized.TestCase):
+  """Class to test `gcloud ml speech recognize-long-running`."""
+
+  _VERSIONS_FOR_RELEASE_TRACKS = {
+      calliope_base.ReleaseTrack.ALPHA: 'v1p1beta1',
+      calliope_base.ReleaseTrack.BETA: 'v1',
+      calliope_base.ReleaseTrack.GA: 'v1'
+  }
+
+  @parameterized.named_parameters(
+      ('Alpha', calliope_base.ReleaseTrack.ALPHA))
+  def testIncludeWordConfidence_Async(self, track):
+    """Test recognize-long-running command basic output with --async flag."""
+    self.SetUpForTrack(track)
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        encoding=None,
+        enable_word_confidence=True
+    )
+
+    actual = self.Run(
+        'ml speech recognize-long-running gs://bucket/object '
+        '    --language-code en-US '
+        '    --sample-rate 16000 '
+        '    --async '
+        '    --include-word-confidence'
+    )
+
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+    self.assertEqual(json.loads(self.GetOutput()),
+                     encoding.MessageToPyValue(expected))
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ gcloud alpha compute networks subnets update \- updates properties of an existin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks subnets update\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks subnets update\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,8 +38,8 @@ The name of the subnetwork to update.
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the subnetwork to update. If not specified, you will be prompted
-to select a region.
+The region of the subnetwork to update. If not specified, you may be prompted to
+select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -69,7 +69,7 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]
+\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]
 Adds secondary IP ranges to the subnetwork for use in IP aliasing.
 
 For example, \f5\-\-add\-secondary\-ranges range1=192.168.64.0/24\fR adds a
@@ -99,7 +99,7 @@ without a public ip address. Use \fB\-\-enable\-private\-ip\-google\-access\fR
 to enable and \fB\-\-no\-enable\-private\-ip\-google\-access\fR to disable.
 
 .TP 2m
-\fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]
+\fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]
 Removes secondary ranges from the subnetwork.
 
 For example, \f5\-\-remove\-secondary\-ranges range2,range3\fR removes the

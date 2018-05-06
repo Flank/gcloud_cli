@@ -36,7 +36,7 @@ class DescribeTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsReferencesetsGetRequest(referenceSetId=
                                                               refset.id),
         response=refset)
-    self.assertEquals(
+    self.assertEqual(
         refset, self.RunGenomics(['referencesets', 'describe', refset.id]))
     self.AssertOutputContains(refset.assemblyId)
     self.AssertOutputContains(refset.description)
@@ -54,8 +54,8 @@ class DescribeTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsReferencesetsGetRequest(referenceSetId=
                                                               '1000',),
         exception=self.MakeHttpError(404, 'Reference set not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Reference set not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Reference set not found: 1000'):
       self.RunGenomics(['referencesets', 'describe', '1000'])
 
 if __name__ == '__main__':

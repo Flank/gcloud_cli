@@ -33,70 +33,72 @@ import urllib
 from boto import config
 import crcmod
 
-from gslib import copy_helper
 from gslib.bucket_listing_ref import BucketListingObject
 from gslib.cloud_api import NotFoundException
 from gslib.command import Command
 from gslib.command import DummyArgChecker
 from gslib.command_argument import CommandArgument
-from gslib.copy_helper import CreateCopyHelperOpts
-from gslib.copy_helper import GetSourceFieldsNeededForCopy
-from gslib.copy_helper import SkipUnsupportedObjectError
 from gslib.cs_api_map import ApiSelector
 from gslib.exception import CommandException
-from gslib.hashing_helper import CalculateB64EncodedCrc32cFromContents
-from gslib.hashing_helper import CalculateB64EncodedMd5FromContents
-from gslib.hashing_helper import SLOW_CRCMOD_RSYNC_WARNING
-from gslib.hashing_helper import SLOW_CRCMOD_WARNING
 from gslib.metrics import LogPerformanceSummaryParams
 from gslib.plurality_checkable_iterator import PluralityCheckableIterator
-from gslib.posix_util import ATIME_ATTR
-from gslib.posix_util import ConvertDatetimeToPOSIX
-from gslib.posix_util import ConvertModeToBase8
-from gslib.posix_util import DeserializeFileAttributesFromObjectMetadata
-from gslib.posix_util import GID_ATTR
-from gslib.posix_util import InitializeUserGroups
-from gslib.posix_util import MODE_ATTR
-from gslib.posix_util import MTIME_ATTR
-from gslib.posix_util import NA_ID
-from gslib.posix_util import NA_MODE
-from gslib.posix_util import NA_TIME
-from gslib.posix_util import NeedsPOSIXAttributeUpdate
-from gslib.posix_util import ParseAndSetPOSIXAttributes
-from gslib.posix_util import POSIXAttributes
-from gslib.posix_util import SerializeFileAttributesToObjectMetadata
-from gslib.posix_util import UID_ATTR
-from gslib.posix_util import ValidateFilePermissionAccess
-from gslib.posix_util import WarnFutureTimestamp
-from gslib.posix_util import WarnInvalidValue
-from gslib.posix_util import WarnNegativeAttribute
 from gslib.seek_ahead_thread import SeekAheadResult
 from gslib.sig_handling import GetCaughtSignals
 from gslib.sig_handling import RegisterSignalHandler
+from gslib.storage_url import GenerationFromUrlAndString
+from gslib.storage_url import IsCloudSubdirPlaceholder
 from gslib.storage_url import StorageUrlFromString
 from gslib.third_party.storage_apitools import storage_v1_messages as apitools_messages
-from gslib.translation_helper import CopyCustomMetadata
-from gslib.translation_helper import GenerationFromUrlAndString
-from gslib.util import CalculateThroughput
-from gslib.util import CreateCustomMetadata
-from gslib.util import CreateLock
-from gslib.util import GetCloudApiInstance
-from gslib.util import GetValueFromObjectCustomMetadata
-from gslib.util import IS_WINDOWS
-from gslib.util import IsCloudSubdirPlaceholder
-from gslib.util import ObjectIsGzipEncoded
-from gslib.util import RsyncDiffToApply
-from gslib.util import SECONDS_PER_DAY
-from gslib.util import TEN_MIB
-from gslib.util import UsingCrcmodExtension
-from gslib.util import UTF8
+from gslib.utils import constants
+from gslib.utils import copy_helper
+from gslib.utils import parallelism_framework_util
+from gslib.utils.boto_util import UsingCrcmodExtension
+from gslib.utils.cloud_api_helper import GetCloudApiInstance
+from gslib.utils.copy_helper import CreateCopyHelperOpts
+from gslib.utils.copy_helper import GetSourceFieldsNeededForCopy
+from gslib.utils.copy_helper import GZIP_ALL_FILES
+from gslib.utils.copy_helper import SkipUnsupportedObjectError
+from gslib.utils.hashing_helper import CalculateB64EncodedCrc32cFromContents
+from gslib.utils.hashing_helper import CalculateB64EncodedMd5FromContents
+from gslib.utils.hashing_helper import SLOW_CRCMOD_RSYNC_WARNING
+from gslib.utils.hashing_helper import SLOW_CRCMOD_WARNING
+from gslib.utils.metadata_util import CreateCustomMetadata
+from gslib.utils.metadata_util import GetValueFromObjectCustomMetadata
+from gslib.utils.metadata_util import ObjectIsGzipEncoded
+from gslib.utils.posix_util import ATIME_ATTR
+from gslib.utils.posix_util import ConvertDatetimeToPOSIX
+from gslib.utils.posix_util import ConvertModeToBase8
+from gslib.utils.posix_util import DeserializeFileAttributesFromObjectMetadata
+from gslib.utils.posix_util import GID_ATTR
+from gslib.utils.posix_util import InitializeUserGroups
+from gslib.utils.posix_util import MODE_ATTR
+from gslib.utils.posix_util import MTIME_ATTR
+from gslib.utils.posix_util import NA_ID
+from gslib.utils.posix_util import NA_MODE
+from gslib.utils.posix_util import NA_TIME
+from gslib.utils.posix_util import NeedsPOSIXAttributeUpdate
+from gslib.utils.posix_util import ParseAndSetPOSIXAttributes
+from gslib.utils.posix_util import POSIXAttributes
+from gslib.utils.posix_util import SerializeFileAttributesToObjectMetadata
+from gslib.utils.posix_util import UID_ATTR
+from gslib.utils.posix_util import ValidateFilePermissionAccess
+from gslib.utils.posix_util import WarnFutureTimestamp
+from gslib.utils.posix_util import WarnInvalidValue
+from gslib.utils.posix_util import WarnNegativeAttribute
+from gslib.utils.rsync_util import DiffAction
+from gslib.utils.rsync_util import RsyncDiffToApply
+from gslib.utils.system_util import IS_WINDOWS
+from gslib.utils.translation_helper import CopyCustomMetadata
+from gslib.utils.unit_util import CalculateThroughput
+from gslib.utils.unit_util import SECONDS_PER_DAY
+from gslib.utils.unit_util import TEN_MIB
 from gslib.wildcard_iterator import CreateWildcardIterator
 
-
 _SYNOPSIS = """
-  gsutil rsync [-a] [-c] [-C] [-d] [-e] [-n] [-p] [-r] [-U] [-x] src_url dst_url
+  gsutil rsync [OPTION]... src_url dst_url
 """
 
+# pylint: disable=anomalous-backslash-in-string
 _DETAILED_HELP_TEXT = ("""
 <B>SYNOPSIS</B>
 """ + _SYNOPSIS + """
@@ -322,103 +324,138 @@ _DETAILED_HELP_TEXT = ("""
      perform partial overwrites.
 
 <B>OPTIONS</B>
-  -a canned_acl Sets named canned_acl when uploaded objects created. See
-                "gsutil help acls" for further details. Note that rsync will
-                decide whether or not to perform a copy based only on object size
-                and modification time, not current ACL state. Also see the -p
-                option below.
+  -a canned_acl  Sets named canned_acl when uploaded objects created. See
+                 "gsutil help acls" for further details. Note that rsync will
+                 decide whether or not to perform a copy based only on object
+                 size and modification time, not current ACL state. Also see the
+                 -p option below.
 
-  -c            Causes the rsync command to compute and compare checksums
-                (instead of comparing mtime) for files if the size of source and
-                destination as well as mtime (if available) match. This option
-                increases local disk I/O and run time if either src_url or
-                dst_url are on the local file system.
+  -c             Causes the rsync command to compute and compare checksums
+                 (instead of comparing mtime) for files if the size of source
+                 and destination match. This option increases local disk I/O and
+                 run time if either src_url or dst_url are on the local file
+                 system.
 
-  -C            If an error occurs, continue to attempt to copy the remaining
-                files. If errors occurred, gsutil's exit status will be non-zero
-                even if this flag is set. This option is implicitly set when
-                running "gsutil -m rsync...".  Note: -C only applies to the
-                actual copying operation. If an error occurs while iterating
-                over the files in the local directory (e.g., invalid Unicode
-                file name) gsutil will print an error message and abort.
+  -C             If an error occurs, continue to attempt to copy the remaining
+                 files. If errors occurred, gsutil's exit status will be
+                 non-zero even if this flag is set. This option is implicitly
+                 set when running "gsutil -m rsync...".  Note: -C only applies
+                 to the actual copying operation. If an error occurs while
+                 iterating over the files in the local directory (e.g., invalid
+                 Unicode file name) gsutil will print an error message and
+                 abort.
 
-  -d            Delete extra files under dst_url not found under src_url. By
-                default extra files are not deleted. Note: this option can
-                delete data quickly if you specify the wrong source/destination
-                combination. See the help section above,
-                "BE CAREFUL WHEN USING -d OPTION!".
+  -d             Delete extra files under dst_url not found under src_url. By
+                 default extra files are not deleted. Note: this option can
+                 delete data quickly if you specify the wrong source/destination
+                 combination. See the help section above,
+                 "BE CAREFUL WHEN USING -d OPTION!".
 
-  -e            Exclude symlinks. When specified, symbolic links will be
-                ignored. Note that gsutil does not follow directory symlinks,
-                regardless of whether -e is specified.
+  -e             Exclude symlinks. When specified, symbolic links will be
+                 ignored. Note that gsutil does not follow directory symlinks,
+                 regardless of whether -e is specified.
 
-  -n            Causes rsync to run in "dry run" mode, i.e., just outputting
-                what would be copied or deleted without actually doing any
-                copying/deleting.
+  -j <ext,...>   Applies gzip transport encoding to any file upload whose
+                 extension matches the -j extension list. This is useful when
+                 uploading files with compressible content (such as .js, .css,
+                 or .html files) because it saves network bandwidth while
+                 also leaving the data uncompressed in Google Cloud Storage.
 
-  -p            Causes ACLs to be preserved when objects are copied. Note that
-                rsync will decide whether or not to perform a copy based only
-                on object size and modification time, not current ACL state.
-                Thus, if the source and destination differ in size or
-                modification time and you run gsutil rsync -p, the file will be
-                copied and ACL preserved. However, if the source and destination
-                don't differ in size or checksum but have different ACLs,
-                running gsutil rsync -p will have no effect.
+                 When you specify the -j option, files being uploaded are
+                 compressed in-memory and on-the-wire only. Both the local
+                 files and GCS objects remain uncompressed. The uploaded
+                 objects retain the Content-Type and name of the original
+                 files.
 
-                Note that this option has performance and cost implications when
-                using the XML API, as it requires separate HTTP calls for
-                interacting with ACLs. The performance issue can be mitigated to
-                some degree by using gsutil -m rsync to cause parallel
-                synchronization. Also, this option only works if you have OWNER
-                access to all of the objects that are copied.
+                 Note that if you want to use the top-level -m option to
+                 parallelize copies along with the -j/-J options, you should
+                 prefer using multiple processes instead of multiple threads;
+                 when using -j/-J, multiple threads in the same process are
+                 bottlenecked by Python's GIL. Thread and process count can be
+                 set using the "parallel_thread_count" and
+                 "parallel_process_count" boto config options, e.g.:
 
-                You can avoid the additional performance and cost of using
-                rsync -p if you want all objects in the destination bucket to
-                end up with the same ACL by setting a default object ACL on that
-                bucket instead of using rsync -p. See 'gsutil help defacl'.
+                   gsutil -o "GSUtil:parallel_process_count=8" \\
+                     -o "GSUtil:parallel_thread_count=1" \\
+                     -m rsync -j /local/source/dir gs://bucket/path
 
-  -P            Causes POSIX attributes to be preserved when objects are copied.
-                With this feature enabled, gsutil rsync will copy fields
-                provided by stat. These are the user ID of the owner, the group
-                ID of the owning group, the mode (permissions) of the file, and
-                the access/modification time of the file. For downloads, these
-                attributes will only be set if the source objects were uploaded
-                with this flag enabled.
+  -J             Applies gzip transport encoding to file uploads. This option
+                 works like the -j option described above, but it applies to
+                 all uploaded files, regardless of extension.
 
-                On Windows, this flag will only set and restore access time and
-                modification time. This is because Windows doesn't have a notion
-                of POSIX uid/gid/mode.
+                 Warning: If you use this option and some of the source files
+                 don't compress well (e.g., that's often true of binary data),
+                 this option may result in longer uploads.
 
-  -R, -r        The -R and -r options are synonymous. Causes directories,
-                buckets, and bucket subdirectories to be synchronized
-                recursively. If you neglect to use this option gsutil will make
-                only the top-level directory in the source and destination URLs
-                match, skipping any sub-directories.
+  -n             Causes rsync to run in "dry run" mode, i.e., just outputting
+                 what would be copied or deleted without actually doing any
+                 copying/deleting.
 
-  -U            Skip objects with unsupported object types instead of failing.
-                Unsupported object types are Amazon S3 Objects in the GLACIER
-                storage class.
+  -p             Causes ACLs to be preserved when objects are copied. Note that
+                 rsync will decide whether or not to perform a copy based only
+                 on object size and modification time, not current ACL state.
+                 Thus, if the source and destination differ in size or
+                 modification time and you run gsutil rsync -p, the file will be
+                 copied and ACL preserved. However, if the source and
+                 destination don't differ in size or checksum but have different
+                 ACLs, running gsutil rsync -p will have no effect.
 
-  -x pattern    Causes files/objects matching pattern to be excluded, i.e., any
-                matching files/objects will not be copied or deleted. Note that
-                the pattern is a Python regular expression, not a wildcard (so,
-                matching any string ending in "abc" would be specified using
-                ".*abc$" rather than "*abc"). Note also that the exclude path is
-                always relative (similar to Unix rsync or tar exclude options).
-                For example, if you run the command:
+                 Note that this option has performance and cost implications
+                 when using the XML API, as it requires separate HTTP calls for
+                 interacting with ACLs. The performance issue can be mitigated
+                 to some degree by using gsutil -m rsync to cause parallel
+                 synchronization. Also, this option only works if you have OWNER
+                 access to all of the objects that are copied.
 
-                  gsutil rsync -x "data./.*\.txt$" dir gs://my-bucket
+                 You can avoid the additional performance and cost of using
+                 rsync -p if you want all objects in the destination bucket to
+                 end up with the same ACL by setting a default object ACL on
+                 that bucket instead of using rsync -p. See 'gsutil help
+                 defacl'.
 
-                it will skip the file dir/data1/a.txt.
+  -P             Causes POSIX attributes to be preserved when objects are
+                 copied.  With this feature enabled, gsutil rsync will copy
+                 fields provided by stat. These are the user ID of the owner,
+                 the group ID of the owning group, the mode (permissions) of the
+                 file, and the access/modification time of the file. For
+                 downloads, these attributes will only be set if the source
+                 objects were uploaded with this flag enabled.
 
-                You can use regex alternation to specify multiple exclusions,
-                for example:
+                 On Windows, this flag will only set and restore access time and
+                 modification time. This is because Windows doesn't have a
+                 notion of POSIX uid/gid/mode.
 
-                  gsutil rsync -x ".*\.txt$|.*\.jpg$" dir gs://my-bucket
+  -R, -r         The -R and -r options are synonymous. Causes directories,
+                 buckets, and bucket subdirectories to be synchronized
+                 recursively. If you neglect to use this option gsutil will make
+                 only the top-level directory in the source and destination URLs
+                 match, skipping any sub-directories.
 
-                NOTE: When using this on the Windows command line, use ^ as an
-                escape character instead of \ and escape the | character.
+  -U             Skip objects with unsupported object types instead of failing.
+                 Unsupported object types are Amazon S3 Objects in the GLACIER
+                 storage class.
+
+  -x pattern     Causes files/objects matching pattern to be excluded, i.e., any
+                 matching files/objects will not be copied or deleted. Note that
+                 the pattern is a Python regular expression, not a wildcard (so,
+                 matching any string ending in "abc" would be specified using
+                 ".*abc$" rather than "*abc"). Note also that the exclude path
+                 is always relative (similar to Unix rsync or tar exclude
+                 options). For example, if you run the command:
+
+                   gsutil rsync -x "data./.*\.txt$" dir gs://my-bucket
+
+                 it will skip the file dir/data1/a.txt.
+
+                 You can use regex alternation to specify multiple exclusions,
+                 for example:
+
+                   gsutil rsync -x ".*\.txt$|.*\.jpg$" dir gs://my-bucket
+
+                 NOTE: When using this on the Windows command line, use ^ as an
+                 escape character instead of \ and escape the | character.
 """)
+# pylint: enable=anomalous-backslash-in-string
 
 _NA = '-'
 _OUTPUT_BUFFER_SIZE = 64 * 1024
@@ -426,13 +463,6 @@ _PROGRESS_REPORT_LISTING_COUNT = 10000
 
 # Tracks files we need to clean up at end or if interrupted.
 _tmp_files = []
-
-
-class _DiffAction(object):
-  COPY = 'copy'
-  REMOVE = 'remove'
-  MTIME_SRC_TO_DST = 'mtime_src_to_dst'
-  POSIX_SRC_TO_DST = 'posix_src_to_dst'
 
 
 # pylint: disable=unused-argument
@@ -459,7 +489,7 @@ def CleanUpTempFiles():
 
 def _DiffToApplyArgChecker(command_instance, diff_to_apply):
   """Arg checker that skips symlinks if -e flag specified."""
-  if (diff_to_apply.diff_action == _DiffAction.REMOVE
+  if (diff_to_apply.diff_action == DiffAction.REMOVE
       or not command_instance.exclude_symlinks):
     # No src URL is populated for REMOVE actions.
     return True
@@ -535,7 +565,7 @@ def _ListUrlRootFunc(cls, args_tuple, thread_state=None):
   (base_url_str, out_filename, desc) = args_tuple
   # We sort while iterating over base_url_str, allowing parallelism of batched
   # sorting with collecting the listing.
-  out_file = io.open(out_filename, mode='w', encoding=UTF8)
+  out_file = io.open(out_filename, mode='w', encoding=constants.UTF8)
   try:
     _BatchSort(_FieldedListingIterator(cls, gsutil_api, base_url_str, desc),
                out_file)
@@ -713,7 +743,7 @@ def _EncodeUrl(url_string):
   Returns:
     encoded URL.
   """
-  return urllib.quote_plus(url_string.encode(UTF8))
+  return urllib.quote_plus(url_string.encode(constants.UTF8))
 
 
 def _DecodeUrl(enc_url_string):
@@ -725,7 +755,7 @@ def _DecodeUrl(enc_url_string):
   Returns:
     decoded URL.
   """
-  return urllib.unquote_plus(enc_url_string).decode(UTF8)
+  return urllib.unquote_plus(enc_url_string).decode(constants.UTF8)
 
 
 # pylint: disable=bare-except
@@ -757,7 +787,7 @@ def _BatchSort(in_iter, out_file):
       if not current_chunk:
         break
       output_chunk = io.open('%s-%06i' % (out_file.name, len(chunk_files)),
-                             mode='w+', encoding=UTF8)
+                             mode='w+', encoding=constants.UTF8)
       chunk_files.append(output_chunk)
       output_chunk.write(unicode(''.join(current_chunk)))
       output_chunk.flush()
@@ -1023,14 +1053,14 @@ class _DiffIterator(object):
         # There's no dst object corresponding to src object, so copy src to dst.
         yield RsyncDiffToApply(
             src_url_str, dst_url_str_would_copy_to, posix_attrs,
-            _DiffAction.COPY, src_size)
+            DiffAction.COPY, src_size)
         src_url_str = None
       elif src_url_str_to_check > dst_url_str_to_check:
         # dst object without a corresponding src object, so remove dst if -d
         # option was specified.
         if self.delete_extras:
           yield RsyncDiffToApply(None, dst_url_str, POSIXAttributes(),
-                                 _DiffAction.REMOVE, None)
+                                 DiffAction.REMOVE, None)
         dst_url_str = None
       else:
         # There is a dst object corresponding to src object, so check if objects
@@ -1044,19 +1074,19 @@ class _DiffIterator(object):
             dst_size, dst_mtime, dst_crc32c, dst_md5))
         if should_replace:
           yield RsyncDiffToApply(src_url_str, dst_url_str, posix_attrs,
-                                 _DiffAction.COPY, src_size)
+                                 DiffAction.COPY, src_size)
         elif self.preserve_posix:
           posix_attrs, needs_update = NeedsPOSIXAttributeUpdate(
               src_atime, dst_atime, src_mtime, dst_mtime, src_uid, dst_uid,
               src_gid, dst_gid, src_mode, dst_mode)
           if needs_update:
             yield RsyncDiffToApply(src_url_str, dst_url_str, posix_attrs,
-                                   _DiffAction.POSIX_SRC_TO_DST, src_size)
+                                   DiffAction.POSIX_SRC_TO_DST, src_size)
         elif has_src_mtime and not has_dst_mtime:
           # File/object at destination matches source but is missing mtime
           # attribute at destination.
           yield RsyncDiffToApply(src_url_str, dst_url_str, posix_attrs,
-                                 _DiffAction.MTIME_SRC_TO_DST, src_size)
+                                 DiffAction.MTIME_SRC_TO_DST, src_size)
         # else: we don't need to copy the file from src to dst since they're
         # the same files.
         # Advance to the next two objects.
@@ -1069,11 +1099,11 @@ class _DiffIterator(object):
     # be removed.
     if dst_url_str:
       yield RsyncDiffToApply(None, dst_url_str, POSIXAttributes(),
-                             _DiffAction.REMOVE, None)
+                             DiffAction.REMOVE, None)
     for line in self.sorted_dst_urls_it:
       (dst_url_str, _, _, _, _, _, _, _, _, _) = self._ParseTmpFileLine(line)
       yield RsyncDiffToApply(None, dst_url_str, POSIXAttributes(),
-                             _DiffAction.REMOVE, None)
+                             DiffAction.REMOVE, None)
 
 
 class _SeekAheadDiffIterator(object):
@@ -1085,8 +1115,8 @@ class _SeekAheadDiffIterator(object):
   def __iter__(self):
     for diff_to_apply in self.cloned_diff_iterator:
       bytes_to_copy = diff_to_apply.copy_size or 0
-      if (diff_to_apply.diff_action == _DiffAction.MTIME_SRC_TO_DST or
-          diff_to_apply.diff_action == _DiffAction.POSIX_SRC_TO_DST):
+      if (diff_to_apply.diff_action == DiffAction.MTIME_SRC_TO_DST or
+          diff_to_apply.diff_action == DiffAction.POSIX_SRC_TO_DST):
         # Assume MTIME_SRC_TO_DST and POSIX_SRC_TO_DST are metadata-only
         # copies. However, if the user does not have OWNER permission on
         # an object, the data must be re-sent, and this function will
@@ -1142,7 +1172,7 @@ def _RsyncFunc(cls, diff_to_apply, thread_state=None):
   dst_url_str = diff_to_apply.dst_url_str
   dst_url = StorageUrlFromString(dst_url_str)
   posix_attrs = diff_to_apply.src_posix_attrs
-  if diff_to_apply.diff_action == _DiffAction.REMOVE:
+  if diff_to_apply.diff_action == DiffAction.REMOVE:
     if cls.dryrun:
       cls.logger.info('Would remove %s', dst_url)
     else:
@@ -1158,7 +1188,7 @@ def _RsyncFunc(cls, diff_to_apply, thread_state=None):
           # If the object happened to be deleted by an external process, this
           # is fine because it moves us closer to the desired state.
           pass
-  elif diff_to_apply.diff_action == _DiffAction.COPY:
+  elif diff_to_apply.diff_action == DiffAction.COPY:
     src_url_str = diff_to_apply.src_url_str
     src_url = StorageUrlFromString(src_url_str)
     if cls.dryrun:
@@ -1211,8 +1241,8 @@ def _RsyncFunc(cls, diff_to_apply, thread_state=None):
         copy_result = copy_helper.PerformCopy(
             cls.logger, src_url, dst_url, gsutil_api, cls,
             _RsyncExceptionHandler, src_obj_metadata=src_obj_metadata,
-            headers=cls.headers, is_rsync=True,
-            preserve_posix=cls.preserve_posix_attrs)
+            headers=cls.headers, is_rsync=True, gzip_encoded=cls.gzip_encoded,
+            gzip_exts=cls.gzip_exts, preserve_posix=cls.preserve_posix_attrs)
         if copy_result is not None:
           (_, bytes_transferred, _, _) = copy_result
           with cls.stats_lock:
@@ -1220,7 +1250,7 @@ def _RsyncFunc(cls, diff_to_apply, thread_state=None):
       except SkipUnsupportedObjectError, e:
         cls.logger.info('Skipping item %s with unsupported object type %s',
                         src_url, e.unsupported_type)
-  elif diff_to_apply.diff_action == _DiffAction.MTIME_SRC_TO_DST:
+  elif diff_to_apply.diff_action == DiffAction.MTIME_SRC_TO_DST:
     # If the destination is an object in a bucket, this will not blow away other
     # metadata. This behavior is unlike if the file/object actually needed to be
     # copied from the source to the destination.
@@ -1253,13 +1283,13 @@ def _RsyncFunc(cls, diff_to_apply, thread_state=None):
           _RsyncFunc(cls, RsyncDiffToApply(diff_to_apply.src_url_str,
                                            diff_to_apply.dst_url_str,
                                            posix_attrs,
-                                           _DiffAction.COPY,
+                                           DiffAction.COPY,
                                            diff_to_apply.copy_size),
                      thread_state=thread_state)
       else:
         ParseAndSetPOSIXAttributes(dst_url.object_name, obj_metadata,
                                    preserve_posix=cls.preserve_posix_attrs)
-  elif diff_to_apply.diff_action == _DiffAction.POSIX_SRC_TO_DST:
+  elif diff_to_apply.diff_action == DiffAction.POSIX_SRC_TO_DST:
     # If the destination is an object in a bucket, this will not blow away other
     # metadata. This behavior is unlike if the file/object actually needed to be
     # copied from the source to the destination.
@@ -1293,7 +1323,7 @@ def _RsyncFunc(cls, diff_to_apply, thread_state=None):
                           'object.', dst_url.url_string)
           _RsyncFunc(cls, RsyncDiffToApply(diff_to_apply.src_url_str,
                                            diff_to_apply.dst_url_str,
-                                           posix_attrs, _DiffAction.COPY,
+                                           posix_attrs, DiffAction.COPY,
                                            diff_to_apply.copy_size),
                      thread_state=thread_state)
   else:
@@ -1324,7 +1354,7 @@ class RsyncCommand(Command):
       usage_synopsis=_SYNOPSIS,
       min_args=2,
       max_args=2,
-      supported_sub_args='a:cCdenpPrRUx:',
+      supported_sub_args='a:cCdenpPrRUx:j:J',
       file_url_ok=True,
       provider_url_ok=False,
       urls_start_arg=0,
@@ -1375,7 +1405,7 @@ class RsyncCommand(Command):
     self.total_bytes_transferred = 0
     # Use a lock to ensure accurate statistics in the face of
     # multi-threading/multi-processing.
-    self.stats_lock = CreateLock()
+    self.stats_lock = parallelism_framework_util.CreateLock()
     if not UsingCrcmodExtension(crcmod):
       if self.compute_file_checksums:
         self.logger.warn(SLOW_CRCMOD_WARNING)
@@ -1417,7 +1447,7 @@ class RsyncCommand(Command):
     seek_ahead_iterator = _SeekAheadDiffIterator(
         _AvoidChecksumAndListingDiffIterator(diff_iterator))
 
-    self.logger.info('Starting synchronization')
+    self.logger.info('Starting synchronization...')
     start_time = time.time()
     try:
       self.Apply(_RsyncFunc, diff_iterator, _RsyncExceptionHandler,
@@ -1462,6 +1492,13 @@ class RsyncCommand(Command):
     # Command class, so save in Command state rather than CopyHelperOpts.
     self.canned = None
 
+    # Files matching these extensions should be compressed.
+    # The gzip_encoded flag marks if the files should be compressed during
+    # the upload.
+    gzip_encoded = False
+    gzip_arg_exts = None
+    gzip_arg_all = None
+
     if self.sub_opts:
       for o, a in self.sub_opts:
         if o == '-a':
@@ -1478,6 +1515,12 @@ class RsyncCommand(Command):
           self.delete_extras = True
         elif o == '-e':
           self.exclude_symlinks = True
+        elif o == '-j':
+          gzip_encoded = True
+          gzip_arg_exts = [x.strip() for x in a.split(',')]
+        elif o == '-J':
+          gzip_encoded = True
+          gzip_arg_all = GZIP_ALL_FILES
         elif o == '-n':
           self.dryrun = True
         elif o == '-p':
@@ -1497,9 +1540,16 @@ class RsyncCommand(Command):
             self.exclude_pattern = re.compile(a)
           except re.error:
             raise CommandException('Invalid exclude filter (%s)' % a)
+
     if self.preserve_acl and canned_acl:
       raise CommandException(
           'Specifying both the -p and -a options together is invalid.')
+    if gzip_arg_exts and gzip_arg_all:
+      raise CommandException(
+          'Specifying both the -j and -J options together is invalid.')
+    self.gzip_encoded = gzip_encoded
+    self.gzip_exts = gzip_arg_exts or gzip_arg_all
+
     return CreateCopyHelperOpts(
         canned_acl=canned_acl,
         preserve_acl=self.preserve_acl,

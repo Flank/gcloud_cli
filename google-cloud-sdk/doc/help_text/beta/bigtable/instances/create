@@ -3,8 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud beta bigtable instances create INSTANCE --cluster=CLUSTER
-        --cluster-zone=CLUSTER_ZONE
-        (--description=DESCRIPTION | --display-name=DISPLAY_NAME) [--async]
+        --cluster-zone=CLUSTER_ZONE --display-name=DISPLAY_NAME [--async]
         [--cluster-num-nodes=CLUSTER_NUM_NODES]
         [--cluster-storage-type=CLUSTER_STORAGE_TYPE; default="ssd"]
         [--instance-type=INSTANCE_TYPE; default="PRODUCTION"]
@@ -25,16 +24,8 @@ REQUIRED FLAGS
         ID of the zone where the cluster is located. Supported zones are listed
         at https://cloud.google.com/bigtable/docs/locations.
 
-     Exactly one of these must be specified:
-
-       --description=DESCRIPTION
-          (DEPRECATED) Friendly name of the instance.
-
-          Flag --description is deprecated. Use --display-name=DISPLAY_NAME
-          instead.
-
-       --display-name=DISPLAY_NAME
-          Friendly name of the instance.
+     --display-name=DISPLAY_NAME
+        Friendly name of the instance.
 
 OPTIONAL FLAGS
      --async

@@ -54,7 +54,8 @@ EXAMPLES
         $ gcloud kms keyrings list --location global --limit=5
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keyrings list
         $ gcloud beta kms keyrings list
 

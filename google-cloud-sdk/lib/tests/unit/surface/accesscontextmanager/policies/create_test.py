@@ -50,8 +50,8 @@ class PoliciesCreateTest(accesscontextmanager.Base):
     result = self.Run('access-context-manager policies create '
                       '    --title "My Policy" '
                       '    --organization 12345')
-    self.assertEquals(result.additionalProperties[0].value.string_value,
-                      'accessPolicies/67890')
+    self.assertEqual(result.additionalProperties[0].value.string_value,
+                     'accessPolicies/67890')
 
 
 if __name__ == '__main__':

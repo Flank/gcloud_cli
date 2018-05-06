@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import resource as resource_util
 from tests.lib import test_case
 
@@ -26,15 +28,15 @@ class SplitUrlTest(test_case.Base):
     resource_path = 'path/to/resource'
     url = 'https://{0}/{1}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
-    self.assertEquals((api_name, api_version, resource_path),
-                      resource_util.SplitDefaultEndpointUrl(url))
+    self.assertEqual((api_name, api_version, resource_path),
+                     resource_util.SplitDefaultEndpointUrl(url))
 
   def testGoogleApis_NoVersion_NoResource(self):
     domain = 'googleapis.com'
     api_name = 'ml'
     url = 'https://{0}.{1}/'.format(api_name, domain)
-    self.assertEquals((api_name, None, ''),
-                      resource_util.SplitDefaultEndpointUrl(url))
+    self.assertEqual((api_name, None, ''),
+                     resource_util.SplitDefaultEndpointUrl(url))
 
   def testGoogleApis_NoResource(self):
     domain = 'www.googleapis.com'
@@ -43,8 +45,8 @@ class SplitUrlTest(test_case.Base):
     resource_path = ''
     url = 'https://{0}/{1}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
-    self.assertEquals((api_name, api_version, resource_path),
-                      resource_util.SplitDefaultEndpointUrl(url))
+    self.assertEqual((api_name, api_version, resource_path),
+                     resource_util.SplitDefaultEndpointUrl(url))
 
   def testGoogleApis_ApiNameFirst(self):
     domain = 'googleapis.com'
@@ -53,8 +55,8 @@ class SplitUrlTest(test_case.Base):
     resource_path = 'path/to/resource'
     url = 'https://{1}.{0}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
-    self.assertEquals((api_name, api_version, resource_path),
-                      resource_util.SplitDefaultEndpointUrl(url))
+    self.assertEqual((api_name, api_version, resource_path),
+                     resource_util.SplitDefaultEndpointUrl(url))
 
   def testGoogleApis_ApiNameFirst_NoResource(self):
     domain = 'googleapis.com'
@@ -63,8 +65,8 @@ class SplitUrlTest(test_case.Base):
     resource_path = ''
     url = 'https://{1}.{0}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
-    self.assertEquals((api_name, api_version, resource_path),
-                      resource_util.SplitDefaultEndpointUrl(url))
+    self.assertEqual((api_name, api_version, resource_path),
+                     resource_util.SplitDefaultEndpointUrl(url))
 
   def testOtherDomain(self):
     domain = 'otherdomain.com'
@@ -73,40 +75,40 @@ class SplitUrlTest(test_case.Base):
     resource_path = 'path/to/resource'
     url = 'https://{0}/{1}/{2}/{3}'.format(
         domain, api_name, api_version, resource_path)
-    self.assertEquals((api_name, api_version, resource_path),
-                      resource_util.SplitDefaultEndpointUrl(url))
+    self.assertEqual((api_name, api_version, resource_path),
+                     resource_util.SplitDefaultEndpointUrl(url))
 
 
 class UriTemplateTests(test_case.Base):
 
   def testEmptyPath(self):
-    self.assertEquals([], resource_util.GetParamsFromPath(''))
+    self.assertEqual([], resource_util.GetParamsFromPath(''))
 
   def testPathWithNoParams(self):
-    self.assertEquals([], resource_util.GetParamsFromPath('//a/b/c'))
+    self.assertEqual([], resource_util.GetParamsFromPath('//a/b/c'))
 
   def testPathSingleParams(self):
-    self.assertEquals(['bvalue'],
-                      resource_util.GetParamsFromPath('//a/b/{bvalue}/c'))
+    self.assertEqual(['bvalue'],
+                     resource_util.GetParamsFromPath('//a/b/{bvalue}/c'))
 
   def testPathMultiParams(self):
-    self.assertEquals(
+    self.assertEqual(
         ['bvalue', 'cvalue'],
         resource_util.GetParamsFromPath('//a/b/{bvalue}/c/{cvalue}'))
-    self.assertEquals(
+    self.assertEqual(
         ['bvalue', 'cvalue'],
         resource_util.GetParamsFromPath('//a/b/{bvalue}/c/{cvalue}/d'))
-    self.assertEquals(
+    self.assertEqual(
         ['bvalue', 'cvalue'],
         resource_util.GetParamsFromPath('//a/b/{bvalue}/c/{cvalue}:custom'))
-    self.assertEquals(
+    self.assertEqual(
         ['bvalue', 'cvalue'],
         resource_util.GetParamsFromPath('//a/b/{bvalue}/c/{cvalue}/d:custom'))
 
   def testPathSingleOnlyParams(self):
-    self.assertEquals(['bvalue'], resource_util.GetParamsFromPath('{+bvalue}'))
-    self.assertEquals(['bvalue'],
-                      resource_util.GetParamsFromPath('{+bvalue}:custom'))
+    self.assertEqual(['bvalue'], resource_util.GetParamsFromPath('{+bvalue}'))
+    self.assertEqual(['bvalue'],
+                     resource_util.GetParamsFromPath('{+bvalue}:custom'))
 
 
 class CollectionInfoTests(test_case.Base):

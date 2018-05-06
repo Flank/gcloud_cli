@@ -4,9 +4,9 @@ NAME
 SYNOPSIS
     gcloud compute disks create DISK_NAME [DISK_NAME ...]
         [--csek-key-file=FILE] [--description=DESCRIPTION]
-        [--labels=[KEY=VALUE,...]] [--licenses=[LICENSE,...]]
-        [--no-require-csek-key-create] [--size=SIZE] [--type=TYPE]
-        [--zone=ZONE]
+        [--guest-os-features=[GUEST_OS_FEATURE,...]] [--labels=[KEY=VALUE,...]]
+        [--licenses=[LICENSE,...]] [--no-require-csek-key-create] [--size=SIZE]
+        [--type=TYPE] [--zone=ZONE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
         [GCLOUD_WIDE_FLAG ...]
@@ -48,6 +48,35 @@ FLAGS
      --description=DESCRIPTION
         An optional, textual description for the disks being created.
 
+     --guest-os-features=[GUEST_OS_FEATURE,...]
+        This parameter enables one or more features for VM instances that use
+        the image for their boot disks. The following features are available:
+
+        * MULTI_IP_SUBNET - For configuring interfaces with a netmask other
+          than /32.
+
+        * SECURE_BOOT - Enables UEFI secure boot, which restrics unsigned
+          software from booting or unsigned drivers from loading on the VM
+          instance.
+
+        * UEFI_COMPATIBLE - Enables UEFI booting, which is an alternative
+          system boot method. Most public images use the GRUB bootloader as
+          their primary boot method.
+
+        * VIRTIO_SCSI_MULTIQUEUE - Enables multiqueue SCSI capabilities for
+          Local SSD devices. This option is an alternative to NVMe.
+          + For Linux images, you can enable VIRTIO_SCSI_MULTIQUEUE on images
+            with kernel versions 3.17 and higher.
+          + For Windows images, you can enable VIRTIO_SCSI_MULTIQUEUE on
+            images with driver version 1.2.0.1621 or higher.
+
+        * WINDOWS - Required for Windows Server images. Newer public images
+          for Windows server include the WINDOWS parameter to indicate that it
+          is a Windows image.
+
+    GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, SECURE_BOOT,
+    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
+
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
@@ -80,7 +109,7 @@ FLAGS
 
      --zone=ZONE
         The zone of the disks to create. If not specified and the compute/zone
-        property isn't set, you will be prompted to select a zone.
+        property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

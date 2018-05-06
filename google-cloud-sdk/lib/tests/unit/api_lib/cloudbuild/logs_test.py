@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.cloudbuild.logs."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions as api_exceptions
 
 from googlecloudsdk.api_lib.cloudbuild import logs as cloudbuild_logs
@@ -188,9 +190,8 @@ class MakeLogTailerTest(e2e_base.WithMockHttp):
 
   def _makeMockBuildResource(self, bucket):
     bucket += '_cloudbuild/logs'
-    return type('', (), dict(id=TEST_ID,
-                             bucket=bucket,
-                             logsBucket='gs://' + bucket + ''))()
+    return type(str(''), (), dict(id=TEST_ID, bucket=bucket,
+                                  logsBucket='gs://' + bucket + ''))()
 
   # Test for b/35934834 where lstrip() would remove "s", "g" from bucket name 2
   def testMakeLogTailer(self):

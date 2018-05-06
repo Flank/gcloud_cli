@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 import datetime
 import sys
 import textwrap
@@ -24,6 +25,8 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core.resource import resource_printer
 from tests.lib import sdk_test_base
 from tests.lib.core.resource import resource_printer_test_base
+
+import six
 
 
 class JsonPrinterTest(resource_printer_test_base.Base):
@@ -990,20 +993,20 @@ class JsonPrintTest(resource_printer_test_base.Base):
     resource_printer.Print(resource, 'json')
     self.AssertOutputEquals(textwrap.dedent("""\
         [
-          {
-            "start": {
+          {{
+            "start": {{
               "datetime": "2015-10-21 10:11:12",
-              "day": 21,
+              "day": 21,{fold}
               "hour": 10,
               "microsecond": 0,
               "minute": 11,
               "month": 10,
               "second": 12,
               "year": 2015
-            }
-          }
+            }}
+          }}
         ]
-        """))
+        """.format(fold='\n              "fold": 0,' if six.PY3 else '')))
 
   def testPrintIterEmpty(self):
     resource = [{'empty': iter([])}]

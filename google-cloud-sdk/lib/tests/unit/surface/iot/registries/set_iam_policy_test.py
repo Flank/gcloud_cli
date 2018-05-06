@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure setting an IAM policy works properly."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import base64
 import textwrap
@@ -23,6 +27,7 @@ from googlecloudsdk.core.console import console_io
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
+
 
 _ETAG_CONFIRM_PROMPT = textwrap.dedent("""\
     The specified policy does not contain an "etag" field identifying a specific version to replace. Changing a policy without an "etag" can overwrite concurrent policy changes.
@@ -39,10 +44,11 @@ class SetIamPolicy(base.CloudIotBase):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def _CreatePolicyAndFile(self, include_etag=False):
-    etag_bin = 'abcde'
+    etag_bin = b'abcde'
     if include_etag:
       etag_field = ''',
-              "etag": "{}"'''.format(base64.urlsafe_b64encode(etag_bin))
+              "etag": "{}"'''.format(
+                  base64.urlsafe_b64encode(etag_bin).decode())
     else:
       etag_field = ''
     policy = self.messages.Policy(
@@ -86,7 +92,7 @@ class SetIamPolicy(base.CloudIotBase):
                       'us-central1 {0}'.format(in_file))
 
     self.assertEqual(result, policy)
-    self.AssertLogContains('Set IAM policy for registry [my-registry].')
+    self.AssertLogContains('Updated IAM policy for registry [my-registry].')
 
   def testSetIamPolicyWithServiceAccount(self, track):
     self.track = track

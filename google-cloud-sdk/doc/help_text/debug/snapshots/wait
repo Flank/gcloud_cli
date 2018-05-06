@@ -5,8 +5,7 @@ SYNOPSIS
     gcloud debug snapshots wait [ID ...] [--all] [--all-users]
         [--location=LOCATION-REGEXP] [--target=(ID|DESCRIPTION_REGEXP)]
         [--timeout=TIMEOUT; default="unlimited"] [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+        [--limit=LIMIT] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     This command waits for one or more snapshots on a Cloud Debugger debug
@@ -62,21 +61,11 @@ LIST COMMAND FLAGS
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
-     --page-size=PAGE_SIZE
-        Some services group resource list output into pages. This flag
-        specifies the maximum number of resources per page. The default is
-        determined by the service if it supports paging, otherwise it is
-        unlimited (no paging). Paging may be applied before or after --filter
-        and --limit depending on the service.
-
      --sort-by=[FIELD,...]
         A comma-separated list of resource field key names to sort by. The
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
-
-     --uri
-        Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

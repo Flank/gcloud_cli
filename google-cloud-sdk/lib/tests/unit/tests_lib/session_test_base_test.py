@@ -59,14 +59,14 @@ class TestSessionTest(sdk_test_base.SdkBase):
         'http://foo.bar', 'GET', request_1, request_headers)
     result_2 = self._http_mock._SplitBatchRequest(
         'http://foo.bar', 'GET', request_2, request_headers)
-    self.assertEquals(len(result_1), 2)
-    self.assertEquals(len(result_2), 2)
+    self.assertEqual(len(result_1), 2)
+    self.assertEqual(len(result_2), 2)
     for r1, r2 in zip(result_1, result_2):
-      self.assertEquals(r1[0].strip(), base_headers)
-      self.assertEquals(r2[0].strip(), base_headers)
+      self.assertEqual(r1[0].strip(), base_headers)
+      self.assertEqual(r2[0].strip(), base_headers)
       r1[1].AssertSessionEquals(r2[1])
       r2[1].AssertSessionEquals(r1[1])
-      self.assertEquals(r1[2], r2[2])  # body
+      self.assertEqual(r1[2], r2[2])  # body
 
 
 if __name__ == '__main__':

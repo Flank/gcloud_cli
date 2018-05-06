@@ -314,12 +314,12 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
                         check_response_func=None):
       del http, retries, max_retry_wait, redirections, retry_func
       del check_response_func
-      self.assertEquals('PUT', request.http_method)
-      self.assertEquals('foo', request.url)
-      self.assertEquals(request.headers['Content-Length'], '7')
-      self.assertEquals(request.headers['x-goog-content-length-range'],
-                        '0,104857600')
-      self.assertEquals(request.headers['content-type'], 'application/zip')
+      self.assertEqual('PUT', request.http_method)
+      self.assertEqual('foo', request.url)
+      self.assertEqual(request.headers['Content-Length'], '7')
+      self.assertEqual(request.headers['x-goog-content-length-range'],
+                       '0,104857600')
+      self.assertEqual(request.headers['content-type'], 'application/zip')
 
       return http_wrapper.Response(
           info={'status': 200, 'location': request.url}, content='',
@@ -374,7 +374,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           'functions deploy my-test --region {} '
           '--trigger-topic topic '
           '--quiet'.format(region))
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
   def testCreateWithPubSubAndRetrying(self):
@@ -424,7 +424,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           '--trigger-topic topic '
           '--retry '
           '--quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
   def testCreateWithPubSubAndLabels(self):
@@ -476,7 +476,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           '--trigger-topic topic '
           '--update-labels=foo=bar,boo=baz '
           '--quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
   def testDeployFromLocalDirWithSourceFlag(self):
@@ -529,7 +529,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
       result = self.Run(
           'functions deploy my-test --trigger-topic topic '
           '--source my/functions/directory --quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
   def testDeployFromLocalSource_failIfPathDoesNotExist(self):
@@ -537,7 +537,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
 
     self.ExpectGetFunction()
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.FunctionsError,
         'argument --source: Provided directory does not exist.'):
       self.Run(
@@ -574,7 +574,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     result = self.Run(
         'functions deploy my-test --trigger-topic topic '
         '--source gs://my-bucket/function.zip --quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
   def testDeployFromRepoWithSourceFlag(self):
@@ -612,12 +612,12 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         'https://source.developers.google.com/projects/my-project/'
         'repos/my-repo/fixed-aliases/rc0.0.9 '
         '--quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
   def testHttpTriggerAndRetrying(self):
     self.MockUnpackedSourcesDirSize()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.ConflictingArgumentsException,
         'arguments not allowed simultaneously: --trigger-http, --retry'):
       self.Run(
@@ -1025,7 +1025,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         'functions deploy my-test --timeout 512 --trigger-http')
 
   def testManuallySettingDeploymentLabel(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.InvalidArgumentException,
         'Label keys starting with `deployment` are reserved for use by '
         'deployment tools and cannot be specified manually.'):
@@ -1033,7 +1033,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           'functions deploy my-test --update-labels=deployment=contingency ')
 
   def testManuallyRemovingDeploymentLabel(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.InvalidArgumentException,
         'Label keys starting with `deployment` are reserved for use by '
         'deployment tools and cannot be specified manually.'):
@@ -1050,7 +1050,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
 
     self.ExpectGetFunction()
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.OversizedDeployment,
         r'Uncompressed deployment is \d+B, bigger than maximum allowed size of '
         r'\d+B.'):
@@ -1070,7 +1070,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         self.GenerateFunctionWithPubsub(
             function_name, 'old-topic', source_archive_url='url'))
     with file_utils.TemporaryDirectory() as t:
-      with self.assertRaisesRegexp(Exception, _OP_FAILED_UPLOAD):
+      with self.assertRaisesRegex(Exception, _OP_FAILED_UPLOAD):
         self.Run(
             'functions deploy my-test --source {0} --trigger-topic topic '
             '--stage-bucket buck'

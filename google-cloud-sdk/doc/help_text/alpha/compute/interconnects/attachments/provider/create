@@ -6,8 +6,8 @@ SYNOPSIS
     gcloud alpha compute interconnects attachments provider create NAME
         --bandwidth=BANDWIDTH --interconnect=INTERCONNECT
         --pairing-key=PAIRING_KEY
-        --partner-interconnect-name=PARTNER_INTERCONNECT_NAME
-        --partner-name=PARTNER_NAME --partner-portal-url=PARTNER_PORTAL_URL
+        (--partner-interconnect-name=PARTNER_INTERCONNECT_NAME
+          --partner-name=PARTNER_NAME --partner-portal-url=PARTNER_PORTAL_URL)
         [--candidate-subnets=[SUBNET,...]] [--description=DESCRIPTION]
         [--partner-asn=PARTNER_ASN] [--region=REGION] [--vlan=VLAN]
         [GCLOUD_WIDE_FLAG ...]
@@ -55,19 +55,25 @@ REQUIRED FLAGS
         Value of the pairing-key from the target partner attachment provided by
         the customer.
 
-     --partner-interconnect-name=PARTNER_INTERCONNECT_NAME
-        Plain text name of the Interconnect this attachment is connected to, as
-        displayed in the Partner's portal. For instance "Chicago 1".
+     Partner metadata. This must be specified.
 
-     --partner-name=PARTNER_NAME
-        Plain text name of the Partner providing this attachment. This value
-        may be validated to match approved Partner values.
+       --partner-interconnect-name=PARTNER_INTERCONNECT_NAME
+          Plain text name of the Interconnect this attachment is connected to,
+          as displayed in the Partner's portal. For instance "Chicago 1". This
+          flag must be specified if any of the other arguments in this group
+          are specified.
 
-     --partner-portal-url=PARTNER_PORTAL_URL
-        URL of the Partner's portal for this Attachment. The Partner may wish
-        to customise this to be a deep-link to the specific resource on the
-        Partner portal. This value may be validated to match approved Partner
-        values.
+       --partner-name=PARTNER_NAME
+          Plain text name of the Partner providing this attachment. This value
+          may be validated to match approved Partner values. This flag must be
+          specified if any of the other arguments in this group are specified.
+
+       --partner-portal-url=PARTNER_PORTAL_URL
+          URL of the Partner's portal for this Attachment. The Partner may wish
+          to customise this to be a deep-link to the specific resource on the
+          Partner portal. This value may be validated to match approved Partner
+          values. This flag must be specified if any of the other arguments in
+          this group are specified.
 
 OPTIONAL FLAGS
      --candidate-subnets=[SUBNET,...]
@@ -89,7 +95,7 @@ OPTIONAL FLAGS
 
      --region=REGION
         The region of the interconnect attachment to create. If not specified,
-        you will be prompted to select a region.
+        you may be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:

@@ -66,49 +66,49 @@ class PkgResourcesTest(test_case.TestCase):
 
   def testListPackage(self):
     with files.TemporaryDirectory() as t:
-      self.assertEquals(([], []), pkg_resources.ListPackage(t))
+      self.assertEqual(([], []), pkg_resources.ListPackage(t))
       Touch(os.path.join(t, 'foo.py'), '"""Foo module."""')
-      self.assertEquals(([], ['foo']), pkg_resources.ListPackage(t))
+      self.assertEqual(([], ['foo']), pkg_resources.ListPackage(t))
       Touch(os.path.join(t, '__init__.py'), '"""Package marker."""')
-      self.assertEquals(([], ['foo']), pkg_resources.ListPackage(t))
+      self.assertEqual(([], ['foo']), pkg_resources.ListPackage(t))
       os.makedirs(os.path.join(t, 'pkg'))
-      self.assertEquals(([], ['foo']), pkg_resources.ListPackage(t))
+      self.assertEqual(([], ['foo']), pkg_resources.ListPackage(t))
       Touch(os.path.join(t, 'pkg', '__init__.py'), '"""Package marker."""')
-      self.assertEquals((['pkg'], ['foo']), pkg_resources.ListPackage(t))
+      self.assertEqual((['pkg'], ['foo']), pkg_resources.ListPackage(t))
       Touch(os.path.join(t, 'bar.py'), '"""Bar module."""')
-      self.assertEquals((['pkg'], ['bar', 'foo']), pkg_resources.ListPackage(t))
+      self.assertEqual((['pkg'], ['bar', 'foo']), pkg_resources.ListPackage(t))
 
       # Check support for additional extensions.
-      self.assertEquals((['pkg'], ['bar', 'foo']),
-                        pkg_resources.ListPackage(
-                            t, extra_extensions=['.yaml', '.junk']))
+      self.assertEqual((['pkg'], ['bar', 'foo']),
+                       pkg_resources.ListPackage(
+                           t, extra_extensions=['.yaml', '.junk']))
       Touch(os.path.join(t, 'baz.yaml'), '')
       Touch(os.path.join(t, 'baz.junk'), '')
-      self.assertEquals((['pkg'], ['bar', 'baz.yaml', 'foo']),
-                        pkg_resources.ListPackage(
-                            t, extra_extensions=['.yaml']))
-      self.assertEquals((['pkg'], ['bar', 'baz.junk', 'baz.yaml', 'foo']),
-                        pkg_resources.ListPackage(
-                            t, extra_extensions=['.yaml', '.junk']))
+      self.assertEqual((['pkg'], ['bar', 'baz.yaml', 'foo']),
+                       pkg_resources.ListPackage(
+                           t, extra_extensions=['.yaml']))
+      self.assertEqual((['pkg'], ['bar', 'baz.junk', 'baz.yaml', 'foo']),
+                       pkg_resources.ListPackage(
+                           t, extra_extensions=['.yaml', '.junk']))
 
   def testListPackageResources(self):
     with files.TemporaryDirectory() as t:
-      self.assertEquals([], sorted(pkg_resources.ListPackageResources(t)))
+      self.assertEqual([], sorted(pkg_resources.ListPackageResources(t)))
       Touch(os.path.join(t, 'foo.py'), '"""Foo module."""')
-      self.assertEquals(['foo.py'],
-                        sorted(pkg_resources.ListPackageResources(t)))
+      self.assertEqual(['foo.py'],
+                       sorted(pkg_resources.ListPackageResources(t)))
       Touch(os.path.join(t, '__init__.py'), '"""Package marker."""')
-      self.assertEquals(['__init__.py', 'foo.py'],
-                        sorted(pkg_resources.ListPackageResources(t)))
+      self.assertEqual(['__init__.py', 'foo.py'],
+                       sorted(pkg_resources.ListPackageResources(t)))
       os.makedirs(os.path.join(t, 'pkg'))
-      self.assertEquals(['__init__.py', 'foo.py', 'pkg' + os.sep],
-                        sorted(pkg_resources.ListPackageResources(t)))
+      self.assertEqual(['__init__.py', 'foo.py', 'pkg' + os.sep],
+                       sorted(pkg_resources.ListPackageResources(t)))
       Touch(os.path.join(t, 'pkg', '__init__.py'), '"""Package marker."""')
-      self.assertEquals(['__init__.py', 'foo.py', 'pkg' + os.sep],
-                        sorted(pkg_resources.ListPackageResources(t)))
+      self.assertEqual(['__init__.py', 'foo.py', 'pkg' + os.sep],
+                       sorted(pkg_resources.ListPackageResources(t)))
       Touch(os.path.join(t, 'bar'), 'BAR')
-      self.assertEquals(['__init__.py', 'bar', 'foo.py', 'pkg' + os.sep],
-                        sorted(pkg_resources.ListPackageResources(t)))
+      self.assertEqual(['__init__.py', 'bar', 'foo.py', 'pkg' + os.sep],
+                       sorted(pkg_resources.ListPackageResources(t)))
       self.assertEqual(
           b'BAR', pkg_resources.GetResourceFromFile(os.path.join(t, 'bar')))
 
@@ -119,61 +119,61 @@ class PkgResourcesTest(test_case.TestCase):
     with files.TemporaryDirectory() as t:
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(([], []), pkg_resources.ListPackage(zip_pkg))
+        self.assertEqual(([], []), pkg_resources.ListPackage(zip_pkg))
       Touch(os.path.join(t, 'foo.py'), '"""Foo module."""')
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(([], ['foo']), pkg_resources.ListPackage(zip_pkg))
+        self.assertEqual(([], ['foo']), pkg_resources.ListPackage(zip_pkg))
       Touch(os.path.join(t, '__init__.py'), '"""Package marker."""')
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(([], ['foo']), pkg_resources.ListPackage(zip_pkg))
+        self.assertEqual(([], ['foo']), pkg_resources.ListPackage(zip_pkg))
       os.makedirs(os.path.join(t, 'pkg'))
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(([], ['foo']), pkg_resources.ListPackage(zip_pkg))
+        self.assertEqual(([], ['foo']), pkg_resources.ListPackage(zip_pkg))
       Touch(os.path.join(t, 'pkg', '__init__.py'), '"""Package marker."""')
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals((['pkg'], ['foo']),
-                          pkg_resources.ListPackage(zip_pkg))
+        self.assertEqual((['pkg'], ['foo']),
+                         pkg_resources.ListPackage(zip_pkg))
       Touch(os.path.join(t, 'bar.py'), '"""Bar module."""')
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals((['pkg'], ['bar', 'foo']),
-                          pkg_resources.ListPackage(zip_pkg))
+        self.assertEqual((['pkg'], ['bar', 'foo']),
+                         pkg_resources.ListPackage(zip_pkg))
 
   def testListPackageResourcesInZip(self):
     with files.TemporaryDirectory() as t:
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals([],
-                          sorted(pkg_resources.ListPackageResources(zip_pkg)))
+        self.assertEqual([],
+                         sorted(pkg_resources.ListPackageResources(zip_pkg)))
       Touch(os.path.join(t, 'foo.py'), '"""Foo module."""')
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(['foo.py'],
-                          sorted(pkg_resources.ListPackageResources(zip_pkg)))
+        self.assertEqual(['foo.py'],
+                         sorted(pkg_resources.ListPackageResources(zip_pkg)))
       Touch(os.path.join(t, '__init__.py'), '"""Package marker."""')
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(['__init__.py', 'foo.py'],
-                          sorted(pkg_resources.ListPackageResources(zip_pkg)))
+        self.assertEqual(['__init__.py', 'foo.py'],
+                         sorted(pkg_resources.ListPackageResources(zip_pkg)))
       os.makedirs(os.path.join(t, 'pkg'))
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(['__init__.py', 'foo.py', 'pkg' + os.sep],
-                          sorted(pkg_resources.ListPackageResources(zip_pkg)))
+        self.assertEqual(['__init__.py', 'foo.py', 'pkg' + os.sep],
+                         sorted(pkg_resources.ListPackageResources(zip_pkg)))
       Touch(os.path.join(t, 'pkg', '__init__.py'), '"""Package marker."""')
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(['__init__.py', 'foo.py', 'pkg' + os.sep],
-                          sorted(pkg_resources.ListPackageResources(zip_pkg)))
+        self.assertEqual(['__init__.py', 'foo.py', 'pkg' + os.sep],
+                         sorted(pkg_resources.ListPackageResources(zip_pkg)))
       Touch(os.path.join(t, 'bar'), 'BAR')
       with files.TemporaryDirectory() as zip_tmp_dir:
         zip_pkg = MakeZip(t, zip_tmp_dir, 'pkg')
-        self.assertEquals(['__init__.py', 'bar', 'foo.py', 'pkg' + os.sep],
-                          sorted(pkg_resources.ListPackageResources(zip_pkg)))
+        self.assertEqual(['__init__.py', 'bar', 'foo.py', 'pkg' + os.sep],
+                         sorted(pkg_resources.ListPackageResources(zip_pkg)))
         self.assertEqual(
             b'BAR', pkg_resources.GetResourceFromFile(os.path.join(t, 'bar')))
         with self.assertRaises(IOError):
@@ -196,16 +196,16 @@ class PkgResourcesTest(test_case.TestCase):
                                                 os.path.join(t, 'foo'))
       self.assertIn('my.foo.mod', sys.modules)
       del sys.modules['my.foo.mod']
-      self.assertEquals(5, foo_mod.Foo.VALUE)
-      self.assertEquals('my.foo.mod', foo_mod.__name__)
+      self.assertEqual(5, foo_mod.Foo.VALUE)
+      self.assertEqual('my.foo.mod', foo_mod.__name__)
 
       bar_mod = pkg_resources.GetModuleFromPath('my.bar.mod',
                                                 os.path.join(t, 'pkg', 'bar'))
       self.assertIn('my.bar.mod', sys.modules)
       del sys.modules['my.bar.mod']
-      self.assertEquals(7, bar_mod.Bar.VALUE)
-      self.assertEquals('my.bar.mod', bar_mod.__name__)
-      self.assertEquals('my.bar.mod', bar_mod.Bar.__module__)
+      self.assertEqual(7, bar_mod.Bar.VALUE)
+      self.assertEqual('my.bar.mod', bar_mod.__name__)
+      self.assertEqual('my.bar.mod', bar_mod.Bar.__module__)
 
       with self.assertRaises(ImportError):
         pkg_resources.GetModuleFromPath('my.baz.mod',
@@ -225,16 +225,16 @@ class PkgResourcesTest(test_case.TestCase):
                                                   os.path.join(zip_pkg, 'foo'))
         self.assertIn('my.foo.mod', sys.modules)
         del sys.modules['my.foo.mod']
-        self.assertEquals(5, foo_mod.Foo.VALUE)
-        self.assertEquals('my.foo.mod', foo_mod.__name__)
+        self.assertEqual(5, foo_mod.Foo.VALUE)
+        self.assertEqual('my.foo.mod', foo_mod.__name__)
 
         bar_mod = pkg_resources.GetModuleFromPath(
             'my.bar.mod', os.path.join(zip_pkg, 'pkg', 'bar'))
         self.assertIn('my.bar.mod', sys.modules)
         del sys.modules['my.bar.mod']
-        self.assertEquals(7, bar_mod.Bar.VALUE)
-        self.assertEquals('my.bar.mod', bar_mod.__name__)
-        self.assertEquals('my.bar.mod', bar_mod.Bar.__module__)
+        self.assertEqual(7, bar_mod.Bar.VALUE)
+        self.assertEqual('my.bar.mod', bar_mod.__name__)
+        self.assertEqual('my.bar.mod', bar_mod.Bar.__module__)
 
         with self.assertRaises(ImportError):
           pkg_resources.GetModuleFromPath('my.baz.mod',

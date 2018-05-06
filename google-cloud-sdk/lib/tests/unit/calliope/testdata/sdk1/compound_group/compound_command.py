@@ -13,6 +13,8 @@
 # limitations under the License.
 """A command with an underscore in it."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import log
 

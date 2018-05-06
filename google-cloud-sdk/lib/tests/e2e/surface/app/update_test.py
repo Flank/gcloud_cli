@@ -22,7 +22,12 @@ from tests.lib import test_case
 class UpdateTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
   """Test we can update feature settings for apps."""
 
-  @test_case.Filters.skip('Failing', 'b/72860381')
+  @sdk_test_base.Retry(why=('Roses are red, violets are blue, 409 is fine.'),
+                       max_retrials=3,
+                       sleep_ms=500)
+  def ExecuteScript(self, *args, **kwargs):
+    super(UpdateTests, self).ExecuteScript(*args, **kwargs)
+
   def testAppUpdate(self):
     # Run these commands in sequence otherwise there may be operation conflict
     # errors.

@@ -13,7 +13,10 @@
 # limitations under the License.
 """Tests for the completers and resource_parameter_info modules."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.protorpclite import messages
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.concepts import completers
@@ -25,7 +28,10 @@ from tests.lib.apitools import http_error
 from tests.lib.calliope.concepts import concepts_test_base
 from tests.lib.command_lib.util.apis import base as apis_base
 from tests.lib.command_lib.util.concepts import resource_completer_test_base
+
 import mock
+import six
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class ShelvesMessage(messages.Message):
@@ -299,7 +305,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         attribute_name, attribute_name, args=args)
 
     query = completer.BuildListQuery(parameter_info)
-    for key, value in expected_fields.iteritems():
+    for key, value in six.iteritems(expected_fields):
       self.assertEqual(value, getattr(query, key))
 
   @parameterized.named_parameters(

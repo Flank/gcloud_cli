@@ -40,7 +40,7 @@ class DescribeTest(base.TpuUnitTestBase):
         tpu
     )
 
-    self.assertEquals(
+    self.assertEqual(
         self.Run('compute tpus describe mytpu'),
         tpu)
 
@@ -56,7 +56,7 @@ class DescribeTest(base.TpuUnitTestBase):
         tpu
     )
 
-    self.assertEquals(
+    self.assertEqual(
         self.Run('compute tpus describe mytpu --zone {}'.format(zone)),
         tpu)
 

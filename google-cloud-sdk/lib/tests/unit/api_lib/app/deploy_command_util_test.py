@@ -566,8 +566,8 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
 
     module = Config(module='foo', env='flex', runtime='python27',
                     tmpdir=self.temp_path)
-    with self.assertRaisesRegexp(deploy_command_util.WindowMaxPathError,
-                                 long_filename):
+    with self.assertRaisesRegex(deploy_command_util.WindowMaxPathError,
+                                long_filename):
       source_dir = os.path.dirname(module.file)
       deploy_command_util.BuildAndPushDockerImage(
           'fakeproject', module, source_dir, version_id='1.2',
@@ -1090,7 +1090,7 @@ class PossiblyEnableFlexTest(sdk_test_base.WithOutputCapture,
                                              'EnableServiceIfDisabled')
     self.enable_mock.side_effect = (
         exceptions.EnableServicePermissionDeniedException('message'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         deploy_command_util.PrepareFailureError,
         r'Enabling the Appengine Flexible API failed on project '
         r'\[fakeproject\]'):
@@ -1122,7 +1122,7 @@ class PossiblyEnableFlexTest(sdk_test_base.WithOutputCapture,
              'Detailed error information:\n'
              '- \'@type\': type.googleapis.com/google.rpc.DebugInfo\n'
              '  detail: Error details.')
-    with self.assertRaisesRegexp(api_lib_exceptions.HttpException, regex):
+    with self.assertRaisesRegex(api_lib_exceptions.HttpException, regex):
       deploy_command_util.PossiblyEnableFlex(self.project)
 
 

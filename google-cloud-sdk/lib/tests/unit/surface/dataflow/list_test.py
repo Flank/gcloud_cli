@@ -14,9 +14,12 @@
 
 """Test of the 'dataflow jobs list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.dataflow import base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 JOB_1_ID = base.JOB_1_ID
 JOB_2_ID = base.JOB_2_ID
@@ -38,7 +41,7 @@ class ListUnitTest(base.DataflowMockingTestBase,
   def testListNoJobs(self):
     self.MockAggregatedListJobs([])
     result = self.Run('beta dataflow jobs list')
-    self.assertEquals([], list(result))
+    self.assertEqual([], list(result))
 
   def testListOneJobNoCreationTime(self):
     job = self.SampleJob(job_id='the_job')
@@ -64,10 +67,10 @@ the_job  the_job_name  Batch  2013-09-06 17:54:10  Done   us-central1
 
   def testListPaging(self):
     self.MockAggregatedListJobs(
-        [self.SampleJob(job_id='job%d' % n) for n in xrange(1, 5)],
+        [self.SampleJob(job_id='job%d' % n) for n in range(1, 5)],
         next_page_token='pageToken')
     self.MockAggregatedListJobs(
-        [self.SampleJob(job_id='job%d' % n) for n in xrange(5, 6)],
+        [self.SampleJob(job_id='job%d' % n) for n in range(5, 6)],
         page_token='pageToken')
 
     self.Run('beta dataflow jobs list')

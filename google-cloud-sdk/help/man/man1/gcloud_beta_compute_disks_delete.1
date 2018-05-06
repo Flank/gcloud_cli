@@ -11,7 +11,7 @@ gcloud beta compute disks delete \- delete Google Compute Engine persistent disk
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute disks delete\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute disks delete\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,9 +38,41 @@ The names of the disks to delete.
 
 .RS 2m
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The region of the disks to delete. If not specified, you may be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 The zone of the disks to delete. If not specified and the
-\f5\fIcompute/zone\fR\fR property isn't set, you will be prompted to select a
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
 zone.
 
 To avoid prompting when this flag is omitted, you can set the
@@ -66,6 +98,7 @@ Alternatively, the zone can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
 
+.RE
 .RE
 .sp
 

@@ -243,6 +243,7 @@ class _Sections(object):
     self.auth = _SectionAuth()
     self.billing = _SectionBilling()
     self.component_manager = _SectionComponentManager()
+    self.composer = _SectionComposer()
     self.compute = _SectionCompute()
     self.container = _SectionContainer()
     self.core = _SectionCore()
@@ -257,6 +258,7 @@ class _Sections(object):
     self.ml_engine = _SectionMlEngine()
     self.proxy = _SectionProxy()
     self.pubsub = _SectionPubsub()
+    self.redis = _SectionRedis()
     self.spanner = _SectionSpanner()
     self.test = _SectionTest()
 
@@ -268,6 +270,7 @@ class _Sections(object):
         self.auth,
         self.billing,
         self.component_manager,
+        self.composer,
         self.compute,
         self.container,
         self.core,
@@ -281,6 +284,7 @@ class _Sections(object):
         self.metrics,
         self.ml_engine,
         self.proxy,
+        self.redis,
         self.spanner,
         self.test,
     ]
@@ -752,20 +756,22 @@ class _SectionContainer(_Section):
         'the cluster API server.')
     self.use_v1_api = self._AddBool(
         'use_v1_api',
-        default=True,
-        help_text='If true, all gcloud Kubernetes Engine commands (regardless '
+        default=False,
+        help_text='This property is DEPRECATED. '
+        'If true, all gcloud Kubernetes Engine commands (regardless '
         'of release track) will use the v1 API; otherwise, gcloud beta track '
         'commands will use v1beta1 API and gcloud alpha track commands will '
-        'use v1alpha1 API. By default, it is set to true. The Kubernetes '
+        'use v1alpha1 API. By default, it is set to false. The Kubernetes '
         'Engine v1alpha1 API is whitelist-only at this time. '
         'Note: use_v1_api is an alias of use_v1_api_client.')
     self.use_v1_api_client = self._AddBool(
         'use_v1_api_client',
-        default=True,
-        help_text='If true, all gcloud Kubernetes Engine commands (regardless '
+        default=False,
+        help_text='This property is DEPRECATED. '
+        'If true, all gcloud Kubernetes Engine commands (regardless '
         'of release track) will use the v1 API; otherwise, gcloud beta track '
         'commands will use v1beta1 API and gcloud alpha track commands will '
-        'use v1alpha1 API. By default, it is set to true. The Kubernetes '
+        'use v1alpha1 API. By default, it is set to false. The Kubernetes '
         'Engine v1alpha1 API is whitelist-only at this time. '
         'Note: use_v1_api_client is an alias of use_v1_api.')
     self.new_scopes_behavior = self._AddBool(
@@ -945,6 +951,9 @@ class _SectionCore(_Section):
         'trace_log',
         default=False,
         hidden=True)
+    self.request_reason = self._Add(
+        'request_reason',
+        hidden=True)
     self.pass_credentials_to_gsutil = self._AddBool(
         'pass_credentials_to_gsutil',
         default=True,
@@ -961,6 +970,11 @@ class _SectionCore(_Section):
         hidden=True,
         help_text='If true, will prompt to enable an API if a command fails due'
         ' to the API not being enabled.')
+    self.allow_py3 = self._AddBool(
+        'allow_py3',
+        default=False,
+        hidden=True,
+        help_text='If true, allow a Python 3 interpreter to run gcloud.')
 
     def CaptureSessionFileValidator(filename):
       """Validates if session could be captured to given file."""
@@ -1066,8 +1080,6 @@ class _SectionCore(_Section):
           'The project property must be set to a valid project ID, '
           '[{value}] is not a valid project ID.'.format(value=project))
 
-    # pylint: disable=unnecessary-lambda, We don't want to call Metadata()
-    # unless we really have to.
     self.project = self._Add(
         'project',
         help_text='The project id of the Cloud Platform project to operate on '
@@ -1086,11 +1098,9 @@ class _SectionAuth(_Section):
 
   def __init__(self):
     super(_SectionAuth, self).__init__('auth')
-    # pylint: disable=unnecessary-lambda, We don't want to call Metadata()
-    # unless we really have to.
     self.auth_host = self._Add(
         'auth_host', hidden=True,
-        default='https://accounts.google.com/o/oauth2/auth')
+        default=b'https://accounts.google.com/o/oauth2/auth')
     self.disable_credentials = self._AddBool(
         'disable_credentials', default=False,
         help_text='If true, gcloud will not attempt to load any credentials or '
@@ -1098,7 +1108,7 @@ class _SectionAuth(_Section):
         'that adds authentication to your requests.')
     self.token_host = self._Add(
         'token_host', hidden=True,
-        default='https://accounts.google.com/o/oauth2/token')
+        default=b'https://www.googleapis.com/oauth2/v4/token')
     self.disable_ssl_validation = self._AddBool(
         'disable_ssl_validation', hidden=True)
     self.client_id = self._Add(
@@ -1212,6 +1222,22 @@ class _SectionPubsub(_Section):
         help_text=('Use the legacy output for beta pubsub commands. The legacy '
                    'output from beta is being deprecated. This property will '
                    'eventually be removed.'))
+
+
+class _SectionComposer(_Section):
+  """Contains the properties for the 'composer' section."""
+
+  def __init__(self):
+    super(_SectionComposer, self).__init__('composer')
+    self.location = self._Add(
+        'location',
+        help_text=(
+            'Specifies the Composer location to use. Each Composer location'
+            'constitutes an independent resource namespace constrained to '
+            'deploying environments into Compute Engine regions inside the '
+            'location. This location parameter corresponds to the '
+            '/locations/<location> segment of the Composer resource URIs being '
+            'referenced.'))
 
 
 class _SectionDataproc(_Section):
@@ -1356,12 +1382,11 @@ class _SectionApiEndpointOverrides(_Section):
     self.cloudkms = self._Add('cloudkms')
     self.cloudresourcemanager = self._Add('cloudresourcemanager')
     self.cloudresourcesearch = self._Add('cloudresourcesearch')
-    self.clouduseraccounts = self._Add('clouduseraccounts')
+    self.composer = self._Add('composer')
     self.compute = self._Add('compute')
     self.container = self._Add('container')
     self.containeranalysis = self._Add('containeranalysis')
     self.dataflow = self._Add('dataflow')
-    self.dataproc = self._Add('dataproc')
     self.datapol = self._Add('datapol')
     self.dataproc = self._Add('dataproc')
     self.datastore = self._Add('datastore')
@@ -1374,9 +1399,11 @@ class _SectionApiEndpointOverrides(_Section):
     self.logging = self._Add('logging')
     self.manager = self._Add('manager')
     self.ml = self._Add('ml')
+    self.oslogin = self._Add('oslogin')
     self.pubsub = self._Add('pubsub')
     self.replicapoolupdater = self._Add('replicapoolupdater')
     self.runtimeconfig = self._Add('runtimeconfig')
+    self.redis = self._Add('redis')
     self.servicemanagement = self._Add('servicemanagement')
     self.serviceregistry = self._Add('serviceregistry')
     self.serviceuser = self._Add('serviceuser')
@@ -1388,8 +1415,8 @@ class _SectionApiEndpointOverrides(_Section):
     self.storage = self._Add('storage')
     self.testing = self._Add('testing')
     self.toolresults = self._Add('toolresults')
-    self.vision = self._Add('vision')
     self.tpu = self._Add('tpu')
+    self.vision = self._Add('vision')
 
   def EndpointValidator(self, value):
     """Checks to see if the endpoint override string is valid."""
@@ -1452,6 +1479,18 @@ class _SectionAccessContextManager(_Section):
         help_text=('The ID of the policy resource to operate on. Can be found '
                    'by running the `access-context-manager policies list` '
                    'command.'))
+
+
+class _SectionRedis(_Section):
+  """Contains the properties for the 'redis' section."""
+
+  def __init__(self):
+    super(_SectionRedis, self).__init__('redis', hidden=True)
+    self.region = self._Add(
+        'region',
+        help_text='The default region to use when working with Cloud '
+        'Memorystore for Redis resources. When a `region` is required but not '
+        'provided by a flag, the command will fall back to this value, if set.')
 
 
 class _Property(object):

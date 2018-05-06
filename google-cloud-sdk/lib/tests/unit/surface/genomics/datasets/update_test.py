@@ -40,8 +40,8 @@ class UpdateTest(base.GenomicsUnitTest):
             dataset=self.messages.Dataset(name='dataset-name-new',),
             datasetId='1000',),
         exception=self.MakeHttpError(404, 'Dataset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Dataset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Dataset not found: 1000'):
       self.RunGenomics(['datasets', 'update', '1000',
                         '--name', 'dataset-name-new'])
 

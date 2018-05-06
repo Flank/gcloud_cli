@@ -75,8 +75,8 @@ class ListSlicerTest(test_case.TestCase):
   def testPageSizeZero(self):
     list_ = range(100)
     page_size = 0
-    with self.assertRaisesRegexp(
-        ValueError, r'range\(\) step argument must not be zero'):
+    with self.assertRaisesRegex(
+        ValueError, r'xrange\(\) arg 3 must not be zero'):
       list_slicer.SliceList(list_, page_size)
 
 

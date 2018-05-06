@@ -14,6 +14,9 @@
 
 """Base class providing path aliases for configurations tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from tests.lib import cli_test_base

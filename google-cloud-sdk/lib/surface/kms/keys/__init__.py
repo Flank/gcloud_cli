@@ -13,6 +13,8 @@
 # limitations under the License.
 """The command group for keys."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudkms import base as cloudkms_base
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.kms import flags
@@ -26,9 +28,12 @@ class Keys(base.Group):
   operations.
   """
 
-  @staticmethod
-  def Args(parser):
-    flags.AddKeyRingFlag(parser)
-    flags.AddLocationFlag(parser)
+  @classmethod
+  def Args(cls, parser):
+    if cls.ReleaseTrack() != base.ReleaseTrack.ALPHA:
+      # These flags are automatically added in declarative commands and
+      # currently all declarative commands are ALPHA.
+      flags.AddKeyRingFlag(parser)
+      flags.AddLocationFlag(parser)
     parser.display_info.AddUriFunc(
         cloudkms_base.MakeGetUriFunc(flags.CRYPTO_KEY_COLLECTION))

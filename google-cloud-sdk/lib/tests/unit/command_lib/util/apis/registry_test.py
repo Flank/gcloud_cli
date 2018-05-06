@@ -14,7 +14,10 @@
 
 """Tests for the registry module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.util.apis import registry
 from tests.lib import sdk_test_base
@@ -329,6 +332,17 @@ class NonMockedTests(base.Base):
     self.assertEqual(m.resource_argument_collection.detailed_params,
                      ['projectsId', 'topicsId'])
 
+  def testGetMessagesByName(self):
+    method = registry.GetMethod('compute.instances', 'get')
+    client = apis.GetClientClass('compute', 'v1')
+    messages = client.MESSAGES_MODULE
+    self.assertEqual(messages.Instance,
+                     method.GetMessageByName('Instance'))
+
+  def testGetMessageByNameWithBadName(self):
+    method = registry.GetMethod('compute.instances', 'get')
+    self.assertIsNone(method.GetMessageByName('FooBar'))
+
 
 class CallTests(sdk_test_base.WithFakeAuth):
 
@@ -379,29 +393,32 @@ class CallTests(sdk_test_base.WithFakeAuth):
 
   def testRawListNonPageable(self):
     self.MockAPI('container', 'v1')
-    request = self.messages.ContainerProjectsZonesClustersListRequest(
-        zone='zone1', projectId='foo')
+    request = self.messages.ContainerProjectsLocationsClustersListRequest(
+        parent='projects/foo/locations/zone1')
     response = self.messages.ListClustersResponse(
         clusters=[self.messages.Cluster(name='c-1'),
                   self.messages.Cluster(name='c-2')])
-    self.mocked_client.projects_zones_clusters.List.Expect(request, response)
-    actual = registry.GetMethod('container.projects.zones.clusters',
-                                'list').Call(request, raw=True)
+    self.mocked_client.projects_locations_clusters.List.Expect(
+        request, response)
+    actual = registry.GetMethod('container.projects.locations.clusters',
+                                'list').Call(
+                                    request, raw=True)
     self.assertEqual(len(actual.clusters), 2)
     self.assertEqual(actual.clusters[0].name, 'c-1')
     self.assertEqual(actual.clusters[1].name, 'c-2')
 
   def testFlatListNonPageable(self):
     self.MockAPI('container', 'v1')
-    request = self.messages.ContainerProjectsZonesClustersListRequest(
-        zone='zone1', projectId='foo')
+    request = self.messages.ContainerProjectsLocationsClustersListRequest(
+        parent='projects/foo/locations/zone1')
     response = self.messages.ListClustersResponse(
         clusters=[self.messages.Cluster(name='c-1'),
                   self.messages.Cluster(name='c-2')])
-    self.mocked_client.projects_zones_clusters.List.Expect(request, response)
+    self.mocked_client.projects_locations_clusters.List.Expect(
+        request, response)
     actual = list(
-        registry.GetMethod('container.projects.zones.clusters', 'list').Call(
-            request, raw=False))
+        registry.GetMethod('container.projects.locations.clusters',
+                           'list').Call(request, raw=False))
     self.assertEqual(len(actual), 2)
     self.assertEqual(actual[0].name, 'c-1')
     self.assertEqual(actual[1].name, 'c-2')
@@ -450,6 +467,12 @@ class CallTests(sdk_test_base.WithFakeAuth):
     self.mocked_client.instances.Insert.Expect(request, {})
     self.assertEqual({}, registry.GetMethod('compute.instances', 'insert').Call(
         request))
+
+  def testGetMessagesByName(self):
+    self.MockAPI('compute', 'v1')
+    method = registry.GetMethod('compute.instances', 'get')
+    self.assertEqual(self.messages.Instance,
+                     method.GetMessageByName('Instance'))
 
 
 if __name__ == '__main__':

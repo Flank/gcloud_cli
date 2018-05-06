@@ -34,7 +34,7 @@ class DatabasesClientTest(base.SpannerTestBase):
                 createStatement='CREATE DATABASE `dbId`',
                 extraStatements=extra_ddl)),
         response=response)
-    self.assertEquals(response, databases.Create(ref, 'dbId', extra_ddl))
+    self.assertEqual(response, databases.Create(ref, 'dbId', extra_ddl))
 
   def testDelete(self):
     response = self.msgs.Empty()
@@ -49,7 +49,7 @@ class DatabasesClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesDatabasesDropDatabaseRequest(
             database=ref.RelativeName()),
         response=response)
-    self.assertEquals(response, databases.Delete(ref))
+    self.assertEqual(response, databases.Delete(ref))
 
   def testGet(self):
     response = self.msgs.Database()
@@ -64,7 +64,7 @@ class DatabasesClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesDatabasesGetRequest(
             name=ref.RelativeName()),
         response=response)
-    self.assertEquals(response, databases.Get(ref))
+    self.assertEqual(response, databases.Get(ref))
 
   def testGetDdl(self):
     statements = ['a', 'b']
@@ -111,4 +111,4 @@ class DatabasesClientTest(base.SpannerTestBase):
             updateDatabaseDdlRequest=self.msgs.UpdateDatabaseDdlRequest(
                 statements=statements)),
         response=response)
-    self.assertEquals(response, databases.UpdateDdl(ref, statements))
+    self.assertEqual(response, databases.UpdateDdl(ref, statements))

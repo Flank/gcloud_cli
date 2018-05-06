@@ -65,7 +65,7 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
         compute routers update-bgp-peer my-router --region us-central1 --async
         --peer-name my-peer
         """)
-    self.assertEquals('operation-X', result.name)
+    self.assertEqual('operation-X', result.name)
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for peer [my-peer] in router [my-router] '
@@ -167,14 +167,14 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
 
     error_msg = ('--add/remove-advertisement flags are not compatible with '
                  '--set-advertisement flags.')
-    with self.assertRaisesRegexp(parser_errors.ArgumentError, error_msg):
+    with self.assertRaisesRegex(parser_errors.ArgumentError, error_msg):
       self.Run("""
           compute routers update-bgp-peer my-router --region us-central1
           --peer-name my-peer
           --set-advertisement-groups=ALL_SUBNETS
           --add-advertisement-groups=ALL_SUBNETS
           """)
-    with self.assertRaisesRegexp(parser_errors.ArgumentError, error_msg):
+    with self.assertRaisesRegex(parser_errors.ArgumentError, error_msg):
       self.Run("""
           compute routers update-bgp-peer my-router --region us-central1
           --peer-name my-peer

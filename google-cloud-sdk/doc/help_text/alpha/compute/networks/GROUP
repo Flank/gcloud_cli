@@ -41,10 +41,6 @@ COMMANDS
      list-ip-owners
         (ALPHA) List IP owners in a network.
 
-     switch-mode
-        (ALPHA) (DEPRECATED) Switch the mode of a Google Compute Engine
-        network.
-
      update
         (ALPHA) Update a Google Compute Engine network.
 

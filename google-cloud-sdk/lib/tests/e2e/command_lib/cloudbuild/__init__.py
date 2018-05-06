@@ -13,3 +13,5 @@
 # limitations under the License.
 
 """Tests for libraries to support the builds command surface."""
+
+from __future__ import unicode_literals

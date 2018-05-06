@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.core import properties
@@ -26,18 +29,18 @@ class DeleteTest(test_base.ConfigurationsBaseTest):
   def testDeleteActiveFail(self):
     self.Run('config configurations create foo')
 
-    with self.assertRaisesRegexp(named_configs.NamedConfigError,
-                                 r'Deleting named configuration failed because '
-                                 r'configuration \[foo\] is set as active.'):
+    with self.assertRaisesRegex(named_configs.NamedConfigError,
+                                r'Deleting named configuration failed because '
+                                r'configuration \[foo\] is set as active.'):
       self.Run('config configurations delete foo')
 
   def testDeleteActiveMultiFail(self):
     self.Run('config configurations create foo')
     self.Run('config configurations create bar --no-activate')
 
-    with self.assertRaisesRegexp(named_configs.NamedConfigError,
-                                 r'Deleting named configuration failed because '
-                                 r'configuration \[foo\] is set as active.'):
+    with self.assertRaisesRegex(named_configs.NamedConfigError,
+                                r'Deleting named configuration failed because '
+                                r'configuration \[foo\] is set as active.'):
       self.Run('config configurations delete foo bar')
 
   def testDeleteActiveOverrideFail(self):
@@ -47,14 +50,14 @@ class DeleteTest(test_base.ConfigurationsBaseTest):
 
     # Fails to remove both foo and bar because bar is actually active, but foo
     # is active in the file.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         named_configs.NamedConfigError,
         r'Cannot delete configuration \[foo\], it is currently set as the '
         r'active configuration in your gcloud properties.'):
       self.Run('config configurations delete foo')
 
   def testDeleteMissingFail(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         named_configs.NamedConfigError,
         r'Cannot delete configuration \[foo\], it does not exist.'):
       self.Run('config configurations delete foo')
@@ -90,8 +93,8 @@ class DeleteTest(test_base.ConfigurationsBaseTest):
     self.Run('config configurations create foo --no-activate')
 
     self.WriteInput('n\n')
-    with self.assertRaisesRegexp(console_io.OperationCancelledError,
-                                 'Aborted by user.'):
+    with self.assertRaisesRegex(console_io.OperationCancelledError,
+                                'Aborted by user.'):
       self.Run('config configurations delete foo')
 
     self.AssertErrContains('The following configurations will be deleted:\n'

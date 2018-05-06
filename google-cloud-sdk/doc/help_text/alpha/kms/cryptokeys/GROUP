@@ -1,0 +1,75 @@
+NAME
+    gcloud alpha kms cryptokeys - create and manage CryptoKeys
+
+SYNOPSIS
+    gcloud alpha kms cryptokeys GROUP | COMMAND [--keyring=KEYRING]
+        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (REMOVED) Create and manage CryptoKeys.
+
+    The command group cryptokeys is deprecated, please use the keys command
+    group.
+
+    A CryptoKey represents a logical key that can be used for cryptographic
+    operations.
+
+FLAGS
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     versions
+        (ALPHA) (REMOVED) Create and manage CryptoKeyVersions.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) (REMOVED) Add IAM policy binding to a CryptoKey.
+
+     create
+        (ALPHA) (REMOVED) Create a new CryptoKey.
+
+     describe
+        (ALPHA) (REMOVED) Get metadata for a given CryptoKey.
+
+     get-iam-policy
+        (ALPHA) (REMOVED) Get the IAM policy for a CryptoKey.
+
+     list
+        (ALPHA) (REMOVED) List the CryptoKeys within a KeyRing.
+
+     remove-iam-policy-binding
+        (ALPHA) (REMOVED) Remove an IAM policy binding from a CryptoKey.
+
+     remove-rotation-schedule
+        (ALPHA) (REMOVED) Remove the rotation schedule for a CryptoKey.
+
+     set-iam-policy
+        (ALPHA) (REMOVED) Set the IAM policy for a CryptoKey.
+
+     set-primary-version
+        (ALPHA) (REMOVED) Set the primary version of a CryptoKey.
+
+     set-rotation-schedule
+        (ALPHA) (REMOVED) Update the rotation schedule for a CryptoKey.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

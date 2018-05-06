@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the docker credential utils library."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 import json
 import os
@@ -45,11 +47,12 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
         cred_utils,
         'DefaultAuthenticatedRegistries',
         return_value=_TEST_REGISTRIES)
-    self.StartObjectPatch(client_lib,
-                          'GetDockerConfigPath',
-                          return_value=(self.test_config, True))
-    self.StartObjectPatch(client_lib, 'GetDockerVersion',
-                          return_value=self.test_version)
+    self.StartObjectPatch(
+        client_lib,
+        'GetDockerConfigPath',
+        return_value=(self.test_config, True))
+    self.mock_get_docker_version = self.StartObjectPatch(
+        client_lib, 'GetDockerVersion', return_value=self.test_version)
 
   def _WriteTestDockerConfig(self, json_str):
     """Writes Test Docker configuration with json_str to test_dir."""
@@ -64,7 +67,6 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
   def _GetFakeConfiguration(self, json_str=_EMPTY_JSON_OBJECT_STRING):
     """Builds Test Configuration object from json_str."""
     return cred_utils.Configuration.FromJson(json_str,
-                                             self.test_version,
                                              self.test_config)
 
   def testGetGcloudCredentialHelperConfig(self):
@@ -94,7 +96,7 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
 
   def testRegisterCredentialHelpersBadMappings(self):
     docker_info = self._GetFakeConfiguration('{"credHelpers": {"foo": "bar"}}')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError,
         r'Invalid Docker credential helpers mappings'):
       docker_info.RegisterCredentialHelpers(['foo'])
@@ -102,16 +104,16 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
   def testRegisterCredentialHelpersError(self):
     self.StartObjectPatch(files, 'WriteFileAtomically').side_effect = IOError()
     docker_info = self._GetFakeConfiguration()
-    with self.assertRaisesRegexp(cred_utils.DockerConfigUpdateError,
-                                 r'Error writing Docker configuration to disk'):
+    with self.assertRaisesRegex(cred_utils.DockerConfigUpdateError,
+                                r'Error writing Docker configuration to disk'):
       docker_info.RegisterCredentialHelpers()
 
   def testRegisterCredentialHelpersNotSupported(self):
     docker_info = self._GetFakeConfiguration()
-    docker_info.version = distutils_version.LooseVersion('1.01')
-    with self.assertRaisesRegexp(cred_utils.DockerConfigUpdateError,
-                                 r'Credential Helpers not supported for this '
-                                 r'Docker client version 1.0'):
+    self.mock_get_docker_version.return_value = '1.01'
+    with self.assertRaisesRegex(cred_utils.DockerConfigUpdateError,
+                                r'Credential Helpers not supported for this '
+                                r'Docker client version 1.0'):
       docker_info.RegisterCredentialHelpers()
 
   def testReadFromDisk(self):
@@ -126,19 +128,19 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
     actual_config = cred_utils.Configuration.ReadFromDisk(path='/fake/path')
     self.assertEqual(actual_config.contents, {})
 
-  def testReadFromDiskDockerError(self):
-    self.StartObjectPatch(client_lib, 'GetDockerVersion',
-                          side_effect=client_lib.DockerError)
-    with self.assertRaisesRegexp(client_lib.InvalidDockerConfigError,
-                                 r'Docker configuration file \[.*\] could '
-                                 r'not be read as JSON'):
-      cred_utils.Configuration.ReadFromDisk()
-
   def testSupportsRegistryHelpers(self):
     config = self._GetFakeConfiguration(_TEST_CRED_HELPERS_CONTENT_STRING)
     self.assertTrue(config.SupportsRegistryHelpers())
-    config.version = distutils_version.LooseVersion('1.01')
+
+  def testDoesntSupportRegistryHelpers(self):
+    config = self._GetFakeConfiguration(_TEST_CRED_HELPERS_CONTENT_STRING)
+    self.mock_get_docker_version.return_value = '1.01'
     self.assertFalse(config.SupportsRegistryHelpers())
+
+  def testSupportRegistryHelpersException(self):
+    config = self._GetFakeConfiguration(_TEST_CRED_HELPERS_CONTENT_STRING)
+    self.mock_get_docker_version.side_effect = Exception('any error')
+    self.assertTrue(config.SupportsRegistryHelpers())  # Fail open.
 
   def testWriteToDisk(self):
     expected_config = self._GetFakeConfiguration(
@@ -149,21 +151,24 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
 
   def testWriteToDiskError(self):
     self.StartObjectPatch(files, 'WriteFileAtomically').side_effect = IOError()
-    with self.assertRaisesRegexp(cred_utils.DockerConfigUpdateError,
-                                 r'Error writing Docker configuration '
-                                 r'to disk:'):
+    with self.assertRaisesRegex(cred_utils.DockerConfigUpdateError,
+                                r'Error writing Docker configuration '
+                                r'to disk:'):
       self._GetFakeConfiguration().WriteToDisk()
 
   def testFromJson(self):
     json_str = '{"credHelpers": {"foo": "bar"}}'
     parsed_config = self._GetFakeConfiguration(json_str)
     expected_config = cred_utils.Configuration(json.loads(json_str),
-                                               self.test_version,
                                                self.test_config)
     self.assertEqual(parsed_config, expected_config)
 
   def testToJson(self):
     config = cred_utils.Configuration(_TEST_CRED_HELPERS_CONTENT_DICT,
-                                      self.test_version,
                                       self.test_config)
     self.assertEqual(_TEST_CRED_HELPERS_CONTENT_STRING, config.ToJson())
+
+  def testDockerVersion(self):
+    expected_version = distutils_version.LooseVersion(self.test_version)
+    config = self._GetFakeConfiguration(_TEST_CRED_HELPERS_CONTENT_STRING)
+    self.assertEqual(config.DockerVersion(), expected_version)

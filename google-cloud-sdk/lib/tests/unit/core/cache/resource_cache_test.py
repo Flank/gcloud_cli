@@ -14,6 +14,8 @@
 
 """Unit tests for the resource cache module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.core import config
@@ -229,7 +231,7 @@ class ResourceCacheTest(sdk_test_base.SdkBase):
         ('aaa', 'pdq-a', 'xyz-a'), parameter_info, create=False).name)
     self.assertEqual('test.api.xyz-b', collection.GetTableForRow(
         ('aab', 'pdq-b', 'xyz-b'), parameter_info, create=False).name)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.CacheTableNotFound,
         r'resource.cache] cache table \[test.api.xyz-c] not found'):
       collection.GetTableForRow(
@@ -505,7 +507,7 @@ class ResourceCacheDeleteTest(sdk_test_base.SdkBase):
           os.environ, 'CLOUDSDK_CACHE_IMPLEMENTATION', delete_implementation)
     resource_cache.Delete()
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.CacheNotFound,
         r'resource.cache] not found'):
       resource_cache.Delete()

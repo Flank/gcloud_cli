@@ -44,7 +44,7 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     test_project_id = util.GetTestActiveProject().projectId
     self.WriteInput('n\n')
     result = self.RunProjectsBeta('delete', test_project_id)
-    self.assertEquals([], list(result))
+    self.assertEqual([], list(result))
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
     self.AssertErrContains('Do you want to continue (Y/n)?')

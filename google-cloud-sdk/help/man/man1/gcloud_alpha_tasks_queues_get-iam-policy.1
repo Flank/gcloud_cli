@@ -11,17 +11,18 @@ gcloud alpha tasks queues get\-iam\-policy \- get the IAM policy for a queue
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks queues get\-iam\-policy\fR \fIQUEUE\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks queues get\-iam\-policy\fR (\fIQUEUE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR This command gets the IAM policy for a queue. If formatted as
-JSON, the output can be edited and used as a policy file for
-\f5set\-iam\-policy\fR. The output includes an "etag" field identifying the
-version emitted and allowing detection of concurrent policy updates; see
-\f5set\-iam\-policy\fR for additional details.
+\fB(ALPHA)\fR \fBgcloud alpha tasks queues get\-iam\-policy\fR displays the IAM
+policy associated with a queue. If formatted as JSON, the output can be edited
+and used as a policy file for set\-iam\-policy. The output includes an "etag"
+field identifying the version emitted and allowing detection of concurrent
+policy updates; see $ gcloud alpha tasks queues set\-iam\-policy for additional
+details.
 
 
 
@@ -29,11 +30,26 @@ version emitted and allowing detection of concurrent policy updates; see
 
 .RS 2m
 .TP 2m
+
+QUEUE \- The Cloud Spanner queue for which to display the IAM policy. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: Set the property [core/project] or
+provide the flag [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
 \fIQUEUE\fR
-The queue to get the IAM policy for.
+The ID of the queue or a fully qualified identifier for the queue. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location name.
 
 
-
+.RE
 .RE
 .sp
 
@@ -69,10 +85,6 @@ order is ascending. Prefix a field with ``~'' for descending order on that
 field. This flag interacts with other flags that are applied in this order:
 \fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
-.TP 2m
-\fB\-\-uri\fR
-Print a list of resource URIs instead of the default output.
-
 
 .RE
 .sp
@@ -86,11 +98,32 @@ help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcloudtasks/v2beta2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/cloud\-tasks/
+
+
+
+.SH "EXAMPLES"
+
+To print the IAM policy for a given queue, run:
+
+.RS 2m
+$ gcloud alpha tasks queues get\-iam\-policy my\-queue
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. Usually, users
 of ALPHA commands and flags need to apply for access, agree to applicable terms,
 and have their projects whitelisted. Contact Google or sign up on a product's
 page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta tasks queues get\-iam\-policy
+.RE
 

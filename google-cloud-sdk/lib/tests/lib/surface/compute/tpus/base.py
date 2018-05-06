@@ -18,6 +18,7 @@ from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
@@ -49,7 +50,7 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                  description=None,
                  health_description=None,
                  ip_address=None,
-                 network='global/networks/default',
+                 network='data-test',
                  version=None,
                  port='2222',
                  accelerator_type='tpu-v2'
@@ -64,8 +65,38 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         state=self.GetReadyState(),
         tensorflowVersion=version,
         port=port,
-        acceleratorType=accelerator_type
+        acceleratorType=accelerator_type,
+        networkEndpoints=self._GetNetworkEndpoints(cidr, port, 2)
     )
+
+  def _GetNetworkEndpoints(self, base_range, port, count):
+    base_ip, _ = base_range.split('/')
+    octets = [int(x) for x in base_ip.split('.')]
+    results = []
+    for _ in range(count):
+      octets[3] += 1
+      ip = '.'.join(str(v) for v in octets)
+      results.append(
+          self.messages.NetworkEndpoint(ipAddress=ip, port=int(port)))
+    return results
+
+  def GetTestLocation(self, name='us-east1'):
+    return self.messages.Location(
+        name=name,
+        locationId='projects/{}/locations/{}'.format(self.Project(), name))
+
+  def GetTestTFVersion(self, version='1.6'):
+    return self.messages.TensorFlowVersion(
+        version=version,
+        name=('projects/{project}/locations/{zone}/tensorflowVersions/{version}'
+              .format(project=self.Project(), zone=self.zone, version=version)))
+
+  def GetTestAccType(self, acc_type='tpu-v2'):
+    return self.messages.AcceleratorType(
+        type=acc_type,
+        name=('projects/{project}/locations/{zone}/acceleratorTypes/{acc_type}'
+              .format(project=self.Project(), zone=self.zone,
+                      acc_type=acc_type)))
 
   def GetOperationResponse(
       self,
@@ -91,27 +122,27 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                                 poll_count=3,
                                 response_value=None,
                                 error_json=None):
+    op_ref = resources.REGISTRY.Parse(
+        op_name,
+        params={
+            'projectsId': self.Project(),
+            'locationsId': self.zone},
+        collection='tpu.projects.locations.operations')
     for _ in xrange(poll_count):
       op_polling_response = self.GetOperationResponse(op_name, is_done=False)
       self.mock_client.projects_locations_operations.Get.Expect(
           self.messages.TpuProjectsLocationsOperationsGetRequest(
-              name='projects/{0}/locations/{1}/operations/{2}'.format(
-                  self.Project(),
-                  self.zone,
-                  op_name)),
+              name=op_ref.RelativeName()),
           op_polling_response
       )
 
-    op_done_response = self.GetOperationResponse(op_name,
+    op_done_response = self.GetOperationResponse(op_ref.RelativeName(),
                                                  is_done=True,
                                                  error_json=error_json)
 
     self.mock_client.projects_locations_operations.Get.Expect(
         self.messages.TpuProjectsLocationsOperationsGetRequest(
-            name='projects/{0}/locations/{1}/operations/{2}'.format(
-                self.Project(),
-                self.zone,
-                op_name)),
+            name=op_ref.RelativeName()),
         op_done_response
     )
     return op_done_response

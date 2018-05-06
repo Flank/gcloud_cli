@@ -13,15 +13,18 @@
 # limitations under the License.
 """Integration tests for gce properties."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import socket
-import urllib2
 
 from googlecloudsdk.core.credentials import gce_cache
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
 import mock
+import six
 
 
 class GCECacheTest(sdk_test_base.SdkBase):
@@ -33,7 +36,7 @@ class GCECacheTest(sdk_test_base.SdkBase):
     self.StartPatch(
         'googlecloudsdk.core.config.Paths.GCECachePath',
         return_value=self.tempfilepath)
-    self._SetUpServerResponse(error=urllib2.URLError(''))
+    self._SetUpServerResponse(error=six.moves.urllib.error.URLError(''))
 
   def _SetUpFile(self, contents, mtime):
     with open(self.tempfilepath, 'w') as f:
@@ -168,13 +171,13 @@ class GCECacheTest(sdk_test_base.SdkBase):
 
   def testGetOnGce_NotInMemory_NotOnDisk_CheckServerErrors(self):
     errors = (
-        urllib2.URLError(''),
-        urllib2.HTTPError(None, None, None, None, None),
+        six.moves.urllib.error.URLError(''),
+        six.moves.urllib.error.HTTPError(None, None, None, None, None),
         socket.timeout(''),
         socket.error(''),
         socket.herror(''),
         socket.gaierror(''),
-        httplib.BadStatusLine('')
+        six.moves.http_client.BadStatusLine('')
     )
     for error in errors:
       self._SetUpServerResponse(error=error)
@@ -204,7 +207,7 @@ class GCECacheTest(sdk_test_base.SdkBase):
     self._SetUpServerResponse()
     # Use the decorator because holding onto this any longer than necessary can
     # obscure errors.
-    with mock.patch('__builtin__.open', side_effect=IOError()):
+    with mock.patch('io.open', side_effect=IOError()):
       on_gce = on_gce_cache.GetOnGCE()
     self.assertTrue(on_gce)
 

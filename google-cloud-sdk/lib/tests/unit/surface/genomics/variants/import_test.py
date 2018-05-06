@@ -30,7 +30,7 @@ class ImportTest(base.GenomicsUnitTest):
         normalizeReferenceNames=False)
     resp = self.messages.ImportVariantsResponse(callSetIds=['123-1', '123-2'])
     self.mocked_client.variants.Import.Expect(request=req, response=resp)
-    self.assertEquals(resp, self.RunGenomics(['variants',
+    self.assertEqual(resp, self.RunGenomics(['variants',
                                               'import',
                                               '--variantset-id',
                                               '123',
@@ -48,7 +48,7 @@ class ImportTest(base.GenomicsUnitTest):
         normalizeReferenceNames=True)
     resp = self.messages.ImportVariantsResponse(callSetIds=['123-1', '123-2'])
     self.mocked_client.variants.Import.Expect(request=req, response=resp)
-    self.assertEquals(resp, self.RunGenomics(['variants',
+    self.assertEqual(resp, self.RunGenomics(['variants',
                                               'import',
                                               '--variantset-id',
                                               '123',
@@ -78,7 +78,7 @@ class ImportTest(base.GenomicsUnitTest):
         infoMergeConfig=imc(additionalProperties=additional_properties))
     resp = self.messages.ImportVariantsResponse(callSetIds=['123-1', '123-2'])
     self.mocked_client.variants.Import.Expect(request=req, response=resp)
-    self.assertEquals(
+    self.assertEqual(
         resp,
         self.RunGenomics(['variants', 'import', '--variantset-id', '123',
                           '--source-uris', 'gs://uri0/foo', '--file-format',

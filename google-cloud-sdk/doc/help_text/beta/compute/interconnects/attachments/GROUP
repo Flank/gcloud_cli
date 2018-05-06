@@ -3,7 +3,7 @@ NAME
         Compute Engine interconnect attachments
 
 SYNOPSIS
-    gcloud beta compute interconnects attachments COMMAND
+    gcloud beta compute interconnects attachments GROUP | COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -13,6 +13,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     dedicated
+        (BETA) Create or manipulate dedicated interconnect attachments.
+
+     partner
+        (BETA) Create or manipulate partner interconnect attachments.
 
 COMMANDS
     COMMAND is one of the following:

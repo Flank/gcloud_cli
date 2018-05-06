@@ -28,7 +28,8 @@ EXAMPLES
         $ gcloud kms keyrings describe towers --location us-east1
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keyrings describe
         $ gcloud beta kms keyrings describe
 

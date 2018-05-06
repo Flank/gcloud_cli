@@ -1,36 +1,54 @@
 NAME
-    gcloud alpha pubsub subscriptions set-iam-policy - set IAM policy for a
-        subscription
+    gcloud alpha pubsub subscriptions set-iam-policy - set the IAM policy for a
+        Cloud Pub/Sub Subscription
 
 SYNOPSIS
     gcloud alpha pubsub subscriptions set-iam-policy SUBSCRIPTION POLICY_FILE
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Set the IAM policy for a Cloud Pub/Sub Subscription.
+    (ALPHA) This command replaces the existing IAM policy for a subscription,
+    given a subscription and a file encoded in JSON or YAML that contains the
+    IAM policy.
+
+    If the given policy file specifies an "etag" value, then the replacement
+    will succeed only if the policy already in place matches that etag. (An
+    etag obtained via get-iam-policy will prevent the replacement if the policy
+    for the subscription has been subsequently updated.) A policy file that
+    does not contain an etag value will replace any existing policy for the
+    subscription.
 
 POSITIONAL ARGUMENTS
-     SUBSCRIPTION
-        Name of the subscription to set an IAM policy on.
+     SUBSCRIPTION - The subscription for which to set the IAM policy. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
+
+       SUBSCRIPTION
+          The ID of the subscription or a fully qualified identifier for the
+          subscription.
 
      POLICY_FILE
-        JSON or YAML file with the IAM policy
+        Path to a local JSON or YAML formatted file containing a valid policy.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
+API REFERENCE
+    This command uses the pubsub/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/pubsub/docs
+
 EXAMPLES
     The following command will read an IAM policy defined in a JSON file
-    'policy.json' and set it for a subscription with identifier
-    'my-subscription'
+    policy.json and set it for a subscription my-sub
 
-        $ gcloud alpha pubsub subscriptions set-iam-policy my-subscription \
-            policy.json
+        $ gcloud alpha pubsub subscriptions set-iam-policy my-sub policy.json
 
-    See https://cloud.google.com/iam/docs/managing-policies for details of the
-    policy file format and contents.
+        See https://cloud.google.com/iam/docs/managing-policies for details of
+        the policy file format and contents.
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

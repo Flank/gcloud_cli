@@ -13,16 +13,19 @@
 # limitations under the License.
 """Unit tests for deployments stop command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.deployment_manager import exceptions
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.deployment_manager import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 DEPLOYMENT_NAME = 'deployment-name'
 OPERATION_NAME = 'operation-12345-67890'
-FINGERPRINT = '123456'
+FINGERPRINT = b'123456'
 FINGERPRINT_ENCODED = 'MTIzNDU2'
 INVALID_FINGERPRINT_ERROR = 'fingerprint cannot be decoded.'
 
@@ -88,6 +91,67 @@ class DeploymentsStopTest(unit_test_base.DmV2UnitTestBase):
     self.Run('deployment-manager deployments stop ' + DEPLOYMENT_NAME)
     self.AssertErrContains(OPERATION_NAME)
     self.AssertErrContains('completed successfully')
+    self.AssertOutputNotContains('PENDING')
+    for i in range(4):
+      self.AssertOutputContains('resource-' + str(i))
+
+  def testDeploymentsStop_WithWarning(self):
+    self.expectBasicDeploymentGet()
+    self.mocked_client.deployments.Stop.Expect(
+        request=self.messages.DeploymentmanagerDeploymentsStopRequest(
+            project=self.Project(),
+            deployment=DEPLOYMENT_NAME,
+            deploymentsStopRequest=self.messages.DeploymentsStopRequest(
+                fingerprint=FINGERPRINT,),
+        ),
+        response=self.messages.Operation(
+            name=OPERATION_NAME,
+            operationType='stop',
+            status='PENDING',
+        ))
+    for _ in range(2):
+      # Operation is pending for a while
+      self.mocked_client.operations.Get.Expect(
+          request=self.messages.DeploymentmanagerOperationsGetRequest(
+              project=self.Project(),
+              operation=OPERATION_NAME,
+          ),
+          response=self.messages.Operation(
+              name=OPERATION_NAME,
+              operationType='stop',
+              status='PENDING',
+          ))
+    # Operation complete: one 'DONE' response to end poll
+    self.mocked_client.operations.Get.Expect(
+        request=self.messages.DeploymentmanagerOperationsGetRequest(
+            project=self.Project(),
+            operation=OPERATION_NAME,
+        ),
+        response=self.messages.Operation(
+            name=OPERATION_NAME,
+            operationType='stop',
+            status='DONE',
+            warnings=[
+                self.messages.Operation.WarningsValueListEntry(
+                    message='warning')
+            ]))
+    # On operation success, list call to display resources after stop
+    self.mocked_client.resources.List.Expect(
+        request=self.messages.DeploymentmanagerResourcesListRequest(
+            project=self.Project(),
+            deployment=DEPLOYMENT_NAME,
+        ),
+        response=self.messages.ResourcesListResponse(resources=[
+            self.messages.Resource(
+                name='resource-' + str(i),
+                id=i,
+            ) for i in range(4)
+        ]))
+    self.Run('deployment-manager deployments stop ' + DEPLOYMENT_NAME)
+    self.AssertErrContains(OPERATION_NAME)
+    self.AssertErrContains('WARNING: Stop operation operation-12345-67890 '
+                           'completed with warnings:')
+    self.AssertErrContains('message: warning')
     self.AssertOutputNotContains('PENDING')
     for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
@@ -160,8 +224,8 @@ class DeploymentsStopTest(unit_test_base.DmV2UnitTestBase):
                + ' --fingerprint invalid')
       self.fail('Expected invalid fingerprint error')
     except calliope_exceptions.InvalidArgumentException as e:
-      self.assertTrue('Invalid value for [--fingerprint]' in e.message)
-      self.assertTrue(INVALID_FINGERPRINT_ERROR in e.message)
+      self.assertTrue('Invalid value for [--fingerprint]' in str(e))
+      self.assertTrue(INVALID_FINGERPRINT_ERROR in str(e))
 
   def testDeploymentsStop_Async(self):
     self.expectBasicDeploymentGet()
@@ -242,17 +306,17 @@ class DeploymentsStopTest(unit_test_base.DmV2UnitTestBase):
       self.Run('deployment-manager deployments stop ' + DEPLOYMENT_NAME)
       self.fail('Expected gcloud error for stop operation with error.')
     except exceptions.Error as e:
-      self.assertTrue(error_string in e.message)
-      self.assertTrue(OPERATION_NAME in e.message)
+      self.assertTrue(error_string in str(e))
+      self.assertTrue(OPERATION_NAME in str(e))
 
   def testDeploymentsStop_NoFingerprintFromService(self):
-    self.expectBasicDeploymentGet(fingerprint='')
+    self.expectBasicDeploymentGet(fingerprint=b'')
     self.mocked_client.deployments.Stop.Expect(
         request=self.messages.DeploymentmanagerDeploymentsStopRequest(
             project=self.Project(),
             deployment=DEPLOYMENT_NAME,
             deploymentsStopRequest=self.messages.DeploymentsStopRequest(
-                fingerprint='',
+                fingerprint=b'',
             ),
         ),
         response=self.messages.Operation(

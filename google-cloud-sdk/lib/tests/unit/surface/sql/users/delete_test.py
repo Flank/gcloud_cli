@@ -61,7 +61,7 @@ class UsersDeleteTest(base.SqlMockTestBeta):
 
     result = self.Run('sql users delete --instance my_instance my_username '
                       'my_host --async')
-    self.assertEquals(result.name, 'op_name')
+    self.assertEqual(result.name, 'op_name')
     self.AssertOutputEquals('')
     self.AssertErrContains('my_username@my_host will be deleted. New '
                            'connections can no longer be made using this user. '

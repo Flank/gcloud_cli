@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha kms keys versions create - create a new version
+
+SYNOPSIS
+    gcloud alpha kms keys versions create [--key=KEY] [--primary]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Creates a new version within the given key.
+
+FLAGS
+     --key=KEY
+        The containing key.
+
+     --primary
+        If specified, immediately make the new version primary.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command creates a new version within the frodo key,
+    fellowship keyring, and global location and sets it as the primary version:
+
+        $ gcloud alpha kms keys versions create --location global \
+            --keyring fellowship \
+            --key frodo --primary
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keys versions create
+        $ gcloud beta kms keys versions create
+

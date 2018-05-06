@@ -256,7 +256,8 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
   def ExpectCreateVersion(self, project, service, version_id, num_attempts=1,
                           success=True, deployment=None,
                           handlers=None, beta_settings=None,
-                          version_call_args=None):
+                          version_call_args=None,
+                          operation_metadata=None):
     """Adds expected version create call and response to mock client.
 
     Args:
@@ -273,6 +274,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
           the beta settings in the app.yaml if any.
       version_call_args: kwargs to be added to the Version message, if any
           (e.g. {'vm': True}.
+      operation_metadata: Metadata to be returned in the operation.
     """
     version_call_args = version_call_args or self.DEFAULT_SERVICE_CONFIG
     op_name = VersionOperationName(project, service)
@@ -287,6 +289,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       final_response = self.messages.Operation(
           name=op_name,
           done=True,
+          metadata=operation_metadata,
           response=encoding.JsonToMessage(
               self.messages.Operation.ResponseValue,
               encoding.MessageToJson(version_call.version)))

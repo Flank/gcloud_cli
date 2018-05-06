@@ -2,7 +2,7 @@ NAME
     gcloud alpha compute tpus - list, create, and delete Cloud TPUs
 
 SYNOPSIS
-    gcloud alpha compute tpus COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute tpus GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) List, create, and delete Cloud TPUs.
@@ -11,6 +11,18 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     accelerator-types
+        (ALPHA) List or Describe Available Cloud TPU accelerator types.
+
+     locations
+        (ALPHA) List or Describe Available Cloud TPU Locations.
+
+     versions
+        (ALPHA) Explore Available Tensorflow versions for Cloud TPUs.
 
 COMMANDS
     COMMAND is one of the following:
@@ -26,6 +38,15 @@ COMMANDS
 
      list
         (ALPHA) List Cloud TPUs.
+
+     reimage
+        (ALPHA) Reimages the OS on a Cloud TPU.
+
+     start
+        (ALPHA) Start a Cloud TPU.
+
+     stop
+        (ALPHA) Stop a Cloud TPU.
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

@@ -14,7 +14,8 @@
 
 """Unit tests for network diagnostics."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import socket
 import ssl
 
@@ -27,13 +28,15 @@ from googlecloudsdk.core.diagnostics import network_diagnostics
 from tests.lib import test_case
 from tests.lib.core.diagnostics import diagnostics_test_base
 import httplib2
+from six.moves import http_client
 import socks
 
 
 CHANGE_PROXY = http_proxy_setup.ChangeGcloudProxySettings
 
 
-def CheckFailResult(urls, first_run=True, exception=httplib.ResponseNotReady()):
+def CheckFailResult(urls, first_run=True,
+                    exception=http_client.ResponseNotReady()):
   message = 'Reachability Check {0}.\n'.format('failed' if first_run else
                                                'still does not pass')
   def CreateFailure(url, err):
@@ -56,7 +59,7 @@ class ReachabilityCheckerTests(diagnostics_test_base.DiagnosticTestBase):
     self.reachability_checker = network_diagnostics.ReachabilityChecker()
 
   def testCantConnectNoInternet(self):
-    self.http_request_mock.side_effect = httplib.ResponseNotReady
+    self.http_request_mock.side_effect = http_client.ResponseNotReady
     expected_result = CheckFailResult(['https://www.google.com'])
     actual_result, actual_fixer = self.reachability_checker.Check(
         ['https://www.google.com'])

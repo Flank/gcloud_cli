@@ -51,9 +51,9 @@ class RecordSetsTransactionAddTest(base.DnsMockTest):
           '{3} {4}'.format(test_zone.name, test_record.name,
                            test_record.ttl, test_record.type,
                            test_record.rrdatas[0]))
-      self.assertEquals(context.exception.message,
-                        'transaction not found at [{0}]'.format(
-                            transaction_util.DEFAULT_PATH))
+      self.assertEqual(context.exception.message,
+                       'transaction not found at [{0}]'.format(
+                           transaction_util.DEFAULT_PATH))
 
   def testTransactionAddUnsupportedType(self):
     shutil.copyfile(
@@ -67,15 +67,15 @@ class RecordSetsTransactionAddTest(base.DnsMockTest):
           '{3} {4}'.format(test_zone.name, test_record.name,
                            test_record.ttl, test_record.type,
                            test_record.rrdatas[0]))
-      self.assertEquals(
+      self.assertEqual(
           context.exception.message,
           'unsupported record-set type [{0}]'.format(test_record.type))
 
   def _RunTestRaisesCorruptedTransactionFileError(self):
     test_zone = util.GetManagedZones()[0]
     test_record = util.GetMGRecord()
-    with self.assertRaisesRegexp(transaction_util.CorruptedTransactionFileError,
-                                 'Corrupted transaction file.'):
+    with self.assertRaisesRegex(transaction_util.CorruptedTransactionFileError,
+                                'Corrupted transaction file.'):
       self.Run(
           'dns record-sets transaction add -z {0} --name {1} --ttl {2} --type '
           '{3} {4}'.format(test_zone.name, test_record.name,
@@ -115,7 +115,7 @@ class RecordSetsTransactionAddTest(base.DnsMockTest):
       expected_change.additions.append(test_record)
     with open(transaction_util.DEFAULT_PATH) as actual:
       actual_change = transaction_util.ChangeFromYamlFile(actual)
-      self.assertEquals(expected_change, actual_change)
+      self.assertEqual(expected_change, actual_change)
 
   def testTransactionAddData(self):
     shutil.copyfile(
@@ -137,7 +137,7 @@ class RecordSetsTransactionAddTest(base.DnsMockTest):
       expected_change.additions.append(test_record)
     with open(transaction_util.DEFAULT_PATH) as actual:
       actual_change = transaction_util.ChangeFromYamlFile(actual)
-      self.assertEquals(expected_change, actual_change)
+      self.assertEqual(expected_change, actual_change)
 
 
 class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
@@ -162,9 +162,9 @@ class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
           '{3} {4}'.format(test_zone.name, test_record.name,
                            test_record.ttl, test_record.type,
                            test_record.rrdatas[0]))
-      self.assertEquals(context.exception.message,
-                        'transaction not found at [{0}]'.format(
-                            transaction_util.DEFAULT_PATH))
+      self.assertEqual(context.exception.message,
+                       'transaction not found at [{0}]'.format(
+                           transaction_util.DEFAULT_PATH))
 
   def testTransactionAddUnsupportedType(self):
     shutil.copyfile(
@@ -178,15 +178,15 @@ class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
           '{3} {4}'.format(test_zone.name, test_record.name,
                            test_record.ttl, test_record.type,
                            test_record.rrdatas[0]))
-      self.assertEquals(
+      self.assertEqual(
           context.exception.message,
           'unsupported record-set type [{0}]'.format(test_record.type))
 
   def _RunTestRaisesCorruptedTransactionFileError(self):
     test_zone = util_beta.GetManagedZones()[0]
     test_record = util_beta.GetMGRecord()
-    with self.assertRaisesRegexp(transaction_util.CorruptedTransactionFileError,
-                                 'Corrupted transaction file.'):
+    with self.assertRaisesRegex(transaction_util.CorruptedTransactionFileError,
+                                'Corrupted transaction file.'):
       self.Run(
           'dns record-sets transaction add -z {0} --name {1} --ttl {2} --type '
           '{3} {4}'.format(test_zone.name, test_record.name,
@@ -223,7 +223,7 @@ class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
     with open(transaction_util.DEFAULT_PATH) as actual:
       actual_change = transaction_util.ChangeFromYamlFile(
           actual, api_version=self.api_version)
-      self.assertEquals(expected_change, actual_change)
+      self.assertEqual(expected_change, actual_change)
 
   def testTransactionAddData(self):
     shutil.copyfile(
@@ -247,7 +247,7 @@ class RecordSetsTransactionAddBetaTest(base.DnsMockBetaTest):
     with open(transaction_util.DEFAULT_PATH) as actual:
       actual_change = transaction_util.ChangeFromYamlFile(
           actual, api_version=self.api_version)
-      self.assertEquals(expected_change, actual_change)
+      self.assertEqual(expected_change, actual_change)
 
 
 if __name__ == '__main__':

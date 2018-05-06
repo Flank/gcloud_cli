@@ -42,8 +42,8 @@ class RecordSetsExportTest(base.DnsMockTest):
 
     with open(self.result_file_path) as results:
       with open(self.zone_file_path) as expected:
-        self.assertEquals(expected.read().splitlines(),
-                          results.read().splitlines())
+        self.assertEqual(expected.read().splitlines(),
+                         results.read().splitlines())
 
   def testWriteToYamlFile(self):
     with open(self.result_file_path, 'w') as yaml_file:
@@ -51,8 +51,8 @@ class RecordSetsExportTest(base.DnsMockTest):
 
     with open(self.result_file_path) as results:
       with open(self.yaml_file_path) as expected:
-        self.assertEquals(expected.read().splitlines(),
-                          results.read().splitlines())
+        self.assertEqual(expected.read().splitlines(),
+                         results.read().splitlines())
 
   def _ExportToFileHelper(self, expected_file, flags=''):
     test_zone = util.GetManagedZones()[0]
@@ -74,8 +74,8 @@ class RecordSetsExportTest(base.DnsMockTest):
         test_zone.name, self.result_file_path, flags))
     with open(self.result_file_path) as results:
       with open(expected_file) as expected:
-        self.assertEquals(expected.read().splitlines(),
-                          results.read().splitlines())
+        self.assertEqual(expected.read().splitlines(),
+                         results.read().splitlines())
 
   def testExportToZoneFile(self):
     self._ExportToFileHelper(self.zone_file_path, '--zone-file-format')
@@ -102,8 +102,8 @@ class RecordSetsExportBetaTest(base.DnsMockBetaTest):
 
     with open(self.result_file_path) as results:
       with open(self.zone_file_path) as expected:
-        self.assertEquals(expected.read().splitlines(),
-                          results.read().splitlines())
+        self.assertEqual(expected.read().splitlines(),
+                         results.read().splitlines())
 
   def testWriteToYamlFile(self):
     with open(self.result_file_path, 'w') as yaml_file:
@@ -111,8 +111,8 @@ class RecordSetsExportBetaTest(base.DnsMockBetaTest):
 
     with open(self.result_file_path) as results:
       with open(self.yaml_file_path) as expected:
-        self.assertEquals(expected.read().splitlines(),
-                          results.read().splitlines())
+        self.assertEqual(expected.read().splitlines(),
+                         results.read().splitlines())
 
   def _ExportToFileHelper(self, expected_file, flags=''):
     test_zone = util_beta.GetManagedZones()[0]
@@ -134,8 +134,8 @@ class RecordSetsExportBetaTest(base.DnsMockBetaTest):
         test_zone.name, self.result_file_path, flags))
     with open(self.result_file_path) as results:
       with open(expected_file) as expected:
-        self.assertEquals(expected.read().splitlines(),
-                          results.read().splitlines())
+        self.assertEqual(expected.read().splitlines(),
+                         results.read().splitlines())
 
   def testExportToZoneFile(self):
     self._ExportToFileHelper(self.zone_file_path, '--zone-file-format')

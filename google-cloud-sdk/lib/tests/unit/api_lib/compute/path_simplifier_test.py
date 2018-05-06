@@ -13,8 +13,11 @@
 # limitations under the License.
 """Unit tests for simplify_path."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import path_simplifier
 from tests.lib import test_case
+import six
 
 
 class SimplifyPathTest(test_case.TestCase):
@@ -31,7 +34,7 @@ class SimplifyPathTest(test_case.TestCase):
     }
 
   def testName(self):
-    for _, path in self.paths.iteritems():
+    for _, path in six.iteritems(self.paths):
       name = path_simplifier.Name(path)
       self.assertEqual('my-name', name)
 
@@ -42,7 +45,7 @@ class SimplifyPathTest(test_case.TestCase):
         'zonal': 'my-zone/names/my-name',
     }
 
-    for object_type, path in self.paths.iteritems():
+    for object_type, path in six.iteritems(self.paths):
       suffix = path_simplifier.ScopedSuffix(path)
       self.assertEqual(expected_suffix[object_type], suffix)
 
@@ -53,7 +56,7 @@ class SimplifyPathTest(test_case.TestCase):
         'zonal': 'my-project/zones/my-zone/names/my-name',
     }
 
-    for object_type, path in self.paths.iteritems():
+    for object_type, path in six.iteritems(self.paths):
       suffix = path_simplifier.ProjectSuffix(path)
       self.assertEqual(expected_suffix[object_type], suffix)
 

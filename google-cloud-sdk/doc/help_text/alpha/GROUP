@@ -116,6 +116,9 @@ GROUPS
      deployment-manager
         (ALPHA) Manage deployments of cloud resources.
 
+     dlp
+        (ALPHA) Manage sensitive data with Cloud Data Loss Prevention.
+
      emulators
         (ALPHA) Set up your local development environment using emulators.
 
@@ -131,14 +134,24 @@ GROUPS
      genomics
         (ALPHA) Manage Genomics resources using version 1 of the API.
 
+     iam
+        (ALPHA) Manage IAM service accounts and keys.
+
      iot
         (ALPHA) Manage Cloud IoT resources.
+
+     kms
+        (ALPHA) Manage cryptographic keys in the cloud.
 
      ml
         (ALPHA) Use Google Cloud machine learning capabilities.
 
      ml-engine
         (ALPHA) Manage Cloud ML Engine jobs and models.
+
+     monitoring
+        (ALPHA) Manage Stackdriver Monitoring alerting policies and
+        notification channels.
 
      organizations
         (ALPHA) Create and manage Google Cloud Platform Organizations.
@@ -148,6 +161,9 @@ GROUPS
 
      pubsub
         (ALPHA) Manage Cloud Pub/Sub topics and subscriptions.
+
+     redis
+        (ALPHA) Manage Cloud Memorystore Redis resources.
 
      resource-manager
         (ALPHA) Manage Cloud Resources.

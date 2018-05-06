@@ -36,7 +36,8 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam service-accounts list
         $ gcloud beta iam service-accounts list
 

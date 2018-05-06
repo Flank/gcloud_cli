@@ -62,17 +62,18 @@ class SecurityPoliciesTestAlpha(e2e_test_base.BaseTest):
                    security_policy_name, self.result_file_path))
       security_policy = yaml.load_path(self.result_file_path)
 
-      self.assertEquals('', security_policy['description'])
-      self.assertEquals(1, len(security_policy['rules']))
+      self.assertEqual('', security_policy['description'])
+      self.assertEqual(1, len(security_policy['rules']))
       default_rule = security_policy['rules'][0]
-      self.assertEquals('default rule', default_rule['description'])
-      self.assertEquals(2147483647, default_rule['priority'])
-      self.assertEquals('SRC_IPS_V1', default_rule['match']['versionedExpr'])
-      self.assertEquals('*', default_rule['match']['config']['srcIpRanges'][0])
-      self.assertEquals('allow', default_rule['action'])
-      self.assertEquals(False, default_rule['preview'])
+      self.assertEqual('default rule', default_rule['description'])
+      self.assertEqual(2147483647, default_rule['priority'])
+      self.assertEqual('SRC_IPS_V1', default_rule['match']['versionedExpr'])
+      self.assertEqual('*', default_rule['match']['config']['srcIpRanges'][0])
+      self.assertEqual('allow', default_rule['action'])
+      self.assertEqual(False, default_rule['preview'])
 
       security_policy['description'] = 'new description'
+      security_policy['rules'] = []
 
       with open(self.result_file_path, 'w') as export_file:
         security_policies_utils.WriteToFile(export_file, security_policy,
@@ -86,15 +87,15 @@ class SecurityPoliciesTestAlpha(e2e_test_base.BaseTest):
                    security_policy_name, self.result_file_path))
       security_policy = yaml.load_path(self.result_file_path)
 
-      self.assertEquals('new description', security_policy['description'])
-      self.assertEquals(1, len(security_policy['rules']))
+      self.assertEqual('new description', security_policy['description'])
+      self.assertEqual(1, len(security_policy['rules']))
       default_rule = security_policy['rules'][0]
-      self.assertEquals('default rule', default_rule['description'])
-      self.assertEquals(2147483647, default_rule['priority'])
-      self.assertEquals('SRC_IPS_V1', default_rule['match']['versionedExpr'])
-      self.assertEquals('*', default_rule['match']['config']['srcIpRanges'][0])
-      self.assertEquals('allow', default_rule['action'])
-      self.assertEquals(False, default_rule['preview'])
+      self.assertEqual('default rule', default_rule['description'])
+      self.assertEqual(2147483647, default_rule['priority'])
+      self.assertEqual('SRC_IPS_V1', default_rule['match']['versionedExpr'])
+      self.assertEqual('*', default_rule['match']['config']['srcIpRanges'][0])
+      self.assertEqual('allow', default_rule['action'])
+      self.assertEqual(False, default_rule['preview'])
 
 
 class SecurityPoliciesTestBeta(SecurityPoliciesTestAlpha):

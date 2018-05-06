@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.auth import util as auth_util
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import test_case
+
 import mock
 from oauth2client import client
 
@@ -53,8 +57,8 @@ class PrintAccessTokenTest(cli_test_base.CliTestBase):
         'oauth2client.client.GoogleCredentials.get_application_default')
     mock_get_adc.return_value = self.GetGoogleCredentials(token=None)
 
-    with self.assertRaisesRegexp(exceptions.ToolException,
-                                 'No access token could be obtained'):
+    with self.assertRaisesRegex(exceptions.ToolException,
+                                'No access token could be obtained'):
       self.Run('beta auth application-default print-access-token')
 
   def testNoCred(self):
@@ -63,8 +67,8 @@ class PrintAccessTokenTest(cli_test_base.CliTestBase):
     mock_get_adc.side_effect = client.ApplicationDefaultCredentialsError(
         'no file')
 
-    with self.assertRaisesRegexp(exceptions.ToolException,
-                                 'no file'):
+    with self.assertRaisesRegex(exceptions.ToolException,
+                                'no file'):
       self.Run('beta auth application-default print-access-token')
 
   def testScopedDefault(self):

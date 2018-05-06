@@ -539,7 +539,7 @@ class CompleteCommandRunExceptionTest(test_base.BaseTest,
     os.environ['_ARGCOMPLETE_TEST'] = (
         'collection=sql.instances,list_command=no-such-gcloud-command')
     self.WriteInput('x\nx')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         Exception,
         r'Update command \[no-such-gcloud-command --quiet]: Invalid choice: '
         r"'no-such-gcloud-command'\."):
@@ -567,7 +567,7 @@ COMPLETE> """)
     os.environ['_ARGCOMPLETE_TEST'] = (
         'collection=sql.instances,list_command=meta test --core-exception')
     self.WriteInput('x\nx')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         Exception,
         r'Update command \[meta test --core-exception --quiet]: '
         r'Some core exception\.'):

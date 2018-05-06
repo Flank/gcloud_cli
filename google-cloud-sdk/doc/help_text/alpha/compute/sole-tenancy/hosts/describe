@@ -7,7 +7,11 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Display detailed information about a sole-tenancy host.
+    (ALPHA) (DEPRECATED) Display detailed information about a sole-tenancy
+    host.
+
+    This command group is deprecated. Please use gcloud alpha compute
+    sole-tenancy node-groups instead.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -16,7 +20,7 @@ POSITIONAL ARGUMENTS
 FLAGS
      --zone=ZONE
         The zone of the host to describe. If not specified and the compute/zone
-        property isn't set, you will be prompted to select a zone.
+        property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

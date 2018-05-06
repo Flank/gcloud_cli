@@ -13,8 +13,11 @@
 # limitations under the License.
 """A command for testing how required/not-required arguments are handled."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import log
+import six
 
 
 class Test(base.Command):
@@ -41,11 +44,10 @@ class Test(base.Command):
     log.Print(args.group_not_required_test)
     log.Print(args.command_required_test)
     log.Print(args.command_not_required_test)
-    log.Print(args.command_not_required_test)
     log.Print(args.config)
     log.Print(args.positional)
     log.Print('=====')
     log.Print('\n'.join(
-        name + '=' + value
-        for name, value in sorted(args.GetSpecifiedArgs().iteritems())))
+        '{}={}'.format(name, value)
+        for name, value in sorted(six.iteritems(args.GetSpecifiedArgs()))))
     log.Print('=====')

@@ -65,16 +65,16 @@ class InterconnectsDescribeGATest(test_base.BaseTest):
         [(self.compute_v1.interconnects, 'Get',
           self.messages.ComputeInterconnectsGetRequest(
               project='my-project', interconnect='my-interconnect1'))],)
-    self.assertEquals(result.description, 'description')
-    self.assertEquals(result.name, 'my-interconnect1')
-    self.assertEquals(str(result.interconnectType), 'DEDICATED')
-    self.assertEquals(str(result.linkType), 'LINK_TYPE_ETHERNET_10G_LR')
-    self.assertEquals(result.requestedLinkCount, 5)
-    self.assertEquals(
+    self.assertEqual(result.description, 'description')
+    self.assertEqual(result.name, 'my-interconnect1')
+    self.assertEqual(str(result.interconnectType), 'DEDICATED')
+    self.assertEqual(str(result.linkType), 'LINK_TYPE_ETHERNET_10G_LR')
+    self.assertEqual(result.requestedLinkCount, 5)
+    self.assertEqual(
         result.selfLink,
         'https://www.googleapis.com/compute/v1/projects/my-project/global/'
         'interconnects/my-interconnect1')
-    self.assertEquals(
+    self.assertEqual(
         result.location,
         'https://www.googleapis.com/compute/v1/projects/my-project/global/'
         'interconnectLocations/my-location')
@@ -102,16 +102,16 @@ class InterconnectsDescribeGATest(test_base.BaseTest):
         [(self.compute_v1.interconnects, 'Get',
           self.messages.ComputeInterconnectsGetRequest(
               project='my-project', interconnect='my-interconnect1'))],)
-    self.assertEquals(result.description, 'description')
-    self.assertEquals(result.name, 'my-interconnect1')
-    self.assertEquals(str(result.interconnectType), 'DEDICATED')
-    self.assertEquals(str(result.linkType), 'LINK_TYPE_ETHERNET_10G_LR')
-    self.assertEquals(result.requestedLinkCount, 5)
-    self.assertEquals(
+    self.assertEqual(result.description, 'description')
+    self.assertEqual(result.name, 'my-interconnect1')
+    self.assertEqual(str(result.interconnectType), 'DEDICATED')
+    self.assertEqual(str(result.linkType), 'LINK_TYPE_ETHERNET_10G_LR')
+    self.assertEqual(result.requestedLinkCount, 5)
+    self.assertEqual(
         result.selfLink,
         'https://www.googleapis.com/compute/v1/projects/my-project/global/'
         'interconnects/my-interconnect1')
-    self.assertEquals(
+    self.assertEqual(
         result.location,
         'https://www.googleapis.com/compute/v1/projects/my-project/global/'
         'interconnectLocations/my-location')
@@ -162,16 +162,16 @@ class InterconnectsDescribeBetaTest(test_base.BaseTest):
         [(self.compute_beta.interconnects, 'Get',
           self.messages.ComputeInterconnectsGetRequest(
               project='my-project', interconnect='my-interconnect1'))],)
-    self.assertEquals(result.description, 'description')
-    self.assertEquals(result.name, 'my-interconnect1')
-    self.assertEquals(str(result.interconnectType), 'IT_PRIVATE')
-    self.assertEquals(str(result.linkType), 'LINK_TYPE_ETHERNET_10G_LR')
-    self.assertEquals(result.requestedLinkCount, 5)
-    self.assertEquals(
+    self.assertEqual(result.description, 'description')
+    self.assertEqual(result.name, 'my-interconnect1')
+    self.assertEqual(str(result.interconnectType), 'IT_PRIVATE')
+    self.assertEqual(str(result.linkType), 'LINK_TYPE_ETHERNET_10G_LR')
+    self.assertEqual(result.requestedLinkCount, 5)
+    self.assertEqual(
         result.selfLink,
         'https://www.googleapis.com/compute/beta/projects/my-project/global/'
         'interconnects/my-interconnect1')
-    self.assertEquals(
+    self.assertEqual(
         result.location,
         'https://www.googleapis.com/compute/beta/projects/my-project/global/'
         'interconnectLocations/my-location')
@@ -199,16 +199,16 @@ class InterconnectsDescribeBetaTest(test_base.BaseTest):
         [(self.compute_beta.interconnects, 'Get',
           self.messages.ComputeInterconnectsGetRequest(
               project='my-project', interconnect='my-interconnect1'))],)
-    self.assertEquals(result.description, 'description')
-    self.assertEquals(result.name, 'my-interconnect1')
-    self.assertEquals(str(result.interconnectType), 'IT_PRIVATE')
-    self.assertEquals(str(result.linkType), 'LINK_TYPE_ETHERNET_10G_LR')
-    self.assertEquals(result.requestedLinkCount, 5)
-    self.assertEquals(
+    self.assertEqual(result.description, 'description')
+    self.assertEqual(result.name, 'my-interconnect1')
+    self.assertEqual(str(result.interconnectType), 'IT_PRIVATE')
+    self.assertEqual(str(result.linkType), 'LINK_TYPE_ETHERNET_10G_LR')
+    self.assertEqual(result.requestedLinkCount, 5)
+    self.assertEqual(
         result.selfLink,
         'https://www.googleapis.com/compute/beta/projects/my-project/global/'
         'interconnects/my-interconnect1')
-    self.assertEquals(
+    self.assertEqual(
         result.location,
         'https://www.googleapis.com/compute/beta/projects/my-project/global/'
         'interconnectLocations/my-location')

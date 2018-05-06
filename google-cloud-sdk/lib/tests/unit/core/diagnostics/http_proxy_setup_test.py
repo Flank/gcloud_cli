@@ -14,6 +14,8 @@
 
 """Unit tests for http proxy properties setup."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core import http_proxy
@@ -147,11 +149,11 @@ class ChangeGcloudProxySettingsTests(cli_test_base.CliTestBase):
          'https_proxy': 'https://baduser:badpassword@badproxy:8081'})
     pi = http_proxy.GetHttpProxyInfo()
     self.assertTrue(callable(pi))
-    self.assertEquals(
+    self.assertEqual(
         (socks.PROXY_TYPE_HTTP, 'badproxy', 8080, True, 'baduser',
          'badpassword', None),
         pi('http').astuple())
-    self.assertEquals(
+    self.assertEqual(
         (socks.PROXY_TYPE_HTTP, 'badproxy', 8081, True, 'baduser',
          'badpassword', None),
         pi('https').astuple())

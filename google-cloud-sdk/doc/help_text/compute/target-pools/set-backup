@@ -35,7 +35,7 @@ OPTIONAL FLAGS
 
      --region=REGION
         The region of the target pool to set a backup pool for. If not
-        specified, you will be prompted to select a region.
+        specified, you may be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:

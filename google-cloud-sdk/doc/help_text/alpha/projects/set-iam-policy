@@ -10,23 +10,33 @@ DESCRIPTION
     encoded in JSON or YAML that contains the IAM policy.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to set IAM policy for.
+     PROJECT ID - The project to set the IAM policy for. This represents a
+     Cloud resource. This must be specified.
+
+       PROJECT_ID
+          The ID of the project or a fully qualified identifier for the
+          project.
 
      POLICY_FILE
-        JSON or YAML file with the IAM policy
+        Path to a local JSON or YAML formatted file containing a valid policy.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
+API REFERENCE
+    This command uses the cloudresourcemanager/v1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/resource-manager
+
 EXAMPLES
     The following command reads an IAM policy defined in a JSON file
     policy.json and sets it for a project with the ID example-project-id-1:
 
-        $ gcloud alpha projects set-iam-policy example-project-id-1 \
-            policy.json
+    $ gcloud alpha projects set-iam-policy example-project-id-1 \        policy.json
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

@@ -11,7 +11,7 @@ gcloud container clusters create \- create a cluster for running containers
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters create\fR \fINAME\fR [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-no\-enable\-cloud\-logging\fR] [\fB\-\-no\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-no\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-addons\fR=[\fIADDON\fR,...]\ |\ \fB\-\-disable\-addons\fR=[\fIDISABLE_ADDON\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-no\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR;\ default="admin"] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters create\fR \fINAME\fR [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-no\-enable\-cloud\-logging\fR] [\fB\-\-no\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-no\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-no\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR;\ default="admin"] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -56,6 +56,16 @@ $ gcloud container clusters create example\-cluster \e
 
 This flag is deprecated. Use \-\-node\-locations=PRIMARY_ZONE,[ZONE,...]
 instead.
+
+.TP 2m
+\fB\-\-addons\fR=[\fIADDON\fR,...]
+Default set of addons includes HttpLoadBalancing, HorizontalPodAutoscaling.
+Addons
+(https://cloud.google.com/kubernetes\-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
+are additional Kubernetes cluster components. Addons specified by this flag will
+be enabled. The others will be disabled. \fIADDON\fR must be one of:
+\fBHttpLoadBalancing\fR, \fBHorizontalPodAutoscaling\fR,
+\fBKubernetesDashboard\fR, \fBIstio\fR, \fBNetworkPolicy\fR.
 
 .TP 2m
 \fB\-\-async\fR
@@ -174,8 +184,8 @@ to disable.
 .TP 2m
 \fB\-\-enable\-ip\-alias\fR
 Enable use of alias IPs (https://cloud.google.com/compute/docs/alias\-ip/) for
-pod IPs. This will create two new subnetworks, one for the instance and pod IPs,
-and another to reserve space for the services range.
+pod IPs. This will create two secondary ranges, one for the pod IPs and another
+to reserve space for the services range.
 
 .TP 2m
 \fB\-\-enable\-kubernetes\-alpha\fR
@@ -248,7 +258,24 @@ https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR, \fB\-m\fR \fIMACHINE_TYPE\fR
-The type of machine to use for nodes. Defaults to n1\-standard\-1.
+The type of machine to use for nodes. Defaults to n1\-standard\-1. The list of
+predefined machine types is available using the following command:
+
+.RS 2m
+$ gcloud compute machine\-types list
+.RE
+
+You can also specify custom machine types with the string "custom\-CPUS\-RAM"
+where ``CPUS`` is the number of virtual CPUs and ``RAM`` is the amount of RAM in
+MiB.
+
+For example, to create a node pool using custom machines with 2 vCPUs and 12 GiB
+of RAM:
+
+.RS 2m
+$ gcloud container clusters create high\-mem\-pool \e
+    \-\-machine\-type=custom\-2\-12288
+.RE
 
 .TP 2m
 \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR
@@ -308,9 +335,12 @@ http://kubernetes.io/docs/user\-guide/node\-selection/ for examples.
 .TP 2m
 \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]
 The set of zones in which the specified node footprint should be replicated. All
-zones must be in the same region as the cluster's primary zone, specified by the
-\-\-zone flag. \-\-node\-locations must contain the primary zone. If
-node\-locations is not specified, all nodes will be in the primary zone.
+zones must be in the same region as the cluster's master(s), specified by the
+\f5\-\-zone\fR or \f5\-\-region\fR flag. Additionally, for zonal clusters,
+\f5\-\-node\-locations\fR must contain the cluster's primary zone. If not
+specified, all nodes will be in the cluster's primary zone (for zonal clusters)
+or spread across three randomly chosen zones within the cluster's region (for
+regional clusters).
 
 Note that \f5NUM_NODES\fR nodes will be created in each zone, such that if you
 specify \f5\-\-num\-nodes=4\fR and choose two locations, 8 nodes will be
@@ -374,7 +404,7 @@ Can be specified as a netmask size (e.g. '/20') or as in CIDR notion (e.g.
 \'10.100.0.0/20'). If given as a netmask size, the IP range will be chosen
 automatically from the available space in the network.
 
-If unspecified, the services CIDR range will use automatic defaults.
+If unspecified, the services CIDR range will be chosen with a default mask size.
 
 Can not be specified unless '\-\-enable\-ip\-alias' is also specified.
 
@@ -415,32 +445,6 @@ The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 
 .TP 2m
 
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-addons\fR=[\fIADDON\fR,...]
-Default set of addons includes HttpLoadBalancing, HorizontalPodAutoscaling.
-Addons
-(https://cloud.google.com/kubernetes\-engine/reference/rest/v1/projects.zones.clusters#AddonsConfig)
-are additional Kubernetes cluster components. Addons specified by this flag will
-be enabled. The others will be disabled. \fIADDON\fR must be one of:
-\fBHttpLoadBalancing\fR, \fBHorizontalPodAutoscaling\fR,
-\fBKubernetesDashboard\fR, \fBIstio\fR.
-
-.TP 2m
-\fB\-\-disable\-addons\fR=[\fIDISABLE_ADDON\fR,...]
-(DEPRECATED) List of cluster addons to disable. Options are HttpLoadBalancing,
-HorizontalPodAutoscaling, KubernetesDashboard, Istio
-
-This flag is deprecated. Use \-\-addons instead. \fIDISABLE_ADDON\fR must be one
-of: \fBHttpLoadBalancing\fR, \fBHorizontalPodAutoscaling\fR,
-\fBKubernetesDashboard\fR, \fBIstio\fR.
-
-.RE
-.sp
-.TP 2m
-
 Cluster autoscaling
 
 .RS 2m
@@ -476,17 +480,26 @@ Master Authorized Networks
 .RS 2m
 .TP 2m
 \fB\-\-enable\-master\-authorized\-networks\fR
-Allow only Authorized Networks (specified by the
-\f5\-\-master\-authorized\-networks\fR flag) and Google Compute Engine Public
-IPs to connect to Kubernetes master through HTTPS. By default public internet
-(0.0.0.0/0) is allowed to connect to Kubernetes master through HTTPS.
+Allow only specified set of CIDR blocks (specified by the
+\f5\-\-master\-authorized\-networks\fR flag) to connect to Kubernetes master
+through HTTPS. Besides these blocks, the following have access as well:
+
+.RS 2m
+1) The private network the cluster connects to if
+`\-\-private\-cluster` is specified.
+2) Google Compute Engine Public IPs if `\-\-private\-cluster` is not
+specified.
+.RE
+
+When disabled, public internet (0.0.0.0/0) is allowed to connect to Kubernetes
+master through HTTPS.
 
 .TP 2m
 \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]
-The list of external networks (up to 10) that are allowed to connect to
-Kubernetes master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30).
-Can not be specified unless \f5\-\-enable\-master\-authorized\-networks\fR is
-also specified.
+The list of CIDR blocks (up to 20) that are allowed to connect to Kubernetes
+master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Can not be
+specified unless \f5\-\-enable\-master\-authorized\-networks\fR is also
+specified.
 
 .RE
 .sp
@@ -530,8 +543,9 @@ Options to specify the node identity. At most one of these may be specified:
 .TP 2m
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
 The Google Cloud Platform Service Account to be used by the node VMs. If a
-service account is specified, the cloud\-platform scope is used. If no Service
-Account is specified, the project default service account is used.
+service account is specified, the cloud\-platform and userinfo.email scopes are
+used. If no Service Account is specified, the project default service account is
+used.
 
 .TP 2m
 

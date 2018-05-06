@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Test of the 'pubsub topics describe' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
@@ -36,7 +41,7 @@ class TopicsDescribeTest(base.CloudPubsubTestBase):
 
     result = self.Run('pubsub topics describe topic1')
 
-    self.assertEquals(result, topic)
+    self.assertEqual(result, topic)
 
   def testTopicsDescribeFullUri(self):
     topic_ref = util.ParseTopic('topic1', self.Project())
@@ -49,7 +54,7 @@ class TopicsDescribeTest(base.CloudPubsubTestBase):
     result = self.Run(
         'pubsub topics describe {}'.format(topic_ref.SelfLink()))
 
-    self.assertEquals(result, topic)
+    self.assertEqual(result, topic)
 
 
 if __name__ == '__main__':

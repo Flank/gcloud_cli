@@ -27,8 +27,8 @@ class CreateTest(base.GenomicsUnitTest):
         request=self.messages.VariantSet(datasetId='42',
                                          name='foo'),
         exception=self.MakeHttpError(404, 'Dataset 42 not found'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Dataset 42 not found'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Dataset 42 not found'):
       self.RunGenomics(['variantsets', 'create',
                         '--name', 'foo', '--dataset-id', '42'])
 

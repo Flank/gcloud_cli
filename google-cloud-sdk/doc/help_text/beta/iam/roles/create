@@ -36,7 +36,8 @@ FLAGS
             separate them.
 
          --stage=STAGE
-            The state of the role you want to create.
+            The state of the role you want to create. This represents a role's
+            lifecycle phase: ALPHA, BETA, GA, DEPRECATED, DISABLED, EAP.
 
          --title=TITLE
             The title of the role you want to create.
@@ -60,8 +61,9 @@ EXAMPLES
             resourcemanager.projects.get,resourcemanager.projects.update
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud iam roles create
+        $ gcloud alpha iam roles create
 

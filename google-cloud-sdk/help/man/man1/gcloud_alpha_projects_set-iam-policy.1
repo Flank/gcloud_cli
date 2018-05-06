@@ -26,12 +26,20 @@ encoded in JSON or YAML that contains the IAM policy.
 
 .RS 2m
 .TP 2m
-\fIPROJECT_ID\fR
-ID for the project you want to set IAM policy for.
 
+PROJECT ID \- The project to set the IAM policy for. This represents a Cloud
+resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIPROJECT_ID\fR
+The ID of the project or a fully qualified identifier for the project.
+
+.RE
+.sp
 .TP 2m
 \fIPOLICY_FILE\fR
-JSON or YAML file with the IAM policy
+Path to a local JSON or YAML formatted file containing a valid policy.
 
 
 .RE
@@ -46,16 +54,26 @@ help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcloudresourcemanager/v1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/resource\-manager
+
+
+
 .SH "EXAMPLES"
 
 The following command reads an IAM policy defined in a JSON file
 \f5policy.json\fR and sets it for a project with the ID
 \f5example\-project\-id\-1\fR:
 
-.RS 2m
-$ gcloud alpha projects set\-iam\-policy example\-project\-id\-1 \e
-    policy.json
+$ gcloud alpha projects set\-iam\-policy example\-project\-id\-1 \e.RS 2m
+policy.json
+
 .RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
 
 
 

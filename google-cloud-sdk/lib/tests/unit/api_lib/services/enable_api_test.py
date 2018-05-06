@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests of the enable_api module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.services import enable_api
@@ -64,7 +66,7 @@ class EnableApiTest(unit_test_base.SV1UnitTestBase,
     server_error = http_error.MakeDetailedHttpError(code=403,
                                                     message='Something.')
     self._ExpectListEnabledServicesCall(error=server_error)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ListServicesPermissionDeniedException, r'Something.'):
       enable_api.IsServiceEnabled(self.Project(), 'service3')
 
@@ -73,7 +75,7 @@ class EnableApiTest(unit_test_base.SV1UnitTestBase,
     server_error = http_error.MakeDetailedHttpError(code=401,
                                                     message='Something else.')
     self._ExpectListEnabledServicesCall(error=server_error)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         apitools_exceptions.HttpError, r'Something else.'):
       enable_api.IsServiceEnabled(self.Project(), 'service3')
 
@@ -103,7 +105,7 @@ class EnableApiTest(unit_test_base.SV1UnitTestBase,
     """
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
     self._ExpectEnableServiceCall('service3', None, error=server_error)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.EnableServicePermissionDeniedException,
         r'Error.'):
       enable_api.EnableServiceApiCall(self.Project(), 'service3')
@@ -113,7 +115,7 @@ class EnableApiTest(unit_test_base.SV1UnitTestBase,
     """
     server_error = http_error.MakeDetailedHttpError(code=400, message='Error.')
     self._ExpectEnableServiceCall('service3', None, error=server_error)
-    with self.assertRaisesRegexp(apitools_exceptions.HttpError, r'Error.'):
+    with self.assertRaisesRegex(apitools_exceptions.HttpError, r'Error.'):
       enable_api.EnableServiceApiCall(self.Project(), 'service3')
 
   def testEnableServiceIfDisabled_AlreadyEnabled(self):

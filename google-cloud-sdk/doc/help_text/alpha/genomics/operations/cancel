@@ -9,8 +9,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the operation to be canceled. The "operations/" prefix for
-        the name is optional.
+        The name of the operation to be canceled.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

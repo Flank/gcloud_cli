@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for gcloud app operations describe."""
 
+from __future__ import absolute_import
 from apitools.base.py import extra_types
 
 from googlecloudsdk.core import properties
@@ -27,8 +28,8 @@ class OperationsDescribeTest(operations_base.OperationsTestBase):
 
   def testDescribe_NoProject(self):
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app operations describe o1')
 
   def testDescribe(self):
@@ -36,7 +37,7 @@ class OperationsDescribeTest(operations_base.OperationsTestBase):
     operation = self.MakeOperation(self.Project(), 'o1', True)
     self.ExpectGetOperationsRequest(self.Project(), 'o1', operation)
     op = self.Run('app operations describe o1')
-    self.assertEquals(operation, op)
+    self.assertEqual(operation, op)
 
   def testDescribeWithProperties(self):
     """Basic test to describe an operation."""
@@ -54,4 +55,4 @@ class OperationsDescribeTest(operations_base.OperationsTestBase):
                                    'o1', True, props=props)
     self.ExpectGetOperationsRequest(self.Project(), 'o1', operation)
     op = self.Run('app operations describe o1')
-    self.assertEquals(operation, op)
+    self.assertEqual(operation, op)

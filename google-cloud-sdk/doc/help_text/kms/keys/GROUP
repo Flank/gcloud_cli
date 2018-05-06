@@ -64,7 +64,8 @@ COMMANDS
         Update a key.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys
         $ gcloud beta kms keys
 

@@ -13,10 +13,15 @@
 # limitations under the License.
 """Tests for Spanner instances get-iam-policy command."""
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class GetIamPolicyTest(base.SpannerTestBase):
 
   def SetUp(self):
@@ -25,7 +30,8 @@ class GetIamPolicyTest(base.SpannerTestBase):
         params={'projectsId': self.Project()},
         collection='spanner.projects.instances')
 
-  def testGetIamPolicy(self):
+  def testGetIamPolicy(self, track):
+    self.track = track
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
@@ -44,7 +50,8 @@ class GetIamPolicyTest(base.SpannerTestBase):
         'spanner instances get-iam-policy insId')
     self.assertEqual(get_policy_request, test_iam_policy)
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
+    self.track = track
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(

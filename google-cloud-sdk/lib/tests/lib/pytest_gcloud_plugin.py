@@ -35,8 +35,10 @@ import random
 import sys
 import time
 
+
 from py._path import local
 import pytest
+import six
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
@@ -139,9 +141,12 @@ def _flatten_once(lists):
 def _get_root_dir():
   # This file lives in the tests/lib/ folder. The rootdir for all tests should
   # be tests/ regardless of where pytest was run from.
-  return local.LocalPath(os.path.dirname(
-      __file__.decode(sys.getfilesystemencoding() or
-                      sys.getdefaultencoding()))).join('..')
+  if six.PY2:
+    return local.LocalPath(
+        os.path.dirname(
+            __file__.decode(sys.getfilesystemencoding() or
+                            sys.getdefaultencoding()))).join('..')
+  return local.LocalPath(os.path.dirname(__file__)).join('..')
 
 
 @pytest.hookimpl(trylast=True)

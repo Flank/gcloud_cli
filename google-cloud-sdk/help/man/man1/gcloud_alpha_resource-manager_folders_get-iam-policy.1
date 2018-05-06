@@ -5,19 +5,24 @@
 
 .SH "NAME"
 .HP
-gcloud alpha resource\-manager folders get\-iam\-policy \- get IAM policy for a folder
+gcloud alpha resource\-manager folders get\-iam\-policy \- get the IAM policy for a folder
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha resource\-manager folders get\-iam\-policy\fR \fIFOLDER_ID\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha resource\-manager folders get\-iam\-policy\fR \fIFOLDER\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Gets the IAM policy for a folder, given a folder ID.
+\fB(ALPHA)\fR \fBgcloud alpha resource\-manager folders get\-iam\-policy\fR
+displays the IAM policy associated with a folder. If formatted as JSON, the
+output can be edited and used as a policy file for set\-iam\-policy. The output
+includes an "etag" field identifying the version emitted and allowing detection
+of concurrent policy updates; see $ {parent} set\-iam\-policy for additional
+details.
 
 
 
@@ -25,10 +30,17 @@ gcloud alpha resource\-manager folders get\-iam\-policy \- get IAM policy for a 
 
 .RS 2m
 .TP 2m
-\fIFOLDER_ID\fR
-ID for the folder whose policy you want to get.
+
+FOLDER \- The ID of the folder for which to display the IAM policy. This
+represents a Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIFOLDER\fR
+The ID of the folder\-id or a fully qualified identifier for the folder\-id.
 
 
+.RE
 .RE
 .sp
 
@@ -77,13 +89,20 @@ help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcloudresourcemanager/v2beta1\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/resource\-manager
+
+
+
 .SH "EXAMPLES"
 
-The following command prints the IAM policy for a folder with the ID
-\f53589215982\fR:
+To print the IAM policy for a given folder, run:
 
 .RS 2m
-$ gcloud alpha resource\-manager folders get\-iam\-policy 3589215982
+$ gcloud alpha resource\-manager folders get\-iam\-policy my\-folder
 .RE
 
 
@@ -94,5 +113,9 @@ This command is currently in ALPHA and may change without notice. Usually, users
 of ALPHA commands and flags need to apply for access, agree to applicable terms,
 and have their projects whitelisted. Contact Google or sign up on a product's
 page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta resource\-manager folders get\-iam\-policy
+.RE
 

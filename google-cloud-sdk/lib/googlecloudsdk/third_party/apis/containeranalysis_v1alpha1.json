@@ -958,6 +958,30 @@
         "operation": {
           "description": "Output only. An operation that indicates the status of the current scan.",
           "$ref": "Operation"
+        },
+        "analysisStatus": {
+          "description": "The status of discovery for the resource.",
+          "enumDescriptions": [
+            "Unknown",
+            "Resource is known but no action has been taken yet.",
+            "Resource is being analyzed.",
+            "Analysis has finished successfully.",
+            "Analysis has finished unsuccessfully, the analysis itself is in a bad\nstate.",
+            "Analysis will not happen, the resource is not supported."
+          ],
+          "type": "string",
+          "enum": [
+            "ANALYSIS_STATUS_UNSPECIFIED",
+            "PENDING",
+            "SCANNING",
+            "FINISHED_SUCCESS",
+            "FINISHED_FAILED",
+            "UNSUPPORTED_RESOURCE"
+          ]
+        },
+        "analysisStatusError": {
+          "description": "When an error is encountered this will contain a LocalizedMessage under\ndetails to show to the user. The LocalizedMessage output only and\npopulated by the API.",
+          "$ref": "Status"
         }
       }
     },
@@ -1055,7 +1079,7 @@
           ]
         },
         "pgpKeyId": {
-          "description": "The cryptographic fingerprint of the key used to generate the signature,\nas output by, e.g. `gpg --list-keys`. This should be the version 4, full\n160-bit fingerprint, expressed as a 40 character hexidecimal string. See\nhttps:\/\/tools.ietf.org\/html\/rfc4880#section-12.2 for details.\nImplementations may choose to acknowledge \"LONG\", \"SHORT\", or other\nabbreviated key IDs, but only the full fingerprint is guaranteed to work.\nIn gpg, the full fingerprint can be retrieved from the `fpr` field\nreturned when calling --list-keys with --with-colons.  For example:\n```\ngpg --with-colons --with-fingerprint --force-v4-certs \\\n    --list-keys attester@example.com\ntru::1:1513631572:0:3:1:5\npub:...<SNIP>...\nfpr:::::::::24FF6481B76AC91E66A00AC657A93A81EF3AE6FB:\n```\nAbove, the fingerprint is `24FF6481B76AC91E66A00AC657A93A81EF3AE6FB`.",
+          "description": "The cryptographic fingerprint of the key used to generate the signature,\nas output by, e.g. `gpg --list-keys`. This should be the version 4, full\n160-bit fingerprint, expressed as a 40 character hexadecimal string. See\nhttps:\/\/tools.ietf.org\/html\/rfc4880#section-12.2 for details.\nImplementations may choose to acknowledge \"LONG\", \"SHORT\", or other\nabbreviated key IDs, but only the full fingerprint is guaranteed to work.\nIn gpg, the full fingerprint can be retrieved from the `fpr` field\nreturned when calling --list-keys with --with-colons.  For example:\n```\ngpg --with-colons --with-fingerprint --force-v4-certs \\\n    --list-keys attester@example.com\ntru::1:1513631572:0:3:1:5\npub:...<SNIP>...\nfpr:::::::::24FF6481B76AC91E66A00AC657A93A81EF3AE6FB:\n```\nAbove, the fingerprint is `24FF6481B76AC91E66A00AC657A93A81EF3AE6FB`.",
           "type": "string"
         }
       }
@@ -1563,7 +1587,7 @@
     },
     "Policy": {
       "id": "Policy",
-      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` consists of a list of `bindings`. A `Binding` binds a list of\n`members` to a `role`, where the members can be user accounts, Google groups,\nGoogle domains, and service accounts. A `role` is a named list of permissions\ndefined by IAM.\n\n**Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/owner\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-other-app@appspot.gserviceaccount.com\",\n          ]\n        },\n        {\n          \"role\": \"roles\/viewer\",\n          \"members\": [\"user:sean@example.com\"]\n        }\n      ]\n    }\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
+      "description": "Defines an Identity and Access Management (IAM) policy. It is used to\nspecify access control policies for Cloud Platform resources.\n\n\nA `Policy` consists of a list of `bindings`. A `binding` binds a list of\n`members` to a `role`, where the members can be user accounts, Google groups,\nGoogle domains, and service accounts. A `role` is a named list of permissions\ndefined by IAM.\n\n**JSON Example**\n\n    {\n      \"bindings\": [\n        {\n          \"role\": \"roles\/owner\",\n          \"members\": [\n            \"user:mike@example.com\",\n            \"group:admins@example.com\",\n            \"domain:google.com\",\n            \"serviceAccount:my-other-app@appspot.gserviceaccount.com\"\n          ]\n        },\n        {\n          \"role\": \"roles\/viewer\",\n          \"members\": [\"user:sean@example.com\"]\n        }\n      ]\n    }\n\n**YAML Example**\n\n    bindings:\n    - members:\n      - user:mike@example.com\n      - group:admins@example.com\n      - domain:google.com\n      - serviceAccount:my-other-app@appspot.gserviceaccount.com\n      role: roles\/owner\n    - members:\n      - user:sean@example.com\n      role: roles\/viewer\n\n\nFor a description of IAM and its features, see the\n[IAM developer's guide](https:\/\/cloud.google.com\/iam\/docs).",
       "type": "object",
       "properties": {
         "version": {
@@ -1602,7 +1626,7 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` or `joe@example.com`.\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: A Google Apps domain name that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: A Google Apps domain name that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
@@ -1620,7 +1644,7 @@
           "type": "string"
         },
         "auditLogConfigs": {
-          "description": "The configuration for logging of each type of permission.\nNext ID: 4",
+          "description": "The configuration for logging of each type of permission.",
           "type": "array",
           "items": {
             "$ref": "AuditLogConfig"
@@ -1760,8 +1784,8 @@
         }
       }
     },
-    "OperationMetadata": {
-      "id": "OperationMetadata",
+    "GoogleDevtoolsContaineranalysisV1alpha1OperationMetadata": {
+      "id": "GoogleDevtoolsContaineranalysisV1alpha1OperationMetadata",
       "description": "Metadata for all operations used and required for all operations\nthat created by Container Analysis Providers",
       "type": "object",
       "properties": {
@@ -1772,6 +1796,23 @@
         },
         "endTime": {
           "description": "Output only. The time that this operation was marked completed or failed.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "GrafeasV1beta1OperationMetadata": {
+      "id": "GrafeasV1beta1OperationMetadata",
+      "description": "Metadata for an operation.",
+      "type": "object",
+      "properties": {
+        "createTime": {
+          "description": "Output only. The time this operation was created.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "endTime": {
+          "description": "Output only. The time that this operation was marked as done.",
           "type": "string",
           "format": "google-datetime"
         }
@@ -2207,7 +2248,7 @@
               "httpMethod": "POST",
               "parameters": {
                 "parent": {
-                  "description": "This field contains the project Id for example:\n\"project\/{project_id}",
+                  "description": "This field contains the project Id for example:\n\"projects\/{project_id}",
                   "location": "path",
                   "required": true,
                   "pattern": "^projects\/[^\/]+$",
@@ -2685,7 +2726,7 @@
                   "type": "string"
                 },
                 "parent": {
-                  "description": "This field contains the project Id for example:\n\"project\/{project_id}",
+                  "description": "This field contains the project Id for example:\n\"projects\/{project_id}",
                   "location": "query",
                   "type": "string"
                 },

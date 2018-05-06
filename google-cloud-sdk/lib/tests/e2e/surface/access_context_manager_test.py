@@ -32,7 +32,7 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
                                    cli_test_base.CliTestBase):
 
   ORG_ID = '1054311078602'
-  LEVEL_SPEC = ('[{"ipSubnetworks": ["10.0.0.0/24"]}, '
+  LEVEL_SPEC = ('[{"ipSubnetworks": ["8.8.8.8/32"]}, '
                 '{"members": ["user:example@example.com"]}]')
   PROJECT_NUMBER = '175742511250'
   # Requires an already-set-up regular zone, in case it runs multiple times
@@ -115,23 +115,23 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
         'access-context-manager policies list '
         '    --format disable '
         '    --organization ' + self.ORG_ID))
-    self.assertEquals(len(policies), 1)
+    self.assertEqual(len(policies), 1)
     policy_ref = resources.REGISTRY.Parse(
         policies[0].name, collection='accesscontextmanager.accessPolicies')
 
     with self._SetPolicyProperty(policy_ref.Name()):
       with self._CreateLevel() as level_id:
         level = self._DescribeLevel(level_id)
-        self.assertEquals(level.title, 'My Level ' + level_id)
+        self.assertEqual(level.title, 'My Level ' + level_id)
         self._UpdateLevel(level_id, 'My Level Redux ' + level_id)
         level = self._DescribeLevel(level_id)
-        self.assertEquals(level.title, 'My Level Redux ' + level_id)
+        self.assertEqual(level.title, 'My Level Redux ' + level_id)
         with self._CreateZone() as zone_id:
           zone = self._DescribeZone(zone_id)
-          self.assertEquals(zone.title, 'My Zone ' + zone_id)
+          self.assertEqual(zone.title, 'My Zone ' + zone_id)
           self._UpdateZone(zone_id, 'My Zone Redux ' + zone_id)
           zone = self._DescribeZone(zone_id)
-          self.assertEquals(zone.title, 'My Zone Redux ' + zone_id)
+          self.assertEqual(zone.title, 'My Zone Redux ' + zone_id)
 
 
 if __name__ == '__main__':

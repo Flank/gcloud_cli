@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'dataflow logs list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core.util import iso_duration
 from googlecloudsdk.core.util import times
 from tests.lib import sdk_test_base

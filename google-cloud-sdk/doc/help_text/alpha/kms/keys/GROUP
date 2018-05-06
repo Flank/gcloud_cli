@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha kms keys - create and manage keys
+
+SYNOPSIS
+    gcloud alpha kms keys GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A key represents a logical key that can be used for cryptographic
+    operations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     versions
+        (ALPHA) Create and manage versions.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding to a key.
+
+     create
+        (ALPHA) Create a new key.
+
+     describe
+        (ALPHA) Get metadata for a given key.
+
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a key.
+
+     list
+        (ALPHA) List the keys within a keyring.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove an IAM policy binding from a key.
+
+     remove-rotation-schedule
+        (ALPHA) Remove the rotation schedule for a key.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a key.
+
+     set-primary-version
+        (ALPHA) Set the primary version of a key.
+
+     set-rotation-schedule
+        (ALPHA) Update the rotation schedule for a key.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keys
+        $ gcloud beta kms keys
+

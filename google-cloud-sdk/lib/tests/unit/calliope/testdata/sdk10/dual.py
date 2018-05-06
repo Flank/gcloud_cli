@@ -13,6 +13,9 @@
 # limitations under the License.
 """This is a command for testing."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
@@ -24,5 +27,5 @@ class DualCommand(base.Command):
     parser.add_argument('--foo', help='Auxilio aliis.')
 
   def Run(self, args):
-    print 'This is the ALPHA track'
-    print args.foo
+    print('This is the ALPHA track')
+    print(args.foo)

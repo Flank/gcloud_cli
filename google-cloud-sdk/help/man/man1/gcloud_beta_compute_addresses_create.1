@@ -11,7 +11,7 @@ gcloud beta compute addresses create \- reserve IP addresses
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute addresses create\fR [\fINAME\fR\ ...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-addresses\fR=\fIADDRESS\fR,[\fIADDRESS\fR,...]\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute addresses create\fR [\fINAME\fR\ ...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-addresses\fR=\fIADDRESS\fR,[\fIADDRESS\fR,...]\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -42,6 +42,12 @@ The names of the addresses to create.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional textual description for the addresses.
+
+.TP 2m
+\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
+The network tier to assign to the reserved IP addresses.
+\f5\fINETWORK_TIER\fR\fR must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The
+default value is \f5PREMIUM\fR.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR

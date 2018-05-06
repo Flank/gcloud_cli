@@ -17,7 +17,7 @@ POSITIONAL ARGUMENTS
 FLAGS
      --zone=ZONE
         The zone of the target instances to delete. If not specified and the
-        compute/zone property isn't set, you will be prompted to select a zone.
+        compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

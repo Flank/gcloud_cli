@@ -60,6 +60,19 @@ help\fR for details.
 
 .SH "EXAMPLES"
 
+To see a list of all jobs, run:
+
+.RS 2m
+$ gcloud dataproc jobs list
+.RE
+
+To display these jobs with their respective IDs and underlying REST calls, run:
+
+.RS 2m
+$ gcloud dataproc jobs list \-\-format "table(reference.jobId)" \e
+  \-\-limit 1 \-\-log\-http
+.RE
+
 To view the output of a job as it runs, run:
 
 .RS 2m

@@ -11,15 +11,15 @@ gcloud container images add\-tag \- adds tags to existing image
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container images add\-tag\fR \fISRC_IMAGE\fR \fIDEST_IMAGE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container images add\-tag\fR \fISRC_IMAGE\fR \fIDEST_IMAGE\fR [\fIDEST_IMAGE\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-The container images add\-tag command adds the tag specified in the second tag
-parameter to the image referenced in the first tag parameter. Repositories must
-be hosted by the Google Container Registry.
+The container images add\-tag command adds the tag(s) specified in the second
+(and following) tag parameter(s) to the image referenced in the first tag
+parameter. Repositories must be hosted by the Google Container Registry.
 
 
 
@@ -28,14 +28,14 @@ be hosted by the Google Container Registry.
 .RS 2m
 .TP 2m
 \fISRC_IMAGE\fR
-The fully qualified name(s) of image(s) to add a tag for. The name(s) should be
+The fully qualified name(s) of image(s) to add tags for. The name(s) should be
 formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH@sha256:DIGEST or
 *.gcr.io/PROJECT_ID/IMAGE_PATH:TAG.
 
 .TP 2m
-\fIDEST_IMAGE\fR
-The fully qualified name(s) of image(s) to be the new tag. The name(s) should be
-formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH:TAG.
+\fIDEST_IMAGE\fR [\fIDEST_IMAGE\fR ...]
+The fully qualified name(s) of image(s) to be the new tags. The name(s) should
+be formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH:TAG.
 
 
 .RE

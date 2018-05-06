@@ -11,31 +11,41 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Base class for all ml speech tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py import encoding as apitools_encoding
 from apitools.base.py.testing import mock
-from googlecloudsdk.api_lib.ml.speech import speech_api_client
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.ml.speech import util
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
                        cli_test_base.CliTestBase):
   """Base class for gcloud ml speech command unit tests."""
 
+  _VERSIONS_FOR_RELEASE_TRACKS = {
+      calliope_base.ReleaseTrack.ALPHA: 'v1',
+      calliope_base.ReleaseTrack.BETA: 'v1',
+      calliope_base.ReleaseTrack.GA: 'v1'
+  }
+
   def SetUp(self):
     """Creates mock client and adds Unmock on cleanup."""
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.client = mock.Client(
-        client_class=apis.GetClientClass(
-            speech_api_client.SPEECH_API, speech_api_client.SPEECH_API_VERSION))
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.messages = apis.GetMessagesModule(
-        speech_api_client.SPEECH_API, speech_api_client.SPEECH_API_VERSION)
+    self.track = None
+    self.version = None
+    self.client = None
+    self.messages = None
+
     self.long_file = self.Resource('tests', 'unit', 'api_lib', 'ml', 'speech',
                                    'testdata', 'sample.raw')
     self.sample_error_details = [
@@ -46,12 +56,22 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
     ]
     self.StartPatch('time.sleep')
 
-  def _ExpectRecognizeRequest(
-      self, content=None, uri=None, enable_word_time_offsets=False,
-      language='en-US', encoding=None, sample_rate=None, hints=None,
-      max_alternatives=None, filter_profanity=False, results=None, error=None):
-    """Expect request to client.speech.Recognize method."""
-    request = self.messages.RecognizeRequest(
+  def SetUpForTrack(self, track):
+    self.track = track
+
+    self.version = self._VERSIONS_FOR_RELEASE_TRACKS[track]
+    self.client = mock.Client(
+        client_class=apis.GetClientClass(util.SPEECH_API, self.version))
+    self.client.Mock()
+    self.addCleanup(self.client.Unmock)
+    self.messages = apis.GetMessagesModule(util.SPEECH_API, self.version)
+
+  def _MakeRecognizeRequest(
+      self, request_type, content=None, uri=None,
+      enable_word_time_offsets=False, language='en-US', encoding=None,
+      sample_rate=None, hints=None, max_alternatives=None,
+      filter_profanity=False, enable_word_confidence=None):
+    request = request_type(
         audio=self.messages.RecognitionAudio(content=content,
                                              uri=uri),
         config=self.messages.RecognitionConfig(
@@ -65,6 +85,26 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
             profanityFilter=filter_profanity,
             maxAlternatives=max_alternatives)
     )
+
+    try:
+      # Command default value
+      request.config.enableWordConfidence = False
+    except AttributeError:
+      pass  # This is expected for some API versions
+    if enable_word_confidence is not None:
+      request.config.enableWordConfidence = enable_word_confidence
+    return request
+
+  def _ExpectRecognizeRequest(
+      self, content=None, uri=None, enable_word_time_offsets=False,
+      language='en-US', encoding=None, sample_rate=None, hints=None,
+      max_alternatives=None, filter_profanity=False,
+      enable_word_confidence=None, results=None, error=None):
+    """Expect request to client.speech.Recognize method."""
+    request = self._MakeRecognizeRequest(
+        self.messages.RecognizeRequest,
+        content, uri, enable_word_time_offsets, language, encoding, sample_rate,
+        hints, max_alternatives, filter_profanity, enable_word_confidence)
     if results:
       response = self.messages.RecognizeResponse(
           results=[
@@ -83,23 +123,13 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
   def _ExpectLongRunningRecognizeRequest(
       self, content=None, uri=None, language='en-US',
       enable_word_time_offsets=False, encoding=None, sample_rate=None,
-      hints=None, max_alternatives=None, filter_profanity=False, result=None,
-      error=None):
+      hints=None, max_alternatives=None, filter_profanity=False,
+      enable_word_confidence=None, result=None, error=None):
     """Expect request to client.speech.Longrunningrecognize method."""
-    request = self.messages.LongRunningRecognizeRequest(
-        audio=self.messages.RecognitionAudio(content=content,
-                                             uri=uri),
-        config=self.messages.RecognitionConfig(
-            enableWordTimeOffsets=enable_word_time_offsets,
-            languageCode=language,
-            encoding=self.messages.RecognitionConfig.EncodingValueValuesEnum(
-                encoding or 'ENCODING_UNSPECIFIED'),
-            sampleRateHertz=sample_rate,
-            speechContexts=[self.messages.SpeechContext(phrases=hints or [])],
-            profanityFilter=filter_profanity,
-            maxAlternatives=max_alternatives
-        )
-    )
+    request = self._MakeRecognizeRequest(
+        self.messages.LongRunningRecognizeRequest,
+        content, uri, enable_word_time_offsets, language, encoding, sample_rate,
+        hints, max_alternatives, filter_profanity, enable_word_confidence)
     response = self.messages.Operation(name=result) if result else None
     self.client.speech.Longrunningrecognize.Expect(
         request,
@@ -113,8 +143,8 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
       operation.done = True
       operation.response = apitools_encoding.PyValueToMessage(
           self.messages.Operation.ResponseValue,
-          {'@type': ('type.googleapis.com/google.cloud.speech.v1.LongRunning'
-                     'RecognizeResponse'),
+          {'@type': ('type.googleapis.com/google.cloud.speech.{}.LongRunning'
+                     'RecognizeResponse').format(self.version),
            'results': [
                {'alternatives': [{'confidence': 0.8, 'transcript': text}
                                  for text in results]}]})

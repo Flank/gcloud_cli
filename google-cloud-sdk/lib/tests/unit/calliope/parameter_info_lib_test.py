@@ -14,6 +14,8 @@
 
 """Unit tests for the calliope.parameter_info_lib module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.util import parameter_info_lib
 from googlecloudsdk.core import properties
 from tests.lib import completer_test_data

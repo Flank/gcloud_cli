@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha dlp images inspect - finds potentially sensitive data in image
+        content
+
+SYNOPSIS
+    gcloud alpha dlp images inspect IMAGE --info-types=[INFOTYPE,...]
+        [--exclude-info-types] [--include-quote]
+        [--max-findings=MAX_FINDINGS; default=1000]
+        [--min-likelihood=MIN_LIKELIHOOD; default="possible"]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Finds potentially sensitive data in image content.
+
+POSITIONAL ARGUMENTS
+     IMAGE
+        Image file to search for sensitive info. The file type must be one of
+        PNG, JPEG, SVG, or BMP.
+
+REQUIRED FLAGS
+     --info-types=[INFOTYPE,...]
+        Which infoTypes to look for. The values must correspond to InfoType
+        values found in documentation. For more information about valid
+        infoTypes, see InfoTypes Reference
+        (https://cloud.google.com/dlp/docs/infotypes-reference)
+
+OPTIONAL FLAGS
+     --exclude-info-types
+        Whether or not to exclude type information of the findings. Type
+        information is included by default.
+
+     --include-quote
+        If True, the server will attempt to filter out profanities, replacing
+        all but the initial character in each filtered word with asterisks,
+        e.g. \"f**\".
+
+     --max-findings=MAX_FINDINGS; default=1000
+        Maximum number of findings that will be returned per execution.
+
+        If not specified, will return up to the system maximum of 1000
+        findings.
+
+     --min-likelihood=MIN_LIKELIHOOD; default="possible"
+        Only return findings equal to or above this threshold. One of:
+        very-unlikely, unlikely, possible, likely, very-likely. The default
+        value is possible. MIN_LIKELIHOOD must be one of: likely, possible,
+        unlikely, very-likely, very-unlikely.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the dlp/v2 API. The full documentation for this API can
+    be found at: https://cloud.google.com/dlp/docs/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

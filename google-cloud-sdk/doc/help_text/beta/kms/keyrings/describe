@@ -28,8 +28,9 @@ EXAMPLES
         $ gcloud beta kms keyrings describe towers --location us-east1
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud kms keyrings describe
+        $ gcloud alpha kms keyrings describe
 

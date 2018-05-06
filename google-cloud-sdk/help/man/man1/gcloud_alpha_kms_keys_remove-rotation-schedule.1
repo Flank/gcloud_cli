@@ -1,0 +1,69 @@
+
+.TH "GCLOUD_ALPHA_KMS_KEYS_REMOVE\-ROTATION\-SCHEDULE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha kms keys remove\-rotation\-schedule \- remove the rotation schedule for a key
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha kms keys remove\-rotation\-schedule\fR \fIKEY\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Removes the rotation schedule for the given key.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIKEY\fR
+Name of the key from which to clear the rotation schedule.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command removes the rotation schedule for the key named
+\f5frodo\fR within the keyring \f5fellowship\fR and location \f5global\fR:
+
+.RS 2m
+$ gcloud alpha kms keys remove\-rotation\-schedule frodo \e
+    \-\-location global \e
+    \-\-keyring fellowship
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud kms keys remove\-rotation\-schedule
+$ gcloud beta kms keys remove\-rotation\-schedule
+.RE
+

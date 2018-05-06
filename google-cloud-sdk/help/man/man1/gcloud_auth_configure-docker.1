@@ -1,0 +1,50 @@
+
+.TH "GCLOUD_AUTH_CONFIGURE\-DOCKER" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud auth configure\-docker \- registers gcloud as a Docker credential helper
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud auth configure\-docker\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Adds Docker \f5credHelper\fR entry to Docker's configuration file, or creates
+the file if it doesn't exist, which will register gcloud as the credential
+helper for all Google supported Docker registries.
+
+If Docker configuration already contains a \f5credHelper\fR entry it will be
+overwritten.
+
+See
+https://docs.docker.com/engine/reference/commandline/login/#credential\-helpers
+for more details on Docker credential helpers.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha auth configure\-docker
+$ gcloud beta auth configure\-docker
+.RE
+

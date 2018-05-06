@@ -16,19 +16,20 @@
 from googlecloudsdk.api_lib.util import apis
 from surface.firebase.test.android import run
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test.android import unit_base
 
 TOOLRESULTS_MESSAGES = apis.GetMessagesModule('toolresults', 'v1beta3')
 
 HISTORY_LIST_REQ = TOOLRESULTS_MESSAGES.ToolresultsProjectsHistoriesListRequest(
-    projectId=unit_base._Base.PROJECT_ID, filterByName='superbowl.49')
+    projectId=unit_base.AndroidUnitTestBase.PROJECT_ID,
+    filterByName='superbowl.49')
 HISTORY_WITH_ID1 = TOOLRESULTS_MESSAGES.History(
     name='superbowl.49', historyId='bh.1')
 HISTORY_WITH_ID2 = TOOLRESULTS_MESSAGES.History(
     name='superbowl.49', historyId='bh.2')
 
 
-class ToolResultsHistoryPickerTest(unit_base.TestMockClientTest):
+class ToolResultsHistoryPickerTest(unit_base.AndroidMockClientTest):
   """Unit tests for the history picker."""
 
   def testHistoryCreatedIfDoesNotExist(self):

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for the client_adapter module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 from apitools.base.py import batch
 
@@ -23,6 +25,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 import mock
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 Payload = collections.namedtuple(
@@ -44,8 +47,8 @@ class ClientAdapterTest(sdk_test_base.SdkBase):
         batch.BatchApiRequest, 'Execute', return_value=responses):
       result = self.adapter.BatchRequests([], errors_to_collect)
 
-    self.assertEquals([], result)
-    self.assertEquals([], errors_to_collect)
+    self.assertEqual([], result)
+    self.assertEqual([], errors_to_collect)
 
   def testBatch_SingleRequest(self):
     requests = [
@@ -65,32 +68,30 @@ class ClientAdapterTest(sdk_test_base.SdkBase):
       result = self.adapter.BatchRequests(requests, errors_to_collect)
 
     self.assertEqual(len(requests), len(responses))
-    self.assertEquals(['Some response'], result)
-    self.assertEquals([], errors_to_collect)
+    self.assertEqual(['Some response'], result)
+    self.assertEqual([], errors_to_collect)
 
   def testBatch_MultipleRequest(self):
-    requests = [
-        (self.client.instances,
-         'Get',
-         self.messages.ComputeInstancesGetRequest(instance='instance=X',
-                                                  zone='zone-X',
-                                                  project='project-X'))
-        for i in xrange(3)
-    ]
+    requests = [(self.client.instances, 'Get',
+                 self.messages.ComputeInstancesGetRequest(
+                     instance='instance=X', zone='zone-X', project='project-X'))
+                for i in range(3)]
     errors_to_collect = []
     responses = [
-        Payload(response='Some response {}'.format(i),
-                is_error=False, exception=None) for i in xrange(3)
+        Payload(
+            response='Some response {}'.format(i),
+            is_error=False,
+            exception=None) for i in range(3)
     ]
 
     with mock.patch.object(
         batch.BatchApiRequest, 'Execute', return_value=responses):
       result = self.adapter.BatchRequests(requests, errors_to_collect)
 
-    self.assertEquals(['Some response 0', 'Some response 1', 'Some response 2'],
-                      result)
+    self.assertEqual(['Some response 0', 'Some response 1', 'Some response 2'],
+                     result)
     self.assertEqual(len(requests), len(responses))
-    self.assertEquals([], errors_to_collect)
+    self.assertEqual([], errors_to_collect)
 
   def testBatch_SingleError(self):
     requests = [
@@ -115,10 +116,10 @@ class ClientAdapterTest(sdk_test_base.SdkBase):
         batch.BatchApiRequest, 'Execute', return_value=responses):
       result = self.adapter.BatchRequests(requests, errors_to_collect)
 
-    self.assertEquals(['Some response'], result)
+    self.assertEqual(['Some response'], result)
     self.assertEqual(len(requests), len(responses))
-    self.assertEquals([api_exceptions.HttpException(http_err)],
-                      errors_to_collect)
+    self.assertEqual([api_exceptions.HttpException(http_err)],
+                     errors_to_collect)
 
 
 if __name__ == '__main__':

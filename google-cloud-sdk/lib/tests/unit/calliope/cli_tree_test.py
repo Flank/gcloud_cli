@@ -14,6 +14,8 @@
 
 """Tests for the calliope.cli_tree module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import cli_tree
@@ -249,7 +251,7 @@ class DumpLoadTest(calliope_test_base.CalliopeTestBase):
     self.ClearOutput()
 
     # Verify the current version was loaded.
-    self.assertEquals(cli_tree.VERSION, tree[cli_tree.LOOKUP_VERSION])
+    self.assertEqual(cli_tree.VERSION, tree[cli_tree.LOOKUP_VERSION])
 
     # Change the current version, reload the tree, verify it was regenerated
     # with the new version.
@@ -262,7 +264,7 @@ class DumpLoadTest(calliope_test_base.CalliopeTestBase):
       cli_tree.VERSION = old_version
 
     # The regenerated tree should have the new version.
-    self.assertEquals(new_version, tree[cli_tree.LOOKUP_VERSION])
+    self.assertEqual(new_version, tree[cli_tree.LOOKUP_VERSION])
 
 
 if __name__ == '__main__':

@@ -4,9 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud beta bigtable instances update INSTANCE
-        [--instance-type=INSTANCE_TYPE]
-        [--description=DESCRIPTION | --display-name=DISPLAY_NAME]
-        [GCLOUD_WIDE_FLAG ...]
+        [--display-name=DISPLAY_NAME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Modify an existing Bigtable instance.
@@ -16,29 +14,8 @@ POSITIONAL ARGUMENTS
         ID of the instance.
 
 FLAGS
-     --instance-type=INSTANCE_TYPE
-        (DEPRECATED) Change the instance type. Note development instances can
-        be promoted to production instances, but production instances cannot be
-        downgraded to development.
-
-        Upgrading development instances with --instance-type is deprecated. Use
-        the bigtable instances upgrade command instead. INSTANCE_TYPE must be
-        (currently only one value is supported):
-
-         PRODUCTION
-            Production instances have a minimum of three nodes, provide high
-            availability, and are suitable for applications in production.
-
-     At most one of these may be specified:
-
-       --description=DESCRIPTION
-          (DEPRECATED) Friendly name of the instance.
-
-          Flag --description is deprecated. Use --display-name=DISPLAY_NAME
-          instead.
-
-       --display-name=DISPLAY_NAME
-          Friendly name of the instance.
+     --display-name=DISPLAY_NAME
+        Friendly name of the instance.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

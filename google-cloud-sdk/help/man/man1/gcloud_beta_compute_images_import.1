@@ -11,7 +11,7 @@ gcloud beta compute images import \- import a Google Compute Engine image
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute images import\fR \fIIMAGE_NAME\fR (\fB\-\-os\fR=\fIOS\fR\ |\ \fB\-\-no\-translate\fR) (\fB\-\-source\-file\fR=\fISOURCE_FILE\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR) [\fB\-\-async\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute images import\fR \fIIMAGE_NAME\fR (\fB\-\-data\-disk\fR\ |\ \fB\-\-os\fR=\fIOS\fR) (\fB\-\-source\-file\fR=\fISOURCE_FILE\fR\ |\ \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR) [\fB\-\-async\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -34,7 +34,7 @@ This command will perform all three of these steps as necessary, depending on
 the input arguments specified by the user.
 
 This command uses the \f5\-\-os\fR flag to choose the appropriate translation.
-You can omit the translation step using the \f5\-\-no\-translate\fR flag.
+You can omit the translation step using the \f5\-\-data\-disk\fR flag.
 
 
 
@@ -58,17 +58,17 @@ Exactly one of these must be specified:
 
 .RS 2m
 .TP 2m
+\fB\-\-data\-disk\fR
+Specifies that the disk has no bootable OS installed on it. Imports the disk
+without making it bootable or installing Google tools on it.
+
+.TP 2m
 \fB\-\-os\fR=\fIOS\fR
-Specifies the OS of the image being translated. \fIOS\fR must be one of:
+Specifies the OS of the image being imported. \fIOS\fR must be one of:
 \fBcentos\-6\fR, \fBcentos\-7\fR, \fBdebian\-8\fR, \fBdebian\-9\fR,
 \fBrhel\-6\fR, \fBrhel\-6\-byol\fR, \fBrhel\-7\fR, \fBrhel\-7\-byol\fR,
 \fBubuntu\-1404\fR, \fBubuntu\-1604\fR, \fBwindows\-2008r2\fR,
 \fBwindows\-2012r2\fR, \fBwindows\-2016\fR.
-
-.TP 2m
-\fB\-\-translate\fR
-Import the disk without making it bootable or installing Google tools on it.
-Enabled by default, use \fB\-\-no\-translate\fR to disable.
 
 .RE
 .sp
@@ -85,7 +85,7 @@ import. For example: \f5\fIgs://my\-bucket/my\-image.vmdk\fR\fR or
 
 .TP 2m
 \fB\-\-source\-image\fR=\fISOURCE_IMAGE\fR
-The name of the imported image to translate.
+An existing Compute Engine image from which to import.
 
 
 .RE
@@ -112,6 +112,12 @@ Maximum time a build can last before it is failed as "TIMEOUT". For example,
 specifying \f5\fI2h\fR\fR will fail the process after 2 hours. See $ gcloud
 topic datetimes for information on duration formats.
 
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the image to import. The zone in which to do the work of importing
+the image. Overrides the default \fBcompute/zone\fR property value for this
+command invocation.
+
 
 .RE
 .sp
@@ -127,10 +133,11 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute images import
 $ gcloud alpha compute images import
 .RE
 

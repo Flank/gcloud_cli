@@ -13,6 +13,8 @@
 # limitations under the License.
 """Command to list SSL policies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.calliope import base
@@ -20,7 +22,6 @@ from googlecloudsdk.command_lib.compute.ssl_policies import flags
 from googlecloudsdk.core import properties
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class List(base.ListCommand):
   """List Google Compute Engine SSL policies."""
 

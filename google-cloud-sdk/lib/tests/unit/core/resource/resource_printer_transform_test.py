@@ -708,9 +708,9 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
   def testTableTransformMapNestedList(self):
     self.Print(projection='(abc[].def[].ghi[].map().list())',
                resource=_RESOURCE_NESTED_LIST)
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputMatches(textwrap.dedent("""\
         GHI
-        [u'[1, 2],[3, 4]', u'[5, 6],[7, 8]']
+        \\[u?'\\[1, 2],\\[3, 4]', u?'\\[5, 6],\\[7, 8]']
         """))
 
   def testTableTransformMapNestedList0(self):
@@ -724,17 +724,17 @@ class ResourcePrinterTransformTest(resource_printer_test_base.Base):
   def testTableTransformMapNestedList1(self):
     self.Print(projection='(abc[].def[].ghi[].map(1).list())',
                resource=_RESOURCE_NESTED_LIST)
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputMatches(textwrap.dedent("""\
         GHI
-        [u'[1, 2],[3, 4]', u'[5, 6],[7, 8]']
+        \\[u?'\\[1, 2],\\[3, 4]', u?'\\[5, 6],\\[7, 8]']
         """))
 
   def testTableTransformMapNestedList2(self):
     self.Print(projection='(abc[].def[].ghi[].map(2).list())',
                resource=_RESOURCE_NESTED_LIST)
-    self.AssertOutputEquals(textwrap.dedent("""\
+    self.AssertOutputMatches(textwrap.dedent("""\
         GHI
-        [u'1,2', u'3,4', u'5,6', u'7,8']
+        \\[u?'1,2', u?'3,4', u?'5,6', u?'7,8']
         """))
 
   def testTableTransformMapNestedList3(self):

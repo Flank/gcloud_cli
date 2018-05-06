@@ -96,8 +96,8 @@ class ListTest(base.GenomicsUnitTest):
         request=self.messages.SearchCallSetsRequest(variantSetIds=['42']),
         exception=self.MakeHttpError(403,
                                      'Permission denied; need GET permission'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Permission denied; need GET permission'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Permission denied; need GET permission'):
       self.RunGenomics(['callsets', 'list', '42'])
 
 if __name__ == '__main__':

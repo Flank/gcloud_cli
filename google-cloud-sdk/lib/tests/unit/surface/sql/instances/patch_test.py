@@ -159,10 +159,10 @@ class _BaseInstancePatchTest(object):
 
   def testPatchAuthorizedNetworksBadCidr(self):
     self.WriteInput('n\n')
-    with self.assertRaisesRegexp(cli_test_base.MockArgumentError,
-                                 r'argument --authorized-networks: Bad value '
-                                 r'\[abc\]: Must be specified in CIDR '
-                                 r'notation'):
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
+                                r'argument --authorized-networks: Bad value '
+                                r'\[abc\]: Must be specified in CIDR '
+                                r'notation'):
       self.Run('sql instances patch custom-instance '
                '--authorized-networks abc')
 
@@ -334,6 +334,37 @@ class _BaseInstancePatchTest(object):
     with self.assertRaises(exceptions.ToolException):
       self.Run('sql instances patch custom-instance --no-backup '
                '--enable-bin-log')
+
+  def testPatchRemoveHighAvailability(self):
+    instance_name = 'custom-instance'
+    diff = {
+        'name': instance_name,
+        'databaseVersion': 'POSTGRES_9_6',
+        'settings': {
+            'availabilityType': 'REGIONAL',
+            'tier': 'db-custom-1-1024'
+        }
+    }
+    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+    update_diff = {
+        'name': instance_name,
+        'settings': {
+            'availabilityType': 'ZONAL'
+        }
+    }
+    self.ExpectInstancePatch(self.GetPatchRequestInstance(), update_diff)
+    self.ExpectDoneUpdateOperationGet()
+    diff['settings'].update(update_diff['settings'])
+    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+
+    self.Run('sql instances patch custom-instance --availability-type=ZONAL '
+             '--quiet --diff')
+    self.AssertOutputContains(
+        """\
+-settings.availabilityType: REGIONAL
++settings.availabilityType: ZONAL
+""",
+        normalize_space=True)
 
 
 class InstancesPatchGATest(_BaseInstancePatchTest, base.SqlMockTestGA):
@@ -555,38 +586,6 @@ class InstancesPatchBetaTest(_BaseInstancePatchTest, base.SqlMockTestBeta):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run('sql instances patch custom-instance '
                '--remove-labels=foo --clear-labels')
-
-  def testPatchRemoveHighAvailability(self):
-    instance_name = 'custom-instance'
-    diff = {
-        'name': instance_name,
-        'databaseVersion': 'POSTGRES_9_6',
-        'settings': {
-            'availabilityType': 'REGIONAL',
-            'tier': 'db-custom-1-1024'
-        }
-    }
-    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
-    update_diff = {
-        'name': instance_name,
-        'settings': {
-            'availabilityType': 'ZONAL'
-        }
-    }
-    self.ExpectInstancePatch(self.GetPatchRequestInstance(), update_diff)
-    self.ExpectDoneUpdateOperationGet()
-    diff['settings'].update(update_diff['settings'])
-    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
-
-    self.Run('sql instances patch custom-instance --availability-type=ZONAL '
-             '--quiet --diff')
-    self.AssertOutputContains(
-        """\
--settings.availabilityType: REGIONAL
-+settings.availabilityType: ZONAL
-""",
-        normalize_space=True)
-
 
 if __name__ == '__main__':
   test_case.main()

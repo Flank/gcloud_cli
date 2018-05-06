@@ -11,7 +11,7 @@ gcloud alpha ml speech recognize\-long\-running \- get transcripts of longer aud
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml speech recognize\-long\-running\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-async\fR] [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml speech recognize\-long\-running\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-async\fR] [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-confidence\fR] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -106,6 +106,10 @@ the vocabulary of the recognizer. See
 https://cloud.google.com/speech/limits#content.
 
 .TP 2m
+\fR\-\-include\-word\-confidence\fB
+Include a list of words and the confidence for those words in the top result.
+
+.TP 2m
 \fR\-\-include\-word\-time\-offsets\fB
 If True, the top result includes a list of words with the start and end time
 offsets (timestamps) for those words. If False, no word\-level time offset
@@ -139,8 +143,8 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBspeech/v1\fR API. The full documentation for this API
-can be found at: https://cloud.google.com/speech/
+This command uses the \fBspeech/v1p1beta1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/speech/
 
 
 

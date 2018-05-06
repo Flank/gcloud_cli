@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Cloud Datastore rewrite backends."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.datastore import rewrite_backend
 from googlecloudsdk.core.resource import resource_exceptions
 from tests.lib import test_case

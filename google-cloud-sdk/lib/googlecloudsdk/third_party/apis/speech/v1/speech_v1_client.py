@@ -24,7 +24,7 @@ class SpeechV1(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new speech handle."""
     url = url or self.BASE_URL
     super(SpeechV1, self).__init__(
@@ -33,7 +33,8 @@ class SpeechV1(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.operations = self.OperationsService(self)
     self.speech = self.SpeechService(self)
 
@@ -48,7 +49,7 @@ class SpeechV1(base_api.BaseApiClient):
           }
 
     def Get(self, request, global_params=None):
-      """Gets the latest state of a long-running operation.  Clients can use this.
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
 method to poll the operation result at intervals as recommended by the API
 service.
 
@@ -87,7 +88,7 @@ service.
           }
 
     def Longrunningrecognize(self, request, global_params=None):
-      """Performs asynchronous speech recognition: receive results via the.
+      r"""Performs asynchronous speech recognition: receive results via the.
 google.longrunning.Operations interface. Returns either an
 `Operation.error` or an `Operation.response` which contains
 a `LongRunningRecognizeResponse` message.
@@ -116,7 +117,7 @@ a `LongRunningRecognizeResponse` message.
     )
 
     def Recognize(self, request, global_params=None):
-      """Performs synchronous speech recognition: receive results after all audio.
+      r"""Performs synchronous speech recognition: receive results after all audio.
 has been sent and processed.
 
       Args:

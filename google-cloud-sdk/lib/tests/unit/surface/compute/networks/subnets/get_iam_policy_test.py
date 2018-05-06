@@ -14,18 +14,84 @@
 """Generate tests for the get-iam-policy subcommand."""
 import textwrap
 
+from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import cli_test_base
+from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
-messages = core_apis.GetMessagesModule('compute', 'beta')
 
-
-class GetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
+class GetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def SetUp(self):
+    api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.messages = core_apis.GetMessagesModule('compute', api_version)
+    self.mock_client = mock.Client(
+        core_apis.GetClientClass('compute', api_version),
+        real_client=core_apis.GetClientInstance('compute', api_version,
+                                                no_http=True))
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
+
+  def testSimpleEmptyResponseCase(self):
+    self.mock_client.subnetworks.GetIamPolicy.Expect(
+        self.messages.ComputeSubnetworksGetIamPolicyRequest(
+            resource='my-resource', region='my-region', project='fake-project'),
+        response=test_resources.EmptyAlphaIamPolicy())
+
+    self.Run("""
+        compute networks subnets get-iam-policy --region=my-region my-resource
+        """)
+
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            etag: dGVzdA==
+            """))
+
+  def testSimpleResponseCase(self):
+    self.mock_client.subnetworks.GetIamPolicy.Expect(
+        self.messages.ComputeSubnetworksGetIamPolicyRequest(
+            resource='my-resource', region='my-region', project='fake-project'),
+        response=test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+
+    self.Run("""
+        compute networks subnets get-iam-policy --region=my-region my-resource
+        """)
+
+    self.assertMultiLineEqual(
+        self.GetOutput(),
+        textwrap.dedent("""\
+            bindings:
+            - members:
+              - user:testuser@google.com
+              role: owner
+            etag: ZXRhZ1R3bw==
+            """))
+
+  def testListCommandFilter(self):
+    self.mock_client.subnetworks.GetIamPolicy.Expect(
+        self.messages.ComputeSubnetworksGetIamPolicyRequest(
+            resource='my-resource', region='my-region', project='fake-project'),
+        response=test_resources.AlphaIamPolicyWithOneBindingAndDifferentEtag())
+
+    self.Run("""
+        compute networks subnets get-iam-policy --region=my-region my-resource
+        --flatten=bindings[].members --filter=bindings.role:owner
+        --format='value(bindings.members)'
+        """)
+
+    self.AssertOutputContains('user:testuser@google.com')
+
+
+class GetIamPolicyBetaTest(test_base.BaseTest, test_case.WithOutputCapture):
+
+  def SetUp(self):
+    self.messages = core_apis.GetMessagesModule('compute', 'beta')
     self.SelectApi('beta')
     self.track = calliope_base.ReleaseTrack.BETA
 
@@ -39,7 +105,7 @@ class GetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
     self.CheckRequests(
         [(self.compute.subnetworks,
           'GetIamPolicy',
-          messages.ComputeSubnetworksGetIamPolicyRequest(
+          self.messages.ComputeSubnetworksGetIamPolicyRequest(
               resource='my-resource',
               project='my-project',
               region='region-1'))],
@@ -60,7 +126,7 @@ class GetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
     self.CheckRequests(
         [(self.compute.subnetworks,
           'GetIamPolicy',
-          messages.ComputeSubnetworksGetIamPolicyRequest(
+          self.messages.ComputeSubnetworksGetIamPolicyRequest(
               resource='my-resource',
               project='my-project',
               region='region-1'))],
@@ -88,7 +154,7 @@ class GetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
     self.CheckRequests(
         [(self.compute.subnetworks,
           'GetIamPolicy',
-          messages.ComputeSubnetworksGetIamPolicyRequest(
+          self.messages.ComputeSubnetworksGetIamPolicyRequest(
               resource='my-resource',
               project='my-project',
               region='region-1'))],

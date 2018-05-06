@@ -4,11 +4,11 @@ NAME
 
 SYNOPSIS
     gcloud firebase test android run [ARGSPEC] [--app=APP]
-        [--device=DIMENSION=VALUE,[DIMENSION=VALUE,...]] [--test=TEST]
-        [--timeout=TIMEOUT] [--type=TYPE] [--app-package=APP_PACKAGE] [--async]
+        [--device=DIMENSION=VALUE,[...]] [--test=TEST] [--timeout=TIMEOUT]
+        [--type=TYPE] [--app-package=APP_PACKAGE] [--async]
         [--no-auto-google-login] [--directories-to-pull=[DIR_TO_PULL,...]]
         [--environment-variables=[KEY=VALUE,...]]
-        [--obb-files=OBB_FILE,[OBB_FILE,...]] [--no-performance-metrics]
+        [--obb-files=OBB_FILE,[OBB_FILE]] [--no-performance-metrics]
         [--no-record-video] [--results-bucket=RESULTS_BUCKET]
         [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME]
@@ -18,12 +18,11 @@ SYNOPSIS
         [--max-steps=int] [--robo-directives=[TYPE:RESOURCE_NAME=INPUT,...]]
         [--device-ids=MODEL_ID,[MODEL_ID,...], -d MODEL_ID,[MODEL_ID,...]]
         [--locales=LOCALE,[LOCALE,...], -l LOCALE,[LOCALE,...]]
-        [--orientations=ORIENTATION,[ORIENTATION,...],
-          -o ORIENTATION,[ORIENTATION,...]]
-        [--os-version-ids=OS_VERSION_ID,[OS_VERSION_ID,...],
-          -v OS_VERSION_ID,[OS_VERSION_ID,...]] [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+        [--orientations=ORIENTATION,[ORIENTATION],
+          -o ORIENTATION,[ORIENTATION]]
+        [--os-version-ids=OS_VERSION_ID,[...], -v OS_VERSION_ID,[...]]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud firebase test android run invokes and monitors tests in Firebase
@@ -59,7 +58,7 @@ COMMONLY USED FLAGS
         The path to the application binary file. The path may be in the local
         filesystem or in Google Cloud Storage using gs:// notation.
 
-     --device=DIMENSION=VALUE,[DIMENSION=VALUE,...]
+     --device=DIMENSION=VALUE,[...]
         A list of DIMENSION=VALUE pairs which specify a target device to test
         against. This flag may be repeated to specify multiple devices. The
         four device dimensions are: model, version, locale, and orientation. If
@@ -127,7 +126,7 @@ FLAGS
         coverage=true,coverageFile="/sdcard/coverage.ec" to enable code
         coverage and provide a file path to store the coverage results.
 
-     --obb-files=OBB_FILE,[OBB_FILE,...]
+     --obb-files=OBB_FILE,[OBB_FILE]
         A list of one or two Android OBB file names which will be copied to
         each test device before the tests will run (default: None). Each OBB
         file name must conform to the format as specified by Android (e.g.
@@ -233,12 +232,12 @@ DEPRECATED DEVICE DIMENSIONS FLAGS
         The list of LOCALEs to test against (default: a single locale
         determined by the Firebase Test Lab device catalog).
 
-     --orientations=ORIENTATION,[ORIENTATION,...], -o ORIENTATION,[ORIENTATION,...]
+     --orientations=ORIENTATION,[ORIENTATION], -o ORIENTATION,[ORIENTATION]
         The device orientation(s) to test against (default: portrait).
         Specifying 'default' will pick the preferred orientation for the app.
         ORIENTATION must be one of: portrait, landscape, default.
 
-     --os-version-ids=OS_VERSION_ID,[OS_VERSION_ID,...], -v OS_VERSION_ID,[OS_VERSION_ID,...]
+     --os-version-ids=OS_VERSION_ID,[...], -v OS_VERSION_ID,[...]
         The list of OS_VERSION_IDs to test against (default: a version ID
         determined by the Firebase Test Lab device catalog).
 
@@ -267,9 +266,6 @@ LIST COMMAND FLAGS
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
-
-     --uri
-        Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

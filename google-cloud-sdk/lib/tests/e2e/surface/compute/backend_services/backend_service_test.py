@@ -239,17 +239,11 @@ class BackendServicesTestBeta(BackendServicesTest):
   def SetUp(self):
     self._SetUpReleaseTrack(calliope_base.ReleaseTrack.BETA, 'beta')
 
-
-class BackendServicesTestAlpha(BackendServicesTestBeta):
-
-  def SetUp(self):
-    self._SetUpReleaseTrack(calliope_base.ReleaseTrack.ALPHA, 'alpha')
-
   def testHttpBackendServiceLb(self):
     """Verifies backend service operations when using a HTTP health check."""
     self.HttpBackendServiceLbTests(cache_max_age_sec=1234)
 
-  def testCustomRequestHeaderpBackendServiceLb(self):
+  def testCustomRequestHeadersBackendServiceLb(self):
     hc_name = self.CreateHttpHealthCheck()
     bs_name = self.CreateHttpBackendService(hc_name)
 
@@ -260,7 +254,13 @@ class BackendServicesTestAlpha(BackendServicesTestBeta):
     result = self.Run('compute backend-services describe {0} --global'
                       .format(bs_name))
     result_list = resource_projector.MakeSerializable(result)
-    self.assertEquals('Test:', result_list['customRequestHeaders'][0])
+    self.assertEqual('Test:', result_list['customRequestHeaders'][0])
+
+
+class BackendServicesTestAlpha(BackendServicesTestBeta):
+
+  def SetUp(self):
+    self._SetUpReleaseTrack(calliope_base.ReleaseTrack.ALPHA, 'alpha')
 
 
 if __name__ == '__main__':

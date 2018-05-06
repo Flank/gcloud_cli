@@ -17,7 +17,7 @@ from googlecloudsdk.api_lib.firebase.test import tool_results
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test.android import unit_base
 
 
 TESTING_V1_MESSAGES = apis.GetMessagesModule('testing', 'v1')
@@ -27,7 +27,7 @@ M_ERROR = TESTING_V1_MESSAGES.TestMatrix.StateValueValuesEnum.ERROR
 DETAILS = TESTING_V1_MESSAGES.TestMatrix.InvalidMatrixDetailsValueValuesEnum
 
 
-class ToolResultsTests(unit_base.TestMockClientTest):
+class ToolResultsTests(unit_base.AndroidMockClientTest):
   """Unit tests for test/lib/tool_results.py."""
 
   def testCreateToolResultsUiUrl_withProdUrl(self):

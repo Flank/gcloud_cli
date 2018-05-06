@@ -19,6 +19,8 @@ each overrides the Update() method to bypass the list command logic and instead
 returns a fixed list of parsed resource tuples.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import resource_search
 from googlecloudsdk.calliope import parser_completer
 from googlecloudsdk.command_lib.util import completers
@@ -44,7 +46,7 @@ class ParserCompleterTest(completer_test_base.CompleterBase):
       actual_command = self.commands[0]
     else:
       actual_command = self.commands
-    self.assertEquals(expected_command, actual_command)
+    self.assertEqual(expected_command, actual_command)
 
   def SetUp(self):
     properties.VALUES.core.project.Set('my-project')
@@ -354,19 +356,19 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['name'])
 
     positional_completers = self.parser.data.positional_completers
-    self.assertEquals(1, len(positional_completers))
+    self.assertEqual(1, len(positional_completers))
 
     completer_class = list(positional_completers)[0]
-    self.assertEquals(ZonalCompleter, completer_class)
+    self.assertEqual(ZonalCompleter, completer_class)
 
     positional_args = self.parser.positional_args
-    self.assertEquals(1, len(positional_args))
+    self.assertEqual(1, len(positional_args))
 
     instance_arg = parsed_args.GetPositionalArgument('instance')
-    self.assertEquals(instance_arg, positional_args[0])
+    self.assertEqual(instance_arg, positional_args[0])
 
     completer = instance_arg.completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -395,7 +397,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['--project=a-project', 'name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -422,7 +424,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['--project=b-project', 'name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -449,7 +451,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['--zone=a-zone', 'name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -476,7 +478,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['--zone=b-zone', 'name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -504,7 +506,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
         ['--project=a-project', '--zone=a-zone', 'name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         ['name-1'],
@@ -529,7 +531,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
         ['--project=a-project', '--zone=b-zone', 'name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         ['name-2'],
@@ -554,7 +556,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
         ['--project=b-project', '--zone=a-zone', 'name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         ['name-3'],
@@ -579,7 +581,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
         ['--project=b-project', '--zone=b-zone', 'name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(ZonalCompleter, completer.completer_class)
+    self.assertEqual(ZonalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         ['name-4'],
@@ -603,7 +605,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(RegionalCompleter, completer.completer_class)
+    self.assertEqual(RegionalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -632,7 +634,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(GlobalCompleter, completer.completer_class)
+    self.assertEqual(GlobalCompleter, completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -662,8 +664,8 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['name'])
 
     arg_completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(MultiGlobalRegionalZonalCompleter,
-                      arg_completer._completer_class)
+    self.assertEqual(MultiGlobalRegionalZonalCompleter,
+                     arg_completer._completer_class)
     multi_completer = arg_completer._completer_class(cache=self.cache)
 
     qualified_parameter_names = {'region', 'zone'}
@@ -681,8 +683,8 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['name'])
 
     completer = parsed_args.GetPositionalArgument('instance').completer
-    self.assertEquals(MultiGlobalRegionalZonalCompleter,
-                      completer.completer_class)
+    self.assertEqual(MultiGlobalRegionalZonalCompleter,
+                     completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -741,8 +743,8 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['--instance=name'])
 
     completer = parsed_args.GetFlagArgument('instance').completer
-    self.assertEquals(MultiGlobalRegionalZonalCompleter,
-                      completer.completer_class)
+    self.assertEqual(MultiGlobalRegionalZonalCompleter,
+                     completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -809,13 +811,13 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     ])
 
     g_completer = parsed_args.GetFlagArgument('g_instance').completer
-    self.assertEquals(GlobalCompleter, g_completer.completer_class)
+    self.assertEqual(GlobalCompleter, g_completer.completer_class)
 
     r_completer = parsed_args.GetFlagArgument('r_instance').completer
-    self.assertEquals(RegionalCompleter, r_completer.completer_class)
+    self.assertEqual(RegionalCompleter, r_completer.completer_class)
 
     z_completer = parsed_args.GetFlagArgument('z_instance').completer
-    self.assertEquals(ZonalCompleter, z_completer.completer_class)
+    self.assertEqual(ZonalCompleter, z_completer.completer_class)
 
     self.AssertSetEquals(
         [
@@ -850,14 +852,14 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
     parsed_args = self.parser.parse_args(['--instance=name'])
 
     completer = parsed_args.GetFlagArgument('instance').completer
-    self.assertEquals(TrialCompleter, completer.completer_class)
+    self.assertEqual(TrialCompleter, completer.completer_class)
 
-    self.assertEquals(
+    self.assertEqual(
         [
             'no-error',
         ],
         completer(prefix='no-error', parsed_args=parsed_args))
-    self.assertEquals(
+    self.assertEqual(
         [
             'unknown-method-errorERROR: '
             'tests.testInstance resource completer failed.',
@@ -865,7 +867,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
             "'TrialCompleter' object has no attribute 'UnknownMethod'",
         ],
         completer(prefix='unknown-method-error', parsed_args=parsed_args))
-    self.assertEquals(
+    self.assertEqual(
         [
             'update-errorERROR: '
             'tests.testInstance resource completer failed.',
@@ -873,7 +875,7 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
             'Catastrophic cache update failure.      ',
         ],
         completer(prefix='update-error', parsed_args=parsed_args))
-    self.assertEquals(
+    self.assertEqual(
         [
             'no-parametersERROR: '
             'tests.testInstance resource completer failed.',
@@ -881,25 +883,25 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
             "'NoneType' object is not iterable      ",
         ],
         completer(prefix='no-parameters', parsed_args=parsed_args))
-    self.assertEquals(
+    self.assertEqual(
         [
             None,
         ],
         completer(prefix='GetParameterFlag-no-property-no-value',
                   parsed_args=parsed_args))
-    self.assertEquals(
+    self.assertEqual(
         [
             '--test=no-property-value',
         ],
         completer(prefix='GetParameterFlag-no-property-value',
                   parsed_args=parsed_args))
-    self.assertEquals(
+    self.assertEqual(
         [
             '--test=test-property-value',
         ],
         completer(prefix='GetParameterFlag-property-no-value',
                   parsed_args=parsed_args))
-    self.assertEquals(
+    self.assertEqual(
         [
             '--test=property-value',
         ],

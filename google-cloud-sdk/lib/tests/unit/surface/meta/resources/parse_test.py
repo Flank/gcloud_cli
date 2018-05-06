@@ -58,7 +58,7 @@ class ParseCommandTest(calliope_test_base.CalliopeTestBase):
                     'instances/my-instance-2'),
         },
     ]
-    self.assertEquals(expected, actual)
+    self.assertEqual(expected, actual)
 
   def testParseOneBadOneGood(self):
     with self.AssertRaisesExceptionMatches(
@@ -109,7 +109,7 @@ class ParseCommandTest(calliope_test_base.CalliopeTestBase):
                     'instances/my-instance-2'),
         },
     ]
-    self.assertEquals(expected, actual)
+    self.assertEqual(expected, actual)
 
 
 class ParseCommandInteractiveTest(calliope_test_base.CalliopeTestBase):

@@ -107,7 +107,7 @@ class InstancesSetSchedulingTest(test_base.BaseTest):
     self.CheckRequests([self._MakeSetMachineTypeRequest('bad-machine-type')])
 
   def testNoMachineTypeDefaults(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ToolException,
         r'One of --custom-cpu, --custom-memory, --machine-type must be '
         r'specified.'):
@@ -159,7 +159,7 @@ class InstancesSetSchedulingTest(test_base.BaseTest):
           """)
 
   def testMachineTypeWithCustomMemory(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Cannot set both \[--machine-type\] and '
         r'\[--custom-cpu\]\/\[--custom-memory\]'):

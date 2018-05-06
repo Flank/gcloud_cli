@@ -17,6 +17,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -29,7 +30,8 @@ def SetUp(test_obj, api_version):
   test_obj._connection = m.Backend.BalancingModeValueValuesEnum.CONNECTION
 
 
-class BackendServiceAddBackendGroupTest(test_base.BaseTest):
+class BackendServiceAddBackendGroupTest(test_base.BaseTest,
+                                        parameterized.TestCase):
 
   def SetUp(self):
     SetUp(self, 'alpha')
@@ -335,7 +337,12 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
               project='my-project'))],
     )
 
-  def testWithRateBalancingModeAndMaxRatePerInstance(self):
+  @parameterized.parameters(
+      ('--instance-group', 'instance', 'instanceGroups'),
+      ('--network-endpoint-group', 'endpoint', 'networkEndpointGroups'))
+  def testWithRateBalancingModeAndMaxRatePerInstance(self, flag_base,
+                                                     rate_flag_suffix,
+                                                     resource_type):
     messages = self.messages
     self.make_requests.side_effect = iter([
         [messages.BackendService(
@@ -348,12 +355,21 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
 
     self.Run("""
         compute backend-services add-backend my-backend-service
-          --instance-group my-group --instance-group-zone us-central1-a
+          {0} my-group
+          {0}-zone us-central1-a
           --balancing-mode RATE
-          --max-rate-per-instance 0.9
+          --max-rate-per-{1} 0.9
           --global
-        """)
+        """.format(flag_base, rate_flag_suffix))
 
+    backend = messages.Backend(
+        balancingMode=self._rate,
+        group=('https://www.googleapis.com/compute/alpha/projects/my-project/'
+               'zones/us-central1-a/{}/my-group'.format(resource_type)))
+    if rate_flag_suffix == 'instance':
+      backend.maxRatePerInstance = 0.9
+    elif rate_flag_suffix == 'endpoint':
+      backend.maxRatePerEndpoint = 0.9
     self.CheckRequests(
         [(self.compute.backendServices,
           'Get',
@@ -368,14 +384,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
                   name='my-backend-service',
                   port=80,
                   fingerprint='my-fingerprint',
-                  backends=[
-                      messages.Backend(
-                          balancingMode=self._rate,
-                          group=('https://www.googleapis.com/compute/'
-                                 'alpha/projects/my-project/zones/'
-                                 'us-central1-a/instanceGroups/my-group'),
-                          maxRatePerInstance=0.9),
-                  ],
+                  backends=[backend],
                   timeoutSec=120),
               project='my-project'))],
     )
@@ -397,9 +406,9 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
     ])
 
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --max-rate: At most one of --max-connections | '
-        '--max-connections-per-instance | --max-rate | --max-rate-per-instance '
-        'may be specified.'):
+        'Exactly one of ([--instance-group : --instance-group-region | '
+        '--instance-group-zone] | [--network-endpoint-group : '
+        '--network-endpoint-group-zone]) must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
             --balancing-mode RATE
@@ -484,7 +493,11 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
               project='my-project'))],
     )
 
-  def testWithConnectionBalancingModeAndMaxConnectionsPerInstance(self):
+  @parameterized.parameters(
+      ('--instance-group', 'instance', 'instanceGroups'),
+      ('--network-endpoint-group', 'endpoint', 'networkEndpointGroups'))
+  def testWithConnectionBalancingModeAndMaxConnectionsPerInstance(
+      self, flag_base, rate_flag_suffix, resource_type):
     messages = self.messages
     self.make_requests.side_effect = iter([
         [messages.BackendService(
@@ -497,12 +510,20 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
 
     self.Run("""
         compute backend-services add-backend my-backend-service
-          --instance-group my-group --instance-group-zone us-central1-a
+          {0} my-group {0}-zone us-central1-a
           --balancing-mode CONNECTION
-          --max-connections-per-instance 5
+          --max-connections-per-{1} 5
           --global
-        """)
+        """.format(flag_base, rate_flag_suffix))
 
+    backend = messages.Backend(
+        balancingMode=self._connection,
+        group=('https://www.googleapis.com/compute/alpha/projects/my-project/'
+               'zones/us-central1-a/{}/my-group'.format(resource_type)))
+    if rate_flag_suffix == 'instance':
+      backend.maxConnectionsPerInstance = 5
+    elif rate_flag_suffix == 'endpoint':
+      backend.maxConnectionsPerEndpoint = 5
     self.CheckRequests(
         [(self.compute.backendServices,
           'Get',
@@ -517,14 +538,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
                   name='my-backend-service',
                   port=80,
                   fingerprint='my-fingerprint',
-                  backends=[
-                      messages.Backend(
-                          balancingMode=self._connection,
-                          group=('https://www.googleapis.com/compute/'
-                                 'alpha/projects/my-project/zones/'
-                                 'us-central1-a/instanceGroups/my-group'),
-                          maxConnectionsPerInstance=5),
-                  ],
+                  backends=[backend],
                   timeoutSec=120),
               project='my-project'))],
     )
@@ -546,9 +560,9 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
     ])
 
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --max-connections: At most one of --max-connections | '
-        '--max-connections-per-instance | --max-rate | --max-rate-per-instance '
-        'may be specified.'):
+        'Exactly one of ([--instance-group : --instance-group-region | '
+        '--instance-group-zone] | [--network-endpoint-group : '
+        '--network-endpoint-group-zone]) must be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
             --balancing-mode CONNECTION
@@ -567,7 +581,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
             timeoutSec=120)],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-connections.*cannot be set with RATE balancing mode'):
       self.Run("""
@@ -588,7 +602,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
             timeoutSec=120)],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-utilization.*cannot be set with RATE balancing mode'):
       self.Run("""
@@ -609,7 +623,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
             timeoutSec=120)],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-rate-per-instance.*cannot be set with CONNECTION'
         ' balancing mode'):
@@ -631,7 +645,7 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
             timeoutSec=120)],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-utilization.*cannot be set with CONNECTION balancing mode'):
       self.Run("""
@@ -745,9 +759,9 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
     ])
 
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --max-connections: At most one of '
-        '--max-connections | --max-connections-per-instance | '
-        '--max-rate | --max-rate-per-instance may be specified.'):
+        'At most one of --max-connections | --max-connections-per-endpoint | '
+        '--max-connections-per-instance | --max-rate | --max-rate-per-endpoint '
+        '| --max-rate-per-instance may be specified.'):
       self.Run("""
           compute backend-services add-backend my-backend-service
             --instance-group my-group --instance-group-zone us-central1-a
@@ -995,6 +1009,78 @@ class BackendServiceAddBackendGroupTest(test_base.BaseTest):
     self.AssertErrContains('us-central1-a')
     self.AssertErrContains('us-central1-b')
     self.AssertErrContains('us-central2-a')
+
+  def testUtilizationBalancingModeIncompatibleWithNeg(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [messages.BackendService(
+            name='my-backend-service',
+            fingerprint='my-fingerprint',
+            port=80,
+            timeoutSec=120)]])
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--network-endpoint-group]: cannot be set with '
+        'UTILIZATION balancing mode'):
+      self.Run("""
+          compute backend-services add-backend my-backend-service
+            --network-endpoint-group my-group
+            --network-endpoint-group-zone us-central1-a
+            --balancing-mode UTILIZATION
+            --max-connections 100
+            --global
+          """)
+
+  def testInstanceGroupAndNetworkEndpointGroupMutualExclusion(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [messages.BackendService(
+            name='my-backend-service',
+            fingerprint='my-fingerprint',
+            port=80,
+            timeoutSec=120)]])
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of ([--instance-group : --instance-group-region | '
+        '--instance-group-zone] | [--network-endpoint-group : '
+        '--network-endpoint-group-zone]) must be specified.'):
+      self.Run("""
+          compute backend-services add-backend my-backend-service
+            --network-endpoint-group my-group
+            --network-endpoint-group-zone us-central1-a
+            --instance-group my-group
+            --instance-group-zone us-central1-f
+            --balancing-mode CONNECTION
+            --max-connections 100
+            --global
+          """)
+
+  @parameterized.parameters(
+      ('--network-endpoint-group', 'CONNECTION',
+       '--max-connections-per-instance'),
+      ('--network-endpoint-group', 'RATE', '--max-rate-per-instance'),
+      ('--instance-group', 'CONNECTION', '--max-connections-per-endpoint'),
+      ('--instance-group', 'RATE', '--max-rate-per-endpoint'),)
+  def testGroupResourceMatchesFlags(self, group_flag, balancing_mode,
+                                    incomptaible_flag):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [messages.BackendService(
+            name='my-backend-service',
+            fingerprint='my-fingerprint',
+            port=80,
+            timeoutSec=120)]])
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [{0}]: cannot be set with {1}'.format(
+            incomptaible_flag, group_flag)):
+      self.Run("""
+          compute backend-services add-backend my-backend-service
+            {0} my-group
+            {0}-zone us-central1-a
+            --balancing-mode {1}
+            {2} 100
+            --global
+          """.format(group_flag, balancing_mode, incomptaible_flag))
 
 
 class BackendServiceAddBackendZonalInstanceGroupTest(test_base.BaseTest):

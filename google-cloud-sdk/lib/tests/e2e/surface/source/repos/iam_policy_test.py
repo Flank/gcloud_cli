@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'get-iam-policy' and 'set-iam-policy' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.core import properties
@@ -34,7 +36,7 @@ class GetIamPolicyTest(base.SourceIntegrationTest):
   def testGetIamPolicy(self):
     properties.VALUES.core.user_output_enabled.Set(True)
 
-    repo_name = e2e_utils.GetResourceNameGenerator(prefix='iamtest').next()
+    repo_name = next(e2e_utils.GetResourceNameGenerator(prefix='iamtest'))
 
     with self._Repository(repo_name):
       self.ClearOutput()

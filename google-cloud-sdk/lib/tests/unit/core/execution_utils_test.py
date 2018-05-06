@@ -15,11 +15,13 @@
 
 """Unit tests for the file_utils module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import errno
+import io
 import os
 import re
 import signal
-import StringIO
 import subprocess
 import sys
 
@@ -34,18 +36,21 @@ from tests.lib import test_case
 
 class ExecutionTests(sdk_test_base.WithLogCapture,
                      sdk_test_base.WithOutputCapture):
-  _SCRIPT = u'test.' + ('cmd' if test_case.Filters.IsOnWindows() else 'sh')
+  _SCRIPT = 'test.' + ('cmd' if test_case.Filters.IsOnWindows() else 'sh')
 
   def SetUp(self):
     self.scripts_dir = self.Resource(
         'tests', 'unit', 'core', 'test_data', 'execution_utils', 'scripts')
     self.exit_mock = self.StartObjectPatch(sys, 'exit')
 
+    # Set encoding so sys.stdout and sys.stderr mocks can accept unicode
+    self.SetEncoding('utf8')
+
   def testExec_WithExit(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
-                         in_str='test input\n')
-    self.AssertOutputNotContains('test output')
-    self.AssertLogNotContains('test output')
+                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
+    self.AssertOutputNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertLogNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.exit_mock.assert_called_once_with(1)
 
   def testExec_WithArgsWithExit(self):
@@ -53,98 +58,98 @@ class ExecutionTests(sdk_test_base.WithLogCapture,
     # if args are not encoded properly.
     execution_utils.Exec(
         [os.path.join(self.scripts_dir, self._SCRIPT),
-         u'Ṳᾔḯ¢◎ⅾℯ'.encode('utf7')],
-        in_str='fish',
+         'Ṳᾔḯ¢◎ⅾℯ'.encode('utf7')],
+        in_str='fḯsh',
         out_func=sys.stdout.write,
         err_func=sys.stderr.write,
     )
     # The script above just echoes what we provided which is python encoded
     # value. This just make sure that arguments are encoded by default.
     self.assertMultiLineEqual(
-        'input: fish\n'
+        'input: fḯsh\n'
         'argument: +HnIflB4vAKIlziF+IS8-\n'
-        'test output\n',
-        self.stdout.getvalue())
-    self.AssertErrEquals('test error\n')
-    self.AssertLogNotContains('test output')
+        'test Ṳᾔḯ¢◎ⅾℯ output\n',
+        encoding.Decode(self.stdout.getvalue()))
+    self.AssertErrEquals('test Ṳᾔḯ¢◎ⅾℯ error\n')
+    self.AssertLogNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.exit_mock.assert_called_once_with(1)
 
   def testExec_NoExit(self):
     ret_val = execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
-                                   in_str='test input\n',
+                                   in_str='test Ṳᾔḯ¢◎ⅾℯ input\n',
                                    no_exit=True)
     self.assertEqual(ret_val, 1)
-    self.AssertOutputNotContains('test output')
-    self.AssertLogNotContains('test output')
+    self.AssertOutputNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertLogNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
     self.assertFalse(self.exit_mock.called)
 
   def testExecPipeOut(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
-                         in_str='test input\n',
+                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n',
                          out_func=log.out.write)
     self.exit_mock.assert_called_once_with(1)
-    self.AssertOutputContains('test output')
-    self.AssertErrNotContains('test error')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrNotContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
   def testExecPipeErr(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
-                         in_str='test input\n',
+                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n',
                          err_func=log.err.write)
     self.exit_mock.assert_called_once_with(1)
-    self.AssertOutputNotContains('test output')
-    self.AssertErrContains('test error')
+    self.AssertOutputNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
   def testExecPipeIn(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
-                         in_str='test input\n')
+                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
     self.exit_mock.assert_called_once_with(1)
     # Has no output
-    self.AssertOutputNotContains('test input')
-    self.AssertOutputNotContains('test output')
-    self.AssertErrNotContains('test error')
+    self.AssertOutputNotContains('test Ṳᾔḯ¢◎ⅾℯ input')
+    self.AssertOutputNotContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrNotContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
   def testExecPipeInAndOut(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
                          out_func=log.out.write,
-                         in_str='test input\n')
+                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
     self.exit_mock.assert_called_once_with(1)
-    self.AssertOutputContains('test input')
-    self.AssertOutputContains('test output')
-    self.AssertErrNotContains('test error')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ input')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrNotContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
   def testExecPipeOutAndErr(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
                          out_func=log.out.write,
                          err_func=log.err.write,
-                         in_str='test input\n')
+                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
     self.exit_mock.assert_called_once_with(1)
-    self.AssertOutputContains('test output')
-    self.AssertErrContains('test error')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
   def testExecPipeInAndOutAndErr(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
                          out_func=log.out.write, err_func=log.err.write,
-                         in_str='test input\n')
+                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
     self.exit_mock.assert_called_once_with(1)
-    self.AssertOutputContains('test input')
-    self.AssertOutputContains('test output')
-    self.AssertErrContains('test error')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ input')
+    self.AssertOutputContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertErrContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
   def testExecPipeThroughLogger(self):
     execution_utils.Exec(os.path.join(self.scripts_dir, self._SCRIPT),
                          err_func=log.file_only_logger.debug,
                          out_func=log.file_only_logger.debug,
-                         in_str='test input\n')
+                         in_str='test Ṳᾔḯ¢◎ⅾℯ input\n')
     self.exit_mock.assert_called_once_with(1)
-    self.AssertLogContains('test output')
-    self.AssertLogContains('test error')
+    self.AssertLogContains('test Ṳᾔḯ¢◎ⅾℯ output')
+    self.AssertLogContains('test Ṳᾔḯ¢◎ⅾℯ error')
 
   def testExec_FilePermissionError(self):
     error_message = 'Permission denied'
     popen_mock = self.StartObjectPatch(subprocess, 'Popen')
     popen_mock.side_effect = OSError(errno.EACCES, error_message)
-    self.assertRaises(execution_utils.PermissionError(errno.EACCES))
-    with self.assertRaisesRegexp(execution_utils.PermissionError, re.escape(
+    self.assertRaises(execution_utils.PermissionError)
+    with self.assertRaisesRegex(execution_utils.PermissionError, re.escape(
         '\nPlease verify that you have execute permission for all '
         'files in your CLOUD SDK bin'
         ' folder')):
@@ -156,8 +161,8 @@ class ExecutionTests(sdk_test_base.WithLogCapture,
     fake_command = ['fake', 'command']
     popen_mock = self.StartObjectPatch(subprocess, 'Popen')
     popen_mock.side_effect = OSError(errno.ENOENT, error_message)
-    self.assertRaises(OSError(errno.ENOENT))
-    with self.assertRaisesRegexp(execution_utils.InvalidCommandError, re.escape(
+    self.assertRaises(OSError)
+    with self.assertRaisesRegex(execution_utils.InvalidCommandError, re.escape(
         '{0}: command not found'.format(fake_command[0]))):
       execution_utils.Exec(fake_command)
 
@@ -165,8 +170,8 @@ class ExecutionTests(sdk_test_base.WithLogCapture,
     error_message = 'No such process'
     popen_mock = self.StartObjectPatch(subprocess, 'Popen')
     popen_mock.side_effect = OSError(errno.ESRCH, error_message)
-    self.assertRaises(OSError(errno.ESRCH))
-    with self.assertRaisesRegexp(OSError, re.escape(
+    self.assertRaises(OSError)
+    with self.assertRaisesRegex(OSError, re.escape(
         '[Errno 3] {0}'.format(error_message))):
       execution_utils.Exec(
           os.path.join(self.scripts_dir, self._SCRIPT))
@@ -241,7 +246,7 @@ class UninterruptibleSectionTests(test_case.WithOutputCapture):
     # a SIGINT signal on Windows.  The Windows shell catches CTRL-C and converts
     # it into a SIGINT (which is why the code works.  Also sending a
     # CTRL_C_EVENT does not actually trigger the SIGINT handler.
-    output = StringIO.StringIO()
+    output = io.StringIO()
     with execution_utils.UninterruptibleSection(stream=output, message='foo'):
       os.kill(os.getpid(), signal.SIGINT)
     self.assertIn('foo', output.getvalue())

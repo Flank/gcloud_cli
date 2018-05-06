@@ -16,13 +16,18 @@
 
 """Tests for the console_attr module."""
 
-import StringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 import sys
 
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_attr_os
 from tests.lib import test_case
+
+import mock
+import six
 
 
 class _Object(object):
@@ -32,26 +37,19 @@ class _Object(object):
     self._value = value
 
   def __str__(self):
-    return u'{name}={value}'.format(name=self._name, value=self._value)
+    return '{name}={value}'.format(name=self._name, value=self._value)
 
 
 _ASCII = 'Unicode'
-_ISO_8859_1 = '\xdc\xf1\xee\xe7\xf2\xd0\xe9'  # ÜñîçòÐé
-_UNICODE = u'Ṳᾔḯ¢◎ⅾℯ'
+_ISO_8859_1 = b'\xdc\xf1\xee\xe7\xf2\xd0\xe9'  # ÜñîçòÐé
+_UNICODE = 'Ṳᾔḯ¢◎ⅾℯ'
 _UTF8 = _UNICODE.encode('utf8')
 
 
-class ConsoleAttrTestBase(test_case.Base):
+class ConsoleAttrTestBase(test_case.WithOutputCapture):
   """Save and restore console attributes state."""
 
-  def SetUp(self):
-    self.__saved_stdout = sys.stdout
-
   def TearDown(self):
-    reset_log = log.out.GetConsoleWriterStream() is sys.stdout
-    sys.stdout = self.__saved_stdout
-    if reset_log:
-      log.Reset()
     console_attr.ResetConsoleAttr()
 
 
@@ -92,17 +90,16 @@ class ConsoleAttrEncodingTests(ConsoleAttrTestBase):
     self.assertEqual(attr.GetEncoding(), 'cp437')
 
   def testEncodingStdOutUtf8(self):
-    sys.stdout = StringIO.StringIO('data')
+    sys.stdout = mock.MagicMock()
     sys.stdout.encoding = 'UTF-8'
     log.Reset()
-    attr = console_attr.ResetConsoleAttr()
+    attr = console_attr.GetConsoleAttr(reset=True)
     self.assertEqual(attr.GetEncoding(), 'utf8')
 
   def testEncodingStdOutWin(self):
-    sys.stdout = StringIO.StringIO('data')
+    sys.stdout = mock.MagicMock()
     sys.stdout.encoding = 'CP437'
-    log.Reset()
-    attr = console_attr.ResetConsoleAttr()
+    attr = console_attr.GetConsoleAttr(reset=True)
     self.assertEqual(attr.GetEncoding(), 'cp437')
 
 
@@ -110,7 +107,7 @@ class AsciiConsoleAttrTests(ConsoleAttrTestBase):
 
   def SetUp(self):
     self.StartEnvPatch({'TERM': 'dumb'})
-    self.buf = StringIO.StringIO()
+    self.buf = io.StringIO()
     self._con = console_attr.GetConsoleAttr(encoding='ascii', reset=True)
 
   def testBoxLineCharactersAscii(self):
@@ -279,7 +276,7 @@ class ScreenConsoleAttrTests(ConsoleAttrTestBase):
 
   def SetUp(self):
     self.StartEnvPatch({'TERM': 'screen'})
-    self.buf = StringIO.StringIO()
+    self.buf = io.StringIO()
     self._con = console_attr.GetConsoleAttr(encoding='utf8', reset=True)
 
   def testFontBoldScreen(self):
@@ -466,15 +463,11 @@ class ScreenDefaultOutDefaultInitTests(ConsoleAttrTestBase):
     self.StartEnvPatch({'TERM': 'screen'})
 
   def testColorizerBlueScreenDefaultOutImplicitInit(self):
-    sys.stdout = StringIO.StringIO()
-    sys.stdout.encoding = 'UTF-8'
-    log.Reset()
-    console_attr.ResetConsoleAttr()
-
+    console_attr.ResetConsoleAttr(encoding='UTF-8')
     s = 'Am I blue?'
     colorize = console_attr.Colorizer(s, 'blue')
-    colorize.Render(log.out)
-    self.assertEqual('\x1b[34;1m{0}\x1b[39;0m'.format(s), sys.stdout.getvalue())
+    colorize.Render(sys.stdout)
+    self.AssertOutputEquals('\x1b[34;1m{0}\x1b[39;0m'.format(s))
 
 
 class XtermConsoleAttrTests(ConsoleAttrTestBase):
@@ -522,7 +515,7 @@ class XtermConsoleAttrTests(ConsoleAttrTestBase):
     self.assertEqual(15, self._con.DisplayWidth(s))
 
   def testDisplayWidthMiddleUnicodeXterm(self):
-    s = u'This is {0}a UÜ車 test.'.format(self._con.GetFontCode(bold=True))
+    s = 'This is {0}a UÜ車 test.'.format(self._con.GetFontCode(bold=True))
     self.assertEqual(20, self._con.DisplayWidth(s))
 
 
@@ -571,7 +564,7 @@ class Xterm256ConsoleAttrTests(ConsoleAttrTestBase):
     self.assertEqual(15, self._con.DisplayWidth(s))
 
   def testDisplayWidthMiddleUnicodeXterm256(self):
-    s = u'This is {0}a UÜ車 test.'.format(self._con.GetFontCode(bold=True))
+    s = 'This is {0}a UÜ車 test.'.format(self._con.GetFontCode(bold=True))
     self.assertEqual(20, self._con.DisplayWidth(s))
 
 
@@ -655,114 +648,145 @@ class GetCharacterDisplayWidthTests(ConsoleAttrTestBase):
 
   def testGetCharacterDisplayWidth0(self):
     self.assertEqual(0, console_attr.GetCharacterDisplayWidth(
-        u'\N{ZERO WIDTH SPACE}'))
+        '\N{ZERO WIDTH SPACE}'))
     self.assertEqual(0, console_attr.GetCharacterDisplayWidth(
-        u'\N{SOFT HYPHEN}'))
+        '\N{SOFT HYPHEN}'))
 
   def testGetCharacterDisplayWidth1(self):
     self.assertEqual(1, console_attr.GetCharacterDisplayWidth('U'))
-    self.assertEqual(1, console_attr.GetCharacterDisplayWidth(u'U'))
-    self.assertEqual(1, console_attr.GetCharacterDisplayWidth(u'Ü'))
-    self.assertEqual(1, console_attr.GetCharacterDisplayWidth(u'Ⓤ'))
+    self.assertEqual(1, console_attr.GetCharacterDisplayWidth('U'))
+    self.assertEqual(1, console_attr.GetCharacterDisplayWidth('Ü'))
+    self.assertEqual(1, console_attr.GetCharacterDisplayWidth('Ⓤ'))
 
   def testGetCharacterDisplayWidth2(self):
-    self.assertEqual(2, console_attr.GetCharacterDisplayWidth(u'車'))
+    self.assertEqual(2, console_attr.GetCharacterDisplayWidth('車'))
 
 
-class ConsoleAttrEncodeForConsoleTests(ConsoleAttrTestBase):
+class ConsoleAttrSafeTextTests(ConsoleAttrTestBase):
 
-  def testEncodeForConsoleException(self):
-    self.assertEquals('\\xff',
-                      console_attr.SafeText(Exception(u'\xff')))
-    self.assertEquals(
-        '\\u1000', console_attr.SafeText(Exception(u'\u1000')))
-    self.assertEquals(
-        '\\xff', console_attr.SafeText(Exception('\xc3\xbf')))
+  def testSafeTextException(self):
+    self.assertEqual('\\u1000', console_attr.SafeText(Exception('\u1000')))
+    if six.PY2:
+      self.assertEqual('\\xff', console_attr.SafeText(Exception(b'\xff')))
+      self.assertEqual('\\xff', console_attr.SafeText(Exception(b'\xc3\xbf')))
+    else:
+      # On Py3, bytes are not treated as strings and the str() of Exception
+      # contains the repr(). This should be fine because on Py3 Exceptions
+      # should not contain bytes anyway, and if they do, there is no expectation
+      # that it can be decoded.
+      self.assertEqual(r"b'\xff'", console_attr.SafeText(Exception(b'\xff')))
+      self.assertEqual(r"b'\xc3\xbf'",
+                       console_attr.SafeText(Exception(b'\xc3\xbf')))
 
-  def testEncodeForConsoleAsciiToAscii(self):
+  def testSafeTextAsciiToAscii(self):
     expected = _ASCII
     actual = console_attr.SafeText(_ASCII, encoding='ascii')
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleIso8859_1ToAsciiEscape(self):
-    expected = _ISO_8859_1.decode('iso-8859-1').encode('ascii',
-                                                       'backslashreplace')
+  def testSafeTextIso8859_1ToAsciiEscape(self):
+    expected = r'\xdc\xf1\xee\xe7\xf2\xd0\xe9'
     actual = console_attr.SafeText(_ISO_8859_1, encoding='ascii')
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleIso8859_1ToAsciiUnknown(self):
-    expected = _ISO_8859_1.decode('iso-8859-1').encode('ascii', 'replace')
-    actual = console_attr.SafeText(
-        _ISO_8859_1, encoding='ascii', escape=False)
+  def testSafeTextIso8859_1ToAsciiUnknown(self):
+    expected = '???????'
+    actual = console_attr.SafeText(_ISO_8859_1, encoding='ascii', escape=False)
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleIso8859_1ToIso8859_1(self):
-    expected = u'\xdc\xf1\xee\xe7\xf2\xd0\xe9'
-    actual = console_attr.SafeText(
-        _ISO_8859_1, encoding='iso-8859-1')
+  def testSafeTextIso8859_1ToIso8859_1(self):
+    expected = '\xdc\xf1\xee\xe7\xf2\xd0\xe9'
+    actual = console_attr.SafeText(_ISO_8859_1, encoding='iso-8859-1')
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUnicodeToAsciiEscape(self):
-    expected = _UNICODE.encode('ascii', 'backslashreplace')
+  def testSafeTextUnicodeToAsciiEscape(self):
+    expected = '\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f'
     actual = console_attr.SafeText(_UNICODE, encoding='ascii')
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUnicodeToAsciiUnknown(self):
-    expected = _UNICODE.encode('ascii', 'replace')
+  def testSafeTextUnicodeToAsciiUnknown(self):
+    expected = '???????'
     actual = console_attr.SafeText(
         _UNICODE, encoding='ascii', escape=False)
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUnicodeToCp437Escape(self):
+  def testSafeTextUnicodeToCp437Escape(self):
     expected = _UNICODE.encode('cp437', 'backslashreplace').decode('cp437')
     actual = console_attr.SafeText(_UNICODE, encoding='cp437')
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUnicodeToCp437Unknown(self):
+  def testSafeTextUnicodeToCp437Unknown(self):
     expected = _UNICODE.encode('cp437', 'replace').decode('cp437')
     actual = console_attr.SafeText(
         _UNICODE, encoding='cp437', escape=False)
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUtf8ToAsciiEscape(self):
-    expected = _UNICODE.encode('ascii', 'backslashreplace')
+  def testSafeTextUtf8ToAsciiEscape(self):
+    expected = '\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f'
     actual = console_attr.SafeText(_UTF8, encoding='ascii')
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUtf8ToAsciiUnknown(self):
-    expected = _UNICODE.encode('ascii', 'replace')
-    actual = console_attr.SafeText(
-        _UTF8, encoding='ascii', escape=False)
+  def testSafeTextUtf8ToAsciiUnknown(self):
+    expected = '???????'
+    actual = console_attr.SafeText(_UTF8, encoding='ascii', escape=False)
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUnicodeToUtf8(self):
+  def testSafeTextUnicodeToUtf8(self):
     expected = _UNICODE
     actual = console_attr.SafeText(_UNICODE, encoding='utf8')
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUtf8ToUtf8(self):
+  def testSafeTextUtf8ToUtf8(self):
     expected = _UNICODE
     actual = console_attr.SafeText(_UTF8, encoding='utf8')
     self.assertEqual(expected, actual)
 
-  def testEncodeForConsoleUtf8ToUtf8DefaultEncoding(self):
+  def testSafeTextUtf8ToUtf8DefaultEncoding(self):
     console_attr.GetConsoleAttr(encoding='utf8', reset=True)
     expected = _UNICODE
     actual = console_attr.SafeText(_UTF8)
     self.assertEqual(expected, actual)
 
 
+class ConsoleAttrEncodeToBytesTests(ConsoleAttrTestBase):
+
+  def testEncodeToBytesAscii(self):
+    expected = b'Unicode'
+    actual = console_attr.EncodeToBytes(_ASCII)
+    self.assertEqual(expected, actual)
+
+  def testEncodeToBytesIso8859_1(self):
+    expected = b'\xdc\xf1\xee\xe7\xf2\xd0\xe9'
+    actual = console_attr.EncodeToBytes(_ISO_8859_1)
+    self.assertEqual(expected, actual)
+
+  def testEncodeToBytesUnicode(self):
+    expected = (b'\xe1\xb9\xb2\xe1\xbe\x94\xe1\xb8\xaf\xc2\xa2'
+                b'\xe2\x97\x8e\xe2\x85\xbe\xe2\x84\xaf')
+    actual = console_attr.EncodeToBytes(_UNICODE)
+    self.assertEqual(expected, actual)
+
+  def testEncodeToBytesUtf8(self):
+    expected = (b'\xe1\xb9\xb2\xe1\xbe\x94\xe1\xb8\xaf\xc2\xa2'
+                b'\xe2\x97\x8e\xe2\x85\xbe\xe2\x84\xaf')
+    actual = console_attr.EncodeToBytes(_UTF8)
+    self.assertEqual(expected, actual)
+
+
 class ConsoleAttrDecodeTests(ConsoleAttrTestBase):
 
   def testDecodeException(self):
-    self.assertEquals('ascii',
-                      console_attr.Decode(Exception('ascii')))
-    self.assertEquals(u'\xff',
-                      console_attr.Decode(Exception(u'\xff')))
-    self.assertEquals(
-        u'\u1000', console_attr.Decode(Exception(u'\u1000')))
-    self.assertEquals(
-        u'\xff', console_attr.Decode(Exception('\xc3\xbf')))
+    self.assertEqual('ascii', console_attr.Decode(Exception('ascii')))
+    self.assertEqual('\xff', console_attr.Decode(Exception('\xff')))
+    self.assertEqual('\u1000', console_attr.Decode(Exception('\u1000')))
+    if six.PY2:
+      self.assertEqual('\xff', console_attr.Decode(Exception(b'\xc3\xbf')))
+    else:
+      # On Py3, bytes are not treated as strings and the str() of Exception
+      # contains the repr(). This should be fine because on Py3 Exceptions
+      # should not contain bytes anyway, and if they do, there is no expectation
+      # that it can be decoded.
+      self.assertEqual(
+          r"b'\xc3\xbf'", console_attr.Decode(Exception(b'\xc3\xbf')))
 
   def testDecodeAscii(self):
     expected = _ASCII
@@ -818,13 +842,13 @@ class ConsoleAttrDecodeTests(ConsoleAttrTestBase):
 
   def testDecodeObjectAscii(self):
     obj = _Object()
-    expected = u'abc=123'
+    expected = 'abc=123'
     actual = console_attr.Decode(obj)
     self.assertEqual(expected, actual)
 
   def testDecodeObjectUnicode(self):
-    obj = _Object(name=u'Ṁöë', value=u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW")
-    expected = u"Ṁöë=.TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"
+    obj = _Object(name='Ṁöë', value=".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW")
+    expected = "Ṁöë=.TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"
     actual = console_attr.Decode(obj)
     self.assertEqual(expected, actual)
 

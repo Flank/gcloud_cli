@@ -11,7 +11,7 @@ gcloud beta compute networks subnets create \- define a subnet for a network in 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -56,14 +56,18 @@ The IP space allocated to this subnetwork in CIDR format.
 An optional description of this subnetwork.
 
 .TP 2m
+\fB\-\-enable\-flow\-logs\fR
+Enable/disable flow logs for this subnet.
+
+.TP 2m
 \fB\-\-enable\-private\-ip\-google\-access\fR
 Enable/disable access to Google Cloud APIs from this subnet for instances
 without a public ip address.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the subnetwork to create. If not specified, you will be prompted
-to select a region.
+The region of the subnetwork to create. If not specified, you may be prompted to
+select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -88,7 +92,7 @@ Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 .TP 2m
-\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[\fIPROPERTY\fR=\fIVALUE\fR,...]
+\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]
 Adds a secondary IP range to the subnetwork for use in IP aliasing.
 
 For example, \f5\-\-secondary\-range range1=192.168.64.0/24\fR adds a secondary

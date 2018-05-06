@@ -72,7 +72,7 @@ class CallsetsIntegrationTest(base.GenomicsIntegrationTest):
       # This field is currently a mess - it seems to get set to an empty
       # array about 50% of the time, which causes the test to fail.
       call_set.info = None
-      self.assertEquals(
+      self.assertEqual(
           call_set,
           self.messages.CallSet(
               created=call_set.created,
@@ -95,7 +95,7 @@ class CallsetsIntegrationTest(base.GenomicsIntegrationTest):
       # This field is currently a mess - it seems to get set to an empty
       # array about 50% of the time, which causes the test to fail.
       call_set.info = None
-      self.assertEquals(
+      self.assertEqual(
           call_set,
           self.messages.CallSet(
               created=call_set.created,

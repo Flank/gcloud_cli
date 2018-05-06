@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise IAM-related 'gcloud kms keyrings *' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
@@ -26,7 +28,7 @@ class KeyringsIamTest(base.KmsMockTest):
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(
             resource=self.kr_name.RelativeName()),
-        self.messages.Policy(etag='foo'))
+        self.messages.Policy(etag=b'foo'))
 
     self.Run('kms keyrings get-iam-policy --location={0} {1}'.format(
         self.kr_name.location_id, self.kr_name.key_ring_id))
@@ -36,7 +38,7 @@ class KeyringsIamTest(base.KmsMockTest):
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(
             resource=self.kr_name.RelativeName()),
-        self.messages.Policy(etag='foo'))
+        self.messages.Policy(etag=b'foo'))
 
     self.Run("""
         kms keyrings get-iam-policy
@@ -49,7 +51,7 @@ class KeyringsIamTest(base.KmsMockTest):
 
   def testSetBindings(self):
     policy = self.messages.Policy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
@@ -82,7 +84,7 @@ etag: Zm9v
 
   def testSetBindingsAndAuditConfig(self):
     policy = self.messages.Policy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ],
@@ -129,10 +131,10 @@ etag: Zm9v
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(
             resource=self.kr_name.RelativeName()),
-        self.messages.Policy(etag='foo'))
+        self.messages.Policy(etag=b'foo'))
 
     policy = self.messages.Policy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
@@ -153,11 +155,11 @@ etag: Zm9v
 
   def testRemoveBinding(self):
     policy_before = self.messages.Policy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
-    policy_after = self.messages.Policy(etag='foo', bindings=[])
+    policy_after = self.messages.Policy(etag=b'foo', bindings=[])
 
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(

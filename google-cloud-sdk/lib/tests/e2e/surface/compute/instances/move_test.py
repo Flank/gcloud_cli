@@ -33,7 +33,7 @@ class MoveTest(e2e_instances_test_base.InstancesTestBase):
             self.instance_name, self.alternative_zone))
     real_zone_ref = resources.REGISTRY.Parse(
         result.zone, collection='compute.zones', enforce_collection=True)
-    self.assertEquals(self.alternative_zone, real_zone_ref.zone)
+    self.assertEqual(self.alternative_zone, real_zone_ref.zone)
 
 
 if __name__ == '__main__':

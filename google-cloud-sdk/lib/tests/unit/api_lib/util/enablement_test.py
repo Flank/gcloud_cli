@@ -14,6 +14,8 @@
 
 """Tests for tests.unit.api_lib.util.enablement."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py import exceptions as api_exceptions
@@ -54,8 +56,8 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
         'googlecloudsdk.api_lib.services.enable_api.'
         'EnableServiceIfDisabled')
     def Enable(enable_project, enable_service):
-      self.assertEquals(enable_project, self.project)
-      self.assertEquals(enable_service, self.service)
+      self.assertEqual(enable_project, self.project)
+      self.assertEqual(enable_service, self.service)
       service_enablement['enabled'] = True
     enable_mock.side_effect = Enable
 
@@ -63,7 +65,7 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
     def Perform(arg, method, body, headers, redirections, connection_type):
       # We ignore the inputs and just return what we expect
       if service_enablement['enabled']:
-        return ({'status': '200'}, '{"field": "abc"}')
+        return ({'status': '200'}, '{"field": "abc"}'.encode('utf8'))
       else:
         return ({'status': '403'}, textwrap.dedent("""\
           {{
@@ -72,7 +74,7 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
             "message": "{message}",
             "status": "PERMISSION_DENIED"
            }}
-          }}""").format(message=self.message))
+          }}""").format(message=self.message).encode('utf8'))
 
     mock_http_methods = mock.Mock()
     self.StartObjectPatch(http, 'Http', autospec=True,
@@ -92,7 +94,7 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
     # This ensures that it was called twice (once for failure, once for
     # success)
     self.assertTrue(service_enablement['enabled'])
-    self.assertEquals(mock_http_methods.request.call_count, 2)
+    self.assertEqual(mock_http_methods.request.call_count, 2)
 
     enable_mock.assert_called_once_with(self.project, self.service)
 
@@ -125,7 +127,7 @@ class EnablementTest(cli_test_base.CliTestBase, parameterized.TestCase):
               projectId=self.project,
               region='global',
               jobId='testjobid'))
-    self.assertEquals(mock_http_methods.request.call_count, 1)
+    self.assertEqual(mock_http_methods.request.call_count, 1)
 
   def testBatchHelperMakeRequest_DisableApiPrompts(self):
     properties.VALUES.core.should_prompt_to_enable_api.Set(False)

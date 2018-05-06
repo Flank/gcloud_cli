@@ -13,6 +13,8 @@
 # limitations under the License.
 """gcloud sdk tests top level command that sorts last in DevSite _toc.yaml."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 

@@ -11,7 +11,7 @@ gcloud alpha ml vision detect\-labels \- detect broad sets of categories within 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml vision detect\-labels\fR \fIIMAGE_PATH\fR [\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml vision detect\-labels\fR \fIIMAGE_PATH\fR [\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR] [\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR;\ default="builtin/stable"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -42,6 +42,11 @@ Vision. If you provide a URL, it must be in Google Cloud Storage format
 .TP 2m
 \fB\-\-max\-results\fR=\fIMAX_RESULTS\fR
 The maximum number of results to be provided.
+
+.TP 2m
+\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR; default="builtin/stable"
+The model version to use for the feature. Supported values include
+"builtin/stable" and "builtin/latest".
 
 
 .RE

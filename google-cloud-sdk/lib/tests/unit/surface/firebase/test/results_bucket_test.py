@@ -15,10 +15,11 @@
 from googlecloudsdk.api_lib.firebase.test import results_bucket
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test import test_utils
+from tests.lib.surface.firebase.test.android import unit_base
 
 
-class ResultsBucketOpsTests(unit_base.TestMockClientTest):
+class ResultsBucketOpsTests(unit_base.AndroidMockClientTest):
   """Unit tests for test/lib/results_bucket.py.
 
   Note: integration tests for this class are in integration/bucket_test.py.
@@ -42,7 +43,7 @@ class ResultsBucketOpsTests(unit_base.TestMockClientTest):
             projectId=self.PROJECT_ID))
     self.tr_client.projects.InitializeSettings.Expect(
         request=request,
-        exception=unit_base.MakeHttpError(
+        exception=test_utils.MakeHttpError(
             'borked', 'Simulated failure to get default bucket.'))
 
     with self.assertRaises(exceptions.HttpException) as e:
@@ -58,8 +59,8 @@ class ResultsBucketOpsTests(unit_base.TestMockClientTest):
             projectId=self.PROJECT_ID))
     self.tr_client.projects.InitializeSettings.Expect(
         request=request,
-        exception=unit_base.MakeHttpError(
-            'choked', 'Bucket access denied', 403))
+        exception=test_utils.MakeHttpError('choked', 'Bucket access denied',
+                                           403))
 
     with self.assertRaises(exceptions.HttpException) as e:
       self._CreateBucketOps(None)

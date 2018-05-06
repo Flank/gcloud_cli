@@ -14,7 +14,9 @@
 
 """Tests for the 'gcloud dns record-sets import' command."""
 
+import io
 import textwrap
+
 from dns import rdatatype
 from googlecloudsdk.api_lib.dns import import_util
 from googlecloudsdk.calliope.exceptions import ToolException
@@ -31,6 +33,9 @@ class RecordSetsImportTest(base.DnsMockTest):
     self.zone_file_path = sdk_test_base.SdkBase.Resource(
         'tests', 'unit', 'surface', 'dns', 'test_data',
         'zone.com-to-import.zone')
+    self.crnl_file_path = sdk_test_base.SdkBase.Resource(
+        'tests', 'unit', 'surface', 'dns', 'test_data',
+        'zone.com-to-import.crnl')
     self.yaml_file_path = sdk_test_base.SdkBase.Resource(
         'tests', 'unit', 'surface', 'dns', 'test_data',
         'zone.com-to-import.yaml')
@@ -42,13 +47,19 @@ class RecordSetsImportTest(base.DnsMockTest):
         'zone.com-to-import-no-conflicts.yaml')
 
   def testRecordSetsFromZoneFile(self):
-    zone_file = open(self.zone_file_path)
+    zone_file = io.open(self.zone_file_path, mode='rt')
+    rsets = import_util.RecordSetsFromZoneFile(zone_file, 'zone.com.')
+    self.assertEqual(util.GetImportedRecordSets(), rsets)
+    zone_file.close()
+
+  def testRecordSetsFromZoneFileCRNL(self):
+    zone_file = io.open(self.crnl_file_path, mode='rt')
     rsets = import_util.RecordSetsFromZoneFile(zone_file, 'zone.com.')
     self.assertEqual(util.GetImportedRecordSets(), rsets)
     zone_file.close()
 
   def testRecordSetsFromYamlFile(self):
-    yaml_file = open(self.yaml_file_path)
+    yaml_file = io.open(self.yaml_file_path, mode='rt')
     rsets = import_util.RecordSetsFromYamlFile(yaml_file)
     self.assertEqual(util.GetImportedRecordSets(), rsets)
     yaml_file.close()
@@ -239,14 +250,14 @@ class RecordSetsImportBetaTest(base.DnsMockBetaTest):
         'zone.com-to-import-no-conflicts.yaml')
 
   def testRecordSetsFromZoneFile(self):
-    zone_file = open(self.zone_file_path)
+    zone_file = io.open(self.zone_file_path, mode='rt')
     rsets = import_util.RecordSetsFromZoneFile(
         zone_file, 'zone.com.', api_version=self.api_version)
     self.assertEqual(util_beta.GetImportedRecordSets(), rsets)
     zone_file.close()
 
   def testRecordSetsFromYamlFile(self):
-    yaml_file = open(self.yaml_file_path)
+    yaml_file = io.open(self.yaml_file_path, mode='rt')
     rsets = import_util.RecordSetsFromYamlFile(
         yaml_file, api_version=self.api_version)
     self.assertEqual(util_beta.GetImportedRecordSets(), rsets)

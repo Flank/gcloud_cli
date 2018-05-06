@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Test of the 'pubsub subscriptions create' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -70,10 +74,9 @@ class SubscriptionsCreateTest(SubscriptionsCreateTestBase):
         'pubsub subscriptions create subs1 --topic topic1 --ack-deadline=180',
         [req_subscription])
 
-    self.assertEquals(result[0].name,
-                      sub_ref.RelativeName())
-    self.assertEquals(result[0].ackDeadlineSeconds, 180)
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].ackDeadlineSeconds, 180)
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
   def testSubscriptionFormatsProjectsPathsCorrectly(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -88,8 +91,8 @@ class SubscriptionsCreateTest(SubscriptionsCreateTestBase):
          ' --topic-project my_project'),
         [req_subscription])
 
-    self.assertEquals(result[0].name, sub_ref.RelativeName())
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
   def testSubscriptionProjectFlags(self):
     sub_ref = util.ParseSubscription('subs1', 'proj1')
@@ -104,8 +107,8 @@ class SubscriptionsCreateTest(SubscriptionsCreateTestBase):
          ' --topic-project proj2 --project proj1'),
         [req_subscription])
 
-    self.assertEquals(result[0].name, sub_ref.RelativeName())
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
   def testPullSubscriptionsCreateFullUri(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -120,10 +123,9 @@ class SubscriptionsCreateTest(SubscriptionsCreateTestBase):
         '--ack-deadline=180'.format(sub_ref.SelfLink(), topic_ref.SelfLink()),
         [req_subscription])
 
-    self.assertEquals(result[0].name,
-                      sub_ref.RelativeName())
-    self.assertEquals(result[0].ackDeadlineSeconds, 180)
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].ackDeadlineSeconds, 180)
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
   def testPullSubscriptionsCreateFullUriDifferentTopicProject(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -138,10 +140,9 @@ class SubscriptionsCreateTest(SubscriptionsCreateTestBase):
         '--ack-deadline=180'.format(sub_ref.SelfLink(), topic_ref.SelfLink()),
         [req_subscription])
 
-    self.assertEquals(result[0].name,
-                      sub_ref.RelativeName())
-    self.assertEquals(result[0].ackDeadlineSeconds, 180)
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].ackDeadlineSeconds, 180)
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
   def testPullSubscriptionsCreateWithCrossProjectTopic(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -156,9 +157,9 @@ class SubscriptionsCreateTest(SubscriptionsCreateTestBase):
          '--topic-project fake-topic-project --ack-deadline=180'),
         [req_subscription])
 
-    self.assertEquals(result[0].name, sub_ref.RelativeName())
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
-    self.assertEquals(result[0].ackDeadlineSeconds, 180)
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].ackDeadlineSeconds, 180)
 
   def testPushSubscriptionsCreateNoOutput(self):
     sub_refs = [
@@ -178,16 +179,16 @@ class SubscriptionsCreateTest(SubscriptionsCreateTestBase):
          ' --push-endpoint https://my.appspot.com/push'),
         req_subscriptions)
 
-    self.assertEquals(2, len(result))
+    self.assertEqual(2, len(result))
     for idx, sub_ref in enumerate(sub_refs):
-      self.assertEquals(result[idx].ackDeadlineSeconds, 10)
-      self.assertEquals(
+      self.assertEqual(result[idx].ackDeadlineSeconds, 10)
+      self.assertEqual(
           result[idx].name,
           sub_ref.RelativeName())
-      self.assertEquals(
+      self.assertEqual(
           result[idx].topic,
           topic_ref.RelativeName())
-      self.assertEquals(
+      self.assertEqual(
           result[idx].pushConfig.pushEndpoint,
           'https://my.appspot.com/push')
 
@@ -289,10 +290,9 @@ class SubscriptionsCreateGATest(SubscriptionsCreateTestBase):
         'pubsub subscriptions create subs1 --topic topic1 --ack-deadline=180',
         [req_subscription])
 
-    self.assertEquals(result[0].name,
-                      sub_ref.RelativeName())
-    self.assertEquals(result[0].ackDeadlineSeconds, 180)
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].ackDeadlineSeconds, 180)
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
 
 class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
@@ -313,10 +313,9 @@ class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
         'pubsub subscriptions create subs1 --topic topic1 --ack-deadline=180',
         [req_subscription])
 
-    self.assertEquals(result[0]['subscriptionId'],
-                      sub_ref.RelativeName())
-    self.assertEquals(result[0]['ackDeadlineSeconds'], 180)
-    self.assertEquals(result[0]['topic'], topic_ref.RelativeName())
+    self.assertEqual(result[0]['subscriptionId'], sub_ref.RelativeName())
+    self.assertEqual(result[0]['ackDeadlineSeconds'], 180)
+    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
 
   def testSubscriptionsCreateLabels(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
@@ -333,8 +332,8 @@ class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
         'pubsub subscriptions create subs1 --topic topic1 --labels key1=value1',
         [req_subscription])
 
-    self.assertEquals(result[0].name, sub_ref.RelativeName())
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
 
 class SubscriptionsCreateAlphaTest(SubscriptionsCreateTest):
@@ -356,10 +355,10 @@ class SubscriptionsCreateAlphaTest(SubscriptionsCreateTest):
          ' --retain-acked-messages --message-retention-duration=3d'),
         [req_subscription])
 
-    self.assertEquals(result[0].name, sub_ref.RelativeName())
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
-    self.assertEquals(result[0].retainAckedMessages, True)
-    self.assertEquals(result[0].messageRetentionDuration, '259200s')
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].retainAckedMessages, True)
+    self.assertEqual(result[0].messageRetentionDuration, '259200s')
 
   def testRetentionPullSubscriptionsCreateWithOutputAndFormat(self):
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -398,9 +397,9 @@ class SubscriptionsCreateAlphaTest(SubscriptionsCreateTest):
          ' --no-retain-acked-messages'),
         [req_subscription])
 
-    self.assertEquals(result[0].name, sub_ref.RelativeName())
-    self.assertEquals(result[0].topic, topic_ref.RelativeName())
-    self.assertEquals(result[0].retainAckedMessages, False)
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].retainAckedMessages, False)
 
   def testNoRetentionPullSubscriptionsCreateWithOutputAndFormat(self):
     properties.VALUES.core.user_output_enabled.Set(True)

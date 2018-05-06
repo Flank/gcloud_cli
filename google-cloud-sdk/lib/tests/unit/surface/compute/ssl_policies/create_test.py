@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the SSL policies create alpha command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -20,10 +22,10 @@ from tests.lib import test_case
 from tests.lib.surface.compute import ssl_policies_test_base
 
 
-class SslPolicyCreateBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
+class SslPolicyCreateGATest(ssl_policies_test_base.SslPoliciesTestBase):
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def testNonCustomProfile(self):
     name = 'my-ssl-policy'
@@ -41,7 +43,7 @@ class SslPolicyCreateBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
         minTlsVersion=min_tls_version_enum,
         customFeatures=[])
     created_ssl_policy = copy.deepcopy(ssl_policy_to_insert)
-    created_ssl_policy.fingerprint = 'SOME_FINGERPRINT'
+    created_ssl_policy.fingerprint = b'SOME_FINGERPRINT'
     created_ssl_policy.selfLink = ssl_policy_ref.SelfLink()
 
     operation_ref = self.GetOperationRef('operation-1')
@@ -77,7 +79,7 @@ class SslPolicyCreateBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
         minTlsVersion=min_tls_version_enum,
         customFeatures=custom_features)
     created_ssl_policy = copy.deepcopy(ssl_policy_to_insert)
-    created_ssl_policy.fingerprint = 'SOME_FINGERPRINT'
+    created_ssl_policy.fingerprint = b'SOME_FINGERPRINT'
     created_ssl_policy.selfLink = ssl_policy_ref.SelfLink()
 
     operation_ref = self.GetOperationRef('operation-1')
@@ -109,7 +111,7 @@ class SslPolicyCreateBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
         minTlsVersion=min_tls_version_enum,
         customFeatures=[])
     created_ssl_policy = copy.deepcopy(ssl_policy_to_insert)
-    created_ssl_policy.fingerprint = 'SOME_FINGERPRINT'
+    created_ssl_policy.fingerprint = b'SOME_FINGERPRINT'
     created_ssl_policy.selfLink = ssl_policy_ref.SelfLink()
 
     operation_ref = self.GetOperationRef('operation-1')
@@ -140,7 +142,7 @@ class SslPolicyCreateBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
         minTlsVersion=min_tls_version_enum,
         customFeatures=[])
     created_ssl_policy = copy.deepcopy(ssl_policy_to_insert)
-    created_ssl_policy.fingerprint = 'SOME_FINGERPRINT'
+    created_ssl_policy.fingerprint = b'SOME_FINGERPRINT'
     created_ssl_policy.selfLink = ssl_policy_ref.SelfLink()
 
     operation_ref = self.GetOperationRef('operation-1')
@@ -166,6 +168,12 @@ class SslPolicyCreateBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
         'argument --min-tls-version: Invalid choice: \'2.0\''):
       self.Run('compute ssl-policies create my-ssl-policy '
                '--min-tls-version 2.0')
+
+
+class SslPolicyCreateBetaTest(SslPolicyCreateGATest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class SslPolicyCreateAlphaTest(SslPolicyCreateBetaTest):

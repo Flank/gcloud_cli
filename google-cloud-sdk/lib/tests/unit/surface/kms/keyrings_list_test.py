@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise the 'gcloud kms keyrings list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 

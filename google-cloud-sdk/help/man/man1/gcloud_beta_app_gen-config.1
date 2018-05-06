@@ -17,7 +17,18 @@ gcloud beta app gen\-config \- generate missing configuration files for a source
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Generate missing configuration files for a source directory.
+\fB(BETA)\fR \fB(DEPRECATED)\fR This command is deprecated and will soon be
+removed.
+
+As an alternative, create an app.yaml file yourself using the directions at
+https://cloud.google.com/appengine/docs/flexible/python/configuring\-your\-app\-with\-app\-yaml
+(App Engine Flexible Environment) or
+https://cloud.google.com/appengine/docs/standard/python/config/appref (App
+Engine Standard Environment) under the tab for your language.
+
+To create a custom runtime, please follow the instructions at
+https://cloud.google.com/appengine/docs/flexible/custom\-runtimes/
+
 
 This command generates all relevant config files (app.yaml, Dockerfile and a
 build Dockerfile) for your application in the current directory or emits an

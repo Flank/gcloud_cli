@@ -13,12 +13,14 @@
 # limitations under the License.
 """Common utilities for the Category Manager API."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.category_manager import store
 from googlecloudsdk.core import resources
 
 
-def GetTaxonomyStoreRefFromOrgRef(org_ref):
-  """Gets a taxonomy store reference from an organization reference."""
+def GetTaxonomyStoreFromOrgResource(org_resource):
+  """Gets a taxonomy store object from an organization resource object."""
   return resources.REGISTRY.Parse(
-      store.GetTaxonomyStoreFromOrgRef(org_ref).name,
+      store.GetTaxonomyStoreFromOrgResource(org_resource).name,
       collection='categorymanager.taxonomyStores')

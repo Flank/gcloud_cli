@@ -8,9 +8,9 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute sign-url is used to generate a signed URL for
-    the specified URL and optionally validate the response by sending a request
-    to the signed URL.
+    (ALPHA) gcloud alpha compute sign-url generates a signed URL for the
+    specified URL and optionally validates the response by sending a request to
+    the signed URL.
 
     Cloud CDN Signed URLs give you a way to serve responses from the globally
     distributed CDN cache, even if the request needs to be authorized.
@@ -80,5 +80,7 @@ NOTES
     users of ALPHA commands and flags need to apply for access, agree to
     applicable terms, and have their projects whitelisted. Contact Google or
     sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/.
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta compute sign-url
 

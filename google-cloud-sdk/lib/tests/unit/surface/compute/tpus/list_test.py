@@ -75,10 +75,10 @@ class ListTest(base.TpuUnitTestBase):
     )
     self.Run('compute tpus list')
     self.AssertOutputEquals("""\
-NAME ZONE ACCELERATOR_TYPE NETWORK_ENDPOINT NETWORK RANGE STATUS
-tpu-1 us-central1-c tpu-v2 10.142.0.1:2222 default 10.142.0.0/29 READY
-tpu-2 us-central1-c tpu-v2 10.142.0.1:2222 default 10.142.0.0/29 READY
-tpu-3 us-central1-c tpu-v2 10.142.0.1:2222 default 10.142.0.0/29 READY
+NAME ZONE ACCELERATOR_TYPE NETWORK_ENDPOINTS NETWORK RANGE STATUS
+tpu-1 us-central1-c tpu-v2 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
+tpu-2 us-central1-c tpu-v2 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
+tpu-3 us-central1-c tpu-v2 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
 """, normalize_space=True)
 
   def testListWithPaging(self, track):

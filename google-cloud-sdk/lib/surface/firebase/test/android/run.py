@@ -178,8 +178,13 @@ class _BaseRun(object):
       bucket_ops.UploadFileToGcs(args.test)
     for obb_file in (args.obb_files or []):
       bucket_ops.UploadFileToGcs(obb_file)
-    if hasattr(args, u'robo_script') and args.robo_script:
+    if getattr(args, 'robo_script', None):
       bucket_ops.UploadFileToGcs(args.robo_script)
+    additional_apks = getattr(args, 'additional_apks', None) or []
+    for additional_apk in additional_apks:
+      bucket_ops.UploadFileToGcs(additional_apk)
+    for other_files in getattr(args, 'other-files', None) or {}:
+      bucket_ops.UploadFileToGcs(other_files)
     bucket_ops.LogGcsResultsUrl()
 
     tr_history_picker = history_picker.ToolResultsHistoryPicker(
@@ -230,6 +235,7 @@ class RunGA(_BaseRun, base.ListCommand):
     arg_util.AddMatrixArgs(parser)
     arg_util.AddAndroidTestArgs(parser)
     arg_util.AddGaArgs(parser)
+    base.URI_FLAG.RemoveFromParser(parser)
     parser.display_info.AddFormat(util.OUTCOMES_FORMAT)
 
 
@@ -243,6 +249,7 @@ class RunBeta(_BaseRun, base.ListCommand):
     arg_util.AddMatrixArgs(parser)
     arg_util.AddAndroidTestArgs(parser)
     arg_util.AddBetaArgs(parser)
+    base.URI_FLAG.RemoveFromParser(parser)
     parser.display_info.AddFormat(util.OUTCOMES_FORMAT)
 
 

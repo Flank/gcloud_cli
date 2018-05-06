@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha iot registries set\-iam\-policy \- set IAM policy for a device registry
+gcloud alpha iot registries set\-iam\-policy \- set the IAM policy for a device registry
 
 
 
@@ -33,11 +33,11 @@ existing policy for the device registry.
 .RS 2m
 .TP 2m
 
-REGISTRY \- The device registry for which to set IAM policy. The arguments in
-this group can be used to specify the attributes of this resource. (NOTE) Some
-attributes are not given arguments in this group but can be set in other ways.
-To set the [project] attribute: Set the property [core/project] or provide the
-flag [\-\-project] on the command line. This must be specified.
+REGISTRY \- The device registry for which to set the IAM policy. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: Set the property [core/project] or provide
+the flag [\-\-project] on the command line. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -48,13 +48,13 @@ specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The Cloud region for the registry.
+The name of the Cloud IoT region.
 
 .RE
 .sp
 .TP 2m
 \fIPOLICY_FILE\fR
-JSON or YAML file with the IAM policy
+Path to a local JSON or YAML formatted file containing a valid policy.
 
 
 .RE
@@ -69,6 +69,13 @@ help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/iot
+
+
+
 .SH "EXAMPLES"
 
 The following command will read an IAM policy defined in a JSON file
@@ -78,7 +85,6 @@ The following command will read an IAM policy defined in a JSON file
 $ gcloud alpha iot registries set\-iam\-policy \-\-region us\-central1 \e
     my\-registry policy.json
 .RE
-
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of the
 policy file format and contents.

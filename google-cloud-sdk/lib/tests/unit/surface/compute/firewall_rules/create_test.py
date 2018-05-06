@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the firewall-rules create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import firewalls_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
@@ -49,12 +51,12 @@ class FirewallRulesCreateTest(test_base.BaseTest):
                                                     *args,
                                                     **kwargs):
     if callable_obj is None:
-      return self.assertRaisesRegexp(firewalls_utils.ArgumentValidationError,
-                                     expected_regexp)
+      return self.assertRaisesRegex(firewalls_utils.ArgumentValidationError,
+                                    expected_regexp)
 
-    return self.assertRaisesRegexp(firewalls_utils.ArgumentValidationError,
-                                   expected_regexp, callable_obj, *args,
-                                   **kwargs)
+    return self.assertRaisesRegex(firewalls_utils.ArgumentValidationError,
+                                  expected_regexp, callable_obj, *args,
+                                  **kwargs)
 
   def testDefaultOptions(self):
     self.make_requests.side_effect = [[
@@ -415,7 +417,8 @@ class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
             ],
             denied=[
                 self.messages.Firewall.DeniedValueListEntry(IPProtocol='all')
-            ])
+            ],
+            disabled=False)
     ]]
 
     self.Run("""
@@ -431,20 +434,10 @@ class BetaFirewallRulesCreateTest(FirewallRulesCreateTest):
 
     self.AssertOutputEquals(
         """\
-      NAME        NETWORK  DIRECTION  PRIORITY  ALLOW   DENY
-      firewall-1  default  INGRESS    65534     tcp:80  all
+      NAME        NETWORK  DIRECTION  PRIORITY  ALLOW   DENY  DISABLED
+      firewall-1  default  INGRESS    65534     tcp:80  all   False
       """,
         normalize_space=True)
-
-
-class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
-
-  def SetUp(self):
-    self.api_version = 'alpha'
-    self.SelectApi(self.api_version)
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
 
   def testDisabled(self):
     self.Run("""
@@ -475,6 +468,16 @@ class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
         name='firewall-1',
         disabled=False,
         sourceRanges=[])
+
+
+class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
+
+  def SetUp(self):
+    self.api_version = 'alpha'
+    self.SelectApi(self.api_version)
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
 
   def testEnableLogging(self):
     self.Run("""

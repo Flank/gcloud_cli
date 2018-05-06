@@ -14,18 +14,24 @@
 
 """Tests for orgnaizations get-iam-policy."""
 
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.organizations import testbase
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class OrganizationsGetIamPolicyTest(testbase.OrganizationsUnitTestBase):
 
-  def testGetIamPolicyOrganization(self):
+  def testGetIamPolicyOrganization(self, track):
+    self.track = track
     self.mock_client.organizations.GetIamPolicy.Expect(self.ExpectedRequest(),
                                                        self._GetTestIamPolicy())
     self.assertEqual(self.DoRequest(), self._GetTestIamPolicy())
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
+    self.track = track
     self.mock_client.organizations.GetIamPolicy.Expect(self.ExpectedRequest(),
                                                        self._GetTestIamPolicy())
     args = [
@@ -36,13 +42,16 @@ class OrganizationsGetIamPolicyTest(testbase.OrganizationsUnitTestBase):
     self.DoRequest(args)
     self.AssertOutputEquals('user:admin@foo.com\n')
 
-  def testGetIamPolicyOrganization_raisesOrganizationsNotFoundError(self):
+  def testGetIamPolicyOrganization_raisesOrganizationsNotFoundError(self,
+                                                                    track):
+    self.track = track
     self.SetupGetIamPolicyFailure(self.HTTP_404_ERR)
     with self.AssertRaisesHttpExceptionMatches(
         'Organization [BAD_ID] not found: Resource not found.'):
       self.DoRequest()
 
-  def testGetIamPolicyOrganization_raisesOrganizationsAccessError(self):
+  def testGetIamPolicyOrganization_raisesOrganizationsAccessError(self, track):
+    self.track = track
     self.SetupGetIamPolicyFailure(self.HTTP_403_ERR)
     with self.AssertRaisesHttpExceptionMatches(
         'User [{}] does not have permission to access organization [SECRET_ID] '
@@ -52,8 +61,7 @@ class OrganizationsGetIamPolicyTest(testbase.OrganizationsUnitTestBase):
 
   def ExpectedRequest(self):
     return self.messages.CloudresourcemanagerOrganizationsGetIamPolicyRequest(
-        organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):],
-        getIamPolicyRequest=self.messages.GetIamPolicyRequest())
+        organizationsId=self.TEST_ORGANIZATION.name[len('organizations/'):])
 
   def SetupGetIamPolicyFailure(self, exception):
     self.mock_client.organizations.GetIamPolicy.Expect(self.ExpectedRequest(),

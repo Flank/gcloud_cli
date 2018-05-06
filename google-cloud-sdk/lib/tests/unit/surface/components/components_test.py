@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.calliope import exceptions
@@ -81,7 +84,7 @@ class ComponentsTest(cli_test_base.CliTestBase, sdk_test_base.WithLogCapture,
         platform_filter=(None, platforms.Architecture.x86))
 
     self.updater_mock.reset_mock()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ToolException,
         r'Could not parse \[junk\] into a valid Architecture\.'):
       self.Run('components list --architecture-override=junk')

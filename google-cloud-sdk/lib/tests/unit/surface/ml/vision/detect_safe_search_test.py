@@ -13,6 +13,8 @@
 # limitations under the License.
 """beta ml vision tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py import encoding
@@ -23,14 +25,10 @@ from tests.lib import test_case
 from tests.lib.surface.ml.vision import base as vision_base
 
 
-@parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA),
-    ('Beta', base.ReleaseTrack.BETA),
-    ('GA', base.ReleaseTrack.GA))
-class DetectSafeSearchTest(vision_base.MlVisionTestBase):
+class DetectSafeSearchBase(vision_base.MlVisionTestBase):
 
   def _ExpectSafeSearchRequest(self, image_path, success=False,
-                               error_message=None, contents=None):
+                               error_message=None, contents=None, model=None):
     """Build expected requests/responses for detect-safe-search command.
 
     Args:
@@ -40,6 +38,7 @@ class DetectSafeSearchTest(vision_base.MlVisionTestBase):
       error_message: str, the error message expected from the API (if any).
       contents: the content field of the Image message to be expected (if any).
           Alternative to image_path.
+      model: str, the model version to use for the feature.
     """
     ftype = self.messages.Feature.TypeValueValuesEnum.SAFE_SEARCH_DETECTION
     image = self.messages.Image()
@@ -49,7 +48,7 @@ class DetectSafeSearchTest(vision_base.MlVisionTestBase):
       image.content = contents
     request = self.messages.BatchAnnotateImagesRequest(
         requests=[self.messages.AnnotateImageRequest(
-            features=[self.messages.Feature(type=ftype)],
+            features=[self.messages.Feature(type=ftype, model=model)],
             image=image)])
     responses = []
     if success:
@@ -71,11 +70,18 @@ class DetectSafeSearchTest(vision_base.MlVisionTestBase):
     self.client.images.Annotate.Expect(request,
                                        response=response)
 
-  def testDetectSafeSearch_Successful(self, track):
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA, 'builtin/stable'),
+    ('Beta', base.ReleaseTrack.BETA, 'builtin/stable'),
+    ('GA', base.ReleaseTrack.GA, None))
+class DetectSafeSearchCommonTest(DetectSafeSearchBase):
+
+  def testDetectSafeSearch_Successful(self, track, model):
     """Test `ml vision detect-safe-search` runs & outputs correctly."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
-    self._ExpectSafeSearchRequest(path_to_image, success=True)
+    self._ExpectSafeSearchRequest(path_to_image, success=True, model=model)
     self.Run('ml vision detect-safe-search {path}'
              .format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
@@ -93,12 +99,13 @@ class DetectSafeSearchTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectSafeSearch_LocalPath(self, track):
+  def testDetectSafeSearch_LocalPath(self, track, model):
     """Test `ml vision detect-safe-search` with a local image path."""
     self.track = track
     tempdir = self.CreateTempDir()
     path_to_image = self.Touch(tempdir, name='imagefile', contents='image')
-    self._ExpectSafeSearchRequest(None, success=True, contents=bytes('image'))
+    self._ExpectSafeSearchRequest(
+        None, success=True, contents=b'image', model=model)
     self.Run('ml vision detect-safe-search {path}'
              .format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
@@ -116,14 +123,43 @@ class DetectSafeSearchTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectSafeSearch_Error(self, track):
+  def testDetectSafeSearch_Error(self, track, model):
     """Test `ml vision detect-safe-search` with an error."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
-    self._ExpectSafeSearchRequest(path_to_image, error_message='Not found.')
+    self._ExpectSafeSearchRequest(
+        path_to_image, error_message='Not found.', model=model)
     with self.AssertRaisesExceptionMatches(exceptions.Error,
                                            'Code: [400] Message: [Not found.]'):
       self.Run('ml vision detect-safe-search {path}'.format(path=path_to_image))
+
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA),
+    ('Beta', base.ReleaseTrack.BETA))
+class DetectSafeSearchAlphaBetaTest(DetectSafeSearchBase):
+
+  def testDetectSafeSearch_ModelVersion(self, track):
+    self.track = track
+    path_to_image = 'gs://fake-bucket/fake-file'
+    self._ExpectSafeSearchRequest(path_to_image, success=True,
+                                  model='builtin/latest')
+    self.Run('ml vision detect-safe-search {path} '
+             '--model-version builtin/latest'.format(path=path_to_image))
+    self.AssertOutputEquals(textwrap.dedent("""\
+        {
+          "responses": [
+            {
+              "safeSearchAnnotation": {
+                "adult": "POSSIBLE",
+                "medical": "POSSIBLE",
+                "spoof": "POSSIBLE",
+                "violence": "POSSIBLE"
+              }
+            }
+          ]
+        }
+    """))
 
 
 if __name__ == '__main__':

@@ -22,7 +22,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
 
   def testUpdateMissingNameOrLabels(self):
     snapshot_ref = self._GetSnapshotRef('snapshot-1')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.RequiredArgumentException,
         'At least one of --update-labels, '
         '--remove-labels, or --clear-labels must be specified.'):

@@ -14,6 +14,9 @@
 # limitations under the License.
 """Tests for Spanner databases query command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from apitools.base.py import extra_types
 from googlecloudsdk.core import resources
 from tests.lib.surface.spanner import base

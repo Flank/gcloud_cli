@@ -11,7 +11,7 @@ gcloud alpha scheduler jobs create\-app\-engine\-job \- create a Cloud Scheduler
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha scheduler jobs create\-app\-engine\-job\fR \fB\-\-schedule\fR=\fISCHEDULE\fR [\fB\-\-header\fR=\fIHEADER\fR] [\fB\-\-http\-method\fR=\fIHTTP_METHOD\fR;\ default="post"] [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR;\ default="1h"] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR;\ default=16] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR;\ default="0.1s"] [\fB\-\-relative\-url\fR=\fIRELATIVE_URL\fR;\ default="/"] [\fB\-\-service\fR=\fISERVICE\fR] [\fB\-\-timezone\fR=\fITIMEZONE\fR;\ default="Etc/UTC"] [\fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-payload\fR=\fIPAYLOAD\fR\ |\ \fB\-\-payload\-from\-file\fR=\fIPAYLOAD_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha scheduler jobs create\-app\-engine\-job\fR \fIJOB\fR \fB\-\-schedule\fR=\fISCHEDULE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-header\fR=\fIHEADER\fR] [\fB\-\-http\-method\fR=\fIHTTP_METHOD\fR;\ default="post"] [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR;\ default="1h"] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR;\ default=16] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR;\ default="5s"] [\fB\-\-relative\-url\fR=\fIRELATIVE_URL\fR;\ default="/"] [\fB\-\-service\fR=\fISERVICE\fR] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR;\ default="Etc/UTC"] [\fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-message\-body\fR=\fIMESSAGE_BODY\fR\ |\ \fB\-\-message\-body\-from\-file\fR=\fIMESSAGE_BODY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -20,6 +20,27 @@ gcloud alpha scheduler jobs create\-app\-engine\-job \- create a Cloud Scheduler
 \fB(ALPHA)\fR Create a Cloud Scheduler job with an App Engine target.
 
 
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+JOB \- The job to create. This represents a Cloud resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: Set the property [core/project] or provide the
+flag [\-\-project] on the command line. To set the [location] attribute: As the
+location of the current project's App Engine App.. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+The ID of the job or a fully qualified identifier for the job.
+
+
+.RE
+.RE
+.sp
 
 .SH "REQUIRED FLAGS"
 
@@ -39,9 +60,14 @@ for details.
 
 .RS 2m
 .TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A human\-readable description of the job.
+
+.TP 2m
 \fB\-\-header\fR=\fIHEADER\fR
 "KEY: VALUE" pair, HTTP header to include in the request. \fBMay be repeated\fR.
-Example: \f5\-\-header 'User\-Agent: Browser' \-\-header 'Accept: text/plain'\fR
+Example: \f5\-\-header 'Accept\-Language: en\-us' \-\-header 'Accept:
+text/plain'\fR
 
 .TP 2m
 \fB\-\-http\-method\fR=\fIHTTP_METHOD\fR; default="post"
@@ -70,9 +96,9 @@ run. If specified with \f5\-\-max\-attempts\fR, the task will be retried until
 both limits are reached. Default is 0 (which means unlimited)
 
 .TP 2m
-\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR; default="0.1s"
+\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR; default="5s"
 Duration, the minimum amount of time to wait before retrying a task after it
-fails. Ex. \f510s\fR (default is \f50.1s\fR).
+fails. Ex. \f510s\fR (default is \f55s\fR).
 
 .TP 2m
 \fB\-\-relative\-url\fR=\fIRELATIVE_URL\fR; default="/"
@@ -83,7 +109,7 @@ String, relative URL to use for the request (beginning with "/").
 String, ID of the App Engine service to which to send the request.
 
 .TP 2m
-\fB\-\-timezone\fR=\fITIMEZONE\fR; default="Etc/UTC"
+\fB\-\-time\-zone\fR=\fITIME_ZONE\fR; default="Etc/UTC"
 String, a time zone name from the tz database
 (http://en.wikipedia.org/wiki/Tz_database).
 
@@ -97,12 +123,12 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-payload\fR=\fIPAYLOAD\fR
+\fB\-\-message\-body\fR=\fIMESSAGE_BODY\fR
 String, a data payload to be included as the body of the HTTP request. May only
 be given with compatible HTTP methods (PUT or POST).
 
 .TP 2m
-\fB\-\-payload\-from\-file\fR=\fIPAYLOAD_FROM_FILE\fR
+\fB\-\-message\-body\-from\-file\fR=\fIMESSAGE_BODY_FROM_FILE\fR
 String, a data payload to be included as the body of the HTTP request. May only
 be given with compatible HTTP methods (PUT or POST).
 

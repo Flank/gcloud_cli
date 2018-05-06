@@ -199,6 +199,7 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
                             deployment=None,
                             handlers=None, beta_settings=None,
                             version_call_args=None,
+                            operation_metadata=None,
                             project=None):
     """Build expected calls and responses for a single service deployment.
 
@@ -227,6 +228,7 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
           message containing settings to be passed to version Create method
       version_call_args: dict of additional kwargs to be passed to the version
           Create method (e.g. {'vm': True})
+      operation_metadata: Metadata to be returned on the Operation.
       project: str, ID of project (self.Project() will be used by default)
     """
     project = project or self.Project()
@@ -239,6 +241,7 @@ class DeployWithApiTestsBase(DeployTestBase, cloud_storage_util.WithGCSCalls):
                              deployment=deployment,
                              handlers=handlers,
                              beta_settings=beta_settings,
+                             operation_metadata=operation_metadata,
                              version_call_args=version_call_args)
 
     # A call to list all versions will be made before setting default version
@@ -403,8 +406,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     create_app_mock = self.StartObjectPatch(create_util,
                                             'CreateAppInteractively')
 
-    with self.assertRaisesRegexp(app_exceptions.MissingApplicationError,
-                                 'does not contain an App Engine application'):
+    with self.assertRaisesRegex(app_exceptions.MissingApplicationError,
+                                'does not contain an App Engine application'):
       self.Run('app deploy ' + self.FullPath('app.yaml'))
 
     create_app_mock.assert_not_called()
@@ -447,7 +450,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
         exception=http_error.MakeDetailedHttpError(
             code=403,
             message='Original message.'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         api_lib_exceptions.HttpException,
         (r'Permissions error fetching application \[{}\]. '
          r'Please make sure you are using the correct project ID and that '
@@ -463,7 +466,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
         exception=http_error.MakeDetailedHttpError(
             code=402,
             message='Original message.'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         api_lib_exceptions.HttpException,
         (r'Original message.')):
       self.Run('app deploy ' + self.FullPath('app.yaml'))
@@ -496,7 +499,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     error_regex = (r'^\[(.*)\] could not be converted to the App Engine '
                    r'configuration format for the following reason: A '
                    r'conversion error.$')
-    with self.assertRaisesRegexp(exceptions.ConfigError, error_regex):
+    with self.assertRaisesRegex(exceptions.ConfigError, error_regex):
       self.Run('app deploy --version=1 ' + self.FullPath('app.yaml'))
 
   def testDeploy_StructuredOutput(self):
@@ -655,7 +658,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     build_mock.assert_called_once_with(
         mock.ANY, mock.ANY, staging_dir, mock.ANY, mock.ANY, mock.ANY,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
-    upload_files_mock.assert_called_once_with(mock.ANY, staging_dir, mock.ANY)
+    upload_files_mock.assert_called_once_with(mock.ANY, staging_dir, mock.ANY,
+                                              max_file_size=32 * 1024 * 1024)
 
   def testDeploy_CustomStaging(self):
     """Tests that an explicit --staging-command gets run."""
@@ -726,8 +730,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     error_regex = ('Your deployment has succeeded, but promoting the new '
                    'version to default failed. You may not have permissions '
                    'to change traffic splits.')
-    with self.assertRaisesRegexp(deploy_util.VersionPromotionError,
-                                 error_regex):
+    with self.assertRaisesRegex(deploy_util.VersionPromotionError,
+                                error_regex):
       self.Run(('app deploy --bucket=gs://default-bucket/ --version=1 '
                 '{0}').format(self.FullPath('app.yaml')))
 
@@ -760,13 +764,13 @@ class DeployWithApiTests(DeployWithApiTestsBase):
         ('app deploy {0} {1} --bucket=gs://default-bucket/ '
          '--version=1').format(self.FullPath('app.yaml'),
                                self.FullPath('app2.yaml')))
-    self.assertEquals(structured_output,
-                      {'configs': [],
-                       'versions': [
-                           version_util.Version(self.Project(),
-                                                'default', '1'),
-                           version_util.Version(self.Project(),
-                                                'fakeservice', '1')]})
+    self.assertEqual(structured_output,
+                     {'configs': [],
+                      'versions': [
+                          version_util.Version(self.Project(),
+                                               'default', '1'),
+                          version_util.Version(self.Project(),
+                                               'fakeservice', '1')]})
     self.AssertPostDeployHints(multiple_services=True)
 
   def testDeploy_InvalidVersionFlag(self):
@@ -924,8 +928,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
 
     error_regex = r'Operation \[{0}\] timed out.'.format(
         api_test_util.VersionOperationName(self.Project(), 'default'))
-    with self.assertRaisesRegexp(operations_util.OperationTimeoutError,
-                                 error_regex):
+    with self.assertRaisesRegex(operations_util.OperationTimeoutError,
+                                error_regex):
       self.Run(('app deploy --bucket=gs://default-bucket/ --version=1 '
                 '{m}').format(m=self.FullPath('app.yaml')))
 
@@ -947,8 +951,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
         )
     )
 
-    with self.assertRaisesRegexp(operations_util.OperationError,
-                                 'Error Response:'):
+    with self.assertRaisesRegex(operations_util.OperationError,
+                                'Error Response:'):
       self.Run(('app deploy --bucket=gs://default-bucket/ --version=1 '
                 '{m}').format(m=self.FullPath('app.yaml')))
 
@@ -1317,6 +1321,37 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
                            'runtime': u'vm'},
         handlers=handlers)
 
+  def _ExpectServiceDeployedWithBuildOptions(self, runtime='python-compat',
+                                             warning=None,
+                                             build_id=None,
+                                             timeout=None):
+    expected_deployment = self.GetDeploymentMessage(filenames=['app.yaml'])
+    expected_deployment.cloudBuildOptions = self.messages.CloudBuildOptions(
+        appYamlPath=u'app.yaml',
+        cloudBuildTimeout=timeout)
+    create_version_metadata = None
+    if build_id:
+      create_version_metadata = self.messages.CreateVersionMetadataV1Beta(
+          cloudBuildId=build_id)
+    operation_metadata = encoding.PyValueToMessage(
+        self.messages.Operation.MetadataValue,
+        encoding.MessageToPyValue(
+            self.messages.OperationMetadataV1Beta(
+                warning=[warning] if warning else [],
+                createVersionMetadata=create_version_metadata,
+            )))
+    beta_settings = self.VmBetaSettings(vm_runtime=runtime)
+    handlers = self.DefaultHandlers(with_static=True)
+    self.ExpectServiceDeployed(
+        'default',
+        '1',
+        deployment=expected_deployment,
+        beta_settings=beta_settings,
+        version_call_args={'env': u'flex',
+                           'runtime': u'vm'},
+        operation_metadata=operation_metadata,
+        handlers=handlers)
+
 
 class FlexDeployWithApiTests(DeployWithFlexBase):
 
@@ -1541,7 +1576,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
         error=http_error.MakeDetailedHttpError(code=403, message='Message'))
     # Deploy should fail before any other requests to AppEngine.
     self.ExpectGetApplicationRequest(self.Project())
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         deploy_command_util.PrepareFailureError,
         r'Enabling the Appengine Flexible API failed on project '
         r'\[fake-project\].'):
@@ -1554,7 +1589,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
         error=http_error.MakeDetailedHttpError(code=400, message='Message'))
     # Deploy should fail before any other requests to AppEngine.
     self.ExpectGetApplicationRequest(self.Project())
-    with self.assertRaisesRegexp(api_lib_exceptions.HttpException, r'Message'):
+    with self.assertRaisesRegex(api_lib_exceptions.HttpException, r'Message'):
       self.Run('app deploy {} --version=1'.format(self.service_path))
 
   def testDeploy_EnableFlex_PropertyOverride(self):
@@ -1673,40 +1708,22 @@ class BetaDeploy(DeployWithFlexBase):
         r'^Unable to deploy to application \[{}\] with status '
         r'\[USER_DISABLED\]: Deploying to stopped apps is not allowed.$'
         .format(self.Project()))
-    with self.assertRaisesRegexp(deploy_util.StoppedApplicationError,
-                                 regex):
+    with self.assertRaisesRegex(deploy_util.StoppedApplicationError,
+                                regex):
       self.Run('app deploy ' + self.FullPath('app.yaml'))
 
-  def testDeploy_UseWhitelistedRuntimeBuilders(self):
-    """Tests that `beta` deployments always use whitelisted runtime builders."""
-    self._ExpectServiceDeployedWithBuildId('test-beta')
-    service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
-                                 runtime='test-beta')
-    self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
-
-    self.Run('app deploy --bucket=gs://default-bucket/ --version=1 ' +
-             service_path)
-
-    self.load_cloud_build_mock.assert_called_once_with(
-        {'_OUTPUT_IMAGE': 'us.gcr.io/{}/appengine/default.1:latest'.format(
-            self.Project()),
-         '_GAE_APPLICATION_YAML_PATH': 'app.yaml'})
-
-  def testDeploy_UseRuntimeBuilders(self):
-    """Tests that `beta` deployments respect the use_runtime_builders flag."""
-    self._ExpectServiceDeployedWithBuildId()
+  def testDeploy_BuilderWarning(self):
+    """Tests that `beta` deployments display builder warnings."""
     properties.VALUES.app.use_runtime_builders.Set(True)
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                  runtime='python-compat')
     self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
+    self._ExpectServiceDeployedWithBuildOptions(
+        build_id='build-id', warning='BUILDER DEPRECATED')
 
     self.Run('app deploy --bucket=gs://default-bucket/ --version=1 ' +
              service_path)
 
-    self.load_cloud_build_mock.assert_called_once_with(
-        {'_OUTPUT_IMAGE': 'us.gcr.io/{}/appengine/default.1:latest'.format(
-            self.Project()),
-         '_GAE_APPLICATION_YAML_PATH': 'app.yaml'})
     self.AssertErrContains('BUILDER DEPRECATED\n')
     self.cloud_client_mock.Stream.assert_called_once_with(
         resources.REGISTRY.Parse(
@@ -1724,7 +1741,7 @@ class BetaDeploy(DeployWithFlexBase):
     self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
 
     deployment_message = encoding.PyValueToMessage(
-        self.messages.Deployment, {'files': {}})
+        self.messages.Deployment, {'files': {},})
     self.ExpectServiceDeployed('default', '1', deployment=deployment_message)
     self.WriteApp('app.yaml', runtime='python27')
     self.Run(
@@ -1738,34 +1755,38 @@ class BetaDeploy(DeployWithFlexBase):
     Even though 'aspnetcore' is whitelisted for beta, we should *not* use the
     runtime builder (that is, load_cloud_build_mock is not called).
     """
-    self._ExpectServiceDeployedWithBuildId(runtime='aspnetcore')
     properties.VALUES.app.use_runtime_builders.Set(False)
     self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                  runtime='aspnetcore')
+    self._ExpectServiceDeployedWithBuildOptions('aspnetcore')
 
     self.Run('app deploy --bucket=gs://default-bucket/ --version=1 ' +
              service_path)
 
-    self.load_cloud_build_mock.assert_not_called()
+  def testDeploy_CloudBuildTimeout(self):
+    """Make sure the beta staging registry is used in beta release track."""
+    service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
+                                 runtime='python-compat')
+    self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
+    properties.VALUES.app.cloud_build_timeout.Set('100')
+    self._ExpectServiceDeployedWithBuildOptions(timeout=u'100')
+    self.Run(
+        'app deploy --bucket=gs://default-bucket/ --version=1 {0}'.format(
+            service_path))
 
   def testDeploy_UseRuntimeBuildersWithPinnedVersion(self):
     """Tests that using a pinned builder ends up passing through the runtime.
     """
-    self._ExpectServiceDeployedWithBuildId(
-        runtime='gs://runtime-builders/asdf-1234.yaml')
     properties.VALUES.app.use_runtime_builders.Set(True)
     service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
                                  runtime='gs://runtime-builders/asdf-1234.yaml')
     self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
+    self._ExpectServiceDeployedWithBuildOptions(
+        runtime='gs://runtime-builders/asdf-1234.yaml')
 
     self.Run('app deploy --bucket=gs://default-bucket/ --version=1 ' +
              service_path)
-
-    self.load_cloud_build_mock.assert_called_once_with(
-        {'_OUTPUT_IMAGE': 'us.gcr.io/fake-project/appengine/default.1:latest',
-         '_GAE_APPLICATION_YAML_PATH': 'app.yaml'})
-    self.AssertErrContains('BUILDER DEPRECATED\n')
 
   def testDeploy_UsePinnedVersionWithoutRuntimeBuilders(self):
     """Tests that using a pinned builder without runtime builders is an error.
@@ -1782,24 +1803,6 @@ class BetaDeploy(DeployWithFlexBase):
                service_path)
 
     self.load_cloud_build_mock.assert_not_called()
-    self.AssertErrNotContains('BUILDER DEPRECATED\n')
-
-  def testDeploy_UseRuntimeBuildersRuntimeWithDot(self):
-    """Tests that using a pinned builder ends up passing through the runtime.
-    """
-    self._ExpectServiceDeployedWithBuildId(runtime='go-1.8')
-    properties.VALUES.app.use_runtime_builders.Set(True)
-    service_path = self.WriteApp('app.yaml', data=self.APP_DATA_ENV_FLEX,
-                                 runtime='go-1.8')
-    self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
-
-    self.Run('app deploy --bucket=gs://default-bucket/ --version=1 ' +
-             service_path)
-
-    self.load_cloud_build_mock.assert_called_once_with(
-        {'_OUTPUT_IMAGE': 'us.gcr.io/fake-project/appengine/default.1:latest',
-         '_GAE_APPLICATION_YAML_PATH': 'app.yaml'})
-    self.AssertErrContains('BUILDER DEPRECATED\n')
 
 if __name__ == '__main__':
   test_case.main()

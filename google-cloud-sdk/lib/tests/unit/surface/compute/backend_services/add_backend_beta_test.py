@@ -223,7 +223,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
             timeoutSec=120)],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-connections.*cannot be set with RATE balancing mode'):
       self.Run("""
@@ -244,7 +244,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
             timeoutSec=120)],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-utilization.*cannot be set with RATE balancing mode'):
       self.Run("""
@@ -265,7 +265,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
             timeoutSec=120)],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-rate-per-instance.*cannot be set with CONNECTION'
         ' balancing mode'):
@@ -287,7 +287,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
             timeoutSec=120)],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-utilization.*cannot be set with CONNECTION balancing mode'):
       self.Run("""

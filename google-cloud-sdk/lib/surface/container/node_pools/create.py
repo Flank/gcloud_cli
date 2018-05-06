@@ -13,6 +13,8 @@
 # limitations under the License.
 """Create node pool command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.container import api_adapter
@@ -68,10 +70,7 @@ def _Args(parser):
       help='The number of nodes in the node pool in each of the '
       'cluster\'s zones.',
       default=3)
-  parser.add_argument(
-      '--machine-type',
-      '-m',
-      help='The type of machine to use for nodes. Defaults to n1-standard-1')
+  flags.AddMachineTypeFlag(parser)
   parser.add_argument(
       '--disk-size',
       type=int,
@@ -104,6 +103,7 @@ def ParseCreateNodePoolOptionsBase(args):
       properties.VALUES.container.new_scopes_behavior.GetBool()):
     raise util.Error('Flag --[no-]enable-cloud-endpoints is not allowed if '
                      'property container/ new_scopes_behavior is set to true.')
+  flags.WarnForUnspecifiedAutorepair(args)
   return api_adapter.CreateNodePoolOptions(
       machine_type=args.machine_type,
       disk_size_gb=args.disk_size,

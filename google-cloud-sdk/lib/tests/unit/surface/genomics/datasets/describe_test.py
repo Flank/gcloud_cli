@@ -29,8 +29,8 @@ class DescribeTest(base.GenomicsUnitTest):
     self.mocked_client.datasets.Get.Expect(
         request=self.messages.GenomicsDatasetsGetRequest(datasetId=dataset.id),
         response=dataset,)
-    self.assertEquals(dataset,
-                      self.RunGenomics(['datasets', 'describe', dataset.id]))
+    self.assertEqual(dataset,
+                     self.RunGenomics(['datasets', 'describe', dataset.id]))
     self.AssertOutputContains(dataset.id)
     self.AssertOutputContains(dataset.name)
     self.AssertOutputContains(dataset.createTime)
@@ -39,8 +39,8 @@ class DescribeTest(base.GenomicsUnitTest):
     self.mocked_client.datasets.Get.Expect(
         request=self.messages.GenomicsDatasetsGetRequest(datasetId='1000'),
         exception=self.MakeHttpError(404, 'Dataset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Dataset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Dataset not found: 1000'):
       self.RunGenomics(['datasets', 'describe', '1000'])
 
 if __name__ == '__main__':

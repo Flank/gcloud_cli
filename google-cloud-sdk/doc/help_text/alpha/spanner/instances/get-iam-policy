@@ -8,11 +8,23 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Get the IAM policy for a Cloud Spanner instance.
+    (ALPHA) gcloud alpha spanner instances get-iam-policy displays the IAM
+    policy associated with a Cloud Spanner instance. If formatted as JSON, the
+    output can be edited and used as a policy file for set-iam-policy. The
+    output includes an "etag" field identifying the version emitted and
+    allowing detection of concurrent policy updates; see $ {parent}
+    set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     INSTANCE
-        Cloud Spanner instance ID.
+     INSTANCE - The Cloud Spanner instance for which to display the IAM policy.
+     This represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
+
+       INSTANCE
+          The ID of the instance or a fully qualified identifier for the
+          instance.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -44,6 +56,15 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the spanner/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/spanner/
+
+EXAMPLES
+    To print the IAM policy for a given Cloud Spanner instance, run:
+
+        $ gcloud alpha spanner instances get-iam-policy my-instance
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

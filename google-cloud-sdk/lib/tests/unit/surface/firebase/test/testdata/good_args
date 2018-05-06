@@ -71,3 +71,11 @@ robo-script.local:
 
 robo-script.gcs:
   robo-script: gs://bucket/robo_script.json
+
+additional-apks.two:
+  additional-apks: ['local/dir/apk1.apk', 'gs://bucket/apk2.apk']
+
+other-files.good:
+  other-files:
+    local/dir/file1: /sdcard/dir1
+    'gs://bucket/file2': '/sdcard/dir2'

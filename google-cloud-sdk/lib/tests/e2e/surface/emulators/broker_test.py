@@ -174,7 +174,7 @@ class BrokerTestBase(sdk_test_base.BundledBase,
         except OSError as e:
           # The child process no longer exists (or never existed). This is a
           # successful exit condition.
-          self.assertEquals(errno.ECHILD, e.errno)
+          self.assertEqual(errno.ECHILD, e.errno)
       else:
         retryer.RetryOnResult(process.poll, should_retry_if=None, sleep_ms=200)
     except retry.WaitException as e:
@@ -281,14 +281,14 @@ class BrokerTest(BrokerTestBase):
     b.CreateEmulator('some.emulator', '/some/path', ['arg1', 'arg2'],
                      ['target1', 'target2'])
     emulators = b.ListEmulators()
-    self.assertEquals(1, len(emulators))
+    self.assertEqual(1, len(emulators))
     emulator = emulators[0]
-    self.assertEquals('some.emulator', emulator['emulator_id'])
-    self.assertEquals('/some/path', emulator['start_command']['path'])
-    self.assertEquals('arg1', emulator['start_command']['args'][0])
-    self.assertEquals('arg2', emulator['start_command']['args'][1])
-    self.assertEquals('target1', emulator['rule']['target_patterns'][0])
-    self.assertEquals('target2', emulator['rule']['target_patterns'][1])
+    self.assertEqual('some.emulator', emulator['emulator_id'])
+    self.assertEqual('/some/path', emulator['start_command']['path'])
+    self.assertEqual('arg1', emulator['start_command']['args'][0])
+    self.assertEqual('arg2', emulator['start_command']['args'][1])
+    self.assertEqual('target1', emulator['rule']['target_patterns'][0])
+    self.assertEqual('target2', emulator['rule']['target_patterns'][1])
 
   def testCreateEmulator_WhenBrokerNotRunning(self):
     b = self._NewBroker(self._BrokerAddress())
@@ -313,8 +313,8 @@ class BrokerTest(BrokerTestBase):
     emulator_id = 'some.emulator'
     self._CreateDummyEmulator(b, emulator_id, resolved_host='foo:123')
     emulator = b.GetEmulator(emulator_id)
-    self.assertEquals(emulator_id, emulator['emulator_id'])
-    self.assertEquals('foo:123', emulator['rule']['resolved_host'])
+    self.assertEqual(emulator_id, emulator['emulator_id'])
+    self.assertEqual('foo:123', emulator['rule']['resolved_host'])
 
   def testGetEmulator_WhenBrokerNotRunning(self):
     b = self._NewBroker(self._BrokerAddress())
@@ -403,14 +403,14 @@ class BrokerJavaTest(BrokerTestBase):
 
     b.StartEmulator('google.pubsub')
     emulators = b.ListEmulators()
-    self.assertEquals(1, len(emulators))
-    self.assertEquals(2, emulators[0]['state'])  # ONLINE
+    self.assertEqual(1, len(emulators))
+    self.assertEqual(2, emulators[0]['state'])  # ONLINE
 
     b.StopEmulator('google.pubsub')
     emulators = b.ListEmulators()
-    self.assertEquals(1, len(emulators))
+    self.assertEqual(1, len(emulators))
     if 'state' in emulators[0]:
-      self.assertEquals(0, emulators[0]['state'])  # OFFLINE
+      self.assertEqual(0, emulators[0]['state'])  # OFFLINE
 
   def testStartEmulator_WhenAlreadyStarted(self):
     config_file = self._WriteDefaultBrokerConfig()
@@ -423,8 +423,8 @@ class BrokerJavaTest(BrokerTestBase):
 
     b.StartEmulator('google.pubsub')
     emulators = b.ListEmulators()
-    self.assertEquals(1, len(emulators))
-    self.assertEquals(2, emulators[0]['state'])  # ONLINE
+    self.assertEqual(1, len(emulators))
+    self.assertEqual(2, emulators[0]['state'])  # ONLINE
 
     with self.assertRaises(broker.BrokerError):
       b.StartEmulator('google.pubsub')
@@ -439,14 +439,14 @@ class BrokerJavaTest(BrokerTestBase):
     self._CreatePubSubEmulator(b)
 
     emulators = b.ListEmulators()
-    self.assertEquals(1, len(emulators))
+    self.assertEqual(1, len(emulators))
     if 'state' in emulators[0]:
-      self.assertEquals(0, emulators[0]['state'])  # OFFLINE
+      self.assertEqual(0, emulators[0]['state'])  # OFFLINE
 
     b.StartEmulator('google.pubsub')
     emulators = b.ListEmulators()
-    self.assertEquals(1, len(emulators))
-    self.assertEquals(2, emulators[0]['state'])  # ONLINE
+    self.assertEqual(1, len(emulators))
+    self.assertEqual(2, emulators[0]['state'])  # ONLINE
 
   def testShutdown_StopsEmulators(self):
     config_file = self._WriteDefaultBrokerConfig()
@@ -463,7 +463,7 @@ class BrokerJavaTest(BrokerTestBase):
     # the emulator is stopped after broker shutdown.
     resolved_host = b.GetEmulator('google.pubsub')['rule']['resolved_host']
     self.assertIsNotNone(resolved_host)
-    self.assertEquals('Ok', self._HttpGet(resolved_host, '/').rstrip())
+    self.assertEqual('Ok', self._HttpGet(resolved_host, '/').rstrip())
 
     b.Shutdown()
 

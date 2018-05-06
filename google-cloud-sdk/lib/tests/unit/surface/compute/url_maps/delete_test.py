@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the url-maps delete subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector

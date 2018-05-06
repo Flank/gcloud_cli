@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.resource import resource_exceptions
 from googlecloudsdk.core.resource import resource_projection_spec
@@ -23,6 +24,8 @@ from googlecloudsdk.core.resource import resource_projector
 from googlecloudsdk.core.resource import resource_transform
 from googlecloudsdk.core.util import times
 from tests.lib import test_case
+
+import six
 
 
 _FLOAT_RESOURCE = [
@@ -125,12 +128,12 @@ class ResourceTransformTest(test_case.Base):
   class SelfLink1(object):
 
     def __init__(self):
-      self.selfLink = 'https://oo/selfLink1'  # pylint: disable=invalid-name
+      self.selfLink = 'https://oo/selfLink1'  # pylint: disable=invalid-name,NOTYPO
 
   class SelfLink2(object):
 
     def __init__(self):
-      self.SelfLink = 'https://oo/SelfLink2'  # pylint: disable=invalid-name
+      self.SelfLink = 'https://oo/SelfLink2'  # pylint: disable=invalid-name,NOTYPO
 
   def Colorize(self, string, color, **kwargs):
     return '<{color}>{string}</{color}>'.format(color=color, string=string)
@@ -159,7 +162,7 @@ class ResourceTransformTest(test_case.Base):
             'dict': {'a': 1, 'b': 2, 'c': 3, 'd': 4},
             'res': self.Resolution1(100, 200),
             'size': 1024 * (1024 * 1024 * 1024 + 123),
-            'selfLink': 'https://oo/before/regions/region-a/foo/bar',
+            'selfLink': 'https://oo/before/regions/region-a/foo/bar',  # NOTYPO
             'status': 'PASSED',
             'value': None,
             },
@@ -173,7 +176,7 @@ class ResourceTransformTest(test_case.Base):
             'dict': {'A': 'a', 'B': 'b', 'C': 'c', 'D': 'd'},
             'res': self.Resolution2(100, 200),
             'size': 1024 * (1024 * 1024 + 123),
-            'selfLink': 'https://oo/before/zones/zone-b/foo/bar',
+            'selfLink': 'https://oo/before/zones/zone-b/foo/bar',  # NOTYPO
             'status': 'FAILED',
             'value': 0,
             },
@@ -187,7 +190,8 @@ class ResourceTransformTest(test_case.Base):
             'dict': {'B': 'b', 'D': 'd'},
             'res': self.Resolution3(100, 200),
             'size': 1024 * (1024 + 123),
-            'selfLink': 'https://oo/before/projects/project-c/foo%2Fbar',
+            'selfLink':
+            'https://oo/before/projects/project-c/foo%2Fbar',  # NOTYPO
             'status': 'WARNING',
             'value': True,
             },
@@ -201,7 +205,8 @@ class ResourceTransformTest(test_case.Base):
             'dict': None,
             'res': self.Resolution4(100, 200),
             'size': 1024 + 123,
-            'selfLink': 'https://oo/before/zones/all/zones/zone-b/foo/bar',
+            'selfLink':
+            'https://oo/before/zones/all/zones/zone-b/foo/bar',  # NOTYPO
             'status': 'DOWN',
             'value': [],
             },
@@ -212,7 +217,8 @@ class ResourceTransformTest(test_case.Base):
             'dict': 'line of text',
             'res': self.Resolution5(100, 200),
             'size': 123,
-            'selfLink': 'https://oo/before/zone/all/zones/zone-b/foo%2Fbar',
+            'selfLink':
+            'https://oo/before/zone/all/zones/zone-b/foo%2Fbar',  # NOTYPO
             'status': 'UNKNOWN',
             'value': [1],
             },
@@ -224,7 +230,7 @@ class ResourceTransformTest(test_case.Base):
             'dict': 1234,
             'res': self.Resolution6(100, 200),
             'size': 0,
-            'selfLink': 'https://oo/before/zones/',
+            'selfLink': 'https://oo/before/zones/',  # NOTYPO
             'status': '',
             'value': '',
             },
@@ -235,7 +241,7 @@ class ResourceTransformTest(test_case.Base):
             'list': [1, 2, 3, 4],
             'res': self.Resolution6(100, 200),
             'size': 1024 * (1024 * 1024 * 1024 * 1024 + 123),
-            'selfLink': 'https://oo/before/zones',
+            'selfLink': 'https://oo/before/zones',  # NOTYPO
             'status': None,
             'value': '',
             },
@@ -898,18 +904,18 @@ class ResourceTransformTest(test_case.Base):
   def testTransformDurationErrors(self):
     resource = [1e12]
     kwargs = {'undefined': 'UNDEFINED'}
-    expected = ['UNDEFINED']
+    expected = ['UNDEFINED' if six.PY2 else 'P31688Y279D']
     self.Run(resource, None, resource_transform.TransformDuration, [], expected,
              kwargs)
 
   def testTransformEncodeBase64(self):
-    resource = ['This is base64 encoded.',
+    resource = [b'This is base64 encoded.',
                 12345]
     kwargs = {
         'undefined': 'ERROR'
     }
     expected = ['VGhpcyBpcyBiYXNlNjQgZW5jb2RlZC4=',
-                'ERROR']
+                'MTIzNDU=']
     self.Run(resource, None, resource_transform.TransformEncode,
              ['base64'], expected, kwargs)
 
@@ -920,7 +926,7 @@ class ResourceTransformTest(test_case.Base):
         'undefined': 'ERROR'
     }
     expected = ['This is ASCII text.',
-                'ERROR']
+                '12345']
     self.Run(resource, None, resource_transform.TransformEncode,
              ['utf8'], expected, kwargs)
 
@@ -1004,14 +1010,14 @@ class ResourceTransformTest(test_case.Base):
 
   def testTransformErrorWithMessage(self):
     msg = 'Test error message.'
-    with self.assertRaisesRegexp(resource_exceptions.Error, msg):
+    with self.assertRaisesRegex(resource_exceptions.Error, msg):
       self.Run(self._resource, 'error', resource_transform.TransformError,
                [msg], [])
 
   def testTransformErrorNoMessage(self):
     msg = 'Test error message.'
     resource = [{'error': msg}]
-    with self.assertRaisesRegexp(resource_exceptions.Error, msg):
+    with self.assertRaisesRegex(resource_exceptions.Error, msg):
       self.Run(resource, 'error', resource_transform.TransformError,
                [], [])
 
@@ -1036,7 +1042,7 @@ class ResourceTransformTest(test_case.Base):
 
   def testTransformFatal(self):
     msg = 'Test fatal message.'
-    with self.assertRaisesRegexp(resource_exceptions.InternalError, msg):
+    with self.assertRaisesRegex(resource_exceptions.InternalError, msg):
       self.Run(self._resource, 'fatal', resource_transform.TransformFatal,
                [msg], [])
 
@@ -1786,31 +1792,31 @@ class ResourceTransformTest(test_case.Base):
 
   def testTransformUri(self):
     self.Run(self._resource, None, resource_transform.TransformUri, [],
-             ['https://oo/before/regions/region-a/foo/bar',
-              'https://oo/before/zones/zone-b/foo/bar',
-              'https://oo/before/projects/project-c/foo%2Fbar',
-              'https://oo/before/zones/all/zones/zone-b/foo/bar',
-              'https://oo/before/zone/all/zones/zone-b/foo%2Fbar',
-              'https://oo/before/zones/',
-              'https://oo/before/zones'])
+             ['https://oo/before/regions/region-a/foo/bar',  # NOTYPO
+              'https://oo/before/zones/zone-b/foo/bar',  # NOTYPO
+              'https://oo/before/projects/project-c/foo%2Fbar',  # NOTYPO
+              'https://oo/before/zones/all/zones/zone-b/foo/bar',  # NOTYPO
+              'https://oo/before/zone/all/zones/zone-b/foo%2Fbar',  # NOTYPO
+              'https://oo/before/zones/',  # NOTYPO
+              'https://oo/before/zones'])  # NOTYPO
 
   def testTransformUriValue(self):
     self.Run(self._resource, 'selfLink', resource_transform.TransformUri, [],
-             ['https://oo/before/regions/region-a/foo/bar',
-              'https://oo/before/zones/zone-b/foo/bar',
-              'https://oo/before/projects/project-c/foo%2Fbar',
-              'https://oo/before/zones/all/zones/zone-b/foo/bar',
-              'https://oo/before/zone/all/zones/zone-b/foo%2Fbar',
-              'https://oo/before/zones/',
-              'https://oo/before/zones'])
+             ['https://oo/before/regions/region-a/foo/bar',  # NOTYPO
+              'https://oo/before/zones/zone-b/foo/bar',  # NOTYPO
+              'https://oo/before/projects/project-c/foo%2Fbar',  # NOTYPO
+              'https://oo/before/zones/all/zones/zone-b/foo/bar',  # NOTYPO
+              'https://oo/before/zone/all/zones/zone-b/foo%2Fbar',  # NOTYPO
+              'https://oo/before/zones/',  # NOTYPO
+              'https://oo/before/zones'])  # NOTYPO
 
   def testTransformUriSelfLink1(self):
     self.Run([self.SelfLink1()], None, resource_transform.TransformUri, [],
-             ['https://oo/selfLink1'])
+             ['https://oo/selfLink1'])  # NOTYPO
 
   def testTransformUriSelfLink2(self):
     self.Run([self.SelfLink2()], None, resource_transform.TransformUri, [],
-             ['https://oo/SelfLink2'])
+             ['https://oo/SelfLink2'])  # NOTYPO
 
   def testTransformYesNo(self):
     self.Run(self._resource, 'value', resource_transform.TransformYesNo,

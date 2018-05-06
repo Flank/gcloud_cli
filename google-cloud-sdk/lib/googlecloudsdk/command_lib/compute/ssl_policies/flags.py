@@ -13,6 +13,8 @@
 # limitations under the License.
 """Flags and helpers for the compute ssl-policies commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import completers as compute_completers
@@ -31,7 +33,6 @@ _TLS_VERSION_MAP = {
     '1.0': 'TLS_1_0',
     '1.1': 'TLS_1_1',
     '1.2': 'TLS_1_2',
-    '1.3': 'TLS_1_3',
 }
 
 

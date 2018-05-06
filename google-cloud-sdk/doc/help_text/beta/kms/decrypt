@@ -58,8 +58,9 @@ EXAMPLES
             --plaintext-file path/to/output/plaintext
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud kms decrypt
+        $ gcloud alpha kms decrypt
 

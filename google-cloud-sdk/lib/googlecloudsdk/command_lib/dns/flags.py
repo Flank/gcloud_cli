@@ -14,29 +14,13 @@
 
 """Common flags for some of the DNS commands."""
 
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope.concepts import concepts
+from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.util import completers
 from googlecloudsdk.command_lib.util.apis import arg_utils
-
-
-_DNSEC_MAP = arg_utils.ChoiceEnumMapper(
-    '--dnssec-state', (apis.GetMessagesModule('dns', 'v1beta2')
-                       .ManagedZoneDnsSecConfig.StateValueValuesEnum),
-    custom_mappings={
-        'off': ('off', 'Disable DNSSEC for the managed zone.'),
-        'on': ('on', 'Enable DNSSEC for the managed zone.'),
-        'transfer': ('transfer', ('Enable DNSSEC and allow '
-                                  'transferring a signed zone in '
-                                  'or out.'))
-    },
-    help_str='The DNSSEC state for this managed zone.')
-
-_DOE_MAP = arg_utils.ChoiceEnumMapper(
-    '--denial-of-existence',
-    (apis.GetMessagesModule('dns', 'v2beta1')
-     .ManagedZoneDnsSecConfig.NonExistenceValueValuesEnum),
-    help_str='Requires DNSSEC enabled.')
+from googlecloudsdk.command_lib.util.concepts import concept_parsers
+from googlecloudsdk.core import properties
 
 
 class KeyCompleter(completers.ListCommandCompleter):
@@ -79,14 +63,63 @@ def GetDnsZoneArg(help_text):
       help=help_text)
 
 
-def GetZoneArg(help_text=(
-    'Name of the managed-zone whose record-sets you want to manage.')):
-  return base.Argument(
-      '--zone',
-      '-z',
-      completer=ManagedZoneCompleter,
-      help=help_text,
+def ZoneAttributeConfig():
+  return concepts.ResourceParameterAttributeConfig(
+      name='zone',
+      help_text='The Cloud DNS zone for the {resource}.')
+
+
+def ProjectAttributeConfig():
+  return concepts.ResourceParameterAttributeConfig(
+      name='project',
+      help_text='The Cloud project for the {resource}.',
+      fallthroughs=[deps.PropertyFallthrough(properties.VALUES.core.project)])
+
+
+def GetZoneResourceSpec():
+  return concepts.ResourceSpec(
+      'dns.managedZones',
+      resource_name='zone',
+      managedZone=ZoneAttributeConfig(),
+      project=ProjectAttributeConfig(),
+      disable_auto_completers=False)
+
+
+def GetZoneResourceArg(help_text, positional=True, plural=False):
+  arg_name = 'zones' if plural else 'zone'
+  return concept_parsers.ConceptParser.ForResource(
+      arg_name if positional else '--{}'.format(arg_name),
+      GetZoneResourceSpec(),
+      help_text,
+      plural=plural,
       required=True)
+
+
+def GetZoneArg(help_text=(
+    'Name of the managed-zone whose record-sets you want to manage.'),
+               hide_short_zone_flag=False):
+  if hide_short_zone_flag:
+    zone_group = base.ArgumentGroup(required=True)
+    zone_group.AddArgument(
+        base.Argument(
+            '--zone',
+            completer=ManagedZoneCompleter,
+            help=help_text))
+    zone_group.AddArgument(
+        base.Argument(
+            '-z',
+            dest='zone',
+            completer=ManagedZoneCompleter,
+            help=help_text,
+            hidden=True))
+    return zone_group
+  else:
+    return base.Argument(
+        '--zone',
+        '-z',
+        completer=ManagedZoneCompleter,
+        help=help_text,
+        required=True)
 
 
 def GetManagedZonesDnsNameArg():
@@ -103,18 +136,30 @@ def GetManagedZonesDescriptionArg(required=False):
       help='Short description for the managed-zone.')
 
 
-def GetDnsSecStateFlagMapper():
-  return _DNSEC_MAP
+def GetDnsSecStateFlagMapper(messages):
+  return arg_utils.ChoiceEnumMapper(
+      '--dnssec-state', messages.ManagedZoneDnsSecConfig.StateValueValuesEnum,
+      custom_mappings={
+          'off': ('off', 'Disable DNSSEC for the managed zone.'),
+          'on': ('on', 'Enable DNSSEC for the managed zone.'),
+          'transfer': ('transfer', ('Enable DNSSEC and allow '
+                                    'transferring a signed zone in '
+                                    'or out.'))
+      },
+      help_str='The DNSSEC state for this managed zone.')
 
 
-def GetDoeFlagMapper():
-  return _DOE_MAP
+def GetDoeFlagMapper(messages):
+  return arg_utils.ChoiceEnumMapper(
+      '--denial-of-existence',
+      messages.ManagedZoneDnsSecConfig.NonExistenceValueValuesEnum,
+      help_str='Requires DNSSEC enabled.')
 
 
-def AddCommonManagedZonesDnssecArgs(parser):
+def AddCommonManagedZonesDnssecArgs(parser, messages):
   """Add Common DNSSEC flags for the managed-zones group."""
-  _DNSEC_MAP.choice_arg.AddToParser(parser)
-  _DOE_MAP.choice_arg.AddToParser(parser)
+  GetDnsSecStateFlagMapper(messages).choice_arg.AddToParser(parser)
+  GetDoeFlagMapper(messages).choice_arg.AddToParser(parser)
   parser.add_argument(
       '--ksk-algorithm',
       help='String mnemonic specifying the DNSSEC algorithm of the '

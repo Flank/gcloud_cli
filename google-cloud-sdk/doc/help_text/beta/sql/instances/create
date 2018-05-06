@@ -22,7 +22,15 @@ SYNOPSIS
         [--replication=REPLICATION] [--require-ssl] [--storage-auto-increase]
         [--storage-auto-increase-limit=STORAGE_AUTO_INCREASE_LIMIT]
         [--storage-size=STORAGE_SIZE] [--storage-type=STORAGE_TYPE]
-        [--tier=TIER, -t TIER] [GCLOUD_WIDE_FLAG ...]
+        [--tier=TIER, -t TIER]
+        [--master-dump-file-path=MASTER_DUMP_FILE_PATH
+          --master-username=MASTER_USERNAME
+          : [--master-ca-certificate-path=MASTER_CA_CERTIFICATE_PATH
+          : --client-certificate-path=CLIENT_CERTIFICATE_PATH
+          --client-key-path=CLIENT_KEY_PATH] --master-password=MASTER_PASSWORD
+          | --prompt-for-master-password]
+        [--source-ip-address=SOURCE_IP_ADDRESS
+          : --source-port=SOURCE_PORT; default=3306] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Creates a new Cloud SQL instance.
@@ -58,14 +66,14 @@ FLAGS
         (e.g. 192.168.100.0/24).
 
      --availability-type=AVAILABILITY_TYPE
-        Specifies level of availability. Only applies to PSQL instances.
+        Specifies level of availability. Only applies to PostgreSQL instances.
         AVAILABILITY_TYPE must be one of:
 
-         REGIONAL
+         regional
             Provides high availability and is recommended for production
             instances; instance automatically fails over to another zone within
             your selected region.
-         ZONAL
+         zonal
             Provides no failover capability. This is the default.
 
      --backup
@@ -190,6 +198,62 @@ FLAGS
         instances, only shared-core machine types (e.g., db-f1-micro) apply.
         The default tier is db-n1-standard-1. A complete list of tiers is
         available here: https://cloud.google.com/sql/pricing
+
+     Options for creating an internal replica of an external data source.
+
+       --master-dump-file-path=MASTER_DUMP_FILE_PATH
+          Path to the MySQL dump file in Google Cloud Storage from which the
+          seed import is made. The URI is in the form gs://bucketName/fileName.
+          Compressed gzip files (.gz) are also supported. This flag must be
+          specified if any of the other arguments in this group are specified.
+
+       --master-username=MASTER_USERNAME
+          Name of the replication user on the external data source. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       Client and server credentials.
+
+         --master-ca-certificate-path=MASTER_CA_CERTIFICATE_PATH
+            Path to a file containing the X.509v3 (RFC5280) PEM encoded
+            certificate of the CA that signed the external data source's
+            certificate. This flag must be specified if any of the other
+            arguments in this group are specified.
+
+         Client credentials.
+
+           --client-certificate-path=CLIENT_CERTIFICATE_PATH
+              Path to a file containing the X.509v3 (RFC5280) PEM encoded
+              certificate that will be used by the replica to authenticate
+              against the external data source. This flag must be specified if
+              any of the other arguments in this group are specified.
+
+           --client-key-path=CLIENT_KEY_PATH
+              Path to a file containing the unencrypted PKCS#1 or PKCS#8 PEM
+              encoded private key associated with the clientCertificate. This
+              flag must be specified if any of the other arguments in this
+              group are specified.
+
+       Password group. At most one of these may be specified:
+
+         --master-password=MASTER_PASSWORD
+            Password of the replication user on the external data source.
+
+         --prompt-for-master-password
+            Prompt for the password of the replication user on the external
+            data source. The password is all typed characters up to but not
+            including the RETURN or ENTER key.
+
+     Options for creating a wrapper for an external data source.
+
+       --source-ip-address=SOURCE_IP_ADDRESS
+          Public IP address used to connect to and replicate from the external
+          data source. This flag must be specified if any of the other
+          arguments in this group are specified.
+
+       --source-port=SOURCE_PORT; default=3306
+          Port number used to connect to and replicate from the external data
+          source.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

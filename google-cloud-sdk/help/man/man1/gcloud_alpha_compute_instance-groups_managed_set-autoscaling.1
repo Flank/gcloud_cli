@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed set\-autoscaling \- set autoscalin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR] [\fB\-\-queue\-scaling\-cloud\-pub\-sub\fR=[\fIsubscription\fR=\fISUBSCRIPTION\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-queue\-scaling\-single\-worker\-throughput\fR=\fIQUEUE_SCALING_SINGLE_WORKER_THROUGHPUT\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed set\-autoscaling\fR \fINAME\fR [\fB\-\-autoscaling\-file\fR=\fIPATH\fR] [\fB\-\-cool\-down\-period\fR=\fICOOL_DOWN_PERIOD\fR] [\fB\-\-custom\-metric\-utilization\fR=[\fImetric\fR=\fIMETRIC\fR],[\fIutilization\-target\fR=\fIUTILIZATION\-TARGET\fR],[\fIutilization\-target\-type\fR=\fIUTILIZATION\-TARGET\-TYPE\fR]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-max\-num\-replicas\fR=\fIMAX_NUM_REPLICAS\fR] [\fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR] [\fB\-\-mode\fR=\fIMODE\fR] [\fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR] [\fB\-\-queue\-scaling\-cloud\-pub\-sub\fR=[\fIsubscription\fR=\fISUBSCRIPTION\fR],[\fItopic\fR=\fITOPIC\fR]] [\fB\-\-queue\-scaling\-single\-worker\-throughput\fR=\fIQUEUE_SCALING_SINGLE_WORKER_THROUGHPUT\fR] [\fB\-\-remove\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-scale\-based\-on\-cpu\fR] [\fB\-\-scale\-based\-on\-load\-balancing\fR] [\fB\-\-stackdriver\-metric\-filter\fR=\fIFILTER\fR] [\fB\-\-stackdriver\-metric\-single\-instance\-assignment\fR=\fIASSIGNMENT\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\fR=\fITARGET\fR] [\fB\-\-stackdriver\-metric\-utilization\-target\-type\fR=\fITARGET_TYPE\fR] [\fB\-\-target\-cpu\-utilization\fR=\fITARGET_CPU_UTILIZATION\fR] [\fB\-\-target\-load\-balancing\-utilization\fR=\fITARGET_LOAD_BALANCING_UTILIZATION\fR] [\fB\-\-update\-stackdriver\-metric\fR=\fIMETRIC\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -88,6 +88,33 @@ Maximum number of replicas Autoscaler will set.
 \fB\-\-min\-num\-replicas\fR=\fIMIN_NUM_REPLICAS\fR
 Minimum number of replicas Autoscaler will set.
 
+.TP 2m
+\fB\-\-mode\fR=\fIMODE\fR
+Set the mode of an autoscaler for a managed instance group.
+
+You can turn off or restrict MIG activities without changing MIG configuration
+and then having to restore it later. MIG configuration persists while the
+activities are turned off or restricted, and the activities pick it up when they
+are turned on again or when the restrictions are lifted.
+
+\fIMODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBoff\fR
+to turn off autoscaling, while keeping the new configuration.
+.TP 2m
+\fBon\fR
+to permit autoscaling to scale up and down (default for new autoscalers).
+.TP 2m
+\fBonly\-down\fR
+to permit autoscaling to scale only down and not up.
+.TP 2m
+\fBonly\-up\fR
+to permit autoscaling to scale only up and not down.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-queue\-scaling\-acceptable\-backlog\-per\-instance\fR=\fIQUEUE_SCALING_ACCEPTABLE_BACKLOG_PER_INSTANCE\fR
 Queue\-based scaling target: autoscaler will aim to assure that average number
@@ -186,7 +213,7 @@ At most one of these may be specified:
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
 The region of the managed instance group to operate on. If not specified, you
-will be prompted to select a region.
+may be prompted to select a region.
 
 A list of regions can be fetched by running:
 

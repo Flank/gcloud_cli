@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha projects get-iam-policy - get IAM policy for a project
+    gcloud alpha projects get-iam-policy - get the IAM policy for a project
 
 SYNOPSIS
     gcloud alpha projects get-iam-policy PROJECT_ID [--filter=EXPRESSION]
@@ -7,11 +7,19 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Gets the IAM policy for a project, given a project ID.
+    (ALPHA) gcloud alpha projects get-iam-policy displays the IAM policy
+    associated with a project. If formatted as JSON, the output can be edited
+    and used as a policy file for set-iam-policy. The output includes an "etag"
+    field identifying the version emitted and allowing detection of concurrent
+    policy updates; see $ {parent} set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     PROJECT_ID
-        ID for the project you want to get IAM policy for.
+     PROJECT ID - The project for which to display the IAM policy. This
+     represents a Cloud resource. This must be specified.
+
+       PROJECT_ID
+          The ID of the project or a fully qualified identifier for the
+          project.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -44,11 +52,14 @@ GCLOUD WIDE FLAGS
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
-EXAMPLES
-    The following command prints the IAM policy for a project with the ID
-    example-project-id-1:
+API REFERENCE
+    This command uses the cloudresourcemanager/v1 API. The full documentation
+    for this API can be found at: https://cloud.google.com/resource-manager
 
-        $ gcloud alpha projects get-iam-policy example-project-id-1
+EXAMPLES
+    To print the IAM policy for a given project, run:
+
+        $ gcloud alpha projects get-iam-policy my-project
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

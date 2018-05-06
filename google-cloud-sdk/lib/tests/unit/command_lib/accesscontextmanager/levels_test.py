@@ -36,31 +36,31 @@ class LevelsTest(test_case.TestCase):
     return full_path
 
   def testParseMissingFile(self):
-    with self.assertRaisesRegexp(yaml.FileLoadError,
-                                 'Failed to load'):
+    with self.assertRaisesRegex(yaml.FileLoadError,
+                                'Failed to load'):
       levels.ParseBasicLevelConditions('does-not-exist.yaml')
 
   def testParseInvalidYaml(self):
     path = self._MakeFile(':')
-    with self.assertRaisesRegexp(yaml.YAMLParseError,
-                                 'Failed to parse YAML'):
+    with self.assertRaisesRegex(yaml.YAMLParseError,
+                                'Failed to parse YAML'):
       levels.ParseBasicLevelConditions(path)
 
   def testParseEmpty(self):
     path = self._MakeFile('')
-    with self.assertRaisesRegexp(levels.ParseError, 'File is empty'):
+    with self.assertRaisesRegex(levels.ParseError, 'File is empty'):
       levels.ParseBasicLevelConditions(path)
 
   def testParseValidYamlInvalidObjectEncodeError(self):
     path = self._MakeFile('test')
-    with self.assertRaisesRegexp(levels.ParseError,
-                                 'Invalid format'):
+    with self.assertRaisesRegex(levels.ParseError,
+                                'Invalid format'):
       levels.ParseBasicLevelConditions(path)
 
   def testParseValidYamlInvalidObjectUnrecognizedField(self):
     path = self._MakeFile('[{"invalid-prop": "value"}]')
-    with self.assertRaisesRegexp(levels.ParseError,
-                                 r'Unrecognized fields: \[invalid-prop\]'):
+    with self.assertRaisesRegex(levels.ParseError,
+                                r'Unrecognized fields: \[invalid-prop\]'):
       levels.ParseBasicLevelConditions(path)
 
   def testParseSuccess(self):

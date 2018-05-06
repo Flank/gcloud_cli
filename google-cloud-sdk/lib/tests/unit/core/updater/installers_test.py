@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import time
-import urllib2
 
 from googlecloudsdk.core import url_opener
 from googlecloudsdk.core.updater import installers
 from tests.lib.core.updater import util
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 
 
 class InstallersTest(util.Base):
@@ -27,20 +31,20 @@ class InstallersTest(util.Base):
 
   def testRetryExceeded404(self):
     fake_url = 'https://google.com/junk'
-    fake_error = urllib2.HTTPError(
+    fake_error = six.moves.urllib.error.HTTPError(
         fake_url, code=404, msg='Not Found', hdrs={}, fp=None)
     urlopen_mock = self.StartObjectPatch(
         url_opener, 'urlopen', side_effect=fake_error)
 
-    with self.assertRaisesRegexp(urllib2.HTTPError,
-                                 'HTTP Error 404: Not Found'):
+    with self.assertRaisesRegex(six.moves.urllib.error.HTTPError,
+                                'HTTP Error 404: Not Found'):
       installers.ComponentInstaller.MakeRequest(fake_url, command_path='junk')
     # Original request and 3 retries for 404 errors.
     self.assertEqual(4, urlopen_mock.call_count)
 
   def testRetry404(self):
     fake_url = 'https://google.com/junk'
-    fake_error = urllib2.HTTPError(
+    fake_error = six.moves.urllib.error.HTTPError(
         fake_url, code=404, msg='Not Found', hdrs={}, fp=None)
     request = object()
     urlopen_mock = self.StartObjectPatch(
@@ -53,12 +57,13 @@ class InstallersTest(util.Base):
 
   def testNoRetry403(self):
     fake_url = 'https://google.com/junk'
-    fake_error = urllib2.HTTPError(
+    fake_error = six.moves.urllib.error.HTTPError(
         fake_url, code=403, msg='Denied', hdrs={}, fp=None)
     urlopen_mock = self.StartObjectPatch(
         url_opener, 'urlopen', side_effect=fake_error)
 
-    with self.assertRaisesRegexp(urllib2.HTTPError, 'HTTP Error 403: Denied'):
+    with self.assertRaisesRegex(six.moves.urllib.error.HTTPError,
+                                'HTTP Error 403: Denied'):
       installers.ComponentInstaller.MakeRequest(fake_url, command_path='junk')
     # No retry should occur for 403 errors.
     urlopen_mock.assert_called_once()
@@ -72,7 +77,8 @@ class InstallersTest(util.Base):
 
     # Local files don't get retried because there is no 404 error
     # Linux and windows return different error messages so wildcard the match.
-    with self.assertRaisesRegexp(urllib2.URLError, r'urlopen error \[.+2\]'):
+    with self.assertRaisesRegex(six.moves.urllib.error.URLError,
+                                r'urlopen error \[.+2\]'):
       installers.ComponentInstaller.MakeRequest(fake_url, command_path='junk')
     urlopen_mock.assert_called_once()
 
@@ -80,5 +86,5 @@ class InstallersTest(util.Base):
     self.Touch(self.root_path, 'missing_file', 'contents')
     result = installers.ComponentInstaller.MakeRequest(
         fake_url, command_path='junk')
-    self.assertEqual('contents', result.read())
+    self.assertEqual(b'contents', result.read())
     result.close()

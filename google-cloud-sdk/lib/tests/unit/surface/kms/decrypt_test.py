@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise the 'gcloud kms decrypt' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import exceptions
@@ -32,28 +34,28 @@ class KeysDecryptTest(base.KmsMockTest):
     self.kms.projects_locations_keyRings_cryptoKeys.Decrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysDecryptRequest(
             name=self.key_name.RelativeName(),
-            decryptRequest=self.messages.DecryptRequest(ciphertext='foo bar')),
-        response=self.messages.DecryptResponse(plaintext='decrypted foo bar'))
+            decryptRequest=self.messages.DecryptRequest(ciphertext=b'foo bar')),
+        response=self.messages.DecryptResponse(plaintext=b'decrypted foo bar'))
 
     self.Run('kms decrypt --location={0} --keyring={1} --key={2} '
              '--plaintext-file={3} --ciphertext-file={4}'.format(
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id, pt_path, ct_path))
 
-    self.AssertFileExistsWithContents('decrypted foo bar', pt_path)
+    self.AssertBinaryFileEquals(b'decrypted foo bar', pt_path)
 
   def testDecryptWithAad(self):
-    ct_path = self.Touch(self.temp_path, name='ciphertext', contents='foo bar')
-    aad_path = self.Touch(self.temp_path, name='aad', contents='authed data')
+    ct_path = self.Touch(self.temp_path, name='ciphertext', contents=b'foo bar')
+    aad_path = self.Touch(self.temp_path, name='aad', contents=b'authed data')
     pt_path = self.Touch(self.temp_path, name='plaintext')
 
     self.kms.projects_locations_keyRings_cryptoKeys.Decrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysDecryptRequest(
             name=self.key_name.RelativeName(),
             decryptRequest=self.messages.DecryptRequest(
-                ciphertext='foo bar',
-                additionalAuthenticatedData='authed data')),
-        response=self.messages.DecryptResponse(plaintext='decrypted foo bar'))
+                ciphertext=b'foo bar',
+                additionalAuthenticatedData=b'authed data')),
+        response=self.messages.DecryptResponse(plaintext=b'decrypted foo bar'))
 
     self.Run('kms decrypt --location={0} --keyring={1} --key={2} '
              '--plaintext-file={3} --ciphertext-file={4} '
@@ -61,18 +63,16 @@ class KeysDecryptTest(base.KmsMockTest):
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id, pt_path, ct_path, aad_path))
 
-    self.AssertFileExistsWithContents('decrypted foo bar', pt_path)
+    self.AssertBinaryFileEquals(b'decrypted foo bar', pt_path)
 
   def testDecryptStdio(self):
-    self.WriteInput('foo bar')
+    self.WriteBinaryInput(b'foo bar')
 
     self.kms.projects_locations_keyRings_cryptoKeys.Decrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysDecryptRequest(
             name=self.key_name.RelativeName(),
-            # WriteInput appends the \n.
-            decryptRequest=self.messages.DecryptRequest(
-                ciphertext='foo bar\n')),
-        response=self.messages.DecryptResponse(plaintext='decrypted foo bar'))
+            decryptRequest=self.messages.DecryptRequest(ciphertext=b'foo bar')),
+        response=self.messages.DecryptResponse(plaintext=b'decrypted foo bar'))
 
     self.Run(
         'kms decrypt --location={0} --keyring={1} --key={2} --plaintext-file=- '
@@ -80,13 +80,13 @@ class KeysDecryptTest(base.KmsMockTest):
                                      self.key_name.key_ring_id,
                                      self.key_name.crypto_key_id))
 
-    self.AssertOutputEquals('decrypted foo bar')
+    self.AssertOutputBytesEquals(b'decrypted foo bar')
 
   def testDecryptMissingCiphertextFile(self):
     ct_path = os.path.join(self.temp_path, 'file-that-does-not-exist')
     pt_path = self.Touch(self.temp_path, name='plaintext')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         'Failed to read ciphertext file.*No such file'):
       self.Run('kms decrypt --location={0} --keyring={1} --key={2} '
@@ -95,11 +95,11 @@ class KeysDecryptTest(base.KmsMockTest):
                    self.key_name.crypto_key_id, pt_path, ct_path))
 
   def testDecryptMissingAadFile(self):
-    ct_path = self.Touch(self.temp_path, name='ciphertext', contents='foo bar')
+    ct_path = self.Touch(self.temp_path, name='ciphertext', contents=b'foo bar')
     aad_path = os.path.join(self.temp_path, 'file-that-does-not-exist')
     pt_path = self.Touch(self.temp_path, name='plaintext')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         'Failed to read additional authenticated data file.*No such file'):
       self.Run('kms decrypt --location={0} --keyring={1} --key={2} '
@@ -115,8 +115,8 @@ class KeysDecryptTest(base.KmsMockTest):
     self.kms.projects_locations_keyRings_cryptoKeys.Decrypt.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsCryptoKeysDecryptRequest(
             name=self.key_name.RelativeName(),
-            decryptRequest=self.messages.DecryptRequest(ciphertext='foo bar')),
-        response=self.messages.DecryptResponse(plaintext='decrypted foo bar'))
+            decryptRequest=self.messages.DecryptRequest(ciphertext=b'foo bar')),
+        response=self.messages.DecryptResponse(plaintext=b'decrypted foo bar'))
 
     with self.AssertRaisesToolExceptionMatches('No such file or directory'):
       self.Run('kms decrypt --location={0} --keyring={1} --key={2} '
@@ -143,11 +143,11 @@ class KeysDecryptTest(base.KmsMockTest):
                    self.key_name.crypto_key_id, file_path))
 
   def testDecryptTooLarge(self):
-    contents = 'a' * 3 * 65536  # arbitrarily selected limit is 2*65536
+    contents = b'a' * 3 * 65536  # arbitrarily selected limit is 2*65536
     ct_path = self.Touch(self.temp_path, name='ciphertext', contents=contents)
     pt_path = self.Touch(self.temp_path, name='plaintext')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         r'is larger than the maximum size of 131072 bytes.'):
       self.Run('kms decrypt --location={0} --keyring={1} --key={2} '
@@ -158,7 +158,7 @@ class KeysDecryptTest(base.KmsMockTest):
   def testRejectCiphertextAndAadFromStdin(self):
     pt_path = self.Touch(self.temp_path, name='plaintext')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'--ciphertext-file.*--additional-authenticated-data-file'):
       self.Run('kms decrypt --location={0} --keyring={1} --key={2} '

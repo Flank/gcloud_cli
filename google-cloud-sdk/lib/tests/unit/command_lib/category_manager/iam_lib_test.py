@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for googlecloudsdk/command_lib/category_manager/iam_lib."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.category_manager import store
 from googlecloudsdk.api_lib.category_manager import utils
 from googlecloudsdk.command_lib.category_manager import iam_lib
@@ -47,13 +49,13 @@ class IamLibTest(sdk_test_base.WithFakeAuth):
 
   def testAddIamPolicyBinding(self):
     iam_lib.AddIamPolicyBinding(
-        resource_ref=self.store_ref,
+        resource_resource=self.store_ref,
         role='role/categorymanager.admin',
         member='user:admin2@gmail.com',
         module=store)
     self.store_getiam_mock.assert_called_once_with(self.store_ref)
     self.store_setiam_mock.assert_called_once_with(self.store_ref, self.policy)
-    self.assertEquals([
+    self.assertEqual([
         self.messages.Binding(
             role='role/categorymanager.admin',
             members=[
@@ -68,13 +70,13 @@ class IamLibTest(sdk_test_base.WithFakeAuth):
 
   def testAddIamPolicyBindingAddNewRoles(self):
     iam_lib.AddIamPolicyBinding(
-        resource_ref=self.store_ref,
+        resource_resource=self.store_ref,
         role='role/categorymanager.tagReader',
         member='user:user3@gmail.com',
         module=store)
     self.store_getiam_mock.assert_called_once_with(self.store_ref)
     self.store_setiam_mock.assert_called_once_with(self.store_ref, self.policy)
-    self.assertEquals([
+    self.assertEqual([
         self.messages.Binding(
             role='role/categorymanager.admin',
             members=[
@@ -91,13 +93,13 @@ class IamLibTest(sdk_test_base.WithFakeAuth):
 
   def testAddIamPolicyBindingWithDuplicateEntry(self):
     iam_lib.AddIamPolicyBinding(
-        resource_ref=self.store_ref,
+        resource_resource=self.store_ref,
         role='role/categorymanager.admin',
         member='user:admin@gmail.com',
         module=store)
     self.store_getiam_mock.assert_called_once_with(self.store_ref)
     self.store_setiam_mock.assert_called_once_with(self.store_ref, self.policy)
-    self.assertEquals([
+    self.assertEqual([
         self.messages.Binding(
             role='role/categorymanager.admin',
             members=[
@@ -111,13 +113,13 @@ class IamLibTest(sdk_test_base.WithFakeAuth):
 
   def testRemoveIamPolicyBinding(self):
     iam_lib.RemoveIamPolicyBinding(
-        resource_ref=self.store_ref,
+        resource_resource=self.store_ref,
         role='role/categorymanager.reader',
         member='user:user1@gmail.com',
         module=store)
     self.store_getiam_mock.assert_called_once_with(self.store_ref)
     self.store_setiam_mock.assert_called_once_with(self.store_ref, self.policy)
-    self.assertEquals([
+    self.assertEqual([
         self.messages.Binding(
             role='role/categorymanager.admin',
             members=[
@@ -133,23 +135,23 @@ class IamLibTest(sdk_test_base.WithFakeAuth):
     self.assertRaises(
         core_exceptions.Error,
         iam_lib.RemoveIamPolicyBinding,
-        resource_ref=self.store_ref,
+        resource_resource=self.store_ref,
         role='role/categorymanager.reader',
         member='user:nosuchuser@gmail.com',
         module=store)
     self.store_getiam_mock.assert_called_once_with(self.store_ref)
-    self.assertEquals(0, self.store_setiam_mock.call_count)
+    self.assertEqual(0, self.store_setiam_mock.call_count)
 
   def testRemoveIamPolicyBindingRaisesWhenRoleNotFoundInBindings(self):
     self.assertRaises(
         core_exceptions.Error,
         iam_lib.RemoveIamPolicyBinding,
-        resource_ref=self.store_ref,
+        resource_resource=self.store_ref,
         role='role/categorymanager.fakeReader',
         member='user:user1@gmail.com',
         module=store)
     self.store_getiam_mock.assert_called_once_with(self.store_ref)
-    self.assertEquals(0, self.store_setiam_mock.call_count)
+    self.assertEqual(0, self.store_setiam_mock.call_count)
 
 
 if __name__ == '__main__':

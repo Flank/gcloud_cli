@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for deployable services and configs."""
 
+from __future__ import absolute_import
 import os
 
 from googlecloudsdk.api_lib.app import deploy_command_util
@@ -57,13 +58,13 @@ class ServicesTest(test_case.TestCase):
 
   def testServiceConstructor(self):
     """Just check that the service has the right properties after creation."""
-    self.assertEquals(self.s1.descriptor, self.descriptor)
-    self.assertEquals(self.s1.source, self.source)
-    self.assertEquals(self.s1.service_info, self.info)
-    self.assertEquals(self.s1.upload_dir, self.upload_dir)
+    self.assertEqual(self.s1.descriptor, self.descriptor)
+    self.assertEqual(self.s1.source, self.source)
+    self.assertEqual(self.s1.service_info, self.info)
+    self.assertEqual(self.s1.upload_dir, self.upload_dir)
 
-    self.assertEquals(self.s1.path, 'app.yaml')
-    self.assertEquals(self.s1.service_id, 'my-service')
+    self.assertEqual(self.s1.path, 'app.yaml')
+    self.assertEqual(self.s1.service_id, 'my-service')
 
   def testMultipleServices(self):
     services = deployables.Services()
@@ -71,13 +72,13 @@ class ServicesTest(test_case.TestCase):
     services.Add(self.s2)
     s_all = services.GetAll()
     s_ids = [s.service_id for s in s_all]
-    self.assertEquals(s_ids, ['my-service', 'other-service'])
+    self.assertEqual(s_ids, ['my-service', 'other-service'])
 
   def testMultipleServicesConstructor(self):
     services = deployables.Services([self.s1, self.s2])
     s_all = services.GetAll()
     s_ids = [s.service_id for s in s_all]
-    self.assertEquals(s_ids, ['my-service', 'other-service'])
+    self.assertEqual(s_ids, ['my-service', 'other-service'])
 
   def testDuplicateServices(self):
     services = deployables.Services()
@@ -99,7 +100,7 @@ class ConfigsTest(test_case.TestCase):
     configs.Add(self.dos)
     c_all = configs.GetAll()
     c_names = [c.name for c in c_all]
-    self.assertEquals(c_names, ['cron', 'dos'])
+    self.assertEqual(c_names, ['cron', 'dos'])
 
   def testDuplicateConfigs(self):
     configs = deployables.Configs()
@@ -128,12 +129,12 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     self.Touch(self.cwd_path, name='app.yaml', contents='unused')
     services, configs = deployables.GetDeployables(
         ['app.yaml'], self.stager, deployables.GetPathMatchers())
-    self.assertEquals(len(services), 1)
+    self.assertEqual(len(services), 1)
     s = services[0]
-    self.assertEquals(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
-    self.assertEquals(s.service_id, 'my-service')
-    self.assertEquals(s.upload_dir, self.cwd_path)
-    self.assertEquals(configs, [])
+    self.assertEqual(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, self.cwd_path)
+    self.assertEqual(configs, [])
 
   def testDirWithAppYaml(self):
     """Directory with app.yaml passed as deployable."""
@@ -142,12 +143,12 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     self.Touch(self.cwd_path, name='app.yaml', contents='unused')
     services, configs = deployables.GetDeployables(
         ['.'], self.stager, deployables.GetPathMatchers())
-    self.assertEquals(len(services), 1)
+    self.assertEqual(len(services), 1)
     s = services[0]
-    self.assertEquals(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
-    self.assertEquals(s.service_id, 'my-service')
-    self.assertEquals(s.upload_dir, self.cwd_path)
-    self.assertEquals(configs, [])
+    self.assertEqual(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, self.cwd_path)
+    self.assertEqual(configs, [])
 
   def testDirWithAppYamlEmptyArgs(self):
     """Directory with nothing passed as deployable."""
@@ -156,12 +157,12 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     self.Touch(self.cwd_path, name='app.yaml', contents='unused')
     services, configs = deployables.GetDeployables(
         [], self.stager, deployables.GetPathMatchers())
-    self.assertEquals(len(services), 1)
+    self.assertEqual(len(services), 1)
     s = services[0]
-    self.assertEquals(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
-    self.assertEquals(s.service_id, 'my-service')
-    self.assertEquals(s.upload_dir, self.cwd_path)
-    self.assertEquals(configs, [])
+    self.assertEqual(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, self.cwd_path)
+    self.assertEqual(configs, [])
 
   def testCronYaml(self):
     """cron.yaml passed as deployable."""
@@ -169,10 +170,10 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     self.Touch(self.cwd_path, name='cron.yaml', contents='unused')
     services, configs = deployables.GetDeployables(
         ['cron.yaml'], self.stager, deployables.GetPathMatchers())
-    self.assertEquals(services, [])
-    self.assertEquals(len(configs), 1)
+    self.assertEqual(services, [])
+    self.assertEqual(len(configs), 1)
     c = configs[0]
-    self.assertEquals(c.name, 'cron')
+    self.assertEqual(c.name, 'cron')
 
   def testDirWithOtherYaml(self):
     """Directory with other.yaml inside, should error."""
@@ -193,12 +194,12 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     self.Touch(self.cwd_path, name='other.yaml', contents='unused')
     services, configs = deployables.GetDeployables(
         ['other.yaml'], self.stager, deployables.GetPathMatchers())
-    self.assertEquals(len(services), 1)
+    self.assertEqual(len(services), 1)
     s = services[0]
-    self.assertEquals(s.descriptor, os.path.join(self.cwd_path, 'other.yaml'))
-    self.assertEquals(s.service_id, 'my-service')
-    self.assertEquals(s.upload_dir, self.cwd_path)
-    self.assertEquals(configs, [])
+    self.assertEqual(s.descriptor, os.path.join(self.cwd_path, 'other.yaml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, self.cwd_path)
+    self.assertEqual(configs, [])
 
   def testCronYamlAndAppDir(self):
     """Directory with app.yaml passed as deployable."""
@@ -208,14 +209,14 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     self.Touch(self.cwd_path, name='cron.yaml', contents='unused')
     services, configs = deployables.GetDeployables(
         ['.', 'cron.yaml'], self.stager, deployables.GetPathMatchers())
-    self.assertEquals(len(services), 1)
+    self.assertEqual(len(services), 1)
     s = services[0]
-    self.assertEquals(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
-    self.assertEquals(s.service_id, 'my-service')
-    self.assertEquals(s.upload_dir, self.cwd_path)
-    self.assertEquals(len(configs), 1)
+    self.assertEqual(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, self.cwd_path)
+    self.assertEqual(len(configs), 1)
     c = configs[0]
-    self.assertEquals(c.name, 'cron')
+    self.assertEqual(c.name, 'cron')
 
   def testDuplicateServices(self):
     """Duplicate services passed as deployable."""
@@ -246,13 +247,13 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
                name='appengine-web.xml', contents='unused')
     services, configs = deployables.GetDeployables(
         ['.'], self.stager, deployables.GetPathMatchers())
-    self.assertEquals(len(services), 1)
+    self.assertEqual(len(services), 1)
     s = services[0]
-    self.assertEquals(s.descriptor, os.path.join(self.cwd_path, 'WEB-INF',
-                                                 'appengine-web.xml'))
-    self.assertEquals(s.service_id, 'my-service')
-    self.assertEquals(s.upload_dir, 'stage-dir')
-    self.assertEquals(configs, [])
+    self.assertEqual(s.descriptor, os.path.join(self.cwd_path, 'WEB-INF',
+                                                'appengine-web.xml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, 'stage-dir')
+    self.assertEqual(configs, [])
 
   def testAppengineWebXml(self):
     """WEB_INF/appengine-web.xml passed as deployable."""
@@ -264,13 +265,13 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     services, configs = deployables.GetDeployables(
         [os.path.join('WEB-INF', 'appengine-web.xml')],
         self.stager, deployables.GetPathMatchers())
-    self.assertEquals(len(services), 1)
+    self.assertEqual(len(services), 1)
     s = services[0]
-    self.assertEquals(s.descriptor, os.path.join(self.cwd_path, 'WEB-INF',
-                                                 'appengine-web.xml'))
-    self.assertEquals(s.service_id, 'my-service')
-    self.assertEquals(s.upload_dir, 'stage-dir')
-    self.assertEquals(configs, [])
+    self.assertEqual(s.descriptor, os.path.join(self.cwd_path, 'WEB-INF',
+                                                'appengine-web.xml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, 'stage-dir')
+    self.assertEqual(configs, [])
 
   def testDirWithAppYamlAndAppengineWebXml(self):
     """Directory with both app.yaml and WEB-INF/appengine-web.xml.
@@ -285,12 +286,12 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
                name='appengine-web.xml', contents='unused')
     services, configs = deployables.GetDeployables(
         ['.'], self.stager, deployables.GetPathMatchers())
-    self.assertEquals(len(services), 1)
+    self.assertEqual(len(services), 1)
     s = services[0]
-    self.assertEquals(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
-    self.assertEquals(s.service_id, 'my-service')
-    self.assertEquals(s.upload_dir, self.cwd_path)
-    self.assertEquals(configs, [])
+    self.assertEqual(s.descriptor, os.path.join(self.cwd_path, 'app.yaml'))
+    self.assertEqual(s.service_id, 'my-service')
+    self.assertEqual(s.upload_dir, self.cwd_path)
+    self.assertEqual(configs, [])
     java_match_mock.assert_not_called()
 
   def testAppengineWebXmlNoStaging(self):
@@ -319,8 +320,8 @@ class TestGetDeployables(sdk_test_base.WithTempCWD):
     services, _ = deployables.GetDeployables(['.'], self.stager,
                                              deployables.GetPathMatchers())
     m.assert_called_once()
-    self.assertEquals(len(services), 1)
-    self.assertEquals(services[0].descriptor, '/path/to/app.yaml')
+    self.assertEqual(len(services), 1)
+    self.assertEqual(services[0].descriptor, '/path/to/app.yaml')
 
   @test_case.Filters.DoNotRunOnWindows("Windows doesn't support symlinks")
   def testLinkedAppYaml(self):

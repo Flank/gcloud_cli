@@ -85,7 +85,7 @@ class SetSecurityPolicyTestAlpha(e2e_test_base.BaseTest):
           """.format(self.command_name, bs_name, sp_name))
       result = self.Run('compute backend-services describe {0} --global'
                         .format(bs_name))
-      self.assertEquals(sp_name, result.securityPolicy.rsplit('/', 1)[-1])
+      self.assertEqual(sp_name, result.securityPolicy.rsplit('/', 1)[-1])
 
       # Clear security policy
       self.Run("""

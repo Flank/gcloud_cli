@@ -15,12 +15,15 @@
 """Unit tests for types list command."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from surface.deployment_manager.types import list as types_list
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.deployment_manager import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class TypesListTest(unit_test_base.DmV2UnitTestBase):

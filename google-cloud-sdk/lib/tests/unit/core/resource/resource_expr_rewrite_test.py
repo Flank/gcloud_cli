@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core.resource import resource_exceptions
 from googlecloudsdk.core.resource import resource_expr_rewrite
@@ -24,6 +25,8 @@ from googlecloudsdk.core.resource import resource_projection_parser
 from tests.lib import subtests
 from tests.lib import test_case
 from tests.lib.core.resource import s_expr
+
+import six
 
 
 class ResourceFilterExpressionBackendRewriteTest(subtests.Base):
@@ -419,31 +422,47 @@ class MessageRewriteResourceTest(subtests.Base):
     # numeric field. The InstanceGroup message overrides the heuristic that
     # uses the operand value as a hint.
     message = apis.GetMessagesModule('compute', 'v1').InstanceGroup
+    # Only using type names in this test.
+    text = 'str' if six.PY3 else 'unicode'
 
     def T(expected, expression, frontend_fields=None, exception=None):
       self.Run(expected, expression, message, frontend_fields=frontend_fields,
                depth=2, exception=exception)
 
-    T((None, 'unicode::(name = foo*bar)'),
+    T((None, text + '::(name = foo*bar)'),
       'name=foo*bar')
-    T((None, 'unicode::(name != foo*bar)'),
+    T((None, text + '::(name != foo*bar)'),
       'name!=foo*bar')
-    T((None, 'unicode::(name : foo*bar)'),
+    T((None, text + '::(name : foo*bar)'),
       'name:foo*bar')
 
-    T((None, 'unicode::(kind : bar)'),
+    T((None, text + '::(kind : bar)'),
       'kind:bar')
     T((None, 'int::(size = 987)'),
       'size=987')
 
-    T((None, 'unicode::(namedPorts.name : foo)'),
+    T((None, text + '::(namedPorts.name : foo)'),
       'namedPorts.name:foo')
-    T((None, 'unicode::(namedPorts.name : foo)'),
+    T((None, text + '::(namedPorts.name : foo)'),
       'named_ports.name:foo')
     T((None, 'int::(namedPorts.port : 80)'),
       'namedPorts.port:80')
     T((None, 'int::(namedPorts.port : 1024)'),
       'named_ports.port:1024')
+
+    T(('namedPorts.unknown=abc', None),
+      'namedPorts.unknown=abc')
+    T(('named_ports.unknown=xyz', None),
+      'named_ports.unknown=xyz')
+
+    T(None,
+      'namedPorts.unknown=abc',
+      frontend_fields={},
+      exception=resource_exceptions.UnknownFieldError)
+    T(None,
+      'named_ports.unknown=xyz',
+      frontend_fields={},
+      exception=resource_exceptions.UnknownFieldError)
 
     T(('unknown:bar', None),
       'unknown:bar')

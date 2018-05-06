@@ -14,10 +14,13 @@
 
 """Unit tests for the property_selector module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 
 from googlecloudsdk.api_lib.compute import property_selector
 from tests.lib import test_case
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class ProperySelectorTest(test_case.TestCase):
@@ -26,7 +29,7 @@ class ProperySelectorTest(test_case.TestCase):
     self.object = {
         'string': 'one',
         'integer': 123,
-        'integerList': range(20),
+        'integerList': list(range(20)),
         'dict': {'string': 'one', 'integer': 2},
         'listOfDicts': [
             {'string': 'one', 'hello': 'world'},

@@ -13,10 +13,15 @@
 # limitations under the License.
 """Tests for Spanner databases get-iam-policy command."""
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class GetIamPolicyTest(base.SpannerTestBase):
 
   def SetUp(self):
@@ -28,7 +33,8 @@ class GetIamPolicyTest(base.SpannerTestBase):
         },
         collection='spanner.projects.instances.databases')
 
-  def testGetIamPolicy(self):
+  def testGetIamPolicy(self, track):
+    self.track = track
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
@@ -47,26 +53,8 @@ class GetIamPolicyTest(base.SpannerTestBase):
         'spanner databases get-iam-policy dbId --instance=insId')
     self.assertEqual(get_policy_request, test_iam_policy)
 
-  def testGetIamPolicyWithDefaultInstance(self):
-    test_iam_policy = self.msgs.Policy(
-        bindings=[
-            self.msgs.Binding(
-                role=u'roles/spanner.databaseAdmin',
-                members=[u'domain:foo.com']),
-            self.msgs.Binding(
-                role=u'roles/spanner.viewer', members=[u'user:admin@foo.com'])
-        ],
-        etag='someUniqueEtag',
-        version=1)
-    self.client.projects_instances_databases.GetIamPolicy.Expect(
-        request=self.msgs.SpannerProjectsInstancesDatabasesGetIamPolicyRequest(
-            resource=self.database_ref.RelativeName()),
-        response=test_iam_policy)
-    self.Run('config set spanner/instance insId')
-    get_policy_request = self.Run('spanner databases get-iam-policy dbId')
-    self.assertEqual(get_policy_request, test_iam_policy)
-
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
+    self.track = track
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(

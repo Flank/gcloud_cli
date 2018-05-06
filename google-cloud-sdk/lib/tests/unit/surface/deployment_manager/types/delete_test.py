@@ -15,6 +15,8 @@
 
 """Unit tests for 'types delete' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.deployment_manager import exceptions
@@ -38,8 +40,8 @@ class TypesDeleteTest(unit_test_base.DmV2UnitTestBase):
 
   def testNoDelete(self):
     self.WriteInput('n\n')
-    with self.assertRaisesRegexp(exceptions.OperationError,
-                                 'Deletion aborted by user.'):
+    with self.assertRaisesRegex(exceptions.OperationError,
+                                'Deletion aborted by user.'):
       self.Run(self.deleteCommand(additional_args=''))
     self.AssertErrContains(CT_NAME)
 
@@ -63,15 +65,15 @@ class TypesDeleteTest(unit_test_base.DmV2UnitTestBase):
     self.withExpectedDelete()
     self.Run(self.deleteCommand() + ' --async')
     self.AssertOutputEquals('Operation [op-123] running....\n')
-    self.AssertErrEquals('Delete in progress for composite_type [ct1].\n')
+    self.AssertErrContains('Delete in progress for composite_type [ct1].\n')
 
   def testOperationFailed(self):
     self.withExpectedDelete()
     self.WithOperationPolling(poll_attempts=0,
                               error=self.OperationErrorFor('something bad'),
                               operation_type='create')
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 re.compile(r'.*something bad.*')):
+    with self.assertRaisesRegex(exceptions.Error,
+                                re.compile(r'.*something bad.*')):
       self.Run(self.deleteCommand())
 
   def deleteCommand(self, additional_args='--quiet'):

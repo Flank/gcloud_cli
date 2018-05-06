@@ -14,6 +14,8 @@
 
 """Unit tests for the compute filter expression rewrite module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from apitools.base.protorpclite import messages
@@ -25,6 +27,7 @@ from googlecloudsdk.core.resource import resource_exceptions
 from googlecloudsdk.core.resource import resource_transform as core_transforms
 from tests.lib import subtests
 from tests.lib import test_case
+import six
 
 
 class MockDisplayInfo(object):
@@ -37,7 +40,7 @@ class MockDisplayInfo(object):
 class MockArgs(object):
 
   def __init__(self, args):
-    for name, value in args.iteritems():
+    for name, value in six.iteritems(args):
       setattr(self, name, value)
 
   def GetDisplayInfo(self):
@@ -558,6 +561,22 @@ class ComputeFilterRewriteTest(subtests.Base):
     T((None, r'region ne ".*(\bus-central1-b\b).*"'), 'region!~^us-central1-b$')
     T((None, r'zone ne ".*(\bus-central1-b\b).*"'), 'zone!~^us-central1-b$')
 
+    # TODO(b/77934881) compute API labels filter workaround
+    # server side labels matching is currently problematic
+
+    T(('labels:*', None),
+      'labels:*')
+    T(('labels:* AND name:my-name', 'name eq ".*\\bmy\\-name\\b.*"'),
+      'labels:* AND name:my-name')
+    T(('labels.foo-bar:*', None),
+      'labels.foo-bar:*')
+    T(('labels.foo-bar:* AND name:my-name', 'name eq ".*\\bmy\\-name\\b.*"'),
+      'labels.foo-bar:* AND name:my-name')
+    T(('labels.foo-bar:baz', None),
+      'labels.foo-bar:baz')
+    T(('labels.foo-bar:baz AND name:my-name', 'name eq ".*\\bmy\\-name\\b.*"'),
+      'labels.foo-bar:baz AND name:my-name')
+
     # absent the resource proto message, enum-like operands are not matchable
 
     T((None, 'direction eq INGRESS'), 'direction:INGRESS')
@@ -888,8 +907,8 @@ class GuessOperandTypeTest(subtests.Base):
     T(bool, 'false')
     T(messages.EnumField, 'RUNNING')
     T(messages.EnumField, 'THE_END')
-    T(unicode, '1.23x')
-    T(unicode, 'ascii!')
+    T(six.text_type, '1.23x')
+    T(six.text_type, 'ascii!')
 
 
 if __name__ == '__main__':

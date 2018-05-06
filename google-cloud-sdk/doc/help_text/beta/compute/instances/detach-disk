@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud beta compute instances detach-disk INSTANCE_NAME
-        (--device-name=DEVICE_NAME | --disk=DISK) [--zone=ZONE]
+        (--device-name=DEVICE_NAME | --disk=DISK)
+        [--disk-scope=DISK_SCOPE; default="zonal"] [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -38,6 +39,18 @@ REQUIRED FLAGS
           device name using the --device-name flag.
 
 OPTIONAL FLAGS
+     --disk-scope=DISK_SCOPE; default="zonal"
+        The scope of the disk. DISK_SCOPE must be one of:
+
+         regional
+            The disk specified in --disk is interpreted as a regional disk in
+            the same region as the instance. Ignored if a full URI is provided
+            to the --disk flag.
+         zonal
+            The disk specified in --disk is interpreted as a zonal disk in the
+            same zone as the instance. Ignored if a full URI is provided to the
+            --disk flag.
+
      --zone=ZONE
         The zone of the instance to operate on. If not specified, you may be
         prompted to select a zone. gcloud will attempt to identify the zone by

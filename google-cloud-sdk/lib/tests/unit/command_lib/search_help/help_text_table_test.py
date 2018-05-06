@@ -79,21 +79,21 @@ class TableTests(calliope_test_base.CalliopeTestBase):
     self.assertTrue('--hidden' in xyzzy.flags)
 
     # Check that flags contain help information.
-    self.assertEquals(xyzzy.flags['--exactly-three'].name, '--exactly-three')
-    self.assertEquals(xyzzy.flags['--exactly-three'].default,
-                      ['Moe', 'Larry', 'Shemp'])
-    self.assertEquals(xyzzy.flags['--exactly-three'].description,
-                      'Exactly three description.')
+    self.assertEqual(xyzzy.flags['--exactly-three'].name, '--exactly-three')
+    self.assertEqual(xyzzy.flags['--exactly-three'].default,
+                     ['Moe', 'Larry', 'Shemp'])
+    self.assertEqual(xyzzy.flags['--exactly-three'].description,
+                     'Exactly three description.')
 
     # Positionals should be included in command nodes.
-    self.assertEquals([p.name for p in xyzzy.positionals], ['pdq'])
+    self.assertEqual([p.name for p in xyzzy.positionals], ['pdq'])
 
     # Check that positionals contain help information.
-    self.assertEquals([p.description for p in xyzzy.positionals],
-                      ['pdq the PDQ.'])
+    self.assertEqual([p.description for p in xyzzy.positionals],
+                     ['pdq the PDQ.'])
 
     # Check that command contains help information.
-    self.assertEquals(
+    self.assertEqual(
         xyzzy.sections,
         {
             'DESCRIPTION': 'Nothing Happens.',
@@ -111,8 +111,8 @@ class TableTests(calliope_test_base.CalliopeTestBase):
                   $ gcloud beta sdk xyzzy"""),
         }
     )
-    self.assertEquals(xyzzy.capsule,
-                      'Brief description of what Nothing Happens means.')
+    self.assertEqual(xyzzy.capsule,
+                     'Brief description of what Nothing Happens means.')
 
   def testFirstUpdate(self):
     # Ensure table file does not exist
@@ -131,7 +131,7 @@ class TableTests(calliope_test_base.CalliopeTestBase):
       table_contents = 'I am a help table.\n'
       table_file.write(table_contents)
     with open(self.table_file_path) as table_file:
-      self.assertEquals(table_contents, table_file.readline())
+      self.assertEqual(table_contents, table_file.readline())
 
     # Update the table
     cli_tree.Dump(self.test_cli)

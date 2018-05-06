@@ -9,8 +9,14 @@ DESCRIPTION
     (BETA) Creates one or more Cloud Pub/Sub topics.
 
 POSITIONAL ARGUMENTS
-     TOPIC [TOPIC ...]
-        One or more topics to create.
+     TOPIC - One or more topics to create. This represents a Cloud resource.
+     (NOTE) Some attributes are not given arguments in this group but can be
+     set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       TOPIC [TOPIC ...]
+          The ID of the topic or a fully qualified identifier for the topic.
 
 FLAGS
      --labels=[KEY=VALUE,...]

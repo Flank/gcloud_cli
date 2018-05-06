@@ -15,6 +15,7 @@
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -31,6 +32,7 @@ class InstancesMinCpuPlatformTest(
         'compute zones describe {} --format=disable'.format(self.zone))
     return result.availableCpuPlatforms
 
+  @test_case.Filters.skip('Failing', 'b/77856420')
   def testInstanceWithMinCpuPlatform(self):
     self.GetInstanceName()
     cpu_platforms = self.GetCpuPlatforms()

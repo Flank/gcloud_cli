@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for 'gcloud category-manager taxonomies delete'."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io

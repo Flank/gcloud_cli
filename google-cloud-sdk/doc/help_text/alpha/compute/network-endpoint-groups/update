@@ -1,0 +1,106 @@
+NAME
+    gcloud alpha compute network-endpoint-groups update - updates a Google
+        Compute Engine network endpoint group
+
+SYNOPSIS
+    gcloud alpha compute network-endpoint-groups update NAME [--zone=ZONE]
+        [--add-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT]
+          | --remove-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT]]
+        [GCLOUD_WIDE_FLAG ...]
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the network endpoint group to operate on.
+
+FLAGS
+     --zone=ZONE
+        The zone of the network endpoint group to operate on. If not specified
+        and the compute/zone property isn't set, you may be prompted to select
+        a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+     These flags can be specified multiple times to add/remove multiple
+     endpoints. At most one of these may be specified:
+
+       --add-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT]
+          The network endpoint to add to the network endpoint group. Allowed
+          keys are:
+
+          + instance - Name of instance in same zone as network endpoint
+            group.
+
+                The VM instance must belong to the network / subnetwork associated
+                with the network endpoint group. If the VM instance is deleted, then
+                any network endpoint group that has a reference to it is updated.
+                The delete causes all network endpoints on the VM to be removed
+                from the network endpoint group.
+
+          + ip - Optional IP address of the network endpoint.
+
+                Optional IP address of the network endpoint. If the IP address is
+                not specified then, we use the primary IP address for the VM
+                instance in the network that the NEG belongs to.
+
+          + port - Optional port for the network endpoint.
+
+                Optional port for the network endpoint. If not specified and the
+                networkEndpointType is `GCE_VM_IP_PORT`, the defaultPort for the
+                network endpoint group will be used.
+
+         --remove-endpoint=[instance=INSTANCE],[ip=IP],[port=PORT]
+            The network endpoint to detach from the network endpoint group.
+            Allowed keys are:
+
+            + instance - Name of instance in same zone as network endpoint
+              group.
+
+            + ip - Optional IP address of the network endpoint.
+
+                  If the IP address is not specified then all network endpoints that
+                  belong to the instance are removed from the NEG.
+
+            + port - Optional port for the network endpoint. Required if the
+              network endpoint type is GCE_VM_IP_PORT.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To add two endpoints to a network endpoint group:
+
+        $ gcloud alpha compute network-endpoint-groups update my-neg \
+            --zone us-central1-a \
+          --add-endpoint instance=my-instance1,ip=127.0.0.1,port=1234 \
+          --add-endpoint instance=my-instance2
+
+    To remove two endpoints from a network endpoint group:
+
+        $ gcloud alpha compute network-endpoint-groups update my-neg \
+            --zone us-central1-a \
+          --remove-endpoint instance=my-instance1,ip=127.0.0.1,port=1234 \
+          --remove-endpoint instance=my-instance2
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

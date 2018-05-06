@@ -13,6 +13,7 @@
 # limitations under the License.
 """Code that's shared between multiple networks subcommands."""
 
+from __future__ import absolute_import
 from googlecloudsdk.calliope import actions as calliope_actions
 from googlecloudsdk.calliope import parser_errors
 
@@ -80,10 +81,9 @@ def AddCreateSubnetModeArg(parser):
       '--mode',
       action=calliope_actions.DeprecationAction(
           'mode',
-          removed=False,
-          warn='{flag_name} is deprecated. Please use subnet-mode instead.',
-          error='{flag_name} has been removed. Please use subnet-mode instead.'
-      ),
+          removed=True,
+          error=('`{flag_name}` has been removed. '
+                 'Please use `subnet-mode` instead.')),
       metavar='NETWORK_TYPE',
       choices={
           'auto': ('Subnets are created automatically. This is the recommended '

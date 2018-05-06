@@ -54,8 +54,8 @@ class MakeRequestsTest(cli_test_base.CliTestBase):
         'googlecloudsdk.api_lib.services.enable_api.'
         'EnableServiceIfDisabled')
     def Enable(enable_project, enable_service):
-      self.assertEquals(enable_project, self.project)
-      self.assertEquals(enable_service, self.service)
+      self.assertEqual(enable_project, self.project)
+      self.assertEqual(enable_service, self.service)
       service_enablement['enabled'] = True
     enable_mock.side_effect = Enable
 
@@ -118,7 +118,7 @@ class MakeRequestsTest(cli_test_base.CliTestBase):
       # This ensures that it was called twice (once for failure, once for
       # success)
       self.assertTrue(service_enablement['enabled'])
-      self.assertEquals(2, mock_request.call_count)
+      self.assertEqual(2, mock_request.call_count)
 
     enable_mock.assert_called_once_with(self.project, self.service)
 
@@ -168,9 +168,9 @@ class MakeRequestsTest(cli_test_base.CliTestBase):
       # Errors are thrown in a layer above this one. It is sufficient to check
       # that the error matches what we expect and MakeRequest is only called
       # once (which means no retries).
-      self.assertEquals(error_code, 403)
-      self.assertEquals(error_msg, self.message)
-      self.assertEquals(mock_request.call_count, 1)
+      self.assertEqual(error_code, 403)
+      self.assertEqual(error_msg, self.message)
+      self.assertEqual(mock_request.call_count, 1)
 
   def testBatchHelperMakeRequest_DisableApiPrompts(self):
     properties.VALUES.core.should_prompt_to_enable_api.Set(False)

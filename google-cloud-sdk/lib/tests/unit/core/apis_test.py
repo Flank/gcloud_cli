@@ -14,6 +14,8 @@
 
 """Tests for the apis module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis_internal
 from googlecloudsdk.api_lib.util import apis_util
@@ -48,18 +50,18 @@ class ApisTest(sdk_test_base.SdkBase):
         'dns_v1_client.DnsV1',
         'dns_v1_messages', True)
     actual_api_def = apis.ConstructApiDef('dns', 'v1', True)
-    self.assertEquals(expected_api_def, actual_api_def)
+    self.assertEqual(expected_api_def, actual_api_def)
 
   def testAddToApisMap(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         apis_util.UnknownAPIError,
         r'API named \[hello\] does not exist in the APIs map'):
       apis_internal._GetApiDef('hello', 'v1')
 
     expected_api_def = apis.ConstructApiDef('hello', 'v1', True)
     apis.AddToApisMap('hello', 'v1', True)
-    self.assertEquals('v1', apis_internal._GetDefaultVersion('hello'))
-    self.assertEquals(expected_api_def, apis_internal._GetApiDef('hello', 'v1'))
+    self.assertEqual('v1', apis_internal._GetDefaultVersion('hello'))
+    self.assertEqual(expected_api_def, apis_internal._GetApiDef('hello', 'v1'))
 
   def testAddToApisMap_NoDefault(self):
     apis.AddToApisMap('hello', 'v1')
@@ -75,15 +77,15 @@ class ApisTest(sdk_test_base.SdkBase):
     default_version = apis_internal._GetDefaultVersion(api_name)
     also_default_api_def = apis_internal._GetApiDef(api_name, default_version)
 
-    self.assertEquals(default_api_def, also_default_api_def)
+    self.assertEqual(default_api_def, also_default_api_def)
 
   def testGetDefaultVersionUnknownAPI(self):
-    self.assertEquals(None, apis_internal._GetDefaultVersion('something'))
+    self.assertEqual(None, apis_internal._GetDefaultVersion('something'))
 
   def testSetDefaultVersion(self):
-    self.assertEquals('v1', apis_internal._GetDefaultVersion('dns'))
+    self.assertEqual('v1', apis_internal._GetDefaultVersion('dns'))
     apis.SetDefaultVersion('dns', 'v1beta1')
-    self.assertEquals('v1beta1', apis_internal._GetDefaultVersion('dns'))
+    self.assertEqual('v1beta1', apis_internal._GetDefaultVersion('dns'))
 
   def testSetDefaultVersionUnknownAPI(self):
     with self.assertRaises(apis_util.UnknownAPIError):
@@ -94,53 +96,53 @@ class ApisTest(sdk_test_base.SdkBase):
       apis.SetDefaultVersion('dns', 'v1something')
 
   def testResolveVersionWithOverride(self):
-    overriden_version = 'alpha'
-    properties.VALUES.api_client_overrides.compute.Set(overriden_version)
+    overridden_version = 'alpha'
+    properties.VALUES.api_client_overrides.compute.Set(overridden_version)
     resolved_version = apis.ResolveVersion('compute')
-    self.assertEquals(overriden_version, resolved_version)
+    self.assertEqual(overridden_version, resolved_version)
 
-    overriden_version = 'v1beta4'
-    properties.VALUES.api_client_overrides.sql.Set(overriden_version)
+    overridden_version = 'v1beta4'
+    properties.VALUES.api_client_overrides.sql.Set(overridden_version)
     resolved_version = apis.ResolveVersion('sql')
-    self.assertEquals(overriden_version, resolved_version)
+    self.assertEqual(overridden_version, resolved_version)
 
   def testResolveVersionWithoutOverride(self):
     resolved_version = apis.ResolveVersion('compute')
-    self.assertEquals('v1', resolved_version)
+    self.assertEqual('v1', resolved_version)
 
   def testResolveVersionWithDefaultOverride(self):
     resolved_version = apis.ResolveVersion('compute', 'hello')
-    self.assertEquals('hello', resolved_version)
+    self.assertEqual('hello', resolved_version)
 
   def testGetDefaultApiDef(self):
     expected_api_def = apis.ConstructApiDef('dns', 'v1', True)
     actual_api_def = apis_internal._GetApiDef('dns', 'v1')
-    self.assertEquals(expected_api_def, actual_api_def)
+    self.assertEqual(expected_api_def, actual_api_def)
 
   def testGetApiDefWithOverride(self):
     expected_api_def = apis.ConstructApiDef('compute', 'alpha', False)
     properties.VALUES.api_client_overrides.compute.Set('alpha')
     actual_api_def = apis_internal._GetApiDef('compute', 'v1')
-    self.assertEquals(expected_api_def, actual_api_def)
+    self.assertEqual(expected_api_def, actual_api_def)
 
     expected_api_def = apis.ConstructApiDef('sql', 'v1beta4', False)
     properties.VALUES.api_client_overrides.sql.Set('v1beta4')
     actual_api_def = apis_internal._GetApiDef('sql', 'v1beta3')
-    self.assertEquals(expected_api_def, actual_api_def)
+    self.assertEqual(expected_api_def, actual_api_def)
 
   def testGetApiDefWithAlias(self):
     sqladmin_api_def = apis_internal._GetApiDef('sqladmin', 'v1beta3')
     also_sqladmin_api_def = apis_internal._GetApiDef('sql', 'v1beta3')
-    self.assertEquals(sqladmin_api_def, also_sqladmin_api_def)
+    self.assertEqual(sqladmin_api_def, also_sqladmin_api_def)
 
-  def testGetApiDefUnkownAPI(self):
-    with self.assertRaisesRegexp(
+  def testGetApiDefUnknownAPI(self):
+    with self.assertRaisesRegex(
         apis_util.UnknownAPIError,
         r'API named \[hello\] does not exist in the APIs map'):
       apis_internal._GetApiDef('hello', 'v1')
 
-  def testGetApiDefUnkownVersion(self):
-    with self.assertRaisesRegexp(
+  def testGetApiDefUnknownVersion(self):
+    with self.assertRaisesRegex(
         apis_util.UnknownVersionError,
         r'The \[compute\] API does not have version \[hello\] in the APIs map'):
       apis_internal._GetApiDef('compute', 'hello')
@@ -162,38 +164,38 @@ class ApisTest(sdk_test_base.SdkBase):
     override = 'https://www-googleapis-test.sandbox.google.com/compute/v1/'
     properties.VALUES.api_endpoint_overrides.compute.Set(override)
     client = apis.GetClientInstance('compute', 'v1', no_http=True)
-    self.assertEquals(override, client._url)
+    self.assertEqual(override, client._url)
 
     override = 'http://localhost:1234/'
     properties.VALUES.api_endpoint_overrides.sql.Set(override)
     client = apis.GetClientInstance('sql', 'v1beta3', no_http=True)
-    self.assertEquals(override, client._url)
+    self.assertEqual(override, client._url)
 
   def testGetDefaultEndpointForUrl(self):
     url = 'https://www.googleapis.com/sql/v1beta3/path/to/resource'
     default_endpoint_url = apis_internal._GetDefaultEndpointUrl(url)
-    self.assertEquals(url, default_endpoint_url)
+    self.assertEqual(url, default_endpoint_url)
 
   def testGetDefaultEndpointForUrl_Override(self):
     override = 'http://localhost:1234/'
     properties.VALUES.api_endpoint_overrides.sql.Set(override)
     endpoint = apis_internal._GetDefaultEndpointUrl(
         override + 'path/to/resource')
-    self.assertEquals('https://www.googleapis.com/sql/v1beta3/path/to/resource',
-                      endpoint)
+    self.assertEqual('https://www.googleapis.com/sql/v1beta3/path/to/resource',
+                     endpoint)
 
   def testGetDefaultMessagesModule(self):
     messages_module = apis.GetMessagesModule('compute', 'v1')
-    self.assertEquals(compute_v1_messages, messages_module)
+    self.assertEqual(compute_v1_messages, messages_module)
 
   def testGetDefaultMessagesModuleWithOverride(self):
     properties.VALUES.api_client_overrides.compute.Set('alpha')
     messages_module = apis.GetMessagesModule('compute', 'v1')
-    self.assertEquals(compute_alpha_messages, messages_module)
+    self.assertEqual(compute_alpha_messages, messages_module)
 
   def testGetMessagesModuleForSpecificVersion(self):
     messages_module = apis.GetMessagesModule('compute', 'alpha')
-    self.assertEquals(compute_alpha_messages, messages_module)
+    self.assertEqual(compute_alpha_messages, messages_module)
 
 
 if __name__ == '__main__':

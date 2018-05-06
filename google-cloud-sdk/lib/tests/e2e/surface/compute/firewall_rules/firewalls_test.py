@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for creating/deleting firewalls."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -29,10 +31,12 @@ class FirewallsTest(e2e_test_base.BaseTest):
   def GetFirewallName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up
-    self.firewall_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-firewall').next()
-    self.egress_firewall_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-firewall-egress-deny').next()
+    self.firewall_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-test-firewall'))
+    self.egress_firewall_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-firewall-egress-deny'))
     self.firewall_names_used.append(self.firewall_name)
     self.firewall_names_used.append(self.egress_firewall_name)
 
@@ -116,21 +120,18 @@ class FirewallsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputNotContains(self.firewall_name)
 
 
-class AlphaFirewallsTest(e2e_test_base.BaseTest):
+class BetaFirewallsTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.firewall_names_used = []
     self.GetFirewallName()
 
   def GetFirewallName(self):
-    self.firewall_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-firewall').next()
-    self.firewall_name_disabled = e2e_utils.GetResourceNameGenerator(
-        prefix='firewall-disabled').next()
-    self.firewall_name_enabled = e2e_utils.GetResourceNameGenerator(
-        prefix='firewall-enabled').next()
-    self.firewall_names_used.append(self.firewall_name)
+    self.firewall_name_disabled = next(
+        e2e_utils.GetResourceNameGenerator(prefix='firewall-disabled'))
+    self.firewall_name_enabled = next(
+        e2e_utils.GetResourceNameGenerator(prefix='firewall-enabled'))
     self.firewall_names_used.append(self.firewall_name_disabled)
     self.firewall_names_used.append(self.firewall_name_enabled)
 
@@ -144,7 +145,6 @@ class AlphaFirewallsTest(e2e_test_base.BaseTest):
     self._TestCreateEnabledFirewall()
     self._TestUpdateFirewall_disabledToEnabled()
     self._TestUpdateFirewall_enabledToDisabled()
-    self._TestCreateLoggingFirewall()
 
   def _TestCreateDisabledFirewall(self):
     self.Run('compute firewall-rules create {0} --allow tcp:80,tcp:443'
@@ -185,6 +185,28 @@ class AlphaFirewallsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputContains("ports:\n  - '80'", reset=False)
     self.AssertNewOutputContains("ports:\n  - '443'", reset=False)
     self.AssertNewOutputNotContains('disabled: false')
+
+
+class AlphaFirewallsTest(e2e_test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.firewall_names_used = []
+    self.GetFirewallName()
+
+  def GetFirewallName(self):
+    self.firewall_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-test-firewall'))
+    self.firewall_names_used.append(self.firewall_name)
+
+  def TearDown(self):
+    logging.info('Starting TearDown (will delete resources if test fails).')
+    for name in self.firewall_names_used:
+      self.CleanUpResource(name, 'firewall-rules', scope=e2e_test_base.GLOBAL)
+
+  def testFirewallLogging(self):
+    self._TestCreateLoggingFirewall()
 
   def _TestCreateLoggingFirewall(self):
     # Create one egress deny firewall.

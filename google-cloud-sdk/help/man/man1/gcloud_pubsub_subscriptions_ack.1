@@ -11,7 +11,7 @@ gcloud pubsub subscriptions ack \- acknowledges one or more messages on the spec
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud pubsub subscriptions ack\fR \fISUBSCRIPTION\fR [\fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud pubsub subscriptions ack\fR \fISUBSCRIPTION\fR \fB\-\-ack\-ids\fR=[\fIACK_ID\fR,...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,14 +30,24 @@ use the \f5\-\-auto\-ack\fR flag on \f5gcloud pubsub subscriptions pull\fR.
 
 .RS 2m
 .TP 2m
+
+SUBSCRIPTION \- Name of the subscription to ACK messages on. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: Set the property
+[core/project] or provide the flag [\-\-project] on the command line. This must
+be specified.
+
+.RS 2m
+.TP 2m
 \fISUBSCRIPTION\fR
-Name of the subscription to ACK messages on.
+The ID of the subscription or a fully qualified identifier for the subscription.
 
 
 .RE
+.RE
 .sp
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
 
 .RS 2m
 .TP 2m

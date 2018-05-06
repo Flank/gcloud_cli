@@ -142,7 +142,7 @@ class BackendBucketsTestAlpha(BackendBucketsTestBase):
   def testBackendBucket(self):
     """Tests backend bucket operations using Alpha API."""
     backend_bucket_name = self.CreateBackendBucketTest(
-        cache_max_age_sec=3333444455556666)
+        cache_max_age_sec=33445566)
     self.UpdateDescriptionTest(backend_bucket_name)
     self.UpdateGcsBucketTest(backend_bucket_name)
     self.UpdateEnableCdnTest(backend_bucket_name)

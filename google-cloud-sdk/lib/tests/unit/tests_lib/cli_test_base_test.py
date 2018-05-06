@@ -42,11 +42,11 @@ class CliTestBaseRunUntilTest(cli_test_base.CliTestBase):
           ['foo'], 'bar', exponential_sleep_multiplier=2.0, jitter_ms=0)
 
     calls = [mock.call(1.0), mock.call(2.0)]
-    self.assertEquals(len(calls), self.sleep_patch.call_count)
+    self.assertEqual(len(calls), self.sleep_patch.call_count)
     self.sleep_patch.assert_has_calls(calls)
 
     calls = [mock.call(['foo']), mock.call(['foo']), mock.call(['foo'])]
-    self.assertEquals(len(calls), self.run_patch.call_count)
+    self.assertEqual(len(calls), self.run_patch.call_count)
     self.run_patch.assert_has_calls(calls)
 
   def testRunUntilTimeOut(self):
@@ -58,11 +58,11 @@ class CliTestBaseRunUntilTest(cli_test_base.CliTestBase):
           ['foo'], 'bar', exponential_sleep_multiplier=2.0, jitter_ms=0)
 
     calls = [mock.call(1.0)]
-    self.assertEquals(len(calls), self.sleep_patch.call_count)
+    self.assertEqual(len(calls), self.sleep_patch.call_count)
     self.sleep_patch.assert_has_calls(calls)
 
     calls = [mock.call(['foo']), mock.call(['foo'])]
-    self.assertEquals(len(calls), self.run_patch.call_count)
+    self.assertEqual(len(calls), self.run_patch.call_count)
     self.run_patch.assert_has_calls(calls)
 
   def testRunUntilSuccess(self):
@@ -77,14 +77,14 @@ class CliTestBaseRunUntilTest(cli_test_base.CliTestBase):
     result = self.ReRunUntilOutputContains(
         ['foo'], '3', exponential_sleep_multiplier=2.0, jitter_ms=0)
 
-    self.assertEquals(['foo'], result)
+    self.assertEqual(['foo'], result)
 
     calls = [mock.call(1.0), mock.call(2.0)]
-    self.assertEquals(len(calls), self.sleep_patch.call_count)
+    self.assertEqual(len(calls), self.sleep_patch.call_count)
     self.sleep_patch.assert_has_calls(calls)
 
     calls = [mock.call(['foo']), mock.call(['foo']), mock.call(['foo'])]
-    self.assertEquals(len(calls), self.run_patch.call_count)
+    self.assertEqual(len(calls), self.run_patch.call_count)
     self.run_patch.assert_has_calls(calls)
 
   def testRunWhileException(self):
@@ -96,11 +96,11 @@ class CliTestBaseRunUntilTest(cli_test_base.CliTestBase):
           ['foo'], ValueError, exponential_sleep_multiplier=2.0, jitter_ms=0)
 
     calls = [mock.call(1.0), mock.call(2.0)]
-    self.assertEquals(len(calls), self.sleep_patch.call_count)
+    self.assertEqual(len(calls), self.sleep_patch.call_count)
     self.sleep_patch.assert_has_calls(calls)
 
     calls = [mock.call(['foo']), mock.call(['foo']), mock.call(['foo'])]
-    self.assertEquals(len(calls), self.run_patch.call_count)
+    self.assertEqual(len(calls), self.run_patch.call_count)
     self.run_patch.assert_has_calls(calls)
 
   def testRunWhileWrongException(self):
@@ -114,7 +114,7 @@ class CliTestBaseRunUntilTest(cli_test_base.CliTestBase):
     self.sleep_patch.assert_not_called()
 
     calls = [mock.call(['foo'])]
-    self.assertEquals(len(calls), self.run_patch.call_count)
+    self.assertEqual(len(calls), self.run_patch.call_count)
     self.run_patch.assert_has_calls(calls)
 
   def testAssertRaisesExceptionRegexp(self):

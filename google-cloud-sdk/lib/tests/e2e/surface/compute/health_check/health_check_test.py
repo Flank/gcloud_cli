@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for health checks."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -23,8 +25,9 @@ from tests.lib.surface.compute import e2e_test_base
 class HealthChecksTest(e2e_test_base.BaseTest):
 
   def UniqueName(self, name):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='compute-health-check-test-' + name).next()
+    return next(
+        e2e_utils.GetResourceNameGenerator(prefix='compute-health-check-test-' +
+                                           name))
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -49,8 +52,8 @@ class HealthChecksTest(e2e_test_base.BaseTest):
         'compute health-checks create {0} {1}'.format(protocol, name))
 
     result_list = list(result)
-    self.assertEquals(1, len(result_list))
-    self.assertEquals(name, result_list[0].name)
+    self.assertEqual(1, len(result_list))
+    self.assertEqual(name, result_list[0].name)
     self.health_check_names.append(name)
     return name, result_list[0]
 
@@ -74,21 +77,21 @@ class HealthChecksTest(e2e_test_base.BaseTest):
     result = self.Run('compute health-checks update {0} {1} {2} {3}'.format(
         protocol, hc_name, updated_default, updated_protocol_params))
 
-    self.assertEquals(1, len(result))
-    self.assertEquals(hc_name, result[0].name)
+    self.assertEqual(1, len(result))
+    self.assertEqual(hc_name, result[0].name)
     self.assertDictContainsSubset(expected, encoding.MessageToDict(result[0]))
     return result[0]
 
   def ListHealthCheck(self, name):
     result = self.Run('compute health-checks list {0}'.format(name))
     result_list = list(result)
-    self.assertEquals(1, len(result_list))
+    self.assertEqual(1, len(result_list))
     return result_list[0]
 
   def DeleteHealthCheck(self, hc_name):
     result = self.Run('compute health-checks delete {0}'.format(hc_name))
     result_list = list(result)
-    self.assertEquals(0, len(result_list))
+    self.assertEqual(0, len(result_list))
 
   def testHTTPHealthCheck(self):
     protocol = 'http'
@@ -125,7 +128,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
 
     # Test the list operation.
     hc = self.ListHealthCheck(hc_name)
-    self.assertEquals(protocol.upper(), hc['type'])
+    self.assertEqual(protocol.upper(), hc['type'])
 
     # Test the delete operation.
     self.DeleteHealthCheck(hc_name)
@@ -165,7 +168,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
 
     # Test the list operation.
     hc = self.ListHealthCheck(hc_name)
-    self.assertEquals(protocol.upper(), hc['type'])
+    self.assertEqual(protocol.upper(), hc['type'])
 
     # Test the delete operation.
     self.DeleteHealthCheck(hc_name)
@@ -206,7 +209,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
 
     # Test the list operation.
     hc = self.ListHealthCheck(hc_name)
-    self.assertEquals(protocol.upper(), hc['type'])
+    self.assertEqual(protocol.upper(), hc['type'])
 
     # Test the delete operation.
     self.DeleteHealthCheck(hc_name)
@@ -247,7 +250,7 @@ class HealthChecksTest(e2e_test_base.BaseTest):
 
     # Test the list operation.
     hc = self.ListHealthCheck(hc_name)
-    self.assertEquals(protocol.upper(), hc['type'])
+    self.assertEqual(protocol.upper(), hc['type'])
 
     # Test the delete operation.
     self.DeleteHealthCheck(hc_name)

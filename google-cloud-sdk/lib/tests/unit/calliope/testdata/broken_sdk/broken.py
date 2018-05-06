@@ -18,4 +18,5 @@
 # pylint: disable=undefined-variable
 # pylint: disable=pointless-statement
 # pylint: disable=multiple-statements
+from __future__ import unicode_literals
 asd;lkjasd = sdlfkjdsf

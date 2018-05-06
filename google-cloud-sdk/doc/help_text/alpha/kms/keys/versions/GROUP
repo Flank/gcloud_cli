@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha kms keys versions - create and manage versions
+
+SYNOPSIS
+    gcloud alpha kms keys versions COMMAND [--key=KEY] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) A version represents an individual cryptographic key and the
+    associated key material.
+
+FLAGS
+     --key=KEY
+        The containing key.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a new version.
+
+     describe
+        (ALPHA) Get metadata for a given version.
+
+     destroy
+        (ALPHA) Schedule a version to be destroyed.
+
+     disable
+        (ALPHA) Disable a given version.
+
+     enable
+        (ALPHA) Enable a given version.
+
+     list
+        (ALPHA) List the versions within a key.
+
+     restore
+        (ALPHA) Restore a version scheduled for destruction.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keys versions
+        $ gcloud beta kms keys versions
+

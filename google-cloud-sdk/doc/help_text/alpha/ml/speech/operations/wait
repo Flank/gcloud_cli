@@ -11,8 +11,12 @@ DESCRIPTION
     results of the transcription.
 
 POSITIONAL ARGUMENTS
-     OPERATION
-        The ID of the operation to wait for.
+     OPERATION - The ID of the operation to wait for. This represents a Cloud
+     resource. This must be specified.
+
+       OPERATION
+          The ID of the operation or a fully qualified identifier for the
+          operation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

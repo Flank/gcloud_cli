@@ -1,0 +1,64 @@
+NAME
+    gcloud alpha container binauthz authorities add-iam-policy-binding - add
+        IAM policy binding to an authority
+
+SYNOPSIS
+    gcloud alpha container binauthz authorities add-iam-policy-binding
+        AUTHORITY --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) See https://cloud.google.com/iam/docs/managing-policies for details
+    of policy role and member types.
+
+POSITIONAL ARGUMENTS
+     AUTHORITY - The authority whose IAM policy will be modified. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
+
+       AUTHORITY
+          The ID of the authority or a fully qualified identifier for the
+          authority.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to add the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        Define the role of the member.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will add an IAM policy binding for the role of
+    'roles/binaryauthorization.attestationAuthoritiesEditor' for the user
+    'test-user@gmail.com' on the authority my_authority:
+
+        $ gcloud alpha container binauthz authorities \
+            add-iam-policy-binding my_authority \
+            --member='user:test-user@gmail.com' \
+            --role='roles/binaryauthorization.attestationAuthoritiesEditor'
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

@@ -14,6 +14,8 @@
 
 """Tests for googlecloudsdk.core.credentials.creds."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import base64
 import datetime
 import json
@@ -96,37 +98,37 @@ class CredsSerializationTests(test_case.Base):
 
   def testFromJson_UserAccount(self):
     credentials = creds.FromJson(_GetJsonUserADC())
-    self.assertEquals('foo.apps.googleusercontent.com', credentials.client_id)
-    self.assertEquals('file-secret', credentials.client_secret)
-    self.assertEquals('file-token', credentials.refresh_token)
+    self.assertEqual('foo.apps.googleusercontent.com', credentials.client_id)
+    self.assertEqual('file-secret', credentials.client_secret)
+    self.assertEqual('file-token', credentials.refresh_token)
     creds_type = creds.CredentialType.FromCredentials(credentials)
-    self.assertEquals(creds.CredentialType.USER_ACCOUNT, creds_type)
+    self.assertEqual(creds.CredentialType.USER_ACCOUNT, creds_type)
 
   def testFromJson_ServiceAccount(self):
     self.StartPatch('oauth2client.crypt.Signer', autospec=True)
     credentials = creds.FromJson(_GetJsonServiceADC())
-    self.assertEquals('bar.apps.googleusercontent.com', credentials.client_id)
-    self.assertEquals('bar@developer.gserviceaccount.com',
-                      credentials._service_account_email)
-    self.assertEquals('key-id', credentials._private_key_id)
-    self.assertEquals(
+    self.assertEqual('bar.apps.googleusercontent.com', credentials.client_id)
+    self.assertEqual('bar@developer.gserviceaccount.com',
+                     credentials._service_account_email)
+    self.assertEqual('key-id', credentials._private_key_id)
+    self.assertEqual(
         '-----BEGIN PRIVATE KEY-----\nasdf\n-----END PRIVATE KEY-----\n',
         credentials._private_key_pkcs8_pem)
     creds_type = creds.CredentialType.FromCredentials(credentials)
-    self.assertEquals(creds.CredentialType.SERVICE_ACCOUNT, creds_type)
+    self.assertEqual(creds.CredentialType.SERVICE_ACCOUNT, creds_type)
 
   def testFromJson_P12ServiceAccount(self):
     signer = self.StartPatch('oauth2client.crypt.Signer', autospec=True)
     self.StartObjectPatch(crypt, 'OpenSSLSigner', new=signer)
 
     credentials = creds.FromJson(_GetJsonP12ServiceADC())
-    self.assertEquals('p12owner@developer.gserviceaccount.com',
-                      credentials._service_account_email)
-    self.assertEquals('key-password', credentials._private_key_password)
-    self.assertEquals('BASE64ENCODED', credentials._private_key_pkcs12)
+    self.assertEqual('p12owner@developer.gserviceaccount.com',
+                     credentials._service_account_email)
+    self.assertEqual('key-password', credentials._private_key_password)
+    self.assertEqual(b'BASE64ENCODED', credentials._private_key_pkcs12)
 
     creds_type = creds.CredentialType.FromCredentials(credentials)
-    self.assertEquals(creds.CredentialType.P12_SERVICE_ACCOUNT, creds_type)
+    self.assertEqual(creds.CredentialType.P12_SERVICE_ACCOUNT, creds_type)
 
 
 class StoreTests(sdk_test_base.SdkBase):
@@ -164,7 +166,7 @@ class StoreTests(sdk_test_base.SdkBase):
     access_token_file = os.path.join(self.temp_path, 'access_token.db')
     store = creds.GetCredentialStore(store_file, access_token_file)
     self.assertIsInstance(store, expected_type)
-    self.assertEquals(set([]), store.GetAccounts())
+    self.assertEqual(set([]), store.GetAccounts())
     self.assertIsNone(store.Load('test_account'))
     store.Remove('test_account')  # Does nothing, does not fail.
 
@@ -173,25 +175,25 @@ class StoreTests(sdk_test_base.SdkBase):
     service_account_credentials = self._MakeServiceAccountCredentials()
     store.Store('service_account', service_account_credentials)
 
-    self.assertEquals({'test_account', 'service_account'}, store.GetAccounts())
+    self.assertEqual({'test_account', 'service_account'}, store.GetAccounts())
 
     loaded_credentials = store.Load('test_account')
-    self.assertEquals(credentials.client_id, loaded_credentials.client_id)
-    self.assertEquals(credentials.client_secret,
-                      loaded_credentials.client_secret)
-    self.assertEquals('access-token', loaded_credentials.access_token)
+    self.assertEqual(credentials.client_id, loaded_credentials.client_id)
+    self.assertEqual(credentials.client_secret,
+                     loaded_credentials.client_secret)
+    self.assertEqual('access-token', loaded_credentials.access_token)
 
-    self.assertEquals(credentials.token_expiry, loaded_credentials.token_expiry)
-    self.assertEquals('rapt_token5', loaded_credentials.rapt_token)
+    self.assertEqual(credentials.token_expiry, loaded_credentials.token_expiry)
+    self.assertEqual('rapt_token5', loaded_credentials.rapt_token)
 
     store.Remove('test_account')
-    self.assertEquals(set(['service_account']), store.GetAccounts())
+    self.assertEqual(set(['service_account']), store.GetAccounts())
     self.assertIsNone(store.Load('test_account'))
     loaded_service_account_credentials = store.Load('service_account')
     self.assertFalse(hasattr(loaded_service_account_credentials, 'rapt_token'))
 
   def AssertCredentialsEqual(self, expected_cred, actual_cred):
-    self.assertEquals(type(expected_cred), type(actual_cred))
+    self.assertEqual(type(expected_cred), type(actual_cred))
     fields = [
         'access_token',
         'client_id',
@@ -209,9 +211,9 @@ class StoreTests(sdk_test_base.SdkBase):
     for f in fields:
       expected_has, actual_has = (hasattr(expected_cred, f),
                                   hasattr(actual_cred, f))
-      self.assertEquals(expected_has, actual_has, f)
+      self.assertEqual(expected_has, actual_has, f)
       if expected_has:
-        self.assertEquals(getattr(expected_cred, f), getattr(actual_cred, f), f)
+        self.assertEqual(getattr(expected_cred, f), getattr(actual_cred, f), f)
 
   def testCredentialStoreWithCache(self):
     self.checkCredentialStore(creds.CredentialStoreWithCache)
@@ -269,7 +271,7 @@ class Sqlite3Tests(sdk_test_base.SdkBase, test_case.WithOutputCapture):
         rapt_token=None)
     self.assertIsNone(credentials.access_token)
     new_cred = creds.MaybeAttachAccessTokenCacheStore(credentials)
-    self.assertEquals('token1', new_cred.access_token)
+    self.assertEqual('token1', new_cred.access_token)
 
 
 if __name__ == '__main__':

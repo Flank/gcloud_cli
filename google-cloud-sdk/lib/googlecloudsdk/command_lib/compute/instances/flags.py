@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Flags and helpers for the compute VM instances commands."""
+from __future__ import absolute_import
 import functools
 
 from googlecloudsdk.api_lib.compute import constants
@@ -477,9 +478,9 @@ def AddCreateDiskArgs(parser, enable_kms=False):
       *image*::: Specifies the name of the image that the disk will be
       initialized with. A new disk will be created based on the given
       image. To view a list of public images and projects, run
-      `$ gcloud compute images list`. If omitted image-family must be
-      specified to identify the image. It is best practice to use image when
-      a specific version of an image is needed.
+      `$ gcloud compute images list`. It is best practice to use image when
+      a specific version of an image is needed. If both image and image-family
+      flags are omitted a blank disk will be created.
 
       *image-family*::: The family of the image that the disk will be
       initialized with. When a family is specified instead of an image,
@@ -810,12 +811,8 @@ def ValidateCreateDiskFlags(args):
     image_family_value = disk.get('image-family')
     if image_value and image_family_value:
       raise exceptions.ToolException(
-          'Cannot specify [image] and [image-family] for a [--create-disk].'
-          'The fields are mutually excusive.')
-    if not image_value and not image_family_value:
-      raise exceptions.ToolException(
-          'Either [image] or [image-family] must be specified for '
-          '[--create-disk].')
+          'Cannot specify [image] and [image-family] for a [--create-disk]. '
+          'The fields are mutually exclusive.')
 
 
 def AddAddressArgs(parser,
@@ -1120,12 +1117,6 @@ def AddServiceAccountAndScopeArgs(parser, instance_exists,
 
     taskqueue
       - https://www.googleapis.com/auth/taskqueue
-
-    useraccounts-ro
-      - https://www.googleapis.com/auth/cloud.useraccounts.readonly
-
-    useraccounts-rw
-      - https://www.googleapis.com/auth/cloud.useraccounts
 
     userinfo-email
       - https://www.googleapis.com/auth/userinfo.email
@@ -1573,7 +1564,7 @@ def AddKonletArgs(parser):
       choices=['never', 'on-failure', 'always'],
       default='always',
       metavar='POLICY',
-      type=str.lower,
+      type=lambda val: val.lower(),
       help="""\
       Specify whether to restart a container on exit.
       """)
@@ -1643,12 +1634,13 @@ def AddDiskScopeFlag(parser):
       '--disk-scope',
       choices={'zonal':
                'The disk specified in --disk is interpreted as a '
-               'zonal disk in the same zone as the instance',
+               'zonal disk in the same zone as the instance. '
+               'Ignored if a full URI is provided to the `--disk` flag.',
                'regional':
                'The disk specified in --disk is interpreted as a '
-               'regional disk in the same region as the instance'},
+               'regional disk in the same region as the instance. '
+               'Ignored if a full URI is provided to the `--disk` flag.'},
       help='The scope of the disk.',
-      hidden=True,
       default='zonal')
 
 

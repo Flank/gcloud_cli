@@ -39,7 +39,7 @@ class JobsListTest(base.SchedulerTestBase):
       job = self.messages.Job(
           name=job_name,
           schedule=self.messages.Schedule(schedule='every tuesday',
-                                          timezone='utc'),
+                                          timeZone='utc'),
           pubsubTarget=pubsub_target,
           appEngineHttpTarget=app_engine_http_target,
           jobState=self.messages.Job.JobStateValueValuesEnum.ENABLED,

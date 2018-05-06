@@ -6,8 +6,7 @@ SYNOPSIS
     gcloud alpha compute networks subnets create NAME --network=NETWORK
         --range=RANGE [--description=DESCRIPTION] [--enable-flow-logs]
         [--enable-private-ip-google-access] [--region=REGION]
-        [--secondary-range=PROPERTY=VALUE,[PROPERTY=VALUE,...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--secondary-range=PROPERTY=VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Define a subnet for a network in custom subnet mode. Subnets must
@@ -36,7 +35,7 @@ OPTIONAL FLAGS
         instances without a public ip address.
 
      --region=REGION
-        The region of the subnetwork to create. If not specified, you will be
+        The region of the subnetwork to create. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
@@ -55,7 +54,7 @@ OPTIONAL FLAGS
         Alternatively, the region can be stored in the environment variable
         CLOUDSDK_COMPUTE_REGION.
 
-     --secondary-range=PROPERTY=VALUE,[PROPERTY=VALUE,...]
+     --secondary-range=PROPERTY=VALUE,[...]
         Adds a secondary IP range to the subnetwork for use in IP aliasing.
 
         For example, --secondary-range range1=192.168.64.0/24 adds a secondary

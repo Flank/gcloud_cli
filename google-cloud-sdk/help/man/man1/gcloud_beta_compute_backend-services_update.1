@@ -11,7 +11,7 @@ gcloud beta compute backend\-services update \- update a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[\fIHEALTH_CHECK\fR,...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[\fIHTTP_HEALTH_CHECK\fR,...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[\fIHTTPS_HEALTH_CHECK\fR,...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[\fIQUERY_STRING\fR,...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute backend\-services update\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-cache\-key\-include\-host\fR] [\fB\-\-cache\-key\-include\-protocol\fR] [\fB\-\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-security\-policy\fR=\fISECURITY_POLICY\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR\ |\ \fB\-\-no\-custom\-request\-headers\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -83,18 +83,18 @@ from a backend service at the edge of the network, close to users. Cloud CDN is
 disabled by default.
 
 .TP 2m
-\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[\fIHEALTH_CHECK\fR,...]
+\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]
 Specifies a list of health check objects for checking the health of the backend
 service. Health checks need not be for the same protocol as that of the backend
 service.
 
 .TP 2m
-\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[\fIHTTP_HEALTH_CHECK\fR,...]
+\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]
 Specifies a list of HTTP health check objects for checking the health of the
 backend service.
 
 .TP 2m
-\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[\fIHTTPS_HEALTH_CHECK\fR,...]
+\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]
 Specifies a list of HTTPS health check objects for checking the health of the
 backend service.
 
@@ -159,6 +159,21 @@ Session affinity is disabled.
 .RE
 .sp
 .TP 2m
+\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR
+The amount of time up to which the response to a signed URL request will be
+cached in the CDN. After this time period, the Signed URL will be revalidated
+before being served. Cloud CDN will internally act as though all responses from
+this backend had a \f5Cache\-Control: public, max\-age=[TTL]\fR header,
+regardless of any existing Cache\-Control header. The actual headers served in
+responses will not be altered.
+
+For example, specifying \f512h\fR will cause the responses to signed URL
+requests to be cached in the CDN up to 12 hours. See $ gcloud topic datetimes
+for information on duration formats.
+
+This flag only affects signed URL requests.
+
+.TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR
 The amount of time to wait for a backend to return a full response for the
 request and for the load balancer to proxy the response to the client before
@@ -186,12 +201,34 @@ keys. All other parameters will be included. Either specify
 encoded and not treated as delimiters. Can only be applied for global resources.
 
 .TP 2m
-\fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[\fIQUERY_STRING\fR,...]
+\fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]
 Specifies a comma separated list of query string parameters to include in cache
 keys. All other parameters will be excluded. Either specify
 \-\-cache\-key\-query\-string\-whitelist or
 \-\-cache\-key\-query\-string\-blacklist, not both. '&' and '=' will be percent
 encoded and not treated as delimiters. Can only be applied for global resources.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR
+Specifies a HTTP Header to be added by your load balancer. This flag can be
+repeated to specify multiple headers. For example:
+
+.RS 2m
+$ gcloud beta compute backend\-services update NAME             \e
+    \-\-custom\-request\-header "header\-name: value"             \e
+    \-\-custom\-request\-header "another\-header:"
+.RE
+
+.TP 2m
+\fB\-\-no\-custom\-request\-headers\fR
+Remove all custom request headers for the backend service.
 
 .RE
 .sp

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the health-checks update ssl subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core import exceptions as core_exceptions
@@ -737,7 +739,7 @@ class HealthChecksUpdateSslTest(test_base.BaseTest,
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         'update ssl subcommand applied to health check with protocol TCP'):
       self.Run(

@@ -13,7 +13,9 @@
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.cloudbuild.snapshot."""
 
-import cStringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from io import BytesIO
 import os
 import os.path
 import stat
@@ -26,24 +28,28 @@ from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
-from tests.lib.surface.app import util as test_util
 
 
 class FakeStorageClient(object):
 
   def CopyFileToGCS(self, bucket_ref, local_path, target_path):
     del self, bucket_ref, target_path  # Unused in CopyFileToGCS
-    with open(local_path) as f:
+    with open(local_path, 'rb') as f:
       return f.read()
 
 
-class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
-                   cli_test_base.CliTestBase, sdk_test_base.WithLogCapture):
+class SnapshotTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
+                   sdk_test_base.WithLogCapture):
+
+  def _writeFile(self, file_name, data):
+    files.MakeDir(os.path.dirname(file_name))
+    with open(file_name, 'w') as fp:
+      fp.write(data)
 
   def testMakeTarball(self):
     """Test basic tarball with single file."""
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
     with files.ChDir(proj):
       with files.TemporaryDirectory() as tmp:
         archive_path = os.path.join(tmp, 'file.tgz')
@@ -56,8 +62,8 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
     """Test tarball with file and empty dir."""
     proj = self.CreateTempDir('project')  # Directory to snapshot.
     os.mkdir(os.path.join(proj, 'emptydir'))
-    os.chmod(os.path.join(proj, 'emptydir'), 0777)
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    os.chmod(os.path.join(proj, 'emptydir'), 0o777)
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
     with files.ChDir(proj):
       with files.TemporaryDirectory() as tmp:
         archive_path = os.path.join(tmp, 'file.tgz')
@@ -66,13 +72,13 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
         self.assertEqual(tf.getmember('Dockerfile').size, 5)
         self.assertTrue(tf.getmember('emptydir').isdir())
         mask = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
-        self.assertEqual(tf.getmember('emptydir').mode & mask, 0777)
+        self.assertEqual(tf.getmember('emptydir').mode & mask, 0o777)
         tf.close()
 
   def testMakeTarball_NestedDir(self):
     """Test tarball with file in nested dir."""
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'path', 'to', 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'path', 'to', 'Dockerfile'), 'empty')
     with files.ChDir(proj):
       with files.TemporaryDirectory() as tmp:
         archive_path = os.path.join(tmp, 'file.tgz')
@@ -86,10 +92,9 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
   def testMakeTarball_gcloudignore(self):
     """Test that gcloudignore is respected."""
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(proj, 'file_to_ignore'), 'empty')
-    self.WriteFile(os.path.join(proj, '.gcloudignore'),
-                   '.*\nfile_to_ignore')
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'file_to_ignore'), 'empty')
+    self._writeFile(os.path.join(proj, '.gcloudignore'), '.*\nfile_to_ignore')
     with files.ChDir(proj):
       with files.TemporaryDirectory() as tmp:
         archive_path = os.path.join(tmp, 'file.tgz')
@@ -102,10 +107,10 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
     """Test that gcloudignore is not respected when disabled."""
     properties.VALUES.gcloudignore.enabled.Set(False)
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(proj, 'file_to_ignore'), 'empty')
-    self.WriteFile(os.path.join(proj, '.gcloudignore'),
-                   '.gcloudignore\nfile_to_ignore')
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'file_to_ignore'), 'empty')
+    self._writeFile(os.path.join(proj, '.gcloudignore'),
+                    '.gcloudignore\nfile_to_ignore')
     with files.ChDir(proj):
       with files.TemporaryDirectory() as tmp:
         archive_path = os.path.join(tmp, 'file.tgz')
@@ -117,9 +122,9 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
   def testMakeTarball_gitignore(self):
     """Test that gitignore is respected."""
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(proj, 'file_to_ignore'), 'empty')
-    self.WriteFile(os.path.join(proj, '.gitignore'), 'file_to_ignore')
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'file_to_ignore'), 'empty')
+    self._writeFile(os.path.join(proj, '.gitignore'), 'file_to_ignore')
     with files.ChDir(proj):
       with files.TemporaryDirectory() as tmp:
         archive_path = os.path.join(tmp, 'file.tgz')
@@ -132,11 +137,12 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
   def testMakeTarball_gcloudignore_directory(self):
     """Test that directories in gcloudignore are respected."""
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(proj, 'subdir', 'somefile'), 'garbage')
-    self.WriteFile(os.path.join(proj, 'subdir', 'nested', 'nestedfile'),
-                   'garbage')
-    self.WriteFile(os.path.join(proj, '.gcloudignore'), '.gcloudignore\nsubdir')
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'subdir', 'somefile'), 'garbage')
+    self._writeFile(os.path.join(proj, 'subdir', 'nested', 'nestedfile'),
+                    'garbage')
+    self._writeFile(os.path.join(proj, '.gcloudignore'),
+                    '.gcloudignore\nsubdir')
     with files.ChDir(proj):
       with files.TemporaryDirectory() as tmp:
         archive_path = os.path.join(tmp, 'file.tgz')
@@ -153,13 +159,13 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
     fake_storage_client = FakeStorageClient()
 
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(proj, 'file_to_ignore'), 'empty')
-    self.WriteFile(os.path.join(proj, '.gitignore'), 'file_to_ignore')
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'file_to_ignore'), 'empty')
+    self._writeFile(os.path.join(proj, '.gitignore'), 'file_to_ignore')
 
     tf_data = snapshot.Snapshot(proj).CopyTarballToGCS(fake_storage_client,
                                                        object_)
-    tf = tarfile.open(fileobj=cStringIO.StringIO(tf_data), mode='r:*')
+    tf = tarfile.open(fileobj=BytesIO(tf_data), mode='r:*')
     self.assertEqual(len(tf.getmembers()), 1)
     self.assertEqual(tf.getmember('Dockerfile').size, 5)
     tf.close()
@@ -178,14 +184,14 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
     fake_storage_client = FakeStorageClient()
 
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
-    self.WriteFile(os.path.join(proj, 'file_to_ignore'), 'empty')
-    self.WriteFile(os.path.join(proj, '.gcloudignore'),
-                   '.gcloudignore\nfile_to_ignore')
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'file_to_ignore'), 'empty')
+    self._writeFile(os.path.join(proj, '.gcloudignore'),
+                    '.gcloudignore\nfile_to_ignore')
 
     tf_data = snapshot.Snapshot(proj).CopyTarballToGCS(fake_storage_client,
                                                        object_)
-    tf = tarfile.open(fileobj=cStringIO.StringIO(tf_data), mode='r:*')
+    tf = tarfile.open(fileobj=BytesIO(tf_data), mode='r:*')
     self.assertEqual(len(tf.getmembers()), 1)
     self.assertEqual(tf.getmember('Dockerfile').size, 5)
     tf.close()
@@ -203,11 +209,11 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, test_util.WithAppData,
     fake_storage_client = FakeStorageClient()
 
     proj = self.CreateTempDir('project')  # Directory to snapshot.
-    self.WriteFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
 
     tf_data = snapshot.Snapshot(proj).CopyTarballToGCS(fake_storage_client,
                                                        object_)
-    tf = tarfile.open(fileobj=cStringIO.StringIO(tf_data), mode='r:*')
+    tf = tarfile.open(fileobj=BytesIO(tf_data), mode='r:*')
     self.assertEqual(len(tf.getmembers()), 1)
     self.assertEqual(tf.getmember('Dockerfile').size, 5)
     tf.close()

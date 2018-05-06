@@ -37,9 +37,9 @@ class RecordSetsTransactionStartTest(base.DnsMockTest):
     with self.assertRaises(ToolException) as context:
       self.Run(
           'dns record-sets transaction start -z {0}'.format(test_zone.name))
-      self.assertEquals(context.exception.message,
-                        'transaction already exists at [{0}]'.format(
-                            transaction_util.DEFAULT_PATH))
+      self.assertEqual(context.exception.message,
+                       'transaction already exists at [{0}]'.format(
+                           transaction_util.DEFAULT_PATH))
       os.remove(transaction_util.DEFAULT_PATH)
 
     os.remove(transaction_util.DEFAULT_PATH)
@@ -68,7 +68,7 @@ class RecordSetsTransactionStartTest(base.DnsMockTest):
 
     with open(transaction_util.DEFAULT_PATH) as results:
       with open(self.initial_transaction) as expected:
-        self.assertEquals(expected.readlines(), results.readlines())
+        self.assertEqual(expected.readlines(), results.readlines())
     os.remove(transaction_util.DEFAULT_PATH)
 
 
@@ -85,9 +85,9 @@ class RecordSetsTransactionStartBetaTest(base.DnsMockBetaTest):
     with self.assertRaises(ToolException) as context:
       self.Run(
           'dns record-sets transaction start -z {0}'.format(test_zone.name))
-      self.assertEquals(context.exception.message,
-                        'transaction already exists at [{0}]'.format(
-                            transaction_util.DEFAULT_PATH))
+      self.assertEqual(context.exception.message,
+                       'transaction already exists at [{0}]'.format(
+                           transaction_util.DEFAULT_PATH))
       os.remove(transaction_util.DEFAULT_PATH)
 
     os.remove(transaction_util.DEFAULT_PATH)
@@ -116,7 +116,7 @@ class RecordSetsTransactionStartBetaTest(base.DnsMockBetaTest):
 
     with open(transaction_util.DEFAULT_PATH) as results:
       with open(self.initial_transaction) as expected:
-        self.assertEquals(expected.readlines(), results.readlines())
+        self.assertEqual(expected.readlines(), results.readlines())
     os.remove(transaction_util.DEFAULT_PATH)
 
 

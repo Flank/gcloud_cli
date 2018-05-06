@@ -14,9 +14,13 @@
 
 """Unit tests for deployments describe command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base
+import six
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 DEPLOYMENT_NAME = 'deployment-name'
@@ -25,7 +29,7 @@ MANIFEST_NAME = 'manifest-name'
 DESCRIPTION = 'deployment-description'
 SERVICE_ACCOUNT = 'my-app@appspot.gserviceaccount.com'
 NUM_RESOURCES = 10
-RESOURCE_RANGE = range(1, NUM_RESOURCES + 1)
+RESOURCE_RANGE = list(range(1, NUM_RESOURCES + 1))
 ERROR_NAMES = ['a', 'b', 'c']
 BASE_ERROR_CODE = 40
 DEFAULT_LAYOUT = """
@@ -61,7 +65,7 @@ class DeploymentsDescribeTest(unit_test_base.DmV2UnitTestBase):
     labels_entry = []
     if labels:
       labels_entry = [self.messages.DeploymentLabelEntry(key=k, value=v)
-                      for k, v in labels.iteritems()]
+                      for k, v in six.iteritems(labels)]
     return self.messages.Deployment(
         name=name,
         id=deployment_id,
@@ -133,7 +137,7 @@ class DeploymentsDescribeTest(unit_test_base.DmV2UnitTestBase):
       resource_count: Number of resource created. They will be named
           resource-{0-3}. The default count is 4.
     """
-    resource_range = range(1, resource_count)
+    resource_range = list(range(1, resource_count))
     resource_list = [
         self.messages.Resource(
             name='resource-' + str(i), id=i * 11111, type='type-' + str(i))
@@ -361,7 +365,7 @@ class DeploymentsDescribeTest(unit_test_base.DmV2UnitTestBase):
 
   def deploymentsDescribeErrors_BasicAsserts(self):
     self.AssertOutputContains(DEPLOYMENT_NAME)
-    self.assertEquals(self.GetOutput().count('FAILED'), NUM_RESOURCES)
+    self.assertEqual(self.GetOutput().count('FAILED'), NUM_RESOURCES)
     for i in RESOURCE_RANGE:
       self.AssertOutputContains('resource-' + str(i))
     for ii, error in enumerate(ERROR_NAMES):
@@ -400,7 +404,7 @@ class DeploymentsDescribeTest(unit_test_base.DmV2UnitTestBase):
     self.Run('deployment-manager deployments describe ' + DEPLOYMENT_NAME)
 
     self.AssertOutputContains(DEPLOYMENT_NAME)
-    self.assertEquals(self.GetOutput().count('SUCCESS'), NUM_RESOURCES)
+    self.assertEqual(self.GetOutput().count('SUCCESS'), NUM_RESOURCES)
     for i in RESOURCE_RANGE:
       self.AssertOutputContains('resource-' + str(i))
     self.AssertOutputContains('BIG WARNING')
@@ -474,12 +478,12 @@ class DeploymentsDescribeAlphaTest(DeploymentsDescribeTest):
     self.AssertOutputContains('STATE')
     self.AssertOutputNotContains('INTENT')
     self.AssertOutputContains('RUNTIME_POLICIES')
-    for i in xrange(1, resource_count):
+    for i in range(1, resource_count):
       self.AssertOutputContains('resource-' + str(i))
       self.AssertOutputContains('type-' + str(i))
       self.AssertOutputNotContains(str(i * 11111))
     self.AssertOutputContains('N/A')
-    for i in xrange(1, action_count):
+    for i in range(1, action_count):
       self.AssertOutputContains('action_name-' + str(i))
       self.AssertOutputContains('action-' + str(i))
       self.AssertOutputNotContains(str(i * 11111))
@@ -513,12 +517,12 @@ class DeploymentsDescribeAlphaTest(DeploymentsDescribeTest):
     self.AssertOutputContains('STATE')
     self.AssertOutputNotContains('RUNTIME_POLICIES')
     self.AssertOutputContains('INTENT')
-    for i in xrange(1, resource_count):
+    for i in range(1, resource_count):
       self.AssertOutputContains('resource-' + str(i))
       self.AssertOutputContains('type-' + str(i))
       self.AssertOutputNotContains(str(i * 11111))
       self.AssertOutputContains('UPDATE')
-    for i in xrange(1, action_count):
+    for i in range(1, action_count):
       self.AssertOutputContains('action_name-' + str(i))
       self.AssertOutputContains('action-' + str(i))
       self.AssertOutputNotContains(str(i * 11111))

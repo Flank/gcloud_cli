@@ -13,11 +13,13 @@
 # limitations under the License.
 
 
+from __future__ import absolute_import
 import textwrap
 
 from googlecloudsdk.api_lib.app import instances_util
 from googlecloudsdk.api_lib.app import service_util
 from tests.lib.surface.app import instances_base
+from six import moves
 
 
 class InstancesListTest(instances_base.InstancesTestBase):
@@ -25,10 +27,10 @@ class InstancesListTest(instances_base.InstancesTestBase):
   PROJECT = 'fakeproject'
 
   def _RunTest(self, command, resource_paths):
-    actual_instances = self.Run(command)
-    expected_instances = map(instances_util.Instance.FromResourcePath,
-                             resource_paths)
-    self.assertEqual(set(actual_instances), set(expected_instances))
+    actual_instances = set(self.Run(command))
+    expected_instances = set(moves.map(
+        instances_util.Instance.FromResourcePath, resource_paths))
+    self.assertEqual(actual_instances, expected_instances)
 
   def _RunList(self, command, resource_paths):
     # --format=disable disables output formatting with the side effect that

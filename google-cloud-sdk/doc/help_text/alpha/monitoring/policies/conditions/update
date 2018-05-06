@@ -1,0 +1,59 @@
+NAME
+    gcloud alpha monitoring policies conditions update - update a condition in
+        an alerting policy
+
+SYNOPSIS
+    gcloud alpha monitoring policies conditions update
+        (CONDITION : --policy=POLICY) [--display-name=DISPLAY_NAME]
+        [--if=IF_VALUE]
+        [--trigger-count=TRIGGER_COUNT | --trigger-percent=TRIGGER_PERCENT]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Update a condition in an alerting policy.
+
+POSITIONAL ARGUMENTS
+     CONDITION - The name of the Condition to update. The arguments in this
+     group can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: Set the property [core/project] or
+     provide the flag [--project] on the command line. This must be specified.
+
+       CONDITION
+          The ID of the condition or a fully qualified identifier for the
+          condition. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --policy=POLICY
+          Name of the alerting policy.
+
+FLAGS
+     --display-name=DISPLAY_NAME
+        The display name for the Condition.
+
+     --if=IF_VALUE
+        One of "absent", "< THRESHOLD", "> THRESHOLD" where "THRESHOLD" is an
+        integer or float.
+
+     At most one of these may be specified:
+
+       --trigger-count=TRIGGER_COUNT
+          The absolute number of time series that must fail the predicate for
+          the condition to be triggered.
+
+       --trigger-percent=TRIGGER_PERCENT
+          The percentage of time series that must fail the predicate for the
+          condition to be triggered.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

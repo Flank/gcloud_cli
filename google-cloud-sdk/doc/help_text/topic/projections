@@ -20,6 +20,10 @@ DESCRIPTION
     To list a subset of resource keys in a resource, use projections. Resource
     projections are described in detail below.
 
+    To work through an interactive tutorial about using the filter and format
+    flags instead, see:
+    https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
+
   Projections
     A projection is a list of keys that selects resource data values.
     Projections are used in --format flag expressions. For example, the table
@@ -394,9 +398,9 @@ DESCRIPTION
 
         For example:
 
-         "https://abc/foo/projects/bar/xyz".scope("projects")
+         "http://abc/foo/projects/bar/xyz".scope("projects")
             Returns "bar/xyz".
-         "https://xyz/foo/regions/abc".scope()
+         "http://xyz/foo/regions/abc".scope()
             Returns "abc".
 
      segment(index=-1, undefined="")

@@ -141,7 +141,7 @@ class DescribeTestBase(object):
   def testDescribe(self):
     expected_job = self._GetJobSuccess()
     self.ExpectJob(expected_job)
-    self.assertEquals(
+    self.assertEqual(
         self.Run('ml-engine jobs describe opId'),
         expected_job)
 

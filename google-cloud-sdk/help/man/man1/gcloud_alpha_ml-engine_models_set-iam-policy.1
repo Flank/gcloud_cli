@@ -20,21 +20,28 @@ gcloud alpha ml\-engine models set\-iam\-policy \- set the IAM policy for a mode
 \fB(ALPHA)\fR Sets the IAM policy for the given model as defined in a JSON or
 YAML file.
 
-See https://cloud.google.com/iam/docs/managing\-policies for details of the
-policy file format and contents.
-
 
 
 .SH "POSITIONAL ARGUMENTS"
 
 .RS 2m
 .TP 2m
-\fIMODEL\fR
-Name of the model.
 
+MODEL \- The model to set the IAM policy for. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: Set the property [core/project] or
+provide the flag [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIMODEL\fR
+The ID of the model or a fully qualified identifier for the model.
+
+.RE
+.sp
 .TP 2m
 \fIPOLICY_FILE\fR
-JSON or YAML file with the IAM policy
+Path to a local JSON or YAML formatted file containing a valid policy.
 
 
 .RE
@@ -49,14 +56,22 @@ help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBml/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/ml/
+
+
+
 .SH "EXAMPLES"
 
 The following command will read am IAM policy defined in a JSON file
 \'policy.json' and set it for the model \f5my_model\fR:
 
-.RS 2m
 $ gcloud alpha ml\-engine models set\-iam\-policy my_model policy.json
-.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
 
 
 

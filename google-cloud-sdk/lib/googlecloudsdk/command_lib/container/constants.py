@@ -14,6 +14,7 @@
 
 """Shared constants used by container commands."""
 
+from __future__ import unicode_literals
 DEGRADED_WARNING = (
     "! Clusters in DEGRADED status are missing edit permissions on project.\n"
     "Please refer to https://cloud.google.com/kubernetes-engine/docs/support\n"
@@ -43,8 +44,6 @@ KUBERNETES_REGIONAL_CHARGES_PROMPT = (
 KUBERNETES_API_MISMATCH_WARNING_TEMPLATE = (
     "You invoked `gcloud {track}`, but with current configuration "
     "Kubernetes Engine v1 API will be used instead of {api} API.\n"
-    "`gcloud {track}` will switch to use Kubernetes Engine {api} API by "
-    "default by the end of March 2018.\n"
     "If you want to keep using `gcloud {track}` to talk to v1 API temporarily, "
     "please set `container/use_v1_api` property to true.\n"
     "But we will drop the support for this property at the beginning of "
@@ -56,7 +55,7 @@ KUBERNETES_V1ALPHA1_API_WARNING = (
 
 CANNOT_SET_BOTH_USE_V1_API_PROPERTIES_WITH_DIFF_VALUES = (
     "You cannot specify container/use_v1_api and container/use_v1_api_client "
-    "proterties at the same time with different values.")
+    "properties at the same time with different values.")
 
 KUBERNETES_GPU_LIMITATION_MSG = (
     "Machines with GPUs have certain limitations "

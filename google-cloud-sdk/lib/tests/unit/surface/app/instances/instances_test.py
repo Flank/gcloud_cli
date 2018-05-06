@@ -14,12 +14,14 @@
 
 """Tests for gcloud app instances."""
 
+from __future__ import absolute_import
 from googlecloudsdk.api_lib.app import instances_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.app import instances_base
+from six.moves import map  # pylint: disable=redefined-builtin
 
 
 class InstanceTest(test_case.TestCase):
@@ -45,7 +47,7 @@ class InstanceTest(test_case.TestCase):
                      expected)
 
   def testFromResourcePath_InvalidSpecification(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'Instance resource path is incorrectly specified\.'):
       instances_util.Instance.FromResourcePath('a/b/c/d')
@@ -67,89 +69,89 @@ class FilterInstancesTest(test_case.TestCase):
   PROJECT = 'fakeproject'
 
   def SetUp(self):
-    all_instances = map(instances_util.Instance.FromResourcePath,
-                        ['service1/v1/i1',
-                         'service1/v1/i2',
-                         'service1/v2/i1',
-                         'service2/v1/i1'])
+    all_instances = list(map(instances_util.Instance.FromResourcePath,
+                             ['service1/v1/i1',
+                              'service1/v1/i2',
+                              'service1/v2/i1',
+                              'service2/v1/i1']))
     # Map of instance ID to instance name, for easy in-test reference
     self.instances = dict((str(i), i) for i in all_instances)
 
   def testFilterInstances_NoFilter(self):
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values())),
+        set(instances_util.FilterInstances(list(self.instances.values()))),
         set(self.instances.values()))
 
   def testFilterInstances_FilterService(self):
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service1')),
         set([self.instances['service1/v1/i1'],
              self.instances['service1/v1/i2'],
              self.instances['service1/v2/i1']]))
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service2')),
         set([self.instances['service2/v1/i1']]))
 
   def testFilterInstances_FilterServiceBadService(self):
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='badservice')),
         set())
 
   def testFilterInstances_FilterVersion(self):
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            version='v1')),
         set([self.instances['service1/v1/i1'],
              self.instances['service1/v1/i2'],
              self.instances['service2/v1/i1']]))
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            version='v2')),
         set([self.instances['service1/v2/i1']]))
 
   def testFilterInstances_FilterVersionBadVersion(self):
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            version='badversion')),
         set())
 
   def testFilterInstances_FilterServiceAndVersion(self):
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service1', version='v1')),
         set([self.instances['service1/v1/i1'],
              self.instances['service1/v1/i2']]))
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service1', version='v2')),
         set([self.instances['service1/v2/i1']]))
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service2', version='v1')),
         set([self.instances['service2/v1/i1']]))
 
   def testFilterInstances_FilterServiceAndInstance(self):
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service1',
                                            instance='i1')),
         set([self.instances['service1/v1/i1'],
              self.instances['service1/v2/i1']]))
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service1',
                                            instance='i2')),
         set([self.instances['service1/v1/i2']]))
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service2',
                                            instance='i1')),
         set([self.instances['service2/v1/i1']]))
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service2',
                                            instance='i2')),
         set())
@@ -157,20 +159,20 @@ class FilterInstancesTest(test_case.TestCase):
   def testFilterInstances_FilterBothNoMatch(self):
     # service and version are both good, but don't match anything
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            service='service2', version='v2')),
         set())
 
   def testFilterInstances_FilterInstanceName(self):
     self.assertEqual(
-        set(instances_util.FilterInstances(self.instances.values(),
+        set(instances_util.FilterInstances(list(self.instances.values()),
                                            instance='i2')),
         set([self.instances['service1/v1/i2']]))
 
   def testFilterInstances_FilterInstanceResourcePath(self):
     for instance in self.instances.values():
       self.assertEqual(
-          set(instances_util.FilterInstances(self.instances.values(),
+          set(instances_util.FilterInstances(list(self.instances.values()),
                                              instance=str(instance))),
           set([]))
 
@@ -232,11 +234,11 @@ class SelectInstanceInteractiveTest(sdk_test_base.WithOutputCapture):
     # This means that by having a test that selects each instance for each
     # filtering method (ex. interactive or via the keyword arguments), we get
     # very good coverage of the combinations of filtering mechanisms.
-    all_instances = map(instances_util.Instance.FromResourcePath,
-                        ['service1/v1/i1',
-                         'service1/v1/i2',
-                         'service1/v2/i3',
-                         'service2/v1/i4'])
+    all_instances = list(map(instances_util.Instance.FromResourcePath,
+                             ['service1/v1/i1',
+                              'service1/v1/i2',
+                              'service1/v2/i3',
+                              'service2/v1/i4']))
     # Map of instance ID to instance name, for easy in-test reference
     self.instances = dict((i.id, i) for i in all_instances)
 
@@ -244,34 +246,34 @@ class SelectInstanceInteractiveTest(sdk_test_base.WithOutputCapture):
     properties.VALUES.core.disable_prompts.Set(True)
     self.addCleanup(properties.VALUES.core.disable_prompts.Set, None)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.SelectInstanceError,
         r'Cannot interactively select instances with prompts disabled'):
       instances_util.SelectInstanceInteractive([])
 
   def testSelectInstanceInteractive_NoInstances(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.SelectInstanceError,
         r'No instances were found for the current project \[fakeproject\]\.'):
       instances_util.SelectInstanceInteractive([])
 
   def testSelectInstanceInteractive_NoMatchingInstances(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.SelectInstanceError,
         r'No instances could be found matching the given criteria\.'):
-      instances_util.SelectInstanceInteractive(self.instances.values(),
+      instances_util.SelectInstanceInteractive(list(self.instances.values()),
                                                service='badservice')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.SelectInstanceError,
         r'No instances could be found matching the given criteria\.'):
-      instances_util.SelectInstanceInteractive(self.instances.values(),
+      instances_util.SelectInstanceInteractive(list(self.instances.values()),
                                                service='badservice',
                                                version='badversion')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.SelectInstanceError,
         r'No instances could be found matching the given criteria\.'):
       # A valid service and version, but no instance that matches both
-      instances_util.SelectInstanceInteractive(self.instances.values(),
+      instances_util.SelectInstanceInteractive(list(self.instances.values()),
                                                service='service2', version='v2')
 
   def RunTest(self, prompt_phases, kwargs=None, expected_instance=None):
@@ -325,8 +327,8 @@ class SelectInstanceInteractiveTest(sdk_test_base.WithOutputCapture):
     prompt_mock.side_effect = [p.idx for p in prompt_phases
                                if p.idx is not None]
 
-    result = instances_util.SelectInstanceInteractive(self.instances.values(),
-                                                      **kwargs)
+    result = instances_util.SelectInstanceInteractive(
+        list(self.instances.values()), **kwargs)
 
     # Since the calls don't map 1-to-1 to the phases, keep a separate iterator
     calls = iter(prompt_mock.call_args_list)
@@ -448,11 +450,11 @@ class GetMatchingInstanceTest(test_case.TestCase):
 
   def SetUp(self):
     properties.VALUES.core.project.Set(self.PROJECT)
-    all_instances = map(instances_util.Instance.FromResourcePath,
-                        ['service1/v1/i1',
-                         'service1/v1/i2',
-                         'service1/v2/i3',
-                         'service2/v1/i4'])
+    all_instances = list(map(instances_util.Instance.FromResourcePath,
+                             ['service1/v1/i1',
+                              'service1/v1/i2',
+                              'service1/v2/i3',
+                              'service2/v1/i4']))
     # Map of instance ID to instance name, for easy in-test reference
     self.instances = dict((i.id, i) for i in all_instances)
     self.select_mock = self.StartObjectPatch(instances_util,
@@ -466,25 +468,25 @@ class GetMatchingInstanceTest(test_case.TestCase):
         instances_util.Instance.FromResourcePath('service1/v1/abcd'),
         instances_util.Instance.FromResourcePath('service1/v2/abcd')
     ]
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'More than one instance matches the given specification\.\n\n'
         r"Matching instances: \['service1/v1/abcd', 'service1/v2/abcd'\]"):
       instances_util.GetMatchingInstance(instances, instance='abcd')
 
   def testGetMatchingInstance_NonInteractiveNoMatches(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'No instances match the given specification\.\n\n'
         r"All instances: \['service1/v1/i1', 'service1/v1/i2', "
         r"'service1/v2/i3', 'service2/v1/i4'\]"):
-      instances_util.GetMatchingInstance(self.instances.values(),
+      instances_util.GetMatchingInstance(list(self.instances.values()),
                                          instance='bad')
 
   def testGetMatchingInstance_NonInteractive(self):
     for instance_id, instance in self.instances.items():
       self.assertEqual(
-          instances_util.GetMatchingInstance(self.instances.values(),
+          instances_util.GetMatchingInstance(list(self.instances.values()),
                                              instance=instance_id),
           instance)
 
@@ -492,21 +494,21 @@ class GetMatchingInstanceTest(test_case.TestCase):
     self.select_mock.return_value = self.instances['i1']
 
     self.assertEqual(
-        instances_util.GetMatchingInstance(self.instances.values()),
+        instances_util.GetMatchingInstance(list(self.instances.values())),
         self.instances['i1'])
 
-    self.select_mock.assert_called_once_with(self.instances.values(),
+    self.select_mock.assert_called_once_with(list(self.instances.values()),
                                              service=None, version=None)
 
   def testGetMatchingInstance_InteractiveWithFilters(self):
     self.select_mock.return_value = self.instances['i1']
 
     self.assertEqual(
-        instances_util.GetMatchingInstance(self.instances.values(),
+        instances_util.GetMatchingInstance(list(self.instances.values()),
                                            service='service1', version='v1'),
         self.instances['i1'])
 
-    self.select_mock.assert_called_once_with(self.instances.values(),
+    self.select_mock.assert_called_once_with(list(self.instances.values()),
                                              service='service1', version='v1')
 
 
@@ -561,7 +563,7 @@ class InstancesEnableDebugTest(instances_base.InstancesTestBase):
         ('service1', [
             ('v1_flex', ['i1'])])
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'No instances match the given specification\.'):
       self.Run('app instances enable-debug bad')
@@ -575,7 +577,7 @@ class InstancesEnableDebugTest(instances_base.InstancesTestBase):
         ('service1', [
             ('v1_flex', ['i1'])])
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'More than one instance matches the given specification\.'):
       self.Run('app instances enable-debug i1')
@@ -652,7 +654,7 @@ class InstancesEnableDebugTest(instances_base.InstancesTestBase):
         ('service1', [
             ('v1_flex', ['i1'])])
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instances_util.InvalidInstanceSpecificationError,
         r'No instances match the given specification\.'):
       self.Run('app instances enable-debug default/v1/i1')

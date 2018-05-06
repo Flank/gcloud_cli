@@ -206,7 +206,7 @@ class ManagedTestBase(e2e_test_base.BaseTest):
              '--instances {1} '
              '{2}'.format(igm_name, instance_uris[0], self.GetScopeFlag()))
     self.WaitUntilStable(igm_name)
-    self.assertEquals(0, self.GetNumInstances(igm_name))
+    self.assertEqual(0, self.GetNumInstances(igm_name))
 
   def RunAbandonInstancesTest(self):
     igm_name = self.CreateInstanceTemplateAndInstanceGroupManager(size=1)
@@ -220,7 +220,7 @@ class ManagedTestBase(e2e_test_base.BaseTest):
              '--instances {1} '
              '{2}'.format(igm_name, instance_uris[0], self.GetScopeFlag()))
     self.WaitUntilStable(igm_name)
-    self.assertEquals(0, self.GetNumInstances(igm_name))
+    self.assertEqual(0, self.GetNumInstances(igm_name))
 
   def RunNamedPortsTest(self):
     igm_name = self.CreateInstanceTemplateAndInstanceGroupManager()

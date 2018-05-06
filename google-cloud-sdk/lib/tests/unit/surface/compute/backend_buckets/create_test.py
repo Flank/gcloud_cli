@@ -75,7 +75,7 @@ class BackendBucketCreateGaTest(test_base.BaseTest):
               project='my-project'))])
 
   def testWithoutBucketName(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         'argument --gcs-bucket-name: Must be specified.'):
       self.RunCreate("""
@@ -103,14 +103,14 @@ class BackendBucketCreateGaTest(test_base.BaseTest):
               project='my-project'))])
 
 
-class BackendBucketCreateAlphaTest(BackendBucketCreateGaTest):
+class BackendBucketCreateBetaTest(BackendBucketCreateGaTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
+    self.SelectApi('beta')
 
   def RunCreate(self, command):
     """Runs the compute backend-buckets create command with the arguments."""
-    self.Run('alpha compute backend-buckets create ' + command)
+    self.Run('beta compute backend-buckets create ' + command)
 
   def CheckRequestMadeWithCdnPolicy(self, expected_cdn_policy):
     """Verifies the request was made with the expected CDN policy."""
@@ -177,14 +177,14 @@ class BackendBucketCreateAlphaTest(BackendBucketCreateGaTest):
                      '--signed-url-cache-max-age -1')
 
 
-class BackendBucketCreateBetaTest(BackendBucketCreateGaTest):
+class BackendBucketCreateAlphaTest(BackendBucketCreateBetaTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
+    self.SelectApi('alpha')
 
   def RunCreate(self, command):
     """Runs the compute backend-buckets create command with the arguments."""
-    self.Run('beta compute backend-buckets create ' + command)
+    self.Run('alpha compute backend-buckets create ' + command)
 
 
 if __name__ == '__main__':

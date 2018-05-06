@@ -14,6 +14,8 @@
 
 """Tests for the 'debug targets wait' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.debug import debug
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -30,7 +32,7 @@ class WaitTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):
     result = self.RunDebug(['snapshots', 'wait', '--location=.*'])
 
     self.assertFalse(wait_mock.called)
-    self.assertEquals([], list(result))
+    self.assertEqual([], list(result))
     self.AssertErrContains('No snapshots')
 
   def testWaitForAnythingAndFail(self):
@@ -49,7 +51,7 @@ class WaitTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):
     result = self.RunDebug(['snapshots', 'wait', '--location=.*'])
 
     wait_mock.assert_called_once_with(ids, wait_all=False, timeout=None)
-    self.assertEquals([], list(result))
+    self.assertEqual([], list(result))
     self.AssertErrContains('No snapshots')
 
   def testWaitOne(self):

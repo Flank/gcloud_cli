@@ -119,8 +119,7 @@ atomicName: projects/{0}/configs/{1}/variables/a/var1
 name: a/var1
 updateTime: [^\n]+
 value: {2}
-""".format(self.Project(), config_name, self.FIRST_VAL.encode('base64')
-           .strip()))
+""".format(self.Project(), config_name, self.FIRST_VAL.strip()))
 
       # Test set with text.
       RunVariables('set a/var2 {0} --is-text'.format(self.TEXT_VAL))
@@ -178,8 +177,7 @@ atomicName: projects/{0}/configs/{1}/variables/a/var2
 name: a/var2
 updateTime: [^\n]+
 value: {2}
-""".format(self.Project(), config_name, self.SECOND_VAL.encode('base64')
-           .strip()))
+""".format(self.Project(), config_name, self.SECOND_VAL.strip()))
       self.ClearOutput()
       RunVariables('get-value a/var2')
       self.AssertOutputEquals(self.SECOND_VAL)

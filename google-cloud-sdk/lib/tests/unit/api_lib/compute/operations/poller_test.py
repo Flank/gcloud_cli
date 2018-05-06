@@ -158,8 +158,8 @@ class PollerTest(waiter_test_base.Base):
       self.ExpectOperation(
           client.globalOperations, operation_ref,
           client.instances, instance_ref, error_msg='Something happened')
-      with self.assertRaisesRegexp(compute_poller.OperationErrors,
-                                   r'Something happened'):
+      with self.assertRaisesRegex(compute_poller.OperationErrors,
+                                  r'Something happened'):
         waiter.WaitFor(poller=poller,
                        operation_ref=operation_ref,
                        message='Making Cheese')
@@ -210,8 +210,8 @@ class BatchPollerTest(waiter_test_base.Base):
           operation_ref=compute_poller.OperationBatch([]),
           message='Making Cheese')
     # Expecting a call from Poll and then GetResult
-    self.assertEquals(2, batch_requests.call_count)
-    self.assertEquals(0, len(results))
+    self.assertEqual(2, batch_requests.call_count)
+    self.assertEqual(0, len(results))
     self.AssertOutputEquals('')
     self.AssertErrContains('Making Cheese')
 
@@ -237,7 +237,7 @@ class BatchPollerTest(waiter_test_base.Base):
     #  2. X done, Y pending
     #  3. X done, Y done
     #  4. Get X, Get Y
-    self.assertEquals(4, batch_requests.call_count)
+    self.assertEqual(4, batch_requests.call_count)
     self.assertEqual('Super-Cheese-X', results[0].name)
     self.assertEqual('Super-Cheese-Y', results[1].name)
     self.AssertOutputEquals('')
@@ -255,15 +255,15 @@ class BatchPollerTest(waiter_test_base.Base):
 
       poller = compute_poller.BatchPoller(
           self.adapter, self.adapter.apitools_client.instances)
-      with self.assertRaisesRegexp(core_exceptions.MultiError,
-                                   'HTTPError 444: Fake http error'):
+      with self.assertRaisesRegex(core_exceptions.MultiError,
+                                  'HTTPError 444: Fake http error'):
         waiter.WaitFor(
             poller=poller,
             operation_ref=compute_poller.OperationBatch(
                 [self.operation_x_ref, self.operation_y_ref]),
             message='Making Cheese')
     # Expecting single call as error occurs on first try.
-    self.assertEquals(1, batch_requests.call_count)
+    self.assertEqual(1, batch_requests.call_count)
     self.AssertOutputEquals('')
     self.AssertErrContains('Making Cheese')
 
@@ -281,15 +281,15 @@ class BatchPollerTest(waiter_test_base.Base):
 
       poller = compute_poller.BatchPoller(
           self.adapter, self.adapter.apitools_client.instances)
-      with self.assertRaisesRegexp(core_exceptions.MultiError,
-                                   'HTTPError 444: Fake http error'):
+      with self.assertRaisesRegex(core_exceptions.MultiError,
+                                  'HTTPError 444: Fake http error'):
         waiter.WaitFor(
             poller=poller,
             operation_ref=compute_poller.OperationBatch(
                 [self.operation_x_ref, self.operation_y_ref]),
             message='Making Cheese')
     # Expecting twoo calls: poll and get result.
-    self.assertEquals(2, batch_requests.call_count)
+    self.assertEqual(2, batch_requests.call_count)
     self.AssertOutputEquals('')
     self.AssertErrContains('Making Cheese')
 

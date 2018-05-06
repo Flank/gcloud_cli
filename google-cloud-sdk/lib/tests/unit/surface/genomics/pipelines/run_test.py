@@ -315,7 +315,7 @@ class RunTest(base.GenomicsUnitTest):
 
   def testPipelinesRunDuplicateInputs(self):
     pipeline_path = self.Touch(self.temp_path, contents=PIPELINE_JSON)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         'argument --inputs: "ref3" cannot be specified multiple times; '
         'received: val3a, val3b'):
@@ -332,7 +332,7 @@ class RunTest(base.GenomicsUnitTest):
 
   def testPipelinesRunInputsOverlapInputsFromFile(self):
     pipeline_path = self.Touch(self.temp_path, contents=PIPELINE_JSON)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.GenomicsError,
         "--inputs and --inputs-from-file may not specify overlapping "
         "values: ref3"):
@@ -349,7 +349,7 @@ class RunTest(base.GenomicsUnitTest):
 
   def testPipelinesRunDuplicateLabels(self):
     pipeline_path = self.Touch(self.temp_path, contents=PIPELINE_JSON)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         'argument --labels: "label1" cannot be specified multiple times; '
         'received: val1a, val1b'):

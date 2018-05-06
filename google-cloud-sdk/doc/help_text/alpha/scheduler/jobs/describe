@@ -2,24 +2,21 @@ NAME
     gcloud alpha scheduler jobs describe - show details about a job
 
 SYNOPSIS
-    gcloud alpha scheduler jobs describe JOB [--view=VIEW; default="basic"]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha scheduler jobs describe JOB [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Show details about a job.
 
 POSITIONAL ARGUMENTS
-     JOB
-        The job you want to show details for.
+     JOB - The job you want to show details for. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. To set
+     the [location] attribute: As the location of the current project's App
+     Engine App.. This must be specified.
 
-FLAGS
-     --view=VIEW; default="basic"
-        The response_view specifies which subset of the Job will be returned.
-        By default ListJobsRequest.response_view is Job.View.BASIC; not all
-        information is retrieved by default because some data, such as
-        payloads, might be desirable to return only when needed because of its
-        large size or because of the sensitivity of data that it contains. VIEW
-        must be one of: basic, full.
+       JOB
+          The ID of the job or a fully qualified identifier for the job.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

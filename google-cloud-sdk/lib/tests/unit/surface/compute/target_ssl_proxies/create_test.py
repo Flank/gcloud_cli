@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the target-ssl-proxies create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -105,6 +107,50 @@ class TargetSSLProxiesCreateGATest(test_base.BaseTest):
                                     'sslCertificates/my-cert')])))],
     )
 
+  def testSimpleCaseSslPolicy(self):
+    messages = self.messages
+    proxy_header_enum = messages.TargetSslProxy.ProxyHeaderValueValuesEnum
+
+    self.make_requests.side_effect = iter([
+        [
+            messages.TargetSslProxy(
+                name='my-proxy',
+                sslCertificates=['my-cert', 'my-cert2'],
+                service='my-service',
+                sslPolicy='my-ssl-policy',
+            )
+        ],
+    ])
+
+    result = self.Run("""
+        compute target-ssl-proxies create my-proxy
+          --ssl-certificates my-cert,my-cert2
+          --backend-service my-service
+          --ssl-policy my-ssl-policy
+          --format=disable
+        """)
+
+    target_ssl_proxy = list(result)[0]
+    self.assertEqual(target_ssl_proxy.name, 'my-proxy')
+    self.assertEqual(target_ssl_proxy.sslCertificates, ['my-cert', 'my-cert2'])
+    self.assertEqual(target_ssl_proxy.service, 'my-service')
+    self.assertEqual(target_ssl_proxy.sslPolicy, 'my-ssl-policy')
+
+    cert_uri = self.compute_uri + '/projects/my-project/global/sslCertificates/'
+    self.CheckRequests(
+        [(self.compute.targetSslProxies, 'Insert',
+          messages.ComputeTargetSslProxiesInsertRequest(
+              project='my-project',
+              targetSslProxy=messages.TargetSslProxy(
+                  name='my-proxy',
+                  proxyHeader=proxy_header_enum.NONE,
+                  service=(self.compute_uri + '/projects/my-project/global/'
+                           'backendServices/my-service'),
+                  sslCertificates=[(cert_uri + 'my-cert'),
+                                   (cert_uri + 'my-cert2')],
+                  sslPolicy=self.compute_uri + '/projects/my-project/global/'
+                  'sslPolicies/my-ssl-policy')))],)
+
   def testUriSupport(self):
     messages = self.messages
     proxy_header_enum = messages.TargetSslProxy.ProxyHeaderValueValuesEnum
@@ -167,50 +213,6 @@ class TargetSSLProxiesCreateBetaTest(TargetSSLProxiesCreateGATest):
 
   def SetUp(self):
     self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
-
-  def testSimpleCaseSslPolicy(self):
-    messages = self.messages
-    proxy_header_enum = messages.TargetSslProxy.ProxyHeaderValueValuesEnum
-
-    self.make_requests.side_effect = iter([
-        [
-            messages.TargetSslProxy(
-                name='my-proxy',
-                sslCertificates=['my-cert', 'my-cert2'],
-                service='my-service',
-                sslPolicy='my-ssl-policy',
-            )
-        ],
-    ])
-
-    result = self.Run("""
-        compute target-ssl-proxies create my-proxy
-          --ssl-certificates my-cert,my-cert2
-          --backend-service my-service
-          --ssl-policy my-ssl-policy
-          --format=disable
-        """)
-
-    target_ssl_proxy = list(result)[0]
-    self.assertEqual(target_ssl_proxy.name, 'my-proxy')
-    self.assertEqual(target_ssl_proxy.sslCertificates, ['my-cert', 'my-cert2'])
-    self.assertEqual(target_ssl_proxy.service, 'my-service')
-    self.assertEqual(target_ssl_proxy.sslPolicy, 'my-ssl-policy')
-
-    cert_uri = self.compute_uri + '/projects/my-project/global/sslCertificates/'
-    self.CheckRequests(
-        [(self.compute.targetSslProxies, 'Insert',
-          messages.ComputeTargetSslProxiesInsertRequest(
-              project='my-project',
-              targetSslProxy=messages.TargetSslProxy(
-                  name='my-proxy',
-                  proxyHeader=proxy_header_enum.NONE,
-                  service=(self.compute_uri + '/projects/my-project/global/'
-                           'backendServices/my-service'),
-                  sslCertificates=[(cert_uri + 'my-cert'),
-                                   (cert_uri + 'my-cert2')],
-                  sslPolicy=self.compute_uri + '/projects/my-project/global/'
-                  'sslPolicies/my-ssl-policy')))],)
 
 
 class TargetSSLProxiesCreateAlphaTest(TargetSSLProxiesCreateBetaTest):

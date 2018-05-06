@@ -13,6 +13,9 @@
 # limitations under the License.
 
 """Tests for the arg_marshalling module."""
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 import re
 
 from apitools.base.protorpclite import messages as _messages
@@ -30,6 +33,7 @@ from tests.lib.command_lib.util.apis import base
 from tests.lib.command_lib.util.apis import fake_messages as fm
 
 import mock
+import six
 
 
 class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
@@ -57,17 +61,17 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
   def testGetFromNamespace(self):
     ns = mock.MagicMock(foo_bar='baz', qux=None, project=None)
     value = arg_utils.GetFromNamespace(ns, 'foo-bar')
-    self.assertEquals(value, 'baz')
+    self.assertEqual(value, 'baz')
 
     value = arg_utils.GetFromNamespace(ns, 'qux', fallback=lambda: 42)
-    self.assertEquals(value, 42)
+    self.assertEqual(value, 42)
 
     properties.VALUES.core.project.Set('fake-project')
     value = arg_utils.GetFromNamespace(ns, 'project')
-    self.assertEquals(value, None)
+    self.assertEqual(value, None)
 
     value = arg_utils.GetFromNamespace(ns, 'project', use_defaults=True)
-    self.assertEquals(value, 'fake-project')
+    self.assertEqual(value, 'fake-project')
 
   def testGetFieldFromMessageError(self):
     with self.assertRaises(arg_utils.UnknownFieldError):
@@ -340,6 +344,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
                      'type': _messages.Variant.STRING}})
 
   def _MakeKwargs(self, **kwargs):
+    """Make Test keyword args to compare against arg_utils generated args."""
     k = {'category': None, 'action': 'store', 'completer': None,
          'help': 'foo help',
          'hidden': False, 'metavar': 'FOO', 'type': str, 'choices': None,
@@ -351,14 +356,14 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     a = yaml_command_schema.Argument('asdf', 'foo', 'foo help')
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string1, a)
     self.assertEqual(arg.name, '--foo')
-    self.assertEquals(self._MakeKwargs(), arg.kwargs)
+    self.assertEqual(self._MakeKwargs(), arg.kwargs)
 
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string1, a, category='ASDF')
     self.assertDictContainsSubset(self._MakeKwargs(category='ASDF'), arg.kwargs)
 
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help', default='junk')
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string1, a)
-    self.assertEquals(self._MakeKwargs(default='junk'), arg.kwargs)
+    self.assertEqual(self._MakeKwargs(default='junk'), arg.kwargs)
 
     a = yaml_command_schema.Argument(
         'foo', 'foo', 'foo help',
@@ -367,28 +372,28 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
                  yaml_command_schema_util.Choice({'arg_value': 'c',
                                                   'enum_value': 'd'})])
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string1, a)
-    self.assertEquals(self._MakeKwargs(choices=['a', 'c']), arg.kwargs)
+    self.assertEqual(self._MakeKwargs(choices=['a', 'c']), arg.kwargs)
 
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help', completer='junk')
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string1, a)
-    self.assertEquals(self._MakeKwargs(completer='junk'), arg.kwargs)
+    self.assertEqual(self._MakeKwargs(completer='junk'), arg.kwargs)
 
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help', hidden=True)
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string1, a)
-    self.assertEquals(self._MakeKwargs(hidden=True), arg.kwargs)
+    self.assertEqual(self._MakeKwargs(hidden=True), arg.kwargs)
 
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help', required=True)
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string1, a)
-    self.assertEquals(self._MakeKwargs(required=True), arg.kwargs)
+    self.assertEqual(self._MakeKwargs(required=True), arg.kwargs)
 
     # No api_field
     a = yaml_command_schema.Argument(None, 'foo', 'foo help', repeated=False)
     arg = arg_utils.GenerateFlag(None, a)
-    self.assertEquals(arg.kwargs['type'], None)
+    self.assertEqual(arg.kwargs['type'], None)
 
     # Unknown type
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         arg_utils.ArgumentGenerationError,
         r'Failed to generate argument for field \[message1\]: The field is of '
         r'an unknown type.'):
@@ -432,7 +437,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
                      fm.FakeMessage.InnerMessage(string1='foo', string2='bar'))
 
     # Not allowed to use ArgDict with non-repeated field.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         arg_utils.ArgumentGenerationError,
         r'Failed to generate argument for field \[string1\]: The given type '
         r'can only be used on repeated fields.'):
@@ -441,11 +446,11 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     # Force repeated arg to be singular.
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help', repeated=False)
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string2, a)
-    self.assertEquals(arg.kwargs['type'], str)
+    self.assertEqual(arg.kwargs['type'], str)
 
     # Repeated with custom action is an error.
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help', action='foo')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         arg_utils.ArgumentGenerationError,
         r'Failed to generate argument for field \[string2\]: The field is '
         r'repeated but is but is using a custom action. You might want to set '
@@ -456,15 +461,22 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     a = yaml_command_schema.Argument('asdf', 'foo', 'foo help')
     arg = arg_utils.GenerateFlag(fm.FakeMessage.bool1, a)
     self.assertEqual(arg.name, '--foo')
-    self.assertEquals(
+    self.assertEqual(
         {'category': None, 'action': 'store_true', 'completer': None,
          'help': 'foo help', 'hidden': False, 'required': False}, arg.kwargs)
+
+  def testGenerateUnspecifiedDefault(self):
+    a = yaml_command_schema.Argument.FromData(
+        {'help_text': 'foo help', 'api_field': 'asdf', 'arg_name': 'foo'})
+    arg = arg_utils.GenerateFlag(fm.FakeMessage.string2, a)
+    self.assertEqual(a.default, arg_utils.UNSPECIFIED)
+    self.assertNotIn('default', arg.kwargs)
 
   def testGenerateFlagEnumChoices(self):
     a = yaml_command_schema.Argument('asdf', 'foo', 'foo help')
     arg = arg_utils.GenerateFlag(fm.FakeMessage.enum1, a)
     self.assertEqual(arg.name, '--foo')
-    self.assertEquals(
+    self.assertEqual(
         self._MakeKwargs(choices=['thing-one', 'thing-two'],
                          type=arg_utils.EnumNameToChoice),
         arg.kwargs)
@@ -476,7 +488,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(arg.name, 'foo')
     kwargs = self._MakeKwargs()
     del kwargs['required']
-    self.assertEquals(kwargs, arg.kwargs)
+    self.assertEqual(kwargs, arg.kwargs)
 
   def testParseResourceIntoMessageGet(self):
     self.MockGetListCreateMethods(('foo.projects.locations.instances', True))
@@ -623,9 +635,16 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
     self.parser = util.ArgumentParser()
-    self.test_enum = _messages.Enum.def_enum(self._TEST_ENUM_DICT, 'MY_ENUM')
+    if six.PY2:
+      my_enum_type = b'MY_ENUM'
+      large_enum_type = b'LARGE_ENUM'
+    else:
+      my_enum_type = 'MY_ENUM'
+      large_enum_type = 'LARGE_ENUM'
+
+    self.test_enum = _messages.Enum.def_enum(self._TEST_ENUM_DICT, my_enum_type)
     self.large_enum = _messages.Enum.def_enum(self._LARGE_TEST_ENUM_DICT,
-                                              'LARGE_ENUM')
+                                              large_enum_type)
     self.string_mapping = {
         x: arg_utils.EnumNameToChoice(x)
         for x in self._TEST_ENUM_DICT
@@ -641,7 +660,7 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
     enum_map.choice_arg.AddToParser(self.parser)
     for choice in enum_map.choices:
       parse_result = self.parser.parse_args(['--{}'.format(arg_name), choice])
-      self.assertEquals(choice, getattr(parse_result, custom_dest))
+      self.assertEqual(choice, getattr(parse_result, custom_dest))
 
   def testDefaultMapping(self):  # Base Case #1
     mapper = arg_utils.ChoiceEnumMapper(
@@ -688,7 +707,7 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
 
   def testBadCustomMappingType(self):
     bad_mapping = ['foo']
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         TypeError,
         (r'custom_mappings must be a dict of enum string values to argparse '
          r'argument choices. Choices must be either a string or a string tuple '
@@ -702,7 +721,7 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
         'MY_ENUM_THREE': ('three', 'h1', 'h2'),
         'MY_ENUM_FOUR': ('four', 'h1', 'h2')
     }
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         TypeError,
         (r'custom_mappings must be a dict of enum string values to argparse '
          r'argument choices. Choices must be either a string or a string tuple '
@@ -718,7 +737,7 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
         'MY_ENUM_THREE': ('three', 'h3'),
         'MY_ENUM_FIVE': ('five', 'h5'),
     }
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, (r'custom_mappings \[.*\] may only contain mappings for '
                      r'enum values. invalid values:\[.*\]')):
       arg_utils.ChoiceEnumMapper(
@@ -735,17 +754,17 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
   def testChoiceStringFromEnumValue(self):
     mapper = arg_utils.ChoiceEnumMapper(
         '--test_arg', self.test_enum, help_str='Auxilio aliis.')
-    for enum_string, choice in self.string_mapping.iteritems():
+    for enum_string, choice in six.iteritems(self.string_mapping):
       self.assertEqual(choice, mapper.GetChoiceForEnum(
           self.test_enum(enum_string)))
 
   def testBadEnum(self):
-    with self.assertRaisesRegexp(ValueError, (r'Invalid Message Enum: '
-                                              r'\[None\]')):
+    with self.assertRaisesRegex(ValueError, (r'Invalid Message Enum: '
+                                             r'\[None\]')):
       arg_utils.ChoiceEnumMapper(
           '--test_arg', None, help_str='Auxilio aliis.')
-    with self.assertRaisesRegexp(ValueError, (r'Invalid Message Enum: '
-                                              r'\[NOT AN ENUM\]')):
+    with self.assertRaisesRegex(ValueError, (r'Invalid Message Enum: '
+                                             r'\[NOT AN ENUM\]')):
       arg_utils.ChoiceEnumMapper(
           '--test_arg', 'NOT AN ENUM', help_str='Auxilio aliis.')
 
@@ -759,7 +778,7 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
         '--test_arg', self.test_enum, help_str='Auxilio aliis.')
     expected_mapping = {
         y: arg_utils.ChoiceToEnum(
-            x, self.test_enum) for x, y in self.string_mapping.iteritems()}
+            x, self.test_enum) for x, y in six.iteritems(self.string_mapping)}
     self.assertEqual(expected_mapping, mapper.choice_mappings)
 
   def testDefaultMappingOptionalArgs(self):
@@ -776,7 +795,7 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
     self.assertEqual(set(mapper.choices), expected_choices)
     self.assertIsNone(mapper.custom_mappings)
     self._AssertAllMappings('test_arg', mapper, custom_dest='TEST_ARG_VAL')
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.parser.parse_args(['-h'])
     self.AssertOutputContains(
         '--test_arg MY_TEST_ARG\nCustom Help', normalize_space=True)
@@ -828,15 +847,15 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
         arg_utils.EnumNameToChoice(x)
         for x in self._LARGE_TEST_ENUM_DICT if MyFilter(x)
     ])
-    print 'EXP: {}'.format(expected_choices)
+    print('EXP: {}'.format(expected_choices))
     self.assertEqual(set(mapper.choices), expected_choices)
     self.assertIsNone(mapper.custom_mappings)
     self._AssertAllMappings('test_arg', mapper)
 
   def testInvalidFilter(self):
-    with self.assertRaisesRegexp(TypeError,
-                                 (r'include_filter must be callable '
-                                  r'received \[THIS SHOULD FAIL ROYALLY\]')):
+    with self.assertRaisesRegex(TypeError,
+                                (r'include_filter must be callable '
+                                 r'received \[THIS SHOULD FAIL ROYALLY\]')):
       arg_utils.ChoiceEnumMapper(
           '--test_arg', self.test_enum, help_str='Auxilio aliis.',
           include_filter='THIS SHOULD FAIL ROYALLY')

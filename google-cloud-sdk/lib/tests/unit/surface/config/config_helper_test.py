@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import datetime
 
 from googlecloudsdk.core import config
@@ -53,8 +56,8 @@ class ConfigHelperTest(sdk_test_base.WithFakeAuth,
 
   def testNoCredentials(self):
     self.FakeAuthSetCredentialsPresent(False)
-    with self.assertRaisesRegexp(store.NoCredentialsForAccountException,
-                                 'does not have any valid credentials'):
+    with self.assertRaisesRegex(store.NoCredentialsForAccountException,
+                                'does not have any valid credentials'):
       self.Run('config config-helper')
 
 
@@ -85,8 +88,8 @@ class ConfigHelperTestGCE(sdk_test_base.WithFakeComputeAuth,
 
   def testNoCredentials(self):
     self.FakeAuthSetCredentialsPresent(False)
-    with self.assertRaisesRegexp(store.NoCredentialsForAccountException,
-                                 'does not have any valid credentials'):
+    with self.assertRaisesRegex(store.NoCredentialsForAccountException,
+                                'does not have any valid credentials'):
       self.Run('config config-helper')
 
 

@@ -11,7 +11,7 @@ gcloud alpha genomics variants import \- imports variants into Google Genomics
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha genomics variants import\fR \fB\-\-source\-uris\fR=\fISOURCE_URIS\fR,[\fISOURCE_URIS\fR,...] \fB\-\-variantset\-id\fR=\fIVARIANTSET_ID\fR [\fB\-\-file\-format\fR=\fIFILE_FORMAT\fR;\ default="vcf"] [\fB\-\-info\-merge\-config\fR=\fIINFO_MERGE_CONFIG\fR,[\fIINFO_MERGE_CONFIG\fR,...]] [\fB\-\-normalize\-reference\-names\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha genomics variants import\fR \fB\-\-source\-uris\fR=\fISOURCE_URIS\fR,[\fISOURCE_URIS\fR,...] \fB\-\-variantset\-id\fR=\fIVARIANTSET_ID\fR [\fB\-\-file\-format\fR=\fIFILE_FORMAT\fR;\ default="vcf"] [\fB\-\-info\-merge\-config\fR=\fIINFO_MERGE_CONFIG\fR,[...]] [\fB\-\-normalize\-reference\-names\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -47,7 +47,7 @@ Set the file format of the \f5\-\-source\-uris\fR. \fIFILE_FORMAT\fR must be one
 of: \fBcomplete\-genomics\fR, \fBvcf\fR.
 
 .TP 2m
-\fB\-\-info\-merge\-config\fR=\fIINFO_MERGE_CONFIG\fR,[\fIINFO_MERGE_CONFIG\fR,...]
+\fB\-\-info\-merge\-config\fR=\fIINFO_MERGE_CONFIG\fR,[...]
 A mapping between VCF INFO field keys and the operations to be performed on
 them. Valid operations include: IGNORE_NEW \- By default, variant info fields
 are persisted if the variant does not yet exist in the variant set. If the

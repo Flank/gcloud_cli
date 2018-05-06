@@ -34,7 +34,8 @@ EXAMPLES
             --keyring fellowship
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys remove-rotation-schedule
         $ gcloud beta kms keys remove-rotation-schedule
 

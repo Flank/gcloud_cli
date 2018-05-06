@@ -8,13 +8,17 @@ SYNOPSIS
         [--requested-link-count=REQUESTED_LINK_COUNT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
+    (DEPRECATED) Patch a Google Compute Engine interconnect.
+
+    This command is deprecated.
+
     gcloud compute interconnects patch is used to patch interconnects. An
     interconnect represents a single specific connection between Google and the
-    customer
+    customer.
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the interconnect to patch.
+        The name of the interconnect to update.
 
 FLAGS
      --admin-enabled
@@ -39,8 +43,7 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    These variants are also available:
+    This variant is also available:
 
-        $ gcloud alpha compute interconnects patch
         $ gcloud beta compute interconnects patch
 

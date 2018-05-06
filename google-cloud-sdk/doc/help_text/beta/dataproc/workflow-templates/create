@@ -3,8 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud beta dataproc workflow-templates create TEMPLATE
-        [--labels=[KEY=VALUE,...]] [--region=REGION] [--zone=ZONE, -z ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--labels=[KEY=VALUE,...]] [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create a workflow template.
@@ -25,12 +24,6 @@ FLAGS
         capable of deploying instances into all Google Compute Engine zones
         globally, and is disjoint from other Cloud Dataproc regions. Overrides
         the default dataproc/region property value for this command invocation.
-
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. If empty, and
-        --region is set to a value other than 'global', the server will pick a
-        zone in the region. Overrides the default compute/zone property value
-        for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

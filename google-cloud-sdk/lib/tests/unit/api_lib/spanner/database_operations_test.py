@@ -43,7 +43,7 @@ class DatabaseOperationsClientTest(base.SpannerTestBase):
         self.msgs.SpannerProjectsInstancesDatabasesOperationsGetRequest(
             name=ref.RelativeName()),
         response=done)
-    self.assertEquals(
+    self.assertEqual(
         database_operations.Await(not_done, ''), result)
 
   def testCancel(self):
@@ -61,7 +61,7 @@ class DatabaseOperationsClientTest(base.SpannerTestBase):
         self.msgs.SpannerProjectsInstancesDatabasesOperationsCancelRequest(
             name=ref.RelativeName()),
         response=response)
-    self.assertEquals(
+    self.assertEqual(
         database_operations.Cancel('insId', 'dbId', 'opId'), response)
 
   def testGet(self):
@@ -79,7 +79,7 @@ class DatabaseOperationsClientTest(base.SpannerTestBase):
         self.msgs.SpannerProjectsInstancesDatabasesOperationsGetRequest(
             name=ref.RelativeName()),
         response=response)
-    self.assertEquals(
+    self.assertEqual(
         database_operations.Get('insId', 'dbId', 'opId'), response)
 
   def testList(self):

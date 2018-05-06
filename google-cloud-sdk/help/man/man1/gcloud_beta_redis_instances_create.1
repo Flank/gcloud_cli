@@ -1,0 +1,183 @@
+
+.TH "GCLOUD_BETA_REDIS_INSTANCES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta redis instances create \- create a Memorystore Redis instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta redis instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-alternative\-zone\fR=\fIALTERNATIVE_ZONE\fR] [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-redis\-version\fR=\fIVERSION\fR] [\fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR] [\fB\-\-size\fR=\fISIZE\fR;\ default=1] [\fB\-\-tier\fR=\fITIER\fR;\ default="basic"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a new Redis instance with the given name.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+An instance with the same name already exists.
+.IP "\(bu" 2m
+The active account does not have permission to create instances.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+INSTANCE \- Arguments and flags that specify the Memorystore Redis instance you
+want to create. The arguments in this group can be used to specify the
+attributes of this resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: Set the
+property [core/project] or provide the flag [\-\-project] on the command line.
+This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+The ID of the instance or a fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Redis region of the instance. Overrides the default redis/region
+property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-alternative\-zone\fR=\fIALTERNATIVE_ZONE\fR
+A secondary zone for the Redis instance to create. Only applicable to
+STANDARD_HA tier which protects the instance against zonal failures by
+provisioning it across two zones. If provided, it must be a different zone from
+the one provided through \-\-zone.
+
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+A human\-readable name for the instance.
+
+.TP 2m
+\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR
+A list of label KEY=VALUE pairs to add.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR; default="default"
+The name of the Google Compute Engine network to which the instance will be
+connected. If left unspecified, the default network will be used.
+
+.TP 2m
+\fB\-\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR
+A list of Redis config KEY=VALUE pairs to set on the instance according to
+http://redis.io/topics/config. Currently, the only supported parameters are:
+maxmemory\-policy, notify\-keyspace\-events.
+
+.TP 2m
+\fB\-\-redis\-version\fR=\fIVERSION\fR
+The version of Redis software. \fIVERSION\fR must be (currently only one value
+is supported):
+
+.RS 2m
+.TP 2m
+\fBredis_3_2\fR
+Deploy Redis 3.2
+
+.RE
+.sp
+.TP 2m
+\fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR
+The CIDR range of internal addresses that are reserved for this instance. For
+example, 10.0.0.0/29 or 192.168.0.0/29. Range must be unique and
+non\-overlapping with existing ranges in the network. If left unspecified, the
+service will automatically pick an available range.
+
+.TP 2m
+\fB\-\-size\fR=\fISIZE\fR; default=1
+The memory size of the instance in GiB. If not provided, size of 1 GiB will be
+used.
+
+.TP 2m
+\fB\-\-tier\fR=\fITIER\fR; default="basic"
+The service tier of the instance. \fITIER\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBbasic\fR
+Basic Redis instance with no replication
+.TP 2m
+\fBstandard\fR
+Standard high\-availability Redis instance with replication
+
+.RE
+.sp
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the Redis instance to create. If not provided the service will pick
+a random zone in the region. For STANDARD_HA tier, instances will be created
+across two zones for protection against zonal failures. So if
+\-\-alternative\-zone is also provided, it must be different from \-\-zone.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBredis/v1beta1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/memorystore/docs/redis/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a basic tier instance with the name
+\f5my\-redis\-instance\fR in region \f5us\-central1\fR with memory size of 5
+GiB:
+
+.RS 2m
+$ gcloud beta redis instances create my\-redis\-instance \e
+    \-\-region=us\-central1 \-\-size=5
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha redis instances create
+.RE
+

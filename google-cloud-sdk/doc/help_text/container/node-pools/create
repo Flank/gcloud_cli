@@ -73,7 +73,21 @@ FLAGS
         information.
 
      --machine-type=MACHINE_TYPE, -m MACHINE_TYPE
-        The type of machine to use for nodes. Defaults to n1-standard-1
+        The type of machine to use for nodes. Defaults to n1-standard-1. The
+        list of predefined machine types is available using the following
+        command:
+
+            $ gcloud compute machine-types list
+
+        You can also specify custom machine types with the string
+        "custom-CPUS-RAM" where ``CPUS`` is the number of virtual CPUs and
+        ``RAM`` is the amount of RAM in MiB.
+
+        For example, to create a node pool using custom machines with 2 vCPUs
+        and 12 GiB of RAM:
+
+            $ gcloud container node-pools create high-mem-pool \
+                --machine-type=custom-2-12288
 
      --min-cpu-platform=PLATFORM
         When specified, the nodes for the new node pool will be scheduled on
@@ -183,9 +197,9 @@ FLAGS
 
        --service-account=SERVICE_ACCOUNT
           The Google Cloud Platform Service Account to be used by the node VMs.
-          If a service account is specified, the cloud-platform scope is used.
-          If no Service Account is specified, the project default service
-          account is used.
+          If a service account is specified, the cloud-platform and
+          userinfo.email scopes are used. If no Service Account is specified,
+          the project default service account is used.
 
        Scopes options.
 

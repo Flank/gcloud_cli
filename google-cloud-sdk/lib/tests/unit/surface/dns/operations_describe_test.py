@@ -13,24 +13,31 @@
 # limitations under the License.
 """Tests that exercise the 'gcloud dns operations describe' command."""
 
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.dns import base
 
 
-class OperationsDescribeBetaTest(base.DnsMockBetaTest):
+@parameterized.named_parameters(
+    ('Beta', calliope_base.ReleaseTrack.BETA, 'v1beta2'),
+    ('GA', calliope_base.ReleaseTrack.GA, 'v1'),
+)
+class OperationsDescribeTest(base.DnsMockMultiTrackTest):
 
   def getTestOperation(self):
-    return self.messages_beta.Operation(
+    return self.messages.Operation(
         id='123',
         startTime='2015-10-22T18:46:48.654Z',
-        status=self.messages_beta.Operation.StatusValueValuesEnum('done'),
+        status=self.messages.Operation.StatusValueValuesEnum('done'),
         type='delete',
         user='user@example.net',)
 
-  def testDescribeByZone(self):
+  def testDescribeByZone(self, track, api_version):
+    self.SetUpForTrack(track, api_version)
     test_operation = self.getTestOperation()
-    self.mocked_dns_client.managedZoneOperations.Get.Expect(
-        self.messages_beta.DnsManagedZoneOperationsGetRequest(
+    self.client.managedZoneOperations.Get.Expect(
+        self.messages.DnsManagedZoneOperationsGetRequest(
             managedZone='my-zone',
             project=self.Project(),
             operation=test_operation.id),

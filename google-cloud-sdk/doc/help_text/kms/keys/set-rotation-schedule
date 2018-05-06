@@ -55,7 +55,8 @@ EXAMPLES
             --next-rotation-time 2017-10-12T12:34:56.1234Z
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys set-rotation-schedule
         $ gcloud beta kms keys set-rotation-schedule
 

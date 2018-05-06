@@ -33,14 +33,14 @@ class ConversionTest(unit_test_base.BaseTest):
     for key_type in key_types:
       round_trip_key_type = iam_util.KeyTypeFromCreateKeyType(
           iam_util.KeyTypeToCreateKeyType(key_type))
-      self.assertEquals(key_type, round_trip_key_type)
+      self.assertEqual(key_type, round_trip_key_type)
 
   def testRoundTripKeyTypeString(self):
     key_types = ['p12', 'json', 'unspecified']
     for key_type in key_types:
       round_trip_key_type = iam_util.KeyTypeToString(iam_util.KeyTypeFromString(
           key_type))
-      self.assertEquals(key_type, round_trip_key_type)
+      self.assertEqual(key_type, round_trip_key_type)
 
 
 if __name__ == '__main__':

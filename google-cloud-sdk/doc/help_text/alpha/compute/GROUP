@@ -55,9 +55,6 @@ GROUPS
         (ALPHA) Read and manipulate traffic forwarding rules to network load
         balancers.
 
-     groups
-        (ALPHA) Read and manipulate Google Compute Engine groups.
-
      health-checks
         (ALPHA) Read and manipulate health checks for load balanced instances.
 
@@ -88,8 +85,9 @@ GROUPS
      machine-types
         (ALPHA) Read Google Compute Engine virtual machine types.
 
-     maintenance-policies
-        (ALPHA) Create Google Compute Engine Maintenance Policies.
+     network-endpoint-groups
+        (ALPHA) Read and manipulate Google Compute Engine network endpoint
+        groups.
 
      networks
         (ALPHA) List, create, and delete Google Compute Engine networks.

@@ -24,10 +24,10 @@ class ListTestBase(object):
   def _MakeTestModels(self):
     return [
         self.short_msgs.Model(
-            name='modelName1',
+            name='projects/{}/models/modelName1'.format(self.Project()),
             defaultVersion=self.short_msgs.Version(name='v1')),
         self.short_msgs.Model(
-            name='modelName2',
+            name='projects/{}/models/modelName2'.format(self.Project()),
             defaultVersion=self.short_msgs.Version(name='v2'))]
 
   def testList(self):
@@ -42,6 +42,17 @@ class ListTestBase(object):
         NAME       DEFAULT_VERSION_NAME
         modelName1 v1
         modelName2 v2
+        """, normalize_space=True)
+
+  def testList_Uri(self):
+    self.Run('ml-engine models list --uri')
+
+    project_ref = resources.REGISTRY.Parse(self.Project(),
+                                           collection='ml.projects')
+    self.mocked.assert_called_once_with(project_ref)
+    self.AssertOutputEquals("""\
+        https://ml.googleapis.com/v1/projects/fake-project/models/modelName1
+        https://ml.googleapis.com/v1/projects/fake-project/models/modelName2
         """, normalize_space=True)
 
 

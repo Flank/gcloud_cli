@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for api_lib.cloudbuild.build."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 import time
 
@@ -28,6 +30,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.api_lib.util import build_base
 from tests.lib.apitools import http_error
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class CloudBuildClientTest(e2e_base.WithMockHttp, sdk_test_base.WithLogCapture,
@@ -134,7 +137,7 @@ class CloudBuildClientTest(e2e_base.WithMockHttp, sdk_test_base.WithLogCapture,
           ),
       )
       # Intermediate responses.
-      for _ in xrange(retries):
+      for _ in range(retries):
         self.mock_client.operations.Get.Expect(
             self.messages.Operation(
                 name=self._PROJECT_NAME,
@@ -205,7 +208,7 @@ class CloudBuildClientTest(e2e_base.WithMockHttp, sdk_test_base.WithLogCapture,
 
   def testBuild_TailLogs(self):
     self._ExpectCreateBuild(logs_bucket='logs-bucket', retries=2)
-    for i in xrange(3):
+    for i in range(3):
       self._ExpectLogRequest(b=i * len('Some log text\n'))
     self.build.logsBucket = 'logs-bucket'
 
@@ -310,7 +313,7 @@ class CloudBuildClientTest(e2e_base.WithMockHttp, sdk_test_base.WithLogCapture,
 
   def testBuild_TimeoutWithLogs(self):
     self.build.logsBucket = 'logs-bucket'
-    for i in xrange(60 * 60):
+    for i in range(60 * 60):
       self._ExpectLogRequest(b=i * len('Some log text\n'))
     self._ExpectCreateBuild(
         retries=60 * 60 - 1, success=False, logs_bucket=self.build.logsBucket)

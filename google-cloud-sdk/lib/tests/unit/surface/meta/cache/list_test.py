@@ -45,7 +45,7 @@ INFO: cache table=compute.instances.my-project aggregations=[project=my-project 
 INFO: cache update command: compute instances list --uri --quiet --format=disable --project=my-project
 INFO: cache collection=compute.instances api_version=v1 params=[u'project', u'zone', u'instance']
 INFO: cache rows=[(u'my-project', u'zone-1', u'instance-1'), (u'my-project', u'zone-1', u'instance-2'), (u'my-project', u'zone-1', u'instance-3')]
-INFO: Display format "default none".
+INFO: Display format: "default none"
 """)
 
     self.ClearErr()
@@ -63,7 +63,7 @@ INFO: cache table=compute.zones.my-project aggregations=[project=my-project]
 INFO: cache update command: compute zones list --uri --quiet --format=disable
 INFO: cache collection=compute.zones api_version=v1 params=[u'project', u'zone']
 INFO: cache rows=[]
-INFO: Display format "default none".
+INFO: Display format: "default none"
 """)
 
     self.ClearOutput()
@@ -138,7 +138,7 @@ INFO: cache parameter=zone column=1 value=zone-1 aggregate=None
 INFO: cache table=compute.instances aggregations=[zone=zone-1]
 INFO: cloud resource search query: @type:compute.instances
 INFO: cache rows=[(u'my-project', u'zone-1', u'instance-1'), (u'my-project', u'zone-1', u'instance-2'), (u'my-project', u'zone-1', u'instance-3')]
-INFO: Display format "default none".
+INFO: Display format: "default none"
 """)
 
     self.ClearErr()
@@ -156,7 +156,7 @@ INFO: cache table=compute.zones.my-project aggregations=[project=my-project]
 INFO: cache update command: compute zones list --uri --quiet --format=disable
 INFO: cache collection=compute.zones api_version=v1 params=[u'project', u'zone']
 INFO: cache rows=[]
-INFO: Display format "default none".
+INFO: Display format: "default none"
 """)
 
     self.ClearOutput()

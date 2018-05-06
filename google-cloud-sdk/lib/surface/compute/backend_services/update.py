@@ -417,6 +417,9 @@ class UpdateBeta(UpdateGA):
     flags.AddCacheKeyIncludeHost(parser, default=None)
     flags.AddCacheKeyIncludeQueryString(parser, default=None)
     flags.AddCacheKeyQueryStringList(parser)
+    flags.AddCustomRequestHeaders(parser, remove_all_flag=True, default=None)
+    signed_url_flags.AddSignedUrlCacheMaxAge(
+        parser, required=False, unspecified_help='')
 
   def Modify(self, client, resources, args, existing):
     """Modify Backend Service."""
@@ -426,6 +429,17 @@ class UpdateBeta(UpdateGA):
     if args.connection_draining_timeout is not None:
       replacement.connectionDraining = client.messages.ConnectionDraining(
           drainingTimeoutSec=args.connection_draining_timeout)
+    if args.no_custom_request_headers is not None:
+      replacement.customRequestHeaders = []
+    if args.custom_request_header is not None:
+      replacement.customRequestHeaders = args.custom_request_header
+
+    backend_services_utils.ApplyCdnPolicyArgs(
+        client,
+        args,
+        replacement,
+        is_update=True,
+        apply_signed_url_cache_max_age=True)
 
     return replacement
 
@@ -434,6 +448,8 @@ class UpdateBeta(UpdateGA):
     if not any([
         args.affinity_cookie_ttl is not None,
         args.connection_draining_timeout is not None,
+        args.no_custom_request_headers is not None,
+        args.custom_request_header is not None,
         args.description is not None,
         args.enable_cdn is not None,
         args.cache_key_include_protocol is not None,
@@ -449,6 +465,7 @@ class UpdateBeta(UpdateGA):
         args.protocol,
         args.security_policy is not None,
         args.session_affinity is not None,
+        args.IsSpecified('signed_url_cache_max_age'),
         args.timeout is not None,
     ]):
       raise exceptions.ToolException('At least one property must be modified.')

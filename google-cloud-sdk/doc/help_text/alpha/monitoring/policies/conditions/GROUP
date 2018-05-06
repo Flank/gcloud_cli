@@ -1,0 +1,40 @@
+NAME
+    gcloud alpha monitoring policies conditions - manage Stackdriver Monitoring
+        alerting policy conditions
+
+SYNOPSIS
+    gcloud alpha monitoring policies conditions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Stackdriver Monitoring alerting policies conditions.
+
+    More information can be found here:
+    https://cloud.google.com/monitoring/api/v3/
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a condition in an alerting policy.
+
+     delete
+        (ALPHA) Delete a condition in an alerting policy.
+
+     describe
+        (ALPHA) Describe a condition in a Stackdriver alerting policy.
+
+     update
+        (ALPHA) Update a condition in an alerting policy.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

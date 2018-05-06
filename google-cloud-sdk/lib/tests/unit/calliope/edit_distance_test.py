@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for usage_text.TextChoiceSuggester."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import usage_text
 from tests.lib import sdk_test_base
 from tests.lib import test_case

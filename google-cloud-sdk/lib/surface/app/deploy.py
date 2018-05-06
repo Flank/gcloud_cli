@@ -24,10 +24,16 @@ _DETAILED_HELP = {
               'Engine.'),
     'DESCRIPTION': """\
         This command is used to deploy both code and configuration to the App
-        Engine server.  As an input it takes one or more ``DEPLOYABLES'' that
+        Engine server. As an input it takes one or more ``DEPLOYABLES'' that
         should be uploaded.  A ``DEPLOYABLE'' can be a service's .yaml file or a
-        configuration's .yaml file. For Java Standard apps, add the path to the
-        `appengine-web.xml` file, inside the WEB-INF directory.
+        configuration's .yaml file (for more information about configuration
+        files specific to your App Engine environment, refer to
+        [](https://cloud.google.com/appengine/docs/standard/python/configuration-files)
+        or [](https://cloud.google.com/appengine/docs/flexible/python/configuration-files)).
+        Note, for Java Standard apps, you must add the path to the
+        `appengine-web.xml` file inside the WEB-INF directory. {command}
+        skips files specified in the .gcloudignore file (see `gcloud topic
+        gcloudignore` for more information).
         """,
     'EXAMPLES': """\
         To deploy a single service, run:
@@ -99,7 +105,8 @@ class DeployBeta(base.SilentCommand):
         use_beta_stager=True,
         runtime_builder_strategy=runtime_builder_strategy,
         parallel_build=True,
-        flex_image_build_option=deploy_util.GetFlexImageBuildOption())
+        flex_image_build_option=deploy_util.GetFlexImageBuildOption(
+            default_strategy=deploy_util.FlexImageBuildOptions.ON_SERVER))
 
 
 DeployGA.detailed_help = _DETAILED_HELP

@@ -13,8 +13,12 @@ DESCRIPTION
     a catalog.
 
 REQUIRED FLAGS
-     --catalog=CATALOG
-        The catalog to list reference images for.
+     CATALOG - The catalog to list reference images for. This represents a
+     Cloud resource. This must be specified.
+
+       --catalog=CATALOG
+          The ID of the catalog or a fully qualified identifier for the
+          catalog.
 
 FLAGS
      --product-id=PRODUCT_ID

@@ -216,7 +216,7 @@ class InstancesUpdateAccessConfigTest(test_base.BaseTest):
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--network-interface\]: The specified network '
         r'interface \'nic0\' does not exist'):
@@ -247,7 +247,7 @@ class InstancesUpdateAccessConfigTest(test_base.BaseTest):
             --zone central2-a
           """)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ConflictingArgumentsException,
         r'arguments not allowed simultaneously: --public-ptr-domain, '
         r'--no-public-ptr'):
@@ -620,7 +620,7 @@ class InstancesUpdateAccessConfigAlphaTest(InstancesUpdateAccessConfigTest):
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--network-interface\]: The specified network '
         r'interface \'nic0\' does not exist'):

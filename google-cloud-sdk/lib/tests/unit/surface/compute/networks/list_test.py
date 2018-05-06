@@ -16,30 +16,69 @@
 
 import textwrap
 
+from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.compute.networks import flags
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
 
 import mock
 
-# TODO(b/66504460): Use inline resources instead of test_resources.
-TEST_NETWORKS = {
-    'v1': test_resources.NETWORKS_V1,
-}
+
+def MakeV1NetworksForTest():
+  messages = apis.GetMessagesModule('compute', 'v1')
+  return [
+      # Legacy
+      messages.Network(
+          name='network-1',
+          gatewayIPv4='10.240.0.1',
+          IPv4Range='10.240.0.0/16',
+          routingConfig=messages.NetworkRoutingConfig(
+              routingMode=(messages.NetworkRoutingConfig.
+                           RoutingModeValueValuesEnum.REGIONAL)),
+          selfLink=('https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/network-1')),
+      # Custom
+      messages.Network(
+          name='network-2',
+          autoCreateSubnetworks=False,
+          routingConfig=messages.NetworkRoutingConfig(
+              routingMode=(messages.NetworkRoutingConfig.
+                           RoutingModeValueValuesEnum.REGIONAL)),
+          selfLink=('https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/network-2'),
+          subnetworks=[
+              'https://www.googleapis.com/compute/v1/projects/'
+              'my-project/regions/region-1/subnetworks/subnetwork-1',
+              'https://www.googleapis.com/compute/v1/projects/'
+              'my-project/regions/region-1/subnetworks/subnetwork-2'
+          ]),
+      # Auto
+      messages.Network(
+          name='network-3',
+          autoCreateSubnetworks=True,
+          routingConfig=messages.NetworkRoutingConfig(
+              routingMode=(messages.NetworkRoutingConfig.
+                           RoutingModeValueValuesEnum.GLOBAL)),
+          selfLink=('https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/networks/network-3'),
+          subnetworks=[])
+  ]
 
 
 def SetUp(test, api):
+  test_networks = {
+      'v1': MakeV1NetworksForTest(),
+  }
   lister_patcher = mock.patch(
       'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
       autospec=True)
   test.addCleanup(lister_patcher.stop)
   test.mock_get_global_resources = lister_patcher.start()
   test.mock_get_global_resources.return_value = (
-      resource_projector.MakeSerializable(TEST_NETWORKS[api]))
+      resource_projector.MakeSerializable(test_networks[api]))
   test.SelectApi(api)
 
 

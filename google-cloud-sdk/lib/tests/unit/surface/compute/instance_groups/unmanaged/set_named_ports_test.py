@@ -183,7 +183,7 @@ class UnmanagedInstanceGroupsSetNamedPortsTest(test_base.BaseTest):
       kwargs['errors'].append((404, 'Not Found'))
       yield []
     self.make_requests.side_effect = MakeRequests
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         instance_groups_utils.FingerprintFetchException, 'Not Found'):
       self.Run("""
           compute instance-groups unmanaged set-named-ports group-1

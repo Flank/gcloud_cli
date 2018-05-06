@@ -13,6 +13,8 @@
 # limitations under the License.
 """Bigtable instance upgrade tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.bigtable import instances
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base

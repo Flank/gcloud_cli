@@ -14,6 +14,8 @@
 
 """services operations describe command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import sys
 
 from googlecloudsdk.api_lib.services import services_util
@@ -102,4 +104,4 @@ class Describe(base.DescribeCommand):
 
     # Set async to True because we don't need to wait for the operation
     # to complete to check the status of it.
-    return services_util.GetProcessedOperationResult(operation, async=True)
+    return services_util.GetProcessedOperationResult(operation, is_async=True)

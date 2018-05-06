@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for 'category-manager taxonomies add-iam-policy-binding' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import sdk_test_base
 from tests.lib.surface.category_manager import base
 
@@ -68,13 +70,13 @@ class AddIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
     result = self.Run('alpha category-manager stores add-iam-policy-binding 246'
                       ' --role=roles/categorymanager.admin '
                       '--member=user:admin2@gmail.com')
-    self.assertEquals(self.new_policy, result)
+    self.assertEqual(self.new_policy, result)
 
   def testAddIamPolicyBindingWithOrganizationResourceName(self):
     result = self.Run('alpha category-manager stores add-iam-policy-binding '
                       'organizations/246 --role=roles/categorymanager.admin '
                       '--member=user:admin2@gmail.com')
-    self.assertEquals(self.new_policy, result)
+    self.assertEqual(self.new_policy, result)
 
 if __name__ == '__main__':
   sdk_test_base.main()

@@ -241,6 +241,40 @@ def GetRequestInstance(project, instance_name):
       suspensionReason=[],)
 
 
+def GetExternalMasterRequestInstance(project, instance_name):
+  """Returns an empty external master instance for making create requests."""
+  return sqladmin_v1beta4.DatabaseInstance(
+      backendType=None,
+      connectionName=None,
+      currentDiskSize=None,
+      databaseVersion='MYSQL_5_6',
+      etag=None,
+      failoverReplica=None,
+      gceZone=None,
+      instanceType=None,
+      ipAddresses=[],
+      ipv6Address=None,
+      kind=u'sql#instance',
+      masterInstanceName=None,
+      maxDiskSize=None,
+      name=instance_name,
+      onPremisesConfiguration=sqladmin_v1beta4.OnPremisesConfiguration(
+          hostPort=None,
+          kind=u'sql#onPremisesConfiguration',
+      ),
+      project=project,
+      region='us-central',
+      replicaConfiguration=None,
+      replicaNames=[],
+      selfLink=None,
+      serverCaCert=None,
+      serviceAccountEmailAddress=None,
+      settings=None,
+      state=None,
+      suspensionReason=[],
+  )
+
+
 def GetPatchRequestInstance(project, instance_name):
   """Returns a sample DatabaseInstance named instance_name, to use in PATCH."""
   return sqladmin_v1beta4.DatabaseInstance(
@@ -516,6 +550,40 @@ def GetPostgresInstance(project, instance_name):
           userLabels=None,),
       state=u'RUNNABLE',
       suspensionReason=[],)
+
+
+def GetExternalMasterInstance(project, instance_name):
+  """Returns a sample external master DatabaseInstance named instance_name."""
+  return sqladmin_v1beta4.DatabaseInstance(
+      backendType='EXTERNAL',
+      connectionName=None,
+      currentDiskSize=None,
+      databaseVersion='MYSQL_5_6',
+      etag=u'"7nzH-7nzH-h2yIKFRs9YFu88s0g/MA"',
+      failoverReplica=None,
+      gceZone=None,
+      instanceType='ON_PREMISES_INSTANCE',
+      ipAddresses=[],
+      ipv6Address=None,
+      kind=u'sql#instance',
+      masterInstanceName=None,
+      maxDiskSize=None,
+      name=instance_name,
+      onPremisesConfiguration=sqladmin_v1beta4.OnPremisesConfiguration(
+          hostPort='127.0.0.1:3306',
+          kind=u'sql#onPremisesConfiguration',
+      ),
+      project=project,
+      region='us-central',
+      replicaConfiguration=None,
+      replicaNames=[],
+      selfLink=None,
+      serverCaCert=None,
+      serviceAccountEmailAddress=None,
+      settings=None,
+      state=None,
+      suspensionReason=[],
+  )
 
 
 def GetInstanceGetRequest(project, instance):

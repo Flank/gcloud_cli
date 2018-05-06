@@ -101,7 +101,7 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
     expected_object = self.MakeObject()
     self.ExpectGetObject()
     object_info = self.storage_client.GetObject(self.MakeObject())
-    self.assertEquals(expected_object, object_info)
+    self.assertEqual(expected_object, object_info)
 
   def testGetNonExistentObject(self):
     self.ExpectGetObject(exception=self.MakeHttpError(404))
@@ -136,13 +136,13 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
     expected_object = self.MakeObject()
     self.ExpectGetObject()
     object_info = self.storage_stream._GetObject(0)
-    self.assertEquals(expected_object, object_info)
+    self.assertEqual(expected_object, object_info)
 
   def test_GetObject1(self):
     expected_object = self.MakeObject(name=self.NEXT_GCS_OBJECT_NAME)
     self.ExpectGetObject(expected_object)
     object_info = self.storage_stream._GetObject(1)
-    self.assertEquals(expected_object, object_info)
+    self.assertEqual(expected_object, object_info)
 
   def testOpen(self):
     self.assertTrue(self.storage_stream.open)
@@ -163,8 +163,8 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
     self.ExpectGetObject(object1, exception=self.MakeHttpError(404))
     bytes_read = self.storage_stream.ReadIntoWritable(stream)
     self.assertTrue(self.storage_stream.open)
-    self.assertEquals(0, bytes_read)
-    self.assertEquals('', stream.getvalue())
+    self.assertEqual(0, bytes_read)
+    self.assertEqual('', stream.getvalue())
 
   def testReadIntoWritableInternalError(self):
     stream = StringIO.StringIO()

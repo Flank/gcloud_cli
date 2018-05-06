@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) (DEPRECATED) switch-mode is deprecated. Please use
+    (ALPHA) (REMOVED) switch-mode has been removed. Please use
     --switch-to-custom-subnet-mode with gcloud compute networks update instead.
 
     gcloud alpha compute networks switch-mode is used to change the mode of a
@@ -32,12 +32,10 @@ EXAMPLES
         $ gcloud alpha compute networks switch-mode NETWORK --mode custom
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
-
-        $ gcloud compute networks switch-mode
-        $ gcloud beta compute networks switch-mode
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
 

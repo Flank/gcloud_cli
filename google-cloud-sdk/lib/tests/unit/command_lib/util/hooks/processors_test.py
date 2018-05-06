@@ -14,6 +14,9 @@
 
 """Tests for the processors module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.util.hooks import processors
 from googlecloudsdk.command_lib.util.hooks import types
 from googlecloudsdk.core import properties

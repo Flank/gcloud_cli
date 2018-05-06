@@ -171,3 +171,12 @@ class InterconnectAttachmentsPartnerUpdateAlphaTest(test_base.BaseTest):
                   labels=labels,
                   labelFingerprint='abcd')))],
     )
+
+
+class InterconnectAttachmentsPartnerUpdateBetaTest(
+    InterconnectAttachmentsPartnerUpdateAlphaTest):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.message_version = self.compute_beta

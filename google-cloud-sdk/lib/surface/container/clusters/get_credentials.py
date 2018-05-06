@@ -14,6 +14,8 @@
 
 """Fetch cluster credentials."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.container import util
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import base
@@ -85,9 +87,8 @@ class GetCredentials(base.Command):
     auth = cluster.masterAuth
     # TODO(b/70856999) Make this consistent with the checks in
     # api_lib/container/kubeconfig.py.
-    has_creds = (auth and ((auth.clientCertificate and auth.clientKey) or
-                           (auth.username and auth.password)))
-    if not has_creds and not util.ClusterConfig.UseGCPAuthProvider(cluster):
+    missing_creds = not (auth and auth.clientCertificate and auth.clientKey)
+    if missing_creds and not util.ClusterConfig.UseGCPAuthProvider():
       raise util.Error(
           'get-credentials requires edit permission on {0}'.format(
               cluster_ref.projectId))

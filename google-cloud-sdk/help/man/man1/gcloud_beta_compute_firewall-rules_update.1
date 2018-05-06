@@ -11,7 +11,7 @@ gcloud beta compute firewall\-rules update \- update a firewall rule
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute firewall\-rules update\fR \fINAME\fR [\fB\-\-allow\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-source\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute firewall\-rules update\fR \fINAME\fR [\fB\-\-allow\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-destination\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-disabled\fR] [\fB\-\-priority\fR=\fIPRIORITY\fR] [\fB\-\-rules\fR=[\fIPROTOCOL\fR[:\fIPORT\fR[\-\fIPORT\fR]],...]] [\fB\-\-source\-ranges\fR=[\fICIDR_RANGE\fR,...]] [\fB\-\-source\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-source\-tags\fR=[\fITAG\fR,...]] [\fB\-\-target\-service\-accounts\fR=[\fIEMAIL\fR,...]] [\fB\-\-target\-tags\fR=[\fITAG\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -20,7 +20,9 @@ gcloud beta compute firewall\-rules update \- update a firewall rule
 \fB(BETA)\fR \fBgcloud beta compute firewall\-rules update\fR is used to update
 firewall rules that allow/deny incoming/outgoing traffic. The firewall rule will
 only be updated for arguments that are specifically passed. Other attributes
-will remain unaffected.
+will remain unaffected. The \f5action\fR flag (whether to allow or deny matching
+traffic) cannot be defined when updating a firewall rule; use \f5gcloud compute
+firewall\-rules delete\fR to remove the rule instead.
 
 
 
@@ -102,6 +104,17 @@ $ gcloud beta compute firewall\-rules update MY\-RULE \e
 .RE
 
 .TP 2m
+\fB\-\-disabled\fR
+Use this flag to disable a firewall rule and stop it from being enforced in the
+network. In the case of disabled firewall rules, the associated network behaves
+as if the firewall rule did not exist. To enable a disabled rule instead, use:
+
+.RS 2m
+$ gcloud beta compute firewall\-rules update MY\-RULE \-\-no\-disabled
+.RE
+
+
+.TP 2m
 \fB\-\-priority\fR=\fIPRIORITY\fR
 This is an integer between 0 and 65535, both inclusive. When NOT specified, the
 value assumed is 1000. Relative priority determines precedence of conflicting
@@ -119,15 +132,8 @@ http://www.iana.org/assignments/protocol\-numbers/protocol\-numbers.xhtml
 
 A port or port range can be specified after PROTOCOL to which the firewall rule
 apply on traffic through specific ports. If no port or port range is specified,
-connections through all ranges are applied. For example, the following will
-create a rule that blocks TCP traffic through port 80 and ICMP traffic:
-
-.RS 2m
-$ gcloud beta compute firewall\-rules update MY\-RULE \-\-action deny \e
-    \-\-rules tcp:80,icmp
-.RE
-
-TCP and UDP rules must include a port or port range.
+connections through all ranges are applied. TCP and UDP rules must include a
+port or port range.
 
 Setting this will override the current values.
 

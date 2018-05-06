@@ -11,12 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """ml products search tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 
 from tests.lib import test_case
 from tests.lib.surface.ml.products import base
+
+from six.moves import map  # pylint: disable=redefined-builtin
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class SearchTest(base.MlProductsTestBase):
@@ -48,7 +55,7 @@ class SearchTest(base.MlProductsTestBase):
     elif contents:
       image.content = contents
     search_params = self.search_messages.ProductSearchParams()
-    search_params.boundingPoly = bounds
+    search_params.normalizedBoundingPoly = bounds
     search_params.catalogName = catalog
     search_params.productCategory = category
     search_params.view = search_params.ViewValueValuesEnum('FULL')
@@ -86,7 +93,7 @@ class SearchTest(base.MlProductsTestBase):
   def _GetProductResponses(self, count=3):
     """Get test product search results."""
     return [
-        self.search_messages.Product(
+        self.search_messages.ProductInfo(
             imageUri='gs://fake-bucket/image{}.jpg'.format(i),
             productId='abc123',
             score=0.7) for i in range(count)
@@ -95,7 +102,7 @@ class SearchTest(base.MlProductsTestBase):
   def _MakeBounds(self, bounds):
     vertices = []
     for vertex in bounds:
-      x_coord, y_coord = map(int, vertex.split(':'))
+      x_coord, y_coord = list(map(int, vertex.split(':')))
       vertices.append(
           self.search_messages.NormalizedVertex(x=x_coord, y=y_coord))
     return  self.search_messages.NormalizedBoundingPoly(vertices=vertices)

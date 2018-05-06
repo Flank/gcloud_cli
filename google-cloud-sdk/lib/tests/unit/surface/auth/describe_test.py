@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -39,8 +42,8 @@ class DescribeTest(cli_test_base.CliTestBase):
 
     credentials = self.Run('auth describe {0} --format=disable'
                            .format(self.Account()))
-    self.assertEquals('999999999999999999999', credentials['client_id'])
-    self.assertEquals('test-access-token-25', credentials['access_token'])
+    self.assertEqual('999999999999999999999', credentials['client_id'])
+    self.assertEqual('test-access-token-25', credentials['access_token'])
 
 
 if __name__ == '__main__':

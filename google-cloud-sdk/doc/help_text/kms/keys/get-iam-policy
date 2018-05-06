@@ -61,7 +61,8 @@ EXAMPLES
             --location global
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys get-iam-policy
         $ gcloud beta kms keys get-iam-policy
 

@@ -37,7 +37,7 @@ COMMANDS
         (ALPHA) List device registries.
 
      set-iam-policy
-        (ALPHA) Set IAM policy for a device registry.
+        (ALPHA) Set the IAM policy for a device registry.
 
      update
         (ALPHA) Update a device registry.

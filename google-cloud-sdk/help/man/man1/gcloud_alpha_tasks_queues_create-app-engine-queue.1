@@ -11,7 +11,7 @@ gcloud alpha tasks queues create\-app\-engine\-queue \- create an App Engine que
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks queues create\-app\-engine\-queue\fR \fIAPP_ENGINE_QUEUE_ID\fR [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[\fIKEY\fR:\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks queues create\-app\-engine\-queue\fR \fIAPP_ENGINE_QUEUE_ID\fR [\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -21,8 +21,10 @@ gcloud alpha tasks queues create\-app\-engine\-queue \- create an App Engine que
 endpoint. The flags available to this command represent the fields of an App
 Engine queue that are mutable.
 
-For more information about the different queue target types, see:
-https://cloud.google.com/cloud\-tasks/docs/queue\-types
+If you have early access to Cloud Tasks, refer to the following guide for more
+information about the different queue target types:
+https://cloud.google.com/cloud\-tasks/docs/queue\-types. For access, sign up
+here: https://goo.gl/Ya0AZd
 
 
 
@@ -84,7 +86,7 @@ The minimum amount of time to wait before retrying a task after it fails. Must
 be a string that ends in 's', such as "5s".
 
 .TP 2m
-\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[\fIKEY\fR:\fIVALUE\fR,...]
+\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]
 If provided, the specified route is used for all tasks in the queue, no matter
 what is set is at the task\-level.
 

@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.auth import util as auth_util
@@ -22,6 +25,7 @@ from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
 from tests.lib import test_case
+
 import mock
 from mock import patch
 from oauth2client import client
@@ -46,9 +50,9 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_adc_file_path.return_value = os.path.join(
         self.temp_path, 'ADC')
 
-    mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
-    mock_metadata.return_value.connected = False
-    mock_metadata.return_value.Project = lambda: 'metadata-project'
+    self.mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
+    self.mock_metadata.return_value.connected = False
+    self.mock_metadata.return_value.Project = lambda: 'metadata-project'
     self.StartDictPatch('os.environ', {'DISPLAY': ':1'})
 
   def GetFakeCred(self, account):
@@ -147,7 +151,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     self.mock_webflow.return_value = fake_cred
     self.StartObjectPatch(
         files, 'OpenForWritingPrivate').side_effect = IOError('Error')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         store.CredentialFileSaveError, 'Error saving Application'):
       self.Login()
 
@@ -215,7 +219,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     """When an error occurs in the web flow."""
     self.mock_webflow.side_effect = store.FlowError('flowerror')
 
-    with self.assertRaisesRegexp(store.FlowError, 'flowerror'):
+    with self.assertRaisesRegex(store.FlowError, 'flowerror'):
       self.Login()
     self.AssertErrContains('There was a problem with web authentication.')
 
@@ -232,8 +236,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     become vulnerable. Test the case where the user wishes to continue
     authentication.
     """
-    mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
-    mock_metadata.return_value.connected = True
+    self.mock_metadata.return_value.connected = True
 
     fake_cred = self.GetFakeCred('foo@google.com')
     self.mock_webflow.return_value = fake_cred
@@ -255,8 +258,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     become vulnerable. Test the case where the user wishes to abort
     authentication.
     """
-    mock_metadata = self.StartObjectPatch(gce, 'Metadata', autospec=True)
-    mock_metadata.return_value.connected = True
+    self.mock_metadata.return_value.connected = True
 
     fake_cred = self.GetFakeCred('foo@google.com')
     self.mock_webflow.return_value = fake_cred
@@ -265,7 +267,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     with self.assertRaises(console_io.OperationCancelledError):
       self.Login()
 
-    self.assertEquals(False, self.mock_webflow.called)
+    self.assertEqual(False, self.mock_webflow.called)
 
   def testWarnUserADCEnvVarAnswerNo(self):
     """Warn the user when the ADC environment variable is set."""
@@ -278,7 +280,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
       with self.assertRaises(console_io.OperationCancelledError):
         self.Login()
 
-      self.assertEquals(False, self.mock_webflow.called)
+      self.assertEqual(False, self.mock_webflow.called)
 
   def testLoginMissingDirectory(self):
     """Test login when the .gcloud directory is missing."""

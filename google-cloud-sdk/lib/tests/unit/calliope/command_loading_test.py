@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import command_loading
 from googlecloudsdk.core.util import pkg_resources
 from tests.lib import sdk_test_base
@@ -118,7 +120,7 @@ class CommandLoadingTest(sdk_test_base.SdkBase):
     main_file = self.Touch(self.temp_path, 'main.yaml', contents="""\
     x: !COMMON foo.bar
     """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'references \[common command\] data but it does not exist'):
       command_loading.CreateYamlLoader(main_file).load(
@@ -129,7 +131,7 @@ class CommandLoadingTest(sdk_test_base.SdkBase):
     main_file = self.Touch(self.temp_path, 'main.yaml', contents="""\
     x: !COMMON asdf.asdf
     """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'references \[common command\] data attribute \[asdf\] in path '
         r'\[asdf.asdf\] but it does not exist.'):
@@ -140,7 +142,7 @@ class CommandLoadingTest(sdk_test_base.SdkBase):
     main_file = self.Touch(self.temp_path, 'main.yaml', contents="""\
         x: !REF asdf
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Invalid Yaml reference: \[asdf\].'):
       command_loading.CreateYamlLoader(main_file).load(
@@ -150,7 +152,7 @@ class CommandLoadingTest(sdk_test_base.SdkBase):
     main_file = self.Touch(self.temp_path, 'main.yaml', contents="""\
         x: !REF a:foo
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Failed to load Yaml reference file \[.*a\.yaml\]'):
       command_loading.CreateYamlLoader(main_file).load(
@@ -160,7 +162,7 @@ class CommandLoadingTest(sdk_test_base.SdkBase):
     main_file = self.Touch(self.temp_path, 'main.yaml', contents="""\
         x: !REF {mod}:asdf.asdf
         """.format(mod=self._TestResourcesModule()))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'references \[.*test_data\.yaml\] data attribute \[asdf\] in path \['
         r'asdf.asdf\] but it does not exist.'):

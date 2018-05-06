@@ -13,11 +13,14 @@
 # limitations under the License.
 """Base class for all Datastore Command Unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+import six
 
 
 class DatastoreCommandUnitTest(cli_test_base.CliTestBase,
@@ -34,7 +37,7 @@ class DatastoreCommandUnitTest(cli_test_base.CliTestBase,
   def Serialize(self, x):
     """Serialize a list or dict into a filter-compatible format."""
     if isinstance(x, dict):
-      return ','.join(['%s=%s' % (k, v) for k, v in x.iteritems()])
+      return ','.join(['%s=%s' % (k, v) for k, v in six.iteritems(x)])
     elif isinstance(x, list):
       return ','.join(x)
     else:

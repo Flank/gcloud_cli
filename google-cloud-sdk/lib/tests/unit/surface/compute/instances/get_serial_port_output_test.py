@@ -144,7 +144,7 @@ class InstancesGetSerialPortOutputTest(test_base.BaseTest):
 
     self.make_requests.side_effect = MakeRequests
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.Error,
         'Could not fetch serial port output: Not Found'):
       self.Run("""

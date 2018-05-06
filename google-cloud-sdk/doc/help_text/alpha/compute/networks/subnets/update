@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute networks subnets update NAME [--region=REGION]
-        [--add-secondary-ranges=PROPERTY=VALUE,[PROPERTY=VALUE,...]
-          | --[no-]enable-flow-logs | --[no-]enable-private-ip-google-access
-          | --remove-secondary-ranges=PROPERTY=VALUE,[PROPERTY=VALUE,...]]
+        [--add-secondary-ranges=PROPERTY=VALUE,[...] | --[no-]enable-flow-logs
+          | --[no-]enable-private-ip-google-access
+          | --remove-secondary-ranges=PROPERTY=VALUE,[...]]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -18,7 +18,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --region=REGION
-        The region of the subnetwork to update. If not specified, you will be
+        The region of the subnetwork to update. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
@@ -39,7 +39,7 @@ FLAGS
 
      At most one of these may be specified:
 
-       --add-secondary-ranges=PROPERTY=VALUE,[PROPERTY=VALUE,...]
+       --add-secondary-ranges=PROPERTY=VALUE,[...]
           Adds secondary IP ranges to the subnetwork for use in IP aliasing.
 
           For example, --add-secondary-ranges range1=192.168.64.0/24 adds a
@@ -58,7 +58,7 @@ FLAGS
             --enable-private-ip-google-access to enable and
             --no-enable-private-ip-google-access to disable.
 
-         --remove-secondary-ranges=PROPERTY=VALUE,[PROPERTY=VALUE,...]
+         --remove-secondary-ranges=PROPERTY=VALUE,[...]
             Removes secondary ranges from the subnetwork.
 
             For example, --remove-secondary-ranges range2,range3 removes the

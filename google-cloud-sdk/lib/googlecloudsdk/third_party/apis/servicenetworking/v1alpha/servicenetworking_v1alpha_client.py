@@ -24,7 +24,7 @@ class ServicenetworkingV1alpha(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new servicenetworking handle."""
     url = url or self.BASE_URL
     super(ServicenetworkingV1alpha, self).__init__(
@@ -33,7 +33,8 @@ class ServicenetworkingV1alpha(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.operations = self.OperationsService(self)
     self.services = self.ServicesService(self)
 
@@ -48,7 +49,7 @@ class ServicenetworkingV1alpha(base_api.BaseApiClient):
           }
 
     def Get(self, request, global_params=None):
-      """Gets the latest state of a long-running operation.  Clients can use this.
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
 method to poll the operation result at intervals as recommended by the API
 service.
 
@@ -87,7 +88,7 @@ service.
           }
 
     def AddSubnetwork(self, request, global_params=None):
-      """Service provider use this method to provision a new subnet in a.
+      r"""Service provider use this method to provision a new subnet in a.
 peered service shared VPC network.
 It will validate previously provided reserved ranges, find non-conflicting
 sub-range of requested size (expressed in
@@ -120,7 +121,7 @@ Operation<response: AddSubnetworkResponse>
     )
 
     def Peer(self, request, global_params=None):
-      """To connect service to a VPC network peering connection.
+      r"""To connect service to a VPC network peering connection.
 must be established prior to service provisioning.
 This method must be invoked by the consumer VPC network administrator
 It will establish a permanent peering connection with a shared

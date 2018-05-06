@@ -14,6 +14,8 @@
 
 """Test for the api_lit.util.resource_search module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import resource_search
 from tests.lib.api_lib.util import resource_search_test_base
 
@@ -42,7 +44,7 @@ class ResourceSearchTest(resource_search_test_base.ResourceSearchTestBase):
         ),
     )
     results = list(resource_search.List())
-    self.assertEquals(3, len(results))
+    self.assertEqual(3, len(results))
 
   def testComputeInstancesUri(self):
     self.client.ResourcesService.Search.Expect(
@@ -57,7 +59,7 @@ class ResourceSearchTest(resource_search_test_base.ResourceSearchTestBase):
         ),
     )
     results = list(resource_search.List(uri=True))
-    self.assertEquals(
+    self.assertEqual(
         [
             'https://www.googleapis.com/compute/beta/projects/'
             'test-project-0/zones/test-zone-0/instances/test-name-0',
@@ -81,7 +83,7 @@ class ResourceSearchTest(resource_search_test_base.ResourceSearchTestBase):
         ),
     )
     results = list(resource_search.List(uri=True, limit=1))
-    self.assertEquals(
+    self.assertEqual(
         [
             'https://www.googleapis.com/compute/beta/projects/'
             'test-project-0/zones/test-zone-0/instances/test-name-0',
@@ -101,7 +103,7 @@ class ResourceSearchTest(resource_search_test_base.ResourceSearchTestBase):
         ),
     )
     results = list(resource_search.List(uri=True, page_size=2))
-    self.assertEquals(
+    self.assertEqual(
         [
             'https://www.googleapis.com/compute/beta/projects/'
             'test-project-0/zones/test-zone-0/instances/test-name-0',

@@ -16,6 +16,8 @@
 
 from googlecloudsdk.api_lib.endpoints import services_util
 
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.endpoints import unit_test_base
 
@@ -23,10 +25,14 @@ GET_REQUEST = (services_util.GetMessagesModule()
                .ServicemanagementServicesGetIamPolicyRequest)
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class EndpointsGetIamPolicyTest(unit_test_base.EV1UnitTestBase):
   """Unit tests for endpoints services get-iam-policy command."""
 
-  def testGetIamPolicy(self):
+  def testGetIamPolicy(self, track):
+    self.track = track
     bindings = [
         self.services_messages.Binding(
             role='roles/servicemanagement.serviceConsumer',
@@ -44,7 +50,8 @@ class EndpointsGetIamPolicyTest(unit_test_base.EV1UnitTestBase):
         'endpoints services get-iam-policy %s' % self.DEFAULT_SERVICE_NAME)
     self.assertEqual(response, mocked_response)
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
+    self.track = track
     bindings = [
         self.services_messages.Binding(
             role='roles/servicemanagement.serviceConsumer',

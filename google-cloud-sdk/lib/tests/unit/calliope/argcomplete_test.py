@@ -16,6 +16,8 @@
 
 """Unit tests for calliope argparse vs argcomplete."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import cli_test_base
 from tests.lib.calliope import util as calliope_test_util
 

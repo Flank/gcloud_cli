@@ -243,8 +243,8 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def testIncompleteImageName(self):
     image_name = 'gcr.io/badimage@' + _DIGEST_SUFFIX1
-    with self.assertRaisesRegexp(util.InvalidImageNameError,
-                                 'Image name should start with'):
+    with self.assertRaisesRegex(util.InvalidImageNameError,
+                                'Image name should start with'):
       self.Delete([image_name])
 
   def testDeleteUnsupportedInputTag(self):

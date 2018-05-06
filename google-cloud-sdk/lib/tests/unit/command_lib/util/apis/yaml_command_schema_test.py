@@ -14,6 +14,8 @@
 
 """Tests for the yaml command schema."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 import re
 
@@ -62,7 +64,7 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(r.method, 'list')
 
   def testRequestGeneric(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         'request.method was not specified and there is no default for this '
         'command type.'):
@@ -146,7 +148,7 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(a.error.field, 'error_field')
 
   def testAsyncErrors(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         'async.resource_get_method was specified but extract_resource_result is'
         ' False'):
@@ -318,7 +320,7 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
        'at most one of [default, fallback]'),
   )
   def testArgumentErrors(self, data, message):
-    with self.assertRaisesRegexp(util.InvalidSchemaError, re.escape(message)):
+    with self.assertRaisesRegex(util.InvalidSchemaError, re.escape(message)):
       yaml_command_schema.Argument.FromData(data)
 
   @parameterized.parameters(
@@ -380,12 +382,24 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(c.async.method, 'get')
 
   def testCommandDataErrors(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         'Wait commands must include an async section.'):
       yaml_command_schema.CommandData(
           'wait',
           {'help_text': {}, 'request': {'collection': 'foo.instances'}})
+
+  def testIamData(self):
+    o = yaml_command_schema.IamData({
+        'message_type_overrides': {
+            'policy': 'MyOtherPolicy'
+        },
+        'set_iam_policy_request_path':
+            'setMyOtherIamPolicyRequest.myotherpolicy'
+    })
+    self.assertEqual(o.message_type_overrides['policy'], 'MyOtherPolicy')
+    self.assertEqual(o.set_iam_policy_request_path,
+                     'setMyOtherIamPolicyRequest.myotherpolicy')
 
 
 class ArgGenParseTests(sdk_test_base.SdkBase, parameterized.TestCase):
@@ -410,7 +424,7 @@ class ArgGenParseTests(sdk_test_base.SdkBase, parameterized.TestCase):
       ('Int', 'int1', 'foo', ['--foo=1'], 1),
       ('Float', 'float1', 'foo', ['--foo=1.5'], 1.5),
       ('Bool', 'bool1', 'foo', ['--foo'], True),
-      ('BoolDefault', 'bool1', 'foo', [], False),
+      ('BoolUnspecifiedDefault', 'bool1', 'foo', [], False),
       ('Enum', 'enum1', 'foo', ['--foo=thing-one'],
        fm.FakeMessage.FakeEnum.THING_ONE),
       ('Message', 'message1.string1', 'foo', ['--foo=b'], 'b'),

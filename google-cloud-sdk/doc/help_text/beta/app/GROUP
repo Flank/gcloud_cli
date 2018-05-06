@@ -71,7 +71,8 @@ COMMANDS
         (BETA) Display all data about an existing service using the beta API.
 
      gen-config
-        (BETA) Generate missing configuration files for a source directory.
+        (BETA) (DEPRECATED) Generate missing configuration files for a source
+        directory.
 
      open-console
         (BETA) Open the App Engine dashboard, or log viewer, in a web browser.

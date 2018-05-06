@@ -70,8 +70,7 @@ class FoldersRemoveIamPolicyBindingTest(testbase.FoldersUnitTestBase):
 
   def ExpectedGetRequest(self):
     return self.messages.CloudresourcemanagerFoldersGetIamPolicyRequest(
-        foldersId=folders.FolderIdToName(self.TEST_FOLDER.name),
-        getIamPolicyRequest=self.messages.GetIamPolicyRequest())
+        foldersId=folders.FolderIdToName(self.TEST_FOLDER.name))
 
   def SetupGetIamPolicyFailure(self, exception):
     self.mock_folders.GetIamPolicy.Expect(

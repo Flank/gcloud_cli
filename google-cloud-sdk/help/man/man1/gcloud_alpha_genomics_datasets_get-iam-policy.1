@@ -5,20 +5,24 @@
 
 .SH "NAME"
 .HP
-gcloud alpha genomics datasets get\-iam\-policy \- get IAM policy for a dataset
+gcloud alpha genomics datasets get\-iam\-policy \- get the IAM policy for a dataset
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha genomics datasets get\-iam\-policy\fR \fIID\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha genomics datasets get\-iam\-policy\fR \fIDATASET\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR This command gets the IAM policy for a dataset, given a dataset
-ID.
+\fB(ALPHA)\fR \fBgcloud alpha genomics datasets get\-iam\-policy\fR displays the
+IAM policy associated with a dataset. If formatted as JSON, the output can be
+edited and used as a policy file for set\-iam\-policy. The output includes an
+"etag" field identifying the version emitted and allowing detection of
+concurrent policy updates; see $ {parent} set\-iam\-policy for additional
+details.
 
 
 
@@ -26,10 +30,17 @@ ID.
 
 .RS 2m
 .TP 2m
-\fIID\fR
-The ID of the dataset.
+
+DATASET \- The dataset for which to display the IAM policy. This represents a
+Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDATASET\fR
+The ID of the dataset or a fully qualified identifier for the dataset.
 
 
+.RE
 .RE
 .sp
 
@@ -75,6 +86,23 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBgenomics/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/genomics
+
+
+
+.SH "EXAMPLES"
+
+To print the IAM policy for a given dataset, run:
+
+.RS 2m
+$ gcloud alpha genomics datasets get\-iam\-policy my\-dataset
+.RE
 
 
 

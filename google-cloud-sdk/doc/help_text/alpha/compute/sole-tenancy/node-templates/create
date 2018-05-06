@@ -1,0 +1,94 @@
+NAME
+    gcloud alpha compute sole-tenancy node-templates create - creates a Google
+        Compute Engine node template
+
+SYNOPSIS
+    gcloud alpha compute sole-tenancy node-templates create NAME
+        (--node-requirements=[localSSD=LOCALSSD],[memory=MEMORY],[vCPU=VCPU]
+          | --node-type=NODE_TYPE) [--description=DESCRIPTION]
+        [--node-affinity-labels=[KEY=VALUE,...]] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Creates a Google Compute Engine node template.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the node templates to operate on.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --node-requirements=[localSSD=LOCALSSD],[memory=MEMORY],[vCPU=VCPU]
+          The requirements for nodes. Google Compute Engine will automatically
+          choose a node type that fits the requirements on Node Group creation.
+          If multiple node types match your defined criteria, the NodeType with
+          the least amount of each resource will be selected. You can specify
+          'any' to indicate no preference for a certain resource.
+
+          The following keys are allowed:
+
+           vCPU
+              The number of committed cores available to the node.
+
+           memory
+              The amount of memory available to the node. This value should
+              include unit (eg. 3072MB or 9GB). If no units are specified, MB
+              is assumed.
+
+           localSSD
+              Optional. The amount of SSD space available on the node. This
+              value should include unit (eg. 3072MB or 9GB). If no units are
+              specified, GB is assumed.
+
+       --node-type=NODE_TYPE
+          The node type to use for nodes in node groups using this template.
+          The type of a node determines what resources are available to
+          instances running on the node.
+
+          See the following for more information:
+
+              $ gcloud alpha compute sole-tenancy node-types
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional description of this resource.
+
+     --node-affinity-labels=[KEY=VALUE,...]
+        Labels to use for node affinity, which will be used in instance
+        scheduling. This corresponds to the --node-affinity flag on compute
+        instances create and compute instance-templates create.
+
+     --region=REGION
+        The region of the node templates to operate on. If not specified, you
+        may be prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

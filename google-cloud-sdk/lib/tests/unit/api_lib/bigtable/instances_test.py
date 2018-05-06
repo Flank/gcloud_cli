@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Bigtable snapshots library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.bigtable import instances
 from googlecloudsdk.core import resources
 from tests.lib.surface.bigtable import base
@@ -41,4 +43,4 @@ class InstancesClientTest(base.BigtableV2TestBase):
   def testUpgrade(self):
     response = self.msgs.Operation()
     self.ExpectInstanceUpdateRequest(response)
-    self.assertEquals(instances.Upgrade('my-instance'), response)
+    self.assertEqual(instances.Upgrade('my-instance'), response)

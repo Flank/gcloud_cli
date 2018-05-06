@@ -32,12 +32,12 @@ class DescribeTest(base.Base, cli_test_base.CliTestBase):
     self.AssertOutputContains('version: v1')
 
   def testDescribeMissingAPI(self):
-    with self.assertRaisesRegexp(registry.UnknownAPIError,
-                                 r'\[asdfasdf\] does not exist'):
+    with self.assertRaisesRegex(registry.UnknownAPIError,
+                                r'\[asdfasdf\] does not exist'):
       self.Run('meta apis describe asdfasdf --api-version=v1')
 
   def testDescribeMissingVersion(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         registry.UnknownAPIVersionError,
         r'Version \[v12345\] does not exist for API \[compute\].'):
       self.Run('meta apis describe compute --api-version=v12345')

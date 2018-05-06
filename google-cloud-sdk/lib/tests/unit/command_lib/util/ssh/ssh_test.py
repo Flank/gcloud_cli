@@ -14,6 +14,8 @@
 
 """Tests for googlecloudsdk.command_lib.ssh."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.command_lib.util.ssh import ssh
@@ -26,6 +28,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import mock
+import six
 
 
 class EnvironmentTest(test_case.TestCase):
@@ -204,7 +207,7 @@ class KeysTest(sdk_test_base.WithTempCWD,
     self._CreateFile(ppk_key, 'PuTTY file')  # if test is run on windows
     self._ExpectGenKey()
     # no write input, flag is present
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         console_io.OperationCancelledError,
         '(?s)private.*{}.*public.*?NOT FOUND'.format(private_key)):
       self._EnsureKeysExist(overwrite=False)
@@ -238,7 +241,7 @@ class KeysTest(sdk_test_base.WithTempCWD,
     public_key = self.key_file + '.pub'
     self._CreateFile(public_key, 'BROKENCONTENT')
     keys = ssh.Keys(self.key_file)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidKeyError, r'Public key \[BROKENCONTENT\] is invalid\.'):
       keys.GetPublicKey()
 
@@ -269,7 +272,7 @@ class KeysTest(sdk_test_base.WithTempCWD,
   def testInvalidPublicKeyString(self):
     """Very simple validation -- just use fewer than two components."""
     key_string = 'BROKENCONTENT'
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidKeyError, r'Public key \[BROKENCONTENT\] is invalid\.'):
       ssh.Keys.PublicKey.FromKeyString(key_string)
 
@@ -388,7 +391,7 @@ class CommandTestBase(test_case.TestCase):
       - If arg is str, return [str]
       - If arg is [str]: return [str]
     """
-    if isinstance(arg, basestring):
+    if isinstance(arg, six.string_types):
       return arg.split()
     else:
       return arg
@@ -771,7 +774,7 @@ class SCPCommandTest(CommandTestBase):
         cmd,
         'scp myhost:remote_1 me@myhost:remote_2 local_1',
         None)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidConfigurationError, 'Multiple remote sources not supported'):
       ssh.SCPCommand.Verify(srcs, dst, env=self.putty)
 
@@ -781,7 +784,7 @@ class SCPCommandTest(CommandTestBase):
     dst = self.ref_local_1
     # Passes for OpenSSH
     ssh.SCPCommand.Verify(srcs, dst, single_remote=True, env=self.openssh)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidConfigurationError, 'Multiple remote sources not supported'):
       ssh.SCPCommand.Verify(srcs, dst, single_remote=True, env=self.putty)
 
@@ -789,10 +792,10 @@ class SCPCommandTest(CommandTestBase):
     """Enforcing a single remote fails with multiple remotes."""
     srcs = [self.ref_remote_1, self.ref_remote_2]
     dst = self.ref_local_1
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidConfigurationError, 'Multiple remote sources not supported'):
       ssh.SCPCommand.Verify(srcs, dst, single_remote=True, env=self.putty)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidConfigurationError, 'sources must refer to the same remote'):
       ssh.SCPCommand.Verify(srcs, dst, single_remote=True, env=self.openssh)
 
@@ -800,7 +803,7 @@ class SCPCommandTest(CommandTestBase):
     """Mix of remote and local sources, should raise."""
     srcs = [self.ref_remote_1, self.ref_local_1]
     dst = self.ref_remote_2
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidConfigurationError, 'All sources must be local'):
       ssh.SCPCommand.Verify(srcs, dst, env=self.openssh)
 
@@ -808,7 +811,7 @@ class SCPCommandTest(CommandTestBase):
     """Mix of remote and local sources, should raise."""
     srcs = [self.ref_local_1]
     dst = self.ref_local_2
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidConfigurationError, 'Source\\(s\\) must be remote'):
       ssh.SCPCommand.Verify(srcs, dst, env=self.openssh)
 
@@ -816,14 +819,14 @@ class SCPCommandTest(CommandTestBase):
     """Mix of remote and local sources, should raise."""
     srcs = [self.ref_remote_1, self.ref_local_2]
     dst = self.ref_local_1
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidConfigurationError, 'Source\\(s\\) must be remote'):
       ssh.SCPCommand.Verify(srcs, dst, env=self.openssh)
 
   def testNoSources(self):
     """Require at least one source."""
     cmd = ssh.SCPCommand([], self.ref_remote_2)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.InvalidConfigurationError, 'No sources'):
       cmd.Build(self.openssh)
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the target-https-proxies update subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -90,50 +92,6 @@ class TargetHTTPSProxiesUpdateGATest(test_base.BaseTest):
                      ])))),
     ])
 
-  def testUriSupport(self):
-    messages = self.messages
-    self.Run("""
-        compute target-https-proxies update
-          {uri}/projects/my-project/global/targetHttpsProxies/target-https-proxy-1
-          --ssl-certificates {uri}/projects/my-project/global/sslCertificates/my-cert
-          --url-map {uri}/projects/my-project/global/urlMaps/my-map
-        """.format(uri=self.compute_uri))
-
-    self.CheckRequests(
-        [(self.compute.targetHttpsProxies, 'SetSslCertificates',
-          messages.ComputeTargetHttpsProxiesSetSslCertificatesRequest(
-              project='my-project',
-              targetHttpsProxy='target-https-proxy-1',
-              targetHttpsProxiesSetSslCertificatesRequest=(
-                  messages.TargetHttpsProxiesSetSslCertificatesRequest(
-                      sslCertificates=[
-                          self.compute_uri +
-                          '/projects/my-project/global/sslCertificates/'
-                          'my-cert'
-                      ])))),
-         (self.compute.targetHttpsProxies, 'SetUrlMap',
-          messages.ComputeTargetHttpsProxiesSetUrlMapRequest(
-              project='my-project',
-              targetHttpsProxy='target-https-proxy-1',
-              urlMapReference=messages.UrlMapReference(
-                  urlMap=(self.compute_uri +
-                          '/projects/my-project/global/urlMaps/my-map'))))])
-
-  def testWithoutArgs(self):
-    with self.AssertRaisesToolExceptionMatches(
-        'You must specify at least one of [--ssl-certificates] or [--url-map].'
-    ):
-      self.Run("""
-          compute target-https-proxies update my-proxy
-          """)
-    self.CheckRequests()
-
-
-class TargetHTTPSProxiesUpdateBetaTest(TargetHTTPSProxiesUpdateGATest):
-
-  def SetUp(self):
-    self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
-
   def testSimpleCaseWithSslPolicy(self):
     messages = self.messages
 
@@ -171,45 +129,50 @@ class TargetHTTPSProxiesUpdateBetaTest(TargetHTTPSProxiesUpdateGATest):
                             'my-ssl-policy')))),
     ])
 
-  def testClearSslPolicy(self):
+  def testUriSupport(self):
     messages = self.messages
     self.Run("""
-        compute target-https-proxies update target-https-proxy-1
-        --clear-ssl-policy
-        """)
-    self.CheckRequests([
-        (self.compute.targetHttpsProxies, 'SetSslPolicy',
-         messages.ComputeTargetHttpsProxiesSetSslPolicyRequest(
-             project='my-project',
-             targetHttpsProxy='target-https-proxy-1',
-             sslPolicyReference=None)),
-    ])
+        compute target-https-proxies update
+          {uri}/projects/my-project/global/targetHttpsProxies/target-https-proxy-1
+          --ssl-certificates {uri}/projects/my-project/global/sslCertificates/my-cert
+          --url-map {uri}/projects/my-project/global/urlMaps/my-map
+        """.format(uri=self.compute_uri))
+
+    self.CheckRequests(
+        [(self.compute.targetHttpsProxies, 'SetSslCertificates',
+          messages.ComputeTargetHttpsProxiesSetSslCertificatesRequest(
+              project='my-project',
+              targetHttpsProxy='target-https-proxy-1',
+              targetHttpsProxiesSetSslCertificatesRequest=(
+                  messages.TargetHttpsProxiesSetSslCertificatesRequest(
+                      sslCertificates=[
+                          self.compute_uri +
+                          '/projects/my-project/global/sslCertificates/'
+                          'my-cert'
+                      ])))),
+         (self.compute.targetHttpsProxies, 'SetUrlMap',
+          messages.ComputeTargetHttpsProxiesSetUrlMapRequest(
+              project='my-project',
+              targetHttpsProxy='target-https-proxy-1',
+              urlMapReference=messages.UrlMapReference(
+                  urlMap=(self.compute_uri +
+                          '/projects/my-project/global/urlMaps/my-map'))))])
 
   def testWithoutArgs(self):
     with self.AssertRaisesToolExceptionMatches(
         'You must specify at least one of [--ssl-certificates], [--url-map], '
-        '[--ssl-policy] or [--clear-ssl-policy].'):
+        '[--ssl-policy] or [--clear-ssl-policy].'
+    ):
       self.Run("""
           compute target-https-proxies update my-proxy
           """)
     self.CheckRequests()
 
-  def testBothSetAndClearSslPolicy(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --clear-ssl-policy: At most one of '
-        '--clear-ssl-policy | --ssl-policy may be specified.'):
-      self.Run("""
-          compute target-https-proxies update my-proxy
-          --ssl-policy my-ssl-policy
-          --clear-ssl-policy
-          """)
-    self.CheckRequests()
 
-
-class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
+class TargetHTTPSProxiesUpdateBetaTest(TargetHTTPSProxiesUpdateGATest):
 
   def SetUp(self):
-    self._SetUpReleaseTrack('alpha', calliope_base.ReleaseTrack.ALPHA)
+    self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
 
   def testSimpleCaseWithQuicOverrideAndSslPolicy(self):
     messages = self.messages
@@ -259,6 +222,20 @@ class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
                             'my-ssl-policy')))),
     ])
 
+  def testClearSslPolicy(self):
+    messages = self.messages
+    self.Run("""
+        compute target-https-proxies update target-https-proxy-1
+        --clear-ssl-policy
+        """)
+    self.CheckRequests([
+        (self.compute.targetHttpsProxies, 'SetSslPolicy',
+         messages.ComputeTargetHttpsProxiesSetSslPolicyRequest(
+             project='my-project',
+             targetHttpsProxy='target-https-proxy-1',
+             sslPolicyReference=None)),
+    ])
+
   def testWithoutArgs(self):
     with self.AssertRaisesToolExceptionMatches(
         'You must specify at least one of [--ssl-certificates], [--url-map], '
@@ -267,6 +244,23 @@ class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
           compute target-https-proxies update my-proxy
           """)
     self.CheckRequests()
+
+  def testBothSetAndClearSslPolicy(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --clear-ssl-policy: At most one of '
+        '--clear-ssl-policy | --ssl-policy may be specified.'):
+      self.Run("""
+          compute target-https-proxies update my-proxy
+          --ssl-policy my-ssl-policy
+          --clear-ssl-policy
+          """)
+    self.CheckRequests()
+
+
+class TargetHTTPSProxiesUpdateAlphaTest(TargetHTTPSProxiesUpdateBetaTest):
+
+  def SetUp(self):
+    self._SetUpReleaseTrack('alpha', calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

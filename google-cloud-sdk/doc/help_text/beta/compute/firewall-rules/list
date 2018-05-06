@@ -85,7 +85,8 @@ EXAMPLES
                 sourceTags.list():label=SRC_TAGS,
                 sourceServiceAccounts.list():label=SRC_SVC_ACCT,
                 targetTags.list():label=TARGET_TAGS,
-                targetServiceAccounts.list():label=TARGET_SVC_ACCT
+                targetServiceAccounts.list():label=TARGET_SVC_ACCT,
+                disabled
             )"
 
 NOTES

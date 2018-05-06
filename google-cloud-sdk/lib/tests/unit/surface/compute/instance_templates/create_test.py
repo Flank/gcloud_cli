@@ -21,6 +21,7 @@ from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import flags
+from googlecloudsdk.command_lib.compute.sole_tenancy import util as sole_tenancy_util
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -313,7 +314,7 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
       kwargs['errors'].append((404, 'Not Found'))
     self.make_requests.side_effect = MakeRequests
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         utils.ImageNotFoundError,
         (r'The resource \[(.*)projects/my-project/global/images/non-existent-'
          r'image\] was not found. Is the image located in another project\? '
@@ -2416,7 +2417,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
   def testRegionPromptAttemptedWithSubnet(self):
 
     # This is very dirty, but at least verifies an attempt to prompt.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         flags.UnderSpecifiedResourceError,
         r'Underspecified resource \[my-subnetwork\]. Specify the \[--region\] '
         r'flag.'):
@@ -2444,7 +2445,7 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
           """)
 
   def testWithMachineTypeAndCustomCpuSpecified(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Cannot set both \[--machine-type\] and \[--custom-cpu\]'):
 
@@ -2901,10 +2902,9 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
   def testWithMultipleCreateDisks(self):
     m = self.messages
 
-    self.Run(
-        'compute instance-templates create template-create-disk '
-        '  --create-disk image=debian-8,image-project=debian-cloud'
-        '  --create-disk image=debian-8,image-project=debian-cloud')
+    self.Run('compute instance-templates create template-create-disk '
+             '  --create-disk type=SSD'
+             '  --create-disk image=debian-8,image-project=debian-cloud')
 
     template = m.InstanceTemplate(
         name='template-create-disk',
@@ -2915,8 +2915,14 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                     autoDelete=True,
                     boot=True,
                     initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=self._default_image,
-                    ),
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                m.AttachedDisk(
+                    autoDelete=False,
+                    boot=False,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        diskType='SSD'),
                     mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
                     type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
                 m.AttachedDisk(
@@ -2927,30 +2933,20 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
                                      '/projects/debian-cloud/global/images'
                                      '/debian-8')),
                     mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                m.AttachedDisk(
-                    autoDelete=False,
-                    boot=False,
-                    initializeParams=m.AttachedDiskInitializeParams(
-                        sourceImage=(self.compute_uri +
-                                     '/projects/debian-cloud/global/images'
-                                     '/debian-8')),
-                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
             machineType=_DEFAULT_MACHINE_TYPE,
             metadata=m.Metadata(),
-            networkInterfaces=[m.NetworkInterface(
-                accessConfigs=[self._default_access_config],
-                network=self._default_network)],
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
             serviceAccounts=[
-                m.ServiceAccount(
-                    email='default',
-                    scopes=_DEFAULT_SCOPES
-                ),
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
             ],
             scheduling=m.Scheduling(automaticRestart=True),
-        )
-    )
+        ))
 
     self.CheckRequests(
         self.get_default_image_requests,
@@ -2961,17 +2957,6 @@ class InstanceTemplatesCreateTestAlpha(InstanceTemplatesCreateTest):
               project='my-project',
           ))],
     )
-
-  def testWithCreateDisksNoImage(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Either \[image\] or \[image-family\] must be specified for '
-        r'\[--create-disk\].'):
-      self.Run("""
-          compute instance-templates create template-create-disk
-            --create-disk size=10GB
-          """)
-
-    self.CheckRequests()
 
   def testMultipleNetworkInterfaceCards(self):
     msg = self.messages
@@ -3801,6 +3786,111 @@ class InstanceTemplatesCreateTestBeta(InstanceTemplatesCreateTest,
                'instantiate-from=source-image,'
                'custom-image=projects/image-project/global/images/my-image')
 
+  def testWithPremiumNetworkTier(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create template-1
+        --network-tier PREMIUM
+        """)
+
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[
+                        m.AccessConfig(
+                            name='external-nat',
+                            networkTier=(self.messages.AccessConfig.
+                                         NetworkTierValueValuesEnum.PREMIUM),
+                            type=self._one_to_one_nat)
+                    ],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+        ))
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
+
+  def testWithStandardNetworkTier(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create template-1
+        --network-tier standard
+        """)
+
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[
+                        m.AccessConfig(
+                            name='external-nat',
+                            networkTier=(self.messages.AccessConfig.
+                                         NetworkTierValueValuesEnum.STANDARD),
+                            type=self._one_to_one_nat)
+                    ],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+        ))
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
+
+  def testInvalidNetworkTier(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Invalid value for \[--network-tier\]: Invalid network tier '
+        r'\[RANDOM-NETWORK-TIER\]'):
+      self.Run("""
+          compute instance-templates create template-1
+          --network-tier random-network-tier
+          """)
+
 
 @parameterized.parameters(
     ('alpha', calliope_base.ReleaseTrack.ALPHA),
@@ -4074,6 +4164,240 @@ class InstanceTemplatesCreateShieldedVMConfigTest(InstanceTemplatesCreateTest,
               project='my-project',
           ))],
     )
+
+
+class InstanceTemplatesCreateWithNodeAffinity(test_base.BaseTest,
+                                              parameterized.TestCase):
+  """Test creation of VM instances on sole tenant host."""
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.node_affinity = self.messages.SchedulingNodeAffinity
+    self.operator_enum = self.node_affinity.OperatorValueValuesEnum
+
+  def _CheckCreateRequests(self, node_affinities):
+    m = self.messages
+    prop = m.InstanceProperties(
+        canIpForward=False,
+        disks=[m.AttachedDisk(
+            autoDelete=True,
+            boot=True,
+            initializeParams=m.AttachedDiskInitializeParams(
+                sourceImage=self._default_image,
+            ),
+            mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+            type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+        machineType=_DEFAULT_MACHINE_TYPE,
+        metadata=m.Metadata(),
+        networkInterfaces=[m.NetworkInterface(
+            accessConfigs=[self._default_access_config],
+            network=self._default_network)],
+        serviceAccounts=[
+            m.ServiceAccount(
+                email='default',
+                scopes=_DEFAULT_SCOPES
+            ),
+        ],
+        scheduling=m.Scheduling(
+            automaticRestart=True,
+            nodeAffinities=node_affinities),
+    )
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=prop
+    )
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates,
+          'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],)
+
+  def testCreate_SimpleNodeAffinityJson(self):
+    node_affinities = [
+        self.node_affinity(
+            key='key1',
+            operator=self.operator_enum.IN,
+            values=['value1', 'value2'])]
+    contents = """\
+[{"operator": "IN", "values": ["value1", "value2"], "key": "key1"}]
+    """
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+    self.Run("""
+        compute instance-templates create template-1
+          --node-affinity-file {}
+        """.format(node_affinity_file))
+
+    self._CheckCreateRequests(node_affinities)
+
+  def testCreate_SimpleNodeAffinityYaml(self):
+    node_affinities = [
+        self.node_affinity(
+            key='key1',
+            operator=self.operator_enum.IN,
+            values=['value1', 'value2'])]
+    contents = """\
+- key: key1
+  operator: IN
+  values: [value1, value2]
+    """
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+    self.Run("""
+        compute instance-templates create template-1
+          --node-affinity-file {}
+        """.format(node_affinity_file))
+
+    self._CheckCreateRequests(node_affinities)
+
+  def testCreate_MultipleNodeAffinityMessages(self):
+    node_affinities = [
+        self.node_affinity(
+            key='key1',
+            operator=self.operator_enum.IN,
+            values=['value1']),
+        self.node_affinity(
+            key='key2',
+            operator=self.operator_enum.NOT_IN,
+            values=['value2', 'value3']),
+        self.node_affinity(
+            key='key3',
+            operator=self.operator_enum.IN,
+            values=[])]
+    contents = """\
+- key: key1
+  operator: IN
+  values: [value1]
+- key: key2
+  operator: NOT_IN
+  values: [value2, value3]
+- key: key3
+  operator: IN
+    """
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+    self.Run("""
+        compute instance-templates create template-1
+          --node-affinity-file {}
+        """.format(node_affinity_file))
+
+    self._CheckCreateRequests(node_affinities)
+
+  def testCreate_InvalidOperator(self):
+    contents = """\
+- key: key1
+  operator: HelloWorld
+  values: [value1, value2]
+    """
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+    with self.AssertRaisesExceptionMatches(
+        sole_tenancy_util.NodeAffinityFileParseError,
+        "Key [key1] has invalid field formats for: ['operator']"):
+      self.Run("""
+          compute instance-templates create template-1
+            --node-affinity-file {}
+          """.format(node_affinity_file))
+
+  def testCreate_NoKey(self):
+    contents = """\
+- operator: IN
+  values: [value1, value2]
+    """
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+    with self.AssertRaisesExceptionMatches(
+        sole_tenancy_util.NodeAffinityFileParseError,
+        'A key must be specified for every node affinity label.'):
+      self.Run("""
+          compute instance-templates create template-1
+            --node-affinity-file {}
+          """.format(node_affinity_file))
+
+  def testCreate_InvalidYaml(self):
+    contents = """\
+- key: key1
+  operator: IN
+  values: 3
+    """
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+    with self.AssertRaisesExceptionMatches(
+        sole_tenancy_util.NodeAffinityFileParseError,
+        "Expected type <type 'unicode'> for field values, found 3 "
+        "(type <type 'int'>)"):
+      self.Run("""
+          compute instance-templates create template-1
+            --node-affinity-file {}
+          """.format(node_affinity_file))
+
+  @parameterized.parameters('-', '[{}]')
+  def testCreate_EmptyListItem(self, contents):
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+    with self.AssertRaisesExceptionMatches(
+        sole_tenancy_util.NodeAffinityFileParseError,
+        'Empty list item in JSON/YAML file.'):
+      self.Run("""
+          compute instance-templates create template-1
+            --node-affinity-file {}
+          """.format(node_affinity_file))
+
+  @parameterized.parameters('', '[]')
+  def testCreate_AffinityFileWithLabels(self, contents):
+    node_affinity_file = self.Touch(
+        self.temp_path, 'affinity_config.json', contents=contents)
+    with self.AssertRaisesExceptionMatches(
+        sole_tenancy_util.NodeAffinityFileParseError,
+        'No node affinity labels specified. You must specify at least one '
+        'label to create a sole tenancy instance.'):
+      self.Run("""
+          compute instance-templates create template-1
+            --node-affinity-file {}
+          """.format(node_affinity_file))
+
+  def testCreate_NodeGroup(self):
+    node_affinities = [
+        self.node_affinity(
+            key='compute.googleapis.com/node-group-name',
+            operator=self.operator_enum.IN,
+            values=['my-node-group'])]
+    self.Run("""
+        compute instance-templates create template-1
+          --node-group my-node-group
+        """)
+
+    self._CheckCreateRequests(node_affinities)
+
+  def testCreate_NodeGroupAndNodeIndex(self):
+    node_affinities = [
+        self.node_affinity(
+            key='compute.googleapis.com/node-group-name',
+            operator=self.operator_enum.IN,
+            values=['my-node-group']),
+        self.node_affinity(
+            key='compute.googleapis.com/node-index',
+            operator=self.operator_enum.IN,
+            values=['2'])]
+    self.Run("""
+        compute instance-templates create template-1
+          --node-group my-node-group --node-index 2
+        """)
+
+    self._CheckCreateRequests(node_affinities)
+
+  def testCreate_OnlyNodeIndex(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --node-index: --node-group must be specified.'):
+      self.Run("""
+          compute instance-templates create template-1
+            --node-index 2
+          """)
 
 
 if __name__ == '__main__':

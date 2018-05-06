@@ -77,14 +77,14 @@ class YamlParsingTests(util.WithAppData, sdk_test_base.SdkBase):
 
   def testIllegalVersion(self):
     f = self.WriteApp('app.yaml', version='1')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml_parsing.YamlValidationError,
         r'The \[version\] field is specified'):
       yaml_parsing.ServiceYamlInfo.FromFile(f)
 
   def testIllegalApplication(self):
     f = self.WriteApp('app.yaml', project='foo')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml_parsing.YamlValidationError,
         r'The \[application\] field is specified'):
       yaml_parsing.ServiceYamlInfo.FromFile(f)
@@ -117,7 +117,7 @@ class YamlParsingTests(util.WithAppData, sdk_test_base.SdkBase):
                            normalize_space=True)
 
   def testHasLib(self):
-    """Assert that we don't get a warning for python libssl 2.7.11."""
+    """Test various combinations of HasLib."""
     libdata = """
 threadsafe: true
 handlers:
@@ -134,6 +134,37 @@ libraries:
     self.assertFalse(yaml_parsing.HasLib(parsed, 'other'))
     self.assertTrue(yaml_parsing.HasLib(parsed, 'ssl', '2.7.11'))
     self.assertFalse(yaml_parsing.HasLib(parsed, 'ssl', '2.7.13'))
+
+  def testGetRuntimeConfigAttr(self):
+    """Test various combinations of GetRuntimeConfigAttr."""
+    with_rt_config = """
+env: flex
+runtime_config:
+  str_val: abc
+  int_val: 123
+"""
+    f = self.WriteApp('app.yaml', runtime='python', data=with_rt_config)
+    mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
+    parsed = mod.parsed
+    self.assertEqual(yaml_parsing.GetRuntimeConfigAttr(parsed, 'str_val'),
+                     'abc')
+
+    # Check for implicit string conversion
+    self.assertEqual(yaml_parsing.GetRuntimeConfigAttr(parsed, 'int_val'),
+                     '123')
+    self.assertEqual(yaml_parsing.GetRuntimeConfigAttr(parsed, 'non_existing'),
+                     None)
+
+  def testGetRuntimeConfigAttrNoSection(self):
+    """GetRuntimeConfigAttr returns None when section is not present."""
+    without_rt_config = """
+env: flex
+"""
+    f = self.WriteApp('app.yaml', runtime='python', data=without_rt_config)
+    mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
+    parsed = mod.parsed
+    self.assertEqual(yaml_parsing.GetRuntimeConfigAttr(parsed, 'any_key'),
+                     None)
 
   def testPythonSSLWarning(self):
     """Assert that we get a deprecation warning for python libssl 2.7."""
@@ -168,6 +199,28 @@ libraries:
     self.AssertModule(mod, 'default',
                       env=app_util.Environment.STANDARD)
     self.AssertErrNotContains('outdated version [2.7] of the Python SSL lib')
+
+  def testFlexPy34Warning(self):
+    """Assert that we get a deprecation warning for python 3.4 on flex."""
+    app_snippet = """
+runtime_config:
+  python_version: 3.4
+"""
+    f = self.WriteApp('app.yaml', env='flex', runtime='python',
+                      data=app_snippet)
+    yaml_parsing.ServiceYamlInfo.FromFile(f)
+    self.AssertErrContains('deprecated version [3.4] of Python')
+
+  def testFlexPyLatestNoWarning(self):
+    """No deprecation warning if runtime_config.python_version == latest."""
+    app_snippet = """
+runtime_config:
+  python_version: latest
+"""
+    f = self.WriteApp('app.yaml', env='flex', runtime='python',
+                      data=app_snippet)
+    yaml_parsing.ServiceYamlInfo.FromFile(f)
+    self.AssertErrNotContains('deprecated version [3.4] of Python')
 
   def testSkipFiles(self):
     # Constants for regex comparison.
@@ -248,7 +301,7 @@ libraries:
 
   def testCustomRuntimeNoEnv(self):
     f = self.WriteApp('app.yaml', runtime='custom')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml_parsing.YamlValidationError,
         'runtime "custom" requires that env be explicitly specified.'):
       yaml_parsing.ServiceYamlInfo.FromFile(f)
@@ -278,7 +331,7 @@ handlers:
 
   def testBadFile(self):
     file_path = self.WriteFile('junk.txt', '')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml_parsing.YamlParseError,
         r'An error occurred while parsing file'
         .format(file_path=file_path)):
@@ -288,11 +341,11 @@ handlers:
     f1 = self.WriteApp('app.yaml', project='foo')
     f2 = self.WriteConfig(self.CRON_DATA, project='foo')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml_parsing.YamlValidationError,
         r'The \[application\] field is specified'):
       yaml_parsing.ServiceYamlInfo.FromFile(f1)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml_parsing.YamlValidationError,
         r'The \[application\] field is specified'):
       yaml_parsing.ConfigYamlInfo.FromFile(f2)
@@ -300,10 +353,10 @@ handlers:
   def testBadAppParse(self):
     app_file = os.path.join(self.temp_path, 'app.yaml')
     with open(app_file, 'w') as fp:
-      fp.write('trash')
+      fp.write('project: one\napp: two')
     # Need to escape the path for Windows.
     app_file = app_file.replace('\\', r'\\')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml_parsing.YamlParseError,
         r'An error occurred while parsing file'):
       yaml_parsing.ServiceYamlInfo.FromFile(app_file)
@@ -318,7 +371,7 @@ handlers:
   script: home.app
 """)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml_parsing.YamlValidationError,
         r'Service \[default\] uses unsupported Python 2.5 runtime. Please use '
         r'\[runtime: python27\] instead'):

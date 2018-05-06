@@ -24,27 +24,23 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 
-class UpdateNetworkInterfaceTestAlpha(sdk_test_base.WithFakeAuth,
-                                      cli_test_base.CliTestBase):
+class UpdateNetworkInterfaceTest(sdk_test_base.WithFakeAuth,
+                                 cli_test_base.CliTestBase):
   """Base class for testing instance update network interface command."""
 
-  def _SetUpForReleaseTrack(self, api_name, track):
+  def SetUp(self):
     self.apitools_client = api_mock.Client(
-        core_apis.GetClientClass('compute', api_name),
-        real_client=core_apis.GetClientInstance(
-            'compute', api_name, no_http=True))
+        core_apis.GetClientClass('compute', 'v1'),
+        real_client=core_apis.GetClientInstance('compute', 'v1', no_http=True))
     self.apitools_client.Mock()
     self.addCleanup(self.apitools_client.Unmock)
     self.messages = self.apitools_client.MESSAGES_MODULE
 
     self.resources = resources.Registry()
-    self.resources.RegisterApiByName('compute', api_name)
-    self.track = track
+    self.resources.RegisterApiByName('compute', 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
     self.service = self.apitools_client.instances
     self.zone_operations = self.apitools_client.zoneOperations
-
-  def SetUp(self):
-    self._SetUpForReleaseTrack('alpha', calliope_base.ReleaseTrack.ALPHA)
 
   def _GetInstance(self, name, zone=None):
     params = {'project': self.Project()}
@@ -195,18 +191,12 @@ class UpdateNetworkInterfaceTestAlpha(sdk_test_base.WithFakeAuth,
 
     self._ExpectInstanceGetRequest(instance, instance_ref)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.UnknownArgumentException,
         r'Instance does not have a network interface \[not-a-nic]'):
       self.Run('compute instances network-interfaces update instance-1 '
                '--zone atlanta --network-interface not-a-nic '
                '--aliases "10.128.1.0/24;r1:/32"')
-
-
-class UpdateNetworkInterfaceTestBeta(UpdateNetworkInterfaceTestAlpha):
-
-  def SetUp(self):
-    self._SetUpForReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
 
 
 if __name__ == '__main__':

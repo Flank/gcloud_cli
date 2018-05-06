@@ -8,9 +8,9 @@ SYNOPSIS
         (--default-backend-bucket=DEFAULT_BACKEND_BUCKET
           | --default-service=DEFAULT_SERVICE)
         [--backend-bucket-path-rules=PATH=BUCKET,[PATH=BUCKET,...]]
-        [--backend-service-path-rules=PATH=SERVICE,[PATH=SERVICE,...]]
+        [--backend-service-path-rules=PATH=SERVICE,[...]]
         [--delete-orphaned-path-matcher] [--description=DESCRIPTION]
-        [--path-rules=PATH=SERVICE,[PATH=SERVICE,...]]
+        [--path-rules=PATH=SERVICE,[...]]
         [--existing-host=EXISTING_HOST | --new-hosts=NEW_HOST,[NEW_HOST,...]]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -48,7 +48,7 @@ OPTIONAL FLAGS
      --backend-bucket-path-rules=PATH=BUCKET,[PATH=BUCKET,...]
         Rules for mapping request paths to backend buckets.
 
-     --backend-service-path-rules=PATH=SERVICE,[PATH=SERVICE,...]
+     --backend-service-path-rules=PATH=SERVICE,[...]
         Rules for mapping request paths to services.
 
      --delete-orphaned-path-matcher
@@ -58,7 +58,7 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the path matcher.
 
-     --path-rules=PATH=SERVICE,[PATH=SERVICE,...]
+     --path-rules=PATH=SERVICE,[...]
         Rules for mapping request paths to services.
 
      At most one of these may be specified:

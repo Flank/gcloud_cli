@@ -62,7 +62,7 @@ class LoggingTestBase(cli_test_base.CliTestBase,
     # Remove project.
     properties.PersistProperty(properties.VALUES.core.project, None)
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, NO_PROJECT_REGEXP):
       self.RunLogging(cmd)
 
   def RunWithoutAuth(self, cmd):
@@ -70,7 +70,7 @@ class LoggingTestBase(cli_test_base.CliTestBase,
     # Remove credentials.
     self.FakeAuthSetCredentialsPresent(False)
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, NO_AUTH_REGEXP):
+    with self.assertRaisesRegex(Exception, NO_AUTH_REGEXP):
       self.RunLogging(cmd)
 
 

@@ -6,9 +6,10 @@ SYNOPSIS
     gcloud ml-engine jobs submit training JOB --module-name=MODULE_NAME
         [--config=CONFIG] [--job-dir=JOB_DIR] [--labels=[KEY=VALUE,...]]
         [--package-path=PACKAGE_PATH] [--packages=[PACKAGE,...]]
-        [--region=REGION] [--runtime-version=RUNTIME_VERSION]
-        [--scale-tier=SCALE_TIER] [--staging-bucket=STAGING_BUCKET]
-        [--async | --stream-logs] [GCLOUD_WIDE_FLAG ...] [-- USER_ARGS ...]
+        [--python-version=PYTHON_VERSION] [--region=REGION]
+        [--runtime-version=RUNTIME_VERSION] [--scale-tier=SCALE_TIER]
+        [--staging-bucket=STAGING_BUCKET] [--async | --stream-logs]
+        [GCLOUD_WIDE_FLAG ...] [-- USER_ARGS ...]
 
 DESCRIPTION
     Submits a Cloud Machine Learning training job.
@@ -97,9 +98,14 @@ OPTIONAL FLAGS
         Cloud Storage bucket given by --staging-bucket, or Cloud Storage URLs
         (gs://bucket-name/path/to/package.tar.gz).
 
+     --python-version=PYTHON_VERSION
+        The version of Python used during training. If not set, the default
+        version is 2.7. Python 3.5 is available when runtime_version is set to
+        1.4 and above. Python 2.7 works with all supported runtime versions.
+
      --region=REGION
         The region of the machine learning training job to submit. If not
-        specified, you will be prompted to select a region.
+        specified, you may be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:
@@ -118,10 +124,10 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
      --runtime-version=RUNTIME_VERSION
-        The Google Cloud ML Engine runtime version for this job. Defaults to
-        the latest stable version. See
-        https://cloud.google.com/ml/docs/concepts/runtime-version-list for a
-        list of accepted versions.
+        The Google Cloud ML Engine runtime version for this job. Defaults to a
+        stable version, which is defined in the documentation along with the
+        list of supported versions:
+        https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --scale-tier=SCALE_TIER
         Specifies the machine types, the number of replicas for workers and

@@ -11,20 +11,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Test of the 'pubsub topics get-iam-policy' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.pubsub import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class TopicsGetIamPolicyTest(base.CloudPubsubTestBase):
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(True)
     self.svc = self.client.projects_topics.GetIamPolicy
 
-  def testGetIamPolicy(self):
+  def testGetIamPolicy(self, track):
+    self.track = track
     topic_ref = util.ParseTopic('topic1', self.Project())
     self.svc.Expect(
         self.msgs.PubsubProjectsTopicsGetIamPolicyRequest(
@@ -36,7 +46,8 @@ class TopicsGetIamPolicyTest(base.CloudPubsubTestBase):
 
     self.assertEqual(result, self.policy)
 
-  def testGetIamPolicy_Filter(self):
+  def testGetIamPolicy_Filter(self, track):
+    self.track = track
     topic_ref = util.ParseTopic('topic1', self.Project())
     self.svc.Expect(
         self.msgs.PubsubProjectsTopicsGetIamPolicyRequest(

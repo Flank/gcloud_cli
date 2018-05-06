@@ -17,11 +17,16 @@ import os
 import re
 
 from apitools.base.py import encoding
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib.surface.spanner import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class SetIamPolicyTest(base.SpannerTestBase):
 
   def SetUp(self):
@@ -42,8 +47,10 @@ class SetIamPolicyTest(base.SpannerTestBase):
     json = encoding.MessageToJson(self.policy)
     self.temp_file = self.Touch(self.temp_path, contents=json)
 
-  def testSetIamPolicy(self):
-    set_request = self.msgs.SetIamPolicyRequest(policy=self.policy)
+  def testSetIamPolicy(self, track):
+    self.track = track
+    set_request = self.msgs.SetIamPolicyRequest(
+        policy=self.policy, updateMask='bindings,etag,version')
     self.client.projects_instances.SetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesSetIamPolicyRequest(
             resource=self.instance_ref.RelativeName(),
@@ -55,7 +62,8 @@ class SetIamPolicyTest(base.SpannerTestBase):
     self.assertEqual(set_policy_request, self.policy)
     self.AssertErrContains('Updated IAM policy for instance [insId].')
 
-  def testBadJsonOrYamlSetIamPolicyProject(self):
+  def testBadJsonOrYamlSetIamPolicyProject(self, track):
+    self.track = track
     temp_file = self.Touch(self.temp_path, 'bad', contents='bad')
 
     with self.AssertRaisesExceptionRegexp(
@@ -64,12 +72,13 @@ class SetIamPolicyTest(base.SpannerTestBase):
           spanner instances set-iam-policy insId {0}
           """.format(temp_file))
 
-  def testBadJsonSetIamPolicyProject(self):
+  def testBadJsonSetIamPolicyProject(self, track):
+    self.track = track
     temp_file = os.path.join(self.temp_path, 'doesnotexist')
 
     with self.AssertRaisesExceptionRegexp(
         exceptions.Error,
         r'Failed to load YAML from \[{}\]'.format(re.escape(temp_file))):
       self.Run("""
-          beta spanner instances set-iam-policy insId {0}
+          spanner instances set-iam-policy insId {0}
           """.format(temp_file))

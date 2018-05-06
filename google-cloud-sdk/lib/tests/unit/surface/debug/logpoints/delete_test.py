@@ -14,6 +14,8 @@
 
 """Tests for the 'debug logpoints delete' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.debug import debug
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base

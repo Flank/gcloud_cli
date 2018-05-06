@@ -12,16 +12,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for gcloud ml language classify-text."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from apitools.base.py import encoding
-from googlecloudsdk.api_lib.ml.language import util
 from googlecloudsdk.api_lib.util import exceptions
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.ml.language import util
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.ml.language import base as language_base
+
+import six
 
 
 @parameterized.named_parameters(
@@ -75,7 +81,7 @@ class ClassifyTextTest(language_base.MlLanguageTestBase):
   def _CreateCategoryResponse(self, categories):
     categories_response = []
     if categories:
-      for category, confidence in categories.iteritems():
+      for category, confidence in six.iteritems(categories):
         categories_response.append({'name': category,
                                     'confidence': confidence})
     return {'categories': categories_response}

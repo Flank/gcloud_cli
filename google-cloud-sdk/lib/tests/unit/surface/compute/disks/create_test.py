@@ -21,6 +21,7 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -958,7 +959,7 @@ class DisksCreateTestWithCsekKeys(test_base.BaseTest):
   def testCsekKeyWrappedInvalid(self):
     # Explicitly include the RSA-wrapped key for this one
     self.private_key_fname = self.WriteKeyFile(include_rsa_encrypted=True)
-    with self.assertRaisesRegexp(csek_utils.BadKeyTypeException, re.escape(
+    with self.assertRaisesRegex(csek_utils.BadKeyTypeException, re.escape(
         'Invalid key type [rsa-encrypted]: this feature is only allowed in the '
         'alpha and beta versions of this command.')):
       self.Run("""
@@ -1110,13 +1111,14 @@ class DisksCreateTestWithKmsKeysAlpha(test_base.BaseTest):
           """)
 
 
-class RegionalDisksCreateTest(test_base.BaseTest):
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                          (calliope_base.ReleaseTrack.BETA, 'beta'))
+class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
 
-  def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def testDefaultOptionsWithSingleDisk(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
 
-  def testDefaultOptionsWithSingleDisk(self):
     self.make_requests.side_effect = iter([
         [],
         [
@@ -1145,10 +1147,9 @@ class RegionalDisksCreateTest(test_base.BaseTest):
                   name='disk-1',
                   sizeGb=500,
                   replicaZones=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/zones/central2-b',
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/zones/central2-c']),
+                      self.compute_uri+'/projects/my-project/zones/central2-b',
+                      self.compute_uri+'/projects/my-project/zones/central2-c']
+              ),
               project='my-project',
               region='central2'))],
     )
@@ -1159,7 +1160,10 @@ class RegionalDisksCreateTest(test_base.BaseTest):
         https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting""",
                            normalize_space=True)
 
-  def testRegionalDiskType(self):
+  def testRegionalDiskType(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+
     self.make_requests.side_effect = iter([
         [],
         [
@@ -1190,13 +1194,12 @@ class RegionalDisksCreateTest(test_base.BaseTest):
               disk=self.messages.Disk(
                   name='disk-1',
                   sizeGb=500,
-                  type='https://www.googleapis.com/compute/alpha/projects/'
-                       'my-project/regions/central2/diskTypes/pd-standard',
+                  type=(self.compute_uri+'/projects/'
+                        'my-project/regions/central2/diskTypes/pd-standard'),
                   replicaZones=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/zones/central2-b',
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/zones/central2-c']),
+                      self.compute_uri+'/projects/my-project/zones/central2-b',
+                      self.compute_uri+'/projects/my-project/zones/central2-c']
+              ),
               project='my-project',
               region='central2'))],
     )
@@ -1207,7 +1210,10 @@ class RegionalDisksCreateTest(test_base.BaseTest):
         https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting""",
                            normalize_space=True)
 
-  def testRegionDeprecated(self):
+  def testRegionDeprecated(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+
     self.make_requests.side_effect = iter([
         [],
         [
@@ -1241,10 +1247,9 @@ class RegionalDisksCreateTest(test_base.BaseTest):
                   name='disk-1',
                   sizeGb=500,
                   replicaZones=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/zones/central2-b',
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/zones/central2-c']),
+                      self.compute_uri+'/projects/my-project/zones/central2-b',
+                      self.compute_uri+'/projects/my-project/zones/central2-c']
+              ),
               project='my-project',
               region='central2'))],
     )
@@ -1257,11 +1262,17 @@ class RegionalDisksCreateTest(test_base.BaseTest):
 
       Do you want to continue (Y/n)?"""))
 
-  def testRegionButNoReplicaZones(self):
+  def testRegionButNoReplicaZones(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+
     with self.assertRaises(exceptions.RequiredArgumentException):
       self.Run('compute disks create disk-1 --region central2')
 
-  def testReplicaZonesButNoRegion(self):
+  def testReplicaZonesButNoRegion(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+
     self.make_requests.side_effect = iter([
         [],
         [
@@ -1282,22 +1293,26 @@ class RegionalDisksCreateTest(test_base.BaseTest):
                   name='disk-1',
                   sizeGb=500,
                   replicaZones=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/zones/central2-b',
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/zones/central2-c'
+                      self.compute_uri+'/projects/my-project/zones/central2-b',
+                      self.compute_uri+'/projects/my-project/zones/central2-c'
                   ]),
               project='my-project',
               region='central2'))],)
 
-  def testWrongNumberOfReplicaZones(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
+  def testWrongNumberOfReplicaZones(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+
+    with self.AssertRaisesArgumentError():
       self.Run(
           'compute disks create disk-1 '
           '--region central2 '
           '--replica-zones central2-b')
 
-  def testCreateInDifferentProjects(self):
+  def testCreateInDifferentProjects(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+
     self.make_requests.side_effect = iter([
         [],
         [
@@ -1314,11 +1329,11 @@ class RegionalDisksCreateTest(test_base.BaseTest):
     ])
     self.Run("""
         compute disks create
-        https://www.googleapis.com/compute/alpha/projects/project-1/regions/central2/disks/disk-1
-        https://www.googleapis.com/compute/alpha/projects/project-2/regions/central2/disks/disk-1
+        https://www.googleapis.com/compute/{version}/projects/project-1/regions/central2/disks/disk-1
+        https://www.googleapis.com/compute/{version}/projects/project-2/regions/central2/disks/disk-1
         --region central2
         --replica-zones central2-b,central2-c
-        """)
+        """.format(version=api_version))
 
     self.CheckRequests(
         [],
@@ -1341,10 +1356,8 @@ class RegionalDisksCreateTest(test_base.BaseTest):
                   name='disk-1',
                   sizeGb=500,
                   replicaZones=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'project-1/zones/central2-b',
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'project-1/zones/central2-c']),
+                      self.compute_uri+'/projects/project-1/zones/central2-b',
+                      self.compute_uri+'/projects/project-1/zones/central2-c']),
               project='project-1',
               region='central2')),
          (self.compute.regionDisks,
@@ -1354,22 +1367,23 @@ class RegionalDisksCreateTest(test_base.BaseTest):
                   name='disk-1',
                   sizeGb=500,
                   replicaZones=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'project-2/zones/central2-b',
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'project-2/zones/central2-c']),
+                      self.compute_uri+'/projects/project-2/zones/central2-b',
+                      self.compute_uri+'/projects/project-2/zones/central2-c']),
               project='project-2',
               region='central2'))],
     )
 
 
-class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                          (calliope_base.ReleaseTrack.BETA, 'beta'))
+class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
+                                              parameterized.TestCase):
 
-  def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def _SetUp(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', api_version)
 
     self.make_requests.side_effect = iter([
         [],
@@ -1380,7 +1394,9 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
         [],
     ])
 
-  def testZonalDiskCreate(self):
+  def testZonalDiskCreate(self, track, api_version):
+    self._SetUp(track, api_version)
+
     self.Run("""
         compute disks create disk-1 --zone central2-a
         """)
@@ -1392,7 +1408,9 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
             project='my-project',
             zone='central2-a'))],)
 
-  def testProjectFromRegion(self):
+  def testProjectFromRegion(self, track, api_version):
+    self._SetUp(track, api_version)
+
     self.Run('compute disks create disk-1 '
              '--replica-zones central2-b,central2-c '
              '--region {}'.format(
@@ -1409,15 +1427,15 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
                   name='disk-1',
                   sizeGb=500,
                   replicaZones=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'project-1/zones/central2-b',
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'project-1/zones/central2-c'
+                      self.compute_uri+'/projects/project-1/zones/central2-b',
+                      self.compute_uri+'/projects/project-1/zones/central2-c'
                   ]),
               project='project-1',
               region='central2'))],)
 
-  def testProjectsCache(self):
+  def testProjectsCache(self, track, api_version):
+    self._SetUp(track, api_version)
+
     self.Run('compute disks create disk-1 disk-2 '
              '--replica-zones central2-b,central2-c '
              '--region {}'.format(
@@ -1433,10 +1451,8 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
                  name='disk-1',
                  sizeGb=500,
                  replicaZones=[
-                     'https://www.googleapis.com/compute/alpha/projects/'
-                     'project-1/zones/central2-b',
-                     'https://www.googleapis.com/compute/alpha/projects/'
-                     'project-1/zones/central2-c'
+                     self.compute_uri+'/projects/project-1/zones/central2-b',
+                     self.compute_uri+'/projects/project-1/zones/central2-c'
                  ]),
              project='project-1',
              region='central2')),
@@ -1446,21 +1462,22 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
                  name='disk-2',
                  sizeGb=500,
                  replicaZones=[
-                     'https://www.googleapis.com/compute/alpha/projects/'
-                     'project-1/zones/central2-b',
-                     'https://www.googleapis.com/compute/alpha/projects/'
-                     'project-1/zones/central2-c'
+                     self.compute_uri+'/projects/project-1/zones/central2-b',
+                     self.compute_uri+'/projects/project-1/zones/central2-c'
                  ]),
              project='project-1',
              region='central2'))])
 
-  def testZoneInDifferentProjectThanDisk(self):
+  def testZoneInDifferentProjectThanDisk(self, track, api_version):
+    self._SetUp(track, api_version)
+
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
-        ('Invalid value for [--zone]: Zone [https://www.googleapis.com/compute/'
-         'alpha/projects/project-2/zones/central2-b] lives in different '
-         'project than disk [https://www.googleapis.com/compute/alpha/'
-         'projects/project-1/regions/central2/disks/disk-1].')):
+        ('Invalid value for [--zone]: Zone [{compute_uri}/'
+         'projects/project-2/zones/central2-b] lives in different '
+         'project than disk [{compute_uri}/'
+         'projects/project-1/regions/central2/disks/disk-1].'
+         .format(compute_uri=self.compute_uri))):
       self.Run('compute disks create {} '
                '--replica-zones {},{}'.format(
                    self.resources.Create(
@@ -1475,7 +1492,9 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
                        'compute.zones', project='project-2', zone='central2-c')
                    .SelfLink()))
 
-  def testReplicaZonesInDifferentRegions(self):
+  def testReplicaZonesInDifferentRegions(self, track, api_version):
+    self._SetUp(track, api_version)
+
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         ('Invalid value for [--replica-zones]: Zones [central1-b, central2-c] '
@@ -1495,7 +1514,9 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
                        'compute.zones', project='project-1',
                        zone='central2-c').SelfLink()))
 
-  def testReplicaZonesInconsistentWithExplicitRegion(self):
+  def testReplicaZonesInconsistentWithExplicitRegion(self, track, api_version):
+    self._SetUp(track, api_version)
+
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         ('Invalid value for [--replica-zones]: Region from [--replica-zones] '
@@ -1515,13 +1536,15 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
                        'compute.zones', project='project-1',
                        zone='central2-c').SelfLink()))
 
-  def testRegionFromDiskDifferentFromReplicaZones(self):
+  def testRegionFromDiskDifferentFromReplicaZones(self, track, api_version):
+    self._SetUp(track, api_version)
+
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         ('Invalid value for [--replica-zones]: Region from [DISK_NAME] '
-         '(https://www.googleapis.com/compute/alpha/projects/project-1/'
+         '({compute_uri}/projects/project-1/'
          'regions/central1/disks/disk-1) is different from [--replica-zones] '
-         '(central2).')):
+         '(central2).'.format(compute_uri=self.compute_uri))):
       self.Run('compute disks create {} '
                '--replica-zones {},{} '.format(
                    self.resources.Create(
@@ -1536,7 +1559,9 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest):
                        'compute.zones', project='project-1',
                        zone='central2-c').SelfLink()))
 
-  def testRegionPromptingMissingReplicaZones(self):
+  def testRegionPromptingMissingReplicaZones(self, track, api_version):
+    self._SetUp(track, api_version)
+
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
     self.WriteInput('1\n')
@@ -1602,8 +1627,8 @@ class DisksCreateWithGuestOsFeaturesTest(test_base.BaseTest):
   """Tests for GuestOsFeatures being added during disk creation."""
 
   def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testCreateDisksWithOsFeatures(self):
     self.Run("""

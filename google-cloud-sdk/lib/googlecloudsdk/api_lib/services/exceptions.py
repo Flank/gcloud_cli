@@ -1,4 +1,4 @@
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,10 @@
 # limitations under the License.
 """Wrapper for user-visible error exceptions to raise in the CLI."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from googlecloudsdk.api_lib.util import exceptions as api_lib_exceptions
+from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import exceptions
 
 
@@ -28,9 +32,18 @@ class ListServicesPermissionDeniedException(Error):
   pass
 
 
+class PeerServicePermissionDeniedException(Error):
+  pass
+
+
 class OperationErrorException(Error):
   pass
 
 
 class TimeoutError(Error):
   pass
+
+
+def ReraiseError(err, klass):
+  """Transform and re-raise error helper."""
+  core_exceptions.reraise(klass(api_lib_exceptions.HttpException(err)))

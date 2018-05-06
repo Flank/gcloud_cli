@@ -3,8 +3,8 @@ NAME
         disk type
 
 SYNOPSIS
-    gcloud beta compute disk-types describe DISK_TYPE [--zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta compute disk-types describe DISK_TYPE
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute disk-types describe displays all data associated
@@ -15,9 +15,15 @@ POSITIONAL ARGUMENTS
         The name of the disk type to describe.
 
 FLAGS
-     --zone=ZONE
-        The zone of the disk type to describe. Overrides the default
-        compute/zone property value for this command invocation.
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the disk type to describe. Overrides the default
+          compute/region property value for this command invocation.
+
+       --zone=ZONE
+          The zone of the disk type to describe. Overrides the default
+          compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

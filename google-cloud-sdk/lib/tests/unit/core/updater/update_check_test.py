@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import time
 
@@ -35,17 +37,17 @@ class LastUpdateCheckTests(util.Base, sdk_test_base.WithOutputCapture):
 
     with update_check.UpdateCheckData() as checker:
       # Everything starts as empty because the cache doesn't exist.
-      self.assertEquals(0, checker.LastUpdateCheckTime())
-      self.assertEquals(0, checker.LastUpdateCheckRevision())
+      self.assertEqual(0, checker.LastUpdateCheckTime())
+      self.assertEqual(0, checker.LastUpdateCheckRevision())
       self.assertFalse(checker.UpdatesAvailable())
-      self.assertEquals(checker.SecondsSinceLastUpdateCheck(), 1)
+      self.assertEqual(checker.SecondsSinceLastUpdateCheck(), 1)
       self.assertFalse(checker.ShouldDoUpdateCheck())
 
       # Time elapses, should report that we should do an update check.
       check_plus_one = (
           update_check.UpdateCheckData.UPDATE_CHECK_FREQUENCY_IN_SECONDS + 1)
       time_mock.return_value = check_plus_one
-      self.assertEquals(checker.SecondsSinceLastUpdateCheck(), check_plus_one)
+      self.assertEqual(checker.SecondsSinceLastUpdateCheck(), check_plus_one)
       self.assertTrue(checker.ShouldDoUpdateCheck())
 
       # Set the current state from this snapshot.
@@ -61,10 +63,10 @@ class LastUpdateCheckTests(util.Base, sdk_test_base.WithOutputCapture):
       checker.SetFromSnapshot(snapshot, True)
 
       # Check that the update was done, and all attributes cached correctly.
-      self.assertEquals(check_plus_one, checker.LastUpdateCheckTime())
-      self.assertEquals(20000101000000, checker.LastUpdateCheckRevision())
+      self.assertEqual(check_plus_one, checker.LastUpdateCheckTime())
+      self.assertEqual(20000101000000, checker.LastUpdateCheckRevision())
       self.assertTrue(checker.UpdatesAvailable())
-      self.assertEquals(checker.SecondsSinceLastUpdateCheck(), 0)
+      self.assertEqual(checker.SecondsSinceLastUpdateCheck(), 0)
       self.assertFalse(checker.ShouldDoUpdateCheck())
 
       # Notify that an update is available because we haven't before.
@@ -91,26 +93,26 @@ class LastUpdateCheckTests(util.Base, sdk_test_base.WithOutputCapture):
 
     # Reload the cache and make sure everything was saved correctly.
     with update_check.UpdateCheckData() as checker:
-      self.assertEquals(check_plus_one, checker.LastUpdateCheckTime())
-      self.assertEquals(20000101000000, checker.LastUpdateCheckRevision())
+      self.assertEqual(check_plus_one, checker.LastUpdateCheckTime())
+      self.assertEqual(20000101000000, checker.LastUpdateCheckRevision())
       self.assertTrue(checker.UpdatesAvailable())
-      self.assertEquals(checker.SecondsSinceLastUpdateCheck(), 2)
+      self.assertEqual(checker.SecondsSinceLastUpdateCheck(), 2)
       self.assertFalse(checker.ShouldDoUpdateCheck())
       self.assertEqual(check_plus_one + 2,
                        checker._data.last_nag_times.get('basic'))
 
   def testBadFile(self):
     with update_check.UpdateCheckData() as checker:
-      self.assertEquals(0, checker.LastUpdateCheckTime())
+      self.assertEqual(0, checker.LastUpdateCheckTime())
       checker._data.last_update_check_time = 5
-      self.assertEquals(5, checker.LastUpdateCheckTime())
+      self.assertEqual(5, checker.LastUpdateCheckTime())
 
     with open(config.Paths().update_check_cache_path, 'w') as f:
       f.write('junk')
 
     with update_check.UpdateCheckData() as checker:
       # Make sure there was no error and the file just gets reset.
-      self.assertEquals(0, checker.LastUpdateCheckTime())
+      self.assertEqual(0, checker.LastUpdateCheckTime())
 
   def testConditionMatching(self):
     freq = update_check.UpdateCheckData.UPDATE_CHECK_FREQUENCY_IN_SECONDS
@@ -122,7 +124,7 @@ class LastUpdateCheckTests(util.Base, sdk_test_base.WithOutputCapture):
                     new=20000101000000)
 
     with update_check.UpdateCheckData() as checker:
-      self.assertEquals(checker.SecondsSinceLastUpdateCheck(), freq)
+      self.assertEqual(checker.SecondsSinceLastUpdateCheck(), freq)
       self.assertTrue(checker.ShouldDoUpdateCheck())
 
       # Set the current state from this snapshot.
@@ -325,7 +327,7 @@ class LastUpdateCheckTests(util.Base, sdk_test_base.WithOutputCapture):
               }
           }])
       checker.SetFromSnapshot(snapshot, True)
-      self.assertEquals(1, len(checker._data.notifications))
+      self.assertEqual(1, len(checker._data.notifications))
       self.assertFalse(checker.UpdatesAvailable())
 
       snapshot = self.CreateSnapshotFromComponents(
@@ -338,7 +340,7 @@ class LastUpdateCheckTests(util.Base, sdk_test_base.WithOutputCapture):
               }
           }])
       checker.SetFromSnapshot(snapshot, True)
-      self.assertEquals(1, len(checker._data.notifications))
+      self.assertEqual(1, len(checker._data.notifications))
       self.assertTrue(checker.UpdatesAvailable())
 
 

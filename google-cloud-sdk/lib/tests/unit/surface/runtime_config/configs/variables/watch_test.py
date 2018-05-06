@@ -114,7 +114,7 @@ class VariablesWatchTest(base.RuntimeConfigTestBase):
       self.RunRuntimeConfig(
           'variables watch var1 --config-name foo')
     except api_exceptions.HttpException as e:
-      self.assertEquals(e.exit_code, 1)  # 1 means something other than timeout
+      self.assertEqual(e.exit_code, 1)  # 1 means something other than timeout
     else:
       self.fail('No HttpException raised')
 
@@ -133,7 +133,7 @@ class VariablesWatchTest(base.RuntimeConfigTestBase):
       self.RunRuntimeConfig(
           'variables watch var1 --config-name foo')
     except exceptions.OperationTimeoutError as e:
-      self.assertEquals(e.exit_code, 2)  # 2 means we timed out
+      self.assertEqual(e.exit_code, 2)  # 2 means we timed out
     else:
       self.fail('No exceptions.OperationTimeoutError raised')
 
@@ -153,7 +153,7 @@ class VariablesWatchTest(base.RuntimeConfigTestBase):
       self.RunRuntimeConfig(
           'variables watch var1 --config-name foo --max-wait 5')
     except exceptions.OperationTimeoutError as e:
-      self.assertEquals(e.exit_code, 2)  # 2 means we timed out
+      self.assertEqual(e.exit_code, 2)  # 2 means we timed out
     else:
       self.fail('No exceptions.OperationTimeoutError raised')
 

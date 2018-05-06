@@ -23,6 +23,9 @@ from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 
 
+@test_case.Filters.SkipOnWindows(
+    'DatalabIntegrationTest.testCreateConnectDelete frequently timing out on '
+    'windows', 'b/76138853')
 class DatalabIntegrationTest(sdk_test_base.BundledBase,
                              e2e_instances_test_base.InstancesTestBase,
                              sdk_test_base.WithCommandCapture):
@@ -113,6 +116,7 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
     return
 
   @sdk_test_base.Filters.RunOnlyInBundle  # Requires datalab component
+  @test_case.Filters.skip('Failing.', 'b/78629132')
   def testCreateConnectDelete(self):
     self._TestInstanceCreation(machine_type='n1-highmem-2')
     try:
@@ -127,7 +131,7 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
 
   def _TestConnection(self):
     self._TestUpdateMetadata()
-    self._TestConnect(timeout=600)
+    self._TestConnect(timeout=900)
     return
 
   def _TestInstanceCreation(self, machine_type=None, create_repo=False):
@@ -141,7 +145,7 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
     if machine_type:
       create_cmd += ['--machine-type', machine_type]
     create_cmd.append(self.instance_name)
-    create_result = self.RunDatalab(create_cmd, timeout=120)
+    create_result = self.RunDatalab(create_cmd, timeout=180)
     self.assertIn(
         'Creating the instance {0}'.format(self.instance_name),
         create_result.stdout)

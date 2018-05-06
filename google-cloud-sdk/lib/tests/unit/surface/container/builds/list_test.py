@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise build listing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -47,7 +49,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.mocked_cloudbuild_v1.projects_builds.List.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
-            projectId=u'my-project',
+            projectId='my-project',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[],
@@ -60,7 +62,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.mocked_cloudbuild_v1.projects_builds.List.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
-            projectId=u'my-project',
+            projectId='my-project',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -100,13 +102,13 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
     self.mocked_cloudbuild_v1.projects_builds.List.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
-            projectId=u'my-project',
+            projectId='my-project',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
                 self.cloudbuild_v1_messages.Build(
                     id='123-456-789',
-                    projectId=u'my-project',
+                    projectId='my-project',
                     createTime='2016-05-26T00:00:00.000000Z',
                     finishTime='2016-05-26T00:05:00.000000Z',
                     startTime='2016-05-26T00:00:01.000000Z',
@@ -124,8 +126,8 @@ https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789
     self.mocked_cloudbuild_v1.projects_builds.List.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
-            projectId=u'my-project',
-            filter=u'status="WORKING" OR status="QUEUED"',
+            projectId='my-project',
+            filter='status="WORKING" OR status="QUEUED"',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -154,8 +156,8 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
     self.mocked_cloudbuild_v1.projects_builds.List.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
-            projectId=u'my-project',
-            filter=u'status="WORKING" OR status="QUEUED"',
+            projectId='my-project',
+            filter='status="WORKING" OR status="QUEUED"',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -177,8 +179,8 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
     self.mocked_cloudbuild_v1.projects_builds.List.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken='123',
-            projectId=u'my-project',
-            filter=u'status="WORKING" OR status="QUEUED"',
+            projectId='my-project',
+            filter='status="WORKING" OR status="QUEUED"',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -208,7 +210,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
     self.mocked_cloudbuild_v1.projects_builds.List.Expect(
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
-            projectId=u'my-project',
+            projectId='my-project',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -249,7 +251,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageSize=1,
             pageToken=None,
-            projectId=u'my-project',
+            projectId='my-project',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -275,7 +277,7 @@ ID           CREATE_TIME                DURATION  SOURCE  IMAGES  STATUS
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageSize=1,
             pageToken=None,
-            projectId=u'my-project',
+            projectId='my-project',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -292,7 +294,7 @@ ID           CREATE_TIME                DURATION  SOURCE  IMAGES  STATUS
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageSize=1,
             pageToken='next-page-please',
-            projectId=u'my-project',
+            projectId='my-project',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -318,7 +320,7 @@ ID           CREATE_TIME                DURATION  SOURCE  IMAGES  STATUS
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageSize=1,
             pageToken=None,
-            projectId=u'my-project',
+            projectId='my-project',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[

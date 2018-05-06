@@ -1,12 +1,22 @@
 NAME
-    gcloud beta dns dnskeys - manage your Cloud DNS DnsKeys
+    gcloud beta dns dnskeys - manage Cloud DNS DNSKEY records
 
 SYNOPSIS
     gcloud beta dns dnskeys COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Manage your Cloud DNS DnsKeys. The DnsKey resource represents a
-    public/private key pair to be used for digitally signing zone data.
+    (BETA) (DEPRECATED) Manage Cloud DNS DNSKEY records.
+
+    The gcloud beta dnskeys commands are deprecated; please use the gcloud beta
+    dnskeys commands instead.
+
+    The commands in this group manage Cloud DNS DNS key resources. A DNS key
+    resource represents a cryptographic signing key for use in DNSSEC; a DNSKEY
+    record contains a public key used for digitally signing zone data.
+
+    For more information, including instructions for managing and using DNS
+    keys, see the documentation for DNSSEC
+    (https://cloud.google.com/dns/dnssec).
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -17,10 +27,10 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (BETA) Get a DnsKey.
+        (BETA) (DEPRECATED) Show details about a DNS key resource.
 
      list
-        (BETA) View the list of all your DnsKeys.
+        (BETA) (DEPRECATED) List DNS key resources.
 
 NOTES
     This command is currently in BETA and may change without notice.

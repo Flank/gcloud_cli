@@ -14,7 +14,6 @@
 
 """Tests for `gcloud beta compute scp`."""
 
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import ssh_utils
 from googlecloudsdk.command_lib.util.ssh import ssh
@@ -544,7 +543,7 @@ class ScpTest(test_base.BaseSSHTest):
         [self.project_resource],
     ])
     self.scp_run.side_effect = ssh.CommandError('scp', return_code=255)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.CommandError,
         r'\[scp\] exited with return code \[255\].'):
       self.Run("""\
@@ -615,11 +614,6 @@ class ScpOsloginTest(test_base.BaseSSHTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
-    api_cache = test_base.ApitoolsClientCache(apis.GetClientInstance)
-    self.accounts_api = 'beta'
-    self.accounts = api_cache.GetClientInstance('clouduseraccounts', 'beta')
-    self.accounts_messages = apis.GetMessagesModule(
-        'clouduseraccounts', 'beta')
     self.instance_with_oslogin_enabled = self.messages.Instance(
         id=44444,
         name='instance-4',

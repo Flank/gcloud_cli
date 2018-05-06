@@ -13,6 +13,9 @@
 # limitations under the License.
 """This is a command for testing grabbing the remainder args."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.calliope import base
@@ -32,4 +35,7 @@ class Remainder(base.Command):
     return args.everything
 
   def Display(self, args, result):
-    print str(result)
+    if result:
+      print('[{}]'.format(', '.join(["'" + x + "'" for x in result])))
+    else:
+      print('None')

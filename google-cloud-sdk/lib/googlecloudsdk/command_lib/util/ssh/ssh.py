@@ -13,6 +13,9 @@
 # limitations under the License.
 
 """SSH client utilities for key-generation, dispatching the ssh commands etc."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import errno
 import getpass
 import os
@@ -29,6 +32,8 @@ from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from googlecloudsdk.core.util import retry
+
+import six
 
 
 PER_USER_SSH_CONFIG_FILE = os.path.join('~', '.ssh', 'config')
@@ -54,7 +59,8 @@ class CommandError(core_exceptions.Error):
     message_text = '[{0}]'.format(message) if message else None
     return_code_text = ('return code [{0}]'.format(return_code)
                         if return_code else None)
-    why_failed = ' and '.join(filter(None, [message_text, return_code_text]))
+    why_failed = ' and '.join(
+        [f for f in [message_text, return_code_text] if f])
 
     super(CommandError, self).__init__(
         '[{0}] exited with {1}.'.format(self.cmd, why_failed),
@@ -136,7 +142,7 @@ class Environment(object):
     self.ssh_term = None
     self.scp = None
     self.keygen = None
-    for key, cmd in self.COMMANDS[suite].iteritems():
+    for key, cmd in six.iteritems(self.COMMANDS[suite]):
       setattr(self, key, files.FindExecutableOnPath(cmd, path=self.bin_path))
     self.ssh_exit_code = self.SSH_EXIT_CODES[suite]
 
@@ -251,7 +257,10 @@ class Keys(object):
       # convert to unicode. Assume UTF 8, but if we miss a character we can just
       # replace it with a '?'. The only source of issues would be the hostnames,
       # which are relatively inconsequential.
-      parts = key_string.strip().decode('utf8', 'replace').split(' ', 2)
+      decoded_key = key_string.strip()
+      if isinstance(key_string, six.binary_type):
+        decoded_key = decoded_key.decode('utf8', 'replace')
+      parts = decoded_key.split(' ', 2)
       if len(parts) < 2:
         raise InvalidKeyError('Public key [{}] is invalid.'.format(key_string))
       comment = parts[2].strip() if len(parts) > 2 else ''  # e.g. `me@host`
@@ -266,9 +275,9 @@ class Keys(object):
       Returns:
         str, A key string on the form `TYPE DATA` or `TYPE DATA COMMENT`.
       """
-      out_format = u'{type} {data}'
+      out_format = '{type} {data}'
       if include_comment and self.comment:
-        out_format += u' {comment}'
+        out_format += ' {comment}'
       return out_format.format(
           type=self.key_type, data=self.key_data, comment=self.comment)
 
@@ -373,7 +382,7 @@ class Keys(object):
         self.keys[_KeyFileKind.PUBLIC].status = KeyFileStatus.BROKEN
 
     # Summary
-    collected_values = [x.status for x in self.keys.itervalues()]
+    collected_values = [x.status for x in six.itervalues(self.keys)]
     if all(x == KeyFileStatus.ABSENT for x in collected_values):
       return KeyFileStatus.ABSENT
     elif all(x == KeyFileStatus.PRESENT for x in collected_values):
@@ -413,7 +422,7 @@ class Keys(object):
       console_io.PromptContinue(default=False, cancel_on_no=True)
 
     # Remove existing broken key files.
-    for key_file in self.keys.viewvalues():
+    for key_file in six.viewvalues(self.keys):
       try:
         os.remove(key_file.filename)
       except OSError as e:
@@ -441,7 +450,9 @@ class Keys(object):
         # encoded so it cannot contain any unicode. Comments may contain
         # unicode, but they are ignored in the key file analysis here, so
         # replacing invalid chars with ? is OK.
-        line = f.readline().strip().decode('utf8', 'replace')
+        line = f.readline().strip()
+        if isinstance(line, six.binary_type):
+          line = line.decode('utf8', 'replace')
         if line:
           return line
         msg = 'is empty'
@@ -507,7 +518,7 @@ class Keys(object):
         console_io.PromptContinue(
             message=msg, cancel_on_no=True,
             cancel_string='SSH key generation aborted by user.')
-        files.MakeDir(self.dir, 0700)
+        files.MakeDir(self.dir, 0o700)
 
       cmd = KeygenCommand(self.key_file, allow_passphrase=allow_passphrase)
       cmd.Run(self.env)
@@ -882,7 +893,7 @@ class SSHCommand(object):
 
     if env.suite is Suite.OPENSSH:
       # Always, always deterministic order
-      for key, value in sorted(self.options.iteritems()):
+      for key, value in sorted(six.iteritems(self.options)):
         args.extend(['-o', '{k}={v}'.format(k=key, v=value)])
     args.extend(self.extra_flags)
     args.append(self.remote.ToArg())
@@ -1070,7 +1081,7 @@ class SCPCommand(object):
     # SSH config options
     if env.suite is Suite.OPENSSH:
       # Always, always deterministic order
-      for key, value in sorted(self.options.iteritems()):
+      for key, value in sorted(six.iteritems(self.options)):
         args.extend(['-o', '{k}={v}'.format(k=key, v=value)])
 
     args.extend(self.extra_flags)

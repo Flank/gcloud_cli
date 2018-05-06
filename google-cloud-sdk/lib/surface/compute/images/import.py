@@ -20,6 +20,7 @@ from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute.images import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
@@ -41,6 +42,7 @@ _OS_CHOICES = {'debian-8': 'debian/translate_debian_8.wf.json',
               }
 _WORKFLOW_DIR = '../workflows/image_import/'
 _IMPORT_WORKFLOW = _WORKFLOW_DIR + 'import_image.wf.json'
+_IMPORT_FROM_IMAGE_WORKFLOW = _WORKFLOW_DIR + 'import_from_image.wf.json'
 _IMPORT_AND_TRANSLATE_WORKFLOW = _WORKFLOW_DIR + 'import_and_translate.wf.json'
 _WORKFLOWS_URL = ('https://github.com/GoogleCloudPlatform/compute-image-tools/'
                   'tree/master/daisy_workflows/image_import')
@@ -51,16 +53,21 @@ def _IsLocalFile(file_name):
               file_name.startswith('https://'))
 
 
-def _UploadToGcs(async, local_path, daisy_bucket, image_uuid):
+def _UploadToGcs(is_async, local_path, daisy_bucket, image_uuid):
   """Uploads a local file to GCS. Returns the gs:// URI to that file."""
   file_name = os.path.basename(local_path).replace(' ', '-')
   dest_path = 'gs://{0}/tmpimage/{1}-{2}'.format(
       daisy_bucket, image_uuid, file_name)
   log.status.Print('\nCopying [{0}] to [{1}]'.format(local_path, dest_path))
-  if async:
+  if is_async:
     log.status.Print('Once completed, your image will be imported from Cloud'
                      ' Storage asynchronously.')
-  storage_util.RunGsutilCommand('cp', [local_path, dest_path])
+  retcode = storage_util.RunGsutilCommand('cp', [local_path, dest_path])
+  if retcode != 0:
+    log.err.Print('Failed to upload file. See {} for details.'.format(
+        log.GetLogFilePath()))
+    raise exceptions.FailedSubCommand(
+        ['gsutil', 'cp', local_path, dest_path], retcode)
   return dest_path
 
 
@@ -89,7 +96,6 @@ def _MakeGcsUri(uri):
   return 'gs://{0}/{1}'.format(obj_ref.bucket, obj_ref.object)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class Import(base.CreateCommand):
   """Import a Google Compute Engine image."""
 
@@ -98,6 +104,10 @@ class Import(base.CreateCommand):
     Import.DISK_IMAGE_ARG = flags.MakeDiskImageArg()
     Import.DISK_IMAGE_ARG.AddArgument(parser, operation_type='create')
 
+    flags.compute_flags.AddZoneFlag(
+        parser, 'image', 'import',
+        explanation='The zone in which to do the work of importing the image.')
+
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument(
         '--source-file',
@@ -105,25 +115,25 @@ class Import(base.CreateCommand):
               disk file to import. For example: ``gs://my-bucket/my-image.vmdk''
               or ``./my-local-image.vmdk''"""),
     )
-    flags.SOURCE_IMAGE_ARG.AddArgument(source, operation_type='translate')
+    flags.SOURCE_IMAGE_ARG.AddArgument(source, operation_type='import')
 
     workflow = parser.add_mutually_exclusive_group(required=True)
     workflow.add_argument(
         '--os',
         choices=sorted(_OS_CHOICES.keys()),
-        help='Specifies the OS of the image being translated.'
+        help='Specifies the OS of the image being imported.'
     )
     workflow.add_argument(
-        '--translate',
-        default=True,
-        action='store_true',
-        help=('Import the disk without making it bootable or installing Google '
-              'tools on it.')
+        '--data-disk',
+        help=('Specifies that the disk has no bootable OS installed on it. '
+              'Imports the disk without making it bootable or installing '
+              'Google tools on it.'),
+        action='store_true'
     )
     workflow.add_argument(
         '--custom-workflow',
         help=("""\
-              Specifies a custom workflow to use for the image translate.
+              Specifies a custom workflow to use for image translation.
               Workflow should be relative to the image_import directory here:
               []({0}). For example: ``{1}''""".format(
                   _WORKFLOWS_URL, _OS_CHOICES[sorted(_OS_CHOICES.keys())[0]])),
@@ -141,18 +151,26 @@ class Import(base.CreateCommand):
         storage_client=storage_client)
     image_uuid = uuid.uuid4()
 
-    variables = ['image_name={}'.format(args.image_name)]
+    daisy_vars = ['image_name={}'.format(args.image_name)]
     if args.source_image:
       # If we're starting from an image, then we've already imported it.
-      workflow = '{0}{1}'.format(_WORKFLOW_DIR, _GetTranslateWorkflow(args))
+      workflow = _IMPORT_FROM_IMAGE_WORKFLOW
+      daisy_vars.append(
+          'translate_workflow={}'.format(_GetTranslateWorkflow(args)))
       ref = resources.REGISTRY.Parse(
           args.source_image,
           collection='compute.images',
           params={'project': properties.VALUES.core.project.GetOrFail})
       # source_name should be of the form 'global/images/image-name'.
       source_name = ref.RelativeName()[len(ref.Parent().RelativeName() + '/'):]
-      variables.append('source_image={}'.format(source_name))
+      daisy_vars.append('source_image={}'.format(source_name))
     else:
+      # If the file is an OVA file, print a warning.
+      if args.source_file.endswith('.ova'):
+        log.warning('The specified input file may contain more than one '
+                    'virtual disk. Only the first vmdk disk will be '
+                    'imported. ')
+
       # Get the image into the scratch bucket, wherever it is now.
       if _IsLocalFile(args.source_file):
         gcs_uri = _UploadToGcs(args.async, args.source_file,
@@ -163,16 +181,17 @@ class Import(base.CreateCommand):
                                        storage_client, daisy_bucket)
 
       # Import and (maybe) translate from the scratch bucket.
-      variables.append('source_disk_file={}'.format(gcs_uri))
-      if args.translate:
-        workflow = _IMPORT_AND_TRANSLATE_WORKFLOW
-        variables.append(
-            'translate_workflow={}'.format(_GetTranslateWorkflow(args)))
-      else:
+      daisy_vars.append('source_disk_file={}'.format(gcs_uri))
+      if args.data_disk:
         workflow = _IMPORT_WORKFLOW
+      else:
+        workflow = _IMPORT_AND_TRANSLATE_WORKFLOW
+        daisy_vars.append(
+            'translate_workflow={}'.format(_GetTranslateWorkflow(args)))
 
-    return daisy_utils.RunDaisyBuild(args, workflow, ','.join(variables),
-                                     daisy_bucket=daisy_bucket)
+    return daisy_utils.RunDaisyBuild(args, workflow, ','.join(daisy_vars),
+                                     daisy_bucket=daisy_bucket,
+                                     user_zone=args.zone)
 
 Import.detailed_help = {
     'brief': 'Import a Google Compute Engine image',
@@ -188,6 +207,6 @@ Import.detailed_help = {
         depending on the input arguments specified by the user.
 
         This command uses the `--os` flag to choose the appropriate translation.
-        You can omit the translation step using the `--no-translate` flag.
+        You can omit the translation step using the `--data-disk` flag.
         """,
 }

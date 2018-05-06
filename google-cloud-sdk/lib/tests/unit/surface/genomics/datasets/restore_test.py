@@ -41,7 +41,7 @@ Restored dataset [dataset-name, id: 1000].
 
   def testDatasetsRestoreCancel(self):
     self.WriteInput('n\n')
-    with self.assertRaisesRegexp(GenomicsError, 'Restore aborted by user.'):
+    with self.assertRaisesRegex(GenomicsError, 'Restore aborted by user.'):
       self.RunGenomics(['datasets', 'restore', '1000'])
     self.AssertErrContains(
         'Restoring dataset 1000 will restore all objects in the dataset.')
@@ -60,8 +60,8 @@ Restored dataset [dataset-name, id: 1000].
     self.mocked_client.datasets.Undelete.Expect(
         request=self.messages.GenomicsDatasetsUndeleteRequest(datasetId='1000'),
         exception=self.MakeHttpError(404, 'Dataset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Dataset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Dataset not found: 1000'):
       self.RunGenomics(['datasets', 'restore', '1000'],
                        ['--quiet'])
 
@@ -70,8 +70,8 @@ Restored dataset [dataset-name, id: 1000].
         request=self.messages.GenomicsDatasetsUndeleteRequest(datasetId='1000'),
         exception=self.MakeHttpError(404,
                                      'Cannot undelete active dataset: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Cannot undelete active dataset: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Cannot undelete active dataset: 1000'):
       self.RunGenomics(['datasets', 'restore', '1000'],
                        ['--quiet'])
 

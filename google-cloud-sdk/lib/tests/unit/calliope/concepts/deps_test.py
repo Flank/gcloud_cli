@@ -14,6 +14,8 @@
 
 """Tests for the deps module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope.concepts import deps
@@ -85,7 +87,7 @@ class DepsTest(sdk_test_base.WithFakeAuth):
         '- Provide the flag [--myresource-project] on the command line\n'
         '- Set the property [core/project] or provide the flag [--project] '
         'on the command line')
-    with self.assertRaisesRegexp(deps.AttributeNotFoundError, regex):
+    with self.assertRaisesRegex(deps.AttributeNotFoundError, regex):
       deps_object.Get('project')
 
   def testDeps_AnotherProperty(self):
@@ -111,7 +113,7 @@ class DepsTest(sdk_test_base.WithFakeAuth):
         '- Provide the flag [--myresource-zone] on the command line\n'
         '- Set the property [compute/zone]\n'
         '- Custom hint')
-    with self.assertRaisesRegexp(deps.AttributeNotFoundError, regex):
+    with self.assertRaisesRegex(deps.AttributeNotFoundError, regex):
       deps_object.Get('zone')
 
 

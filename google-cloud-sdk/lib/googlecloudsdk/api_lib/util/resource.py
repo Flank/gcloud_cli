@@ -13,6 +13,8 @@
 # limitations under the License.
 """Utilities for cloud resources."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.core import exceptions
@@ -38,7 +40,7 @@ class CollectionInfo(object):
   """
 
   def __init__(self, api_name, api_version, base_url, docs_url, name,
-               path, flat_paths, params):
+               path, flat_paths, params, enable_uri_parsing=True):
     self.api_name = api_name
     self.api_version = api_version
     self.base_url = base_url
@@ -47,6 +49,7 @@ class CollectionInfo(object):
     self.path = path
     self.flat_paths = flat_paths
     self.params = params
+    self.enable_uri_parsing = enable_uri_parsing
 
   @property
   def full_name(self):
@@ -99,9 +102,32 @@ class CollectionInfo(object):
       return self.path
     return self.flat_paths[subcollection]
 
-  def __cmp__(self, other):
-    return cmp((self.api_name, self.api_version, self.name),
-               (other.api_name, other.api_version, other.name))
+  def __eq__(self, other):
+    return (self.api_name == other.api_name and
+            self.api_version == other.api_version and
+            self.name == other.name)
+
+  def __ne__(self, other):
+    return not self == other
+
+  @classmethod
+  def _CmpHelper(cls, x, y):
+    """Just a helper equivalent to the cmp() function in Python 2."""
+    return (x > y) - (x < y)
+
+  def __lt__(self, other):
+    return self._CmpHelper((self.api_name, self.api_version, self.name),
+                           (other.api_name, other.api_version, other.name)) < 0
+
+  def __gt__(self, other):
+    return self._CmpHelper((self.api_name, self.api_version, self.name),
+                           (other.api_name, other.api_version, other.name)) > 0
+
+  def __le__(self, other):
+    return not self.__gt__(other)
+
+  def __ge__(self, other):
+    return not self.__lt__(other)
 
   def __str__(self):
     return self.full_name

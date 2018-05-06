@@ -75,10 +75,10 @@ OPTIONAL FLAGS
         Defaults to 10 if not specified.
 
      --runtime-version=RUNTIME_VERSION
-        The Google Cloud ML Engine runtime version for this job. Defaults to
-        the latest stable version. See
-        https://cloud.google.com/ml/docs/concepts/runtime-version-list for a
-        list of accepted versions.
+        The Google Cloud ML Engine runtime version for this job. Defaults to a
+        stable version, which is defined in the documentation along with the
+        list of supported versions:
+        https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --version=VERSION
         Model version to be used.

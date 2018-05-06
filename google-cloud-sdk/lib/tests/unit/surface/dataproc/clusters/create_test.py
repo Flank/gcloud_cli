@@ -134,6 +134,21 @@ class ClustersCreateUnitTest(
             cluster_uri=self.ClusterUri(),
             zone='us-central1-a')))
 
+  def testCreateClusterOmitZone_provideRegion(self):
+    self.MockCompute()
+
+    request_cluster = self.MakeCluster()
+    request_cluster.config.gceClusterConfig.zoneUri = ''
+    response_cluster = self.MakeRunningCluster()
+    # response zone uri is a full url to us-central1-a
+
+    self.ExpectCreateCalls(
+        request_cluster, response_cluster, region='us-central1')
+
+    result = self.RunDataproc('clusters create --region={0} {1}'.format(
+        'us-central1', self.CLUSTER_NAME))
+    self.AssertMessagesEqual(response_cluster, result)
+
   def testCreateClusterFlags(self):
     project = 'foo-project'
     cluster_name = 'foo-cluster'
@@ -594,21 +609,6 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         response_cluster=expected_response_cluster)
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(expected_response_cluster, result)
-
-  def testCreateClusterOmitZone_provideRegion(self):
-    self.MockCompute()
-
-    request_cluster = self.MakeCluster()
-    request_cluster.config.gceClusterConfig.zoneUri = ''
-    response_cluster = self.MakeRunningCluster()
-    # response zone uri is a full url to us-central1-a
-
-    self.ExpectCreateCalls(
-        request_cluster, response_cluster, region='us-central1')
-
-    result = self.RunDataproc('clusters create --region={0} {1}'.format(
-        'us-central1', self.CLUSTER_NAME))
-    self.AssertMessagesEqual(response_cluster, result)
 
   def testCreateClusterWithExpirationTimeAndMaxIdle(self):
     """Tests TTL cluster related flags."""

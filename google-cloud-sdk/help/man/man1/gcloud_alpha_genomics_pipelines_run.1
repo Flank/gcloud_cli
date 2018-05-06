@@ -11,7 +11,7 @@ gcloud alpha genomics pipelines run \- defines and runs a pipeline
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha genomics pipelines run\fR \fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-inputs\-from\-file\fR=[\fINAME\fR=\fIFILE\fR,...]] [\fB\-\-logging\fR=\fILOGGING\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-outputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-preemptible\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR;\ default="default"] [\fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-zones\fR=[\fIZONE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha genomics pipelines run\fR [\fB\-\-command\-line\fR=\fICOMMAND_LINE\fR] [\fB\-\-cpus\fR=\fICPUS\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-docker\-image\fR=\fIDOCKER_IMAGE\fR;\ default="google/cloud\-sdk"] [\fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-inputs\-from\-file\fR=[\fINAME\fR=\fIFILE\fR,...]] [\fB\-\-logging\fR=\fILOGGING\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-outputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-preemptible\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR] [\fB\-\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR;\ default="default"] [\fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-zones\fR=[\fIZONE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -22,61 +22,29 @@ outputs. Supports docker\-based commands.
 
 
 
-.SH "REQUIRED FLAGS"
-
-.RS 2m
-.TP 2m
-\fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR
-A YAML or JSON file containing a Pipeline object. See
-https://cloud.google.com/genomics/reference/rest/v1alpha2/pipelines#Pipeline
-
-.RS 2m
-YAML Example:
-  name: hello world
-.RE
-
-.RS 2m
-inputParameters:
-\- name: greeting
-  defaultValue: Hello
-\- name: object
-  defaultValue: World
-.RE
-
-.RS 2m
-outputParameters:
-\- name: outputFile
-  localCopy:
-    path: /data/output/greeting.txt
-    disk: boot
-.RE
-
-.RS 2m
-resources:
-  minimumCpuCores: 1
-  minimumRamGb: 1
-  preemptible: true
-.RE
-
-.RS 2m
-docker:
-  imageName: ubuntu
-  cmd: >
-    echo "${greeting} ${object}" > /data/output/greeting.txt
-.RE
-
-
-.RE
-.sp
-
 .SH "COMMONLY USED FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-command\-line\fR=\fICOMMAND_LINE\fR
+v2alpha1 only. Command line to run with /bin/sh in the specified docker image.
+Cannot be used with \-\-pipeline\-file.
+
+.TP 2m
+\fB\-\-cpus\fR=\fICPUS\fR
+The minimum number of CPUs to run the pipeline. Overrides any value specified in
+the pipeline\-file.
+
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
 The disk size(s) in GB, specified as a comma\-separated list of pairs of disk
 name and size. For example: \-\-disk\-size "name:size,name2:size2". Overrides
 any values specified in the pipeline\-file.
+
+.TP 2m
+\fB\-\-docker\-image\fR=\fIDOCKER_IMAGE\fR; default="google/cloud\-sdk"
+v2alpha1 only. A docker image to run. Requires \-\-command\-line to be specified
+and cannot be used with \-\-pipeline\-file.
 
 .TP 2m
 \fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]
@@ -131,6 +99,26 @@ pipeline\-file must also set preemptible to "true" for this flag to take effect.
 A list of label KEY=VALUE pairs to add.
 
 .TP 2m
+\fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR
+A YAML or JSON file containing a v2alpha1 or v1alpha2 Pipeline object. See
+https://cloud.google.com/genomics/reference/rest/v2alpha1/pipelines#Pipeline
+
+.TP 2m
+\fB\-\-regions\fR=[\fIREGION\fR,...]
+v2alpha1 only. List of Compute Engine regions the pipeline can run in.
+
+If no regions are specified with the regions flag, then regions in the pipeline
+definition file will be used.
+
+If no regions are specified in the pipeline definition, then the default region
+in your local client configuration is used.
+
+At least one region or region must be specified.
+
+For more information on default regions, see
+https://cloud.google.com/compute/docs/gcloud\-compute/#set_default_zone_and_region_in_your_local_client
+
+.TP 2m
 \fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR; default="default"
 The service account used to run the pipeline. If unspecified, defaults to the
 Compute Engine service account for your project.
@@ -138,7 +126,7 @@ Compute Engine service account for your project.
 .TP 2m
 \fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]
 List of additional scopes to be made available for this service account. The
-following scopes are always requested:
+following scopes are always requested for v1alpha2 requests:
 
 .RS 2m
 https://www.googleapis.com/auth/compute
@@ -146,6 +134,16 @@ https://www.googleapis.com/auth/devstorage.full_control
 https://www.googleapis.com/auth/genomics
 https://www.googleapis.com/auth/logging.write
 https://www.googleapis.com/auth/monitoring.write
+.RE
+
+.RS 2m
+For v2alpha1 requests, only the following scopes are always
+requested:
+.RE
+
+.RS 2m
+https://www.googleapis.com/auth/devstorage.read_write
+https://www.googleapis.com/auth/genomics
 .RE
 
 .TP 2m
@@ -158,7 +156,8 @@ definition file will be used.
 If no zones are specified in the pipeline definition, then the default zone in
 your local client configuration is used.
 
-If you have no default zone, then the pipeline may run in any zone.
+If you have no default zone, then v1alpha2 pipelines may run in any zone. For
+v2alpha1 pipelines at least one zone or region must be specified.
 
 For more information on default zones, see
 https://cloud.google.com/compute/docs/gcloud\-compute/#set_default_zone_and_region_in_your_local_client

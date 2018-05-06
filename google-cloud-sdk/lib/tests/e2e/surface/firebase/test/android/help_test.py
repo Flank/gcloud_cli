@@ -13,15 +13,15 @@
 # limitations under the License.
 
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
 from tests.lib.surface.firebase.test import e2e_base
+from tests.lib.surface.firebase.test.android import commands
 
 
 class HelpGcloudTestTests(e2e_base.TestIntegrationTestBase):
   """Integration tests for the *help gcloud firebase test* commands/groups."""
 
   def testHelpTestRun(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('help {cmd}'.format(cmd=commands.ANDROID_TEST_RUN))
     self.AssertOutputContains('invoke a test in Firebase Test Lab')
     self.AssertOutputContains(commands.ANDROID_TEST_RUN)
@@ -31,7 +31,7 @@ class HelpGcloudTestTests(e2e_base.TestIntegrationTestBase):
     self.AssertOutputContains('EXAMPLES')
 
   def testHelpTestDevicesList(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run('help {cmd} list'.format(cmd=commands.ANDROID_MODELS_LIST))
     self.AssertOutputContains('List all Android models available for testing')
     self.AssertOutputContains(commands.ANDROID_MODELS_LIST)

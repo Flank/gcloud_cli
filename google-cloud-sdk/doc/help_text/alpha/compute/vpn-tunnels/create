@@ -48,7 +48,7 @@ OPTIONAL FLAGS
         strings. Example: 192.168.0.0/16,10.0.0.0/24.
 
      --region=REGION
-        The region of the VPN Tunnel to create. If not specified, you will be
+        The region of the VPN Tunnel to create. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the

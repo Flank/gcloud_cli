@@ -2,8 +2,8 @@ NAME
     gcloud beta compute disks describe - describe a Google Compute Engine disk
 
 SYNOPSIS
-    gcloud beta compute disks describe DISK_NAME [--zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta compute disks describe DISK_NAME
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute disks describe displays all data associated with
@@ -14,25 +14,48 @@ POSITIONAL ARGUMENTS
         The name of the disk to describe.
 
 FLAGS
-     --zone=ZONE
-        The zone of the disk to describe. If not specified and the compute/zone
-        property isn't set, you will be prompted to select a zone.
+     At most one of these may be specified:
 
-        To avoid prompting when this flag is omitted, you can set the
-        compute/zone property:
+       --region=REGION
+          The region of the disk to describe. If not specified, you may be
+          prompted to select a region.
 
-            $ gcloud config set compute/zone ZONE
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
 
-        A list of zones can be fetched by running:
+              $ gcloud config set compute/region REGION
 
-            $ gcloud compute zones list
+          A list of regions can be fetched by running:
 
-        To unset the property, run:
+              $ gcloud compute regions list
 
-            $ gcloud config unset compute/zone
+          To unset the property, run:
 
-        Alternatively, the zone can be stored in the environment variable
-        CLOUDSDK_COMPUTE_ZONE.
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+       --zone=ZONE
+          The zone of the disk to describe. If not specified and the
+          compute/zone property isn't set, you may be prompted to select a
+          zone.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
+
+              $ gcloud config set compute/zone ZONE
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

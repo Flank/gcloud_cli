@@ -46,7 +46,7 @@ class LabelsUtilAddLabelsFlagsTest(test_case.TestCase):
         'key2': 'value2',
     }
     actual_update = labels_util.GetUpdateLabelsDictFromArgs(args)
-    self.assertEquals(expected_update, actual_update)
+    self.assertEqual(expected_update, actual_update)
 
   def testAddUpdateLabelsFlags(self):
     parser = argparse.ArgumentParser()
@@ -65,14 +65,14 @@ class LabelsUtilAddLabelsFlagsTest(test_case.TestCase):
         'key2': 'value2',
     }
     actual_update = labels_util.GetUpdateLabelsDictFromArgs(args)
-    self.assertEquals(expected_update, actual_update)
+    self.assertEqual(expected_update, actual_update)
 
     expected_remove = [
         'key3',
         'key4',
     ]
     actual_remove = labels_util.GetRemoveLabelsListFromArgs(args)
-    self.assertEquals(expected_remove, actual_remove)
+    self.assertEqual(expected_remove, actual_remove)
 
 
 class GetAndValidateArgsTest(test_case.TestCase):
@@ -86,7 +86,7 @@ class GetAndValidateArgsTest(test_case.TestCase):
 
   def testMissingArguments(self):
     args = GetAndValidateArgsTest.Args()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.RequiredArgumentException,
         'At least one of --update-labels, --remove-labels, or '
         '--clear-labels must be specified.'):
@@ -253,8 +253,8 @@ class DiffTest(parameterized.TestCase, test_case.TestCase):
                                                          original_value)
 
     expected = self._MakeLabels(expected_labels)
-    self.assertEquals(result._labels, expected)
-    self.assertEquals(result.needs_update, needs_update)
+    self.assertEqual(result._labels, expected)
+    self.assertEqual(result.needs_update, needs_update)
 
   @parameterized.named_parameters(
       ('UpdateOnly',
@@ -291,8 +291,8 @@ class DiffTest(parameterized.TestCase, test_case.TestCase):
         self.labels_cls, original_value)
 
     expected = self._MakeLabels(expected_labels)
-    self.assertEquals(result._labels, expected)
-    self.assertEquals(result.needs_update, needs_update)
+    self.assertEqual(result._labels, expected)
+    self.assertEqual(result.needs_update, needs_update)
 
   @parameterized.named_parameters(
       ('ClearOnly',
@@ -322,8 +322,8 @@ class DiffTest(parameterized.TestCase, test_case.TestCase):
         self.labels_cls, original_value)
 
     expected = self._MakeLabels(expected_labels)
-    self.assertEquals(result._labels, expected)
-    self.assertEquals(result.needs_update, needs_update)
+    self.assertEqual(result._labels, expected)
+    self.assertEqual(result.needs_update, needs_update)
 
   @parameterized.named_parameters(
       ('ClearOnly',
@@ -353,8 +353,8 @@ class DiffTest(parameterized.TestCase, test_case.TestCase):
         args, enable_clear=True).Apply(self.labels_cls, original_value)
 
     expected = self._MakeLabels(expected_labels)
-    self.assertEquals(result._labels, expected)
-    self.assertEquals(result.needs_update, needs_update)
+    self.assertEqual(result._labels, expected)
+    self.assertEqual(result.needs_update, needs_update)
 
   def testClearAndRemoveLabelsNotAllowed(self):
     parser = argparse.ArgumentParser()
@@ -389,7 +389,7 @@ class CreationTest(parameterized.TestCase, test_case.TestCase):
     result = labels_util.ParseCreateArgs(args, self.labels_cls)
 
     expected = self._MakeLabels(expected_labels)
-    self.assertEquals(result, expected)
+    self.assertEqual(result, expected)
 
   @parameterized.named_parameters(
       ('NoArgs', '', None, [], False),
@@ -410,8 +410,8 @@ class CreationTest(parameterized.TestCase, test_case.TestCase):
     result = labels_util.ProcessUpdateArgsLazy(args, self.labels_cls,
                                                _GetLabels)
     expected = self._MakeLabels(expected_labels)
-    self.assertEquals(result._labels, expected)
-    self.assertEquals(result.needs_update, needs_update)
+    self.assertEqual(result._labels, expected)
+    self.assertEqual(result.needs_update, needs_update)
 
 
 if __name__ == '__main__':

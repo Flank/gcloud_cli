@@ -14,6 +14,8 @@
 
 """This is a command for testing nested argument groups."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
@@ -139,6 +141,9 @@ class NestedGroups(base.Command):
         '--optional-value', help='Optional mode value.')
     modal_group.add_argument(
         '--meh', help='Meh if you want.')
+
+    hidden_group = parser.add_group('Hidden Group', hidden=True)
+    hidden_group.add_argument('--waldo', help='Wheres?')
 
   def Run(self, args):
     return {

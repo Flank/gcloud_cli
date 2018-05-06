@@ -13,10 +13,13 @@
 # limitations under the License.
 """Unit tests for the intance_groups_utils module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import instance_groups_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import cli_test_base
 from tests.lib import test_case
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class InstanceGroupUtilsTest(cli_test_base.CliTestBase):
@@ -33,7 +36,7 @@ class InstanceGroupUtilsTest(cli_test_base.CliTestBase):
                 instances=['a', 'b', 'c', 'd', 'e']),
             project='project',
             zone='zone'), 'instanceGroupManagersAbandonInstancesRequest', 2)
-    self.assertEquals(
+    self.assertEqual(
         requests[0],
         self.messages.ComputeInstanceGroupManagersAbandonInstancesRequest(
             instanceGroupManager='name',
@@ -42,7 +45,7 @@ class InstanceGroupUtilsTest(cli_test_base.CliTestBase):
                 instances=['a', 'b'],),
             project='project',
             zone='zone',))
-    self.assertEquals(
+    self.assertEqual(
         requests[1],
         self.messages.ComputeInstanceGroupManagersAbandonInstancesRequest(
             instanceGroupManager='name',
@@ -51,7 +54,7 @@ class InstanceGroupUtilsTest(cli_test_base.CliTestBase):
                 instances=['c', 'd'],),
             project='project',
             zone='zone',))
-    self.assertEquals(
+    self.assertEqual(
         requests[2],
         self.messages.ComputeInstanceGroupManagersAbandonInstancesRequest(
             instanceGroupManager='name',

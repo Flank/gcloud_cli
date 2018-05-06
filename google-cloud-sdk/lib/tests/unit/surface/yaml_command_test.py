@@ -67,6 +67,7 @@ class Validator(object):
       self.fake_resource_ref = resources.REGISTRY.Parse(
           'a',
           collection=request_collection.full_name,
+          api_version=request_collection.api_version,
           params={p: 'a' for p in request_collection.detailed_params})
 
   def E(self, section, message, *args):
@@ -154,9 +155,12 @@ class Validator(object):
     params = self.builder.spec.request.resource_method_params
     if self.builder.method.request_collection:
       method_params = self.builder.method.request_collection.params
-      ref_params = self.fake_resource_ref.AsDict().keys()
+      # For create commands we want to account for query params as well
+      method_query_params = self.builder.method.query_params
+      ref_params = (
+          self.builder.method.resource_argument_collection.detailed_params)
       for param, ref_param in params.iteritems():
-        if param not in method_params:
+        if param not in method_params + method_query_params:
           self.E('request.resource_method_params',
                  'Parameter [{}] does not exist on API method', param)
         if ref_param not in ref_params:
@@ -218,11 +222,16 @@ class Validator(object):
     self._CheckResourceExtraction(poller)
 
   def _CheckAsyncGetOperation(self, poller):
-    async = self.builder.spec.async
+    asynchronous = self.builder.spec.async
     method_params = poller.method.request_collection.params
-    operation_ref = resources.REGISTRY.Parse('a', collection=async.collection)
+    poller_request_params = poller.method.request_collection.detailed_params
+    operation_ref = resources.REGISTRY.Parse(
+        'a',
+        params={p: 'a' for p in poller_request_params},
+        collection=asynchronous.collection)
     ref_params = operation_ref.AsDict().keys()
-    for param, ref_param in async.operation_get_method_params.iteritems():
+    for param, ref_param in (
+        asynchronous.operation_get_method_params.iteritems()):
       if param not in method_params:
         self.E('async.operation_get_method_params',
                'Parameter [{}] does not exist on API method', param)
@@ -232,27 +241,29 @@ class Validator(object):
                'reference', ref_param)
 
   def _CheckAsyncState(self, poller):
-    async = self.builder.spec.async
+    asynchronous = self.builder.spec.async
     op_response = poller.method.GetEffectiveResponseType()
-    for section, f in {'async.response_name_field': async.response_name_field,
-                       'async.state.field': async.state.field,
-                       'async.error.field': async.error.field}.iteritems():
+    for section, f in {
+        'async.response_name_field': asynchronous.response_name_field,
+        'async.state.field': asynchronous.state.field,
+        'async.error.field': asynchronous.error.field}.iteritems():
       self._GetFieldFromMessage(op_response, f, section)
 
     # Check that success and error fields are mutually exclusive.
-    if set(async.state.success_values) & set(async.state.error_values):
+    if (set(asynchronous.state.success_values) &
+        set(asynchronous.state.error_values)):
       self.E('async.state.success_values/error_values',
              'Collections contain overlapping values')
 
   def _CheckResourceExtraction(self, poller):
-    async = self.builder.spec.async
-    if not async.extract_resource_result:
+    asynchronous = self.builder.spec.async
+    if not asynchronous.extract_resource_result:
       return
 
     try:
       self._GetFieldFromMessage(
           poller._ResourceGetMethod().GetEffectiveResponseType(),
-          async.result_attribute, 'async.result_attribute')
+          asynchronous.result_attribute, 'async.result_attribute')
     except registry.Error as e:
       self.E('async.resource_get_method', '{}', e)
       return
@@ -312,11 +323,13 @@ class Validator(object):
         self.builder.spec.request.create_request_hook,
         self.builder.spec.request.issue_request_hook
     ]
+    modify_response_hooks = self.builder.spec.response.modify_response_hooks
 
     unmapped_arguments = (params_without_api_field or arguments_hook)
-    if unmapped_arguments and not any(modify_request_hooks):
-      msg = ('Command has {} but no {{modify,create,issue}}_request_hook. '
-             'These arguments are unused.')
+    if (unmapped_arguments and not any(modify_request_hooks)
+        and not any(modify_response_hooks)):
+      msg = ('Command has {} but no {{modify,create,issue}}_request_hook or '
+             'modify_response_hooks. These arguments are unused.')
       reasons = []
       if params_without_api_field:
         reasons.append('parameters with no api_field ([{}])'.format(
@@ -347,7 +360,7 @@ class _GlobalDataHolder(object):
   """A global data holder for the auto-generated tests.
 
   This is not best practice, but is the only reasonable way we can have a test
-  generated for each YAML command we want to validate. The general apporach is
+  generated for each YAML command we want to validate. The general approach is
   to search the surface tree for all implementations and compile a list of all
   those that exist while this module is being loaded. That allows us to use
   that list of commands as the seed to parameterize the test in the next class.

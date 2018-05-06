@@ -17,6 +17,8 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import unicode_literals
+
 import collections
 
 from googlecloudsdk.core.resource import resource_printer
@@ -113,19 +115,19 @@ class Base(sdk_test_base.WithOutputCapture):
     ]
     self.ordered_dict_resource = [
         collections.OrderedDict([
-            (u'allowed', [
+            ('allowed', [
                 collections.OrderedDict([
-                    (u'IPProtocol', u'tcp'),
-                    (u'ports', [u'2376'])
+                    ('IPProtocol', 'tcp'),
+                    ('ports', ['2376'])
                 ])
             ]),
-            (u'creationTimestamp', u'2015-05-20T08:14:24.654-07:00'),
-            (u'description', u''),
-            (u'id', u'123456789'),
-            (u'kind', u'compute#firewall'),
-            (u'name', u'allow-gae-builder'),
-            (u'network', u'default'),
-            (u'sourceRanges', [u'0.0.0.0/0'])
+            ('creationTimestamp', '2015-05-20T08:14:24.654-07:00'),
+            ('description', ''),
+            ('id', '123456789'),
+            ('kind', 'compute#firewall'),
+            ('name', 'allow-gae-builder'),
+            ('network', 'default'),
+            ('sourceRanges', ['0.0.0.0/0'])
         ])
     ]
     self.repeated_resource = [
@@ -142,55 +144,55 @@ class Base(sdk_test_base.WithOutputCapture):
     self.width_resource = [
         {
             'head': 'zero',
-            'data': u':\N{ZERO WIDTH SPACE}\N{SOFT HYPHEN}:',
+            'data': ':\N{ZERO WIDTH SPACE}\N{SOFT HYPHEN}:',
             'tail': 'ZERO',
         },
         {
             'head': 'one',
-            'data': u':Ü:',
+            'data': ':Ü:',
             'tail': 'ONE',
         },
         {
             'head': 'two',
-            'data': u':車:',
+            'data': ':車:',
             'tail': 'TWO',
         },
     ]
     self.multiline_width_resource = [
         {
             'head': 'zero',
-            'data': u':{lotsofzerodata}:'.format(
-                lotsofzerodata=u'\N{ZERO WIDTH SPACE}\N{SOFT HYPHEN}' * 64),
+            'data': ':{lotsofzerodata}:'.format(
+                lotsofzerodata='\N{ZERO WIDTH SPACE}\N{SOFT HYPHEN}' * 64),
             'tail': 'ZERO',
         },
         {
             'head': 'one',
-            'data': u':{lotsofonedata}:'.format(
-                lotsofonedata=u'Ü' * 64),
+            'data': ':{lotsofonedata}:'.format(
+                lotsofonedata='Ü' * 64),
             'tail': 'ONE',
         },
         {
             'head': 'two',
-            'data': u':{lotsoftwodata}:'.format(
-                lotsoftwodata=u'車' * 64),
+            'data': ':{lotsoftwodata}:'.format(
+                lotsoftwodata='車' * 64),
             'tail': 'TWO',
         },
     ]
     self.unicode_key_resource = [
         {
-            u'ħɇȺđ': 'zero',
-            u'∂αтα': u':\N{ZERO WIDTH SPACE}\N{SOFT HYPHEN}:',
-            u'ẗäïḷ': 'ZERO',
+            'ħɇȺđ': 'zero',
+            '∂αтα': ':\N{ZERO WIDTH SPACE}\N{SOFT HYPHEN}:',
+            'täïḷ': 'ZERO',
         },
         {
-            u'ħɇȺđ': 'one',
-            u'∂αтα': u':Ü:',
-            u'ẗäïḷ': 'ONE',
+            'ħɇȺđ': 'one',
+            '∂αтα': ':Ü:',
+            'täïḷ': 'ONE',
         },
         {
-            u'ħɇȺđ': 'two',
-            u'∂αтα': u':車:',
-            u'ẗäïḷ': 'TWO',
+            'ħɇȺđ': 'two',
+            '∂αтα': ':車:',
+            'täïḷ': 'TWO',
         },
     ]
 
@@ -206,13 +208,13 @@ class Base(sdk_test_base.WithOutputCapture):
     """
     for i in range(num):
       yield {
-          'name': u'my-instance-a{0}-{1}'.format('z' * i, i),
-          'SelfLink': u'http://g/selfie/a{0}-{1}'.format('z' * i, i),
+          'name': 'my-instance-a{0}-{1}'.format('z' * i, i),
+          'SelfLink': 'http://g/selfie/a{0}-{1}'.format('z' * i, i),
           'kind': 'compute#instance',
           'labels': {
               'empty': '',
               'full': 'value',
-              u'Ṳᾔḯ¢◎ⅾℯ': u'®ǖɬɘς',
+              'Ṳᾔḯ¢◎ⅾℯ': '®ǖɬɘς',
           },
           'networkInterfaces': [
               {
@@ -238,7 +240,7 @@ class Base(sdk_test_base.WithOutputCapture):
                   {'key': 'g', 'value': 'h'},
                   ],
               },
-          'unicode': u'python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ',
+          'unicode': 'python 2 Ṳᾔḯ¢◎ⅾℯ ṧʊ¢кṧ',
           }
 
   @staticmethod
@@ -272,7 +274,7 @@ class Base(sdk_test_base.WithOutputCapture):
     if resource is None:
       if style == 'list':
         resource = [
-            u'Ṁöë',
+            'Ṁöë',
             'Larry',
             'Shemp',
             'Curly',
@@ -294,23 +296,23 @@ class Base(sdk_test_base.WithOutputCapture):
       else:
         resource = [
             {
-                'name': u'Ṁöë',
-                'quote': u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW",
+                'name': 'Ṁöë',
+                'quote': ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW",
                 'id': 1267,
             },
             {
                 'name': 'Larry',
-                'quote': u"ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ.",
+                'quote': "ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ.",
                 'id': 1245,
             },
             {
                 'name': 'Shemp',
-                'quote': u'Hey, Ṁöë! Hey, Larry!',
+                'quote': 'Hey, Ṁöë! Hey, Larry!',
                 'id': 'lrlrlrl',
             },
             {
                 'name': 'Curly',
-                'quote': u'Søɨŧɇnłɏ!',
+                'quote': 'Søɨŧɇnłɏ!',
                 'id': 1234,
             },
             {

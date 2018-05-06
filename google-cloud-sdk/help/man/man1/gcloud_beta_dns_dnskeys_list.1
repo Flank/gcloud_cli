@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta dns dnskeys list \- view the list of all your DnsKeys
+gcloud beta dns dnskeys list \- list DNS key resources
 
 
 
@@ -17,7 +17,10 @@ gcloud beta dns dnskeys list \- view the list of all your DnsKeys
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR View the list of all your DnsKeys.
+\fB(BETA)\fR \fB(DEPRECATED)\fR The \f5gcloud beta dnskeys\fR commands are
+deprecated; please use the \f5gcloud beta dnskeys\fR commands instead.
+
+List DNS key resources in a managed zone.
 
 
 
@@ -26,7 +29,7 @@ gcloud beta dns dnskeys list \- view the list of all your DnsKeys
 .RS 2m
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
-The name of the managed\-zone you want to list DnsKeys for.
+The name of the managed\-zone you want to list DNSKEY records for.
 
 
 .RE
@@ -71,10 +74,18 @@ help\fR for details.
 
 .SH "EXAMPLES"
 
-To see the list of all DnsKeys for a managed\-zone, run:
+To see the list of all DNS key resources for a managed zone \f5my_zone\fR, run:
 
 .RS 2m
-$ gcloud beta dns dnskeys list my_zone
+$ gcloud beta dns dnskeys list \-\-zone my_zone
+.RE
+
+To see the DS records for every key\-signing DnsKey in a managed zone, run:
+
+.RS 2m
+$ gcloud beta dns dnskeys list \-\-zone my_zone 3 \e
+    \-\-format 'value(ds_record())'               \e
+    \-\-filter 'type=keySigning'
 .RE
 
 

@@ -17,7 +17,12 @@ gcloud alpha spanner databases get\-iam\-policy \- get the IAM policy for a Clou
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Get the IAM policy for a Cloud Spanner database.
+\fB(ALPHA)\fR \fBgcloud alpha spanner databases get\-iam\-policy\fR displays the
+IAM policy associated with a Cloud Spanner database. If formatted as JSON, the
+output can be edited and used as a policy file for set\-iam\-policy. The output
+includes an "etag" field identifying the version emitted and allowing detection
+of concurrent policy updates; see $ {parent} set\-iam\-policy for additional
+details.
 
 
 
@@ -26,7 +31,7 @@ gcloud alpha spanner databases get\-iam\-policy \- get the IAM policy for a Clou
 .RS 2m
 .TP 2m
 
-DATABASE \- The Cloud Spanner database to get IAM policy binding for. The
+DATABASE \- The Cloud Spanner database for which to display the IAM policy. The
 arguments in this group can be used to specify the attributes of this resource.
 (NOTE) Some attributes are not given arguments in this group but can be set in
 other ways. To set the [project] attribute: Set the property [core/project] or
@@ -41,7 +46,7 @@ specified.
 
 .TP 2m
 \fB\-\-instance\fR=\fIINSTANCE\fR
-The Cloud Spanner instance for the database.
+The name of the spanner instance.
 
 
 .RE
@@ -90,6 +95,23 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBspanner/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/spanner/
+
+
+
+.SH "EXAMPLES"
+
+To print the IAM policy for a given Cloud Spanner database, run:
+
+.RS 2m
+$ gcloud alpha spanner databases get\-iam\-policy my\-database
+.RE
 
 
 

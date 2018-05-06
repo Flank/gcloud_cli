@@ -197,3 +197,12 @@ class InterconnectAttachmentsDedicatedCreateAlphaTest(test_base.BaseTest):
            [3] region-3
           Please enter your numeric choice:  """))
     self.AssertOutputEquals('')
+
+
+class InterconnectAttachmentsDedicatedCreateBetaTest(
+    InterconnectAttachmentsDedicatedCreateAlphaTest):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.message_version = self.compute_beta

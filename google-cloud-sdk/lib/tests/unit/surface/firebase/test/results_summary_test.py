@@ -23,7 +23,8 @@ from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.resource import resource_printer
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test import test_utils
+from tests.lib.surface.firebase.test.android import unit_base
 
 
 TOOLRESULTS_MESSAGES = apis.GetMessagesModule('toolresults', 'v1beta3')
@@ -112,7 +113,7 @@ FAIL_OVERVIEW2 = TOOLRESULTS_MESSAGES.TestSuiteOverview(
     totalCount=8)
 
 
-class ResultsSummaryTest(unit_base.TestMockClientTest):
+class ResultsSummaryTest(unit_base.AndroidMockClientTest):
   """Unit tests for the results summmary class."""
 
   def SetUp(self):
@@ -325,7 +326,7 @@ WARNING: No results found, something went wrong. Try re-running the tests.
     summary_fetcher = self._createResultsSummaryFetcher()
     self.tr_client.projects_histories_executions.Get.Expect(
         request=self._createHistoriesExecutionsRequest(),
-        exception=unit_base.MakeHttpError(
+        exception=test_utils.MakeHttpError(
             'kablooie', "Outcome? We don't need no stinkin' rollup outcome."))
 
     with self.assertRaises(calliope_exceptions.HttpException):

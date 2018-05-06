@@ -32,6 +32,9 @@ GROUPS
      operations
         (ALPHA) Get and list operations for Google Kubernetes Engine clusters.
 
+     subnets
+        (ALPHA) Manage subnets to be used by Google Kubernetes Engine clusters.
+
 COMMANDS
     COMMAND is one of the following:
 

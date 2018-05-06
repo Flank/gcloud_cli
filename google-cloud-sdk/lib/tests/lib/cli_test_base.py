@@ -19,13 +19,13 @@ you want installed.  By default it will contain the top level commands from
 under gcloud.  Add your module to gcloud by calling the RegisterModule() method
 from within the PreSetUp() method of your class.
 """
-from __future__ import absolute_import
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
-import argparse
+
 import contextlib
+import io
 import os
 import re
 import shlex
@@ -37,10 +37,12 @@ from googlecloudsdk.api_lib.util import exceptions
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import cli
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.configurations import named_configs
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import retry
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -97,14 +99,15 @@ class WithCompletion(test_case.TestCase):
       raise StopExecutionException()
 
     try:
-      output_stream = StringIO()
+      output_stream = io.BytesIO()
       with self.assertRaises(StopExecutionException):
         # pylint: disable=protected-access
         cli._ArgComplete(
             parser,
             exit_method=MockExit,
             output_stream=output_stream)
-      completions = [s.strip() for s in output_stream.getvalue().split('\t')]
+      raw_output = encoding.Decode(output_stream.getvalue())
+      completions = [s.strip() for s in raw_output.split('\t')]
       self.assertEqual(set(expected), set(completions),
                        msg='Completions did not match.')
     finally:
@@ -158,7 +161,6 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
     if project:
       properties.PersistProperty(properties.VALUES.core.project, project,
                                  properties.Scope.USER)
-    self.enforce_ascii_args_mock = None
 
     # Make sure we recover the CLI's memory
     self.addCleanup(self._DestroyCLI)
@@ -166,16 +168,16 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
     def MockExit(exc):
       core_exceptions.reraise(exc)
 
-    def MockArgparseExit(status=0, message=None):
-      exc = sys.exc_info()[1]
-      if exc:
-        core_exceptions.reraise(MockArgumentError(exc))
-      log.err.Print(message)
+    def MockArgparseExit(status=0, message=None, exception=None):
+      if exception:
+        core_exceptions.reraise(MockArgumentError(exception))
+      if message:
+        log.err.Print(message)
       sys.exit(status)
 
     self.StartObjectPatch(calliope_exceptions, '_Exit').side_effect = MockExit
     self.StartObjectPatch(
-        argparse.ArgumentParser, 'exit').side_effect = MockArgparseExit
+        parser_extensions.ArgumentParser, 'exit').side_effect = MockArgparseExit
 
     self.cli = self._CreateCLI()
     # Ensure everything gets loaded correctly.
@@ -188,10 +190,6 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
     # Classes like ProgressTracker leave threads behind so as not to block the
     # user interraction.
     self.JoinAllThreads()
-    if (self.enforce_ascii_args_mock and
-        not self.enforce_ascii_args_mock.call_count):
-      self.fail('Delete unused self.AllowUnicode() -- either '
-                'no command was run or @base.UnicodeIsSupported was set.')
 
   def _DestroyCLI(self):
     """Delete all attributes from the modules created by the CLI."""
@@ -208,10 +206,6 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
               pass  # Delete what we can and don't worry about the rest
           del sys.modules[name]
           del module
-
-  def AllowUnicode(self):
-    self.enforce_ascii_args_mock = self.StartObjectPatch(
-        cli.CLI, '_EnforceAsciiArgs')
 
   @staticmethod
   def GetArgparseNamespaceDict(parsed_args):
@@ -232,16 +226,16 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
     else:
       expected_dict = self.GetArgparseNamespaceDict(expected)
     actual_dict = self.GetArgparseNamespaceDict(actual)
-    self.assertEquals(expected_dict, actual_dict)
+    self.assertEqual(expected_dict, actual_dict)
 
   def AssertRaisesExceptionRegexp(
       self, expected_exception, expected_regexp,
       callable_obj=None, *args, **kwargs):
-    """Wrapper around assertRaisesRegexp with regexp matching.
+    """Wrapper around assertRaisesRegex with regexp matching.
 
-    This functionreplicates assertRaisesRegexp() but is a namewise companion to
+    This functionreplicates assertRaisesRegex() but is a namewise companion to
     AssertRaisesExceptionMatches().  Just calls
-    assertRaisesRegexp(expected_exception, ...).
+    assertRaisesRegex(expected_exception, ...).
 
     Args:
       expected_exception: Exception, The expected exception type.
@@ -251,20 +245,20 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       **kwargs: The args for the callable.
 
     Returns:
-      The result of assertRaisesRegexp() which can be used as a context manager.
+      The result of assertRaisesRegex() which can be used as a context manager.
     """
     if callable_obj is None:
-      return self.assertRaisesRegexp(expected_exception, expected_regexp)
-    return self.assertRaisesRegexp(
+      return self.assertRaisesRegex(expected_exception, expected_regexp)
+    return self.assertRaisesRegex(
         expected_exception, expected_regexp,
         callable_obj, *args, **kwargs)
 
   def AssertRaisesExceptionMatches(
       self, expected_exception, expected_message,
       callable_obj=None, *args, **kwargs):
-    """Wrapper around assertRaisesRegexp with regexp escaping.
+    """Wrapper around assertRaisesRegex with regexp escaping.
 
-    Just calls assertRaisesRegexp(expected_exception,
+    Just calls assertRaisesRegex(expected_exception,
                                   re.escape(expected_message), ...)
 
     Args:
@@ -275,12 +269,12 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       **kwargs: The args for the callable.
 
     Returns:
-      The result of assertRaisesRegexp() which can be used as a context manager.
+      The result of assertRaisesRegex() which can be used as a context manager.
     """
     if callable_obj is None:
-      return self.assertRaisesRegexp(expected_exception,
-                                     re.escape(expected_message))
-    return self.assertRaisesRegexp(
+      return self.assertRaisesRegex(expected_exception,
+                                    re.escape(expected_message))
+    return self.assertRaisesRegex(
         expected_exception, re.escape(expected_message),
         callable_obj, *args, **kwargs)
 
@@ -300,7 +294,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       **kwargs: The args for the callable.
 
     Returns:
-      The result of assertRaisesRegexp() which can be used as a context manager.
+      The result of assertRaisesRegex() which can be used as a context manager.
     """
     return self.AssertRaisesExceptionRegexp(
         calliope_exceptions.ToolException, expected_regexp,
@@ -312,7 +306,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
 
     ToolException WILL SOON BE ELIMINATED FROM Cloud SDK.
 
-    Just calls assertRaisesRegexp() with a re.escape() on the expected_message
+    Just calls assertRaisesRegex() with a re.escape() on the expected_message
     and ToolException for the type. This is useful for direct comparison of
     strings that have regex characters that need to be escaped.
 
@@ -323,7 +317,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       **kwargs: The args for the callable.
 
     Returns:
-      The result of assertRaisesRegexp() which can be used as a context manager.
+      The result of assertRaisesRegex() which can be used as a context manager.
     """
     return self.AssertRaisesExceptionMatches(
         calliope_exceptions.ToolException, expected_message,
@@ -342,7 +336,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       **kwargs: The args for the callable.
 
     Returns:
-      The result of assertRaisesRegexp() which can be used as a context manager.
+      The result of assertRaisesRegex() which can be used as a context manager.
     """
     return self.AssertRaisesExceptionRegexp(
         exceptions.HttpException, expected_regexp,
@@ -411,7 +405,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       **kwargs: The args for the callable.
 
     Returns:
-      The result of assertRaisesRegexp() which can be used as a context manager.
+      The result of assertRaisesRegex() which can be used as a context manager.
     """
     return self.AssertRaisesExceptionRegexp(
         MockArgumentError, expected_regexp,
@@ -430,7 +424,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
       **kwargs: The args for the callable.
 
     Returns:
-      The result of assertRaisesRegexp() which can be used as a context manager.
+      The result of assertRaisesRegex() which can be used as a context manager.
     """
     return self.AssertRaisesExceptionMatches(
         MockArgumentError, expected_message,
@@ -473,17 +467,7 @@ class CliTestBase(sdk_test_base.WithOutputCapture,
         preprocessed_cmd = cmd.replace(os.sep, os.sep + os.sep)
       else:
         preprocessed_cmd = cmd
-      cmd = []
-      for arg in _ShlexSplit(
-          StringIO(preprocessed_cmd), comments=True, posix=True):
-        if isinstance(arg, six.text_type):
-          try:
-            # Convert ascii args back to ascii for Python < 2.7.
-            arg = arg.encode('ascii')
-          except UnicodeError:
-            # Encoded args remain encoded.
-            pass
-        cmd.append(arg)
+      cmd = _ShlexSplit(StringIO(preprocessed_cmd), comments=True, posix=True)
     if track is None:
       track = self.track
     if track.prefix is None:

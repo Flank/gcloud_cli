@@ -11,7 +11,7 @@ gcloud alpha compute addresses create \- reserve IP addresses
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute addresses create\fR [\fINAME\fR\ ...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-addresses\fR=\fIADDRESS\fR,[\fIADDRESS\fR,...]\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute addresses create\fR [\fINAME\fR\ ...] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-prefix\-length\fR=\fIPREFIX_LENGTH\fR] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-addresses\fR=\fIADDRESS\fR,[\fIADDRESS\fR,...]\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -44,10 +44,29 @@ The names of the addresses to create.
 An optional textual description for the addresses.
 
 .TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+If specified, the network resource in which the address(es) should be reserved.
+
+This is only available for global internal address, which represents an internal
+IP range reservation from within the network.
+
+.TP 2m
 \fB\-\-network\-tier\fR=\fINETWORK_TIER\fR
 The network tier to assign to the reserved IP addresses.
 \f5\fINETWORK_TIER\fR\fR must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The
 default value is \f5PREMIUM\fR.
+
+.TP 2m
+\fB\-\-prefix\-length\fR=\fIPREFIX_LENGTH\fR
+The prefix length of the IP range. It must be a value between 8 and 30
+inclusive. If not present, it means the address field is a single IP address.
+
+This field is not applicable to external addresses.
+
+.TP 2m
+\fB\-\-purpose\fR=\fIPURPOSE\fR
+The purpose of the address resource. This field is not applicable to external
+addresses. \fIPURPOSE\fR must be one of: \fBVPC_PEERING\fR, \fBGCE_ENDPOINT\fR.
 
 .TP 2m
 \fB\-\-subnet\fR=\fISUBNET\fR
@@ -142,6 +161,24 @@ To reserve an IP address from the subnet \f5\fIdefault\fR\fR in the
 .RS 2m
 $ gcloud alpha compute addresses create SUBNET\-ADDRESS\-1 \e
     \-\-region us\-central1 \-\-subnet default
+.RE
+
+To reserve an IP range 10.110.0.0/16 from the network \f5\fIdefault\fR\fR for
+VPC_PEERING, run:
+
+.RS 2m
+$ gcloud alpha compute addresses create IP\-RANGE\-1 \-\-global \e
+    \-\-addresses 10.110.0.0 \-\-prefix\-length 16
+\-\-purpose VPC_PEERING \-\-network default
+.RE
+
+To reserve any IP range with prefix length 16 from the network
+\f5\fIdefault\fR\fR for VPC_PEERING, run:
+
+.RS 2m
+$ gcloud alpha compute addresses create IP\-RANGE\-1 \-\-global \e
+    \-\-prefix\-length 16 \-\-purpose VPC_PEERING
+\-\-network default
 .RE
 
 

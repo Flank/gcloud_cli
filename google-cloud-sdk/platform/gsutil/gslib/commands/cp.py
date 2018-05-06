@@ -24,18 +24,9 @@ import time
 import traceback
 
 from apitools.base.py import encoding
-from gslib import copy_helper
-from gslib.cat_helper import CatHelper
 from gslib.command import Command
 from gslib.command_argument import CommandArgument
 from gslib.commands.compose import MAX_COMPONENT_COUNT
-from gslib.copy_helper import CreateCopyHelperOpts
-from gslib.copy_helper import GetSourceFieldsNeededForCopy
-from gslib.copy_helper import GZIP_ALL_FILES
-from gslib.copy_helper import ItemExistsError
-from gslib.copy_helper import Manifest
-from gslib.copy_helper import PARALLEL_UPLOAD_TEMP_NAMESPACE
-from gslib.copy_helper import SkipUnsupportedObjectError
 from gslib.cs_api_map import ApiSelector
 from gslib.exception import CommandException
 from gslib.metrics import LogPerformanceSummaryParams
@@ -44,26 +35,35 @@ from gslib.name_expansion import DestinationInfo
 from gslib.name_expansion import NameExpansionIterator
 from gslib.name_expansion import NameExpansionIteratorDestinationTuple
 from gslib.name_expansion import SeekAheadNameExpansionIterator
-from gslib.posix_util import ConvertModeToBase8
-from gslib.posix_util import DeserializeFileAttributesFromObjectMetadata
-from gslib.posix_util import InitializeUserGroups
-from gslib.posix_util import POSIXAttributes
-from gslib.posix_util import SerializeFileAttributesToObjectMetadata
-from gslib.posix_util import ValidateFilePermissionAccess
 from gslib.storage_url import ContainsWildcard
+from gslib.storage_url import IsCloudSubdirPlaceholder
 from gslib.storage_url import StorageUrlFromString
 from gslib.third_party.storage_apitools import storage_v1_messages as apitools_messages
-from gslib.util import CalculateThroughput
-from gslib.util import CreateLock
-from gslib.util import DEBUGLEVEL_DUMP_REQUESTS
-from gslib.util import GetCloudApiInstance
-from gslib.util import GetStreamFromFileUrl
-from gslib.util import IsCloudSubdirPlaceholder
-from gslib.util import MakeHumanReadable
-from gslib.util import NO_MAX
-from gslib.util import NormalizeStorageClass
-from gslib.util import RemoveCRLFFromString
-from gslib.util import StdinIterator
+from gslib.utils import cat_helper
+from gslib.utils import copy_helper
+from gslib.utils import parallelism_framework_util
+from gslib.utils.cloud_api_helper import GetCloudApiInstance
+from gslib.utils.constants import DEBUGLEVEL_DUMP_REQUESTS
+from gslib.utils.constants import NO_MAX
+from gslib.utils.copy_helper import CreateCopyHelperOpts
+from gslib.utils.copy_helper import GetSourceFieldsNeededForCopy
+from gslib.utils.copy_helper import GZIP_ALL_FILES
+from gslib.utils.copy_helper import ItemExistsError
+from gslib.utils.copy_helper import Manifest
+from gslib.utils.copy_helper import PARALLEL_UPLOAD_TEMP_NAMESPACE
+from gslib.utils.copy_helper import SkipUnsupportedObjectError
+from gslib.utils.posix_util import ConvertModeToBase8
+from gslib.utils.posix_util import DeserializeFileAttributesFromObjectMetadata
+from gslib.utils.posix_util import InitializeUserGroups
+from gslib.utils.posix_util import POSIXAttributes
+from gslib.utils.posix_util import SerializeFileAttributesToObjectMetadata
+from gslib.utils.posix_util import ValidateFilePermissionAccess
+from gslib.utils.system_util import GetStreamFromFileUrl
+from gslib.utils.system_util import StdinIterator
+from gslib.utils.text_util import NormalizeStorageClass
+from gslib.utils.text_util import RemoveCRLFFromString
+from gslib.utils.unit_util import CalculateThroughput
+from gslib.utils.unit_util import MakeHumanReadable
 
 _SYNOPSIS = """
   gsutil cp [OPTION]... src_url dst_url
@@ -298,7 +298,8 @@ _CHECKSUM_VALIDATION_TEXT = """
       MD5 computed by your content pipeline when you run gsutil cp will ensure
       that the checksums match all the way through the process (e.g., detecting
       if data gets corrupted on your local disk between the time it was written
-      by your content pipeline and the time it was uploaded to GCS).
+      by your content pipeline and the time it was uploaded to Google Cloud
+      Storage).
 
   Note: The Content-MD5 header is ignored for composite objects, because such
   objects only have a CRC32C checksum.
@@ -580,6 +581,38 @@ _OPTIONS_TEXT = """
                  stdin. This allows you to run a program that generates the list
                  of files to upload/download.
 
+  -j <ext,...>   Applies gzip transport encoding to any file upload whose
+                 extension matches the -j extension list. This is useful when
+                 uploading files with compressible content (such as .js, .css,
+                 or .html files) because it saves network bandwidth while
+                 also leaving the data uncompressed in Google Cloud Storage.
+
+                 When you specify the -j option, files being uploaded are
+                 compressed in-memory and on-the-wire only. Both the local
+                 files and GCS objects remain uncompressed. The uploaded
+                 objects retain the Content-Type and name of the original
+                 files.
+
+                 Note that if you want to use the top-level -m option to
+                 parallelize copies along with the -j/-J options, you should
+                 prefer using multiple processes instead of multiple threads;
+                 when using -j/-J, multiple threads in the same process are
+                 bottlenecked by Python's GIL. Thread and process count can be
+                 set using the "parallel_thread_count" and
+                 "parallel_process_count" boto config options, e.g.:
+
+                   gsutil -o "GSUtil:parallel_process_count=8" \\
+                     -o "GSUtil:parallel_thread_count=1" \\
+                     -m cp -r /local/source/dir gs://bucket/path
+
+  -J             Applies gzip transport encoding to file uploads. This option
+                 works like the -j option described above, but it applies to
+                 all uploaded files, regardless of extension.
+
+                 Warning: If you use this option and some of the source files
+                 don't compress well (e.g., that's often true of binary data),
+                 this option may result in longer uploads.
+
   -L <file>      Outputs a manifest log file with detailed information about
                  each item that was copied. This manifest contains the following
                  information for each item:
@@ -744,8 +777,7 @@ _DETAILED_HELP_TEXT = '\n\n'.join([_SYNOPSIS_TEXT,
                                    _COPYING_SPECIAL_FILES_TEXT,
                                    _OPTIONS_TEXT])
 
-
-CP_SUB_ARGS = 'a:AcDeIL:MNnpPrRs:tUvz:Z'
+CP_SUB_ARGS = 'a:AcDeIL:MNnpPrRs:tUvz:Zj:J'
 
 
 def _CopyFuncWrapper(cls, args, thread_state=None):
@@ -943,8 +975,8 @@ class CpCommand(Command):
               self.logger, exp_src_url, dst_url, gsutil_api,
               self, _CopyExceptionHandler, src_obj_metadata=src_obj_metadata,
               allow_splitting=True, headers=self.headers,
-              manifest=self.manifest, gzip_exts=self.gzip_exts,
-              preserve_posix=preserve_posix))
+              manifest=self.manifest, gzip_encoded=self.gzip_encoded,
+              gzip_exts=self.gzip_exts, preserve_posix=preserve_posix))
       if copy_helper_opts.use_manifest:
         if md5:
           self.manifest.Set(exp_src_url.url_string, 'md5', md5)
@@ -1078,7 +1110,7 @@ class CpCommand(Command):
                                'stream or a named pipe.')
       cat_out_fd = (GetStreamFromFileUrl(dst_url, mode='wb')
                     if dst_url.IsFifo() else None)
-      return CatHelper(self).CatUrlStrings(
+      return cat_helper.CatHelper(self).CatUrlStrings(
           self.args[:-1],
           cat_out_fd=cat_out_fd)
 
@@ -1118,7 +1150,7 @@ class CpCommand(Command):
 
     # Use a lock to ensure accurate statistics in the face of
     # multi-threading/multi-processing.
-    self.stats_lock = CreateLock()
+    self.stats_lock = parallelism_framework_util.CreateLock()
 
     # Tracks if any copies failed.
     self.op_failure_count = 0
@@ -1195,7 +1227,14 @@ class CpCommand(Command):
 
     self.skip_unsupported_objects = False
 
-    # Files matching these extensions should be gzipped before uploading.
+    # Files matching these extensions should be compressed.
+    # The gzip_encoded flag marks if the files should be compressed during
+    # the upload. The gzip_local flag marks if the files should be compressed
+    # before uploading. Files compressed prior to uploaded are stored
+    # compressed, while files compressed during the upload are stored
+    # uncompressed. These flags cannot be mixed.
+    gzip_encoded = False
+    gzip_local = False
     gzip_arg_exts = None
     gzip_arg_all = None
 
@@ -1224,6 +1263,12 @@ class CpCommand(Command):
           test_callback_file = a
         elif o == '-I':
           read_args_from_stdin = True
+        elif o == '-j':
+          gzip_encoded = True
+          gzip_arg_exts = [x.strip() for x in a.split(',')]
+        elif o == '-J':
+          gzip_encoded = True
+          gzip_arg_all = GZIP_ALL_FILES
         elif o == '-L':
           use_manifest = True
           self.manifest = Manifest(a)
@@ -1249,21 +1294,33 @@ class CpCommand(Command):
         elif o == '-v':
           print_ver = True
         elif o == '-z':
+          gzip_local = True
           gzip_arg_exts = [x.strip() for x in a.split(',')]
         elif o == '-Z':
+          gzip_local = True
           gzip_arg_all = GZIP_ALL_FILES
+
     if preserve_acl and canned_acl:
       raise CommandException(
           'Specifying both the -p and -a options together is invalid.')
+
     if self.all_versions and self.parallel_operations:
       raise CommandException(
           'The gsutil -m option is not supported with the cp -A flag, to '
           'ensure that object version ordering is preserved. Please re-run '
           'the command without the -m option.')
-    if gzip_arg_exts and gzip_arg_all:
+    if gzip_encoded and gzip_local:
       raise CommandException(
-          'Specifying both the -z and -Z options together is invalid.')
+          'Specifying both the -j/-J and -z/-Z options together is invalid.')
+    if gzip_arg_exts and gzip_arg_all:
+      if gzip_encoded:
+        raise CommandException(
+            'Specifying both the -j and -J options together is invalid.')
+      else:
+        raise CommandException(
+            'Specifying both the -z and -Z options together is invalid.')
     self.gzip_exts = gzip_arg_exts or gzip_arg_all
+    self.gzip_encoded = gzip_encoded
 
     return CreateCopyHelperOpts(
         perform_mv=perform_mv,

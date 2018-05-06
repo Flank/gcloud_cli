@@ -15,6 +15,8 @@
 
 """A unicode supported command in a unicode not supported group."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
@@ -24,8 +26,8 @@ class Yes(base.Command):
 
   @staticmethod
   def Args(parser):
-    parser.add_argument(u'--車', dest='always', default=u'уєѕ',
-                        help=u'This will søɨŧɇnłɏ work.')
+    parser.add_argument('--車', dest='always', default='уєѕ',
+                        help='This will søɨŧɇnłɏ work.')
 
   def Run(self, args):
     return [args.always]

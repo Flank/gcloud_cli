@@ -12,10 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 import os
+import platform
 import re
 import shlex
-import StringIO
 import subprocess
 import sys
 import time
@@ -98,7 +101,7 @@ class UpdateManagerTests(util.Base,
           'WARNING: You have configured your Cloud SDK installation to be '
           'fixed to version',
           success=warn)
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           update_manager.MismatchedFixedVersionsError,
           r'be fixed to version \[0\.0\.0\] but are attempting to install '
           r'components at\nversion \[1\]\.'):
@@ -148,13 +151,13 @@ class UpdateManagerTests(util.Base,
         self.CreateSnapshotFromComponentsGenerateTars(1, component_tuples))
     url = self.URLFromFile(self.CreateTempSnapshotFileFromSnapshot(snapshot))
     manager = update_manager.UpdateManager(self.sdk_root_path, url)
-    with self.assertRaisesRegexp(update_manager.InvalidComponentError,
-                                 r'The following components are unknown \[b\]'):
+    with self.assertRaisesRegex(update_manager.InvalidComponentError,
+                                r'The following components are unknown \[b\]'):
       manager.Update(['b'])
     self.AssertErrNotContains('no longer exists')
 
-    with self.assertRaisesRegexp(update_manager.InvalidComponentError,
-                                 r'The following components are unknown \[b\]'):
+    with self.assertRaisesRegex(update_manager.InvalidComponentError,
+                                r'The following components are unknown \[b\]'):
       manager.Update(['b', 'pkg-core'])
     self.AssertErrContains('no longer exists')
     self.ClearErr()
@@ -175,7 +178,7 @@ class UpdateManagerTests(util.Base,
 
     # empty
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     self.assertEqual(None, install_state.BackupDirectory())
 
     # initial install
@@ -189,18 +192,18 @@ class UpdateManagerTests(util.Base,
     self.assertTrue(self.restart_bundled_mock.called)
     self.assertTrue(self.postprocess_mock.called)
     self.CheckPathsExist(paths1['a'], exists=True)
-    self.assertEqual(['a'], install_state.InstalledComponents().keys())
+    self.assertEqual(['a'], list(install_state.InstalledComponents().keys()))
     self.assertNotEqual(None, install_state.BackupDirectory())
     self.AssertErrContains('Your current Cloud SDK version is: ' +
                            config.INSTALLATION_CONFIG.version)
     self.AssertErrContains('Installing components from version: 1')
     self.AssertErrNotContains('bundled installation of Python')
     # We registered the release notes file, check that it prints the diff.
-    rendered_notes = StringIO.StringIO()
+    rendered_notes = io.StringIO()
     # Actually user the renderer for testing the output because it renders
     # differently on different platforms.
     render_document.RenderDocument('text',
-                                   StringIO.StringIO('## 1 (date)\n\n*   Note'),
+                                   io.StringIO('## 1 (date)\n\n*   Note'),
                                    rendered_notes)
     self.AssertErrContains("""\
 The following release notes are new in this upgrade.
@@ -226,7 +229,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
     manager.Update()
     self.CheckPathsExist(paths1['a'], exists=False)
     self.CheckPathsExist(paths2['a'], exists=True)
-    self.assertEqual(['a'], install_state.InstalledComponents().keys())
+    self.assertEqual(['a'], list(install_state.InstalledComponents().keys()))
     self.assertNotEqual(None, install_state.BackupDirectory())
     self.CheckPathsExist(paths1['a'], exists=True,
                          alt_root=install_state.BackupDirectory())
@@ -309,7 +312,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
 
     # Empty
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     self.assertEqual(None, install_state.BackupDirectory())
 
     # Initial install
@@ -320,13 +323,13 @@ and bugs fixed.  The latest full release notes can be viewed at:
     url = self.URLFromFile(
         self.CreateTempSnapshotFileFromSnapshot(snapshot, versioned=True))
     manager = update_manager.UpdateManager(self.sdk_root_path, url)
-    with self.assertRaisesRegexp(update_manager.InvalidComponentError,
-                                 'You must specify components to install'):
+    with self.assertRaisesRegex(update_manager.InvalidComponentError,
+                                'You must specify components to install'):
       manager.Install([])
     self.restart_bundled_mock.reset_mock()
 
     # Check invalid component.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         update_manager.InvalidComponentError,
         r'The following components are unknown \[junk\].'):
       manager.Install(['junk'])
@@ -346,10 +349,10 @@ and bugs fixed.  The latest full release notes can be viewed at:
     self.AssertErrContains('All components are up to date.')
     self.ClearErr()
 
-    self.assertEquals({'a': '1'}, manager.GetCurrentVersionsInformation())
+    self.assertEqual({'a': '1'}, manager.GetCurrentVersionsInformation())
     manager.Install(['b'])
-    self.assertEquals({'a': '1', 'b': '1'},
-                      manager.GetCurrentVersionsInformation())
+    self.assertEqual({'a': '1', 'b': '1'},
+                     manager.GetCurrentVersionsInformation())
 
     # Create updated snapshot
     component_tuples = [('a', 2, []), ('b', 2, []), ('c', 1, [])]
@@ -370,13 +373,13 @@ and bugs fixed.  The latest full release notes can be viewed at:
 
     # Check that we get a good error when trying to update to a component that
     # doesn't exist at our current version.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         update_manager.InvalidComponentError,
         r'The following components are unknown \[junk\]\. The following '
         r'components are not available for your current SDK version \[c\]\. '
         r'Please run `gcloud components update` to update your SDK\.'):
       manager.Install(['junk', 'c'])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         update_manager.InvalidComponentError,
         r'The following components are not available for your current SDK '
         r'version \[c\]\. Please run `gcloud components update` to update your '
@@ -399,7 +402,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
     self.CheckPathsExist(paths2['b'], exists=True)
     self.ClearErr()
 
-    self.assertEquals({'a': '2'}, manager.GetCurrentVersionsInformation())
+    self.assertEqual({'a': '2'}, manager.GetCurrentVersionsInformation())
 
   def testInstallWithAdditionalRepos(self):
     self.StartPatch('googlecloudsdk.core.config.INSTALLATION_CONFIG.version',
@@ -471,7 +474,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
     self.CheckPathsExist(paths1['a'], exists=False)
     self.CheckPathsExist(paths1['bundled-python'], exists=False)
     self.CheckPathsExist(paths1['c'], exists=False)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
 
   def testUninstallPlatformSpecific(self):
     install_state = local_state.InstallationState(self.sdk_root_path)
@@ -485,9 +488,9 @@ and bugs fixed.  The latest full release notes can be viewed at:
         snapshot, ['a'],
         platforms.Platform(platforms.OperatingSystem.WINDOWS, None))
     url = self.URLFromFile(self.CreateTempSnapshotFileFromSnapshot(snapshot))
-    platform = platforms.Platform(platforms.OperatingSystem.WINDOWS, None)
+    platf = platforms.Platform(platforms.OperatingSystem.WINDOWS, None)
     manager = update_manager.UpdateManager(self.sdk_root_path, url,
-                                           platform_filter=platform)
+                                           platform_filter=platf)
     manager.Update(['a'])
     self.CheckPathsExist(paths1['a'], exists=True)
     self.CheckPathsExist(paths1['b'], exists=True)
@@ -502,7 +505,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
   def testTwoSnapshotUpdate(self):
     # empty
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     self.assertEqual(None, install_state.BackupDirectory())
 
     # initial install
@@ -545,7 +548,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
   def testUpdateToFixedVersion_RemovedBundledPython(self):
     # empty
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     self.assertEqual(None, install_state.BackupDirectory())
 
     component_tuples1 = [('bundled-python', 1, [])]
@@ -579,7 +582,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
   def testUpdateToFixedVersion(self):
     # empty
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     self.assertEqual(None, install_state.BackupDirectory())
 
     component_tuples1 = [('a', 1, []), ('b', 1, [])]
@@ -640,7 +643,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
   def testRestoreBackup(self):
     # empty
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     self.assertEqual(None, install_state.BackupDirectory())
 
     # initial install
@@ -652,7 +655,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
     manager.Update(['a'])
     self.CheckPathsExist(paths1['a'], exists=True)
     self.CheckPathsExist(paths1['b'], exists=False)
-    self.assertEqual(['a'], install_state.InstalledComponents().keys())
+    self.assertEqual(['a'], list(install_state.InstalledComponents().keys()))
     self.assertNotEqual(None, install_state.BackupDirectory())
 
     # install the second component
@@ -669,7 +672,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
     manager.Restore()
     self.CheckPathsExist(paths1['a'], exists=True)
     self.CheckPathsExist(paths1['b'], exists=False)
-    self.assertEqual(['a'], install_state.InstalledComponents().keys())
+    self.assertEqual(['a'], list(install_state.InstalledComponents().keys()))
     # The backup installation directory doesn't have bundled-python installed,
     # and we've mocked out IsPythonBundled to return True, so this message will
     # print.
@@ -682,7 +685,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
   def testRemoveRequiredComponent(self):
     # empty
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
 
     # initial install
     component_tuples = [('a', 1, []), ('req_b', 1, [])]
@@ -704,8 +707,8 @@ and bugs fixed.  The latest full release notes can be viewed at:
                      set(install_state.InstalledComponents().keys()))
 
     # req_b should not get removed because it is a required component
-    with self.assertRaisesRegexp(update_manager.InvalidComponentError,
-                                 r'are required and cannot be removed'):
+    with self.assertRaisesRegex(update_manager.InvalidComponentError,
+                                r'are required and cannot be removed'):
       manager.Remove(['req_b'])
     self.CheckPathsExist(paths['a'], exists=False)
     self.CheckPathsExist(paths['req_b'], exists=True)
@@ -728,7 +731,7 @@ and bugs fixed.  The latest full release notes can be viewed at:
   def testReinstall(self):
     # empty
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     self.assertEqual(None, install_state.BackupDirectory())
 
     # initial install
@@ -908,15 +911,15 @@ project = cloudsdktest
             components=['cbt', 'abc']), 'sdk-cbt\n\n"abc"')
 
     # Test default error message for restore.
-    with self.assertRaisesRegexp(update_manager.UpdaterDisabledError,
-                                 'consider using a separate installation'):
+    with self.assertRaisesRegex(update_manager.UpdaterDisabledError,
+                                'consider using a separate installation'):
       mapping_mock.side_effect = [commands_mapping, components_mapping]
       manager.Restore()
     self.ClearErr()
 
     # Test non-default case throws error as well.
-    with self.assertRaisesRegexp(update_manager.UpdaterDisabledError,
-                                 'get install google-cloud-sdk-cbt'):
+    with self.assertRaisesRegex(update_manager.UpdaterDisabledError,
+                                'get install google-cloud-sdk-cbt'):
       mapping_mock.side_effect = [commands_mapping, components_mapping]
       manager.Update(['cbt'])
     self.ClearErr()
@@ -967,29 +970,29 @@ project = cloudsdktest
 
     t = self.StartObjectPatch(time, 'time', return_value=freq)
     # Has never checked for updates before
-    self.assertEquals(
+    self.assertEqual(
         freq, update_check.UpdateCheckData().SecondsSinceLastUpdateCheck())
     manager._PerformUpdateCheck(command_path='gcloud.foo')
     # Actually did the check and updated state
-    self.assertEquals(
+    self.assertEqual(
         0, update_check.UpdateCheckData().SecondsSinceLastUpdateCheck())
 
     t.return_value = freq + half_freq
     manager.Update(['a'])
     # Force updated the state after install
-    self.assertEquals(
+    self.assertEqual(
         0, update_check.UpdateCheckData().SecondsSinceLastUpdateCheck())
     self.assertFalse(update_check.UpdateCheckData().UpdatesAvailable())
 
     t.return_value = freq * 2
     manager._PerformUpdateCheck(command_path='gcloud.foo')
     # Did not actually do the update since time had not expired
-    self.assertEquals(
+    self.assertEqual(
         half_freq,
         update_check.UpdateCheckData().SecondsSinceLastUpdateCheck())
     manager._PerformUpdateCheck(command_path='gcloud.foo', force=True)
     # forced update
-    self.assertEquals(
+    self.assertEqual(
         0,
         update_check.UpdateCheckData().SecondsSinceLastUpdateCheck())
 
@@ -1003,7 +1006,7 @@ project = cloudsdktest
     t.return_value = freq * 4
     manager._PerformUpdateCheck(command_path='gcloud.foo')
     # Time expired, update was done
-    self.assertEquals(
+    self.assertEqual(
         0,
         update_check.UpdateCheckData().SecondsSinceLastUpdateCheck())
 
@@ -1012,7 +1015,7 @@ project = cloudsdktest
     t.return_value = freq * 5
     manager.Update(['a'])
     self.assertFalse(update_check.UpdateCheckData().UpdatesAvailable())
-    self.assertEquals(
+    self.assertEqual(
         0,
         update_check.UpdateCheckData().SecondsSinceLastUpdateCheck())
 
@@ -1023,7 +1026,7 @@ project = cloudsdktest
     manager = update_manager.UpdateManager(self.sdk_root_path, url)
     t.return_value = freq * 6
     manager._PerformUpdateCheck(command_path='gcloud.foo')
-    self.assertEquals(
+    self.assertEqual(
         0,
         update_check.UpdateCheckData().SecondsSinceLastUpdateCheck())
 
@@ -1059,7 +1062,7 @@ project = cloudsdktest
     # Updates available, but don't nag because stdout is not a tty.
     t.return_value = base_time + freq
     manager._PerformUpdateCheck(command_path='gcloud.foo')
-    self.assertEquals(base_time + freq, SecondsSinceLastNag())
+    self.assertEqual(base_time + freq, SecondsSinceLastNag())
     self.AssertErrNotContains(
         'Updates are available for some Cloud SDK components')
     self.ClearErr()
@@ -1069,7 +1072,7 @@ project = cloudsdktest
     # Updates available, do nag, update last nag time.
     t.return_value = base_time + freq
     manager._PerformUpdateCheck(command_path='gcloud.foo')
-    self.assertEquals(0, SecondsSinceLastNag())
+    self.assertEqual(0, SecondsSinceLastNag())
     self.AssertErrContains(
         'Updates are available for some Cloud SDK components')
     self.ClearErr()
@@ -1077,7 +1080,7 @@ project = cloudsdktest
     # Still updates but no nag, don't update last nag time.
     t.return_value = base_time + freq * 1.5
     manager._PerformUpdateCheck(command_path='gcloud.foo')
-    self.assertEquals(freq / 2, SecondsSinceLastNag())
+    self.assertEqual(freq / 2, SecondsSinceLastNag())
     self.AssertErrNotContains(
         'Updates are available for some Cloud SDK components')
     self.ClearErr()
@@ -1085,7 +1088,7 @@ project = cloudsdktest
     # Still updates but enough time has passed to re-nag.
     t.return_value = base_time + freq * 2
     manager._PerformUpdateCheck(command_path='gcloud.foo')
-    self.assertEquals(0, SecondsSinceLastNag())
+    self.assertEqual(0, SecondsSinceLastNag())
     self.AssertErrContains(
         'Updates are available for some Cloud SDK components')
 
@@ -1115,14 +1118,14 @@ project = cloudsdktest
     # Updates available, but wrong command, don't nag.
     t.return_value = base_time + freq
     manager._PerformUpdateCheck(command_path='bar')
-    self.assertEquals(base_time + freq, SecondsSinceLastNag())
+    self.assertEqual(base_time + freq, SecondsSinceLastNag())
     self.AssertErrNotContains(
         'Updates are available for some Cloud SDK components')
     self.ClearErr()
 
     # Updates available, correct command.
     manager._PerformUpdateCheck(command_path='foo')
-    self.assertEquals(0, SecondsSinceLastNag())
+    self.assertEqual(0, SecondsSinceLastNag())
     self.AssertErrContains(
         'Updates are available for some Cloud SDK components')
     self.ClearErr()
@@ -1202,23 +1205,23 @@ project = cloudsdktest
          path_dir,
          platform_dir
         ))
-    self.assertEquals(set(), manager.FindAllOldToolsOnPath(path=path))
-    self.assertEquals(set(), manager.FindAllDuplicateToolsOnPath(path=path))
+    self.assertEqual(set(), manager.FindAllOldToolsOnPath(path=path))
+    self.assertEqual(set(), manager.FindAllDuplicateToolsOnPath(path=path))
 
     # Add a component that has an old version on the $PATH.
     manager.Update(['b'])
-    self.assertEquals(
+    self.assertEqual(
         set([os.path.realpath(os.path.join(path_dir, 'b-1.py'))]),
         manager.FindAllOldToolsOnPath(path=path))
-    self.assertEquals(set(), manager.FindAllDuplicateToolsOnPath(path=path))
+    self.assertEqual(set(), manager.FindAllDuplicateToolsOnPath(path=path))
 
     # Add a component that has a duplicate version on the $PATH inside the SDK
     # installation.
     manager.Update(['a'])
-    self.assertEquals(
+    self.assertEqual(
         set([os.path.realpath(os.path.join(path_dir, 'b-1.py'))]),
         manager.FindAllOldToolsOnPath(path=path))
-    self.assertEquals(
+    self.assertEqual(
         set([os.path.realpath(os.path.join(platform_dir, 'a-1.py'))]),
         manager.FindAllDuplicateToolsOnPath(path=path))
 
@@ -1249,8 +1252,8 @@ project = cloudsdktest
     # Require 'b' but say no to installation prompt.
     properties.VALUES.core.disable_prompts.Set(False)
     self.WriteInput('n\n')
-    with self.assertRaisesRegexp(update_manager.MissingRequiredComponentsError,
-                                 r'The following components are required'):
+    with self.assertRaisesRegex(update_manager.MissingRequiredComponentsError,
+                                r'The following components are required'):
       manager._EnsureInstalledAndRestart(['b'], msg='my message')
     self.assertFalse(restart_mock.called)
     self.CheckPathsExist(paths['a'], exists=True)
@@ -1398,7 +1401,7 @@ class UpdateManagerRestartTests(util.Base,
       copy_python_mock = self.StartObjectPatch(update_manager, 'CopyPython')
       copy_python_mock.return_value = '/tmp/python.exe'
 
-      with self.assertRaisesRegexp(SystemExit, '0'):
+      with self.assertRaisesRegex(SystemExit, '0'):
         manager.Update(['a'])
       self.assertTrue(copy_python_mock.called)
       self.assertTrue(restart_mock.called)
@@ -1429,7 +1432,7 @@ class UpdateManagerRestartTests(util.Base,
     try:
       sys.executable = python_path
       manager = update_manager.UpdateManager(self.sdk_root_path, 'dummy url')
-      with self.assertRaisesRegexp(SystemExit, '0'):
+      with self.assertRaisesRegex(SystemExit, '0'):
         manager._RestartIfUsingBundledPython(args=['args'])
     finally:
       sys.executable = old_executable
@@ -1458,7 +1461,7 @@ class UpdateManagerRestartTests(util.Base,
     try:
       sys.executable = python_path
       manager = update_manager.UpdateManager(self.sdk_root_path, 'dummy url')
-      with self.assertRaisesRegexp(SystemExit, '1'):
+      with self.assertRaisesRegex(SystemExit, '1'):
         manager._RestartIfUsingBundledPython(args=['args'])
     finally:
       sys.executable = old_executable
@@ -1488,7 +1491,7 @@ class UpdateManagerRestartTests(util.Base,
     try:
       sys.executable = python_path
       manager = update_manager.UpdateManager(self.sdk_root_path, 'dummy url')
-      with self.assertRaisesRegexp(SystemExit, '0'):
+      with self.assertRaisesRegex(SystemExit, '0'):
         manager._RestartIfUsingBundledPython(args=['args'], command='foo.py')
     finally:
       sys.executable = old_executable
@@ -1581,21 +1584,24 @@ class HashRcFilesTest(util.Base):
 
 class ExecutionTests(sdk_test_base.SdkBase):
 
-  DEFAULT_EXPECTED_ARGS = ['a', u'b c™', 'd']
+  DEFAULT_EXPECTED_ARGS = ['a', 'b c™', 'd']
   WINDOWS_CMD_PATTERN = (r'cmd\.exe /c "(?P<args>.*) & pause"')
 
   def SetUp(self):
     self.old_args = sys.argv
-    sys.argv = ['gcloud', 'a', u'b c™', 'd']
+    sys.argv = ['gcloud', 'a', 'b c™', 'd']
     self.exec_mock = self.StartObjectPatch(execution_utils, 'Exec')
     self.current_os_mock = self.StartObjectPatch(platforms.OperatingSystem,
                                                  'Current')
     # for consistency
     self.current_os_mock.return_value = platforms.OperatingSystem.LINUX
     self.StartObjectPatch(encoding, '_GetEncoding', return_value='utf-8')
+    self.old_executable = sys.executable
+    sys.executable = 'current/python'
 
   def TearDown(self):
     sys.argv = self.old_args
+    sys.executable = self.old_executable
 
   def _MakeSureArgsOk(self, args, python_path=None,
                       command='gcloud.py', expected_args=None):
@@ -1623,6 +1629,12 @@ class ExecutionTests(sdk_test_base.SdkBase):
                          expected_args=['foo', 'bar'])
 
   def testRestartCommandNonBlocking(self):
+    # Store the current machine via a mock because in python3, os.popen shells
+    # out to subprocess.Popen, so mocking Popen later will break
+    # platform.machine().
+    machine = platform.machine()
+    self.StartObjectPatch(platform, 'machine', return_value=machine)
+
     popen_mock = self.StartObjectPatch(subprocess, 'Popen')
 
     update_manager.RestartCommand(block=False)
@@ -1633,8 +1645,13 @@ class ExecutionTests(sdk_test_base.SdkBase):
     self.assertEqual(kwargs['shell'], True)
 
   def testRestartCommandBlockingWindowsInteractive(self):
-    self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
     self.current_os_mock.return_value = platforms.OperatingSystem.WINDOWS
+    # Store the current machine via a mock because in python3, os.popen shells
+    # out to subprocess.Popen, so mocking Popen later will break
+    # platform.machine().
+    machine = platform.machine()
+    self.StartObjectPatch(platform, 'machine', return_value=machine)
+    self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
     popen_mock = self.StartObjectPatch(subprocess, 'Popen')
 
     update_manager.RestartCommand(block=False)
@@ -1644,14 +1661,21 @@ class ExecutionTests(sdk_test_base.SdkBase):
     match = re.match(self.WINDOWS_CMD_PATTERN, args)
     self.assertIsNotNone(match)
     # This is a string, rather than a list as in other cases
-    self._MakeSureArgsOk(shlex.split(match.group('args')))
+    args_group = match.group('args')
+    # shlex only handles utf-8 encoding.
+    self._MakeSureArgsOk(shlex.split(encoding.Encode(args_group, 'utf-8')))
     self.assertEqual(kwargs, {'shell': True,
                               'close_fds': True,
                               'creationflags': 0x208})
 
   def testRestartCommandBlockingWindowsNonInteractive(self):
-    self.StartObjectPatch(console_io, 'CanPrompt', return_value=False)
     self.current_os_mock.return_value = platforms.OperatingSystem.WINDOWS
+    # Store the current machine via a mock because in python3, os.popen shells
+    # out to subprocess.Popen, so mocking Popen later will break
+    # platform.machine().
+    machine = platform.machine()
+    self.StartObjectPatch(platform, 'machine', return_value=machine)
+    self.StartObjectPatch(console_io, 'CanPrompt', return_value=False)
     popen_mock = self.StartObjectPatch(subprocess, 'Popen')
 
     update_manager.RestartCommand(block=False)

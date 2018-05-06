@@ -49,7 +49,7 @@ class EnablementTest(e2e_base.WithServiceAuth):
     create_op = projects_api.Create(
         self.project_ref,
         parent=projects_api.ParentNameToResourceId(GOOGLE_ORG_ID))
-    log.CreatedResource(self.project_ref, async=True)
+    log.CreatedResource(self.project_ref, is_async=True)
     operations.WaitForOperation(create_op)
 
     log.debug('Enabling cloudapis.googleapis.com')

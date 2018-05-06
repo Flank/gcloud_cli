@@ -19,7 +19,6 @@ import re
 import sys
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
-from googlecloudsdk.api_lib.source import source
 from googlecloudsdk.calliope import exceptions as c_exc
 from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
@@ -435,8 +434,6 @@ class InitNoAuthTest(
     self.projects_list_mock = self.StartObjectPatch(projects_api, 'List')
     self.projects_create_mock = self.StartObjectPatch(projects_api, 'Create')
     self.projects_list_mock.return_value = iter([])
-    self.repos_list_mock = self.StartObjectPatch(source.Project, 'ListRepos')
-    self.repos_list_mock.return_value = iter([])
     self.ResetExecutor()
     self.ResetExecutionUtils()
 
@@ -1635,7 +1632,7 @@ class InitNoAuthTest(
 
   def testWithDisabledPrompts(self):
     properties.VALUES.core.disable_prompts.Set(True)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         c_exc.InvalidArgumentException,
         re.escape('Invalid value for [disable_prompts/--quiet]: '
                   'gcloud init command cannot run with disabled prompts.')):
@@ -1652,7 +1649,7 @@ class InitNoAuthTest(
   def testWithCommandException(self):
     # Make sure most command exceptions propagate out.
     self.StartObjectPatch(c_store, 'AvailableAccounts', return_value=[])
-    with self.assertRaisesRegexp(RuntimeError, 'booboo'):
+    with self.assertRaisesRegex(RuntimeError, 'booboo'):
       self.RunScenario([
           (['auth', 'login', '--force', '--brief'], RuntimeError('booboo'))
       ])
@@ -1688,7 +1685,7 @@ class InitNoAuthTest(
 
   def testWithCommandSystemExit(self):
     self.StartObjectPatch(c_store, 'AvailableAccounts', return_value=[])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         c_exc.FailedSubCommand,
         re.escape('Failed command: [auth login --force --brief] '
                   'with exit code [25]')):
@@ -1859,7 +1856,7 @@ class InitNoAuthTest(
 class InitNoExecutorMockingTest(cli_test_base.CliTestBase):
 
   def testWithProjectPositional(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         c_exc.InvalidArgumentException,
         r'Invalid value for \[my-project\]:.*`gcloud init` has changed.*'):
       self.Run('init my-project')

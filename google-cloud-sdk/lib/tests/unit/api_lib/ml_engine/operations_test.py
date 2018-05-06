@@ -37,8 +37,8 @@ class OperationsClientTest(base.MlGaPlatformTestBase):
             operations=response_items))
     project_ref = resources.REGISTRY.Parse(self.Project(),
                                            collection='ml.projects')
-    self.assertEquals(list(self.operations_client.List(project_ref)),
-                      response_items)
+    self.assertEqual(list(self.operations_client.List(project_ref)),
+                     response_items)
 
   def testDescribe(self):
     response = self.msgs.GoogleLongrunningOperation(name='opName', done=True)
@@ -49,7 +49,7 @@ class OperationsClientTest(base.MlGaPlatformTestBase):
     operation_ref = resources.REGISTRY.Create(
         'ml.projects.operations',
         operationsId='opId', projectsId=self.Project())
-    self.assertEquals(self.operations_client.Get(operation_ref), response)
+    self.assertEqual(self.operations_client.Get(operation_ref), response)
 
   def testCancel(self):
     response = self.msgs.GoogleProtobufEmpty()
@@ -60,7 +60,7 @@ class OperationsClientTest(base.MlGaPlatformTestBase):
     operation_ref = resources.REGISTRY.Create(
         'ml.projects.operations',
         operationsId='opId', projectsId=self.Project())
-    self.assertEquals(self.operations_client.Cancel(operation_ref), response)
+    self.assertEqual(self.operations_client.Cancel(operation_ref), response)
 
   def testDelete(self):
     response = self.msgs.GoogleProtobufEmpty()
@@ -71,7 +71,7 @@ class OperationsClientTest(base.MlGaPlatformTestBase):
     operation_ref = resources.REGISTRY.Create(
         'ml.projects.operations',
         operationsId='opId', projectsId=self.Project())
-    self.assertEquals(self.operations_client.Delete(operation_ref), response)
+    self.assertEqual(self.operations_client.Delete(operation_ref), response)
 
   def testWaitForOperation_Success(self):
     self.client.projects_operations.Get.Expect(

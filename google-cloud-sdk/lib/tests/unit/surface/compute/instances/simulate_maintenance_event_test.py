@@ -28,11 +28,11 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
                                    cli_test_base.CliTestBase,
                                    waiter_test_base.Base):
 
-  API_VERSION = 'alpha'
+  API_VERSION = 'beta'
   zone = 'zone-2'
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.api_mock = utils.ComputeApiMock(
         self.API_VERSION, project=self.Project(), zone=self.zone).Start()
     self.addCleanup(self.api_mock.Stop)
@@ -109,9 +109,8 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('')
     self.AssertErrContains(
         'Simulating maintenance on instance(s) '
-        '[https://www.googleapis.com/compute/alpha/projects/fake-project/'
-        'zones/zone-2/instances/instance-1]'
-    )
+        '[https://www.googleapis.com/compute/{}/projects/fake-project/'
+        'zones/zone-2/instances/instance-1]'.format(self.API_VERSION))
 
   def testAsync(self):
     """Test the asynchronous version of the call."""
@@ -134,10 +133,10 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('')
     self.AssertErrEquals(
         'Update in progress for gce instance [instance-1] '
-        '[https://www.googleapis.com/compute/alpha/'
+        '[https://www.googleapis.com/compute/{}/'
         'projects/fake-project/zones/zone-2/operations/operation-1] '
         'Use [gcloud compute operations describe] command to check the status '
-        'of this operation.\n')
+        'of this operation.\n'.format(self.API_VERSION))
 
   def testMultipleWithOperationPolling(self):
     """Test the synchronous version of the call with multiple instances."""
@@ -171,15 +170,15 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('')
     self.AssertErrContains(
         'Simulating maintenance on instance(s) '
-        '[https://www.googleapis.com/compute/alpha/projects/fake-project/'
+        '[https://www.googleapis.com/compute/{}/projects/fake-project/'
         'zones/zone-2/instances/instance-0,'
         ' '
-        'https://www.googleapis.com/compute/alpha/projects/fake-project/'
+        'https://www.googleapis.com/compute/{}/projects/fake-project/'
         'zones/zone-2/instances/instance-1,'
         ' '
-        'https://www.googleapis.com/compute/alpha/projects/fake-project/'
-        'zones/zone-2/instances/instance-2]'
-    )
+        'https://www.googleapis.com/compute/{}/projects/fake-project/'
+        'zones/zone-2/instances/instance-2]'.format(
+            self.API_VERSION, self.API_VERSION, self.API_VERSION))
 
   def testMultipleAsync(self):
     """Test the asynchronous version of the call with multiple instances."""
@@ -207,11 +206,11 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     expected_err = ''
     for c in xrange(n_instances):
       expected_err += ('Update in progress for gce instance [instance-{inum}] '
-                       '[https://www.googleapis.com/compute/alpha/projects/'
+                       '[https://www.googleapis.com/compute/{track}/projects/'
                        'fake-project/zones/zone-2/operations/operation-{onum}]'
                        ' Use [gcloud compute operations describe] command to '
                        'check the status of this operation.\n').format(
-          inum=c, onum=c)
+                           inum=c, onum=c, track=self.API_VERSION)
     self.AssertErrEquals(expected_err)
 
   def testScopePrompt(self):

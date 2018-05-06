@@ -14,6 +14,8 @@
 
 """The command group for cloud container clusters."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.container import transforms
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import base
@@ -43,7 +45,7 @@ class Clusters(base.Group):
         which you can register arguments.  See the public argparse documentation
         for its capabilities.
     """
-    flags.AddZoneFlag(parser)
+    flags.AddZoneAndRegionFlags(parser, region_hidden=True)
     parser.display_info.AddTransforms(transforms.GetTransforms())
 
   def Filter(self, context, args):
@@ -58,7 +60,7 @@ class Clusters(base.Group):
     Returns:
       The refined command context.
     """
-    context['location_get'] = container_command_util.GetZone
+    context['location_get'] = container_command_util.GetZoneOrRegion
     return context
 
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for target VPN gateways update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 import textwrap
 
@@ -31,9 +33,9 @@ class UpdateLabelsTestBeta(
         'gw-1', region='us-central1')
 
   def testUpdateMissingNameOrLabels(self):
-    with self.assertRaisesRegexp(exceptions.RequiredArgumentException,
-                                 'At least one of --update-labels or '
-                                 '--remove-labels must be specified.'):
+    with self.assertRaisesRegex(exceptions.RequiredArgumentException,
+                                'At least one of --update-labels or '
+                                '--remove-labels must be specified.'):
       self.Run('compute target-vpn-gateways update {0} --region {1}'.format(
           self.target_vpn_gateway_ref.Name(),
           self.target_vpn_gateway_ref.region))
@@ -46,7 +48,7 @@ class UpdateLabelsTestBeta(
                                                                'value4'))
 
     target_vpn_gateway = self._MakeTargetVpnGatewayProto(
-        labels=target_vpn_gateway_labels, fingerprint='fingerprint-42')
+        labels=target_vpn_gateway_labels, fingerprint=b'fingerprint-42')
     updated_target_vpn_gateway = self._MakeTargetVpnGatewayProto(
         labels=edited_labels)
 
@@ -56,7 +58,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(self.target_vpn_gateway_ref, target_vpn_gateway)
     self._ExpectLabelsSetRequest(self.target_vpn_gateway_ref, edited_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(self.target_vpn_gateway_ref,
                            updated_target_vpn_gateway)
@@ -74,7 +76,7 @@ class UpdateLabelsTestBeta(
     edited_labels = ()
 
     target_vpn_gateway = self._MakeTargetVpnGatewayProto(
-        labels=target_vpn_gateway_labels, fingerprint='fingerprint-42')
+        labels=target_vpn_gateway_labels, fingerprint=b'fingerprint-42')
     updated_target_vpn_gateway = self._MakeTargetVpnGatewayProto(
         labels=edited_labels)
 
@@ -84,7 +86,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(self.target_vpn_gateway_ref, target_vpn_gateway)
     self._ExpectLabelsSetRequest(self.target_vpn_gateway_ref, edited_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(self.target_vpn_gateway_ref,
                            updated_target_vpn_gateway)
@@ -98,7 +100,7 @@ class UpdateLabelsTestBeta(
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     target_vpn_gateway = self._MakeTargetVpnGatewayProto(
-        labels=(), fingerprint='fingerprint-42')
+        labels=(), fingerprint=b'fingerprint-42')
     updated_target_vpn_gateway = self._MakeTargetVpnGatewayProto(
         labels=update_labels)
     operation_ref = self._GetOperationRef('operation-1', 'us-central1')
@@ -107,7 +109,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(self.target_vpn_gateway_ref, target_vpn_gateway)
     self._ExpectLabelsSetRequest(self.target_vpn_gateway_ref, update_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(self.target_vpn_gateway_ref,
                            updated_target_vpn_gateway)
@@ -120,7 +122,7 @@ class UpdateLabelsTestBeta(
 
   def testRemoveWithNoLabelsOnTargetVpnGateway(self):
     target_vpn_gateway = self._MakeTargetVpnGatewayProto(
-        labels={}, fingerprint='fingerprint-42')
+        labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(self.target_vpn_gateway_ref, target_vpn_gateway)
 
@@ -135,7 +137,7 @@ class UpdateLabelsTestBeta(
     update_labels = copy.deepcopy(target_vpn_gateway_labels)
 
     target_vpn_gateway = self._MakeTargetVpnGatewayProto(
-        labels=target_vpn_gateway_labels, fingerprint='fingerprint-42')
+        labels=target_vpn_gateway_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(self.target_vpn_gateway_ref, target_vpn_gateway)
 

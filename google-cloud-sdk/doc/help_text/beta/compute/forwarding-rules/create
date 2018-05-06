@@ -13,7 +13,8 @@ SYNOPSIS
           | --target-vpn-gateway=TARGET_VPN_GATEWAY)
         [--description=DESCRIPTION] [--ip-protocol=IP_PROTOCOL]
         [--load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"]
-        [--network=NETWORK] [--subnet=SUBNET] [--subnet-region=SUBNET_REGION]
+        [--network=NETWORK] [--network-tier=NETWORK_TIER] [--subnet=SUBNET]
+        [--subnet-region=SUBNET_REGION]
         [--target-instance-zone=TARGET_INSTANCE_ZONE]
         [--target-pool-region=TARGET_POOL_REGION]
         [--target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION]
@@ -22,8 +23,7 @@ SYNOPSIS
         [--backend-service-region=BACKEND_SERVICE_REGION
           | --global-backend-service] [--global | --region=REGION]
         [--port-range=[PORT | START_PORT-END_PORT] | --ports=[PORT
-          | START_PORT-END_PORT],[[PORT | START_PORT-END_PORT],...]]
-        [GCLOUD_WIDE_FLAG ...]
+          | START_PORT-END_PORT],[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute forwarding-rules create is used to create a
@@ -85,7 +85,7 @@ REQUIRED FLAGS
           target instance must be in a zone that's in the forwarding rule's
           region. Global forwarding rules may not direct traffic to target
           instances. If not specified and the compute/zone property isn't set,
-          you will be prompted to select a zone.
+          you may be prompted to select a zone.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/zone property:
@@ -147,6 +147,10 @@ OPTIONAL FLAGS
         forwarding rule applies to. If this field is not specified, the default
         network will be used. In the absence of the default network, this field
         must be specified.
+
+     --network-tier=NETWORK_TIER
+        The network tier to assign to the forwarding rules. NETWORK_TIER must
+        be one of: PREMIUM, STANDARD. The default value is PREMIUM.
 
      --subnet=SUBNET
         (Only for --load-balancing-scheme=INTERNAL) The subnetwork that this
@@ -221,8 +225,8 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --address-region=ADDRESS_REGION
-          The region of the address to operate on. If not specified, you will
-          be prompted to select a region.
+          The region of the address to operate on. If not specified, you may be
+          prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -260,7 +264,7 @@ OPTIONAL FLAGS
 
        --region=REGION
           The region of the forwarding rule to create. If not specified, you
-          will be prompted to select a region.
+          may be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -289,7 +293,7 @@ OPTIONAL FLAGS
           Either an individual port (--port-range 80) or a range of ports
           (--port-range 3000-3100) may be specified.
 
-       --ports=[PORT | START_PORT-END_PORT],[[PORT | START_PORT-END_PORT],...]
+       --ports=[PORT | START_PORT-END_PORT],[...]
           If specified, only packets addressed to ports in the specified list
           will be forwarded. If not specified for regional forwarding rules,
           all ports are matched. This flag is required for global forwarding

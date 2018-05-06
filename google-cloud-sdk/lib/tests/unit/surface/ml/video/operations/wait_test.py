@@ -13,6 +13,9 @@
 # limitations under the License.
 """gcloud ml video operations describe unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import textwrap
 
 from apitools.base.py import encoding
@@ -91,7 +94,7 @@ class WaitTest(base.MlVideoTestBase):
     self.track = track
     error_json = {'code': 400, 'message': 'Error message.'}
     self.ExpectWaitOperationRequest('123', attempts=3, error_json=error_json)
-    with self.assertRaisesRegexp(waiter.OperationError, 'Error message.'):
+    with self.assertRaisesRegex(waiter.OperationError, 'Error message.'):
       self.Run('ml video operations wait 123')
 
 

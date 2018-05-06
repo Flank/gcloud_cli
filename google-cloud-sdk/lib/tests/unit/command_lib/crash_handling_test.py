@@ -16,6 +16,8 @@
 """Tests for error reporting."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import traceback
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.calliope import command_loading
@@ -89,7 +91,7 @@ class LogAndExceptionsAndMessages(cli_test_base.CliTestBase):
   def testHandleGcloudCrashUsageFalsePropertyWithUnicodeMessage(self):
     # disable_usage_reporting is set to False
     self.SetEncoding('utf8')
-    msg = u'Example Ṳᾔḯ¢◎ⅾℯ exception message text'
+    msg = 'Example Ṳᾔḯ¢◎ⅾℯ exception message text'
     exception = Exception(msg)
     properties.VALUES.core.disable_usage_reporting.Set(False)
     crash_handling.HandleGcloudCrash(exception)

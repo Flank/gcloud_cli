@@ -56,7 +56,7 @@ class SecurityPoliciesExportTest(test_base.BaseTest):
 
     with open(self.result_file_path) as results:
       with open(_JSON_FILE_PATH) as expected:
-        self.assertEquals(expected.readlines(), results.readlines())
+        self.assertEqual(expected.readlines(), results.readlines())
 
   def testWriteToYamlFile(self):
     with open(self.result_file_path, 'w') as yaml_file:
@@ -67,7 +67,7 @@ class SecurityPoliciesExportTest(test_base.BaseTest):
 
     with open(self.result_file_path) as results:
       with open(_YAML_FILE_PATH) as expected:
-        self.assertEquals(expected.readlines(), results.readlines())
+        self.assertEqual(expected.readlines(), results.readlines())
 
   def _ExportToFileHelper(self, expected_file, file_format='json'):
     self.make_requests.side_effect = iter([
@@ -79,7 +79,7 @@ class SecurityPoliciesExportTest(test_base.BaseTest):
 
     with open(self.result_file_path) as result:
       with open(expected_file) as expected:
-        self.assertEquals(expected.readlines(), result.readlines())
+        self.assertEqual(expected.readlines(), result.readlines())
 
   def testExportToJsonFile(self):
     self._ExportToFileHelper(_JSON_FILE_PATH)

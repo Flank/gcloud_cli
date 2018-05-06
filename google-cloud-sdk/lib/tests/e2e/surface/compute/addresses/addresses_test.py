@@ -13,12 +13,13 @@
 # limitations under the License.
 """Integration tests for creating/deleting firewalls."""
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
-class FirewallsTest(e2e_instances_test_base.InstancesTestBase):
+class AddressesTest(e2e_instances_test_base.InstancesTestBase):
 
   def SetUp(self):
     self.address_names_used = []
@@ -113,6 +114,35 @@ class FirewallsTest(e2e_instances_test_base.InstancesTestBase):
     self.Run(
         'compute addresses describe {0} --global'.format(self.address_name))
     self.AssertNewOutputContains('IPV4')
+
+
+class AddressesAlphaTest(e2e_test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.address_names_used = []
+
+  def GetAddressName(self):
+    # Make sure the name used is different on each retry, and make sure all
+    # names used are cleaned up
+    self.address_name = e2e_utils.GetResourceNameGenerator(
+        prefix='alpha-gcloud-compute-test-address').next()
+    self.address_names_used.append(self.address_name)
+
+  def TearDown(self):
+    for name in self.address_names_used:
+      self.CleanUpResource(
+          name, 'addresses', scope=e2e_test_base.EXPLICIT_GLOBAL)
+
+  def testVpcPeeringAddress(self):
+    self.GetAddressName()
+    self.Run(
+        'compute addresses create {0} --global --prefix-length 24 --purpose '
+        'VPC_PEERING --network default'.format(self.address_name))
+    self.AssertErrContains(self.address_name)
+    self.Run('compute addresses describe {0} --global'.format(
+        self.address_name))
+    self.AssertNewOutputContains('VPC_PEERING')
 
 
 if __name__ == '__main__':

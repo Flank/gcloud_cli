@@ -10,8 +10,11 @@ DESCRIPTION
     (ALPHA) List access levels.
 
 FLAGS
-     --policy=POLICY
-        The access policy you want to list the access levels for.
+     POLICY - The access policy you want to list the access levels for. This
+     represents a Cloud resource.
+
+       --policy=POLICY
+          The ID of the policy or a fully qualified identifier for the policy.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

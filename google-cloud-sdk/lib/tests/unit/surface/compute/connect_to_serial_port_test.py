@@ -148,7 +148,7 @@ class SerialPortTest(test_base.BaseSSHTest):
   def testWithIllFormattedPositionalArg(self):
     self.mock_http_request.request.return_value = PUBLIC_KEY_RESPONSE
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh_utils.ArgumentError,
         r'Expected argument of the form \[USER@\]INSTANCE. Received '
         r'\[hapoo@instance-1@instance-2\].'):

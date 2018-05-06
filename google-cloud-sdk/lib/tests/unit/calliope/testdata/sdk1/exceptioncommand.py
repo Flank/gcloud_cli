@@ -13,6 +13,8 @@
 # limitations under the License.
 """This is a command for testing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from tests.lib.apitools import http_error
@@ -33,4 +35,4 @@ class ExceptionCommand(base.Command):
           http_error.MakeHttpError(404, 'some error'))
     if args.unknown_error:
       raise ValueError('Unknown Error')
-    raise exceptions.ToolException('noarg', 'no reason', exit_code=2)
+    raise exceptions.ToolException('no reason', exit_code=2)

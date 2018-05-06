@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for gcloud app services."""
+from __future__ import absolute_import
 from googlecloudsdk.core import properties
 from tests.lib.surface.app import operations_base
 
@@ -25,8 +26,8 @@ class OperationsWaitTest(operations_base.OperationsTestBase):
 
   def testWait_NoProject(self):
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app operations wait o1')
 
   def testWaitOnFinishedCommand(self):
@@ -46,8 +47,8 @@ class OperationsWaitTest(operations_base.OperationsTestBase):
 
     # Wait command returns the finished command.
     self.assertTrue(op.done)
-    self.assertEquals(op.name, 'apps/{}/operations/o1'.format(self.Project()))
+    self.assertEqual(op.name, 'apps/{}/operations/o1'.format(self.Project()))
     props = op.metadata.additionalProperties
-    self.assertEquals(len(props), 1)
-    self.assertEquals(props[0].key, 'insertTime')
-    self.assertEquals(props[0].value, self.default_start_time)
+    self.assertEqual(len(props), 1)
+    self.assertEqual(props[0].key, 'insertTime')
+    self.assertEqual(props[0].value, self.default_start_time)

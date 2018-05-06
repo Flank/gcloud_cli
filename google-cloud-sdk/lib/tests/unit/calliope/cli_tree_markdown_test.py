@@ -14,10 +14,13 @@
 
 """Tests for calliope.cli_tree_markdown module."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 import difflib
+import io
 import json
 import os
-import StringIO
 
 from googlecloudsdk.calliope import cli_tree
 from googlecloudsdk.calliope import cli_tree_markdown
@@ -40,7 +43,7 @@ def GenerateMarkdownFromCliTree(command, root, directory):
     render_document.RenderDocument(
         style='markdown',
         title=' '.join(command[cli_tree.LOOKUP_PATH]),
-        fin=StringIO.StringIO(md),
+        fin=io.StringIO(md),
         out=f)
   for cmd in command[cli_tree.LOOKUP_COMMANDS].values():
     GenerateMarkdownFromCliTree(cmd, root, directory)
@@ -57,8 +60,8 @@ class Accumulator(help_util.DiffAccumulator):
       old_lines = old_contents.split('\n')
       new_lines = new_contents.split('\n')
       diff_lines = difflib.unified_diff(old_lines, new_lines)
-      print '<<<REGRESSION {}>>>'.format(relative_file)
-      print '\n'.join(diff_lines)
+      print('<<<REGRESSION {}>>>'.format(relative_file))
+      print('\n'.join(diff_lines))
     return None
 
 
@@ -89,7 +92,7 @@ class CliTreeMarkdownTest(calliope_test_base.CalliopeTestBase,
     tree_directory = os.path.join(self.temp_path, 'tree')
     files.MakeDir(tree_directory)
     internal_tree = walker_util.GCloudTreeGenerator(self.cli).Walk()
-    external_tree = StringIO.StringIO()
+    external_tree = io.StringIO()
     resource_printer.Print(
         resources=internal_tree, print_format='json', out=external_tree)
     tree = json.loads(external_tree.getvalue())
@@ -157,7 +160,7 @@ The gcloud shell.
 
 Exit the shell.
 """
-    self.assertEquals(expected, md)
+    self.assertEqual(expected, md)
 
 
 if __name__ == '__main__':

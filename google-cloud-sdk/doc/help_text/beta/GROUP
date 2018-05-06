@@ -101,6 +101,9 @@ GROUPS
      billing
         (BETA) Manage billing accounts and associate them with projects.
 
+     composer
+        (BETA) Cloud Composer command groups.
+
      compute
         (BETA) Create and manipulate Google Compute Engine resources.
 
@@ -173,6 +176,9 @@ GROUPS
      pubsub
         (BETA) Manage Cloud Pub/Sub topics and subscriptions.
 
+     redis
+        (BETA) Manage Cloud Memorystore Redis resources.
+
      resource-manager
         (BETA) Manage Cloud Resources.
 
@@ -190,6 +196,9 @@ GROUPS
 
      sql
         (BETA) Create and manage Google Cloud SQL databases.
+
+     tasks
+        (BETA) Manage Cloud Tasks queues and tasks.
 
 COMMANDS
     COMMAND is one of the following:

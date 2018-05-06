@@ -14,7 +14,7 @@
 
 """Unit tests for api_lib.app.runtime_builders."""
 
-import cStringIO
+import io
 import re
 
 from googlecloudsdk.api_lib.app import runtime_builders
@@ -138,7 +138,7 @@ class BuilderReferenceTest(sdk_test_base.WithOutputCapture,
     builder_path = 'gs://mybucket/erlang-v2.yaml'
     read_object_mock = self.StartObjectPatch(
         storage_api.StorageClient, 'ReadObject', side_effect=
-        lambda x: cStringIO.StringIO(BuilderReferenceTest.BUILD_FILE))
+        lambda x: io.BytesIO(BuilderReferenceTest.BUILD_FILE.encode('utf-8')))
     br = runtime_builders.BuilderReference(builder_path, builder_path)
     self.assertEqual(br.runtime, builder_path)
     self.assertEqual(
@@ -186,7 +186,7 @@ class BuilderReferenceTest(sdk_test_base.WithOutputCapture,
   def testUnsupportedPath(self):
     for root in ('bad-url', 'badprotocol://bad-url', 'http://foo'):
       path = root + '/erlang-v2.yaml'
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           runtime_builders.InvalidRuntimeBuilderURI,
           re.escape('[{}] is not a valid runtime builder URI'.format(path))):
         br = runtime_builders.BuilderReference('foo', path)
@@ -199,7 +199,7 @@ class BuilderReferenceTest(sdk_test_base.WithOutputCapture,
       br.LoadCloudBuild({'_OUTPUT_IMAGE': 'gcr.io/my/image',
                          '_GAE_APPLICATION_YAML_PATH': 'app.yaml'})
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         runtime_builders.CloudBuildLoadError,
         r'There is no build file associated with runtime \[foo\]'):
       br = runtime_builders.BuilderReference('foo', None)
@@ -235,7 +235,7 @@ class ManifestTest(sdk_test_base.WithFakeAuth):
                contents=ManifestTest.MANIFEST_FILE)
     self.StartObjectPatch(
         storage_api.StorageClient, 'ReadObject', side_effect=
-        lambda x: cStringIO.StringIO(ManifestTest.MANIFEST_FILE))
+        lambda x: io.BytesIO(ManifestTest.MANIFEST_FILE.encode('utf-8')))
     for builder_root in [_URLFromFile(self.temp_path), 'gs://mybucket']:
       m = runtime_builders.Manifest.LoadFromURI(builder_root + '/runtimes.yaml')
       self.assertEqual(m._data, yaml.load(ManifestTest.MANIFEST_FILE))
@@ -269,12 +269,12 @@ class ManifestTest(sdk_test_base.WithFakeAuth):
   def testSchemaVersion(self):
     runtime_builders.Manifest('gs://runtimes.yaml', {'schema_version': 0})
     runtime_builders.Manifest('gs://runtimes.yaml', {'schema_version': 1})
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         runtime_builders.ManifestError,
         r'Your client supports schema version \[{supported}\] but requires '
         r'\[2\]'.format(supported=runtime_builders.Manifest.SCHEMA_VERSION)):
       runtime_builders.Manifest('gs://runtimes.yaml', {'schema_version': 2})
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         runtime_builders.ManifestError,
         r'Unable to parse the runtimes manifest: \[gs://runtimes.yaml\]'):
       runtime_builders.Manifest('gs://runtimes.yaml', {})
@@ -286,7 +286,7 @@ class ManifestTest(sdk_test_base.WithFakeAuth):
          'runtimes': {
              'foo': {'target': {'runtime': 'bar'}},
              'bar': {'target': {'runtime': 'foo'}}}})
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         runtime_builders.ManifestError,
         r'A circular dependency was found while resolving the builder for '
         r'runtime \[foo\]'):
@@ -351,7 +351,7 @@ class ResolverTest(sdk_test_base.SdkBase):
     self.StartObjectPatch(
         runtime_builders, '_Read',
         side_effect=runtime_builders.FileReadError('No manifest'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         runtime_builders.BuilderResolveError,
         r'Unable to resolve a builder for runtime: \[erlang\]'):
       self._GetReferenceFromYaml("""\
@@ -382,7 +382,7 @@ class ResolverTest(sdk_test_base.SdkBase):
         runtime_builders.BuilderReference('fortran', path))
 
   def testResolutionFailed(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         runtime_builders.BuilderResolveError,
         r'Unable to resolve a builder for runtime: \[asdf\]'):
       self._GetReferenceFromYaml("""\
@@ -462,6 +462,16 @@ class RuntimeBuilderStrategyTest(test_case.TestCase):
     self.assertFalse(strategy.ShouldUseRuntimeBuilders('test-beta', False))
     self.assertTrue(strategy.ShouldUseRuntimeBuilders('custom', True))
     self.assertFalse(strategy.ShouldUseRuntimeBuilders('custom', False))
+
+    # Test that python regex is correct
+    self.assertTrue(strategy.ShouldUseRuntimeBuilders('python', True))
+    self.assertTrue(strategy.ShouldUseRuntimeBuilders('python', False))
+    self.assertFalse(strategy.ShouldUseRuntimeBuilders('pythonFoo', True))
+    self.assertFalse(strategy.ShouldUseRuntimeBuilders('pythonFoo', False))
+    self.assertTrue(strategy.ShouldUseRuntimeBuilders('python-compat', True))
+    self.assertTrue(strategy.ShouldUseRuntimeBuilders('python-compat', False))
+    self.assertTrue(strategy.ShouldUseRuntimeBuilders('python-staging', True))
+    self.assertTrue(strategy.ShouldUseRuntimeBuilders('python-staging', False))
 
   def testShouldUseRuntimeBuilders_Never(self):
     strategy = runtime_builders.RuntimeBuilderStrategy.NEVER

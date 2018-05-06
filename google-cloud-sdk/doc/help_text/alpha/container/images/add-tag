@@ -2,22 +2,23 @@ NAME
     gcloud alpha container images add-tag - adds tags to existing image
 
 SYNOPSIS
-    gcloud alpha container images add-tag SRC_IMAGE DEST_IMAGE
+    gcloud alpha container images add-tag SRC_IMAGE DEST_IMAGE [DEST_IMAGE ...]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) The container images add-tag command adds the tag specified in the
-    second tag parameter to the image referenced in the first tag parameter.
-    Repositories must be hosted by the Google Container Registry.
+    (ALPHA) The container images add-tag command adds the tag(s) specified in
+    the second (and following) tag parameter(s) to the image referenced in the
+    first tag parameter. Repositories must be hosted by the Google Container
+    Registry.
 
 POSITIONAL ARGUMENTS
      SRC_IMAGE
-        The fully qualified name(s) of image(s) to add a tag for. The name(s)
+        The fully qualified name(s) of image(s) to add tags for. The name(s)
         should be formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH@sha256:DIGEST or
         *.gcr.io/PROJECT_ID/IMAGE_PATH:TAG.
 
-     DEST_IMAGE
-        The fully qualified name(s) of image(s) to be the new tag. The name(s)
+     DEST_IMAGE [DEST_IMAGE ...]
+        The fully qualified name(s) of image(s) to be the new tags. The name(s)
         should be formatted as *.gcr.io/PROJECT_ID/IMAGE_PATH:TAG.
 
 GCLOUD WIDE FLAGS

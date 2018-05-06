@@ -14,10 +14,13 @@
 
 """Unit tests for manifests list command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 messages = apis.GetMessagesModule('deploymentmanager', 'v2')
 
@@ -68,7 +71,7 @@ class ManifestsListTest(unit_test_base.DmV2UnitTestBase):
     result = self.Run('deployment-manager manifests list --deployment '
                       + DEPLOYMENT_NAME)
     result = list(result)  # consume generator
-    self.assertEquals(manifests, result)
+    self.assertEqual(manifests, result)
 
   def testManifestsList_EmptyList(self):
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -100,7 +103,7 @@ class ManifestsListTest(unit_test_base.DmV2UnitTestBase):
     result = self.Run('deployment-manager manifests list --deployment '
                       + DEPLOYMENT_NAME + ' --limit ' + str(limit))
     result = list(result)  # consume generator
-    self.assertEquals(manifests[:limit], result)
+    self.assertEqual(manifests[:limit], result)
 
 if __name__ == '__main__':
   test_case.main()

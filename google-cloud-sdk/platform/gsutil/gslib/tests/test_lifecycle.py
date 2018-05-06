@@ -25,8 +25,8 @@ import gslib.tests.testcase as testcase
 from gslib.tests.testcase.integration_testcase import SkipForS3
 from gslib.tests.util import ObjectToURI as suri
 from gslib.tests.util import unittest
-from gslib.translation_helper import LifecycleTranslation
-from gslib.util import Retry
+from gslib.utils.retry_util import Retry
+from gslib.utils.translation_helper import LifecycleTranslation
 
 
 @SkipForS3('Lifecycle command is only supported for gs:// URLs')
@@ -62,6 +62,10 @@ class TestSetLifecycle(testcase.GsUtilIntegrationTestCase):
       '{"rule": [{"action": {"type": "Delete"}, "condition": '
       '{"createdBefore": "2014-10-01"}}]}\n')
   lifecycle_created_before_json_obj = json.loads(lifecycle_created_before_doc)
+
+  lifecycle_with_falsy_condition_values = (
+      '{"rule": [{"action": {"type": "Delete"}, "condition": {'
+      '"age": 0, "isLive": false, "numNewerVersions": 0}}]}')
 
   no_lifecycle_config = 'has no lifecycle configuration.'
 
@@ -130,6 +134,21 @@ class TestSetLifecycle(testcase.GsUtilIntegrationTestCase):
     stderr = self.RunGsUtil(['lifecycle', 'set', fpath, suri(bucket_uri)],
                             expected_status=1, return_stderr=True)
     self.assertIn('XML lifecycle data provided', stderr)
+
+  def test_translation_for_falsy_values_works_correctly(self):
+    bucket_uri = self.CreateBucket()
+    fpath = self.CreateTempFile(
+        contents=self.lifecycle_with_falsy_condition_values)
+
+    self.RunGsUtil(['lifecycle', 'set', fpath, suri(bucket_uri)])
+    stdout = self.RunGsUtil(
+        ['lifecycle', 'get', suri(bucket_uri)], return_stdout=True)
+
+    # The lifecycle policy we fetch should include all the False- and 0-valued
+    # attributes that we just set.
+    self.assertRegexpMatches(stdout, r'"age":\s+0')
+    self.assertRegexpMatches(stdout, r'"isLive":\s+false')
+    self.assertRegexpMatches(stdout, r'"numNewerVersions":\s+0')
 
   def test_set_lifecycle_and_reset(self):
     """Tests setting and turning off lifecycle configuration."""

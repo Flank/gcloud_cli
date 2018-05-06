@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the target-ssl-proxies update subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -199,22 +201,6 @@ class TargetSSLProxiesUpdateGATest(test_base.BaseTest):
                      ProxyHeaderValueValuesEnum.PROXY_V1))))
     ])
 
-  def testWithoutArgs(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        'You must specify at least one of '
-        r'\[--ssl-certificates\], \[--backend-service\] or '
-        r'\[--proxy-header\].'):
-      self.Run("""
-          compute target-ssl-proxies update my-proxy
-          """)
-    self.CheckRequests()
-
-
-class TargetSSLProxiesUpdateBetaTest(TargetSSLProxiesUpdateGATest):
-
-  def SetUp(self):
-    self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
-
   def testSimpleCaseWithSslPolicy(self):
     messages = self.messages
     self.Run("""
@@ -296,6 +282,12 @@ class TargetSSLProxiesUpdateBetaTest(TargetSSLProxiesUpdateGATest):
           --clear-ssl-policy
           """)
     self.CheckRequests()
+
+
+class TargetSSLProxiesUpdateBetaTest(TargetSSLProxiesUpdateGATest):
+
+  def SetUp(self):
+    self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
 
 
 class TargetSSLProxiesUpdateAlphaTest(TargetSSLProxiesUpdateBetaTest):

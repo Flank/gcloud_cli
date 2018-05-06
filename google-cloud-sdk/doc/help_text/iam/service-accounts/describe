@@ -30,7 +30,8 @@ EXAMPLES
         $ gcloud iam service-accounts describe my-iam-account@somedomain.com
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam service-accounts describe
         $ gcloud beta iam service-accounts describe
 

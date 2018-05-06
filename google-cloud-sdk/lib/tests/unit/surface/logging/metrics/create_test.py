@@ -75,7 +75,7 @@ class MetricsCreateBetaTest(base.LoggingTestBase, sdk_test_base.WithTempCWD):
     self.AssertOutputContains('')
     self.AssertErrContains('Created [my-metric]')
 
-  def testCreateMetricFromFile(self):
+  def testCreateMetricFromYamlFile(self):
     msgs = util.GetMessages()
     new_metric = msgs.LogMetric(
         name='my-metric',
@@ -109,9 +109,46 @@ class MetricsCreateBetaTest(base.LoggingTestBase, sdk_test_base.WithTempCWD):
                                        'metrics', 'testdata', 'config.yaml')
     ))
 
+  def testCreateMetricFromJsonFile(self):
+    msgs = util.GetMessages()
+    # The only difference in this 'expected' type from the one in the YAML test
+    # is that it has unicode strings (u'xxx') in some additional places to match
+    # what is produced when parsing JSON.
+    new_metric = msgs.LogMetric(
+        name='my-metric',
+        description=u'My fun filter.',
+        filter=u'severity>=ERROR',
+        labelExtractors=msgs.LogMetric.LabelExtractorsValue(
+            additionalProperties=[
+                msgs.LogMetric.LabelExtractorsValue.AdditionalProperty(
+                    key='label1', value=u'REGEXP_EXTRACT(jsonPayload.request, '
+                    '"before ([a-zA-Z ]+) after")')]
+        ),
+        metricDescriptor=msgs.MetricDescriptor(
+            displayName=u'displayname',
+            valueType=msgs.MetricDescriptor.ValueTypeValueValuesEnum.DOUBLE,
+            labels=[
+                msgs.LabelDescriptor(
+                    description=None,
+                    key=u'label1',
+                    valueType=msgs.LabelDescriptor
+                    .ValueTypeValueValuesEnum.STRING)
+            ],
+            metricKind=msgs.MetricDescriptor.MetricKindValueValuesEnum.DELTA),
+        valueExtractor=u'REGEXP_EXTRACT(jsonPayload.request, '
+        '".*quantity=(\d+).*")')  # pylint: disable=anomalous-backslash-in-string
+    self.mock_client_v2.projects_metrics.Create.Expect(
+        msgs.LoggingProjectsMetricsCreateRequest(
+            parent='projects/my-project', logMetric=new_metric),
+        new_metric)
+    self.RunLogging('metrics create my-metric --config-from-file {}'.format(
+        sdk_test_base.SdkBase.Resource('tests', 'unit', 'surface', 'logging',
+                                       'metrics', 'testdata', 'config.json')
+    ))
+
   def testCreateMetricBadFile(self):
     self.Touch(self.cwd_path, 'bad.yaml', contents='[')
-    with self.assertRaisesRegexp(yaml.Error, 'Failed to parse YAML'):
+    with self.assertRaisesRegex(yaml.Error, 'Failed to parse YAML'):
       self.RunLogging('metrics create my-metric --config-from-file {}'.format(
           os.path.join(self.cwd_path, 'bad.yaml')))
 

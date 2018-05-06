@@ -42,10 +42,6 @@ class MakeRequestsTest(test_case.TestCase):
 
     self.compute_v1 = apis.GetClientInstance('compute', 'v1', no_http=True)
     self.messages = apis.GetMessagesModule('compute', 'v1')
-    self.clouduseraccounts = apis.GetClientInstance('clouduseraccounts', 'beta',
-                                                    no_http=True)
-    self.clouduseraccounts_messages = apis.GetMessagesModule(
-        'clouduseraccounts', 'beta')
 
     http_patcher = mock.patch('googlecloudsdk.core.credentials.http.Http',
                               autospec=True)
@@ -842,82 +838,6 @@ class MakeRequestsTest(test_case.TestCase):
                 http=self.mock_http,
                 batch_url='https://www.googleapis.com/batch/compute'),
         ])
-
-  def testWithAsynchronousClouduseraccountsRequestsOnly(self):
-    operations = [
-        self.clouduseraccounts_messages.Operation(
-            kind='clouduseraccounts#operation',
-            name='operation-1',
-            operationType='insert',
-            status=(self.clouduseraccounts_messages.Operation.
-                    StatusValueValuesEnum.DONE),
-            progress=0),
-        self.clouduseraccounts_messages.Operation(
-            kind='clouduseraccounts#operation',
-            name='operation-2',
-            operationType='insert',
-            status=(self.clouduseraccounts_messages.Operation.
-                    StatusValueValuesEnum.DONE),
-            progress=100),
-    ]
-    wait_response = [
-        self.clouduseraccounts_messages.User(name='user1'),
-        self.clouduseraccounts_messages.User(name='user2'),
-    ]
-
-    self.batch_helper.side_effect = iter([
-        (operations, []),
-    ])
-    self.wait_for_operations.side_effect = iter([
-        wait_response,
-    ])
-
-    requests = [
-        (self.clouduseraccounts.users,
-         'Insert',
-         self.clouduseraccounts_messages.ClouduseraccountsUsersInsertRequest(
-             project='my-project',
-             user=self.clouduseraccounts_messages.User(
-                 name='user1',
-                 description='this is a test',
-                 owner='me@google.com'),)),
-        (self.clouduseraccounts.users,
-         'Insert',
-         self.clouduseraccounts_messages.ClouduseraccountsUsersInsertRequest(
-             project='my-project',
-             user=self.clouduseraccounts_messages.User(
-                 name='user2',
-                 description='this is a test',
-                 owner='me@google.com'),))
-
-    ]
-
-    errors = []
-    responses = request_helper.MakeRequests(
-        requests=requests,
-        http=self.mock_http,
-        batch_url='https://www.googleapis.com/batch/compute',
-        errors=errors)
-
-    self.assertEqual(list(responses), wait_response)
-    self.assertFalse(errors)
-    self.batch_helper.assert_called_once_with(
-        requests=requests,
-        http=self.mock_http,
-        batch_url='https://www.googleapis.com/batch/compute')
-    operations_data = []
-    for operation in operations:
-      operations_data.append(
-          waiters.OperationData(operation, 'my-project',
-                                self.clouduseraccounts.globalAccountsOperations,
-                                self.clouduseraccounts.users))
-    self.wait_for_operations.assert_called_once_with(
-        operations_data=operations_data,
-        http=self.mock_http,
-        batch_url='https://www.googleapis.com/batch/compute',
-        progress_tracker=None,
-        warnings=[],
-        errors=[])
 
 
 class ListJsonTests(test_case.TestCase):

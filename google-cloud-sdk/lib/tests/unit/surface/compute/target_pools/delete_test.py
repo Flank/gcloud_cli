@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the target-pools delete subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from tests.lib import test_case

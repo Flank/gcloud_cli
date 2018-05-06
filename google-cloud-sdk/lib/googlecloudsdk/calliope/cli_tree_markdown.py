@@ -39,12 +39,26 @@ Usage:
   markdown = generator.Edit()
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import cli_tree
 from googlecloudsdk.calliope import markdown
 from googlecloudsdk.calliope import usage_text
 from googlecloudsdk.core import properties
+
+import six
+
+
+if six.PY2:
+  FLAG_TYPE_NAME = b'flag'
+  POSITIONAL_TYPE_NAME = b'positional'
+  GROUP_TYPE_NAME = b'group'
+else:
+  FLAG_TYPE_NAME = 'flag'
+  POSITIONAL_TYPE_NAME = 'positional'
+  GROUP_TYPE_NAME = 'group'
 
 
 def _GetReleaseTrackFromId(release_id):
@@ -56,7 +70,7 @@ def _GetReleaseTrackFromId(release_id):
 
 def Flag(d):
   """Returns a flag object suitable for the calliope.markdown module."""
-  flag = type('flag', (object,), d)
+  flag = type(FLAG_TYPE_NAME, (object,), d)
   flag.is_group = False
   flag.is_hidden = d.get(cli_tree.LOOKUP_IS_HIDDEN, d.get('hidden', False))
   flag.hidden = flag.is_hidden
@@ -100,7 +114,7 @@ def Flag(d):
 
 def Positional(d):
   """Returns a positional object suitable for the calliope.markdown module."""
-  positional = type('positional', (object,), d)
+  positional = type(POSITIONAL_TYPE_NAME, (object,), d)
   positional.help = positional.description
   positional.is_group = False
   positional.is_hidden = False
@@ -122,7 +136,7 @@ def Argument(d):
     return Positional(d)
   if not d.get(cli_tree.LOOKUP_IS_GROUP, False):
     return Flag(d)
-  group = type('group', (object,), d)
+  group = type(GROUP_TYPE_NAME, (object,), d)
   group.arguments = [Argument(a) for a in d.get(cli_tree.LOOKUP_ARGUMENTS, [])]
   group.category = None
   group.help = group.description
@@ -216,8 +230,8 @@ class CliTreeMarkdownGenerator(markdown.MarkdownGenerator):
                                  subcommand.get('hidden', False)),
         release_track=_GetReleaseTrackFromId(
             subcommand[cli_tree.LOOKUP_RELEASE]))
-            for name, subcommand in self._command[
-                cli_tree.LOOKUP_COMMANDS].iteritems()
+            for name, subcommand in six.iteritems(self._command[
+                cli_tree.LOOKUP_COMMANDS])
             if subcommand[cli_tree.LOOKUP_IS_GROUP] == is_group}
 
   def GetSubCommandHelp(self):

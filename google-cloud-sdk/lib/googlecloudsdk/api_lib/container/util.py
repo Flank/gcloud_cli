@@ -13,9 +13,10 @@
 # limitations under the License.
 
 """Common utilities for the containers tool."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 import os
-import StringIO
-import distutils.version as dist_version
 
 
 from googlecloudsdk.api_lib.container import kubeconfig as kconfig
@@ -27,7 +28,6 @@ from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import platforms
-
 
 CLUSTERS_FORMAT = """
     table(
@@ -73,7 +73,7 @@ class Error(core_exceptions.Error):
 
 
 def ConstructList(title, items):
-  buf = StringIO.StringIO()
+  buf = io.StringIO()
   resource_printer.Print(items, 'list[title="{0}"]'.format(title), out=buf)
   return buf.getvalue()
 
@@ -112,8 +112,6 @@ def GenerateClusterUrl(cluster_ref):
 
 KUBECONFIG_USAGE_FMT = '''\
 kubeconfig entry generated for {cluster}.'''
-
-MIN_GCP_AUTH_PROVIDER_VERSION = '1.3.0'
 
 
 class MissingEndpointError(Error):
@@ -194,11 +192,8 @@ class ClusterConfig(object):
     return self.ca_data
 
   @staticmethod
-  def UseGCPAuthProvider(cluster):
-    return (cluster.currentMasterVersion and
-            dist_version.LooseVersion(cluster.currentMasterVersion) >=
-            dist_version.LooseVersion(MIN_GCP_AUTH_PROVIDER_VERSION) and
-            not properties.VALUES.container.use_client_certificate.GetBool())
+  def UseGCPAuthProvider():
+    return not properties.VALUES.container.use_client_certificate.GetBool()
 
   @staticmethod
   def GetConfigDir(cluster_name, zone_id, project_id):
@@ -272,7 +267,7 @@ class ClusterConfig(object):
       # state.
       log.warning('Cluster is missing certificate authority data.')
 
-    if cls.UseGCPAuthProvider(cluster):
+    if cls.UseGCPAuthProvider():
       kwargs['auth_provider'] = 'gcp'
     else:
       if auth.clientCertificate and auth.clientKey:

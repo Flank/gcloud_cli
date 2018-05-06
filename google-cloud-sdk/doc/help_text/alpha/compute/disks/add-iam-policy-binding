@@ -35,7 +35,7 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --zone=ZONE
         The zone of the disk to add the IAM policy binding to. If not specified
-        and the compute/zone property isn't set, you will be prompted to select
+        and the compute/zone property isn't set, you may be prompted to select
         a zone.
 
         To avoid prompting when this flag is omitted, you can set the

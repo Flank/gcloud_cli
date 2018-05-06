@@ -14,6 +14,8 @@
 
 """Helpers for tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.protorpclite import messages
 from apitools.base.py import base_api
 
@@ -112,86 +114,86 @@ class Base(sdk_test_base.SdkBase):
       if is_relative:
         flat_params, flat_path = self._FlatPath(collection_name)
         get_method = base_api.ApiMethodInfo(
-            flat_path=u'v1/' + flat_path,
-            http_method=u'GET',
-            method_id=full_collection_name + u'.get',
-            ordered_params=[u'name'],
-            path_params=[u'name'],
+            flat_path='v1/' + flat_path,
+            http_method='GET',
+            method_id=full_collection_name + '.get',
+            ordered_params=['name'],
+            path_params=['name'],
             query_params=[],
-            relative_path=u'v1/{+name}',
+            relative_path='v1/{+name}',
             request_field='',
-            request_type_name=u'GetRequest',
-            response_type_name=u'GetResponse',
+            request_type_name='GetRequest',
+            response_type_name='GetResponse',
             supports_download=False,
         )
         flat_params, flat_path = self._FlatPath(collection_name, parent=True)
         last_part = full_collection_name.split('.')[-1]
         create_method = base_api.ApiMethodInfo(
-            flat_path=u'v1/' + flat_path + u'/' + last_part,
-            http_method=u'POST',
-            method_id=full_collection_name + u'.create',
-            ordered_params=[u'parent'],
-            path_params=[u'parent'],
+            flat_path='v1/' + flat_path + '/' + last_part,
+            http_method='POST',
+            method_id=full_collection_name + '.create',
+            ordered_params=['parent'],
+            path_params=['parent'],
             query_params=[],
-            relative_path=u'v1/{+parent}/' + last_part,
+            relative_path='v1/{+parent}/' + last_part,
             request_field=last_part[:-1],
-            request_type_name=u'CreateRequest',
-            response_type_name=u'CreateResponse',
+            request_type_name='CreateRequest',
+            response_type_name='CreateResponse',
             supports_download=False,
         )
         list_method = base_api.ApiMethodInfo(
-            flat_path=u'v1/' + flat_path + u'/' + last_part,
-            http_method=u'GET',
-            method_id=full_collection_name + u'.list',
-            ordered_params=[u'parent'],
-            path_params=[u'parent'],
-            query_params=[u'pageSize', u'pageToken'],
-            relative_path=u'v1/{+parent}/' + last_part,
+            flat_path='v1/' + flat_path + '/' + last_part,
+            http_method='GET',
+            method_id=full_collection_name + '.list',
+            ordered_params=['parent'],
+            path_params=['parent'],
+            query_params=['pageSize', 'pageToken'],
+            relative_path='v1/{+parent}/' + last_part,
             request_field='',
-            request_type_name=u'ListRequest',
-            response_type_name=u'ListResponse',
+            request_type_name='ListRequest',
+            response_type_name='ListResponse',
             supports_download=False,
         )
 
       else:
         flat_params, flat_path = self._FlatPath(collection_name)
         get_method = base_api.ApiMethodInfo(
-            http_method=u'GET',
-            method_id=full_collection_name + u'.get',
+            http_method='GET',
+            method_id=full_collection_name + '.get',
             ordered_params=flat_params,
             path_params=flat_params,
             query_params=[],
             relative_path=flat_path,
             request_field='',
-            request_type_name=u'GetRequest',
-            response_type_name=u'GetResponse',
+            request_type_name='GetRequest',
+            response_type_name='GetResponse',
             supports_download=False,
         )
         flat_params, flat_path = self._FlatPath(collection_name,
                                                 parent=True)
         last_part = full_collection_name.split('.')[-1]
         create_method = base_api.ApiMethodInfo(
-            http_method=u'POST',
-            method_id=full_collection_name + u'.create',
+            http_method='POST',
+            method_id=full_collection_name + '.create',
             ordered_params=flat_params,
             path_params=flat_params,
             query_params=[],
-            relative_path=flat_path + u'/' + last_part,
+            relative_path=flat_path + '/' + last_part,
             request_field=last_part[:-1],
-            request_type_name=u'CreateRequest',
-            response_type_name=u'CreateResponse',
+            request_type_name='CreateRequest',
+            response_type_name='CreateResponse',
             supports_download=False,
         )
         list_method = base_api.ApiMethodInfo(
-            http_method=u'GET',
-            method_id=full_collection_name + u'.list',
+            http_method='GET',
+            method_id=full_collection_name + '.list',
             ordered_params=flat_params,
             path_params=flat_params,
-            query_params=[u'pageSize', u'pageToken'],
-            relative_path=flat_path + u'/' + last_part,
+            query_params=['pageSize', 'pageToken'],
+            relative_path=flat_path + '/' + last_part,
             request_field='',
-            request_type_name=u'GetRequest',
-            response_type_name=u'GetResponse',
+            request_type_name='GetRequest',
+            response_type_name='GetResponse',
             supports_download=False,
         )
 

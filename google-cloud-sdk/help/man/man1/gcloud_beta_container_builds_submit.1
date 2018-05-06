@@ -34,7 +34,9 @@ At most one of these may be specified:
 The source directory on local disk or tarball in Google Cloud Storage or disk to
 use for this build. If source is a local directory this command skips files
 specified in the \f5.gcloudignore\fR file (see \f5$ gcloud topic gcloudignore\fR
-for more information).
+for more information). If a .gitignore file is present in the local source
+directory, gcloud will use a Git\-compatible .gcloudignore file that respects
+your .gitignore\-ed files. The global .gitignore is not respected.
 
 .TP 2m
 \fB\-\-no\-source\fR

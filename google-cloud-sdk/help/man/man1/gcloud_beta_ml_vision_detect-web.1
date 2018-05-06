@@ -11,7 +11,7 @@ gcloud beta ml vision detect\-web \- detect entities in an image from similar im
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml vision detect\-web\fR \fIIMAGE_PATH\fR [\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml vision detect\-web\fR \fIIMAGE_PATH\fR [\fB\-\-include\-geo\-results\fR] [\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR] [\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR;\ default="builtin/stable"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -39,8 +39,17 @@ Vision. If you provide a URL, it must be in Google Cloud Storage format
 
 .RS 2m
 .TP 2m
+\fB\-\-include\-geo\-results\fR
+Whether to include results derived from the geo information in the image.
+
+.TP 2m
 \fB\-\-max\-results\fR=\fIMAX_RESULTS\fR
 The maximum number of results to be provided.
+
+.TP 2m
+\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR; default="builtin/stable"
+The model version to use for the feature. Supported values include
+"builtin/stable" and "builtin/latest".
 
 
 .RE

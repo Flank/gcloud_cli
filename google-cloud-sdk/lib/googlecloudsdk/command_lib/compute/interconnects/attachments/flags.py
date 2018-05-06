@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Flags and helpers for the compute interconnects commands."""
+from __future__ import absolute_import
 from collections import OrderedDict
 
 from googlecloudsdk.calliope import arg_parsers
@@ -145,21 +146,24 @@ def AddPartnerAsn(parser):
 
 def AddPartnerMetadata(parser, required=True):
   """Adds partner metadata flags to the argparse.ArgumentParser."""
-  parser.add_argument(
+  group = parser.add_group(mutex=False,
+                           required=required,
+                           help='Partner metadata.')
+  group.add_argument(
       '--partner-name',
       required=required,
       help="""\
       Plain text name of the Partner providing this attachment. This value may
       be validated to match approved Partner values.
       """)
-  parser.add_argument(
+  group.add_argument(
       '--partner-interconnect-name',
       required=required,
       help="""\
       Plain text name of the Interconnect this attachment is connected to, as
       displayed in the Partner's portal. For instance "Chicago 1".
       """)
-  parser.add_argument(
+  group.add_argument(
       '--partner-portal-url',
       required=required,
       help="""\

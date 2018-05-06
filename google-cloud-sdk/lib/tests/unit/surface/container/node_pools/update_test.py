@@ -14,6 +14,8 @@
 
 """Tests for 'node-pools delete' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.calliope import exceptions
@@ -64,9 +66,9 @@ class UpdateTestV1API(base.TestBaseV1,
                  ' update {0} --cluster={1} --enable-autorepair ' +
                  '--format=disable')
     result = self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
-    self.assertEquals(result.name, pool.name)
-    self.assertEquals(result.management.autoRepair, True)
-    self.assertEquals(result.management.autoUpgrade, None)
+    self.assertEqual(result.name, pool.name)
+    self.assertEqual(result.management.autoRepair, True)
+    self.assertEqual(result.management.autoUpgrade, None)
 
     self.AssertErrContains("""This will enable the autorepair feature for \
 nodes. Please see
@@ -77,6 +79,9 @@ information on node autorepairs.
 <END PROGRESS TRACKER>SUCCESS
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/{1}/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION, location))
+
+  def testRegionalEnableAutoRepair(self):
+    self._TestEnableAutoRepair(self.REGION)
 
   def testDisableAutoRepair(self):
     pool_kwargs = {
@@ -102,9 +107,9 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/{1}
                ' update {0} --cluster={1} --no-enable-autorepair ' +
                '--format=disable')
     result = self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
-    self.assertEquals(result.name, pool.name)
-    self.assertEquals(result.management.autoRepair, False)
-    self.assertEquals(result.management.autoUpgrade, True)
+    self.assertEqual(result.name, pool.name)
+    self.assertEqual(result.management.autoRepair, False)
+    self.assertEqual(result.management.autoUpgrade, True)
     self.AssertErrContains("""This will disable the autorepair feature for \
 nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more
@@ -139,8 +144,8 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
                ' update {0} --cluster={1} --enable-autoupgrade ' +
                '--format=disable')
     result = self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
-    self.assertEquals(result.management.autoRepair, None)
-    self.assertEquals(result.management.autoUpgrade, True)
+    self.assertEqual(result.management.autoRepair, None)
+    self.assertEqual(result.management.autoUpgrade, True)
     self.AssertErrContains("""This will enable the autoupgrade feature for \
 nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-management for more
@@ -175,8 +180,8 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
                ' update {0} --cluster={1} --no-enable-autoupgrade ' +
                '--format=disable')
     result = self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
-    self.assertEquals(result.management.autoRepair, True)
-    self.assertEquals(result.management.autoUpgrade, False)
+    self.assertEqual(result.management.autoRepair, True)
+    self.assertEqual(result.management.autoUpgrade, False)
     self.AssertErrContains("""This will disable the autoupgrade feature for \
 nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-management for more
@@ -224,8 +229,8 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     result = self.Run(cmdbase.format(
         node_pool_ref.SelfLink(),
         cluster_ref.SelfLink()))
-    self.assertEquals(result.management.autoRepair, None)
-    self.assertEquals(result.management.autoUpgrade, True)
+    self.assertEqual(result.management.autoRepair, None)
+    self.assertEqual(result.management.autoUpgrade, True)
     self.AssertErrContains("""This will enable the autoupgrade feature for \
 nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-management for more
@@ -302,9 +307,6 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(False)
 
-  def testRegionalEnableAutoRepair(self):
-    self._TestEnableAutoRepair(self.REGION)
-
   def testEnableAutoscaling(self):
     pool_kwargs = {}
     pool = self._MakeNodePool(**pool_kwargs)
@@ -341,8 +343,8 @@ class UpdateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpdateTestAlphaV1API,
         desiredNodePoolAutoscaling=self.msgs.NodePoolAutoscaling(
             enabled=False,
             autoprovisioned=False,
-            minNodeCount=3,
-            maxNodeCount=5))
+            minNodeCount=0,
+            maxNodeCount=0))
     cmdbase = (self.node_pools_command_base.format(self.ZONE) +
                ' update {0} --cluster={1} --no-enable-autoscaling ')
     self.ExpectGetNodePool(pool.name, response=pool)

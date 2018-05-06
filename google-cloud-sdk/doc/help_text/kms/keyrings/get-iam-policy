@@ -58,7 +58,8 @@ EXAMPLES
             --location us-central1
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keyrings get-iam-policy
         $ gcloud beta kms keyrings get-iam-policy
 

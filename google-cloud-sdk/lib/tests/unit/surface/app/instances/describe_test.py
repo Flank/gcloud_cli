@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
 from googlecloudsdk.core import properties
 from tests.lib.surface.app import instances_base
 
@@ -40,6 +41,6 @@ class InstancesDescribeTest(instances_base.InstancesTestBase):
     properties.PersistProperty(properties.VALUES.core.project, None,
                                properties.Scope.USER)
     properties.VALUES.core.project.Set(None)
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app instances describe -s default -v v1 i2')

@@ -49,15 +49,15 @@ class FunctionsDeleteTest(base.FunctionsTestBase):
         self.messages.CloudfunctionsOperationsGetRequest(
             name='operations/operation'),
         self._GenerateFailedOperation('operations/operation'))
-    with self.assertRaisesRegexp(exceptions.FunctionsError,
-                                 base.OP_FAILED_REGEXP):
+    with self.assertRaisesRegex(exceptions.FunctionsError,
+                                base.OP_FAILED_REGEXP):
       self.Run('functions delete my-test')
 
   def testDeleteNoAuth(self):
     # Remove credentials.
     self.FakeAuthSetCredentialsPresent(False)
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_AUTH_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_AUTH_REGEXP):
       self.Run('functions delete my-test')
 
 
@@ -68,7 +68,7 @@ class FunctionsDeleteWithoutProjectTest(base.FunctionsTestBase):
 
   def testDeleteNoProject(self):
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_PROJECT_REGEXP):
       self.Run('functions delete my-test')
 
 if __name__ == '__main__':

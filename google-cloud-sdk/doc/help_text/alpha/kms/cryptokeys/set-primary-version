@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha kms cryptokeys set-primary-version - set the primary version
+        of a CryptoKey
+
+SYNOPSIS
+    gcloud alpha kms cryptokeys set-primary-version KEY --version=VERSION
+        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (REMOVED) Set the primary version of a CryptoKey.
+
+    The command group cryptokeys is deprecated, please use the keys command
+    group.
+
+    Sets the specified CryptoKeyVersion as the primary version of the given
+    CryptoKey. The CryptoKeyVersion is specified by its version number assigned
+    on creation.
+
+POSITIONAL ARGUMENTS
+     KEY
+        Name of the key to modify.
+
+REQUIRED FLAGS
+     --version=VERSION
+        The version to make primary.
+
+OPTIONAL FLAGS
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command sets version 9 as the primary version of the
+    CryptoKey samwise within KeyRing fellowship and location global:
+
+        $ gcloud alpha kms cryptokeys set-primary-version samwise \
+            --version 9 --keyring fellowship --location global
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

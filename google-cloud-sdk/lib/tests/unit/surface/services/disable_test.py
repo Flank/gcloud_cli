@@ -14,8 +14,12 @@
 
 """Unit tests for services disable command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.services import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class ServicesDisableTest(unit_test_base.SV1UnitTestBase):

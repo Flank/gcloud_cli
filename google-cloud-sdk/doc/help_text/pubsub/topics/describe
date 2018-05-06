@@ -8,8 +8,14 @@ DESCRIPTION
     Describes a Cloud Pub/Sub topic.
 
 POSITIONAL ARGUMENTS
-     TOPIC
-        Name of the topic to describe.
+     TOPIC - Name of the topic to describe. This represents a Cloud resource.
+     (NOTE) Some attributes are not given arguments in this group but can be
+     set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       TOPIC
+          The ID of the topic or a fully qualified identifier for the topic.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

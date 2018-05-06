@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the apis utility functions."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.dataflow import apis
 from tests.lib import sdk_test_base
 from tests.lib import test_case

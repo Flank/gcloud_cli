@@ -30,25 +30,25 @@ class ReadPredictInstancesTest(base.MlBetaPlatformTestBase):
     instance_file = cStringIO.StringIO('{"images": [0, 1], "key": 3}')
     instances = predict_utilities.ReadInstances(instance_file, JSON_FORMAT)
     expected_instances = [{'images': [0, 1], 'key': 3}]
-    self.assertEquals(expected_instances, instances)
+    self.assertEqual(expected_instances, instances)
 
   def testJsonInstancesTrailingNewline(self):
     instance_file = cStringIO.StringIO('{"images": [0, 1], "key": 3}\n')
     instances = predict_utilities.ReadInstances(instance_file, JSON_FORMAT)
     expected_instances = [{'images': [0, 1], 'key': 3}]
-    self.assertEquals(expected_instances, instances)
+    self.assertEqual(expected_instances, instances)
 
   def testTextInstances(self):
     instance_file = cStringIO.StringIO('abcd')
     instances = predict_utilities.ReadInstances(instance_file, TEXT_FORMAT)
     expected_instances = ['abcd']
-    self.assertEquals(expected_instances, instances)
+    self.assertEqual(expected_instances, instances)
 
   def testTextInstancesTrailingNewline(self):
     instance_file = cStringIO.StringIO('abcd\n')
     instances = predict_utilities.ReadInstances(instance_file, TEXT_FORMAT)
     expected_instances = ['abcd']
-    self.assertEquals(expected_instances, instances)
+    self.assertEqual(expected_instances, instances)
 
   def testMultipleJsonInstances(self):
     test_instances = ('{"images": [0, 1], "key": 3}\n'
@@ -66,18 +66,18 @@ class ReadPredictInstancesTest(base.MlBetaPlatformTestBase):
         'images': [2, 1],
         'key': 1
     }]
-    self.assertEquals(expected_instances, instances)
+    self.assertEqual(expected_instances, instances)
 
   def testMultipleTextInstances(self):
     instance_file = cStringIO.StringIO('2, 3\n4, 5')
     instances = predict_utilities.ReadInstances(instance_file, TEXT_FORMAT)
     expected_instances = ['2, 3', '4, 5']
-    self.assertEquals(expected_instances, instances)
+    self.assertEqual(expected_instances, instances)
 
   def testEmptyFile(self):
     instance_file = cStringIO.StringIO('')
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'No valid instance was found.'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'No valid instance was found.'):
       predict_utilities.ReadInstances(instance_file, JSON_FORMAT)
 
   def testExactlyEnoughInstances(self):
@@ -90,7 +90,7 @@ class ReadPredictInstancesTest(base.MlBetaPlatformTestBase):
   def testTooManyInstances(self):
     test_instances = '\n'.join(['{"images": [0, 1], "key": 3}'] * 101)
     instance_file = cStringIO.StringIO(test_instances)
-    with self.assertRaisesRegexp(core_exceptions.Error, 'no more than 100'):
+    with self.assertRaisesRegex(core_exceptions.Error, 'no more than 100'):
       predict_utilities.ReadInstances(instance_file, JSON_FORMAT, limit=100)
 
   def testTooManyInstancesNoLimit(self):
@@ -104,28 +104,28 @@ class ReadPredictInstancesTest(base.MlBetaPlatformTestBase):
 
   def testNewlineOnlyJSON(self):
     instance_file = cStringIO.StringIO('\n')
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Empty line is not allowed'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Empty line is not allowed'):
       predict_utilities.ReadInstances(instance_file, JSON_FORMAT)
 
   def testNewlineOnlyTEXT(self):
     instance_file = cStringIO.StringIO('\n')
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Empty line is not allowed'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Empty line is not allowed'):
       predict_utilities.ReadInstances(instance_file, TEXT_FORMAT)
 
   def testEmptyLineJson(self):
     test_instances = ('{"images": [0, 1], "key": 3}\n\n'
                       '{"images": [0, 1], "key": 3}')
     instance_file = cStringIO.StringIO(test_instances)
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Empty line is not allowed'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Empty line is not allowed'):
       predict_utilities.ReadInstances(instance_file, JSON_FORMAT)
 
   def testEmptyLineText(self):
     instance_file = cStringIO.StringIO('2, 3\n\n2, 3')
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Empty line is not allowed'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Empty line is not allowed'):
       predict_utilities.ReadInstances(instance_file, TEXT_FORMAT)
 
 
@@ -182,7 +182,7 @@ class ReadInstancesFromArgsTest(base.MlBetaPlatformTestBase):
 class ParseModelOrVersionRefTest(base.MlBetaPlatformTestBase):
 
   def testParseModelOrVersionRef_Version(self):
-    self.assertEquals(
+    self.assertEqual(
         predict_utilities.ParseModelOrVersionRef('m', 'v'),
         resources.REGISTRY.Create('ml.projects.models.versions',
                                   projectsId=self.Project(),
@@ -190,7 +190,7 @@ class ParseModelOrVersionRefTest(base.MlBetaPlatformTestBase):
                                   versionsId='v'))
 
   def testParseModelOrVersionRef_Model(self):
-    self.assertEquals(
+    self.assertEqual(
         predict_utilities.ParseModelOrVersionRef('m', None),
         resources.REGISTRY.Create('ml.projects.models',
                                   projectsId=self.Project(),

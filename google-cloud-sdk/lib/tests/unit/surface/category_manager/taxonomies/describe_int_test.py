@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for 'gcloud category-manager taxonomies describe'."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
@@ -62,15 +64,15 @@ class TaxonomiesDescribeIntTest(base.CategoryManagerUnitTestBase):
     self._ExpectGetProjectTaxonomy(self.expected_project_taxonomy)
     actual_taxonomy = self.Run(
         'category-manager taxonomies describe ' + self.taxonomy_id)
-    self.assertEquals(actual_taxonomy, self.expected_project_taxonomy)
+    self.assertEqual(actual_taxonomy, self.expected_project_taxonomy)
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
   def testDescribeWithTaxonomyStoreTaxonomyName(self):
     self._ExpectGetTaxonomyStoreTaxonomy(self.expected_store_taxonomy)
     actual_taxonomy = self.Run('category-manager taxonomies describe ' +
                                self.taxonomy_store_taxonomy.RelativeName())
-    self.assertEquals(actual_taxonomy,
-                      self.taxonomy_store_taxonomy.RelativeName())
+    self.assertEqual(actual_taxonomy,
+                     self.taxonomy_store_taxonomy.RelativeName())
 
   @test_case.Filters.skip('Taxonomy store not yet supported.', 'b/74080347')
   def testDescribeWithTaxonomyStoreTaxonomyPositionalAndFlag(self):
@@ -78,8 +80,8 @@ class TaxonomiesDescribeIntTest(base.CategoryManagerUnitTestBase):
     actual_taxonomy = self.Run(
         'category-manager taxonomies describe ' + self.taxonomy_id +
         ' --store ' + self.taxonomy_store_id)
-    self.assertEquals(actual_taxonomy,
-                      self.taxonomy_store_taxonomy.RelativeName())
+    self.assertEqual(actual_taxonomy,
+                     self.taxonomy_store_taxonomy.RelativeName())
 
 
 if __name__ == '__main__':

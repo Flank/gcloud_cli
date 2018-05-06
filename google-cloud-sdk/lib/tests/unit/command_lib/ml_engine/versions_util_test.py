@@ -78,7 +78,7 @@ class WaitForOpMaybeTestBase(object):
     op = self._MakeOp(done=False)
 
     result = versions_util.WaitForOpMaybe(self.operations_client, op,
-                                          async_=True)
+                                          asyncronous=True)
 
     self.assertIs(result, op)
     self.AssertErrEquals('')

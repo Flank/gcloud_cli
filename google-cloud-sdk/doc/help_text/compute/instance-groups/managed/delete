@@ -19,7 +19,7 @@ FLAGS
 
        --region=REGION
           The region of the managed instance groups to delete. If not
-          specified, you will be prompted to select a region.
+          specified, you may be prompted to select a region.
 
           A list of regions can be fetched by running:
 

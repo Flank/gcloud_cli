@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'create' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.bigtable import base
@@ -63,45 +65,20 @@ class CreateCommandTest(base.BigtableV2TestBase,
     self.svc.Expect(
         request=self.production_msg,
         response=self.msgs.Operation(name='operations/theop'))
-    self.RunBT(
-        'instances create theinstance --cluster thecluster '
+    self.Run(
+        'bigtable instances create theinstance --cluster thecluster '
         '--cluster-num-nodes 5 --cluster-zone us-central1-b --display-name '
         'thedisplayname --async --instance-type PRODUCTION')
-    self.AssertErrEquals(
-        'Create in progress for bigtable instance theinstance '
-        '[https://bigtableadmin.googleapis.com/v2/operations/theop].\n')
-    self.AssertOutputEquals('')
-
-  # TODO(b/73365914) Remove after deprecation period
-  def testCreateAsyncDescription(self):
-    self.svc.Expect(
-        request=self.production_msg,
-        response=self.msgs.Operation(name='operations/theop'))
-    self.RunBT(
-        'instances create theinstance --cluster thecluster '
-        '--cluster-num-nodes 5 --cluster-zone us-central1-b --description '
-        'thedisplayname --async --instance-type PRODUCTION')
-    self.AssertErrContains('WARNING: Flag --description is deprecated. Use '
-                           '--display-name=DISPLAY_NAME instead.')
     self.AssertErrContains(
         'Create in progress for bigtable instance theinstance '
         '[https://bigtableadmin.googleapis.com/v2/operations/theop].\n')
     self.AssertOutputEquals('')
 
-  # TODO(b/73365914) Remove after deprecation period
-  def testCreateDescriptionDisplayName(self):
-    with self.AssertRaisesArgumentError():
-      self.RunBT(
-          'instances create theinstance --cluster thecluster '
-          '--cluster-num-nodes 5 --cluster-zone us-central1-b --description '
-          'thedisplayname --instance-type PRODUCTION --display-name '
-          'thedisplayname')
-
   def testCreateDisplayNameRequired(self):
     with self.AssertRaisesArgumentError():
-      self.RunBT('instances create theinstance --cluster thecluster '
-                 '--cluster-num-nodes 5 --cluster-zone us-central1-b '
-                 '--instance-type PRODUCTION')
+      self.Run('bigtable instances create theinstance --cluster thecluster '
+               '--cluster-num-nodes 5 --cluster-zone us-central1-b '
+               '--instance-type PRODUCTION')
 
   def testCreateWait(self):
     self.client.projects_instances.Create.Expect(
@@ -113,10 +90,9 @@ class CreateCommandTest(base.BigtableV2TestBase,
     result.displayName = 'weird instance'
     result.state = self.msgs.Instance.StateValueValuesEnum.READY
 
-    self.RunBT(
-        'instances create theinstance --cluster thecluster '
-        '--cluster-num-nodes 5 --cluster-zone us-central1-b --description '
-        'thedisplayname --format=yaml')
+    self.Run('bigtable instances create theinstance --cluster thecluster '
+             '--cluster-num-nodes 5 --cluster-zone us-central1-b '
+             '--display-name thedisplayname --format=yaml')
 
     self.AssertErrContains('Creating bigtable instance theinstance')
     self.AssertOutputContains("""\
@@ -135,9 +111,9 @@ state: READY
     result.displayName = 'weird instance'
     result.state = self.msgs.Instance.StateValueValuesEnum.READY
 
-    self.RunBT('instances create theinstance --cluster thecluster '
-               '--cluster-zone us-central1-b --description '
-               'thedisplayname --format=yaml --instance-type development')
+    self.Run('bigtable instances create theinstance --cluster thecluster '
+             '--cluster-zone us-central1-b --display-name '
+             'thedisplayname --format=yaml --instance-type development')
 
     self.AssertErrContains('Creating bigtable instance theinstance')
     self.AssertOutputContains("""\
@@ -148,9 +124,9 @@ state: READY
 
   def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.production_msg):
-      self.RunBT(
-          'instances create theinstance --cluster thecluster '
-          '--cluster-num-nodes 5 --cluster-zone us-central1-b --description '
+      self.Run(
+          'bigtable instances create theinstance --cluster thecluster '
+          '--cluster-num-nodes 5 --cluster-zone us-central1-b --display-name '
           'thedisplayname --async')
 
 

@@ -17,7 +17,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
-import copy
+from __future__ import unicode_literals
 import platform
 import re
 import time
@@ -30,6 +30,7 @@ from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.resource import session_capturer
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import platforms
 
 import httplib2
@@ -38,7 +39,7 @@ from six.moves import urllib
 from six.moves import zip  # pylint: disable=redefined-builtin
 
 
-def Http(timeout='unset'):
+def Http(timeout='unset', response_encoding=None):
   """Get an httplib2.Http client that is properly configured for use by gcloud.
 
   This method does not add credentials to the client.  For an Http client that
@@ -48,6 +49,7 @@ def Http(timeout='unset'):
     timeout: double, The timeout in seconds to pass to httplib2.  This is the
         socket level timeout.  If timeout is None, timeout is infinite.  If
         default argument 'unset' is given, a sensible default is selected.
+    response_encoding: str, the encoding to use to decode the response.
 
   Returns:
     An httplib2.Http client object configured with all the required settings
@@ -57,7 +59,7 @@ def Http(timeout='unset'):
   # timeout=300), this lets you test with short default timeouts by mocking
   # GetDefaultTimeout.
   effective_timeout = timeout if timeout != 'unset' else GetDefaultTimeout()
-  no_validate = properties.VALUES.auth.disable_ssl_validation.GetBool()
+  no_validate = properties.VALUES.auth.disable_ssl_validation.GetBool() or False
   ca_certs = properties.VALUES.core.custom_ca_certs_file.Get()
   http_client = httplib2.Http(timeout=effective_timeout,
                               proxy_info=http_proxy.GetHttpProxyInfo(),
@@ -71,9 +73,11 @@ def Http(timeout='unset'):
       properties.VALUES.core.trace_token.Get(),
       properties.VALUES.core.trace_email.Get(),
       properties.VALUES.core.trace_log.GetBool(),
+      properties.VALUES.core.request_reason.Get(),
       gcloud_ua,
       properties.VALUES.core.log_http.GetBool(),
       properties.VALUES.core.log_http_redact_token.GetBool(),
+      response_encoding
   )
 
   return http_client
@@ -117,8 +121,8 @@ def GetDefaultTimeout():
 
 
 def _Wrap(
-    http_client, trace_token, trace_email, trace_log, gcloud_ua, log_http,
-    log_http_redact_token):
+    http_client, trace_token, trace_email, trace_log, request_reason, gcloud_ua,
+    log_http, log_http_redact_token, response_encoding):
   """Wrap request with user-agent, and trace reporting.
 
   Args:
@@ -126,10 +130,12 @@ def _Wrap(
     trace_token: str, Token to be used to route service request traces.
     trace_email: str, username to which service request traces should be sent.
     trace_log: bool, Enable/disable server side logging of service requests.
+    request_reason: str, Justification for access.
     gcloud_ua: str, User agent string to be included in the request.
     log_http: bool, True to enable request/response logging.
     log_http_redact_token: bool, True to avoid logging access tokens if log_http
                            is set.
+    response_encoding: str, the encoding to use to decode the response.
 
   Returns:
     http, The same http object but with the request method wrapped.
@@ -155,6 +161,10 @@ def _Wrap(
     handlers.append(Modifiers.Handler(
         Modifiers.AddQueryParam('trace', trace_value)))
 
+  if request_reason:
+    handlers.append(Modifiers.Handler(
+        Modifiers.SetHeader('X-Goog-Request-Reason', request_reason)))
+
   # Do this one last so that it sees the affects of the other modifiers.
   if log_http:
     handlers.append(Modifiers.Handler(
@@ -166,7 +176,8 @@ def _Wrap(
         Modifiers.DumpRequest(session_capturer.SessionCapturer.capturer),
         Modifiers.DumpResponse(session_capturer.SessionCapturer.capturer)))
 
-  return Modifiers.WrapRequest(http_client, handlers)
+  return Modifiers.WrapRequest(http_client, handlers,
+                               response_encoding=response_encoding)
 
 
 class Modifiers(object):
@@ -227,8 +238,8 @@ class Modifiers(object):
       self.data = data
 
   @classmethod
-  def WrapRequest(cls, http_client, handlers,
-                  exc_handler=None, exc_type=Exception):
+  def WrapRequest(cls, http_client, handlers, exc_handler=None,
+                  exc_type=Exception, response_encoding=None):
     """Wraps an http client with request modifiers.
 
     Args:
@@ -239,6 +250,7 @@ class Modifiers(object):
         should also throw an exception if you don't want it to be swallowed.
       exc_type: The type of exception that should be caught and given to the
         handler.
+      response_encoding: str, the encoding to use to decode the response.
 
     Returns:
       The wrapped http client.
@@ -247,13 +259,18 @@ class Modifiers(object):
 
     def WrappedRequest(*args, **kwargs):
       """Replacement http.request() method."""
-      modified_args = args
+      modified_args = list(args)
+
+      if not six.PY2:
+        # httplib2 needs text under Python 3.
+        modified_args[0] = encoding.Decode(modified_args[0])
+
       # We need to make a copy here because if we don't we will be modifying the
       # dictionary that people pass in.
       # TODO(b/37281703): Copy the entire dictionary. This is blocked on making
       # sure anything that comes through is actually copyable.
       if 'headers' in kwargs:
-        kwargs['headers'] = copy.copy(kwargs['headers'])
+        kwargs['headers'] = Modifiers._EncodeHeaders(kwargs['headers'])
       modifier_data = []
 
       for handler in handlers:
@@ -271,6 +288,9 @@ class Modifiers(object):
         else:
           raise
 
+      if response_encoding is not None:
+        response = Modifiers._DecodeResponse(response, response_encoding)
+
       for handler, data in zip(handlers, modifier_data):
         if handler.response:
           handler.response(response, data)
@@ -287,6 +307,26 @@ class Modifiers(object):
     return http_client
 
   @classmethod
+  def _EncodeHeaders(cls, headers):
+    return dict(
+        Modifiers._EncodeHeader(h, v) for h, v in six.iteritems(headers))
+
+  @classmethod
+  def _EncodeHeader(cls, header, value):
+    if isinstance(header, six.text_type):
+      header = header.encode('utf8')
+    if isinstance(value, six.text_type):
+      value = value.encode('utf8')
+    return header, value
+
+  @classmethod
+  def _DecodeResponse(cls, response, response_encoding):
+    """Decodes the response content if an encoding is given."""
+    response, content = response
+    content = content.decode(response_encoding)
+    return response, content
+
+  @classmethod
   def AppendToHeader(cls, header, value):
     """Appends the given value to the existing value in the http request.
 
@@ -297,10 +337,11 @@ class Modifiers(object):
     Returns:
       A function that can be used in a Handler.request.
     """
+    header, value = Modifiers._EncodeHeader(header, value)
     def _AppendToHeader(args, kwargs):
       """Replacement http.request() method."""
-      current_value = Modifiers._GetHeader(args, kwargs, header, '')
-      new_value = '{0} {1}'.format(current_value, value).strip()
+      current_value = Modifiers._GetHeader(args, kwargs, header, b'')
+      new_value = (current_value + b' ' + value).strip()
       modified_args = Modifiers._SetHeader(args, kwargs, header, new_value)
       return Modifiers.Result(args=modified_args)
     return _AppendToHeader
@@ -316,6 +357,7 @@ class Modifiers(object):
     Returns:
       A function that can be used in a Handler.request.
     """
+    header, value = Modifiers._EncodeHeader(header, value)
     def _SetHeader(args, kwargs):
       """Replacement http.request() method."""
       modified_args = Modifiers._SetHeader(args, kwargs, header, value)
@@ -352,7 +394,7 @@ class Modifiers(object):
     """Logs the contents of the http request.
 
     Args:
-      redact_token: bool, True to redact Authorization header.
+      redact_token: bool, True to redact auth tokens.
 
     Returns:
       A function that can be used in a Handler.request.
@@ -383,7 +425,8 @@ class Modifiers(object):
       log.status.Print('method: {method}'.format(method=method))
       log.status.Print('== headers start ==')
       for h, v in sorted(six.iteritems(headers)):
-        if redact_token and h == 'Authorization':
+        if redact_token and (h == b'Authorization' or
+                             h == b'x-goog-iam-authorization-token'):
           v = '--- Token Redacted ---'
         log.status.Print('{0}: {1}'.format(h, v))
       log.status.Print('== headers end ==')
@@ -464,7 +507,7 @@ class Modifiers(object):
 
     def _DumpResponse(response, unused_args):
       """Response handler."""
-      capturer.CaptureHttpResponse(*response)
+      capturer.CaptureHttpResponse(response[0], response[1])
 
     return _DumpResponse
 
@@ -558,7 +601,11 @@ class Modifiers(object):
 
 def IsTokenUri(uri):
   """Determine if the given URI is for requesting an access token."""
-  if uri == 'https://accounts.google.com/o/oauth2/token':
+  if uri in ['https://accounts.google.com/o/oauth2/token',
+             'https://www.googleapis.com/oauth2/v3/token',
+             'https://www.googleapis.com/oauth2/v4/token',
+             'https://oauth2.googleapis.com/token',
+             'https://oauth2.googleapis.com/oauth2/v4/token']:
     return True
 
   metadata_regexp = ('metadata.google.internal/computeMetadata/.*?/instance/'

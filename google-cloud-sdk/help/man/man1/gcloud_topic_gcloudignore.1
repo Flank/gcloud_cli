@@ -18,15 +18,14 @@ upload certain files (i.e., "ignore" them).
 If there is a file called \f5.gcloudignore\fR \fIin the top\-level directory to
 upload\fR, the files that it specifies (see "SYNTAX") will be ignored.
 
-If a \f5.gitignore\fR file is present in the top\-level directory to upload and
-there isn't a \f5.gcloudignore\fR file, \f5gcloud\fR will generate a
-Git\-compatible \f5.gcloudignore\fR file that respects your \f5.gitignore\fR\-ed
-files (see "ADVANCED TOPICS" for details). The global \f5.gitignore\fR is not
-respected.
+Gcloud commands may generate a .gcloudignore file; see the individual command
+help page for details.
 
 The following \f5gcloud\fR commands respect the \f5.gcloudignore\fR file:
 
 .RS 2m
+.IP "\(bu" 2m
+\f5gcloud app deploy\fR
 .IP "\(bu" 2m
 \f5gcloud beta functions deploy\fR
 .IP "\(bu" 2m

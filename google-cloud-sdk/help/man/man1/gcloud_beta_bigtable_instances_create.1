@@ -11,7 +11,7 @@ gcloud beta bigtable instances create \- create a new Bigtable instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta bigtable instances create\fR \fIINSTANCE\fR \fB\-\-cluster\fR=\fICLUSTER\fR \fB\-\-cluster\-zone\fR=\fICLUSTER_ZONE\fR (\fB\-\-description\fR=\fIDESCRIPTION\fR\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR) [\fB\-\-async\fR] [\fB\-\-cluster\-num\-nodes\fR=\fICLUSTER_NUM_NODES\fR] [\fB\-\-cluster\-storage\-type\fR=\fICLUSTER_STORAGE_TYPE\fR;\ default="ssd"] [\fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR;\ default="PRODUCTION"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta bigtable instances create\fR \fIINSTANCE\fR \fB\-\-cluster\fR=\fICLUSTER\fR \fB\-\-cluster\-zone\fR=\fICLUSTER_ZONE\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\-num\-nodes\fR=\fICLUSTER_NUM_NODES\fR] [\fB\-\-cluster\-storage\-type\fR=\fICLUSTER_STORAGE_TYPE\fR;\ default="ssd"] [\fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR;\ default="PRODUCTION"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -45,22 +45,10 @@ ID of the zone where the cluster is located. Supported zones are listed at
 https://cloud.google.com/bigtable/docs/locations.
 
 .TP 2m
-
-Exactly one of these must be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-description\fR=\fIDESCRIPTION\fR
-(DEPRECATED) Friendly name of the instance.
-
-Flag \-\-description is deprecated. Use \-\-display\-name=DISPLAY_NAME instead.
-
-.TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
 Friendly name of the instance.
 
 
-.RE
 .RE
 .sp
 

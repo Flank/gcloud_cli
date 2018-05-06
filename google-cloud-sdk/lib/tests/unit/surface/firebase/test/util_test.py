@@ -35,7 +35,7 @@ class UtilTests(unit_base.TestMockClientTest):
 
   def testGetProject_ProjectSet(self):
     properties.VALUES.core.project.Set(self.PROJECT_ID)
-    self.assertEquals(util.GetProject(), self.PROJECT_ID)
+    self.assertEqual(util.GetProject(), self.PROJECT_ID)
 
 
 if __name__ == '__main__':

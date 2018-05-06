@@ -24,7 +24,7 @@ class GenomicsV1alpha2(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new genomics handle."""
     url = url or self.BASE_URL
     super(GenomicsV1alpha2, self).__init__(
@@ -33,7 +33,8 @@ class GenomicsV1alpha2(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.operations = self.OperationsService(self)
     self.pipelines = self.PipelinesService(self)
 
@@ -48,7 +49,7 @@ class GenomicsV1alpha2(base_api.BaseApiClient):
           }
 
     def Cancel(self, request, global_params=None):
-      """Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation.
+      r"""Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation.
 
       Args:
         request: (GenomicsOperationsCancelRequest) input message
@@ -75,7 +76,7 @@ class GenomicsV1alpha2(base_api.BaseApiClient):
     )
 
     def Get(self, request, global_params=None):
-      """Gets the latest state of a long-running operation.  Clients can use this.
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
 method to poll the operation result at intervals as recommended by the API
 service.
 
@@ -104,7 +105,7 @@ service.
     )
 
     def List(self, request, global_params=None):
-      """Lists operations that match the specified filter in the request.
+      r"""Lists operations that match the specified filter in the request.
 
       Args:
         request: (GenomicsOperationsListRequest) input message
@@ -141,7 +142,7 @@ service.
           }
 
     def Create(self, request, global_params=None):
-      """Creates a pipeline that can be run later. Create takes a Pipeline that.
+      r"""Creates a pipeline that can be run later. Create takes a Pipeline that.
 has all fields other than `pipelineId` populated, and then returns
 the same pipeline with `pipelineId` populated. This id can be used
 to run the pipeline.
@@ -172,7 +173,7 @@ Caller must have WRITE permission to the project.
     )
 
     def Delete(self, request, global_params=None):
-      """Deletes a pipeline based on ID.
+      r"""Deletes a pipeline based on ID.
 
 Caller must have WRITE permission to the project.
 
@@ -200,7 +201,7 @@ Caller must have WRITE permission to the project.
     )
 
     def Get(self, request, global_params=None):
-      """Retrieves a pipeline based on ID.
+      r"""Retrieves a pipeline based on ID.
 
 Caller must have READ permission to the project.
 
@@ -228,7 +229,7 @@ Caller must have READ permission to the project.
     )
 
     def GetControllerConfig(self, request, global_params=None):
-      """Gets controller configuration information. Should only be called.
+      r"""Gets controller configuration information. Should only be called.
 by VMs created by the Pipelines Service and not by end users.
 
       Args:
@@ -255,7 +256,7 @@ by VMs created by the Pipelines Service and not by end users.
     )
 
     def List(self, request, global_params=None):
-      """Lists pipelines.
+      r"""Lists pipelines.
 
 Caller must have READ permission to the project.
 
@@ -283,7 +284,7 @@ Caller must have READ permission to the project.
     )
 
     def Run(self, request, global_params=None):
-      """Runs a pipeline. If `pipelineId` is specified in the request, then.
+      r"""Runs a pipeline. If `pipelineId` is specified in the request, then.
 run a saved pipeline. If `ephemeralPipeline` is specified, then run
 that pipeline once without saving a copy.
 
@@ -317,7 +318,7 @@ If a pipeline operation is still running after 6 days, it will be canceled.
     )
 
     def SetOperationStatus(self, request, global_params=None):
-      """Sets status of a given operation. Any new timestamps (as determined by.
+      r"""Sets status of a given operation. Any new timestamps (as determined by.
 description) are appended to TimestampEvents. Should only be called by VMs
 created by the Pipelines Service and not by end users.
 

@@ -14,6 +14,8 @@
 """Tests for the routes delete subcommand."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base

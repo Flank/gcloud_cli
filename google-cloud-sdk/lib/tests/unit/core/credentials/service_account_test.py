@@ -14,6 +14,9 @@
 
 """Tests for googlecloudsdk.core.credentials.service_account."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 import json
 import os
 
@@ -41,7 +44,7 @@ class StoreTests(sdk_test_base.SdkBase):
         'account': 'inactive@developer.gserviceaccount.com',
         'type': 'google-cloud-sdk',
     }
-    self.assertEquals([key_dict], all_keys)
+    self.assertEqual([key_dict], all_keys)
 
     storage = multistore_file.get_credential_storage_custom_key(
         filename=multistore_store_file,
@@ -54,8 +57,8 @@ class StoreTests(sdk_test_base.SdkBase):
 
     # Check that now it serializes to new format.
     with open(single_store_file) as f:
-      self.assertEquals(json.load(f),
-                        json.loads(creds_from_old.to_json()))
+      self.assertEqual(json.load(f),
+                       json.loads(creds_from_old.to_json()))
 
 
 if __name__ == '__main__':

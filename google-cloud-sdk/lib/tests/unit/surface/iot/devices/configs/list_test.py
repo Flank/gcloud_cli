@@ -11,11 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for `gcloud iot config list`."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
@@ -31,7 +38,7 @@ class ConfigsListTest(base.CloudIotBase):
               cloudUpdateTime='2017-01-01T00:00Z',
               deviceAckTime='2017-01-01T00:00Z',
               version=(idx + 1),
-              binaryData=str(idx)
+              binaryData=bytes(idx)
           )
       )
     return configs

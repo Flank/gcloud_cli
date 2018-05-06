@@ -124,7 +124,7 @@ class SnipTests(test_case.TestCase):
   def testMergeRaises(self):
     slice1 = search_util.TextSlice(0, 1)
     slice2 = search_util.TextSlice(5, 10)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError,
         r'Cannot merge text slices \[0\:1\] and \[5\:10\]\: Do not overlap'):
       slice1.Merge(slice2)
@@ -321,9 +321,9 @@ Choices description. _FRIENDS_ must be one of: *rachel*, *phoebe*, *monica*."""
                           return_value=summary)
     version_command = self.parent.get(lookup.COMMANDS, {}).get('version', {})
     result = search_util.ProcessResult(version_command, {})
-    self.assertEquals(result.get(lookup.COMMANDS, None),
-                      [])
-    self.assertEquals(result.get(lookup.SUMMARY),
+    self.assertEqual(result.get(lookup.COMMANDS, None),
+                     [])
+    self.assertEqual(result.get(lookup.SUMMARY),
                       ('SUMMARY DESCRIPTION\n'
                        'This is a brief description of the command.\n'
                        'FLAGS\n'
@@ -336,22 +336,22 @@ Choices description. _FRIENDS_ must be one of: *rachel*, *phoebe*, *monica*."""
 
   def testLocateTerms(self):
     # Test that terms are correctly located in command.
-    self.assertEquals(search_util.LocateTerm(self.xyzzy, 'phoebe'),
-                      'flags.--three-choices')
-    self.assertEquals(search_util.LocateTerm(self.xyzzy, 'choices'),
-                      'flags.--three-choices')
-    self.assertEquals(search_util.LocateTerm(self.xyzzy, 'choice(s'),
-                      '')
-    self.assertEquals(search_util.LocateTerm(self.xyzzy, 'moe'),
-                      'flags.--exactly-three.default')
-    self.assertEquals(search_util.LocateTerm(self.xyzzy, 'components'),
-                      'sections.EXAMPLES')
-    self.assertEquals(search_util.LocateTerm(self.xyzzy, 'pdq'),
-                      'positionals.pdq')
+    self.assertEqual(search_util.LocateTerm(self.xyzzy, 'phoebe'),
+                     'flags.--three-choices')
+    self.assertEqual(search_util.LocateTerm(self.xyzzy, 'choices'),
+                     'flags.--three-choices')
+    self.assertEqual(search_util.LocateTerm(self.xyzzy, 'choice(s'),
+                     '')
+    self.assertEqual(search_util.LocateTerm(self.xyzzy, 'moe'),
+                     'flags.--exactly-three.default')
+    self.assertEqual(search_util.LocateTerm(self.xyzzy, 'components'),
+                     'sections.EXAMPLES')
+    self.assertEqual(search_util.LocateTerm(self.xyzzy, 'pdq'),
+                     'positionals.pdq')
     # The word 'description appears in the brief description as well as flags.
     # Should only return 'capsule'
-    self.assertEquals(search_util.LocateTerm(self.xyzzy, 'description'),
-                      'capsule')
+    self.assertEqual(search_util.LocateTerm(self.xyzzy, 'description'),
+                     'capsule')
 
   def testLocateTerm_Notes(self):
     """Test that commands don't match if terms are only in ancestor path."""
@@ -359,12 +359,12 @@ Choices description. _FRIENDS_ must be one of: *rachel*, *phoebe*, *monica*."""
     # The NOTES section now contains alternate release track commands, so the
     # ancestor of a command will show up in the NOTES section.
     location = search_util.LocateTerm(self.xyzzy, 'sdk')
-    self.assertEquals('sections.NOTES', location)
+    self.assertEqual('sections.NOTES', location)
 
   def testLocateTerm_NameToCapsule(self):
     """Test that term located in name returns 'capsule'."""
     location = search_util.LocateTerm(self.sdk, 'sdk')
-    self.assertEquals('capsule', location)
+    self.assertEqual('capsule', location)
 
 
 if __name__ == '__main__':

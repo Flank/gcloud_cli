@@ -49,8 +49,8 @@ class AccountsListTest(base.BillingMockTest):
 
     self.Run('billing accounts list')
     self.AssertOutputContains("""\
-ID                    NAME                  OPEN
-000000-000000-000000  A Billing Account     True
+ACCOUNT_ID            NAME               OPEN  MASTER_ACCOUNT_ID
+000000-000000-000000  A Billing Account  True
 """, normalize_space=True)
 
   def testMultiplePages(self):
@@ -75,9 +75,10 @@ ID                    NAME                  OPEN
     )
     self.Run('billing accounts list')
     self.AssertOutputContains("""\
-ID                    NAME                    OPEN
-000000-000000-000000  A Billing Account       True
-000000-000000-000001  Another Billing Account False
+ACCOUNT_ID            NAME                     OPEN  MASTER_ACCOUNT_ID
+000000-000000-000000  A Billing Account        True
+111111-111111-111111  Another Billing Account  False
+222222-222222-222222  A Billing SubAccount     False 111111-111111-111111
 """, normalize_space=True)
 
   def testLimit(self):
@@ -91,8 +92,8 @@ ID                    NAME                    OPEN
     )
     self.Run('billing accounts list --limit=1')
     self.AssertOutputContains("""\
-ID                    NAME                    OPEN
-000000-000000-000000  A Billing Account       True
+ACCOUNT_ID            NAME               OPEN  MASTER_ACCOUNT_ID
+000000-000000-000000  A Billing Account  True
 """, normalize_space=True)
 
 

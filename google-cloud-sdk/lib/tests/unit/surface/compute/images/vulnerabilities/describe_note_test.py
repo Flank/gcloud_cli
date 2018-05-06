@@ -55,4 +55,4 @@ class DescribeNoteTest(
         expected_request, expected_response)
     response = self.Run(
         'compute images vulnerabilities describe-note ' + note_string)
-    self.assertEquals(expected_response, response)
+    self.assertEqual(expected_response, response)

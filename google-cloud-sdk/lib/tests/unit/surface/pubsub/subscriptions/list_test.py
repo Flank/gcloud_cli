@@ -13,11 +13,17 @@
 # limitations under the License.
 
 """Test of the 'pubsub subscriptions list' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.surface.pubsub import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class SubscriptionsListTestBase(base.CloudPubsubTestBase,

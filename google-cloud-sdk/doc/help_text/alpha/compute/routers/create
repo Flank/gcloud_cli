@@ -41,7 +41,7 @@ OPTIONAL FLAGS
         An optional description of this router.
 
      --region=REGION
-        The region of the router to create. If not specified, you will be
+        The region of the router to create. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the

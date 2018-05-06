@@ -7,12 +7,18 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List Cloud TPUs.
+    (ALPHA) List Cloud TPUs
 
 FLAGS
-     --zone=ZONE
-        The zone of the tpu to list. List TPUs from this zone. If not
-        specified, will list TPUs in default compute/zone.
+     ZONE - The compute/zone of the Cloud TPU. If not specified, will use
+     default compute/zone. This represents a Cloud resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: Set the property [core/project] or
+     provide the flag [--project] on the command line.
+
+       --zone=ZONE
+          The ID of the location or a fully qualified identifier for the
+          location.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -47,6 +53,10 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the tpu/v1alpha1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/tpu/
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

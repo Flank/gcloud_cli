@@ -20,7 +20,8 @@ REQUIRED FLAGS
      Data about the new metric. Exactly one of these must be specified:
 
        --config-from-file=CONFIG_FROM_FILE
-          A path to a YAML file specifying the logs-based metric to create.
+          A path to a YAML or JSON file specifying the logs-based metric to
+          create.
 
        A group of arguments to specify simple counter logs-based metrics.
 
@@ -54,8 +55,8 @@ EXAMPLES
         $ gcloud beta logging metrics create my_metric \
             --config-from-file=$PATH_TO_FILE
 
-    The config file should be in YAML format. Detailed information about how to
-    configure metrics can be found at:
+    The config file can be in YAML or JSON format. Detailed information about
+    how to configure metrics can be found at:
     https://cloud.google.com/logging/docs/reference/v2/rest/v2/projects.metrics#LogMetric.
 
 NOTES

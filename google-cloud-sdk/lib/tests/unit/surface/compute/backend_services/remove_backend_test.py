@@ -13,11 +13,12 @@
 # limitations under the License.
 """Tests for the backend services remove-backend subcommand."""
 
+from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class BackendServicesRemoveBackendTest(test_base.BaseTest):
+class RemoveBackendTest(test_base.BaseTest):
 
   def testWithNonExistentBackend(self):
     messages = self.messages
@@ -26,12 +27,12 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
-                           'v1/projects/my-project/zones/'
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-1')),
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
-                           'v1/projects/my-project/zones/'
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
@@ -63,12 +64,12 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
             name='my-backend-service',
             backends=[
                 messages.Backend(group=(
-                    'https://www.googleapis.com/compute/'
-                    'v1/projects/my-project/zones/'
+                    self.compute_uri +
+                    '/projects/my-project/zones/'
                     'us-central1-a/instanceGroups/my-group-1')),
                 messages.Backend(group=(
-                    'https://www.googleapis.com/compute/'
-                    'v1/projects/my-project/zones/'
+                    self.compute_uri +
+                    '/projects/my-project/zones/'
                     'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
@@ -91,12 +92,12 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
-                           'v1/projects/my-project/zones/'
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-1')),
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
-                           'v1/projects/my-project/zones/'
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
@@ -127,8 +128,8 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
                   fingerprint='my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
-                                 'v1/projects/my-project/zones/'
+                          group=(self.compute_uri +
+                                 '/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-2')),
                   ],
                   timeoutSec=120),
@@ -142,12 +143,12 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
-                           'v1/projects/my-project/zones/'
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-1')),
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
-                           'v1/projects/my-project/zones/'
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
@@ -159,7 +160,7 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
     self.Run("""
         compute backend-services remove-backend
           {uri}/projects/my-project/global/backendServices/my-backend-service
-          --instance-group https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instanceGroups/my-group-1
+          --instance-group {uri}/projects/my-project/zones/us-central1-a/instanceGroups/my-group-1
           --global
         """.format(uri=self.compute_uri))
 
@@ -179,8 +180,8 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
                   fingerprint='my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
-                                 'v1/projects/my-project/zones/'
+                          group=(self.compute_uri +
+                                 '/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-2')),
                   ],
                   timeoutSec=120),
@@ -196,12 +197,12 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
             name='my-backend-service',
             backends=[
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
-                           'v1/projects/my-project/zones/'
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-1')),
                 messages.Backend(
-                    group=('https://www.googleapis.com/compute/'
-                           'v1/projects/my-project/zones/'
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
@@ -247,8 +248,8 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
                   fingerprint='my-fingerprint',
                   backends=[
                       messages.Backend(
-                          group=('https://www.googleapis.com/compute/'
-                                 'v1/projects/my-project/zones/'
+                          group=(self.compute_uri +
+                                 '/projects/my-project/zones/'
                                  'us-central1-a/instanceGroups/my-group-2')),
                   ],
                   timeoutSec=120),
@@ -370,6 +371,72 @@ class BackendServicesRemoveBackendTest(test_base.BaseTest):
     self.Run("""
         compute backend-services remove-backend my-backend-service
           --instance-group my-group-1 --instance-group-region us-central1
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices,
+          'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service',
+              project='my-project'))],
+        [(self.compute.backendServices,
+          'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint='my-fingerprint',
+                  backends=[
+                      messages.Backend(
+                          group=(self.compute_uri +
+                                 '/projects/my-project/regions'
+                                 '/us-central1/instanceGroups/my-group-2')),
+                  ],
+                  timeoutSec=120),
+              project='my-project'))],
+    )
+
+
+class RemoveBackendBetaTest(RemoveBackendTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = base.ReleaseTrack.BETA
+
+
+class RemoveBackendAlphaTest(RemoveBackendBetaTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = base.ReleaseTrack.ALPHA
+
+  def testWithExistingBackendNetworkEndpointGroup(self):
+    messages = self.messages
+    self.make_requests.side_effect = [
+        [messages.BackendService(
+            name='my-backend-service',
+            backends=[
+                messages.Backend(
+                    group=(self.compute_uri +
+                           '/projects/my-project/zones/'
+                           'us-central1-a/networkEndpointGroups/my-group-1')),
+                messages.Backend(
+                    group=(self.compute_uri +
+                           '/projects/my-project/regions/'
+                           'us-central1/instanceGroups/my-group-2')),
+            ],
+            port=80,
+            fingerprint='my-fingerprint',
+            timeoutSec=120)],
+        [],
+    ]
+
+    self.Run("""
+        compute backend-services remove-backend my-backend-service
+          --network-endpoint-group my-group-1
+          --network-endpoint-group-zone us-central1-a
           --global
         """)
 

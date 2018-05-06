@@ -13,18 +13,23 @@
 # limitations under the License.
 """Tests for the upload wrapper module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from datetime import datetime
 
 import os
 import uuid
 
-from apitools.base.py import exceptions
+from apitools.base.py.testing import mock as client_mock
 from googlecloudsdk.api_lib.debug import upload
 from googlecloudsdk.api_lib.source import git
-from googlecloudsdk.api_lib.source.repos import sourcerepo
+from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files as file_utils
 from tests.lib import sdk_test_base
+from tests.lib.apitools import http_error
+
+import six
 
 
 class UploadManagerTest(sdk_test_base.WithOutputCapture,
@@ -35,8 +40,27 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
     self.tmpdir = file_utils.TemporaryDirectory().path
     self.StartObjectPatch(
         properties.VALUES.core.project, 'Get', return_value='test_project')
-    self.get_repo_mock = self.StartObjectPatch(sourcerepo.Source, 'GetRepo')
     self.push_mock = self.StartObjectPatch(git.Git, 'ForcePushFilesToBranch')
+
+    self.messages = core_apis.GetMessagesModule('sourcerepo', 'v1')
+    self.mock_client = client_mock.Client(
+        core_apis.GetClientClass('sourcerepo', 'v1'),
+        real_client=core_apis.GetClientInstance(
+            'sourcerepo', 'v1', no_http=True))
+    self.mock_client.Mock()
+    self.addCleanup(self.mock_client.Unmock)
+
+  def SetGetRepoSuccess(self):
+    self.mock_client.projects_repos.Get.Expect(
+        self.messages.SourcerepoProjectsReposGetRequest(
+            name='projects/test_project/repos/google-source-captures'),
+        self.messages.Repo(name='google-source-captures', url='https'))
+
+  def SetGetRepoNotFound(self):
+    self.mock_client.projects_repos.Get.Expect(
+        self.messages.SourcerepoProjectsReposGetRequest(
+            name='projects/test_project/repos/google-source-captures'),
+        exception=http_error.MakeHttpError(code=404))
 
   def CreateFiles(self, paths):
     full_paths = []
@@ -49,18 +73,17 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
     return full_paths
 
   def testUploadWithNoRepo(self):
-    self.get_repo_mock.return_value = None
-    with self.assertRaises(exceptions.Error) as e:
+    self.SetGetRepoNotFound()
+    with self.assertRaises(upload.RepoNotFoundError) as e:
       upload.UploadManager().Upload('branch1', self.tmpdir)
-    self.assertIn('gcloud source repos create', e.exception.message)
+    self.assertIn('gcloud source repos create', six.text_type(e.exception))
 
   def testUpload(self):
+    self.SetGetRepoSuccess()
     full_paths = self.CreateFiles(['dir/file2', 'file1'])
 
     result = upload.UploadManager().Upload('branch1', self.tmpdir)
 
-    self.get_repo_mock.assert_called_with(
-        sourcerepo.ParseRepo('google-source-captures'))
     self.push_mock.assert_called_with('branch1', self.tmpdir, full_paths)
 
     self.assertEqual('branch1', result['branch'])
@@ -81,6 +104,7 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
     }, cloud_repo['aliasContext'])
 
   def testUploadWithGeneratedName(self):
+    self.SetGetRepoSuccess()
     self.StartObjectPatch(upload, '_GetNow', return_value=datetime(1970, 1, 1))
     self.StartObjectPatch(
         upload,
@@ -95,6 +119,7 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
         full_paths)
 
   def testUploadWithGitFiles(self):
+    self.SetGetRepoSuccess()
     full_paths = self.CreateFiles(['file1', '.git/file2'])
 
     upload.UploadManager().Upload('branch1', self.tmpdir)
@@ -102,6 +127,7 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
     self.push_mock.assert_called_with('branch1', self.tmpdir, full_paths[:1])
 
   def testUploadWithGitIgnore(self):
+    self.SetGetRepoSuccess()
     full_paths = self.CreateFiles(
         ['.gitignore', 'file1', 'ignoredfile', 'ignoreddir/file'])
     with open(full_paths[0], 'w') as f:
@@ -112,6 +138,7 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
     self.push_mock.assert_called_with('branch1', self.tmpdir, [full_paths[1]])
 
   def testUploadWithGcloudIgnore(self):
+    self.SetGetRepoSuccess()
     full_paths = self.CreateFiles(
         ['.gcloudignore', 'file1', 'ignoredfile', 'ignoreddir/file'])
     with open(full_paths[0], 'w') as f:
@@ -123,6 +150,7 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
                                       [full_paths[0], full_paths[1]])
 
   def testUploadWithTooLargeFiles(self):
+    self.SetGetRepoSuccess()
     original_size_threshold = upload.UploadManager.SIZE_THRESHOLD
 
     try:

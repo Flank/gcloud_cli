@@ -6,7 +6,11 @@ SYNOPSIS
     gcloud alpha compute sole-tenancy hosts COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manage Google Compute Engine sole-tenancy hosts.
+    (ALPHA) (DEPRECATED) Read and manage Google Compute Engine sole-tenancy
+    hosts.
+
+    This command group is deprecated. Please use gcloud alpha compute
+    sole-tenancy node-groups instead.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -17,16 +21,18 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create Google Compute Engine sole-tenancy hosts.
+        (ALPHA) (DEPRECATED) (REMOVED) Create Google Compute Engine
+        sole-tenancy hosts.
 
      delete
-        (ALPHA) Delete Google Compute Engine sole-tenancy hosts.
+        (ALPHA) (DEPRECATED) Delete Google Compute Engine sole-tenancy hosts.
 
      describe
-        (ALPHA) Display detailed information about a sole-tenancy host.
+        (ALPHA) (DEPRECATED) Display detailed information about a sole-tenancy
+        host.
 
      list
-        (ALPHA) List Google Compute Engine hosts.
+        (ALPHA) (DEPRECATED) List Google Compute Engine hosts.
 
 NOTES
     This command is an internal implementation detail and may change or

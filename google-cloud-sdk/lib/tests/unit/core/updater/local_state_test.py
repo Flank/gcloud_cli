@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
+import re
 import tempfile
-import urllib
-import urllib2
 
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import url_opener
@@ -27,6 +28,10 @@ from tests.lib import test_case
 from tests.lib.core.updater import util
 import mock
 from oauth2client import client as oauth2client
+from six.moves import range  # pylint: disable=redefined-builtin
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 
 
 class LocalStateTestsFS(util.Base):
@@ -37,17 +42,18 @@ class LocalStateTestsFS(util.Base):
     install_state = local_state.InstallationState(self.sdk_root_path)
     self.assertEqual({}, install_state.InstalledComponents())
 
-    component_ids = snapshot.components.keys()
+    component_ids = list(snapshot.components.keys())
     for i in range(0, len(component_ids)):
       install_state.Install(snapshot, component_ids[i])
       self.assertEqual(i + 1, len(install_state.InstalledComponents()))
-    self.assertEqual(component_ids, install_state.InstalledComponents().keys())
+    self.assertEqual(sorted(component_ids),
+                     sorted(list(install_state.InstalledComponents().keys())))
 
     for i in range(0, len(component_ids)):
       install_state.Uninstall(component_ids[i])
       self.assertEqual(len(component_ids) - i - 1,
                        len(install_state.InstalledComponents()))
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
 
   def testCloningReplaceRestore(self):
     snapshot = self.CreateSnapshotFromStrings(1, 'a,b', '')
@@ -166,13 +172,30 @@ class LocalStateTests(util.Base, test_case.WithOutputCapture):
     install_state = local_state.InstallationState(self.sdk_root_path)
     install_state.CompilePythonFiles()
 
+    # Depending on the Python version, compiled files might be located in the
+    # same dir or in the location specified by PEP-3147.
+    def _FileMatchesInDir(dirname, regex):
+      for _, _, filenames in os.walk(dirname):
+        for filename in filenames:
+          if re.match(regex, filename):
+            return True
+      return False
+
     for f in to_compile:
-      self.AssertFileExists(os.path.join(self.sdk_root_path, f) + 'c')
+      d, basename = os.path.split(os.path.join(self.sdk_root_path, f))
+      file_name, extension = basename.split('.', 1)
+      regex = '{0}.(.*){1}c'.format(file_name, re.escape(extension))
+      self.assertTrue(_FileMatchesInDir(d, regex))
     for f in no_compile:
       if f.endswith('.py'):
-        self.AssertFileNotExists(os.path.join(self.sdk_root_path, f) + 'c')
+        d, basename = os.path.split(os.path.join(self.sdk_root_path, f))
+        file_name, extension = basename.split('.', 1)
+        regex = '{0}.(.*){1}c'.format(file_name, re.escape(extension))
+        self.assertFalse(_FileMatchesInDir(d, regex))
       else:
-        self.AssertFileNotExists(os.path.join(self.sdk_root_path, f) + '.pyc')
+        d, basename = os.path.split(os.path.join(self.sdk_root_path, f))
+        regex = '{0}(.*).pyc'.format(basename)
+        self.assertFalse(_FileMatchesInDir(d, regex))
 
     # Ensure this doesn't crash when one of the directories is missing
     files.RmTree(os.path.join(self.sdk_root_path, 'platform'))
@@ -187,12 +210,12 @@ class InstallerTests(util.Base):
         1, component_tuples))
 
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
 
     callback_mock = mock.MagicMock()
     install_state.Install(snapshot, 'a', progress_callback=callback_mock)
     self.CheckPathsExist(paths['a'], exists=True)
-    self.assertEqual(['a'], install_state.InstalledComponents().keys())
+    self.assertEqual(['a'], list(install_state.InstalledComponents().keys()))
     # 5 files, 5 directories, 2 'dones', 1 download block.
     self.assertEqual(13, callback_mock.call_count)
 
@@ -204,7 +227,7 @@ class InstallerTests(util.Base):
     callback_mock.reset_mock()
     install_state.Uninstall('a', progress_callback=callback_mock)
     self.CheckPathsExist(paths['a'], exists=False)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     # 5 files, 0 empty directories.
     self.assertEqual(5, callback_mock.call_count)
 
@@ -229,8 +252,9 @@ class InstallerTests(util.Base):
 
     tar_file = self.CreateTempTarFromDir(self.staging_path, tar_dir)
 
-    new_tuples = [('a', '1', [],
-                   self.URLFromFile(urllib.pathname2url(tar_file)))]
+    new_tuples = [
+        ('a', '1', [],
+         self.URLFromFile(six.moves.urllib.request.pathname2url(tar_file)))]
     snapshot = self.CreateSnapshotFromComponents('1', new_tuples)
     return snapshot
 
@@ -245,7 +269,7 @@ class InstallerTests(util.Base):
     snapshot = self.SetupSymlinkTest()
 
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     install_state.Install(snapshot, 'a')
 
     # This is how we remove the target before the link.
@@ -268,7 +292,7 @@ class InstallerTests(util.Base):
     snapshot = self.SetupSymlinkTest()
 
     install_state = local_state.InstallationState(self.sdk_root_path)
-    self.assertEqual([], install_state.InstalledComponents().keys())
+    self.assertEqual([], list(install_state.InstalledComponents().keys()))
     install_state.Install(snapshot, 'a')
 
     # Remove the targets first, allows links to be cleaned up.
@@ -289,8 +313,8 @@ class InstallerTests(util.Base):
     snapshot.ComponentFromId('a').data.source = fake_url
 
     # Always raise a 403 error when accessing
-    fake_error = urllib2.HTTPError(fake_url, code=403, msg='Forbidden', hdrs={},
-                                   fp=None)
+    fake_error = six.moves.urllib.error.HTTPError(
+        fake_url, code=403, msg='Forbidden', hdrs={}, fp=None)
     # pylint: disable=unused-argument
 
     def RaiseError(*_, **__):
@@ -302,7 +326,7 @@ class InstallerTests(util.Base):
     install_state = local_state.InstallationState(self.sdk_root_path)
 
     # You must have an account set to get credentials.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         installers.ComponentDownloadFailedError,
         'You do not currently have an active account selected.'):
       install_state.Install(snapshot, 'a')
@@ -315,7 +339,7 @@ class InstallerTests(util.Base):
                           return_value=None)
     properties.VALUES.core.account.Set('someaccount')
     # You must have valid credentials.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         installers.ComponentDownloadFailedError,
         r'\[someaccount\] does not have permission to install this component.'):
       install_state.Install(snapshot, 'a')

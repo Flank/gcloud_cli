@@ -13,13 +13,18 @@
 # limitations under the License.
 """Test of the 'list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.bigtable import util
+from googlecloudsdk.command_lib.bigtable import arguments
 from tests.lib import cli_test_base
 from tests.lib import test_case
+from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
-class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
+class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase,
+                      resource_completer_test_base.ResourceCompleterBase):
 
   def SetUp(self):
     self.clusters_list_mock = self.client.projects_instances_clusters.List
@@ -32,10 +37,9 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
             parent=instance_ref.RelativeName()),
         response=self.msgs.ListClustersResponse(clusters=[
             self.msgs.Cluster(
-                name=('projects/theprojects/instances/'
-                      '{}/clusters/{}'.format(instance_ref.Name(),
-                                              cluster_name)),
-                location='projects/theprojects/locations/thezone',
+                name=('projects/{}/instances/{}/clusters/{}'.format(
+                    self.Project(), instance_ref.Name(), cluster_name)),
+                location='projects/{}/locations/thezone'.format(self.Project()),
                 defaultStorageType=(
                     self.msgs.Cluster.DefaultStorageTypeValueValuesEnum.SSD),
                 state=self.msgs.Cluster.StateValueValuesEnum.READY,
@@ -44,7 +48,7 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
 
   def testList(self):
     self.expectClusterList(self.instance_ref, 'thecluster')
-    self.RunBT('clusters list --instances theinstance')
+    self.Run('bigtable clusters list --instances theinstance')
 
     self.AssertOutputEquals(
         'INSTANCE     NAME        ZONE     NODES  STORAGE  STATE\n'
@@ -53,17 +57,18 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
   def testUri(self):
     self.expectClusterList(self.instance_ref, 'thecluster')
     # Check that URI project is used for instance and list of clusters.
-    self.RunBT('clusters list --instances {} --uri --project bogus'
-               .format(self.instance_ref.RelativeName()))
+    self.Run('bigtable clusters list --instances {} --uri --project bogus'
+             .format(self.instance_ref.RelativeName()))
 
     self.AssertOutputEquals(
         'https://bigtableadmin.googleapis.com/v2/'
-        'projects/theprojects/instances/theinstance/clusters/thecluster\n')
+        'projects/{}/instances/theinstance/clusters/thecluster\n'.format(
+            self.Project()))
 
   def testListMultiple(self):
     self.expectClusterList(self.instance_ref, 'thecluster')
     self.expectClusterList(self.other_instance_ref, 'theothercluster')
-    self.RunBT('clusters list --instances theinstance,theotherinstance')
+    self.Run('bigtable clusters list --instances theinstance,theotherinstance')
 
     self.AssertOutputEquals(
         'INSTANCE          NAME             ZONE     NODES  STORAGE  STATE\n'
@@ -76,25 +81,23 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
             parent=util.GetInstanceRef('-').RelativeName()),
         response=self.msgs.ListClustersResponse(clusters=[
             self.msgs.Cluster(
-                name=('projects/theprojects/instances/'
-                      '{}/clusters/{}'.format('theinstance',
-                                              'thecluster')),
-                location='projects/theprojects/locations/thezone',
+                name=('projects/{}/instances/{}/clusters/{}'.format(
+                    self.Project, 'theinstance', 'thecluster')),
+                location='projects/{}/locations/thezone'.format(self.Project()),
                 defaultStorageType=(
                     self.msgs.Cluster.DefaultStorageTypeValueValuesEnum.SSD),
                 state=self.msgs.Cluster.StateValueValuesEnum.READY,
                 serveNodes=5),
             self.msgs.Cluster(
-                name=('projects/theprojects/instances/'
-                      '{}/clusters/{}'.format('theotherinstance',
-                                              'theothercluster')),
-                location='projects/theprojects/locations/thezone',
+                name=('projects/{}/instances/{}/clusters/{}'.format(
+                    self.Project(), 'theotherinstance', 'theothercluster')),
+                location='projects/{}/locations/thezone'.format(self.Project()),
                 defaultStorageType=(
                     self.msgs.Cluster.DefaultStorageTypeValueValuesEnum.SSD),
                 state=self.msgs.Cluster.StateValueValuesEnum.READY,
                 serveNodes=5)
         ]))
-    self.RunBT('clusters list')
+    self.Run('bigtable clusters list')
 
     self.AssertOutputEquals(
         'INSTANCE          NAME             ZONE     NODES  STORAGE  STATE\n'
@@ -103,8 +106,11 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
 
   def testCompletion(self):
     self.expectClusterList(self.instance_ref, 'thecluster')
-    self.RunCompletion('beta bigtable clusters update --instance theinstance t',
-                       ['thecluster --project=theprojects'])
+    self.RunResourceCompleter(
+        arguments.GetClusterResourceSpec(),
+        'cluster',
+        args={'--instance': 'theinstance'},
+        expected_completions=['thecluster'])
 
 
 if __name__ == '__main__':

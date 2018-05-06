@@ -14,6 +14,8 @@
 
 """Basic unit tests for the Importer library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import re
 
@@ -79,7 +81,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       self.fail('Expected exception.')
     except exceptions.ConfigError as e:
       self.assertTrue('No path or name for a config, template, or '
-                      'composite type was specified.' in e.message)
+                      'composite type was specified.' in str(e))
 
   def testBuildTargetConfig_Yaml_WrongFlag_Template(self):
     try:
@@ -88,7 +90,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       self.fail('Expected exception.')
     except exceptions.ArgumentError as e:
       self.assertTrue('The --template flag should only be used '
-                      'when using a template as your config file.' in e.message)
+                      'when using a template as your config file.' in str(e))
 
   def testBuildTargetConfig_Yaml_WrongFlag_CompositeType(self):
     try:
@@ -96,14 +98,14 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer.BuildTargetConfig(messages, composite_type=config_name)
       self.fail('Expected exception.')
     except exceptions.ConfigError as e:
-      self.assertTrue('Invalid composite type syntax.' in e.message)
+      self.assertTrue('Invalid composite type syntax.' in str(e))
 
   def testBuildTargetConfig_Jinja_WrongFlag_Config(self):
     config_name = self.GetTestData('single_vm', 'vm_template.jinja')
 
     dict_props = {'zone': 'ZONE_TO_RUN'}
 
-    with self.assertRaisesRegexp(exceptions.ArgumentError, r'--template'):
+    with self.assertRaisesRegex(exceptions.ArgumentError, r'--template'):
       importer.BuildTargetConfig(messages,
                                  config=config_name,
                                  properties=dict_props)
@@ -131,11 +133,11 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         ]
     )
 
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(expected_target_config.imports,
-                      actual_target_config.imports,
-                      'missing expected import vm_template.jinja')
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(expected_target_config.imports,
+                     actual_target_config.imports,
+                     'missing expected import vm_template.jinja')
 
   def testBuildTargetConfig_SingleVmJinja(self):
     config_name = self.GetTestData('single_vm', 'vm_template.jinja')
@@ -166,11 +168,11 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                                       'type': 'vm_template.jinja',
                                       'properties': {'zone': 'ZONE_TO_RUN'}}]}
 
-    self.assertEquals(expected_config, yaml_config)
+    self.assertEqual(expected_config, yaml_config)
 
-    self.assertEquals(expected_target_config.imports,
-                      actual_target_config.imports,
-                      'missing expected import vm_template.jinja')
+    self.assertEqual(expected_target_config.imports,
+                     actual_target_config.imports,
+                     'missing expected import vm_template.jinja')
 
   def testBuildTargetConfig_SingleVmJinjaWithOutputsInSchema(self):
     config_name = self.GetTestData('single_vm', 'with_output.jinja')
@@ -207,11 +209,11 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                             'value': '$(ref.with-output-jinja.databaseIp)'},
                        ]}
 
-    self.assertEquals(expected_config, yaml_config)
+    self.assertEqual(expected_config, yaml_config)
 
-    self.assertEquals(expected_target_config.imports,
-                      actual_target_config.imports,
-                      'missing expected import with_output.jinja')
+    self.assertEqual(expected_target_config.imports,
+                     actual_target_config.imports,
+                     'missing expected import with_output.jinja')
 
   @mock.patch('requests.get')
   def testBuildTargetConfig_SingleVmJinjaUrl(self, mock_request):
@@ -250,13 +252,13 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                                       'type': 'vm_template.jinja',
                                       'properties': {'zone': 'ZONE_TO_RUN'}}]}
 
-    self.assertEquals(expected_config, yaml_config)
+    self.assertEqual(expected_config, yaml_config)
 
-    self.assertEquals(expected_target_config.imports,
-                      actual_target_config.imports,
-                      'missing expected import vm_template.jinja')
+    self.assertEqual(expected_target_config.imports,
+                     actual_target_config.imports,
+                     'missing expected import vm_template.jinja')
 
-    self.assertEquals(3, mock_request.call_count)
+    self.assertEqual(3, mock_request.call_count)
     mock_request.assert_any_call(config_url)
     mock_request.assert_any_call(schema_url)
 
@@ -302,13 +304,13 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                                       'type': 'vm_template.jinja',
                                       'properties': {'zone': 'ZONE_TO_RUN'}}]}
 
-    self.assertEquals(expected_config, yaml_config)
+    self.assertEqual(expected_config, yaml_config)
 
-    self.assertEquals(expected_target_config.imports,
-                      actual_target_config.imports,
-                      'missing expected import vm_template.jinja')
+    self.assertEqual(expected_target_config.imports,
+                     actual_target_config.imports,
+                     'missing expected import vm_template.jinja')
 
-    self.assertEquals(3, mock_request.call_count)
+    self.assertEqual(3, mock_request.call_count)
     mock_request.assert_any_call(config_url)
     mock_request.assert_any_call(schema_url)
 
@@ -335,9 +337,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
@@ -368,9 +370,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
@@ -401,9 +403,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
@@ -440,9 +442,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
@@ -455,8 +457,8 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer.BuildTargetConfig(messages, config=config_name)
       self.fail('Importing duplicate files.')
     except exceptions.ConfigError as e:
-      self.assertTrue('both being imported' in e.message)
-      self.assertTrue('my-import' in e.message)
+      self.assertTrue('both being imported' in str(e))
+      self.assertTrue('my-import' in str(e))
 
   def testBuildTargetConfig_ConfigAndProperties(self):
     config_name = self.GetTestData('simple_configs', 'simple.yaml')
@@ -467,8 +469,8 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                                  properties=config_properties)
       self.fail('Passing properties to yaml file.')
     except exceptions.Error as e:
-      self.assertTrue('properties flag' in e.message)
-      self.assertTrue('when using a template' in e.message)
+      self.assertTrue('properties flag' in str(e))
+      self.assertTrue('when using a template' in str(e))
 
   def testBuildTargetConfig_WithSimpleSchema(self):
     config_name = self.GetTestData('simple_configs', 'simple_with_schema.yaml')
@@ -493,9 +495,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
@@ -537,9 +539,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
@@ -559,10 +561,10 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         imports=[]
     )
 
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(expected_target_config.imports,
-                      actual_target_config.imports)
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(expected_target_config.imports,
+                     actual_target_config.imports)
 
   def testBuildTargetConfig_CompositeType_WithProps(self):
     config_name = 'example-project-name/composite:example-composite-type-name'
@@ -582,10 +584,10 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         imports=[]
     )
 
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(expected_target_config.imports,
-                      actual_target_config.imports)
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(expected_target_config.imports,
+                     actual_target_config.imports)
 
   def testBuildTargetConfigFromManifest_GetHttpError(self):
     project_name = 'project-name'
@@ -611,7 +613,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   def testHandleTemplateImporter_NoSchema(self):
     import_objects = importer._HandleTemplateImport(
         build_mock_file('', 'no-file.py'))
-    self.assertEquals(import_objects, [])
+    self.assertEqual(import_objects, [])
 
   def testHandleTemplate_EmptySchema(self):
     # empty.py.schema is an empty file
@@ -620,8 +622,8 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     schema_path = self.GetTestData('simple_configs', 'empty.py.schema')
 
-    self.assertEquals(len(import_objects), 1)
-    self.assertEquals(import_objects[0].GetFullPath(), schema_path)
+    self.assertEqual(len(import_objects), 1)
+    self.assertEqual(import_objects[0].GetFullPath(), schema_path)
 
   def testHandleTemplate_SimpleSchema(self):
     # simple.jinja.schema is an empty file
@@ -634,7 +636,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     expected_paths = [schema_path, import_path]
 
-    self.assertEquals(len(import_objects), 2)
+    self.assertEqual(len(import_objects), 2)
     for import_object in import_objects:
       self.assertTrue(import_object.GetFullPath() in expected_paths)
 
@@ -644,11 +646,11 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     obj = importer._BuildFileImportObject(config_path, name=config_name)
 
-    self.assertEquals(config_name, obj.GetName())
+    self.assertEqual(config_name, obj.GetName())
 
     other_path = self.GetTestData('simple_configs', 'empty.yaml')
 
-    self.assertEquals(other_path, obj.BuildChildPath('empty.yaml'))
+    self.assertEqual(other_path, obj.BuildChildPath('empty.yaml'))
 
   def testImportFileChildPath(self):
     config_path = self.GetTestData('saltstack', 'salt_cluster.yaml')
@@ -656,11 +658,11 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     obj = importer._BuildImportObject(config=config_path)
 
     child_path = self.GetTestData('saltstack', 'salt_cluster.jinja')
-    self.assertEquals(child_path, obj.BuildChildPath('salt_cluster.jinja'))
+    self.assertEqual(child_path, obj.BuildChildPath('salt_cluster.jinja'))
 
     deep_child_path = self.GetTestData('saltstack', 'states', 'index.html')
     deep_child_name = os.path.join('states', 'index.html')
-    self.assertEquals(deep_child_path, obj.BuildChildPath(deep_child_name))
+    self.assertEqual(deep_child_path, obj.BuildChildPath(deep_child_name))
 
   def testImportsMissingPath(self):
     content = """
@@ -672,7 +674,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer._GetYamlImports(build_mock_file(content))
       self.fail()
     except exceptions.ConfigError as e:
-      self.assertTrue('Missing required field' in e.message)
+      self.assertTrue('Missing required field' in str(e))
 
   def testGetYamlImports_InvalidYaml(self):
     content = """
@@ -680,7 +682,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         dictionary: is it?
         - list
       """
-    with self.assertRaisesRegexp(yaml.Error, r'Failed to parse YAML'):
+    with self.assertRaisesRegex(yaml.Error, r'Failed to parse YAML'):
       importer._GetYamlImports(build_mock_file(content))
 
   def testGetYamlImports(self):
@@ -695,7 +697,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     imports = [{'path': 'a.yaml', 'name': 'a.yaml'},
                {'path': 'b.yaml', 'name': 'c.yaml'}]
 
-    self.assertEquals(imports, yaml_imports)
+    self.assertEqual(imports, yaml_imports)
 
   def testBuildConfig(self):
     path = os.path.join('foo', 'bar.py')
@@ -705,16 +707,16 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                  'number': 100}
     config_obj = importer.BuildConfig(template=path, properties=prop_dict)
 
-    self.assertEquals(
+    self.assertEqual(
         prop_dict,
         yaml.load(config_obj.GetContent())['resources'][0]['properties'])
 
     child = os.path.join('subdir', 'helper.py')
     expected_child = os.path.join('foo', child)
 
-    self.assertEquals(expected_child, config_obj.BuildChildPath(child))
+    self.assertEqual(expected_child, config_obj.BuildChildPath(child))
 
-    self.assertEquals(path, config_obj.BuildChildPath(config_obj.GetBaseName()))
+    self.assertEqual(path, config_obj.BuildChildPath(config_obj.GetBaseName()))
 
     self.assertTrue('type: bar.py' in config_obj.GetContent())
     self.assertTrue('name: bar-py' in config_obj.GetContent())
@@ -733,16 +735,16 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                  'number': 100}
     config_obj = importer.BuildConfig(template=url, properties=prop_dict)
 
-    self.assertEquals(
+    self.assertEqual(
         prop_dict,
         yaml.load(config_obj.GetContent())['resources'][0]['properties'])
 
     child = 'subdir/helper.py'
     expected_child = 'http://www.google.com/example/foo/subdir/helper.py'
 
-    self.assertEquals(expected_child, config_obj.BuildChildPath(child))
+    self.assertEqual(expected_child, config_obj.BuildChildPath(child))
 
-    self.assertEquals(url, config_obj.BuildChildPath(config_obj.GetBaseName()))
+    self.assertEqual(url, config_obj.BuildChildPath(config_obj.GetBaseName()))
 
     self.assertTrue('type: bar.py' in config_obj.GetContent())
     self.assertTrue('name: bar-py' in config_obj.GetContent())
@@ -753,7 +755,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     path = self.GetTestData('simple_configs', 'simple_bad_schema.jinja')
     prop_dict = {'zone': 'ZONE_TO_RUN'}
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         yaml.Error,
         r'Failed to parse YAML from \[{}\]'.format(
             re.escape(path + '.schema'))):
@@ -762,7 +764,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   def testSanitizeBaseName(self):
     name = 'My_Template.jinja'
     expected = 'my-Template-jinja'
-    self.assertEquals(expected, importer._SanitizeBaseName(name))
+    self.assertEqual(expected, importer._SanitizeBaseName(name))
 
   def testIsUrl_File(self):
     self.assertFalse(importer._IsUrl('a/b/c/foo.bar'))
@@ -779,6 +781,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def testIsValidCompositeTypeSyntax_Success(self):
     expected_successes = ['test-with-dashes-in-id/composite:name-with-dashes',
+                          'test-with-dashes-in-id/composite:name.with.periods',
                           'simpletest/composite:simple']
     for resource in expected_successes:
       self.assertTrue(importer._IsValidCompositeTypeSyntax(resource))
@@ -797,23 +800,23 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer._BuildFileImportObject('ssh://www.google.com/foo.py')
       self.fail('Url isnt http')
     except exceptions.ConfigError as e:
-      self.assertTrue('scheme' in e.message)
-      self.assertTrue("'https'" in e.message)
-      self.assertTrue("'http'" in e.message)
+      self.assertTrue('scheme' in str(e))
+      self.assertTrue("'https'" in str(e))
+      self.assertTrue("'http'" in str(e))
 
   def testInvalidUrl_Path(self):
     try:
       importer._BuildFileImportObject('http://www.google.com')
       self.fail('Url has no path')
     except exceptions.ConfigError as e:
-      self.assertTrue('path' in e.message)
+      self.assertTrue('path' in str(e))
 
   def testInvalidUrl_SlashPath(self):
     try:
       importer._BuildFileImportObject('http://www.google.com/')
       self.fail('Url has no path')
     except exceptions.ConfigError as e:
-      self.assertTrue('path' in e.message)
+      self.assertTrue('path' in str(e))
 
   def testInvalidUrl_Query(self):
     try:
@@ -821,7 +824,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer._BuildFileImportObject(url)
       self.fail('Url has query')
     except exceptions.ConfigError as e:
-      self.assertTrue('queries' in e.message)
+      self.assertTrue('queries' in str(e))
 
   def testInvalidUrl_Fragment(self):
     try:
@@ -829,7 +832,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       importer._BuildFileImportObject(url)
       self.fail('Url has fragment')
     except exceptions.ConfigError as e:
-      self.assertTrue('fragments' in e.message)
+      self.assertTrue('fragments' in str(e))
 
   @mock.patch('requests.get')
   def testImportUrl(self, mock_request):
@@ -837,11 +840,11 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     url_obj = importer._BuildFileImportObject(url)
 
     self.assertTrue(url_obj.IsTemplate())
-    self.assertEquals('foo.py', url_obj.GetBaseName())
-    self.assertEquals('https://www.google.com/bar.py',
-                      url_obj.BuildChildPath('../bar.py'))
-    self.assertEquals('https://www.google.com/a/b/bar.py',
-                      url_obj.BuildChildPath('b/bar.py'))
+    self.assertEqual('foo.py', url_obj.GetBaseName())
+    self.assertEqual('https://www.google.com/bar.py',
+                     url_obj.BuildChildPath('../bar.py'))
+    self.assertEqual('https://www.google.com/a/b/bar.py',
+                     url_obj.BuildChildPath('b/bar.py'))
 
     hello = 'hello world'
 
@@ -849,7 +852,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     mock_request.side_effect = lambda url: mock_responses[url]
 
-    self.assertEquals(hello, url_obj.GetContent())
+    self.assertEqual(hello, url_obj.GetContent())
 
     mock_request.assert_called_once_with(url)
 
@@ -867,7 +870,7 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     mock_request.side_effect = lambda url: mock_responses[url]
 
     self.assertTrue(url_obj.Exists())
-    self.assertEquals(hello, url_obj.GetContent())
+    self.assertEqual(hello, url_obj.GetContent())
 
     mock_request.assert_called_once_with(url)
 
@@ -886,10 +889,10 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
       url_obj.GetContent()
       self.fail('Url should return 403')
     except requests.exceptions.HTTPError as e:
-      self.assertTrue('forbidden' in e.message)
+      self.assertTrue('forbidden' in str(e))
 
     # Called twice, for Exists and GetContent
-    self.assertEquals(2, mock_request.call_count)
+    self.assertEqual(2, mock_request.call_count)
     mock_request.assert_any_call(url)
 
   @mock.patch('requests.get')
@@ -924,9 +927,9 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
@@ -993,14 +996,14 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
 
-    self.assertEquals(4, mock_request.call_count)
+    self.assertEqual(4, mock_request.call_count)
     mock_request.assert_has_calls([mock.call(schema),
                                    mock.call(url),
                                    mock.call(subhelper_schema),
@@ -1087,14 +1090,14 @@ class ImporterTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             for import_item in imports.items()
         ]
     )
-    self.assertEquals(expected_target_config.config,
-                      actual_target_config.config)
-    self.assertEquals(len(imports), len(actual_target_config.imports))
+    self.assertEqual(expected_target_config.config,
+                     actual_target_config.config)
+    self.assertEqual(len(imports), len(actual_target_config.imports))
     for expected_import in expected_target_config.imports:
       self.assertTrue(expected_import in actual_target_config.imports,
                       'missing expected import ' + str(expected_import))
 
-    self.assertEquals(6, mock_request.call_count)
+    self.assertEqual(6, mock_request.call_count)
     mock_request.assert_has_calls([mock.call(shared_schema),
                                    mock.call(shared_url),
                                    mock.call(helper_schema),

@@ -20,7 +20,9 @@ gcloud compute firewall\-rules update \- update a firewall rule
 \fBgcloud compute firewall\-rules update\fR is used to update firewall rules
 that allow/deny incoming/outgoing traffic. The firewall rule will only be
 updated for arguments that are specifically passed. Other attributes will remain
-unaffected.
+unaffected. The \f5action\fR flag (whether to allow or deny matching traffic)
+cannot be defined when updating a firewall rule; use \f5gcloud compute
+firewall\-rules delete\fR to remove the rule instead.
 
 
 
@@ -117,15 +119,8 @@ http://www.iana.org/assignments/protocol\-numbers/protocol\-numbers.xhtml
 
 A port or port range can be specified after PROTOCOL to which the firewall rule
 apply on traffic through specific ports. If no port or port range is specified,
-connections through all ranges are applied. For example, the following will
-create a rule that blocks TCP traffic through port 80 and ICMP traffic:
-
-.RS 2m
-$ gcloud compute firewall\-rules update MY\-RULE \-\-action deny \e
-    \-\-rules tcp:80,icmp
-.RE
-
-TCP and UDP rules must include a port or port range.
+connections through all ranges are applied. TCP and UDP rules must include a
+port or port range.
 
 Setting this will override the current values.
 

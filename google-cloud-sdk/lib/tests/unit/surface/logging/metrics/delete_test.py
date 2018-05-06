@@ -25,7 +25,7 @@ class MetricsDeleteTest(base.LoggingTestBase):
 
   def testDeletePromptNo(self):
     self.WriteInput('n')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         console_io.OperationCancelledError, 'Aborted by user.'):
       self.RunLogging('metrics delete my-metric')
     self.AssertErrNotContains('Deleted [my-metric].')

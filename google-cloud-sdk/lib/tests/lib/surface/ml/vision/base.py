@@ -11,13 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Base class for all ml vision tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
-from googlecloudsdk.api_lib.ml.vision import util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.ml.vision import util
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
@@ -38,7 +42,8 @@ class MlVisionTestBase(sdk_test_base.WithFakeAuth,
   def _ExpectEntityAnnotationRequest(self, image_path, feature_type,
                                      entity_field_name, max_results=None,
                                      results=None, error_message=None,
-                                     language_hints=None, contents=None):
+                                     language_hints=None, contents=None,
+                                     model=None):
     """Expect requests that lead to EntityAnnotations.
 
     Args:
@@ -51,8 +56,9 @@ class MlVisionTestBase(sdk_test_base.WithFakeAuth,
       error_message: str, the error message to be given if an error is desired.
       language_hints: [str], the list of hints given by the caller.
       contents: bytes, the contents of the Image message if desired.
+      model: str, the model version to use for the feature.
     """
-    feature = self.messages.Feature(type=feature_type)
+    feature = self.messages.Feature(type=feature_type, model=model)
     if max_results:
       feature.maxResults = max_results
     image = self.messages.Image()

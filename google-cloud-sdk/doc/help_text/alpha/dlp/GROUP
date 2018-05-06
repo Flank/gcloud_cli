@@ -1,0 +1,38 @@
+NAME
+    gcloud alpha dlp - manage sensitive data with Cloud Data Loss Prevention
+
+SYNOPSIS
+    gcloud alpha dlp GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) The DLP API lets you understand and manage sensitive data. It
+    provides fast, scalable classification and optional redaction for sensitive
+    data elements like credit card numbers, names, Social Security numbers,
+    passport numbers, US and selected international driver's license numbers,
+    and phone numbers. The API classifies this data using more than 50
+    predefined detectors to identify patterns, formats, and checksums, and even
+    understands contextual clues. The API supports text and images; just send
+    data to the API or specify data stored on your Google Cloud Storage,
+    BigQuery, or Cloud Datastore instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     images
+        (ALPHA) Use Cloud DLP Image capabilities.
+
+     text
+        (ALPHA) Use Cloud DLP Text capabilities.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

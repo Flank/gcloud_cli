@@ -213,8 +213,8 @@ class WithServiceAccountFile(WithCoreModules):
   """A base class which only provides service account file."""
 
   def SetUp(self):
-    with tempfile.NamedTemporaryFile(dir=self.temp_path,
-                                     delete=False) as key_file:
+    with tempfile.NamedTemporaryFile(
+        mode='w+t', dir=self.temp_path, delete=False) as key_file:
       json.dump(_TEST_CONFIG['auth_data']['service_account'], key_file)
     self.json_key_file = key_file.name
 

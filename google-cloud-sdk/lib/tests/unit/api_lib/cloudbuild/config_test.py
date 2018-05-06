@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests that exercise cloudbuild config parsing."""
-import cStringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 
 from googlecloudsdk.api_lib.cloudbuild import config
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -35,7 +37,7 @@ class ConfigTest(sdk_test_base.WithTempCWD):
     self.Touch('.', 'garbage.garbage', """
 this file is neither json nor yaml
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.ParserError, 'Could not parse into a message'):
       config.LoadCloudbuildConfigFromPath('garbage.garbage', self.messages)
 
@@ -198,7 +200,7 @@ steps:
 images: gcr.io/my-project/simple
 }
         """)
-    with self.assertRaisesRegexp(config.ParserError, 'error.yaml'):
+    with self.assertRaisesRegex(config.ParserError, 'error.yaml'):
       config.LoadCloudbuildConfigFromPath('error.yaml', self.messages)
 
   def testBadConfigSource(self):
@@ -209,14 +211,14 @@ source:
     bucket: boo
     object: oo
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.BadConfigException, 'config cannot specify source'):
       config.LoadCloudbuildConfigFromPath('has_source.yaml', self.messages)
 
     self.Touch('.', 'no_steps.yaml', """
 images: foobar
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.BadConfigException, 'config must list at least one step'):
       config.LoadCloudbuildConfigFromPath('no_steps.yaml', self.messages)
 
@@ -280,7 +282,7 @@ steps:
    tags: sometag
 images: gcr.io/my-project/simple1
 """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.BadConfigException,
         r'error.yaml: .steps\[0\].tags: unused'):
       config.LoadCloudbuildConfigFromPath('error.yaml', self.messages)
@@ -298,7 +300,7 @@ images: gcr.io/my-project/simple1
   "images": "gcr.io/$PROJECT_ID/simple"
 }
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.BadConfigException,
         r'error.json: .steps\[0\].tags: unused'):
       config.LoadCloudbuildConfigFromPath('error.json', self.messages)
@@ -317,7 +319,7 @@ extra:
     is: "bad"
 images: gcr.io/my-project/simple1
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.BadConfigException,
         r'error\.yaml: \.extra: unused'):
       config.LoadCloudbuildConfigFromPath('error.yaml', self.messages)
@@ -337,7 +339,7 @@ extra:
 nonsense: "bad as well"
 images: gcr.io/my-project/simple1
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.BadConfigException,
         r'error\.yaml: \.\{extra,nonsense\}: unused'):
       config.LoadCloudbuildConfigFromPath('error.yaml', self.messages)
@@ -355,13 +357,13 @@ images: gcr.io/my-project/simple1
   "images": "gcr.io/$PROJECT_ID/simple"
 }
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.BadConfigException,
         r'error\.json: \.steps\[0\]\.{bogus,foo}: unused'):
       config.LoadCloudbuildConfigFromPath('error.json', self.messages)
 
   def testLoadJson_FromStream(self):
-    data = cStringIO.StringIO("""
+    data = io.StringIO("""
 {
   "steps": [
     {"name": "gcr.io/cloud-builders/docker",
@@ -384,7 +386,7 @@ images: gcr.io/my-project/simple1
 
   def testJsonSyntaxError_FromStream(self):
     """Misplaced brace at the end of the document."""
-    data = cStringIO.StringIO("""
+    data = io.StringIO("""
 {
   "steps": [
     {"name": "gcr.io/cloud-builders/docker",
@@ -394,12 +396,12 @@ images: gcr.io/my-project/simple1
   "images": "gcr.io/my-project/simple"
 }}
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.ParserError, 'parsing Cloud Build configuration'):
       config.LoadCloudbuildConfigFromStream(data, self.messages)
 
   def testSubstitution_FromStream(self):
-    data = cStringIO.StringIO("""
+    data = io.StringIO("""
 {
   "steps": [
     {"name": "gcr.io/cloud-builders/docker",
@@ -426,7 +428,7 @@ images: gcr.io/my-project/simple1
     ))
 
   def testSubstitutionError_FromStream(self):
-    data = cStringIO.StringIO("""
+    data = io.StringIO("""
 {
   "steps": [
     {"name": "gcr.io/cloud-builders/docker",
@@ -436,7 +438,7 @@ images: gcr.io/my-project/simple1
   "substitutions": {"COMMIT_SHA": "my-sha"}
 }
         """)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         config.BadConfigException,
         'config cannot specify built-in substitutions'):
       config.LoadCloudbuildConfigFromStream(data, self.messages)
@@ -457,7 +459,7 @@ class FieldMappingTest(subtests.Base):
         ('a__b', 'aB'),
     ]
     for input_string, expected in cases:
-      self.assertEquals(config._SnakeToCamelString(input_string), expected)
+      self.assertEqual(config._SnakeToCamelString(input_string), expected)
 
   def testSnakeToCamel(self):
     cases = [
@@ -476,7 +478,7 @@ class FieldMappingTest(subtests.Base):
          {'secretEnv': {'FOO_BAR': 'asdf'}}),
     ]
     for input_string, expected in cases:
-      self.assertEquals(config._SnakeToCamel(input_string), expected)
+      self.assertEqual(config._SnakeToCamel(input_string), expected)
 
 if __name__ == '__main__':
   test_case.main()

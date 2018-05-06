@@ -4,7 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha ml vision detect-landmarks IMAGE_PATH
-        [--max-results=MAX_RESULTS] [GCLOUD_WIDE_FLAG ...]
+        [--max-results=MAX_RESULTS]
+        [--model-version=MODEL_VERSION; default="builtin/stable"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Google Cloud Vision will recognize landmarks in an image, such as
@@ -21,6 +23,10 @@ POSITIONAL ARGUMENTS
 FLAGS
      --max-results=MAX_RESULTS
         The maximum number of results to be provided.
+
+     --model-version=MODEL_VERSION; default="builtin/stable"
+        The model version to use for the feature. Supported values include
+        "builtin/stable" and "builtin/latest".
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

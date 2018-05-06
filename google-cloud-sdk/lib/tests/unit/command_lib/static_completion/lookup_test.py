@@ -33,75 +33,75 @@ class LookupCmdLineEnvTest(calliope_test_base.CalliopeTestBase):
 
   def testCmdLineEnv(self):
     self._SetCompletionContext('gcloud fruits man', '17')
-    self.assertEquals('gcloud fruits man', lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits man', lookup._GetCmdLineFromEnv())
 
     self._SetCompletionContext('gcloud fruits man ', '9')
-    self.assertEquals('gcloud fr', lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fr', lookup._GetCmdLineFromEnv())
 
   def testCmdLineEnvFlags(self):
     self._SetCompletionContext('gcloud fruits --size', '20')
-    self.assertEquals('gcloud fruits --size', lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits --size', lookup._GetCmdLineFromEnv())
 
     self._SetCompletionContext('gcloud fruits --size', '16')
-    self.assertEquals('gcloud fruits --', lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits --', lookup._GetCmdLineFromEnv())
 
     self._SetCompletionContext('gcloud fruits --size="large"', '28')
-    self.assertEquals('gcloud fruits --size="large"',
-                      lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits --size="large"',
+                     lookup._GetCmdLineFromEnv())
 
     self._SetCompletionContext('gcloud fruits --size=large', '26')
-    self.assertEquals('gcloud fruits --size=large',
-                      lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits --size=large',
+                     lookup._GetCmdLineFromEnv())
 
     self._SetCompletionContext('gcloud fruits --size="extra large"', '34')
-    self.assertEquals('gcloud fruits --size="extra large"',
-                      lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits --size="extra large"',
+                     lookup._GetCmdLineFromEnv())
 
   def testCmdLineEnvEmptyLastWord(self):
     self._SetCompletionContext('gcloud fruits man ', '18')
-    self.assertEquals('gcloud fruits man ', lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits man ', lookup._GetCmdLineFromEnv())
 
     self._SetCompletionContext('gcloud fruits man', '14')
-    self.assertEquals('gcloud fruits ', lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits ', lookup._GetCmdLineFromEnv())
 
     self._SetCompletionContext('gcloud fruits --size ', '21')
-    self.assertEquals('gcloud fruits --size ',
-                      lookup._GetCmdLineFromEnv())
+    self.assertEqual('gcloud fruits --size ',
+                     lookup._GetCmdLineFromEnv())
 
 
 class LookupCmdWordQueueTest(calliope_test_base.CalliopeTestBase):
 
   def testCmdWordQueueCommands(self):
-    self.assertEquals(['man', 'fruits'], lookup._GetCmdWordQueue(
+    self.assertEqual(['man', 'fruits'], lookup._GetCmdWordQueue(
         'gcloud fruits man'))
 
-    self.assertEquals(['fr'], lookup._GetCmdWordQueue('gcloud fr'))
+    self.assertEqual(['fr'], lookup._GetCmdWordQueue('gcloud fr'))
 
   def testCmdWordQueueFlags(self):
-    self.assertEquals(['--size', 'fruits'], lookup._GetCmdWordQueue(
+    self.assertEqual(['--size', 'fruits'], lookup._GetCmdWordQueue(
         'gcloud fruits --size'))
 
-    self.assertEquals(['--', 'fruits'], lookup._GetCmdWordQueue(
+    self.assertEqual(['--', 'fruits'], lookup._GetCmdWordQueue(
         'gcloud fruits --'))
 
-    self.assertEquals(['--size=large', 'fruits'], lookup._GetCmdWordQueue(
+    self.assertEqual(['--size=large', 'fruits'], lookup._GetCmdWordQueue(
         'gcloud fruits --size="large"'))
 
-    self.assertEquals(['--size=large', 'fruits'], lookup._GetCmdWordQueue(
+    self.assertEqual(['--size=large', 'fruits'], lookup._GetCmdWordQueue(
         'gcloud fruits --size=large'))
 
-    self.assertEquals(['--size=extra large', 'fruits'],
-                      lookup._GetCmdWordQueue(
-                          'gcloud fruits --size="extra large"'))
+    self.assertEqual(['--size=extra large', 'fruits'],
+                     lookup._GetCmdWordQueue(
+                         'gcloud fruits --size="extra large"'))
 
   def testCmdWordQueueEmptyLastWord(self):
-    self.assertEquals(['', 'man', 'fruits'], lookup._GetCmdWordQueue(
+    self.assertEqual(['', 'man', 'fruits'], lookup._GetCmdWordQueue(
         'gcloud fruits man '))
 
-    self.assertEquals(['', 'fruits'], lookup._GetCmdWordQueue('gcloud fruits '))
+    self.assertEqual(['', 'fruits'], lookup._GetCmdWordQueue('gcloud fruits '))
 
-    self.assertEquals(['', '--size', 'fruits'],
-                      lookup._GetCmdWordQueue('gcloud fruits --size '))
+    self.assertEqual(['', '--size', 'fruits'],
+                     lookup._GetCmdWordQueue('gcloud fruits --size '))
 
   def testCmdWordQueueUnmatchedQuote(self):
     with self.assertRaises(ValueError):
@@ -151,62 +151,62 @@ class LookupCompletionTest(calliope_test_base.CalliopeTestBase):
     find_completions_mock.return_value = ['internal']
     lookup.Complete()
     self.assertTrue(self.completions_closed)
-    self.assertEquals('internal', self.completions_value)
+    self.assertEqual('internal', self.completions_value)
 
   def testFindCompletionsPartialCommandCompletion(self):
     cmd_line = 'gcloud alpha int'
-    self.assertEquals(['internal'],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['internal'],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsMultipleCommandCompletion(self):
     cmd_line = 'gcloud '
-    self.assertEquals(['alpha', 'beta', 'internal', 'sdk', 'version'],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['alpha', 'beta', 'internal', 'sdk', 'version'],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsIncorrectCompletions(self):
     cmd_line = 'gcloud blpha int'
-    self.assertEquals([],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual([],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsPartialFlagCompletion(self):
     cmd_line = 'gcloud sdk xyzzy --ex'
-    self.assertEquals(['--exactly-one=', '--exactly-three='],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['--exactly-one=', '--exactly-three='],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsIncorrectFlagCompletion(self):
     cmd_line = 'gcloud sdk xyzzy --exte'
-    self.assertEquals([],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual([],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsGlobalFlagCompletion(self):
     cmd_line = 'gcloud sdk --lo'
-    self.assertEquals(['--log-http'],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['--log-http'],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsAfterFlagCompletion(self):
     cmd_line = 'gcloud sdk --log-http xy'
-    self.assertEquals(['xyzzy'],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['xyzzy'],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsFlagValueCompletion(self):
     cmd_line = 'gcloud sdk --verbosity=e'
-    self.assertEquals(['error'],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['error'],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsFlagValueMultipleCompletions(self):
     cmd_line = 'gcloud sdk --verbosity='
-    self.assertEquals(['critical', 'debug', 'error', 'info', 'none', 'warning'],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['critical', 'debug', 'error', 'info', 'none', 'warning'],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsFlagValueCompletionWithEquals(self):
     cmd_line = 'gcloud sdk --verbosity '
-    self.assertEquals(['critical', 'debug', 'error', 'info', 'none', 'warning'],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['critical', 'debug', 'error', 'info', 'none', 'warning'],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsFlagValueCannotComplete(self):
     cmd_line = 'gcloud sdk xyzzy --exactly-one=on'
-    self.assertEquals([],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual([],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsFlagValueDynamicFallback(self):
     cmd_line = 'gcloud beta sdk betagroup sub-command-a --resourceful=on'
@@ -215,18 +215,18 @@ class LookupCompletionTest(calliope_test_base.CalliopeTestBase):
 
   def testFindCompletionsGroupFlagAfterGroup(self):
     cmd_line = 'gcloud beta sdk betagroup --loc'
-    self.assertEquals(['--location='],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['--location='],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsGroupFlagAfterCommand(self):
     cmd_line = 'gcloud beta sdk betagroup beta-command --loc'
-    self.assertEquals(['--location='],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['--location='],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsCommandAfterFlagValueCompletion(self):
     cmd_line = 'gcloud sdk --verbosity=error xy'
-    self.assertEquals(['xyzzy'],
-                      lookup._FindCompletions(self.root, cmd_line))
+    self.assertEqual(['xyzzy'],
+                     lookup._FindCompletions(self.root, cmd_line))
 
   def testFindCompletionsPositionalFallback(self):
     cmd_line = 'gcloud sdk xyzzy '

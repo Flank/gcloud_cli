@@ -1,0 +1,63 @@
+NAME
+    gcloud alpha kms cryptokeys versions - create and manage CryptoKeyVersions
+
+SYNOPSIS
+    gcloud alpha kms cryptokeys versions COMMAND [--key=KEY]
+        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (REMOVED) Create and manage CryptoKeyVersions.
+
+    The command group cryptokeys is deprecated, please use the keys command
+    group.
+
+    A CryptoKeyVersion represents an individual cryptographic key and the
+    associated key material.
+
+FLAGS
+     --key=KEY
+        The containing key.
+
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) (REMOVED) Create a new CryptoKeyVersion.
+
+     describe
+        (ALPHA) (REMOVED) Get metadata for a given CryptoKeyVersion.
+
+     destroy
+        (ALPHA) (REMOVED) Schedule a CryptoKeyVersion to be destroyed.
+
+     disable
+        (ALPHA) (REMOVED) Disable a given CryptoKeyVersion.
+
+     enable
+        (ALPHA) (REMOVED) Enable a given CryptoKeyVersion.
+
+     list
+        (ALPHA) (REMOVED) List the versions within a CryptoKey.
+
+     restore
+        (ALPHA) (REMOVED) Restore a CryptoKeyVersion scheduled for destruction.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

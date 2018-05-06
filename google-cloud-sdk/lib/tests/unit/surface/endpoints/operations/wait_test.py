@@ -56,7 +56,7 @@ class EndpointsOperationsWaitTest(unit_test_base.EV1UnitTestBase):
         )
     )
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.OperationErrorException,
         'The operation with ID operation-12345 resulted in a failure.'):
       self.Run('endpoints operations wait ' + operation_name)

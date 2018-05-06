@@ -268,7 +268,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
       yield
     self.make_requests.side_effect = MakeRequests
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         'Could not fetch resource:'):
       self.Run('compute instance-groups managed set-autoscaling group-1 '
@@ -292,7 +292,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
                '--max-num-replicas -10 --zone zone-1')
 
   def testAssertsMaxSizeGreaterThanMinSize(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--max-num-replicas\]: can\'t be less than min '
         r'num replicas\.'):
@@ -317,7 +317,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
                '--target-cpu-utilization 1.1')
 
   def testAssertsCustomMetricSpecificationComplete(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--custom-metric-utilization\]: metric not '
         r'present\.'):
@@ -327,7 +327,7 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
                'utilization-target-type=GAUGE')
 
   def testAssertsCustomMetricTargetPositive(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for '
         r'\[--custom-metric-utilization utilization-target\]: less than 0\.'):
@@ -518,7 +518,7 @@ class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):
       yield
     self.make_requests.side_effect = MakeRequests
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         'Could not fetch resource:'):
       self.Run("""
@@ -551,7 +551,7 @@ class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):
           """)
 
   def testAssertsMaxSizeGreaterThanMinSize(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--max-num-replicas\]: can\'t be less than min '
         r'num replicas\.'):
@@ -582,7 +582,7 @@ class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):
           """)
 
   def testAssertsCustomMetricSpecificationComplete(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--custom-metric-utilization\]: metric not '
         r'present\.'):
@@ -594,7 +594,7 @@ class InstanceGroupManagersSetAutoscalingRegionalTest(test_base.BaseTest):
            """)
 
   def testAssertsCustomMetricTargetPositive(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for '
         r'\[--custom-metric-utilization utilization-target\]: less than 0\.'):
@@ -695,7 +695,7 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
     return os.path.join(output_dir, 'autoscaling_file.json')
 
   def testFlagConflictingWithAutoscalingFile(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ConflictingArgumentsException,
         r'arguments not allowed simultaneously: --autoscaling-file, .+'):
       self.Run("""
@@ -806,7 +806,7 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
     )
 
   def testFlagConflictCustomMetricUtilizationVsUpdateStackdriverMetric(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ConflictingArgumentsException,
         r'arguments not allowed simultaneously: --custom-metric-utilization, '
         r'--update-stackdriver-metric'):
@@ -819,7 +819,7 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
           """)
 
   def testFlagRequiringUpdateStackdriverMetric(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.RequiredArgumentException,
         r'\[--update-stackdriver-metric\] required to use this flag'):
       self.Run("""
@@ -830,7 +830,7 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
           """)
 
   def testRequiredByUpdateStackdriverMetric(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.RequiredArgumentException,
         r'Missing required argument \[--update-stackdriver-metric\]: '
         r'You must provide one of .+ with'):
@@ -842,7 +842,7 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
           """)
 
   def testSingleInstanceAssignmentVsUtilizationTarget(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ConflictingArgumentsException,
         r'You cannot use any of .+ with `.+`'):
       self.Run("""
@@ -855,7 +855,7 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
           """)
 
   def testUtilizationTargetNeedsType(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.RequiredArgumentException,
         r'Required with \[--stackdriver-metric-utilization-target\]'):
       self.Run("""
@@ -1041,7 +1041,7 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
         test_resources.MakeAutoscalers('beta'),
         []  # Insert autoscaler.
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--remove-stackdriver-metric\]: This would remove '
         r'the only signal used for autoscaling. If you want to stop '
@@ -1062,7 +1062,7 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
         test_resources.MakeAutoscalers('beta'),
         []  # Insert autoscaler.
     ])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'You can not remove Stackdriver metric you are updating with '
         r'\[--update-stackdriver-metric\] flag.'):
@@ -1124,6 +1124,170 @@ class InstanceGroupManagersSetAutoscalingZonalBetaTest(test_base.BaseTest):
         [(self.compute.autoscalers, 'Update', request)],
     )
 
+
+class InstanceGroupManagersSetAutoscalingAlphaTest(test_base.BaseTest):
+
+  INSTANCE_GROUP_MANAGERS = (
+      test_resources.MakeInstanceGroupManagers('alpha'))
+  AUTOSCALERS = test_resources.MakeAutoscalers('alpha')
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.make_requests.side_effect = iter([
+        [self.INSTANCE_GROUP_MANAGERS[0]],  # Get IGM.
+        self.AUTOSCALERS[1:],
+        []  # Insert autoscaler.
+    ])
+
+    self.StartObjectPatch(random, 'choice').return_value = 'a'
+    self.autoscalers_list_request = [
+        (
+            self.compute.autoscalers,
+            'List', self.messages.ComputeAutoscalersListRequest(
+                maxResults=500,
+                project='my-project',
+                zone='zone-1',
+            ),
+        ),
+    ]
+    self.managed_instance_group_get_request = [
+        (
+            self.compute.instanceGroupManagers,
+            'Get', self.messages.ComputeInstanceGroupManagersGetRequest(
+                instanceGroupManager='group-1',
+                project='my-project',
+                zone='zone-1',
+            ),
+        )
+    ]
+    self.managed_instance_group_self_link = (
+        '{0}/projects/my-project/zones/zone-1/instanceGroupManagers/group-1'
+        .format(self.compute_uri)
+    )
+
+  def testInsertMinimalAutoscaler(self):
+    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1')
+    request = self.messages.ComputeAutoscalersInsertRequest(
+        autoscaler=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[],
+                maxNumReplicas=10,
+            ),
+            name='group-1-aaaa',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Insert', request)],
+    )
+
+  def testInsertAutoscaler_Mode(self):
+    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1 --mode only-up')
+    mode_cls = self.messages.AutoscalingPolicy.ModeValueValuesEnum
+    request = self.messages.ComputeAutoscalersInsertRequest(
+        autoscaler=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[],
+                maxNumReplicas=10,
+                mode=mode_cls.ONLY_UP,
+            ),
+            name='group-1-aaaa',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Insert', request)],
+    )
+
+  def testUpdateAutoscaler_Mode(self):
+    self.make_requests.side_effect = iter([
+        [self.INSTANCE_GROUP_MANAGERS[0]],
+        self.AUTOSCALERS,
+        []
+    ])
+
+    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1 --mode only-down')
+
+    custom_metric_utilization = (
+        self.messages.AutoscalingPolicyCustomMetricUtilization(
+            metric='custom.cloudmonitoring.googleapis.com/seconds',
+            utilizationTarget=60.,
+            utilizationTargetType=(
+                self.messages.AutoscalingPolicyCustomMetricUtilization.
+                UtilizationTargetTypeValueValuesEnum.
+                DELTA_PER_MINUTE)))
+    mode_cls = self.messages.AutoscalingPolicy.ModeValueValuesEnum
+    request = self.messages.ComputeAutoscalersUpdateRequest(
+        autoscaler='autoscaler-1',
+        autoscalerResource=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[custom_metric_utilization],
+                maxNumReplicas=10,
+                mode=mode_cls.ONLY_DOWN
+            ),
+            name='autoscaler-1',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Update', request)],
+    )
+
+  def testUpdateAutoscaler_PreservesMode(self):
+    autoscalers = test_resources.MakeAutoscalers('alpha')
+    autoscalers[0].autoscalingPolicy.mode = (
+        autoscalers[0].autoscalingPolicy.ModeValueValuesEnum.ONLY_UP)
+    self.make_requests.side_effect = iter([
+        [self.INSTANCE_GROUP_MANAGERS[0]],
+        autoscalers,
+        []
+    ])
+
+    self.Run('alpha compute instance-groups managed set-autoscaling group-1 '
+             '--max-num-replicas 10 --zone zone-1')
+
+    custom_metric_utilization = (
+        self.messages.AutoscalingPolicyCustomMetricUtilization(
+            metric='custom.cloudmonitoring.googleapis.com/seconds',
+            utilizationTarget=60.,
+            utilizationTargetType=(
+                self.messages.AutoscalingPolicyCustomMetricUtilization.
+                UtilizationTargetTypeValueValuesEnum.
+                DELTA_PER_MINUTE)))
+    request = self.messages.ComputeAutoscalersUpdateRequest(
+        autoscaler='autoscaler-1',
+        autoscalerResource=self.messages.Autoscaler(
+            autoscalingPolicy=self.messages.AutoscalingPolicy(
+                customMetricUtilizations=[custom_metric_utilization],
+                maxNumReplicas=10,
+                mode=self.messages.AutoscalingPolicy.ModeValueValuesEnum.ONLY_UP
+            ),
+            name='autoscaler-1',
+            target=self.managed_instance_group_self_link,
+        ),
+        project='my-project',
+        zone='zone-1',
+    )
+    self.CheckRequests(
+        self.managed_instance_group_get_request,
+        self.autoscalers_list_request,
+        [(self.compute.autoscalers, 'Update', request)],
+    )
 
 if __name__ == '__main__':
   test_case.main()

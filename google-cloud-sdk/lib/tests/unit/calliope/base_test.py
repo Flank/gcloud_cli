@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import base
@@ -99,31 +101,31 @@ class BaseTest(sdk_test_base.SdkBase):
       return self.GetTrackedAttribute(BaseTest, 'FORMAT')
 
   def testEmpty(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'No commands defined in file: \[file\]'):
       _FromModule('file', [], base.ReleaseTrack.GA, is_command=True)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'No command groups defined in file: \[file\]'):
       _FromModule('file', [], base.ReleaseTrack.GA, is_command=False)
 
   def testMultipleDefs(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple definitions for release tracks \[ALPHA\] for element: '
         r'\[file\]'):
       _FromModule(
           'file', [BaseTest.Alpha, BaseTest.AlphaBeta],
           base.ReleaseTrack.GA, is_command=False)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple definitions for release tracks \[.+, .+\] for element: '
         r'\[file\]'):
       _FromModule(
           'file', [BaseTest.Alpha, BaseTest.Beta, BaseTest.AlphaBeta],
           base.ReleaseTrack.GA, is_command=False)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple implementations defined for element: \[file\]. Each must '
         r'explicitly declare valid release tracks.'):
@@ -134,15 +136,15 @@ class BaseTest(sdk_test_base.SdkBase):
   def testGroup(self):
     items = [base.Group]
     # A single group can be found.
-    self.assertEquals(
+    self.assertEqual(
         base.Group,
         _FromModule('file', items, base.ReleaseTrack.GA, is_command=False))
     # Allow a group to not define tracks and still work.
-    self.assertEquals(
+    self.assertEqual(
         base.Group,
         _FromModule('file', items, base.ReleaseTrack.ALPHA, is_command=False))
     # A group is registered but there should be a command.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'You cannot define groups \[Group\] in a command file: \[file\]'):
       _FromModule(
@@ -152,12 +154,12 @@ class BaseTest(sdk_test_base.SdkBase):
       _FromModule(
           'file', [BaseTest.GA], base.ReleaseTrack.ALPHA, is_command=False)
     # Explicitly tracked group can be found.
-    self.assertEquals(
+    self.assertEqual(
         BaseTest.GA,
         _FromModule(
             'file', [BaseTest.GA], base.ReleaseTrack.GA, is_command=False))
     # Make sure we pick the right one.
-    self.assertEquals(
+    self.assertEqual(
         BaseTest.GA,
         _FromModule(
             'file', [BaseTest.GA, BaseTest.Alpha], base.ReleaseTrack.GA,
@@ -171,16 +173,16 @@ class BaseTest(sdk_test_base.SdkBase):
   def testCommand(self):
     items = [base.Command]
     # A single command can be found.
-    self.assertEquals(
+    self.assertEqual(
         base.Command,
         _FromModule('file', items, base.ReleaseTrack.GA, is_command=True))
     # Allow a command to not define tracks and still work.
-    self.assertEquals(
+    self.assertEqual(
         base.Command,
         _FromModule(
             'file', items, base.ReleaseTrack.ALPHA, is_command=True))
     # A command is registered but there should be a group.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'You cannot define commands \[Command\] in a command group file: '
         r'\[file\]'):
@@ -192,12 +194,12 @@ class BaseTest(sdk_test_base.SdkBase):
           'file', [BaseTest.GACommand], base.ReleaseTrack.ALPHA,
           is_command=True)
     # Explicitly tracked command can be found.
-    self.assertEquals(
+    self.assertEqual(
         BaseTest.GACommand,
         _FromModule('file', [BaseTest.GACommand], base.ReleaseTrack.GA,
                     is_command=True))
     # Make sure we pick the right one.
-    self.assertEquals(
+    self.assertEqual(
         BaseTest.GACommand,
         _FromModule(
             'file', [BaseTest.GACommand, BaseTest.AlphaCommand],
@@ -219,7 +221,7 @@ class BaseTest(sdk_test_base.SdkBase):
 class YamlTests(sdk_test_base.SdkBase):
 
   def testNoTranslator(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.CommandLoadFailure,
         r'Problem loading foo.bar: No yaml command translator has been '
         r'registered.'):
@@ -227,14 +229,14 @@ class YamlTests(sdk_test_base.SdkBase):
           'file', ['foo', 'bar'], [], base.ReleaseTrack.GA, None)
 
   def testNoGroups(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.CommandLoadFailure,
         r'Problem loading foo.bar: Command groups cannot be implemented in '
         r'yaml.'):
       command_loading.LoadCommonType(
           ['dir/foo/bar.yaml'], ['foo', 'bar'], base.ReleaseTrack.GA,
           'id', is_command=False)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.CommandLoadFailure,
         r'Problem loading foo.bar: Command groups cannot be implemented in '
         r'yaml.'):
@@ -243,18 +245,18 @@ class YamlTests(sdk_test_base.SdkBase):
           ['foo', 'bar'])
 
   def testNoMatchingTrack(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.ReleaseTrackNotImplementedException,
         r'No implementation for release track \[GA\] for element: \[file\]'):
       _FromYaml(
           'file', ['foo', 'bar'], [], base.ReleaseTrack.GA, object())
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.ReleaseTrackNotImplementedException,
         r'No implementation for release track \[GA\] for element: \[file\]'):
       _FromYaml(
           'file', ['foo', 'bar'], [{'release_tracks': ['ALPHA']}],
           base.ReleaseTrack.GA, object())
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.ReleaseTrackNotImplementedException,
         r'No implementation for release track \[GA\] for element: \[file\]'):
       _FromYaml(
@@ -263,7 +265,7 @@ class YamlTests(sdk_test_base.SdkBase):
           base.ReleaseTrack.GA, object())
 
   def testMultipleDefs(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple definitions for release tracks \[ALPHA\] for element: '
         r'\[file\]'):
@@ -271,7 +273,7 @@ class YamlTests(sdk_test_base.SdkBase):
           'file', ['foo', 'bar'],
           [{'release_tracks': ['ALPHA']}, {'release_tracks': ['ALPHA']}],
           base.ReleaseTrack.ALPHA, object())
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple definitions for release tracks \[.+, .+\] for element: '
         r'\[file\]'):
@@ -280,7 +282,7 @@ class YamlTests(sdk_test_base.SdkBase):
           [{'release_tracks': ['ALPHA']}, {'release_tracks': ['BETA']},
            {'release_tracks': ['ALPHA', 'BETA']}],
           base.ReleaseTrack.ALPHA, object())
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.LayoutException,
         r'Multiple implementations defined for element: \[file\]. Each must '
         r'explicitly declare valid release tracks.'):
@@ -301,18 +303,18 @@ class YamlTests(sdk_test_base.SdkBase):
     t = Translator()
 
     # A single command can be found.
-    self.assertEquals(
+    self.assertEqual(
         (sentinel, None),
         _FromYaml(
             'file', ['foo', 'bar'], [{}], base.ReleaseTrack.GA, t))
     # Explicitly tracked command can be found.
-    self.assertEquals(
+    self.assertEqual(
         (sentinel, ['GA']),
         _FromYaml(
             'file', ['foo', 'bar'], [{'release_tracks': ['GA']}],
             base.ReleaseTrack.GA, t))
     # Make sure we pick the right one.
-    self.assertEquals(
+    self.assertEqual(
         (sentinel, ['GA']),
         _FromYaml(
             'file', ['foo', 'bar'],
@@ -328,7 +330,7 @@ class YamlTests(sdk_test_base.SdkBase):
     self.Touch(self.temp_path, 'bar.yaml', """
 - release_tracks: [GA, BETA]
 - release_tracks: [ALPHA]""")
-    self.assertEquals(
+    self.assertEqual(
         (sentinel, ['GA', 'BETA']),
         command_loading.LoadCommonType(
             [os.path.join(self.temp_path, 'bar.yaml')], ['bar'],

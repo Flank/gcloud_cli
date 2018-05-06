@@ -1,0 +1,34 @@
+NAME
+    gcloud alpha iam service-accounts keys delete - delete a user-managed key
+        from a service account
+
+SYNOPSIS
+    gcloud alpha iam service-accounts keys delete KEY-ID
+        --iam-account=IAM_ACCOUNT [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Delete a user-managed key from a service account.
+
+POSITIONAL ARGUMENTS
+     KEY-ID
+        The key to delete.
+
+REQUIRED FLAGS
+     --iam-account=IAM_ACCOUNT
+        The service account whose key to delete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud iam service-accounts keys delete
+        $ gcloud beta iam service-accounts keys delete
+

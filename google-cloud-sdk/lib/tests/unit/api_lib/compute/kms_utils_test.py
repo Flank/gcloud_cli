@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.compute.kms_utils."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import kms_utils
 from googlecloudsdk.calliope import parser_errors
 from tests.lib import test_case
@@ -77,11 +79,11 @@ class KmsKeyUtilsTest(test_case.TestCase):
   def testDictToKmsKey(self):
     self.assertIsNone(kms_utils._DictToKmsKey(None, DEFAULT_PROJECT))
     self.assertIsNone(kms_utils._DictToKmsKey({}, DEFAULT_PROJECT))
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._DictToKmsKey(
             {'kms-key': EXAMPLE_KEY}, DEFAULT_PROJECT).RelativeName(),
         EXAMPLE_KEY)
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._DictToKmsKey(
             {'kms-key': KEY_NAME,
              'kms-keyring': KEY_KEYRING,
@@ -89,46 +91,46 @@ class KmsKeyUtilsTest(test_case.TestCase):
         EXAMPLE_KEY_IN_DEFAULT_PROJECT)
 
   def testArgsToKmsKey(self):
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._ArgsToKmsKey(EmptyClass(), DEFAULT_PROJECT),
         None)
 
     key = BootDiskKmsKey()
     key.boot_disk_kms_key = EXAMPLE_KEY
     key.boot_disk_kms_project = None
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._ArgsToKmsKey(key, DEFAULT_PROJECT).RelativeName(),
         EXAMPLE_KEY)
 
     key_parts = BootDiskKmsKeyWithParts()
     key_parts.boot_disk_kms_project = None
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._ArgsToKmsKey(key_parts, DEFAULT_PROJECT).RelativeName(),
         EXAMPLE_KEY_IN_DEFAULT_PROJECT)
 
   def testGetSpecifiedKmsArgs(self):
-    self.assertEquals(kms_utils._GetSpecifiedKmsArgs(EmptyClass()), set([]))
-    self.assertEquals(
+    self.assertEqual(kms_utils._GetSpecifiedKmsArgs(EmptyClass()), set([]))
+    self.assertEqual(
         kms_utils._GetSpecifiedKmsArgs(BootDiskKmsKey()),
         set(['--boot-disk-kms-key', '--boot-disk-kms-project']))
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._GetSpecifiedKmsArgs(BootDiskKmsKeyWithParts()),
         set(['--boot-disk-kms-key', '--boot-disk-kms-project',
              '--boot-disk-kms-location', '--boot-disk-kms-keyring']))
 
   def testGetSpecifiedKmsDict(self):
     self.assertIsNone(kms_utils._GetSpecifiedKmsDict({}))
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._GetSpecifiedKmsDict({'kms-key': 'hi'}), set(['kms-key']))
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._GetSpecifiedKmsDict(
             {'kms-key': 'hi', 'kms-location': 'global'}),
         set(['kms-key', 'kms-location']))
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._GetSpecifiedKmsDict(
             {'kms-location': 'global', 'kms-key': 'hi'}),
         set(['kms-key', 'kms-location']))
-    self.assertEquals(
+    self.assertEqual(
         kms_utils._GetSpecifiedKmsDict({'kms-keyring': 'hi'}),
         set(['kms-keyring']))
 

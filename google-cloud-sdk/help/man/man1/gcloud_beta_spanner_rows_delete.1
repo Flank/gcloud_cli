@@ -1,0 +1,76 @@
+
+.TH "GCLOUD_BETA_SPANNER_ROWS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta spanner rows delete \- delete a row in a Cloud Spanner database
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta spanner rows delete\fR \fB\-\-keys\fR=[\fIKEY\fR,...] \fB\-\-table\fR=\fITABLE\fR (\fB\-\-database\fR=\fIDATABASE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Delete a row in a Cloud Spanner database.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-keys\fR=[\fIKEY\fR,...]
+The primary key values of the row to delete.
+
+.TP 2m
+\fB\-\-table\fR=\fITABLE\fR
+The Cloud Spanner table name.
+
+.TP 2m
+
+DATABASE \- The Cloud Spanner database in which to delete a row. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: Set the property [core/project] or provide
+the flag [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-database\fR=\fIDATABASE\fR
+The ID of the database or a fully qualified identifier for the database. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+The Cloud Spanner instance for the database.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha spanner rows delete
+.RE
+

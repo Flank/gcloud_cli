@@ -11,7 +11,7 @@ gcloud beta bigtable instances update \- modify an existing Bigtable instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta bigtable instances update\fR \fIINSTANCE\fR [\fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta bigtable instances update\fR \fIINSTANCE\fR [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,40 +36,10 @@ ID of the instance.
 
 .RS 2m
 .TP 2m
-\fB\-\-instance\-type\fR=\fIINSTANCE_TYPE\fR
-(DEPRECATED) Change the instance type. Note development instances can be
-promoted to production instances, but production instances cannot be downgraded
-to development.
-
-Upgrading development instances with \-\-instance\-type is deprecated. Use the
-bigtable instances upgrade command instead. \fIINSTANCE_TYPE\fR must be
-(currently only one value is supported):
-
-.RS 2m
-.TP 2m
-\fBPRODUCTION\fR
-Production instances have a minimum of three nodes, provide high availability,
-and are suitable for applications in production.
-
-.RE
-.sp
-.TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-description\fR=\fIDESCRIPTION\fR
-(DEPRECATED) Friendly name of the instance.
-
-Flag \-\-description is deprecated. Use \-\-display\-name=DISPLAY_NAME instead.
-
-.TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
 Friendly name of the instance.
 
 
-.RE
 .RE
 .sp
 

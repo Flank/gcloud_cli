@@ -14,6 +14,8 @@
 
 """Unit tests for the transforms module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from googlecloudsdk.api_lib.container import transforms

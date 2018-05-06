@@ -3,8 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud compute target-https-proxies update NAME
-        [--ssl-certificates=SSL_CERTIFICATE,[SSL_CERTIFICATE,...]]
-        [--url-map=URL_MAP] [GCLOUD_WIDE_FLAG ...]
+        [--ssl-certificates=SSL_CERTIFICATE,[...]] [--url-map=URL_MAP]
+        [--clear-ssl-policy | --ssl-policy=SSL_POLICY] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute target-https-proxies update is used to change the SSL
@@ -14,14 +14,15 @@ DESCRIPTION
     turn points to a URL map that defines the rules for routing the requests.
     The URL map's job is to map URLs to backend services which handle the
     actual requests. The target HTTPS proxy also points to at most 10 SSL
-    certificates used for server-side authentication.
+    certificates used for server-side authentication. The target HTTPS proxy
+    can be associated with at most one SSL policy.
 
 POSITIONAL ARGUMENTS
      NAME
         The name of the target HTTPS proxy to update.
 
 FLAGS
-     --ssl-certificates=SSL_CERTIFICATE,[SSL_CERTIFICATE,...]
+     --ssl-certificates=SSL_CERTIFICATE,[...]
         References to at most 10 SSL certificate resources that are used for
         server-side authentication. The first SSL certificate in this list is
         considered the primary SSL certificate associated with the load
@@ -32,6 +33,17 @@ FLAGS
         A reference to a URL map resource that defines the mapping of URLs to
         backend services. The URL map must exist and cannot be deleted while
         referenced by a target HTTPS proxy.
+
+     At most one of these may be specified:
+
+       --clear-ssl-policy
+          Removes any attached SSL policy from the HTTPS proxy.
+
+       --ssl-policy=SSL_POLICY
+          A reference to an SSL policy resource that defines the server-side
+          support for SSL features and affects the connections between clients
+          and the HTTPS proxy load balancer. The SSL policy must exist and
+          cannot be deleted while referenced by a target HTTPS proxy.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

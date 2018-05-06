@@ -17,6 +17,7 @@ import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import parser_errors
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -37,7 +38,7 @@ class NetworksCreateTest(test_base.BaseTest):
     self.make_requests.side_effect = iter([[expected]])
 
     self.Run("""
-        compute networks create --range 10.240.0.0/16 --mode legacy
+        compute networks create --range 10.240.0.0/16 --subnet-mode legacy
              {compute}/projects/my-project/global/networks/my-network
         """.format(compute=self.compute_uri))
 
@@ -84,27 +85,15 @@ class NetworksCreateTest(test_base.BaseTest):
                            project='my-project', network=expected))
     self.CheckRequests([expected_insert])
 
-  def testAutoModeRangeError(self):
-    error_msg = '--range can only be used with --subnet-mode=legacy.'
-    with self.assertRaisesRegexp(parser_errors.ArgumentError, error_msg):
-      self.Run('compute networks create my-network --range 10.245.0.0/16 '
-               '--mode auto')
-
-  def testCustomModeRangeError(self):
-    error_msg = '--range can only be used with --subnet-mode=legacy.'
-    with self.assertRaisesRegexp(parser_errors.ArgumentError, error_msg):
-      self.Run('compute networks create my-network --range 10.245.0.0/16 '
-               '--mode custom')
-
   def testAutoSubnetModeRangeError(self):
     error_msg = '--range can only be used with --subnet-mode=legacy.'
-    with self.assertRaisesRegexp(parser_errors.ArgumentError, error_msg):
+    with self.assertRaisesRegex(parser_errors.ArgumentError, error_msg):
       self.Run('compute networks create my-network --range 10.245.0.0/16 '
                '--subnet-mode auto')
 
   def testCustomSubnetModeRangeError(self):
     error_msg = '--range can only be used with --subnet-mode=legacy.'
-    with self.assertRaisesRegexp(parser_errors.ArgumentError, error_msg):
+    with self.assertRaisesRegex(parser_errors.ArgumentError, error_msg):
       self.Run('compute networks create my-network --range 10.245.0.0/16 '
                '--subnet-mode custom')
 
@@ -216,17 +205,11 @@ $ gcloud compute firewall-rules create <FIREWALL_NAME> --network my-network \
 
     self.make_requests.side_effect = iter([[expected]])
 
-    self.Run('compute networks create my-network --mode custom')
-    expected_insert = (self.compute.networks, 'Insert',
-                       self.messages.ComputeNetworksInsertRequest(
-                           project='my-project', network=expected))
-    self.CheckRequests([expected_insert])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME          SUBNET_MODE    BGP_ROUTING_MODE    IPV4_RANGE    GATEWAY_IPV4
-            my-network    CUSTOM         REGIONAL
-            """),
-        normalize_space=True)
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError,
+        '`mode` has been removed. '
+        'Please use `subnet-mode` instead.'):
+      self.Run('compute networks create my-network --mode custom')
 
 
 class NetworksCreateBetaTest(NetworksCreateTest):

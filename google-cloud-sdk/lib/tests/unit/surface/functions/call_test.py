@@ -46,11 +46,11 @@ class FunctionsCallTest(base.FunctionsTestBase):
     # Remove credentials.
     self.FakeAuthSetCredentialsPresent(False)
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_AUTH_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_AUTH_REGEXP):
       self.Run('functions call my-test')
 
   def testDatavalidation(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'Invalid value for \[--data\]. Is not a valid JSON.'):
       self.Run('functions call my-test --data="not-json"')
@@ -63,7 +63,7 @@ class FunctionsGetWithoutProjectTest(base.FunctionsTestBase):
 
   def testGetNoProject(self):
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegexp(Exception, base.NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_PROJECT_REGEXP):
       self.Run('functions call my-test')
 
 if __name__ == '__main__':

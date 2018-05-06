@@ -14,6 +14,8 @@
 
 """Base for Deployment Manager V2 unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import time
 
 from apitools.base.py.testing import mock
@@ -23,6 +25,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 _TEST_DATA_DIR = ['tests', 'lib', 'surface', 'deployment_manager', 'test_data']

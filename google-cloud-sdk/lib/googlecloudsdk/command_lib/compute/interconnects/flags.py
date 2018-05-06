@@ -13,6 +13,7 @@
 # limitations under the License.
 """Flags and helpers for the compute interconnects commands."""
 
+from __future__ import absolute_import
 from googlecloudsdk.calliope import actions as calliope_actions
 from googlecloudsdk.command_lib.compute import completers as compute_completers
 from googlecloudsdk.command_lib.compute import flags as compute_flags
@@ -22,15 +23,7 @@ _INTERCONNECT_TYPE_CHOICES_GA = {
     'DEDICATED': 'Dedicated private interconnect.',
 }
 
-_INTERCONNECT_TYPE_CHOICES_BETA = {
-    'IT_PRIVATE':
-        'Dedicated private interconnect. (Warning: IT_PRIVATE is deprecated, '
-        'use DEDICATED instead.)',
-    'DEDICATED':
-        'Dedicated private interconnect.',
-}
-
-_INTERCONNECT_TYPE_CHOICES_ALPHA = {
+_INTERCONNECT_TYPE_CHOICES_BETA_AND_ALPHA = {
     'IT_PRIVATE':
         'Dedicated private interconnect. (Warning: IT_PRIVATE is deprecated, '
         'use DEDICATED instead.)',
@@ -129,13 +122,7 @@ def AddCreateGaArgs(parser):
 def AddCreateBetaArgs(parser):
   """Adds beta flags for create command to the argparse.ArgumentParser."""
   AddCreateCommonArgs(parser)
-  AddInterconnectTypeBeta(parser)
-
-
-def AddCreateAlphaArgs(parser):
-  """Adds alpha flags for create command to the argparse.ArgumentParser."""
-  AddCreateCommonArgs(parser)
-  AddInterconnectTypeAlpha(parser)
+  AddInterconnectTypeBetaAndAlpha(parser)
 
 
 def AddDescription(parser):
@@ -160,31 +147,11 @@ def _ShouldShowDeprecatedWarning(value):
   return value and value.upper() == 'IT_PRIVATE'
 
 
-def AddInterconnectTypeBeta(parser):
+def AddInterconnectTypeBetaAndAlpha(parser):
   """Adds interconnect-type flag to the argparse.ArgumentParser."""
   parser.add_argument(
       '--interconnect-type',
-      choices=_INTERCONNECT_TYPE_CHOICES_BETA,
-      action=calliope_actions.DeprecationAction(
-          'interconnect-type',
-          removed=False,
-          show_message=_ShouldShowDeprecatedWarning,
-          warn=('IT_PRIVATE will be deprecated '
-                'for {flag_name}. '
-                'Please use DEDICATED instead.'),
-          error='Value IT_PRIVATE for {flag_name} has been removed. '
-                'Please use DEDICATED instead.'),
-      required=True,
-      help="""\
-      Type of the interconnect.
-      """)
-
-
-def AddInterconnectTypeAlpha(parser):
-  """Adds interconnect-type flag to the argparse.ArgumentParser."""
-  parser.add_argument(
-      '--interconnect-type',
-      choices=_INTERCONNECT_TYPE_CHOICES_ALPHA,
+      choices=_INTERCONNECT_TYPE_CHOICES_BETA_AND_ALPHA,
       action=calliope_actions.DeprecationAction(
           'interconnect-type',
           removed=False,
@@ -222,7 +189,7 @@ def AddRequestedLinkCount(parser):
       """)
 
 
-def AddRequestedLinkCountForPatch(parser):
+def AddRequestedLinkCountForUpdate(parser):
   """Adds requestedLinkCount flag to the argparse.ArgumentParser."""
   parser.add_argument(
       '--requested-link-count',
@@ -269,7 +236,7 @@ def AddAdminEnabled(parser):
       """)
 
 
-def AddAdminEnabledForPatch(parser):
+def AddAdminEnabledForUpdate(parser):
   """Adds adminEnabled flag to the argparse.ArgumentParser."""
   admin_enabled_args = parser.add_mutually_exclusive_group()
   admin_enabled_args.add_argument(

@@ -1,0 +1,67 @@
+
+.TH "GCLOUD_ALPHA_MONITORING_POLICIES_CONDITIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha monitoring policies conditions describe \- describe a condition in a Stackdriver alerting policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha monitoring policies conditions describe\fR (\fICONDITION\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Describe a condition in a Stackdriver alerting policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+CONDITION \- The name of the Condition to describe. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: Set the property [core/project] or provide the flag
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICONDITION\fR
+The ID of the condition or a fully qualified identifier for the condition. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-policy\fR=\fIPOLICY\fR
+Name of the alerting policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.core.configurations import named_configs
@@ -28,7 +31,7 @@ class CreateTest(test_base.ConfigurationsBaseTest):
     with open(self.named_config_dir, 'w') as f:
       f.write('xxx')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         named_configs.NamedConfigFileAccessError,
         r'Failed to create configuration \[foo\]'):
       self.Run('config configurations create foo')
@@ -54,30 +57,30 @@ class CreateTest(test_base.ConfigurationsBaseTest):
 
   def testSuccessfulCreateSimple(self):
     # Test create with neither --activate flag nor property set
-    self.assertEquals('foo', self.Run('config configurations create foo'))
+    self.assertEqual('foo', self.Run('config configurations create foo'))
     self._CheckCreated('foo')
-    self.assertEquals('bar', self.Run('config configurations create bar'))
+    self.assertEqual('bar', self.Run('config configurations create bar'))
     self._CheckCreated('bar')
 
   def testSuccessfulCreateWithActivateFlag(self):
-    self.assertEquals('foo', self.Run('config configurations create foo '
-                                      '--activate'))
+    self.assertEqual('foo', self.Run('config configurations create foo '
+                                     '--activate'))
     self._CheckCreated('foo')
 
   def testSuccessfulCreateWithNoActivateFlag(self):
-    self.assertEquals('foo', self.Run('config configurations create foo '
-                                      '--no-activate'))
+    self.assertEqual('foo', self.Run('config configurations create foo '
+                                     '--no-activate'))
     self._CheckCreated('foo', activated=False)
 
   def testBadConfigName(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         named_configs.NamedConfigError,
         r'Invalid name \[FOO\] for a configuration.  Except for special cases'):
       self.Run('config configurations create FOO')
 
   def testCreateTwiceFails(self):
     self.Run('config configurations create foo')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         named_configs.NamedConfigError,
         r'Cannot create configuration \[foo\], it already exists.'):
       self.Run('config configurations create foo')

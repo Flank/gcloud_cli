@@ -4,13 +4,12 @@ NAME
 
 SYNOPSIS
     gcloud beta compute firewall-rules create NAME
-        (--action=ACTION
-          | --allow=PROTOCOL[:PORT[-PORT]],[PROTOCOL[:PORT[-PORT]],...])
+        (--action=ACTION | --allow=PROTOCOL[:PORT[-PORT]],[...])
         [--description=DESCRIPTION]
         [--destination-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
-        [--direction=DIRECTION] [--network=NETWORK; default="default"]
-        [--priority=PRIORITY]
-        [--rules=PROTOCOL[:PORT[-PORT]],[PROTOCOL[:PORT[-PORT]],...]]
+        [--direction=DIRECTION] [--disabled]
+        [--network=NETWORK; default="default"] [--priority=PRIORITY]
+        [--rules=PROTOCOL[:PORT[-PORT]],[...]]
         [--source-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
         [--source-service-accounts=EMAIL,[EMAIL,...]]
         [--source-tags=TAG,[TAG,...]]
@@ -33,7 +32,7 @@ REQUIRED FLAGS
           traffic. If specified, the flag --rules must also be specified.
           ACTION must be one of: ALLOW, DENY.
 
-       --allow=PROTOCOL[:PORT[-PORT]],[PROTOCOL[:PORT[-PORT]],...]
+       --allow=PROTOCOL[:PORT[-PORT]],[...]
           A list of protocols and ports whose traffic will be allowed.
 
           The protocols allowed over this connection. This can be the
@@ -89,6 +88,16 @@ OPTIONAL FLAGS
 
         DIRECTION must be one of: INGRESS, EGRESS, IN, OUT.
 
+     --disabled
+        Use this flag to disable a firewall rule and stop it from being
+        enforced in the network. In the case of disabled firewall rules, the
+        associated network behaves as if the firewall rule did not exist. To
+        enable a disabled rule instead, use:
+
+            $ gcloud beta compute firewall-rules update MY-RULE --no-disabled
+
+        If omitted firewall rule is considered enabled.
+
      --network=NETWORK; default="default"
         The network to which this rule is attached. If omitted, the rule is
         attached to the default network.
@@ -100,7 +109,7 @@ OPTIONAL FLAGS
         precedence. DENY rules take precedence over ALLOW rules having equal
         priority.
 
-     --rules=PROTOCOL[:PORT[-PORT]],[PROTOCOL[:PORT[-PORT]],...]
+     --rules=PROTOCOL[:PORT[-PORT]],[...]
         A list of protocols and ports to which the firewall rule will apply.
 
         PROTOCOL is the IP protocol whose traffic will be checked. PROTOCOL can
@@ -111,15 +120,15 @@ OPTIONAL FLAGS
         A port or port range can be specified after PROTOCOL to which the
         firewall rule apply on traffic through specific ports. If no port or
         port range is specified, connections through all ranges are applied.
+        TCP and UDP rules must include a port or port range.
+
+        If specified, the flag --action must also be specified.
+
         For example, the following will create a rule that blocks TCP traffic
         through port 80 and ICMP traffic:
 
             $ gcloud beta compute firewall-rules create MY-RULE --action deny \
                 --rules tcp:80,icmp
-
-        TCP and UDP rules must include a port or port range.
-
-        If specified, the flag --action must also be specified.
 
      --source-ranges=CIDR_RANGE,[CIDR_RANGE,...]
         A list of IP address blocks that are allowed to make inbound
@@ -191,17 +200,16 @@ EXAMPLES
 
         $ gcloud beta compute firewall-rules create FooService \
             --allow tcp:8080 \
-          --description "Allow incoming traffic on TCP port 8080"
-          --direction INGRESS
+            --description "Allow incoming traffic on TCP port 8080" \
+            --direction INGRESS
 
     To create a firewall rule that allows TCP traffic through port 80 and
     determines a list of specific IP address blocks that are allowed to make
     inbound connections, run:
 
         $ gcloud beta compute firewall-rules create "tcp-rule" \
-            --allow tcp:80 \
-          --source-ranges="10.0.0.0/22,10.0.0.0/14" \
-          --description="Narrowing TCP traffic"
+            --allow tcp:80 --source-ranges="10.0.0.0/22,10.0.0.0/14" \
+            --description="Narrowing TCP traffic"
 
     To list existing firewall rules, run:
 

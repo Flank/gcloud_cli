@@ -11,7 +11,7 @@ gcloud alpha ml vision detect\-safe\-search \- detect explicit content in an ima
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml vision detect\-safe\-search\fR \fIIMAGE_PATH\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml vision detect\-safe\-search\fR \fIIMAGE_PATH\fR [\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR;\ default="builtin/stable"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -31,6 +31,18 @@ The path to the image to be analyzed. This can be either a local path or a URL.
 If you provide a local file, the contents will be sent directly to Google Cloud
 Vision. If you provide a URL, it must be in Google Cloud Storage format
 (gs://bucket/object) or an HTTP URL (http://... or https://...)
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR; default="builtin/stable"
+The model version to use for the feature. Supported values include
+"builtin/stable" and "builtin/latest".
 
 
 .RE

@@ -11,7 +11,7 @@ gcloud alpha compute forwarding\-rules create \- create a forwarding rule to dir
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute forwarding\-rules create\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ip\-protocol\fR=\fIIP_PROTOCOL\fR] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-service\-label\fR=\fISERVICE_LABEL\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-address\-region\fR=\fIADDRESS_REGION\fR\ |\ \fB\-\-global\-address\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-port\-range\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR]\ |\ \fB\-\-ports\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR],[[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR],...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute forwarding\-rules create\fR \fINAME\fR (\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR\ |\ \fB\-\-target\-http\-proxy\fR=\fITARGET_HTTP_PROXY\fR\ |\ \fB\-\-target\-https\-proxy\fR=\fITARGET_HTTPS_PROXY\fR\ |\ \fB\-\-target\-instance\fR=\fITARGET_INSTANCE\fR\ |\ \fB\-\-target\-pool\fR=\fITARGET_POOL\fR\ |\ \fB\-\-target\-ssl\-proxy\fR=\fITARGET_SSL_PROXY\fR\ |\ \fB\-\-target\-tcp\-proxy\fR=\fITARGET_TCP_PROXY\fR\ |\ \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ip\-protocol\fR=\fIIP_PROTOCOL\fR] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-service\-label\fR=\fISERVICE_LABEL\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-subnet\-region\fR=\fISUBNET_REGION\fR] [\fB\-\-target\-instance\-zone\fR=\fITARGET_INSTANCE_ZONE\fR] [\fB\-\-target\-pool\-region\fR=\fITARGET_POOL_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-ip\-version\fR=\fIIP_VERSION\fR] [\fB\-\-address\-region\fR=\fIADDRESS_REGION\fR\ |\ \fB\-\-global\-address\fR] [\fB\-\-backend\-service\-region\fR=\fIBACKEND_SERVICE_REGION\fR\ |\ \fB\-\-global\-backend\-service\fR] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-port\-range\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR]\ |\ \fB\-\-ports\fR=[\fIPORT\fR\ |\ \fISTART_PORT\-END_PORT\fR],[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -95,7 +95,7 @@ The target HTTPS proxy that will receive the traffic. Acceptable values for
 The name of the target instance that will receive the traffic. The target
 instance must be in a zone that's in the forwarding rule's region. Global
 forwarding rules may not direct traffic to target instances. If not specified
-and the \f5\fIcompute/zone\fR\fR property isn't set, you will be prompted to
+and the \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to
 select a zone.
 
 To avoid prompting when this flag is omitted, you can set the
@@ -295,7 +295,7 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-address\-region\fR=\fIADDRESS_REGION\fR
-The region of the address to operate on. If not specified, you will be prompted
+The region of the address to operate on. If not specified, you may be prompted
 to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
@@ -354,7 +354,7 @@ If provided, it is assumed the forwarding rule is global.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region of the forwarding rule to create. If not specified, you will be
+The region of the forwarding rule to create. If not specified, you may be
 prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
@@ -396,7 +396,7 @@ Either an individual port (\f5\-\-port\-range 80\fR) or a range of ports
 (\f5\-\-port\-range 3000\-3100\fR) may be specified.
 
 .TP 2m
-\fB\-\-ports\fR=[\fIPORT\fR | \fISTART_PORT\-END_PORT\fR],[[\fIPORT\fR | \fISTART_PORT\-END_PORT\fR],...]
+\fB\-\-ports\fR=[\fIPORT\fR | \fISTART_PORT\-END_PORT\fR],[...]
 If specified, only packets addressed to ports in the specified list will be
 forwarded. If not specified for regional forwarding rules, all ports are
 matched. This flag is required for global forwarding rules and accepts a single

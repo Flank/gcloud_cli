@@ -38,7 +38,10 @@ COMMANDS
         List Google Compute Engine interconnects.
 
      patch
-        Patch a Google Compute Engine interconnect.
+        (DEPRECATED) Patch a Google Compute Engine interconnect.
+
+     update
+        Update a Google Compute Engine interconnect.
 
 NOTES
     These variants are also available:

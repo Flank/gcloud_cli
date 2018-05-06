@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the docker command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import base64
 import errno
 import json
@@ -62,6 +64,9 @@ class DockerTest(sdk_test_base.WithFakeAuth):
 
     self.StartObjectPatch(store, 'Refresh', side_effect=FakeRefresh)
 
+    auth_str = _ACCESS_TOKEN_USERNAME + ':' + _TOKEN
+    self.auth = base64.b64encode(auth_str.encode('ascii')).decode('ascii')
+
   def TearDown(self):
     for new_path in [True, False]:
       dcfg, unused_new_file = client_lib.GetDockerConfigPath(new_path)
@@ -109,7 +114,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
       target_server = exec_args[-1]
 
       # Verify that all of the options are as expected.
-      self.assertItemsEqual(docker_login_options, expected_opts)
+      self.assertEqual(sorted(docker_login_options), sorted(expected_opts))
 
       # Verify that the target server was correct, i.e. the last argument.
       self.assertEqual('https://' + registry, target_server)
@@ -167,7 +172,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
         constants.DEFAULT_REGISTRY, _EXPECTED_DOCKER_OPTIONS)
     self.process_mock.returncode = -1  # A failure code.
 
-    with self.assertRaisesRegexp(exceptions.Error, 'login failed'):
+    with self.assertRaisesRegex(exceptions.Error, 'login failed'):
       docker.UpdateDockerCredentials(constants.DEFAULT_REGISTRY)
 
     self.popen_mock.assert_called_once()
@@ -182,7 +187,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     self.CheckDockerConfigAuths({
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': self.auth
         }
     })
 
@@ -195,7 +200,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     self.CheckDockerConfigAuths({
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': self.auth
         }
     })
     self.assertFalse(self.popen_mock.called)
@@ -211,11 +216,11 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     self.CheckDockerConfigAuths({
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': self.auth
         },
         'https://' + constants.REGIONAL_REGISTRIES[0]: {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': self.auth
         }
     })
 
@@ -227,7 +232,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     self.CheckDockerConfigAuths({
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': self.auth
         }
     })
 
@@ -239,7 +244,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     self.CheckDockerConfigAuths({
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': self.auth
         }
     })
     self.assertFalse(self.popen_mock.called)
@@ -247,10 +252,10 @@ class DockerTest(sdk_test_base.WithFakeAuth):
   def testUpdateInvalidJsonFile(self):
     self.WriteNewDockerConfig('not-json')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         client_lib.InvalidDockerConfigError,
         r'Docker configuration file \[.*config\.json\] could not be read as '
-        r'JSON: No JSON object could be decoded'):
+        r'JSON: .*'):
       docker.UpdateDockerCredentials(constants.DEFAULT_REGISTRY)
 
     self.assertFalse(self.popen_mock.called)
@@ -263,7 +268,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     self.CheckDockerConfigAuths({
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': self.auth
         }
     })
     self.assertFalse(self.popen_mock.called)

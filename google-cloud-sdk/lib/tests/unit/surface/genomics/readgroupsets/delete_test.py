@@ -46,7 +46,7 @@ class DeleteTest(base.GenomicsUnitTest):
   def testReadGroupSetsDeleteCancel(self):
     self.WriteInput('n\n')
     self.expectGetRequest()
-    with self.assertRaisesRegexp(GenomicsError, 'Deletion aborted by user.'):
+    with self.assertRaisesRegex(GenomicsError, 'Deletion aborted by user.'):
       self.RunGenomics(['readgroupsets', 'delete', '1000'])
     self.AssertErrContains(
         'Deleting read group set 1000 (rgset-name) will delete all objects')
@@ -69,8 +69,8 @@ class DeleteTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsReadgroupsetsDeleteRequest(readGroupSetId=
                                                                  '1000'),
         exception=self.MakeHttpError(404, 'Read group set not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Read group set not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Read group set not found: 1000'):
       self.RunGenomics(['readgroupsets', 'delete', '1000'],
                        ['--quiet'])
 

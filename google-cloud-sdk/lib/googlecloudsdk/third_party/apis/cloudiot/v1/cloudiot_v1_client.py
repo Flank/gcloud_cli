@@ -24,7 +24,7 @@ class CloudiotV1(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new cloudiot handle."""
     url = url or self.BASE_URL
     super(CloudiotV1, self).__init__(
@@ -33,7 +33,8 @@ class CloudiotV1(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.projects_locations_registries_devices_configVersions = self.ProjectsLocationsRegistriesDevicesConfigVersionsService(self)
     self.projects_locations_registries_devices_states = self.ProjectsLocationsRegistriesDevicesStatesService(self)
     self.projects_locations_registries_devices = self.ProjectsLocationsRegistriesDevicesService(self)
@@ -52,7 +53,7 @@ class CloudiotV1(base_api.BaseApiClient):
           }
 
     def List(self, request, global_params=None):
-      """Lists the last few versions of the device configuration in descending.
+      r"""Lists the last few versions of the device configuration in descending.
 order (i.e.: newest first).
 
       Args:
@@ -90,7 +91,7 @@ order (i.e.: newest first).
           }
 
     def List(self, request, global_params=None):
-      """Lists the last few versions of the device state in descending order (i.e.:.
+      r"""Lists the last few versions of the device state in descending order (i.e.:.
 newest first).
 
       Args:
@@ -128,7 +129,7 @@ newest first).
           }
 
     def Create(self, request, global_params=None):
-      """Creates a device in a device registry.
+      r"""Creates a device in a device registry.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesDevicesCreateRequest) input message
@@ -155,7 +156,7 @@ newest first).
     )
 
     def Delete(self, request, global_params=None):
-      """Deletes a device.
+      r"""Deletes a device.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesDevicesDeleteRequest) input message
@@ -182,7 +183,7 @@ newest first).
     )
 
     def Get(self, request, global_params=None):
-      """Gets details about a device.
+      r"""Gets details about a device.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesDevicesGetRequest) input message
@@ -209,7 +210,7 @@ newest first).
     )
 
     def List(self, request, global_params=None):
-      """List devices in a device registry.
+      r"""List devices in a device registry.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesDevicesListRequest) input message
@@ -236,7 +237,7 @@ newest first).
     )
 
     def ModifyCloudToDeviceConfig(self, request, global_params=None):
-      """Modifies the configuration for the device, which is eventually sent from.
+      r"""Modifies the configuration for the device, which is eventually sent from.
 the Cloud IoT Core servers. Returns the modified configuration version and
 its metadata.
 
@@ -265,7 +266,7 @@ its metadata.
     )
 
     def Patch(self, request, global_params=None):
-      """Updates a device.
+      r"""Updates a device.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesDevicesPatchRequest) input message
@@ -302,7 +303,7 @@ its metadata.
           }
 
     def Create(self, request, global_params=None):
-      """Creates a device registry that contains devices.
+      r"""Creates a device registry that contains devices.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesCreateRequest) input message
@@ -329,7 +330,7 @@ its metadata.
     )
 
     def Delete(self, request, global_params=None):
-      """Deletes a device registry configuration.
+      r"""Deletes a device registry configuration.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesDeleteRequest) input message
@@ -356,7 +357,7 @@ its metadata.
     )
 
     def Get(self, request, global_params=None):
-      """Gets a device registry configuration.
+      r"""Gets a device registry configuration.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesGetRequest) input message
@@ -383,7 +384,7 @@ its metadata.
     )
 
     def GetIamPolicy(self, request, global_params=None):
-      """Gets the access control policy for a resource.
+      r"""Gets the access control policy for a resource.
 Returns an empty policy if the resource exists and does not have a policy
 set.
 
@@ -412,7 +413,7 @@ set.
     )
 
     def List(self, request, global_params=None):
-      """Lists device registries.
+      r"""Lists device registries.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesListRequest) input message
@@ -439,7 +440,7 @@ set.
     )
 
     def Patch(self, request, global_params=None):
-      """Updates a device registry configuration.
+      r"""Updates a device registry configuration.
 
       Args:
         request: (CloudiotProjectsLocationsRegistriesPatchRequest) input message
@@ -466,7 +467,7 @@ set.
     )
 
     def SetIamPolicy(self, request, global_params=None):
-      """Sets the access control policy on the specified resource. Replaces any.
+      r"""Sets the access control policy on the specified resource. Replaces any.
 existing policy.
 
       Args:
@@ -494,7 +495,7 @@ existing policy.
     )
 
     def TestIamPermissions(self, request, global_params=None):
-      """Returns permissions that a caller has on the specified resource.
+      r"""Returns permissions that a caller has on the specified resource.
 If the resource does not exist, this will return an empty set of
 permissions, not a NOT_FOUND error.
 

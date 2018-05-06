@@ -16,33 +16,38 @@
 
 import copy
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.projects import base
 from tests.lib.surface.projects import util as test_util
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class ProjectsGetIamPolicyTest(base.ProjectsUnitTestBase):
 
-  def testGetIamPolicyProject(self):
+  def testGetIamPolicyProject(self, track):
+    self.track = track
     properties.VALUES.core.user_output_enabled.Set(False)
     test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=test_project.projectId),
         copy.deepcopy(test_util.GetTestIamPolicy()))
-    response = self.RunProjectsBeta('get-iam-policy', test_project.projectId)
+    response = self.RunProjects('get-iam-policy', test_project.projectId)
     self.assertEqual(response, test_util.GetTestIamPolicy())
 
-  def testGetIamPolicyProjectOutput(self):
+  def testGetIamPolicyProjectOutput(self, track):
+    self.track = track
     test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=test_project.projectId),
         copy.deepcopy(test_util.GetTestIamPolicy()))
-    self.RunProjectsBeta('get-iam-policy', test_project.projectId)
+    self.RunProjects('get-iam-policy', test_project.projectId)
     self.AssertOutputEquals("""\
 auditConfigs:
 - auditLogConfigs:
@@ -60,12 +65,12 @@ etag: PDwgVW5pcXVlIHZlcnNpb25pbmcgZXRhZyBieXRlZmllbGQgPj4=
 version: 0
 """)
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
+    self.track = track
     test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.GetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsGetIamPolicyRequest(
-            resource=test_project.projectId,
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
+            resource=test_project.projectId),
         copy.deepcopy(test_util.GetTestIamPolicy()))
     command = [
         'get-iam-policy',
@@ -74,7 +79,7 @@ version: 0
         '--filter=bindings.role:roles/owner',
         '--format=table[no-heading](bindings.members:sort=1)',
     ]
-    self.RunProjectsBeta(*command)
+    self.RunProjects(*command)
     self.AssertOutputEquals('user:slick@gmail.com\nuser:tester@gmail.com\n')
 
 

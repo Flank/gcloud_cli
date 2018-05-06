@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import os
 import ssl
 import tempfile
@@ -24,10 +28,12 @@ from googlecloudsdk.calliope import command_loading
 from googlecloudsdk.calliope import display
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.calliope import parser_errors
+from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.updater import update_manager
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -35,6 +41,9 @@ from tests.lib import test_case
 from tests.lib.calliope import util
 
 import httplib2
+import mock
+
+import six
 
 
 class CalliopeTest(util.WithTestTool,
@@ -56,27 +65,15 @@ class CalliopeTest(util.WithTestTool,
     self.AssertErrContains('Filter Sdk1\nFilter Sdk2')
 
   def testBadExecuteInvocationType(self):
-    with self.assertRaisesRegexp(ValueError, 'Execute expects an iterable'):
+    with self.assertRaisesRegex(ValueError, 'Execute expects an iterable'):
       self.cli.Execute('foo bar')
-
-  def testNonAsciiNotAllowed(self):
-    """Test non-ascii character detection."""
-    with self.assertRaisesRegexp(
-        calliope_exceptions.InvalidCharacterInArgException,
-        'Failed to read command line argument'):
-      self.cli.Execute(u'command1 --format=Ṳᾔḯ¢◎ⅾℯ'.split())
-    self.AssertErrContains("""\
-Failed to read command line argument [--format=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f] because it does not appear to be valid 7-bit ASCII.
-
-test command1 --format=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f
-                       ^ invalid character""")
 
   def testIgnoreBroken(self):
     """Test to make sure that groups with errors don't kill everything."""
     # We can run a command ok.
     self.cli.Execute('sdk2 command2'.split())
     # If we load everything, we can see there is a broken command in there.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.CommandLoadFailure,
         r"Problem loading test.broken-sdk.broken\: name 'asd' is not defined."):
       self.cli._TopElement().LoadAllSubElements(recursive=True)
@@ -101,7 +98,7 @@ test command1 --format=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f
         command_root_directory=os.path.join(self.calliope_test_home, 'sdk1'))
     loader.AddModule('broken_sdk', os.path.join(self.calliope_test_home,
                                                 'broken_sdk'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         command_loading.CommandLoadFailure,
         r"Problem loading test.broken-sdk.broken\: name 'asd' is not defined."):
       loader.Generate()
@@ -114,7 +111,7 @@ test command1 --format=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f
         command_root_directory=os.path.join(self.calliope_test_home, 'sdk1'))
     loader.AddModule('broken_required', os.path.join(self.calliope_test_home,
                                                      'broken_required'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         parser_errors.ArgumentException,
         r"Flag \[--not-really-required\] cannot have category='REQUIRED' in "
         r"command \[test.broken-required.broken\]"):
@@ -129,7 +126,7 @@ test command1 --format=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f
     loader.AddModule('broken_required_category',
                      os.path.join(self.calliope_test_home,
                                   'broken_required_category'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         parser_errors.ArgumentException,
         r'Required flag \[--required-with-category\] cannot have a category in '
         r'command \[test\.broken-required-category\.broken\]'):
@@ -173,7 +170,7 @@ test command1 --format=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f
     self.assertEqual(2, errors_mock.call_count)
     commands_args, commands_kwargs = commands_mock.call_args_list[0]
     self.assertIn('UnrecognizedArgumentsError', str(commands_kwargs['error']))
-    self.assertEquals('test.command1', str(commands_args[0]))
+    self.assertEqual('test.command1', str(commands_args[0]))
 
   def testUnexpectedArgs2(self):
     """Test that providing extra arguments is an error."""
@@ -202,42 +199,81 @@ test command1 --format=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f
 
     self.cli.Execute('command1 --coolstuff'.split())
     commands_args = commands_mock.call_args_list[0][0][2]
-    self.assertEquals(['--coolstuff'], commands_args)
+    self.assertEqual(['--coolstuff'], commands_args)
 
     self.cli.Execute('command1'.split())
     commands_args = commands_mock.call_args_list[1][0][2]
-    self.assertEquals([], commands_args)
+    self.assertEqual([], commands_args)
 
     with self.AssertRaisesArgumentErrorMatches(
         'unrecognized arguments: --bogus-arg=junk'):
       self.cli.Execute('command1 --coolstuff --bogus-arg=junk'.split())
     commands_args = commands_mock.call_args_list[2][0][2]
-    self.assertEquals(['--coolstuff'], commands_args)
+    self.assertEqual(['--coolstuff'], commands_args)
 
   def testToolExceptions(self):
     """Test that any ToolExceptions thrown by Run() are given to Display()."""
-    with self.assertRaisesRegexp(
-        calliope_exceptions.ToolException,
-        r"\('noarg', 'no reason'\)"):
+    with self.assertRaisesRegex(
+        calliope_exceptions.ToolException, 'no reason'):
       self.cli.Execute('exceptioncommand'.split())
 
   def testGoofyArgs(self):
-    self.cli.Execute('sdk2 lotsofargs --group-not-required-test=2 '
-                     '--group-required-test=1 test '
-                     '--command-not-required-test=4 --command-required-test=3 6'
+    self.cli.Execute('sdk2 lotsofargs '
+                     '--group-required-test=1 '
+                     'test '
+                     '--group-not-required-test=2 '
+                     '--command-not-required-test=4 '
+                     '--command-required-test=3 '
+                     '6'
                      .split())
-    self.AssertOutputContains('warning\n1\n2\n3\n4\n4\nNone\n6',
+    self.AssertOutputContains('warning\n1\n2\n3\n4\nNone\n6',
                               normalize_space=True)
 
   def testGoofyArgs2(self):
-    self.cli.Execute(
-        ('sdk2 '
-         'lotsofargs --group-required-test=1 --group-not-required-test=2 '
-         'test --command-required-test=3 --command-not-required-test=4 6'
-        ).split())
+    self.cli.Execute('sdk2 lotsofargs '
+                     '--group-required-test=1 '
+                     'test '
+                     '--group-not-required-test=2 '
+                     '--command-required-test=3 '
+                     '--command-not-required-test=4 '
+                     '6'
+                     .split())
 
-    self.AssertOutputContains('warning\n1\n2\n3\n4\n4\nNone\n6',
+    self.AssertOutputContains('warning\n1\n2\n3\n4\nNone\n6',
                               normalize_space=True)
+
+  def testGoofyArgs3(self):
+    self.cli.Execute('sdk2 lotsofargs '
+                     '--group-required-test=Ṳᾔḯ¢◎ⅾℯ '
+                     'test '
+                     '--group-not-required-test=2 '
+                     '--command-required-test=3 '
+                     '--command-not-required-test=4 '
+                     '6'
+                     .split())
+
+    self.AssertOutputContains('warning\n???????\n2\n3\n4\nNone\n6',
+                              normalize_space=True)
+
+  def testGoofyArgs4(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'unrecognized arguments: --group-required-test=1'):
+      self.cli.Execute('sdk2 lotsofargs '
+                       'test '
+                       '--group-required-test=1 '
+                       '--command-required-test=3 '
+                       '6'
+                       .split())
+
+  def testGoofyArgs5(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'unrecognized arguments: --command-required-test=3'):
+      self.cli.Execute('sdk2 lotsofargs '
+                       '--group-required-test=1 '
+                       '--command-required-test=3 '
+                       'test '
+                       '6'
+                       .split())
 
   def testGoofyArgsNoAbbreviatedLeaf(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -413,6 +449,19 @@ Filter Sdk1
 Filter Sdk2
 """)
 
+  def testTopGroupHelp(self):
+    with self.assertRaises(SystemExit):
+      self.cli.Execute('sdk2 --help'.split())
+    self.AssertOutputContains("""\
+NAME
+    test sdk2 -
+
+SYNOPSIS
+    test sdk2 GROUP | COMMAND [TEST_WIDE_FLAG ...]
+
+TEST WIDE FLAGS
+""")
+
   def testNestedGroupsHelp(self):
     with self.assertRaises(SystemExit):
       self.cli.Execute('sdk2 nested-groups --help'.split())
@@ -436,11 +485,15 @@ DESCRIPTION
     A command with nested argument group combinations.
 
 REQUIRED FLAGS
-     --def=DEF
-        DEF help text.
+     Test 011. This must be specified.
 
-     --jkl=JKL
-        JKL help text.
+       --def=DEF
+          DEF help text.
+
+     Test 111. This must be specified.
+
+       --jkl=JKL
+          JKL help text.
 
      Test 012. At least one of these must be specified:
 
@@ -459,11 +512,15 @@ REQUIRED FLAGS
           VWX sib help text.
 
 OPTIONAL FLAGS
-     --abc=ABC
-        ABC help text.
+     Test 001.
 
-     --ghi=GHI
-        GHI help text.
+       --abc=ABC
+          ABC help text.
+
+     Test 101.
+
+       --ghi=GHI
+          GHI help text.
 
      Group 00 flags. At most one of these may be specified:
 
@@ -556,13 +613,17 @@ NOTES
         $ test beta sdk2 nested-groups
 """)
 
-  def testGroupButNoCommand(self):
-    with self.assertRaises(SystemExit):
+  def testGroupNoTopCommand(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Command name argument expected.'):
       self.cli.Execute(
           'sdk2'.split())
-    self.AssertErrContains("""\
-(test.sdk2) Command name argument expected.
-""")
+
+  def testGroupNoSubCommand(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Command name argument expected.'):
+      self.cli.Execute(
+          'sdk2 lotsofargs --group-required-test=notme'.split())
 
   def testUseArgBeforeParserThatDefinesItWIthEquals(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -580,7 +641,7 @@ NOTES
     self.cli.Execute('sdk2 lotsofargs --group-required-test=1 test '
                      '--command-required-test=3 '
                      '--config=5 6'.split())
-    self.AssertOutputContains('warning\n1\nNone\n3\nNone\nNone\n5\n6',
+    self.AssertOutputContains('warning\n1\n9999\n3\nNone\n5\n6',
                               normalize_space=True)
 
   def testUnderscores(self):
@@ -625,6 +686,26 @@ NOTES
         'requiredargcommand --some_required_arg=foo'.split())
     self.assertEqual(called, ['test.requiredargcommand',
                               'test.requiredargcommand'])
+
+  def testCliResetsConcepts(self):
+    class FakeHandler(object):
+
+      def __init__(self):
+        self.was_reset = False
+
+      def Reset(self):
+        self.was_reset = True
+    handler = FakeHandler()
+
+    mock_handler = self.StartObjectPatch(parser_extensions.Namespace,
+                                         'CONCEPTS')
+    mock_handler.__get__ = mock.Mock(return_value=handler)
+    loader = calliope.CLILoader(
+        name='test',
+        command_root_directory=os.path.join(self.calliope_test_home, 'sdk2'))
+    cli = loader.Generate()
+    cli.Execute(['command2'])
+    self.assertTrue(handler.was_reset)
 
   def testNewStyle(self):
     self.assertEqual(self.cli.Execute('newstylecommand --flag=6'.split()), 5)
@@ -687,12 +768,13 @@ NOTES
     self.StartObjectPatch(calliope_exceptions, '_Exit')
 
     # `help` and `--help` now hit the same code which bypasses cli.Execute().
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       cli.Execute(['--help'])
-    self.AssertErrNotContains(exceptions.NetworkIssueError('').message)
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    message = six.text_type(exceptions.NetworkIssueError(''))
+    self.AssertErrNotContains(message)
+    with self.assertRaisesRegex(SystemExit, '0'):
       cli.Execute(['help'])
-    self.AssertErrNotContains(exceptions.NetworkIssueError('').message)
+    self.AssertErrNotContains(message)
 
   def testUsage(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -706,8 +788,7 @@ Usage: test [optional flags] <group | command>
   command may be         command1 | dict-list | exceptioncommand | exit2 |
                          help | implementation-args | loggingcommand |
                          mutex-command | newstylecommand | recommand |
-                         requiredargcommand | simple-command |
-                         static-recommand | unsetprop
+                         requiredargcommand | simple-command | unsetprop
 
 For detailed information on this command and its flags, run:
   test --help
@@ -723,7 +804,7 @@ For detailed information on this command and its flags, run:
     cli.Execute('newstylegroup sdk2 command2'.split())
 
   def testParentFlags(self):
-    with tempfile.NamedTemporaryFile() as f:
+    with tempfile.NamedTemporaryFile('w') as f:
       f.write('{}')
       f.close()
       loader = calliope.CLILoader(
@@ -761,14 +842,6 @@ For detailed information on this command and its flags, run:
     cli.Execute('newstylegroup anothergroup sdk2 command2'.split())
     cli.Execute('newstylegroup anothergroup command2'.split())
     cli.Execute('newstylegroup anothergroup subcommand'.split())
-
-  def testStaticRedirectCommands(self):
-    self.cli.Execute(['static-recommand'])
-    self.AssertOutputContains("""\
-        are we cool? True
-        filtered context
-        trace_email is None
-        Done!""", normalize_space=True)
 
   def testRedirectCommands(self):
     self.cli.Execute(['recommand'])
@@ -917,9 +990,8 @@ unrecognized arguments:
   def testErrorMetric(self):
     command_mock = self.StartObjectPatch(metrics, 'Commands')
     error_mock = self.StartObjectPatch(metrics, 'Error')
-    with self.assertRaisesRegexp(
-        calliope_exceptions.ToolException,
-        r"\('noarg', 'no reason'\)"):
+    with self.assertRaisesRegex(
+        calliope_exceptions.ToolException, 'no reason'):
       self.cli.Execute(['exceptioncommand'])
 
     self.assertEqual(1, error_mock.call_count)
@@ -954,7 +1026,7 @@ unrecognized arguments:
   def testHttpErrorMetric(self):
     error_mock = self.StartObjectPatch(metrics, 'Error')
     command_mock = self.StartObjectPatch(metrics, 'Commands')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.HttpException,
         'Resource not found API reason: some error'):
       self.cli.Execute('exceptioncommand --http-error'.split())
@@ -999,11 +1071,12 @@ unrecognized arguments:
         command_root_directory=pkg_root)
     cli = loader.Generate()
     request_mock = self.StartObjectPatch(httplib2.Http, 'request')
+    request_mock.return_value = ({}, b'response content')
     cli.Execute(['http-command'])
     self.assertEqual(1, request_mock.call_count)
     calls = request_mock.call_args_list
-    self.assertIn(' command/test.http-command ',
-                  calls[0][1]['headers']['user-agent'])
+    self.assertIn(b' command/test.http-command ',
+                  calls[0][1]['headers'][b'user-agent'])
 
 
 class DisplayInfoTest(util.WithTestTool, sdk_test_base.WithOutputCapture):
@@ -1085,19 +1158,19 @@ class DescribeTest(util.WithTestTool, sdk_test_base.WithOutputCapture):
     """Test for default format of describe command."""
 
     self.cli.Execute(['describe', '--verbosity=info'])
-    self.AssertErrContains('INFO: Display format "default".')
+    self.AssertErrContains('INFO: Display format: "default"')
 
   def testLegacyDescribeCommandDefaultFormat(self):
     """Test for default format of describe command."""
 
     self.cli.Execute(['legacy-describe', '--verbosity=info'])
-    self.AssertErrContains('INFO: Display format "default".')
+    self.AssertErrContains('INFO: Display format: "default"')
 
   def testDescribeCommandUriFlag(self):
     """Test for describe --uri command."""
 
     self.cli.Execute(['describe', '--verbosity=info', '--uri'])
-    self.AssertErrContains('INFO: Display format "value(.)".')
+    self.AssertErrContains('INFO: Display format: "value(.)"')
     self.AssertOutputContains('describers/group/uri')
 
 
@@ -1105,33 +1178,22 @@ class UnicodeSupportedTest(util.WithTestTool,
                            sdk_test_base.WithOutputCapture):
 
   def testUnicodeSupportedGroupSupportedCommand(self):
-    expected = [u'Ṳᾔḯ¢◎ⅾℯ']
+    expected = ['Ṳᾔḯ¢◎ⅾℯ']
     actual = self.cli.Execute(
-        ['sdk7', 'sdk', 'supported', 'certainly', u'--søɨŧɇnłɏ=Ṳᾔḯ¢◎ⅾℯ'])
+        ['sdk7', 'sdk', 'supported', 'certainly', '--søɨŧɇnłɏ=Ṳᾔḯ¢◎ⅾℯ'])
     self.assertEqual(expected, actual)
 
   def testUnicodeUnsupportedGroupSupportedCommand(self):
-    expected = [u'Ṳᾔḯ¢◎ⅾℯ']
+    expected = ['Ṳᾔḯ¢◎ⅾℯ']
     actual = self.cli.Execute(
-        ['sdk7', 'sdk', 'unsupported', 'yes', u'--車=Ṳᾔḯ¢◎ⅾℯ'])
+        ['sdk7', 'sdk', 'unsupported', 'yes', '--車=Ṳᾔḯ¢◎ⅾℯ'])
     self.assertEqual(expected, actual)
-
-  def testUnicodeUnsupportedGroupUnsupportedCommand(self):
-    with self.assertRaisesRegexp(SystemExit, '1'):
-      self.cli.Execute(
-          ['sdk7', 'sdk', 'unsupported', 'no', u'--never=Ṳᾔḯ¢◎ⅾℯ'])
-    self.AssertErrContains("""\
-ERROR: (test.sdk7.sdk.unsupported.no) Failed to read command line argument [--never=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f] because it does not appear to be valid 7-bit ASCII.
-
-test sdk7 sdk unsupported no --never=\\u1e72\\u1f94\\u1e2f\\xa2\\u25ce\\u217e\\u212f
-                                     ^ invalid character
-""")
 
   def testUnicodeSupportedGroupUnknownUnicodeCommand(self):
     self.SetEncoding('utf8')
-    with self.assertRaisesRegexp(SystemExit, '2'):
-      self.cli.Execute(['sdk7', u'Ṳᾔḯ¢◎ⅾℯ'])
-    self.AssertErrContains(u"""\
+    with self.assertRaisesRegex(SystemExit, '2'):
+      self.cli.Execute(['sdk7', 'Ṳᾔḯ¢◎ⅾℯ'])
+    self.AssertErrContains("""\
 ERROR: (test.sdk7) Invalid choice: 'Ṳᾔḯ¢◎ⅾℯ'.
 Usage: test sdk7 [optional flags] <group>
   group may be           describers | sdk
@@ -1141,36 +1203,25 @@ For detailed information on this command and its flags, run:
 """)
 
 
-class AllowUnicodeTest(util.WithTestTool, cli_test_base.CliTestBase):
+class UnicodeTest(util.WithTestTool, cli_test_base.CliTestBase):
 
-  def testUnicodeSupportedGroupSupportedCommandWithAllowUnicode(self):
-    self.AllowUnicode()
-    expected = [u'Ṳᾔḯ¢◎ⅾℯ']
+  def testUnicodeSupportedGroupSupportedCommand(self):
+    expected = ['Ṳᾔḯ¢◎ⅾℯ']
     actual = self.cli.Execute(
-        ['sdk7', 'sdk', 'supported', 'certainly', u'--søɨŧɇnłɏ=Ṳᾔḯ¢◎ⅾℯ'])
+        ['sdk7', 'sdk', 'supported', 'certainly', '--søɨŧɇnłɏ=Ṳᾔḯ¢◎ⅾℯ'])
     self.assertEqual(expected, actual)
-    self.assertNotEqual(self.enforce_ascii_args_mock, None)
-    try:
-      self.TearDown()
-      self.fail('Delete self.AllowUnicode() assertion error should have '
-                'been raised.')
-    except AssertionError:
-      self.enforce_ascii_args_mock.call_count = 1
 
-  def testUnicodeUnsupportedGroupUnsupportedCommandWithAllowUnicode(self):
-    self.AllowUnicode()
-    expected = [u'Ṳᾔḯ¢◎ⅾℯ']
+  def testUnicodeUnsupportedGroupUnsupportedCommand(self):
+    expected = ['Ṳᾔḯ¢◎ⅾℯ']
     actual = self.cli.Execute(['sdk7', 'sdk', 'unsupported', 'no',
-                               u'--never=Ṳᾔḯ¢◎ⅾℯ'])
+                               '--never=Ṳᾔḯ¢◎ⅾℯ'])
     self.assertEqual(expected, actual)
-    self.assertNotEqual(self.enforce_ascii_args_mock, None)
-    self.assertEqual(self.enforce_ascii_args_mock.call_count, 1)
 
 
 class HelpCommandAndFlagTests(cli_test_base.CliTestBase):
 
   def testHelpCommandAndFlagEquiv(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['help', 'help'])
     self.AssertOutputContains('NAME')
     self.AssertOutputContains('DESCRIPTION')
@@ -1178,25 +1229,25 @@ class HelpCommandAndFlagTests(cli_test_base.CliTestBase):
     help_command_out = self.GetOutput()
 
     self.ClearOutput()
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['help', '--help'])
     test_out = self.GetOutput()
-    self.assertEquals(help_command_out, test_out)
+    self.assertEqual(help_command_out, test_out)
 
     self.ClearOutput()
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['help', 'topic', '--help'])
     test_out = self.GetOutput()
-    self.assertEquals(help_command_out, test_out)
+    self.assertEqual(help_command_out, test_out)
 
     self.ClearOutput()
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['help', 'topic', '--help', '--help'])
     test_out = self.GetOutput()
-    self.assertEquals(help_command_out, test_out)
+    self.assertEqual(help_command_out, test_out)
 
   def testHelpTopicCommandAndFlagEquiv(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['help', 'topic'])
     self.AssertOutputContains('NAME')
     self.AssertOutputContains('DESCRIPTION')
@@ -1204,16 +1255,33 @@ class HelpCommandAndFlagTests(cli_test_base.CliTestBase):
     help_command_out = self.GetOutput()
 
     self.ClearOutput()
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['topic', '--help'])
     test_out = self.GetOutput()
-    self.assertEquals(help_command_out, test_out)
+    self.assertEqual(help_command_out, test_out)
 
     self.ClearOutput()
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.Run(['topic', '--help', '--help'])
     test_out = self.GetOutput()
-    self.assertEquals(help_command_out, test_out)
+    self.assertEqual(help_command_out, test_out)
+
+  def testHelpInteractivity(self):
+    more_mock = self.StartObjectPatch(console_io, 'More')
+    interactive_mock = self.StartObjectPatch(console_io, 'IsInteractive')
+    interactive_mock.return_value = False
+    with self.assertRaisesRegex(SystemExit, '0'):
+      self.Run(['help', '--help'])
+    self.AssertOutputContains('gcloud help - prints detailed help messages')
+    self.assertFalse(more_mock.called)
+
+    # Interactive mode goes through the console_io pager, make sure that works.
+    interactive_mock.return_value = True
+    with self.assertRaisesRegex(SystemExit, '0'):
+      self.Run(['help', '--help'])
+    self.assertEqual(len(more_mock.call_args_list), 1)
+    self.assertIn('gcloud help - prints detailed help messages',
+                  more_mock.call_args_list[0][0][0])
 
 
 class MarkdownTests(sdk_test_base.WithOutputCapture, sdk_test_base.SdkBase):
@@ -1226,7 +1294,7 @@ class MarkdownTests(sdk_test_base.WithOutputCapture, sdk_test_base.SdkBase):
     self.cli = loader.Generate()
 
   def Execute(self, path):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.cli.Execute(path + ['--document=style=markdown'])
     self.AssertOutputIsGolden(
         __file__, 'markdown', '_'.join(['gcloud'] + path) + '.md')
@@ -1247,7 +1315,7 @@ class MarkdownTests(sdk_test_base.WithOutputCapture, sdk_test_base.SdkBase):
     self.Execute(['hidden-group', 'hidden-command'])
 
   def testShortHelpMarkdownSections(self):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.cli.Execute(['markdown', 'markdown-command', '-h'])
     self.AssertOutputNotContains(' ## EXAMPLES ')
 
@@ -1263,7 +1331,7 @@ class StorePropertyMarkdownTests(sdk_test_base.WithOutputCapture,
     self.cli = loader.Generate()
 
   def Execute(self, path):
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.cli.Execute(path + ['--document=style=markdown'])
 
   def testStorePropertyMarkdown(self):
@@ -1359,7 +1427,7 @@ class DocumentFlagTests(sdk_test_base.WithOutputCapture, sdk_test_base.SdkBase):
     self.cli.Execute(path)
 
   def testDocumentFlagUnknowdAttribute(self):
-    with self.assertRaisesRegexp(SystemExit, '2'):
+    with self.assertRaisesRegex(SystemExit, '2'):
       self.Execute(['command1', '--document=unknownAttribute=foo'])
     self.AssertErrContains('ERROR: (gcloud.command1) Unknown document '
                            'attribute [unknownAttribute]')
@@ -1581,8 +1649,8 @@ NOTES
 """)
 
   def testDeprecateWithError(self):
-    with self.assertRaisesRegexp(calliope_base.DeprecationException,
-                                 'This command has been removed.'):
+    with self.assertRaisesRegex(calliope_base.DeprecationException,
+                                'This command has been removed.'):
       self.cli.Execute(['deprecation-error-command'])
     self.AssertLogNotContains('Deprecation Error Command Complete')
     self.AssertOutputEquals('')
@@ -1647,8 +1715,8 @@ NOTES
 """)
 
   def testDeprecateWithCustomError(self):
-    with self.assertRaisesRegexp(calliope_base.DeprecationException,
-                                 'My Custom Error'):
+    with self.assertRaisesRegex(calliope_base.DeprecationException,
+                                'My Custom Error'):
       self.cli.Execute(['deprecation-error-command-custom-err'])
     self.AssertLogNotContains('Deprecation Error Command Complete')
     self.ClearOutput()
@@ -2245,8 +2313,8 @@ class YamlTranslatorTest(sdk_test_base.WithOutputCapture):
           parser.add_argument('--foo', help='Auxilio aliis.')
 
         def Run(self, args):
-          print command_data['description']
-          print args.foo
+          print(command_data['description'])
+          print(args.foo)
       return Command
 
   def SetUp(self):
@@ -2315,21 +2383,21 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
         '--my-set-arg', 'THING_ONE', '--my-dict-arg', 'diCT_CHoicE-THRee',
         '--my-list-arg', '3.1_THE-LAST', '--my-tuple-arg', 'ONE'
     ])
-    self.assertEquals('thing-one', parse_result.my_set_arg)
-    self.assertEquals('dict-choice-three', parse_result.my_dict_arg)
-    self.assertEquals('3.1-the-last', parse_result.my_list_arg)
-    self.assertEquals('one', parse_result.my_tuple_arg)
+    self.assertEqual('thing-one', parse_result.my_set_arg)
+    self.assertEqual('dict-choice-three', parse_result.my_dict_arg)
+    self.assertEqual('3.1-the-last', parse_result.my_list_arg)
+    self.assertEqual('one', parse_result.my_tuple_arg)
 
   def testBadChoicesType(self):
-    with self.assertRaisesRegexp(TypeError, ('Choices must be an iterable '
-                                             'container of options')):
+    with self.assertRaisesRegex(TypeError, ('Choices must be an iterable '
+                                            'container of options')):
       calliope_base.ChoiceArgument(
           '--my-arg', choices='NO GOOD', default='NONE', help_str='Test help.')
 
   def testBadChoicesValues(self):
-    with self.assertRaisesRegexp(ValueError, ('Choices must be entirely in '
-                                              'lowercase with words separated '
-                                              'by hyphens')):
+    with self.assertRaisesRegex(ValueError, ('Choices must be entirely in '
+                                             'lowercase with words separated '
+                                             'by hyphens')):
       calliope_base.ChoiceArgument(
           '--my-arg',
           choices={
@@ -2340,7 +2408,7 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
           help_str='Test help.')
 
   def testMissingChoices(self):
-    with self.assertRaisesRegexp(ValueError, 'Choices must not be empty'):
+    with self.assertRaisesRegex(ValueError, 'Choices must not be empty'):
       calliope_base.ChoiceArgument(
           '--my-arg', choices=[], help_str='Test help.')
 
@@ -2350,7 +2418,7 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
         choices=self.dict_choices,
         help_str='My Help')
     choice_arg.AddToParser(self.parser)
-    with self.assertRaisesRegexp(SystemExit, '2'):
+    with self.assertRaisesRegex(SystemExit, '2'):
       self.parser.parse_args(['--my-arg', 'DICT_CHOICE_FOUR'])
     self.AssertErrContains(
         "argument --my-arg: Invalid choice: 'dict-choice-four'. "
@@ -2365,7 +2433,7 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
     choice_arg.AddToParser(self.parser)
     self.parser.add_argument(
         '--other-arg', required=False, help='Auxilio aliis.')
-    with self.assertRaisesRegexp(SystemExit, '2'):
+    with self.assertRaisesRegex(SystemExit, '2'):
       self.parser.parse_args(['--other-arg', 'foo'])
     self.AssertErrContains('argument --my-arg: Must be specified.')
 
@@ -2378,8 +2446,8 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
     choice_arg.AddToParser(self.parser)
     parse_result = self.parser.parse_args(['--my-arg', 'DICT_CHOICE_ONE',
                                            '--my-arg', 'DICT_CHOICE_TWO'])
-    self.assertEquals(['dict-choice-one', 'dict-choice-two'],
-                      parse_result.my_arg)
+    self.assertEqual(['dict-choice-one', 'dict-choice-two'],
+                     parse_result.my_arg)
 
   def testMetavarSet(self):
     choice_arg = calliope_base.ChoiceArgument(
@@ -2388,7 +2456,7 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
         help_str='My Help',
         metavar='MY_CHOICE')
     choice_arg.AddToParser(self.parser)
-    with self.assertRaisesRegexp(SystemExit, '0'):
+    with self.assertRaisesRegex(SystemExit, '0'):
       self.parser.parse_args(['-h'])
     self.AssertOutputContains('--my-arg MY_CHOICE  My Help')
 
@@ -2420,7 +2488,7 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
         '--my-arg', choices=self.list_choices, help_str='Test help.')
     choice_arg.AddToParser(self.parser)
     parse_result = self.parser.parse_args(['--my-arg', 'tWO_ThE-seConD'])
-    self.assertEquals('two-the-second', parse_result.my_arg)
+    self.assertEqual('two-the-second', parse_result.my_arg)
 
   def testWithDeprecation(self):
     choice_arg = calliope_base.ChoiceArgument(
@@ -2431,7 +2499,7 @@ class ChoiceArgumentTest(sdk_test_base.WithOutputCapture):
         help_str='Test help.')
     choice_arg.AddToParser(self.parser)
     parse_result = self.parser.parse_args(['--my-arg', 'tWO_ThE-seConD'])
-    self.assertEquals('two-the-second', parse_result.my_arg)
+    self.assertEqual('two-the-second', parse_result.my_arg)
 
 
 if __name__ == '__main__':

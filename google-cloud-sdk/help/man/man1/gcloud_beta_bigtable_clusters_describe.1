@@ -11,7 +11,7 @@ gcloud beta bigtable clusters describe \- describe an existing Bigtable cluster
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta bigtable clusters describe\fR \fICLUSTER\fR [\fB\-\-instance\fR=\fIINSTANCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta bigtable clusters describe\fR (\fICLUSTER\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,21 +25,26 @@ gcloud beta bigtable clusters describe \- describe an existing Bigtable cluster
 
 .RS 2m
 .TP 2m
-\fICLUSTER\fR
-ID of the cluster.
 
-
-.RE
-.sp
-
-.SH "FLAGS"
+CLUSTER \- The cluster to describe. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: Set the property [core/project] or provide the flag [\-\-project] on
+the command line. This must be specified.
 
 .RS 2m
 .TP 2m
+\fICLUSTER\fR
+The ID of the cluster or a fully qualified identifier for the cluster. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
 \fB\-\-instance\fR=\fIINSTANCE\fR
-ID of the instance.
+The Cloud Bigtable instance for the cluster.
 
 
+.RE
 .RE
 .sp
 

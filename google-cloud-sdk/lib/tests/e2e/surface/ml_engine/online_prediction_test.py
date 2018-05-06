@@ -54,7 +54,7 @@ class MlOnlinePredictionTests(e2e_base.WithServiceAuth):
     # themselves are non-deterministic, but we don't really care about whether
     # they're any good in this test. Just that we got *something*.
     predictions = results.get('predictions')
-    self.assertEquals(len(predictions), 10)
+    self.assertEqual(len(predictions), 10)
     for prediction in predictions:
       self.assertSetEqual(set(prediction.keys()),
                           set(('prediction', 'key', 'scores')))

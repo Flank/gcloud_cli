@@ -14,10 +14,14 @@
 
 """Unit tests for bigtable arguments module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.bigtable import util
 from googlecloudsdk.command_lib.bigtable import arguments
 from googlecloudsdk.core import properties
 from tests.lib import completer_test_base
+from tests.lib.calliope.concepts import concepts_test_base
+from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
@@ -143,6 +147,70 @@ class InstanceCompletionTest(base.BigtableV2TestBase,
             '--id': 'my-id',
         },
     )
+
+
+class ResourceArgCompletersTest(
+    completer_test_base.FlagCompleterBase,
+    resource_completer_test_base.ResourceCompleterBase,
+    concepts_test_base.ConceptsTestBase):
+
+  def testInstanceCommandCompletersExist(self):
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances add-iam-policy-binding',
+        arg='instance')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances remove-iam-policy-binding',
+        arg='instance')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances get-iam-policy', arg='instance')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable instances set-iam-policy', arg='instance')
+
+  def testClusterCommandCompletersExist(self):
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable clusters create', arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable clusters update', arg='cluster')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable clusters update', arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable clusters describe', arg='cluster')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable clusters describe', arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable clusters list', arg='--instances')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable clusters delete', arg='cluster')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable clusters delete', arg='--instance')
+
+  def testAppProfileCommandCompletersExist(self):
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles create', arg='app_profile')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles create', arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles delete', arg='app_profile')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles delete', arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles describe', arg='app_profile')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles describe', arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles list', arg='--instance')
+
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles update', arg='app_profile')
+    self.AssertCommandArgResourceCompleter(
+        command='beta bigtable app-profiles update', arg='--instance')
 
 
 if __name__ == '__main__':

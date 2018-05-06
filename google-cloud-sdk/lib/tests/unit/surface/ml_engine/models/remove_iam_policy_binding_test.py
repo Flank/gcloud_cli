@@ -45,7 +45,7 @@ class RemoveIamPolicyBindingUnitTest(base.MlGaPlatformTestBase):
                         '    --member user:test-user1@gmail.com '
                         '    --format disable')
 
-    self.assertEquals(response, self.policy)
+    self.assertEqual(response, self.policy)
     self.remove_iam_policy_binding.assert_called_once_with(
         mock.ANY, 'myModel', 'user:test-user1@gmail.com', 'roles/editor')
 

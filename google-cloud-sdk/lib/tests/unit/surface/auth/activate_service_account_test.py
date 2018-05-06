@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import filecmp
 import json
 import os
@@ -24,6 +27,7 @@ from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import test_case
+
 from mock import patch
 from oauth2client import client
 from oauth2client import service_account
@@ -53,7 +57,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase):
 
   def testJSONFromStdin(self):
     json_key_file = self._GetTestDataPathFor('inactive_service_account.json')
-    contents = files.GetFileContents(json_key_file, binary=True)
+    contents = files.GetFileContents(json_key_file)
     self.WriteInput(contents)
     self.Run('auth activate-service-account {0} --key-file=-'
              .format(self.Account()))
@@ -102,7 +106,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase):
                       'from_p12_keyfile_buffer',
                       side_effect=NotImplementedError):
       p12_key_file = self._GetTestDataPathFor('service_account_key.p12')
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           auth_service_account.UnsupportedCredentialsType,
           r'PyOpenSSL is not available. If you have already installed '
           r'PyOpenSSL, you will need to enable site packages by setting the '
@@ -119,7 +123,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase):
                         'from_p12_keyfile_buffer',
                         side_effect=NotImplementedError):
         p12_key_file = self._GetTestDataPathFor('service_account_key.p12')
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             auth_service_account.UnsupportedCredentialsType,
             r'PyOpenSSL is not available. See '
             r'https://developers.google.com/cloud/sdk/crypto for details or '
@@ -180,7 +184,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase):
   def testJSONBadKey(self):
     """Test that we validate the key file."""
     key_file = self.Touch(directory=self.temp_path, contents='{"foo": "bar"}')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         auth_service_account.BadCredentialJsonFileException,
         r'The \.json key file is not in a valid format\.'):
       self.Run('auth activate-service-account --key-file={0}'.format(key_file))
@@ -215,7 +219,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase):
     with open(paths.LegacyCredentialsAdcPath(self.Account())) as f:
       json_key_file = json.load(f)
 
-    self.assertEquals(json.loads(r"""
+    self.assertEqual(json.loads(r"""
         {
           "private_key_id": "294b4cce6389e0491d1c055585764d5631a3b0b4",
           "type": "service_account",
@@ -254,6 +258,7 @@ class BadServiceAccountTest(cli_test_base.CliTestBase):
                                'bad_key_file.json')
       self.Run('auth activate-service-account --key-file={key_file}'
                .format(key_file=key_file))
+
 
 if __name__ == '__main__':
   test_case.main()

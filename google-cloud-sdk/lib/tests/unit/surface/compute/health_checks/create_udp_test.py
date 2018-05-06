@@ -14,6 +14,8 @@
 # limitations under the License.
 """Tests for the health-checks create udp subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -316,55 +318,49 @@ class HealthChecksCreateUdpUnicodeTest(test_base.BaseTest):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self.track.prefix)
-    self.AllowUnicode()
 
   def testRequestOptionUnicode(self):
-    self.Run(u"""
+    self.Run("""
         compute health-checks create udp my-health-check
         --request Ṳᾔḯ¢◎ⅾℯ
         --response ack
         """)
 
     self.CheckRequests(
-        [(self.compute.healthChecks,
-          'Insert',
+        [(self.compute.healthChecks, 'Insert',
           self.messages.ComputeHealthChecksInsertRequest(
               healthCheck=self.messages.HealthCheck(
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.UDP,
                   udpHealthCheck=self.messages.UDPHealthCheck(
-                      request=u'Ṳᾔḯ¢◎ⅾℯ',
-                      response='ack'),
+                      request='Ṳᾔḯ¢◎ⅾℯ', response='ack'),
                   checkIntervalSec=5,
                   timeoutSec=5,
                   healthyThreshold=2,
                   unhealthyThreshold=2),
-              project='my-project'))],
-    )
+              project='my-project'))],)
 
   def testResponseOptionUnicode(self):
-    self.Run(u"""
+    self.Run("""
         compute health-checks create udp my-health-check
         --request sync
         --response Ṳᾔḯ¢◎ⅾℯ
         """)
 
     self.CheckRequests(
-        [(self.compute.healthChecks,
-          'Insert',
+        [(self.compute.healthChecks, 'Insert',
           self.messages.ComputeHealthChecksInsertRequest(
               healthCheck=self.messages.HealthCheck(
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.UDP,
                   udpHealthCheck=self.messages.UDPHealthCheck(
-                      request='sync',
-                      response=u'Ṳᾔḯ¢◎ⅾℯ'),
+                      request='sync', response='Ṳᾔḯ¢◎ⅾℯ'),
                   checkIntervalSec=5,
                   timeoutSec=5,
                   healthyThreshold=2,
                   unhealthyThreshold=2),
-              project='my-project'))],
-    )
+              project='my-project'))],)
+
 
 if __name__ == '__main__':
   test_case.main()

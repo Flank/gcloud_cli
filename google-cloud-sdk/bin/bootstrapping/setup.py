@@ -43,7 +43,7 @@ from googlecloudsdk.core.util import platforms
 
 # Add more methods to this list for universal checks that need to be performed
 def DoAllRequiredChecks():
-  if not platforms.PythonVersion().IsCompatible():
+  if not platforms.PythonVersion().IsCompatible(allow_py3=False):
     sys.exit(1)
 
 

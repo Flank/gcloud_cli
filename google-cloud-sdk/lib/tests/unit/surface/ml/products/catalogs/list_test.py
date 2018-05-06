@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """ml products catalogs list tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from tests.lib import test_case
 from tests.lib.surface.ml.products import base
@@ -24,7 +28,8 @@ class ListTest(base.MlProductsTestBase):
     self.catalogs = self.test_resources.MakeCatalogList(5)
     self.mock_client.productSearch_catalogs.List.Expect(
         self.messages.AlphaVisionProductSearchCatalogsListRequest(),
-        self.messages.ListCatalogsResponse(catalogs=self.catalogs))
+        self.messages.GoogleCloudVisionV1alpha1ListCatalogsResponse(
+            catalogs=self.catalogs))
 
   def testList(self):
     results = self.RunProductsCommand('catalogs', 'list')

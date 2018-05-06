@@ -18,9 +18,9 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import config
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
-from tests.lib.surface.firebase.test import fake_catalogs
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test.android import commands
+from tests.lib.surface.firebase.test.android import fake_catalogs
+from tests.lib.surface.firebase.test.android import unit_base
 
 PROJECT_ID = 'superbowl'
 DEFAULT_BUCKET = 'default-bucket'
@@ -36,7 +36,7 @@ ORCHESTRATOR_OPTION_ENUMS = (apis.GetMessagesModule(
 GOOD_ARGS = os.path.join(unit_base.TEST_DATA_PATH, 'good_args')
 
 
-class MatrixCreatorOrchestratorTests(unit_base.TestMockClientTest):
+class MatrixCreatorOrchestratorTests(unit_base.AndroidMockClientTest):
   """Unit tests for converting orchestrator flag to OrchestratorOption."""
 
   def BuildMatrix(self, orchestrator_option, test_matrix_id=None):

@@ -7,8 +7,9 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta billing accounts list lists all billing accounts owned
-    by the currently authenticated user.
+    (BETA) gcloud beta billing accounts list lists all billing accounts and
+    subaccounts owned by the currently authenticated user. Subaccounts have a
+    non-empty MASTER_ACCOUNT_ID value.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

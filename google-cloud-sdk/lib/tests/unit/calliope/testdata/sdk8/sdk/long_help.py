@@ -13,6 +13,8 @@
 # limitations under the License.
 """gcloud sdk tests command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 

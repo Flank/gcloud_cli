@@ -35,12 +35,13 @@ class JobsTest(e2e_base.WithServiceAuth):
       --max-retry-duration 10h
       --min-backoff 0.5s
       --schedule "1 of feb 00:00"
-      --timezone America/New_York"""
+      --time-zone America/New_York
+      """
   PUBSUB_JOB_FLAGS = """
       --message-body {}
       --schedule "1 of jan 00:00"
       --attributes key1=value1,key2=value2
-      --timezone America/New_York
+      --time-zone America/New_York
       --topic my-topic
       """.format(PUBSUB_MESSAGE_BODY)
 
@@ -84,14 +85,16 @@ class JobsTest(e2e_base.WithServiceAuth):
       yield subscription_id
 
   @contextlib.contextmanager
-  def _CreatePubsubJob(self, flags):
-    create_command = 'scheduler jobs create-pubsub-job {}'.format(flags)
+  def _CreatePubsubJob(self, flags, job_id):
+    create_command = 'scheduler jobs create-pubsub-job {} {}'.format(job_id,
+                                                                     flags)
     with self._CreateJob(create_command) as job_id:
       yield job_id
 
   @contextlib.contextmanager
-  def _CreateAppEngineJob(self, flags):
-    create_command = 'scheduler jobs create-app-engine-job {}'.format(flags)
+  def _CreateAppEngineJob(self, flags, job_id):
+    create_command = 'scheduler jobs create-app-engine-job {} {}'.format(job_id,
+                                                                         flags)
     with self._CreateJob(create_command) as job_id:
       yield job_id
 
@@ -113,8 +116,10 @@ class JobsTest(e2e_base.WithServiceAuth):
     self.ClearOutput()
 
   def testPubSubJob(self):
+    job_id = next(self.id_generator)
     with self._CreatePubsubTopic() as unused_topic_id, \
-         self._CreatePubsubJob(self.PUBSUB_JOB_FLAGS) as pubsub_job:
+         self._CreatePubsubJob(self.PUBSUB_JOB_FLAGS, job_id) as pubsub_job:
+      self.assertEquals(job_id, pubsub_job)
       self._AssertJobExists(pubsub_job, key_text='1 of jan')
 
       self.Run('scheduler jobs run ' + pubsub_job)
@@ -124,7 +129,10 @@ class JobsTest(e2e_base.WithServiceAuth):
       self.AssertOutputContains('Pub/Sub')
 
   def testAppEngineJob(self):
-    with self._CreateAppEngineJob(self.APP_ENGINE_JOB_FLAGS) as app_engine_job:
+    job_id = next(self.id_generator)
+    with self._CreateAppEngineJob(
+        self.APP_ENGINE_JOB_FLAGS, job_id) as app_engine_job:
+      self.assertEquals(job_id, app_engine_job)
       self._AssertJobExists(app_engine_job, key_text='1 of feb')
 
       self.Run('scheduler jobs list')

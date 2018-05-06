@@ -14,6 +14,8 @@
 
 """Tests for googlecloudsdk.api_lib.compute.utils."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import utils
 from tests.lib import test_case
 

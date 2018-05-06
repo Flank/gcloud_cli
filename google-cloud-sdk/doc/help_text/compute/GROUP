@@ -109,6 +109,9 @@ GROUPS
      ssl-certificates
         List, create, and delete Google Compute Engine SSL certificates.
 
+     ssl-policies
+        List, create, delete and update Google Compute Engine SSL policies.
+
      target-http-proxies
         List, create, and delete target HTTP proxies.
 

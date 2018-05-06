@@ -25,7 +25,8 @@ COMMANDS
         List the keys for a service account.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam service-accounts keys
         $ gcloud beta iam service-accounts keys
 

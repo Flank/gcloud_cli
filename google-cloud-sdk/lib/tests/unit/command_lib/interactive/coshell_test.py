@@ -121,11 +121,11 @@ class _CoshellTestBase(sdk_test_base.SdkBase, test_case.WithContentAssertions):
 class UnixCoshellTest(_CoshellTestBase):
 
   def testUnixCoshellEditMode(self):
-    self.assertEquals('emacs', self.coshell.edit_mode)
+    self.assertEqual('emacs', self.coshell.edit_mode)
     self.coshell.Run('set -o vi')
-    self.assertEquals('vi', self.coshell.edit_mode)
+    self.assertEqual('vi', self.coshell.edit_mode)
     self.coshell.Run('set -o emacs')
-    self.assertEquals('emacs', self.coshell.edit_mode)
+    self.assertEqual('emacs', self.coshell.edit_mode)
 
   def testUnixCoshellIgnoreEof(self):
     self.assertFalse(self.coshell.ignore_eof)
@@ -143,16 +143,16 @@ class UnixCoshellTest(_CoshellTestBase):
         name='coshell.env',
         contents='set -o vi\nset -o ignoreeof\n')
     self.CoOpen()
-    self.assertEquals('vi', self.coshell.edit_mode)
+    self.assertEqual('vi', self.coshell.edit_mode)
     self.assertTrue(self.coshell.ignore_eof)
 
   def testUnixCoshellTrueStatus(self):
     status = self.coshell.Run('true')
-    self.assertEquals(0, status)
+    self.assertEqual(0, status)
 
   def testUnixCoshellFalseStatus(self):
     status = self.coshell.Run('false')
-    self.assertEquals(1, status)
+    self.assertEqual(1, status)
 
   def testUnixCoshellEcho(self):
     self.coshell.Run('echo foo')
@@ -200,7 +200,7 @@ class UnixCoshellTest(_CoshellTestBase):
     self.CoOpen()
     self.CoClose()
     new_fds = _GetOpenFds()
-    self.assertEquals(set(), old_fds ^ new_fds)
+    self.assertEqual(set(), old_fds ^ new_fds)
 
   def testUnixCoshellJobsBackground(self):
     self.coshell.Run('sleep 1 && echo EXPIRED &')
@@ -226,18 +226,18 @@ class UnixCoshellTest(_CoshellTestBase):
   def testUnixCoshellExit(self):
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('exit')
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
 
   def testUnixCoshellExit0(self):
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('exit 0')
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
 
   @test_case.Filters.skip('rare annoying exit 0 flakes', 'b/65456434')
   def testUnixCoshellExit1(self):
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('exit 1')
-    self.assertEquals(1, self.coshell.Close())
+    self.assertEqual(1, self.coshell.Close())
 
   def testUnixCoshellRunAfterExit(self):
     with self.assertRaises(coshell.CoshellExitException):
@@ -245,10 +245,10 @@ class UnixCoshellTest(_CoshellTestBase):
       self.coshell.Run(':')
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('echo oops')
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
 
   def testUnixCoshellRunAfterClose(self):
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('echo oops')
 
@@ -259,12 +259,12 @@ class UnixCoshellTest(_CoshellTestBase):
     status = self.coshell.Close()
     # subprocess.Popen().returncode flakes to 0 in some test environments.
     if status:
-      self.assertEquals(271, status)
+      self.assertEqual(271, status)
 
   def testUnixCoshellSyntaxError(self):
     self.coshell.Run('echo "oops')
     self.coshell.Run('echo ok')
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
     self.AssertOutputContains('ok\n')
     self.AssertErrContains('unexpected EOF while looking for matching')
     self.AssertErrContains('syntax error: unexpected end of file')
@@ -309,13 +309,13 @@ class UnixCoshellTest(_CoshellTestBase):
 
     shell_status_contents = os.read(
         coshell._UnixCoshellBase.SHELL_STATUS_FD, 1024)
-    self.assertEquals('SHELL_STATUS_FD', shell_status_contents)
+    self.assertEqual('SHELL_STATUS_FD', shell_status_contents)
     if old_shell_status_fd >= 0:
       os.dup2(old_shell_status_fd, coshell._UnixCoshellBase.SHELL_STATUS_FD)
 
     shell_stdin_contents = os.read(
         coshell._UnixCoshellBase.SHELL_STDIN_FD, 1024)
-    self.assertEquals('SHELL_STDIN_FD', shell_stdin_contents)
+    self.assertEqual('SHELL_STDIN_FD', shell_stdin_contents)
     if old_shell_stdin_fd >= 0:
       os.dup2(old_shell_stdin_fd, coshell._UnixCoshellBase.SHELL_STDIN_FD)
 
@@ -395,27 +395,27 @@ class UnixCoshellInteractiveTest(_CoshellTestBase):
     status = self.Interactive([
         'true',
     ])
-    self.assertEquals(0, status)
+    self.assertEqual(0, status)
 
   def testUnixCoshellInteractiveFalse(self):
     status = self.Interactive([
         'false',
     ])
-    self.assertEquals(1, status)
+    self.assertEqual(1, status)
 
   @test_case.Filters.skip('rare annoying exit 0 flakes', 'b/65456434')
   def testUnixCoshellInteractiveExit(self):
     status = self.Interactive([
         'exit 123',
     ])
-    self.assertEquals(123, status)
+    self.assertEqual(123, status)
 
   def testUnixCoshellInteractiveEcho(self):
     status = self.Interactive([
         'echo foo',
         'echo bar',
     ])
-    self.assertEquals(0, status)
+    self.assertEqual(0, status)
     self.AssertOutputEquals('foo\nbar\n')
 
   def testUnixCoshellInteractiveInterrupt(self):
@@ -425,7 +425,7 @@ class UnixCoshellInteractiveTest(_CoshellTestBase):
         'TEST-Interrupt',
         'echo DONE',
     ])
-    self.assertEquals(0, status)
+    self.assertEqual(0, status)
     self.AssertOutputEquals('INTERRUPTED\nDONE\n')
 
 
@@ -469,11 +469,11 @@ class MingWCoshellOnUnixTest(_CoshellTestBase):
     os.close(old_err_fd)
 
   def testMinGWCoshellEditMode(self):
-    self.assertEquals('emacs', self.coshell.edit_mode)
+    self.assertEqual('emacs', self.coshell.edit_mode)
     self.coshell.Run('set -o vi')
-    self.assertEquals('vi', self.coshell.edit_mode)
+    self.assertEqual('vi', self.coshell.edit_mode)
     self.coshell.Run('set -o emacs')
-    self.assertEquals('emacs', self.coshell.edit_mode)
+    self.assertEqual('emacs', self.coshell.edit_mode)
 
   def testMinGWCoshellIgnoreEof(self):
     self.assertFalse(self.coshell.ignore_eof)
@@ -487,11 +487,11 @@ class MingWCoshellOnUnixTest(_CoshellTestBase):
 
   def testMinGWCoshellTrueStatus(self):
     status = self.coshell.Run('true')
-    self.assertEquals(0, status)
+    self.assertEqual(0, status)
 
   def testMinGWCoshellFalseStatus(self):
     status = self.coshell.Run('false')
-    self.assertEquals(1, status)
+    self.assertEqual(1, status)
 
   def testMinGWCoshellEcho(self):
     self.coshell.Run('echo foo')
@@ -528,18 +528,18 @@ class MingWCoshellOnUnixTest(_CoshellTestBase):
   def testMinGWCoshellExit(self):
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('exit')
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
 
   def testMinGWCoshellExit0(self):
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('exit 0')
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
 
   def testMinGWCoshellExit1(self):
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('exit 1')
     # EPIPE before status can be retrieved.
-    # self.assertEquals(1, self.coshell.Close())
+    # self.assertEqual(1, self.coshell.Close())
 
   def testMinGWCoshellRunAfterExit(self):
     with self.assertRaises(coshell.CoshellExitException):
@@ -547,10 +547,10 @@ class MingWCoshellOnUnixTest(_CoshellTestBase):
       self.coshell.Run(':')
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('echo oops')
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
 
   def testMinGWCoshellRunAfterClose(self):
-    self.assertEquals(0, self.coshell.Close())
+    self.assertEqual(0, self.coshell.Close())
     with self.assertRaises(coshell.CoshellExitException):
       self.coshell.Run('echo oops')
 
@@ -576,7 +576,7 @@ class WindowsCoshellTest(_CoshellTestBase):
     self.assertFalse(isinstance(self.coshell, coshell._UnixCoshell))
 
   def testWindowsCoshellEditMode(self):
-    self.assertEquals('emacs', self.coshell.edit_mode)
+    self.assertEqual('emacs', self.coshell.edit_mode)
 
   def testWindowsCoshellIgnoreEof(self):
     self.assertFalse(self.coshell.ignore_eof)

@@ -1,0 +1,106 @@
+
+.TH "GCLOUD_ALPHA_DLP_IMAGES_REDACT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dlp images redact \- redact potentially sensitive data from image content
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dlp images redact\fR \fIIMAGE\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] [\fB\-\-include\-quote\fR] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-redact\-all\-text\fR] [\fB\-\-redact\-color\fR=\fIREDACT_COLOR\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Redact potentially sensitive data from image content.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE\fR
+Image file to search for sensitive info. The file type must be one of PNG, JPEG,
+SVG, or BMP.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
+Which infoTypes to look for. The values must correspond to InfoType values found
+in documentation. For more information about valid infoTypes, see InfoTypes
+Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-include\-quote\fR
+If True, the server will attempt to filter out profanities, replacing all but
+the initial character in each filtered word with asterisks, e.g. \e"f**\fB\e".
+
+.TP 2m
+\fR\-\-min\-likelihood\fB=\fIMIN_LIKELIHOOD\fR; default="possible"
+Only return findings equal to or above this threshold. One of:
+\f5very\-unlikely\fR, \f5unlikely\fR, \f5possible\fR, \f5likely\fR,
+\f5very\-likely\fR. The default value is \f5possible\fR. \fIMIN_LIKELIHOOD\fR
+must be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB,
+\fRvery\-likely\fB, \fRvery\-unlikely\fB.
+
+.TP 2m
+\fR\-\-redact\-all\-text\fB
+If specified, all text info in the image will be removed, whether it is detected
+as sensitive or not.
+
+.TP 2m
+\fR\-\-redact\-color\fB=\fIREDACT_COLOR\fR
+The color to use when redacting content from an image. If not specified, the
+default value is black. Colors should be specified as a string of \f5r,g,b\fR
+float values in the interval [0,1] representing the amount of red, green, and
+blue in the color, respectively. For example, \f5black = 0,0,0\fR, \f5red =
+1.0,0,0\fR, \f5white = 1.0,1.0,1.0\fR, and so on.
+
+
+\fR
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdlp/v2\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/dlp/docs/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

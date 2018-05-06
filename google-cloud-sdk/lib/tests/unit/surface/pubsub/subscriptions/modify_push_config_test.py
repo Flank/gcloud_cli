@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Test of the 'pubsub subscriptions modify-push-config' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
@@ -113,7 +117,7 @@ class SubscriptionsModifyPushConfigGATest(base.CloudPubsubTestBase):
     result = self.Run('pubsub subscriptions modify-push-config subs2'
                       ' --push-endpoint https://my.appspot.com/push2')
 
-    self.assertEquals(result, self.msgs.Empty())
+    self.assertEqual(result, self.msgs.Empty())
 
 
 if __name__ == '__main__':

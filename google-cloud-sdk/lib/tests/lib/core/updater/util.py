@@ -16,12 +16,12 @@
 
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import unicode_literals
 import os
 import re
 import sys
 import tarfile
 import tempfile
-import urllib
 
 from googlecloudsdk.core.updater import schemas
 from googlecloudsdk.core.updater import snapshots
@@ -30,6 +30,9 @@ from googlecloudsdk.core.util import platforms
 from tests.lib import sdk_test_base
 
 import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 
 
 def FilesystemSupportsUnicodeEncodedPaths():
@@ -71,6 +74,11 @@ class Base(sdk_test_base.SdkBase):
     self.sdk_root_path = self.CreateTempDir(sdk_root_dir)
 
     self.staging_path = self.CreateTempDir('staging')
+    self.old_executable = sys.executable
+    sys.executable = 'current/python'
+
+  def TearDown(self):
+    sys.executable = self.old_executable
 
   def Resource(self, *args):
     """Returns the path to a test resource under the 'data' directory.
@@ -268,8 +276,9 @@ class Base(sdk_test_base.SdkBase):
     for component_id, version, dependencies in component_tuples:
       rel_paths = self.GeneratePathsFor(component_id, version)
       tar_file = self.CreateTempTar(self.staging_path, rel_paths)
-      new_tuples.append((component_id, version, dependencies,
-                         self.URLFromFile(urllib.pathname2url(tar_file))))
+      new_tuples.append((
+          component_id, version, dependencies,
+          self.URLFromFile(six.moves.urllib.request.pathname2url(tar_file))))
       paths[component_id] = rel_paths
     snapshot = self.CreateSnapshotFromComponents(
         revision, new_tuples, release_notes_file=release_notes_file,

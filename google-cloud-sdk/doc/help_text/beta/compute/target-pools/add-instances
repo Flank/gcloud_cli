@@ -24,7 +24,7 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --instances-zone=INSTANCES_ZONE
         The zone of the instances to add to the target pool. If not specified
-        and the compute/zone property isn't set, you will be prompted to select
+        and the compute/zone property isn't set, you may be prompted to select
         a zone.
 
         To avoid prompting when this flag is omitted, you can set the

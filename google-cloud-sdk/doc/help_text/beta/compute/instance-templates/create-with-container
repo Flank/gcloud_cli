@@ -26,11 +26,12 @@ SYNOPSIS
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--maintenance-policy=MAINTENANCE_POLICY]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
-        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]]
+        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
-        [--network-interface=[PROPERTY=VALUE,...]] [--preemptible]
-        [--region=REGION] [--no-restart-on-failure] [--subnet=SUBNET]
-        [--tags=TAG,[TAG,...]] [--address=ADDRESS | --no-address]
+        [--network-interface=[PROPERTY=VALUE,...]]
+        [--network-tier=NETWORK_TIER] [--preemptible] [--region=REGION]
+        [--no-restart-on-failure] [--subnet=SUBNET] [--tags=TAG,[TAG,...]]
+        [--address=ADDRESS | --no-address]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
           : --custom-extensions]
         [--image-project=IMAGE_PROJECT --image=IMAGE
@@ -189,9 +190,9 @@ FLAGS
             Specifies the name of the image that the disk will be initialized
             with. A new disk will be created based on the given image. To view
             a list of public images and projects, run $ gcloud compute images
-            list. If omitted image-family must be specified to identify the
-            image. It is best practice to use image when a specific version of
-            an image is needed.
+            list. It is best practice to use image when a specific version of
+            an image is needed. If both image and image-family flags are
+            omitted a blank disk will be created.
 
          image-family
             The family of the image that the disk will be initialized with.
@@ -330,7 +331,7 @@ FLAGS
             Same as startup-script except that the script contents are pulled
             from a publicly-accessible location on the web.
 
-     --metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]
+     --metadata-from-file=KEY=LOCAL_FILE_PATH,[...]
         Same as --metadata except that the value for the entry will be read
         from a local file. This is useful for values that are too large such as
         startup-script contents.
@@ -400,6 +401,11 @@ FLAGS
             will pick an available range with the specified netmask and
             allocate it to this network interface.
 
+     --network-tier=NETWORK_TIER
+        Specifies the network tier that will be used to configure the instance.
+        NETWORK_TIER must be one of: PREMIUM, STANDARD. The default value is
+        PREMIUM.
+
      --preemptible
         If provided, instances will be preemptible and time-limited. Instances
         may be preempted to free up resources for standard VM instances, and
@@ -408,7 +414,7 @@ FLAGS
 
      --region=REGION
         The region of the instance template to create. If not specified, you
-        will be prompted to select a region.
+        may be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:
@@ -576,12 +582,6 @@ FLAGS
 
               taskqueue
                 - https://www.googleapis.com/auth/taskqueue
-
-              useraccounts-ro
-                - https://www.googleapis.com/auth/cloud.useraccounts.readonly
-
-              useraccounts-rw
-                - https://www.googleapis.com/auth/cloud.useraccounts
 
               userinfo-email
                 - https://www.googleapis.com/auth/userinfo.email

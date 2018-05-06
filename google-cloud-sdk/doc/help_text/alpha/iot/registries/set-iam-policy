@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha iot registries set-iam-policy - set IAM policy for a device
-        registry
+    gcloud alpha iot registries set-iam-policy - set the IAM policy for a
+        device registry
 
 SYNOPSIS
     gcloud alpha iot registries set-iam-policy (REGISTRY : --region=REGION)
@@ -17,10 +17,10 @@ DESCRIPTION
     will replace any existing policy for the device registry.
 
 POSITIONAL ARGUMENTS
-     REGISTRY - The device registry for which to set IAM policy. The arguments
-     in this group can be used to specify the attributes of this resource.
-     (NOTE) Some attributes are not given arguments in this group but can be
-     set in other ways. To set the [project] attribute: Set the property
+     REGISTRY - The device registry for which to set the IAM policy. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This
      must be specified.
 
@@ -30,15 +30,19 @@ POSITIONAL ARGUMENTS
           arguments in this group are specified.
 
        --region=REGION
-          The Cloud region for the registry.
+          The name of the Cloud IoT region.
 
      POLICY_FILE
-        JSON or YAML file with the IAM policy
+        Path to a local JSON or YAML formatted file containing a valid policy.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the cloudiot/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/iot
 
 EXAMPLES
     The following command will read an IAM policy defined in a JSON file

@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Base class for all Cloud Pub/Sub tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
@@ -42,10 +46,10 @@ class CloudPubsubTestBase(sdk_test_base.WithFakeAuth,
     self.addCleanup(self.client.Unmock)
 
     # List of test message IDs
-    self.message_ids = ['123456', '654321']
+    self.message_ids = ['123456', '654321', '987654']
 
     # List of message data
-    self.message_data = ['Hello, World!', 'World on Fire!']
+    self.message_data = ['Hello, World!', 'World on Fire!', b'Hello \xAA']
 
     attributes = self.msgs.PubsubMessage.AttributesValue(
         additionalProperties=[])
@@ -53,9 +57,12 @@ class CloudPubsubTestBase(sdk_test_base.WithFakeAuth,
     # List of actual Cloud Pub/Sub message objects
     self.messages = [
         self.msgs.PubsubMessage(
-            data=self.message_data[0], attributes=attributes),
+            data=self.message_data[0].encode('utf8'), attributes=attributes),
         self.msgs.PubsubMessage(
-            data=self.message_data[1], attributes=attributes)]
+            data=self.message_data[1].encode('utf8'), attributes=attributes),
+        self.msgs.PubsubMessage(
+            data=self.message_data[2], attributes=attributes)
+    ]
 
     # Policy object used for IAM tests.
     self.policy = self.msgs.Policy(
@@ -87,7 +94,7 @@ class CloudPubsubTestBase(sdk_test_base.WithFakeAuth,
                 role='roles/owner', members=['user:test-user@gmail.com']),
             self.msgs.Binding(role='roles/viewer', members=['allUsers'])
         ],
-        etag='abcde')
+        etag=b'abcde')
     f = None
     if create_file:
       policy_json = encoding.MessageToJson(policy)

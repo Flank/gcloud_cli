@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """ml products reference-images add tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.ml.products import product_util
 from googlecloudsdk.calliope import parser_errors
@@ -61,20 +65,20 @@ class AddTest(base.MlProductsTestBase):
         '[productSearch/catalogs/12345/referenceImages/6789]')
 
   def testAddMissingBounds(self):
-    with self.assertRaisesRegexp(parser_errors.ArgumentError,
-                                 (r'Missing \[bounds\]. Both category and '
-                                  r'bounds must be specified if either is '
-                                  r'provided')):
+    with self.assertRaisesRegex(parser_errors.ArgumentError,
+                                (r'Missing \[bounds\]. Both category and '
+                                 r'bounds must be specified if either is '
+                                 r'provided')):
       self.RunProductsCommand('reference-images',
                               ('add gs://fake-bucket/myimage-0 '
                                '--catalog 12345 --product-id abc123 '
                                '--category test-category '))
 
   def testAddMissingCategory(self):
-    with self.assertRaisesRegexp(parser_errors.ArgumentError,
-                                 (r'Missing \[category\]. Both category and '
-                                  r'bounds must be specified if either is '
-                                  r'provided')):
+    with self.assertRaisesRegex(parser_errors.ArgumentError,
+                                (r'Missing \[category\]. Both category and '
+                                 r'bounds must be specified if either is '
+                                 r'provided')):
       self.RunProductsCommand('reference-images',
                               ('add gs://fake-bucket/myimage-0 '
                                '--catalog 12345 --product-id abc123 '

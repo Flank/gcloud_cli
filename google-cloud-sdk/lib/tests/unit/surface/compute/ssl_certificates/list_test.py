@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -112,6 +113,7 @@ class SslCertificatesListAlphaTest(SslCertificatesListTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
+    self.SetEncoding('utf8')
     lister_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
         autospec=True)
@@ -139,7 +141,7 @@ class SslCertificatesListAlphaTest(SslCertificatesListTest):
             ssl-cert-1 SELF_MANAGED 2017-12-18T11:11:11.000-07:00
             ssl-cert-2 MANAGED 2017-12-17T10:00:00.000-07:00 ACTIVE
               test1.certsbridge.com: ACTIVE
-              test2.certsbridge.com: FAILED_CAA_FORBIDDEN
+              xn--8a342mzfam5b18csni3w.certsbridge.com: FAILED_CAA_FORBIDDEN
             """),
         normalize_space=True)
 

@@ -4,7 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha ml vision detect-text IMAGE_PATH
-        [--language-hints=[LANGUAGE_HINTS,...]] [GCLOUD_WIDE_FLAG ...]
+        [--language-hints=[LANGUAGE_HINTS,...]]
+        [--model-version=MODEL_VERSION; default="builtin/stable"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Detect and extract text within an image.
@@ -34,6 +36,10 @@ POSITIONAL ARGUMENTS
 FLAGS
      --language-hints=[LANGUAGE_HINTS,...]
         List of languages to use for text detection.
+
+     --model-version=MODEL_VERSION; default="builtin/stable"
+        The model version to use for the feature. Supported values include
+        "builtin/stable" and "builtin/latest".
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

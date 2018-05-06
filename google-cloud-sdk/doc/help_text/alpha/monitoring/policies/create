@@ -1,0 +1,137 @@
+NAME
+    gcloud alpha monitoring policies create - create a new alerting policy
+
+SYNOPSIS
+    gcloud alpha monitoring policies create
+        --notification-channels=[NOTIFICATION_CHANNELS,...]
+        [--aggregation=AGGREGATION
+          --condition-display-name=CONDITION_DISPLAY_NAME
+          --condition-filter=CONDITION_FILTER
+          --duration=DURATION --if=IF_VALUE --trigger-count=TRIGGER_COUNT
+          | --trigger-percent=TRIGGER_PERCENT]
+        [--display-name=DISPLAY_NAME --no-enabled --user-labels=[KEY=VALUE,...]
+          --documentation-format=DOCUMENTATION_FORMAT;
+          default="text/markdown" --documentation=DOCUMENTATION
+          | --documentation-from-file=DOCUMENTATION_FROM_FILE]
+        [--policy=POLICY | --policy-from-file=POLICY_FROM_FILE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Creates a new alerting policy. An alert policy can be specified as
+    a JSON/YAML value passed in as a string through the --policy flag or as a
+    file through the --policy-from-file flag. A basic policy can also be
+    specified through command line flags. If a policy is specified through
+    --policy or --policy-from-file, and additional flags are supplied, the
+    flags will override the policy's settings and a specified condition will be
+    appended to the list of conditions.
+
+    For information about the JSON/YAML format of an alerting policy:
+    https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
+
+    Note: When specifying the Channel as a YAML/JSON, the use of channelLabels
+    as an alternative name for labels is supported.
+
+FLAGS
+     NOTIFICATION CHANNELS - Names of one or more Notification Channels to be
+     added to the policy. These should be the resource names (not the display
+     name) of the channels. Acceptable formats are:
+      * Channel Name: my-channel
+        + The project specified through --project or the default project
+          defined by the core/project property will be used, in that order.
+      * Channel Relative Name:
+        projects/my-project/notificationChannels/channel-id0
+      * Channel URI:
+        https://monitoring.googleapis.com/v3/projects/my-project/notificationChannels/channel-id0
+        This represents a Cloud resource. (NOTE) Some attributes are not given
+        arguments in this group but can be set in other ways. To set the
+        [project] attribute: Set the property [core/project] or provide the
+        flag [--project] on the command line.
+
+         --notification-channels=[NOTIFICATION_CHANNELS,...]
+            The ID of the Notification Channel or a fully qualified identifier
+            for the Notification Channel.
+
+     Condition Settings. This will add a condition to the created policy. If
+     any conditions are already specified, this condition will be appended.
+
+       --aggregation=AGGREGATION
+          Specifies an Aggregation message as a JSON/YAML value to be applied
+          to the condition. For more information about the format:
+          https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
+
+       --condition-display-name=CONDITION_DISPLAY_NAME
+          The display name for the condition.
+
+       --condition-filter=CONDITION_FILTER
+          Specifies the "filter" in a metric absence or metric threshold
+          condition.
+
+       --duration=DURATION
+          The duration (e.g. "60s", "2min", etc.) that the condition must hold
+          in order to trigger as true.
+
+       --if=IF_VALUE
+          One of "absent", "< THRESHOLD", "> THRESHOLD" where "THRESHOLD" is an
+          integer or float.
+
+       At most one of these may be specified:
+
+         --trigger-count=TRIGGER_COUNT
+            The absolute number of time series that must fail the predicate for
+            the condition to be triggered.
+
+         --trigger-percent=TRIGGER_PERCENT
+            The percentage of time series that must fail the predicate for the
+            condition to be triggered.
+
+     Policy Settings. If any of these are specified, they will overwrite fields
+     in the --policy or --policy-from-file flags if specified.
+
+       --display-name=DISPLAY_NAME
+          The display name for the Alert Policy.
+
+       --enabled
+          If the policy is enabled. Enabled by default, use --no-enabled to
+          disable.
+
+       --user-labels=[KEY=VALUE,...]
+          A list of label KEY=VALUE pairs to add. If the policy was given as a
+          JSON/YAML object from a string or file, this flag will replace the
+          labels value in the given policy.
+
+       Documentation
+
+         --documentation-format=DOCUMENTATION_FORMAT; default="text/markdown"
+            The MIME type that should be used with --documentation or
+            --documentation-from-file. Currently, only "text/markdown" is
+            supported.
+
+         At most one of these may be specified:
+
+           --documentation=DOCUMENTATION
+              The documentation to be included with the policy.
+
+           --documentation-from-file=DOCUMENTATION_FROM_FILE
+              The path to a file containing the documentation to be included
+              with the policy.
+
+     At most one of these may be specified:
+
+       --policy=POLICY
+          The policy as a string. In either JSON or YAML format.
+
+       --policy-from-file=POLICY_FROM_FILE
+          The path to a JSON or YAML file containing the policy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

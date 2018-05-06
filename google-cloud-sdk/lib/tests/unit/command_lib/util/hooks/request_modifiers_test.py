@@ -14,6 +14,9 @@
 
 """Tests for the request_modifiers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from apitools.base.protorpclite import messages as _messages
 from googlecloudsdk.command_lib.util.hooks import request_modifiers
 from googlecloudsdk.core import resources

@@ -14,6 +14,9 @@
 
 """Tests for googlecloudsdk.command_lib.util.ssh.containers."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.util.ssh import containers
 from tests.lib import test_case
 
@@ -35,26 +38,26 @@ class ContainerTest(test_case.TestCase):
     """With container but no command given."""
     container = 'my-container'
     command = None
-    self.assertEquals(containers.GetRemoteCommand(container, command),
-                      RUN_CONTAINER_COMMAND +
-                      ['-it', 'my-container', '/bin/sh'])
+    self.assertEqual(containers.GetRemoteCommand(container, command),
+                     RUN_CONTAINER_COMMAND +
+                     ['-it', 'my-container', '/bin/sh'])
     self.assertTrue(containers.GetTty(container, command), True)
 
   def testNoContainerWithCommand(self):
     """With command but no container given."""
     container = None
     command = ['echo', 'hello']
-    self.assertEquals(containers.GetRemoteCommand(container, command),
-                      ['echo', 'hello'])
+    self.assertEqual(containers.GetRemoteCommand(container, command),
+                     ['echo', 'hello'])
     self.assertIsNone(containers.GetTty(container, command), None)
 
   def testWithContainerAndCommand(self):
     """With command and container given."""
     container = 'my-container'
     command = ['echo', 'hello']
-    self.assertEquals(containers.GetRemoteCommand(container, command),
-                      RUN_CONTAINER_COMMAND +
-                      ['-i', 'my-container', 'echo', 'hello'])
+    self.assertEqual(containers.GetRemoteCommand(container, command),
+                     RUN_CONTAINER_COMMAND +
+                     ['-i', 'my-container', 'echo', 'hello'])
     self.assertIsNone(containers.GetTty(container, command), None)
 
 

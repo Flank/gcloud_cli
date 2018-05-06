@@ -11,7 +11,7 @@ gcloud alpha genomics variants list \- lists variants that match the search crit
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha genomics variants list\fR \fB\-\-reference\-name\fR=\fIREFERENCE_NAME\fR [\fB\-\-call\-set\-ids\fR=\fICALL_SET_IDS\fR,[\fICALL_SET_IDS\fR,...]] [\fB\-\-end\fR=\fIEND\fR] [\fB\-\-limit\-calls\fR=\fILIMIT_CALLS\fR] [\fB\-\-start\fR=\fISTART\fR] [\fB\-\-variant\-set\-id\fR=\fIVARIANT_SET_ID\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR;\ default=512] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha genomics variants list\fR \fB\-\-reference\-name\fR=\fIREFERENCE_NAME\fR [\fB\-\-call\-set\-ids\fR=\fICALL_SET_IDS\fR,[...]] [\fB\-\-end\fR=\fIEND\fR] [\fB\-\-limit\-calls\fR=\fILIMIT_CALLS\fR] [\fB\-\-start\fR=\fISTART\fR] [\fB\-\-variant\-set\-id\fR=\fIVARIANT_SET_ID\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR;\ default=512] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,7 +36,7 @@ Only return variants in this reference sequence.
 
 .RS 2m
 .TP 2m
-\fB\-\-call\-set\-ids\fR=\fICALL_SET_IDS\fR,[\fICALL_SET_IDS\fR,...]
+\fB\-\-call\-set\-ids\fR=\fICALL_SET_IDS\fR,[...]
 Restrict the list to variants which have calls from the listed call sets. If
 omitted, a \-\-variant\-set\-id must be specified.
 

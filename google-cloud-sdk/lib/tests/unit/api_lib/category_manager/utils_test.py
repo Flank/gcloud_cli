@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Datapol API utils."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.category_manager import utils
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -30,7 +32,7 @@ class UtilTest(sdk_test_base.WithFakeAuth):
     self.addCleanup(properties.VALUES.core.project.Set,
                     properties.VALUES.core.project.Get())
     properties.VALUES.core.project.Set(project_id)
-    self.assertEquals(
+    self.assertEqual(
         resources.REGISTRY.Create(
             'cloudresourcemanager.projects', projectId=project_id),
         utils.GetProjectResource())

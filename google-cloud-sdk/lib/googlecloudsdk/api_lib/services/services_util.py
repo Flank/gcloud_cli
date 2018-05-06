@@ -1,4 +1,4 @@
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
 
 """Common helper methods for Services commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
-
 from googlecloudsdk.api_lib.services import exceptions
 from googlecloudsdk.api_lib.util import apis_internal
+from googlecloudsdk.core import log
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -75,18 +77,18 @@ def GetAvailableListRequest():
   return GetMessagesModule().ServicemanagementServicesListRequest()
 
 
-def ProcessOperationResult(result, async=False):
+def ProcessOperationResult(result, is_async=False):
   """Validate and process Operation outcome for user display.
 
   Args:
     result: The message to process (expected to be of type Operation)'
-    async: If False, the method will block until the operation completes.
+    is_async: If False, the method will block until the operation completes.
 
   Returns:
     The processed Operation message in Python dict form
   """
-  op = GetProcessedOperationResult(result, async)
-  if async:
+  op = GetProcessedOperationResult(result, is_async)
+  if is_async:
     cmd = OP_WAIT_CMD.format(op.get('name'))
     log.status.Print('Asynchronous operation is in progress... '
                      'Use the following command to wait for its '
@@ -99,7 +101,7 @@ def ProcessOperationResult(result, async=False):
   return op
 
 
-def GetProcessedOperationResult(result, async=False):
+def GetProcessedOperationResult(result, is_async=False):
   """Validate and process Operation result message for user display.
 
   This method checks to make sure the result is of type Operation and
@@ -108,7 +110,7 @@ def GetProcessedOperationResult(result, async=False):
 
   Args:
     result: The message to process (expected to be of type Operation)'
-    async: If False, the method will block until the operation completes.
+    is_async: If False, the method will block until the operation completes.
 
   Returns:
     The processed message in Python dict form
@@ -122,7 +124,7 @@ def GetProcessedOperationResult(result, async=False):
 
   result_dict = encoding.MessageToDict(result)
 
-  if not async:
+  if not is_async:
     op_name = result_dict['name']
     op_ref = resources.REGISTRY.Parse(
         op_name,
@@ -192,3 +194,25 @@ def WaitForOperation(operation_ref, client):
   # If we've gotten this far, the operation completed successfully,
   # so return the Operation object
   return WaitForOperation.operation_response
+
+
+def PrintOperation(op):
+  """Print the operation.
+
+  Args:
+    op: The long running operation.
+
+  Raises:
+    OperationErrorException: if the operation fails.
+
+  Returns:
+    Nothing.
+  """
+  if not op.done:
+    log.status.Print('Operation "{0}" is still in progress.'.format(op.name))
+    return
+  if op.error:
+    raise exceptions.OperationErrorException(
+        'The operation "{0}" resulted in a failure "{1}".\nDetails: "{2}".'.
+        format(op.name, op.error.message, op.error.details))
+  log.status.Print('Operation "{0}" finished successfully.'.format(op.name))

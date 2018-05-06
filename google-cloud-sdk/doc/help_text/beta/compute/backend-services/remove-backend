@@ -38,7 +38,7 @@ OPTIONAL FLAGS
 
        --instance-group-region=INSTANCE_GROUP_REGION
           The region of the instance group to remove from the backend service.
-          If not specified, you will be prompted to select a region.
+          If not specified, you may be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -58,7 +58,7 @@ OPTIONAL FLAGS
 
        --instance-group-zone=INSTANCE_GROUP_ZONE
           The zone of the instance group to remove from the backend service. If
-          not specified and the compute/zone property isn't set, you will be
+          not specified and the compute/zone property isn't set, you may be
           prompted to select a zone.
 
           To avoid prompting when this flag is omitted, you can set the

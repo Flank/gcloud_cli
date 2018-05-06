@@ -24,7 +24,7 @@ from tests.lib import e2e_utils
 from tests.lib import test_case
 
 NETWORK = 'tpus-test-do-not-delete'  # auto mode network
-_DELETE_MESSAGE = 'Deleted [{tpu_name}].'
+_DELETE_MESSAGE = 'Deleted tpu [{tpu_name}].'
 _TPU_DESCRIPTION = 'Test TF Node {tpu_name}'
 
 
@@ -79,7 +79,6 @@ class TpusTests(e2e_base.WithServiceAuth):
     self.assertIsNotNone(result)
     self.assertEqual(len(list(result)), 0)
 
-  @test_case.Filters.skip('Failing', 'b/74062611')
   def testWorkflow(self):
     """Test of Basic TPU CRUD Workflow."""
     with self._CreateTPU() as tpu_name:

@@ -11,7 +11,7 @@ gcloud ml\-engine jobs submit training \- submits a Cloud Machine Learning train
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ml\-engine jobs submit training\fR \fIJOB\fR \fB\-\-module\-name\fR=\fIMODULE_NAME\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
+\f5gcloud ml\-engine jobs submit training\fR \fIJOB\fR \fB\-\-module\-name\fR=\fIMODULE_NAME\fR [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-job\-dir\fR=\fIJOB_DIR\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR] [\fB\-\-packages\fR=[\fIPACKAGE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-scale\-tier\fR=\fISCALE_TIER\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-async\fR\ |\ \fB\-\-stream\-logs\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR] [\-\-\ \fIUSER_ARGS\fR\ ...]
 
 
 
@@ -130,9 +130,15 @@ by \f5\-\-staging\-bucket\fR, or Cloud Storage URLs
 (\f5gs://bucket\-name/path/to/package.tar.gz\fR).
 
 .TP 2m
+\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
+The version of Python used during training. If not set, the default version is
+2.7. Python 3.5 is available when \f5runtime_version\fR is set to 1.4 and above.
+Python 2.7 works with all supported runtime versions.
+
+.TP 2m
 \fB\-\-region\fR=\fIREGION\fR
 The region of the machine learning training job to submit. If not specified, you
-will be prompted to select a region.
+may be prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -158,10 +164,10 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-The Google Cloud ML Engine runtime version for this job. Defaults to the latest
-stable version. See
-https://cloud.google.com/ml/docs/concepts/runtime\-version\-list for a list of
-accepted versions.
+The Google Cloud ML Engine runtime version for this job. Defaults to a stable
+version, which is defined in the documentation along with the list of supported
+versions:
+https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 
 .TP 2m
 \fB\-\-scale\-tier\fR=\fISCALE_TIER\fR

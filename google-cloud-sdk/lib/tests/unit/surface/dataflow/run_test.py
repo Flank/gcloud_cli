@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'dataflow jobs run' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -35,8 +37,8 @@ class RunUnitTest(base.DataflowMockingTestBase,
         job_name='myjob',
         gcs_location='gs://foo')
     result = self.Run('dataflow jobs run myjob --gcs-location=gs://foo')
-    self.assertEquals(JOB_1_ID, result.id)
-    self.assertEquals('myjob', result.name)
+    self.assertEqual(JOB_1_ID, result.id)
+    self.assertEqual('myjob', result.name)
 
   def testRunBadGcs(self):
     with self.AssertRaisesExceptionMatches(
@@ -57,11 +59,10 @@ class RunUnitTest(base.DataflowMockingTestBase,
             JOB_1_ID, environment=self.fake_environment),
         gcs_location='gs://foo',
         job_name='myjob',
-        parameters=dict(
-            baz='quux', bar='foo'))
+        parameters=dict(bar='foo', baz='quux'))
     result = self.Run('dataflow jobs run myjob --gcs-location=gs://foo'
                       ' --parameters=bar=foo,baz=quux')
-    self.assertEquals(JOB_1_ID, result.id)
+    self.assertEqual(JOB_1_ID, result.id)
 
   def testRunWithParametersWithRegion(self):
     my_region = 'europe-west1'
@@ -70,11 +71,11 @@ class RunUnitTest(base.DataflowMockingTestBase,
             JOB_1_ID, environment=self.fake_environment, region=my_region),
         gcs_location='gs://foo',
         job_name='myjob',
-        parameters=dict(baz='quux', bar='foo'),
+        parameters=dict(bar='foo', baz='quux'),
         location=my_region)
     result = self.Run('dataflow jobs run myjob --gcs-location=gs://foo'
                       ' --parameters=bar=foo,baz=quux --region=' + my_region)
-    self.assertEquals(JOB_1_ID, result.id)
+    self.assertEqual(JOB_1_ID, result.id)
 
   def testRunNoLocation(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -98,7 +99,7 @@ class RunUnitTest(base.DataflowMockingTestBase,
     result = self.Run(
         'dataflow jobs run myjob --gcs-location=gs://foo '
         '--service-account-email=a@b.com --zone=us-foo1-a --max-workers=5')
-    self.assertEquals(JOB_1_ID, result.id)
+    self.assertEqual(JOB_1_ID, result.id)
 
 if __name__ == '__main__':
   test_case.main()

@@ -41,6 +41,7 @@ class SoleTenantHostTest(e2e_test_base.BaseTest):
     self._name_generator = e2e_utils.GetResourceNameGenerator(
         prefix='sole-tenancy-host', sequence_start=1)
 
+  @test_case.Filters.skip('Failing', 'b/77953407')
   def testDescribeHost(self):
     # Sometimes it's impossible to create a sole tenancy host in a zone because
     # of temporary conditions in the zone. Such situation shouldn't be
@@ -55,8 +56,8 @@ class SoleTenantHostTest(e2e_test_base.BaseTest):
           description = self.Run(
               """compute sole-tenancy hosts describe {0} --zone {1} --quiet
                  --format=disable""".format(host.name, host.zone))
-          self.assertEquals('compute#host', description.kind)
-          self.assertEquals(host.name, description.name)
+          self.assertEqual('compute#host', description.kind)
+          self.assertEqual(host.name, description.name)
           return  # Test succeeded, no need to keep trying.
       except exceptions.ToolException as e:
         if re.search(r'Try a different zone, or try again later.', e.message,

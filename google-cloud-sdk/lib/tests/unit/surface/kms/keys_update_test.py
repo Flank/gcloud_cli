@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise the 'gcloud kms keys update' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error

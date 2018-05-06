@@ -18,11 +18,17 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-signed-url-key
+        (BETA) Add Cloud CDN Signed URL key to a backend bucket.
+
      create
         (BETA) Create a backend bucket.
 
      delete
         (BETA) Delete backend buckets.
+
+     delete-signed-url-key
+        (BETA) Delete Cloud CDN Signed URL key from a backend bucket.
 
      describe
         (BETA) Describe a backend bucket.

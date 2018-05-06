@@ -54,16 +54,16 @@ Do not wait for the operation to complete.
 
 .TP 2m
 \fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR
-Specifies level of availability. Only applies to PSQL instances.
+Specifies level of availability. Only applies to PostgreSQL instances.
 \fIAVAILABILITY_TYPE\fR must be one of:
 
 .RS 2m
 .TP 2m
-\fBREGIONAL\fR
+\fBregional\fR
 Provides high availability and is recommended for production instances; instance
 automatically fails over to another zone within your selected region.
 .TP 2m
-\fBZONAL\fR
+\fBzonal\fR
 Provides no failover capability. This is the default.
 
 .RE

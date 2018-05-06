@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise cloudbuild interaction with Google Cloud Storage."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions as api_exceptions
 from apitools.base.py.testing import mock
 
@@ -38,7 +40,7 @@ class StorageTest(e2e_base.WithMockHttp):
     self.mocked_storage_v1.buckets.Insert.Expect(
         self.storage_v1_messages.StorageBucketsInsertRequest(
             bucket=self.storage_v1_messages.Bucket(
-                kind=u'storage#bucket',
+                kind='storage#bucket',
                 name='bucket-456',
             ),
             project='proj-123',
@@ -53,14 +55,14 @@ class StorageTest(e2e_base.WithMockHttp):
     self.mocked_storage_v1.buckets.Insert.Expect(
         self.storage_v1_messages.StorageBucketsInsertRequest(
             bucket=self.storage_v1_messages.Bucket(
-                kind=u'storage#bucket',
+                kind='storage#bucket',
                 name='bucket-456',
             ),
             project='proj-123',
         ),
         exception=http_error.MakeHttpError(
-            code=409, url=(u'https://www.googleapis.com/storage/v1/buckets/'
-                           u'bucket-456?alt=json')))
+            code=409, url=('https://www.googleapis.com/storage/v1/buckets/'
+                           'bucket-456?alt=json')))
     self.mocked_storage_v1.buckets.Get.Expect(
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket='bucket-456',
@@ -74,25 +76,25 @@ class StorageTest(e2e_base.WithMockHttp):
     self.mocked_storage_v1.buckets.Insert.Expect(
         self.storage_v1_messages.StorageBucketsInsertRequest(
             bucket=self.storage_v1_messages.Bucket(
-                kind=u'storage#bucket',
+                kind='storage#bucket',
                 name='bucket-456',
             ),
             project='proj-123',
         ),
         exception=http_error.MakeHttpError(
-            code=409, url=(u'https://www.googleapis.com/storage/v1/buckets/'
-                           u'bucket-456?alt=json')))
+            code=409, url=('https://www.googleapis.com/storage/v1/buckets/'
+                           'bucket-456?alt=json')))
     self.mocked_storage_v1.buckets.Get.Expect(
         self.storage_v1_messages.StorageBucketsGetRequest(
             bucket='bucket-456',
         ),
         exception=http_error.MakeHttpError(
-            code=403, url=(u'https://www.googleapis.com/storage/v1/buckets/'
-                           u'bucket-456?alt=json')))
+            code=403, url=('https://www.googleapis.com/storage/v1/buckets/'
+                           'bucket-456?alt=json')))
 
     client = storage_api.StorageClient()
 
-    with self.assertRaisesRegexp(api_exceptions.HttpError, 'Permission denied'):
+    with self.assertRaisesRegex(api_exceptions.HttpError, 'Permission denied'):
       client.CreateBucketIfNotExists('bucket-456', 'proj-123')
 
 

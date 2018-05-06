@@ -56,7 +56,7 @@ class UsersCreateTest(base.SqlMockTestBeta):
         msgs.Operation(name='op_name'))
     result = self.Run('sql users create --instance my_instance '
                       'my_username my_host --password my_password --async')
-    self.assertEquals(result.name, 'op_name')
+    self.assertEqual(result.name, 'op_name')
     self.AssertOutputEquals('')
     self.AssertErrContains('Create in progress for user [my_username].\n')
 

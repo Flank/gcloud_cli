@@ -11,7 +11,7 @@ gcloud beta compute instances add\-metadata \- add or update instance metadata
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute instances add\-metadata\fR \fIINSTANCE_NAME\fR [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[\fIKEY\fR=\fILOCAL_FILE_PATH\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute instances add\-metadata\fR \fIINSTANCE_NAME\fR [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -87,7 +87,7 @@ At least one of [\-\-metadata] or [\-\-metadata\-from\-file] is required.
 
 .RS 2m
 .TP 2m
-\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[\fIKEY\fR=\fILOCAL_FILE_PATH\fR,...]
+\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]
 Same as \f5\fI\-\-metadata\fR\fR except that the value for the entry will be
 read from a local file. This is useful for values that are too large such as
 \f5\fIstartup\-script\fR\fR contents.

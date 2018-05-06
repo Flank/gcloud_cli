@@ -23,7 +23,7 @@ class InstanceGroupsAutoscalingTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.prefix = 'managed-instance-group-autoscaling'
-    self.track = calliope_base.ReleaseTrack.GA
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
     # Containers for created resources.
     self.instance_template_names = []
@@ -97,6 +97,7 @@ class InstanceGroupsAutoscalingTest(e2e_test_base.BaseTest):
     # Add autoscaler with everything.
     self.Run('compute instance-groups managed set-autoscaling {0} '
              '--zone {1} '
+             '--mode on '
              '--cool-down-period 1m '
              '--description whatever '
              '--min-num-replicas 5 '

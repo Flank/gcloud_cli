@@ -1,4 +1,4 @@
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import logging
 import os
 import pickle
 import pydoc  # used for importing python classes from their FQN
+import sys
 import timeit
 
 from ._interfaces import Model
@@ -43,6 +44,7 @@ from tensorflow.python.lib.io import file_io
 from tensorflow.python.saved_model import loader
 from tensorflow.python.saved_model import signature_constants
 from tensorflow.python.saved_model import tag_constants
+from tensorflow.python.util import compat
 
 
 # --------------------------
@@ -327,13 +329,13 @@ def canonicalize_single_tensor_input(instances, tensor_name):
     if not isinstance(x, dict):
       # case (2)
       return {tensor_name: x}
-    elif len(x) == 1 and tensor_name == x.keys()[0]:
+    elif len(x) == 1 and tensor_name == list(x.keys())[0]:
       # case (1)
       return x
     else:
       raise PredictionError(PredictionError.INVALID_INPUTS,
                             "Expected tensor name: %s, got tensor name: %s." %
-                            (tensor_name, x.keys()))
+                            (tensor_name, list(x.keys())))
 
   if not isinstance(instances, list):
     instances = [instances]
@@ -436,8 +438,15 @@ def load_model(
   if loader.maybe_saved_model_directory(model_path):
     try:
       logging.info("Importing tensorflow.contrib in load_model")
-      import tensorflow.contrib  # pylint: disable=redefined-outer-name, unused-variable, g-import-not-at-top
-      session = tf_session.Session(target="", graph=None, config=config)
+      # pylint: disable=redefined-outer-name,unused-variable,g-import-not-at-top
+      import tensorflow as tf
+      import tensorflow.contrib
+      from tensorflow.python.framework.ops import Graph
+      # pylint: enable=redefined-outer-name,unused-variable,g-import-not-at-top
+      if tf.__version__.startswith("1.0"):
+        session = tf_session.Session(target="", graph=None, config=config)
+      else:
+        session = tf_session.Session(target="", graph=Graph(), config=config)
       meta_graph = loader.load(session, tags=list(tags), export_dir=model_path)
     except Exception as e:  # pylint: disable=broad-except
       raise PredictionError(PredictionError.FAILED_TO_LOAD_MODEL,
@@ -805,7 +814,7 @@ class TensorFlowModel(BaseModel):
   def is_single_string_input(self, signature):
     """Returns True if the graph only has one string input tensor."""
     if self.is_single_input(signature):
-      dtype = signature.inputs.values()[0].dtype
+      dtype = list(signature.inputs.values())[0].dtype
       return dtype == dtypes.string.as_datatype_enum
     return False
 
@@ -830,7 +839,7 @@ class TensorFlowModel(BaseModel):
     if not self.is_single_input(signature):
       return instances
 
-    tensor_name = signature.inputs.keys()[0]
+    tensor_name = list(signature.inputs.keys())[0]
     return canonicalize_single_tensor_input(instances, tensor_name)
 
   def postprocess(self, predicted_output, original_input=None, stats=None,
@@ -1164,9 +1173,12 @@ def _load_joblib_or_pickle_model(model_path):
 
     return None
   except Exception as e:
-    error_msg = ("Could not load the model: {}. {}. Please make sure the model"
-                 " was exported using python 2 as python 3 is not currently"
-                 " supported.").format(model_file_name, str(e))
+    error_msg = (
+        "Could not load the model: {}. {}. Please make sure the model was "
+        "exported using python {}. Otherwise, please specify the correct "
+        "'python_version' parameter when deploying the model. Currently, "
+        "'python_version' accepts 2.7 and 3.5."
+    ).format(model_file_name, str(e), sys.version_info[0])
     logging.critical(error_msg)
     raise PredictionError(PredictionError.FAILED_TO_LOAD_MODEL, error_msg)
 
@@ -1239,8 +1251,8 @@ def encode_base64(instances, outputs_map):
     # Only string tensors whose name ends in _bytes needs encoding.
     tensor_name, tensor_info = outputs_map.items()[0]
     tensor_type = tensor_info.dtype
-    if tensor_type == dtypes.string and tensor_name.endswith("_bytes"):
-      instances = _encode_str_tensor(instances)
+    if tensor_type == dtypes.string:
+      instances = _encode_str_tensor(instances, tensor_name)
     return instances
 
   encoded_data = []
@@ -1249,17 +1261,32 @@ def encode_base64(instances, outputs_map):
     for tensor_name, tensor_info in six.iteritems(outputs_map):
       tensor_type = tensor_info.dtype
       tensor_data = instance[tensor_name]
-      if tensor_type == dtypes.string and tensor_name.endswith("_bytes"):
-        tensor_data = _encode_str_tensor(tensor_data)
+      if tensor_type == dtypes.string:
+        tensor_data = _encode_str_tensor(tensor_data, tensor_name)
       encoded_instance[tensor_name] = tensor_data
     encoded_data.append(encoded_instance)
   return encoded_data
 
 
-def _encode_str_tensor(data):
+def _encode_str_tensor(data, tensor_name):
+  """Encodes tensor data of type string.
+
+  Data is a bytes in python 3 and a string in python 2. Base 64 encode the data
+  if the tensorname ends in '_bytes', otherwise convert data to a string.
+
+  Args:
+    data: Data of the tensor, type bytes in python 3, string in python 2.
+    tensor_name: The corresponding name of the tensor.
+
+  Returns:
+    JSON-friendly encoded version of the data.
+  """
   if isinstance(data, list):
-    return [_encode_str_tensor(val) for val in data]
-  return {"b64": base64.b64encode(data)}
+    return [_encode_str_tensor(val, tensor_name) for val in data]
+  if tensor_name.endswith("_bytes"):
+    return {"b64": compat.as_text(base64.b64encode(data))}
+  else:
+    return compat.as_text(data)
 
 
 def local_predict(

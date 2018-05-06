@@ -16,7 +16,6 @@
 
 import textwrap
 
-from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -198,89 +197,6 @@ class OperationsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
             targetLink: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1/resource/resource-2
             """))
 
-  def testGlobalConflictsWithUserAccounts(self):
-    with self.assertRaisesRegexp(
-        exceptions.ConflictingArgumentsException,
-        r'arguments not allowed simultaneously: --user-accounts, --global'):
-      self.Run("""
-          alpha compute operations describe --global --user-accounts operation
-          """)
-
-  def testregionConflictsWithUserAccounts(self):
-    with self.assertRaisesRegexp(
-        exceptions.ConflictingArgumentsException,
-        r'arguments not allowed simultaneously: --user-accounts, --region'):
-      self.Run("""
-          alpha compute operations describe --region central1
-          --user-accounts operation
-          """)
-
-  def testZoneConflictsWithUserAccounts(self):
-    with self.assertRaisesRegexp(
-        exceptions.ConflictingArgumentsException,
-        r'arguments not allowed simultaneously: --user-accounts, --zone'):
-      self.Run("""
-          alpha compute operations describe --zone central1-a
-          --user-accounts operation
-          """)
-
-  def testWithUserAccountsFlag(self):
-    self.SelectApi('beta')
-    self.make_requests.side_effect = iter([
-        [test_resources.ACCOUNT_OPERATIONS[0]],
-    ])
-
-    self.Run("""
-        beta compute operations describe operation-1 --user-accounts
-        """)
-
-    self.CheckRequests(
-        [(self.accounts.globalAccountsOperations,
-          'Get',
-          self.accounts_messages
-          .ClouduseraccountsGlobalAccountsOperationsGetRequest(
-              operation='operation-1',
-              project='my-project'))])
-
-    self.assertMultiLineEqual(
-        self.GetOutput(),
-        textwrap.dedent("""\
-            insertTime: '2014-09-04T09:55:33.679-07:00'
-            name: operation-1
-            operationType: insert
-            selfLink: https://www.googleapis.com/clouduseraccounts/beta/projects/my-project/global/operations/operation-1
-            status: DONE
-            targetLink: https://www.googleapis.com/clouduseraccounts/beta/projects/my-project/global/users/test-1
-            """))
-
-  def testWithUserAccountsUri(self):
-    self.SelectApi('beta')
-    self.make_requests.side_effect = iter([
-        [test_resources.ACCOUNT_OPERATIONS[0]],
-    ])
-
-    self.Run("""
-        beta compute operations describe https://www.googleapis.com/clouduseraccounts/beta/projects/my-project/global/operations/operation-1
-        """)
-
-    self.CheckRequests(
-        [(self.accounts.globalAccountsOperations,
-          'Get',
-          self.accounts_messages
-          .ClouduseraccountsGlobalAccountsOperationsGetRequest(
-              operation='operation-1',
-              project='my-project'))])
-
-    self.assertMultiLineEqual(
-        self.GetOutput(),
-        textwrap.dedent("""\
-            insertTime: '2014-09-04T09:55:33.679-07:00'
-            name: operation-1
-            operationType: insert
-            selfLink: https://www.googleapis.com/clouduseraccounts/beta/projects/my-project/global/operations/operation-1
-            status: DONE
-            targetLink: https://www.googleapis.com/clouduseraccounts/beta/projects/my-project/global/users/test-1
-            """))
 
 if __name__ == '__main__':
   test_case.main()

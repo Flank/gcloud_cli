@@ -14,6 +14,9 @@
 
 """Unit tests ml vision flags."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.command_lib.ml.vision import flags
 from tests.lib import parameterized

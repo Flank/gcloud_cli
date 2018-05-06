@@ -21,15 +21,14 @@ SYNOPSIS
         [--local-ssd=[device-name=DEVICE-NAME],
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
-        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]]
+        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
         [--network-interface=[PROPERTY=VALUE,...]]
         [--network-tier=NETWORK_TIER] [--preemptible]
         [--private-network-ip=PRIVATE_NETWORK_IP]
-        [--no-require-csek-key-create]
-        [--resource-maintenance-policies=RESOURCE_MAINTENANCE_POLICIES]
-        [--no-restart-on-failure] [--shielded-vm-integrity-monitoring]
-        [--shielded-vm-secure-boot] [--shielded-vm-vtpm]
+        [--no-require-csek-key-create] [--no-restart-on-failure]
+        [--shielded-vm-integrity-monitoring] [--shielded-vm-secure-boot]
+        [--shielded-vm-vtpm]
         [--source-instance-template=SOURCE_INSTANCE_TEMPLATE] [--subnet=SUBNET]
         [--tags=TAG,[TAG,...]] [--zone=ZONE] [--address=ADDRESS | --no-address]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
@@ -185,9 +184,9 @@ FLAGS
             Specifies the name of the image that the disk will be initialized
             with. A new disk will be created based on the given image. To view
             a list of public images and projects, run $ gcloud compute images
-            list. If omitted image-family must be specified to identify the
-            image. It is best practice to use image when a specific version of
-            an image is needed.
+            list. It is best practice to use image when a specific version of
+            an image is needed. If both image and image-family flags are
+            omitted a blank disk will be created.
 
          image-family
             The family of the image that the disk will be initialized with.
@@ -370,7 +369,7 @@ FLAGS
             Same as startup-script except that the script contents are pulled
             from a publicly-accessible location on the web.
 
-     --metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]
+     --metadata-from-file=KEY=LOCAL_FILE_PATH,[...]
         Same as --metadata except that the value for the entry will be read
         from a local file. This is useful for values that are too large such as
         startup-script contents.
@@ -478,10 +477,6 @@ FLAGS
         for more details. Enabled by default, use --no-require-csek-key-create
         to disable.
 
-     --resource-maintenance-policies=RESOURCE_MAINTENANCE_POLICIES
-        Name of a maintenance policy to be added to the instance. The policy
-        must exist in the same region as the instance.
-
      --restart-on-failure
         The instances will be restarted if they are terminated by Compute
         Engine. This does not affect terminations performed by the user.
@@ -530,7 +525,7 @@ FLAGS
 
      --zone=ZONE
         The zone of the instances to create. If not specified and the
-        compute/zone property isn't set, you will be prompted to select a zone.
+        compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:
@@ -731,12 +726,6 @@ FLAGS
 
               taskqueue
                 - https://www.googleapis.com/auth/taskqueue
-
-              useraccounts-ro
-                - https://www.googleapis.com/auth/cloud.useraccounts.readonly
-
-              useraccounts-rw
-                - https://www.googleapis.com/auth/cloud.useraccounts
 
               userinfo-email
                 - https://www.googleapis.com/auth/userinfo.email

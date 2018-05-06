@@ -19,11 +19,20 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     create
+        (ALPHA) Create an annotation in the specified taxonomy.
+
+     delete
+        (ALPHA) Delete an annotation and all of its child annotations.
+
      describe
         (ALPHA) Get the details of an annotation.
 
      list
         (ALPHA) List all the annotations of a taxonomy.
+
+     update
+        (ALPHA) Update the description of an annotation.
 
 NOTES
     This command is an internal implementation detail and may change or

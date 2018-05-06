@@ -26,6 +26,8 @@ tests every knob of the list subcommands whereas all other
 
 Kittens will die if the guideline is ignored.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import exceptions
@@ -50,7 +52,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
             'my-project/global/backendServices/my-backend-service' % {
                 'api': self._api}),
         description='My URL Map',
-        fingerprint='my-fingerprint',  # 'bXktZmluZ2VycHJpbnQ=' in string form.
+        fingerprint=b'my-fingerprint',
         hostRules=[
             self.messages.HostRule(
                 hosts=['google.com', '*.google.com'],
@@ -422,7 +424,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'my-project/global/backendServices/my-backend-service') %
                   {'api': self._api},
                   description='A changed description',
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   hostRules=[
                       self.messages.HostRule(
                           hosts=['youtube.com', '*.youtube.com'],
@@ -497,7 +499,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'my-project/global/backendBuckets/my-backend-bucket') % {
                           'api': self._api},
                   description='A changed description',
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   hostRules=[
                       self.messages.HostRule(
                           hosts=['youtube.com', '*.youtube.com'],
@@ -564,7 +566,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'https://www.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendServices/my-backend-service') %
                   {'api': self._api},
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   hostRules=[
                       self.messages.HostRule(
                           hosts=['youtube.com', '*.youtube.com'],
@@ -654,7 +656,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'https://www.googleapis.com/compute/%(api)s/projects/'
                       'my-project/global/backendBuckets/my-backend-bucket') % {
                           'api': self._api},
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   hostRules=[
                       self.messages.HostRule(
                           hosts=['youtube.com', '*.youtube.com'],
@@ -778,7 +780,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'my-project/global/backendServices/my-backend-service') %
                   {'api': self._api},
                   description='My URL Map',
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   name='my-url-map',
               )))],
     )
@@ -892,7 +894,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'my-project/global/backendServices/my-backend-service')  %
                   {'api': self._api},
                   description='A changed description',
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   hostRules=[
                       self.messages.HostRule(
                           hosts=['youtube.com', '*.youtube.com'],
@@ -1023,7 +1025,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'my-project/global/backendBuckets/my-backend-bucket') % {
                           'api': self._api},
                   description='A changed description',
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   hostRules=[
                       self.messages.HostRule(
                           hosts=['youtube.com', '*.youtube.com'],
@@ -1111,8 +1113,8 @@ class URLMapsEditTest(test_base.BaseEditTest):
               urlMap='my-url-map',
           ))],
     )
-    self.AssertErrContains(
-        'There was a problem parsing your changes: Expecting : delimiter: line')
+    self.AssertErrContains('There was a problem parsing your changes: Expecting'
+                           ' \':\' delimiter: line')
 
     # The syntax error occurred at line 15, so we check to make sure we
     # did our calculations correctly.
@@ -1195,12 +1197,12 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'my-project/global/backendServices/my-backend-service') %
                   {'api': self._api},
                   description='A changed description',
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   name='my-url-map',
               )))],
     )
-    self.AssertErrContains(
-        'There was a problem parsing your changes: Expecting : delimiter: line')
+    self.AssertErrContains('There was a problem parsing your changes: Expecting'
+                           ' \':\' delimiter: line')
     self.AssertErrContains('15 column 19 (char 485)')
 
   def testEditingWithYAMLWithSyntaxErrorsAndNoRetry(self):
@@ -1249,9 +1251,9 @@ class URLMapsEditTest(test_base.BaseEditTest):
         'There was a problem parsing your changes: Failed to parse YAML: '
         'found undefined alias')
 
-    # The syntax error occured at line 15, so we check to make sure we
+    # The syntax error occurred at line 15, so we check to make sure we
     # did our calculations correctly.
-    self.AssertErrContains('in "<byte string>", line 15, column 1:')
+    self.AssertErrContains('in "<unicode string>", line 15, column 1:')
 
     self.AssertErrContains('Edit aborted by user.')
 
@@ -1330,7 +1332,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'my-project/global/backendServices/my-backend-service') %
                   {'api': self._api},
                   description='A changed description',
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   name='my-url-map',
               )))],
     )
@@ -1338,7 +1340,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
     self.AssertErrContains(
         'There was a problem parsing your changes: Failed to parse YAML: '
         'found undefined alias')
-    self.AssertErrContains('in "<byte string>", line 15, column 1:')
+    self.AssertErrContains('in "<unicode string>", line 15, column 1:')
 
   def testEditingWithServerError(self):
     self.WriteInput('n\n')  # Answer no when prompted to try again.
@@ -1392,7 +1394,7 @@ class URLMapsEditTest(test_base.BaseEditTest):
                       'my-project/global/backendServices/my-backend-service') %
                   {'api': self._api},
                   description='A changed description',
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   name='my-url-map',
               )))],
     )

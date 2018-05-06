@@ -20,6 +20,10 @@ littering the screen in CLI mode. In interpreter mode, they are not caught
 from within calliope.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import errno
 from functools import wraps
 import os
 import sys
@@ -30,6 +34,8 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_attr_os
+
+import six
 
 
 def NewErrorFromCurrentException(error, *args):
@@ -191,6 +197,23 @@ def _TruncateToLineWidth(string, align, width, fill=''):
 _MARKER = '^ invalid character'
 
 
+def _NonAsciiIndex(s):
+  """Returns the index of the first non-ascii char in s, -1 if all ascii."""
+  if isinstance(s, six.text_type):
+    for i, c in enumerate(s):
+      try:
+        c.encode('ascii')
+      except (AttributeError, UnicodeError):
+        return i
+  else:
+    for i, b in enumerate(s):
+      try:
+        b.decode('ascii')
+      except (AttributeError, UnicodeError):
+        return i
+  return -1
+
+
 # pylint: disable=g-doc-bad-indent
 def _FormatNonAsciiMarkerString(args):
   r"""Format a string that will mark the first non-ASCII character it contains.
@@ -215,25 +238,18 @@ def _FormatNonAsciiMarkerString(args):
   Raises:
     ValueError: if the given string is all ASCII characters
   """
-  # nonascii will be True if at least one arg contained a non-ASCII character
-  nonascii = False
   # pos is the position of the first non-ASCII character in ' '.join(args)
   pos = 0
   for arg in args:
-    try:
-      # idx is the index of the first non-ASCII character in arg
-      for idx, char in enumerate(arg):
-        char.decode('ascii')
-    except UnicodeError:
-      # idx will remain set, indicating the first non-ASCII character
-      pos += idx
-      nonascii = True
+    first_non_ascii_index = _NonAsciiIndex(arg)
+    if first_non_ascii_index >= 0:
+      pos += first_non_ascii_index
       break
     # this arg was all ASCII; add 1 for the ' ' between args
     pos += len(arg) + 1
-  if not nonascii:
-    raise ValueError('The command line is composed entirely of ASCII '
-                     'characters.')
+  else:
+    raise ValueError(
+        'The command line is composed entirely of ASCII characters.')
 
   # Make a string that, when printed in parallel, will point to the non-ASCII
   # character
@@ -241,7 +257,7 @@ def _FormatNonAsciiMarkerString(args):
 
   # Make sure that this will still print out nicely on an odd-sized screen
   align = len(marker_string)
-  args_string = u' '.join(
+  args_string = ' '.join(
       [console_attr.SafeText(arg) for arg in args])
   width, _ = console_attr_os.GetTermSize()
   fill = '...'
@@ -269,7 +285,7 @@ def _FormatNonAsciiMarkerString(args):
   formatted_args_string = _TruncateToLineWidth(args_string.ljust(align), align,
                                                width, fill=fill).rstrip()
   formatted_marker_string = _TruncateToLineWidth(marker_string, align, width)
-  return u'\n'.join((formatted_args_string, formatted_marker_string))
+  return '\n'.join((formatted_args_string, formatted_marker_string))
 
 
 class InvalidCharacterInArgException(ToolException):
@@ -283,9 +299,9 @@ class InvalidCharacterInArgException(ToolException):
     args = [cmd] + args[1:]
 
     super(InvalidCharacterInArgException, self).__init__(
-        u'Failed to read command line argument [{0}] because it does '
-        u'not appear to be valid 7-bit ASCII.\n\n'
-        u'{1}'.format(
+        'Failed to read command line argument [{0}] because it does '
+        'not appear to be valid 7-bit ASCII.\n\n'
+        '{1}'.format(
             console_attr.SafeText(self.invalid_arg),
             _FormatNonAsciiMarkerString(args)))
 
@@ -295,7 +311,7 @@ class BadArgumentException(ToolException):
 
   def __init__(self, argument_name, message):
     super(BadArgumentException, self).__init__(
-        u'Invalid value for [{0}]: {1}'.format(argument_name, message))
+        'Invalid value for [{0}]: {1}'.format(argument_name, message))
     self.argument_name = argument_name
 
 
@@ -312,7 +328,7 @@ class InvalidArgumentException(ToolException):
 
   def __init__(self, parameter_name, message):
     super(InvalidArgumentException, self).__init__(
-        u'Invalid value for [{0}]: {1}'.format(parameter_name, message))
+        'Invalid value for [{0}]: {1}'.format(parameter_name, message))
     self.parameter_name = parameter_name
 
 
@@ -321,7 +337,7 @@ class ConflictingArgumentsException(ToolException):
 
   def __init__(self, *parameter_names):
     super(ConflictingArgumentsException, self).__init__(
-        u'arguments not allowed simultaneously: ' + ', '.join(parameter_names))
+        'arguments not allowed simultaneously: ' + ', '.join(parameter_names))
     self.parameter_names = parameter_names
 
 
@@ -330,7 +346,7 @@ class UnknownArgumentException(ToolException):
 
   def __init__(self, parameter_name, message):
     super(UnknownArgumentException, self).__init__(
-        u'Unknown value for [{0}]: {1}'.format(parameter_name, message))
+        'Unknown value for [{0}]: {1}'.format(parameter_name, message))
     self.parameter_name = parameter_name
 
 
@@ -397,6 +413,8 @@ _KNOWN_ERRORS = {
     'googlecloudsdk.calliope.parser_errors.ArgumentError': lambda x: None,
     'googlecloudsdk.core.util.files.Error': lambda x: None,
     'httplib.ResponseNotReady': core_exceptions.NetworkIssueError,
+    # Same error but different location on PY3.
+    'http.client.ResponseNotReady': core_exceptions.NetworkIssueError,
     'oauth2client.client.AccessTokenRefreshError': _GetTokenRefreshError,
     'ssl.SSLError': core_exceptions.NetworkIssueError,
     'socket.error': core_exceptions.NetworkIssueError,
@@ -406,6 +424,27 @@ _KNOWN_ERRORS = {
 def _GetExceptionName(cls):
   """Returns the exception name used as index into _KNOWN_ERRORS from type."""
   return cls.__module__ + '.' + cls.__name__
+
+
+_SOCKET_ERRNO_NAMES = {
+    'EADDRINUSE', 'EADDRNOTAVAIL', 'EAFNOSUPPORT', 'EBADMSG', 'ECOMM',
+    'ECONNABORTED', 'ECONNREFUSED', 'ECONNRESET', 'EDESTADDRREQ', 'EHOSTDOWN',
+    'EHOSTUNREACH', 'EISCONN', 'EMSGSIZE', 'EMULTIHOP', 'ENETDOWN', 'ENETRESET',
+    'ENETUNREACH', 'ENOBUFS', 'ENOPROTOOPT', 'ENOTCONN', 'ENOTSOCK', 'ENOTUNIQ',
+    'EOPNOTSUPP', 'EPFNOSUPPORT', 'EPROTO', 'EPROTONOSUPPORT', 'EPROTOTYPE',
+    'EREMCHG', 'EREMOTEIO', 'ESHUTDOWN', 'ESOCKTNOSUPPORT', 'ETIMEDOUT',
+    'ETOOMANYREFS',
+}
+
+
+def _IsSocketError(exc):
+  """Returns True if exc is a socket error exception."""
+
+  # I've a feeling we're not in python 2 anymore. PEP 3151 eliminated module
+  # specific exceptions in favor of builtin exceptions like OSError. Good
+  # for some things, bad for others. For instance, this brittle errno check
+  # for "network" errors. We use names because errnos are system dependent.
+  return errno.errorcode[exc.errno] in _SOCKET_ERRNO_NAMES
 
 
 def ConvertKnownError(exc):
@@ -434,7 +473,10 @@ def ConvertKnownError(exc):
     cls = classes.pop(0)
     processed.add(cls)
     name = _GetExceptionName(cls)
-    known_err = _KNOWN_ERRORS.get(name)
+    if name == 'builtins.OSError' and _IsSocketError(exc):
+      known_err = core_exceptions.NetworkIssueError
+    else:
+      known_err = _KNOWN_ERRORS.get(name)
     if known_err:
       break
 
@@ -466,7 +508,7 @@ def HandleError(exc, command_path, known_error_handler=None):
   """
   known_exc, print_error = ConvertKnownError(exc)
   if known_exc:
-    msg = u'({0}) {1}'.format(
+    msg = '({0}) {1}'.format(
         console_attr.SafeText(command_path),
         console_attr.SafeText(known_exc))
     log.debug(msg, exc_info=sys.exc_info())
@@ -476,12 +518,12 @@ def HandleError(exc, command_path, known_error_handler=None):
     if known_error_handler:
       known_error_handler(exc)
     if properties.VALUES.core.print_handled_tracebacks.GetBool():
-      raise
+      core_exceptions.reraise(exc)
     _Exit(known_exc)
   else:
     # Make sure any uncaught exceptions still make it into the log file.
     log.debug(console_attr.SafeText(exc), exc_info=sys.exc_info())
-    raise
+    core_exceptions.reraise(exc)
 
 
 def _Exit(exc):

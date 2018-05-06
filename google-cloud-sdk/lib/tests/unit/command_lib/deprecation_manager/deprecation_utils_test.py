@@ -52,8 +52,8 @@ Test Command Complete
     self.AssertOutputContains('(DEPRECATED)')
 
   def testRemoveAtVersion(self):
-    with self.assertRaisesRegexp(calliope_base.DeprecationException,
-                                 'This command has been removed.'):
+    with self.assertRaisesRegex(calliope_base.DeprecationException,
+                                'This command has been removed.'):
       self.cli.Execute(['remove-command-withnoalt'])
     self.AssertLogNotContains('Test Command Complete')
 
@@ -76,8 +76,8 @@ Test Command Complete
     self.AssertOutputContains('(DEPRECATED)')
 
   def testRemoveWithVersionAndReplacement(self):
-    with self.assertRaisesRegexp(calliope_base.DeprecationException,
-                                 'This command has been removed.'):
+    with self.assertRaisesRegex(calliope_base.DeprecationException,
+                                'This command has been removed.'):
       self.cli.Execute(['remove-command-withalt'])
     self.AssertLogNotContains('Test Command Complete')
 
@@ -89,8 +89,8 @@ Test Command Complete
                                'implementation detail'))
 
   def testDeprecateWithInvalidVersion(self):
-    with self.assertRaisesRegexp(command_loading.CommandLoadFailure,
-                                 'Valid remove version is required'):
+    with self.assertRaisesRegex(command_loading.CommandLoadFailure,
+                                'Valid remove version is required'):
       self.cli.Execute(['command-withbadversion'])
     self.AssertLogNotContains('Test Command Complete\n')
 

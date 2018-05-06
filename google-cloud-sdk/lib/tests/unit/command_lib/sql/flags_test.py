@@ -16,7 +16,10 @@
 
 from googlecloudsdk.api_lib.sql import instances
 from googlecloudsdk.command_lib.sql import flags
+from tests.lib import cli_test_base
 from tests.lib import completer_test_base
+from tests.lib import parameterized
+from tests.lib.calliope import util
 from tests.lib.surface.sql import base
 from tests.lib.surface.sql import data
 
@@ -97,6 +100,37 @@ class CompleterTest(base.SqlMockTestBeta, completer_test_base.CompleterBase):
     self.assertItemsEqual(
         ['my_username'],
         completer.Complete('', self.parameter_info))
+
+
+class FlagsTest(cli_test_base.CliTestBase, parameterized.TestCase):
+
+  def SetUp(self):
+    self.parser = util.ArgumentParser()
+    flags.AddAuthorizedNetworks(self.parser)
+
+  @parameterized.parameters(
+      ('1.2.3.4/32',),
+      ('0.0.0.0/0',),
+      ('1.2.3.4',),
+      ('255.255.255.255',),
+  )
+  def testCidr_Good(self, networks):
+    result = self.parser.parse_args(['--authorized-networks', networks])
+    self.assertEqual(result.authorized_networks, networks.split(','))
+
+  @parameterized.parameters(
+      ('1.2.3.256/32',),
+      ('1.2.3.4/-1',),
+      ('0.0.0.0/',),
+      ('0.0.0.0/33',),
+      ('0.0.0.0/255',),
+      ('abcd',),
+      ('abcd-foobar',),
+  )
+  def testCidr_Bad(self, networks):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Must be specified in CIDR notation'):
+      self.parser.parse_args(['--authorized-networks', networks])
 
 
 if __name__ == '__main__':

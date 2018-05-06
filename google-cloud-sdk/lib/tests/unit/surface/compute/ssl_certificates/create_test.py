@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,7 +71,7 @@ class SslCertificatesCreateTest(test_base.BaseTest):
     self.prefix = ''
 
   def RunVersioned(self, command):
-    return self.Run('{prefix} {command}'.format(
+    return self.Run(u'{prefix} {command}'.format(
         prefix=self.prefix, command=command))
 
   def testSimpleCase(self):
@@ -164,6 +165,7 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
 
   def SetUp(self):
     self.SelectApi('alpha')
+    self.SetEncoding('utf8')
     self.prefix = 'alpha'
 
   def testSimpleCase(self):
@@ -195,11 +197,11 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
   def helperTestManaged(self, domains):
     messages = self.messages
 
-    self.RunVersioned("""
+    self.RunVersioned(u"""
         compute ssl-certificates create my-cert-managed
           --domains {domains}
           --description 'Managed certificate one.'
-        """.format(domains=','.join(domains)))
+        """.format(domains=u','.join(domains)))
 
     self.CheckRequests(
         [(self.compute.sslCertificates, 'Insert',
@@ -218,6 +220,12 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
 
   def testManagedMultipleDomains(self):
     self.helperTestManaged(['one.example.com', 'two.example.com'])
+
+  def testManagedUnicodeDomain(self):
+    self.helperTestManaged([u'Ṳᾔḯ¢◎ⅾℯ.certsbridge.com'])
+
+  def testManagedPunycodeDomain(self):
+    self.helperTestManaged(['xn--8a342m2fai5b18csni3w.certsbridge'])
 
   def testUriSupport(self):
     messages = self.messages

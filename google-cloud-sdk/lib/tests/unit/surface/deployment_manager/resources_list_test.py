@@ -14,6 +14,8 @@
 
 """Unit tests for resources list command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.deployment_manager import exceptions
@@ -21,6 +23,7 @@ from googlecloudsdk.api_lib.util import exceptions as api_exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.deployment_manager import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 DEPLOYMENT_NAME = 'deployment-name'
 RESOURCE_NAME = 'resource-name'
@@ -116,7 +119,7 @@ class ResourcesListTest(unit_test_base.DmV2UnitTestBase):
   def testListWithException(self):
     self.setListResponseWithError(
         http_error.MakeHttpError(code=404, message='quux'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         api_exceptions.HttpException,
         re.compile(r'.*ResponseError: code=404, message=quux.*')):
       # only interested in the generator throwing an exception so we suppress
@@ -128,8 +131,8 @@ class ResourcesListTest(unit_test_base.DmV2UnitTestBase):
         str(res)
 
   def testResourcesListNoDeploymentFlag(self):
-    with self.assertRaisesRegexp(exceptions.ArgumentError,
-                                 'argument --deployment is required'):
+    with self.assertRaisesRegex(exceptions.ArgumentError,
+                                'argument --deployment is required'):
       self.Run('deployment-manager resources list')
 
   def createResource(self, identifier=None, preview=False):
@@ -189,7 +192,7 @@ class ResourcesListTest(unit_test_base.DmV2UnitTestBase):
       resources = [
           self.createResource(i, preview) for i in range(num_resources)
       ]
-      for i in xrange(num_actions):
+      for i in range(num_actions):
         resources.append(self.createActionResource(i, preview))
     self.mocked_client.resources.List.Expect(
         request=self.messages.DeploymentmanagerResourcesListRequest(

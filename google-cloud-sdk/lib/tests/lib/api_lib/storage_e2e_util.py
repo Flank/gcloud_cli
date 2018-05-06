@@ -31,8 +31,9 @@ def _CleanUpBucket(storage_client, bucket_ref):
   # The bucket must be empty before we can delete it
   bucket_url = bucket_ref.ToBucketUrl()
   delete_tasks = []
-  for path in storage_client.ListBucket(bucket_ref):
-    delete_tasks.append(storage_parallel.ObjectDeleteTask(bucket_url, path))
+  for obj in storage_client.ListBucket(bucket_ref):
+    delete_tasks.append(storage_parallel.ObjectDeleteTask(bucket_url,
+                                                          obj.name))
   storage_parallel.DeleteObjects(delete_tasks)
   storage_client.DeleteBucket(bucket_ref)
 

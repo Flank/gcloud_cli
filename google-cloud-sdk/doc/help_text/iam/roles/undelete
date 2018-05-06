@@ -38,7 +38,8 @@ EXAMPLES
         $ gcloud iam roles undelete --project myproject viewer
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam roles undelete
         $ gcloud beta iam roles undelete
 

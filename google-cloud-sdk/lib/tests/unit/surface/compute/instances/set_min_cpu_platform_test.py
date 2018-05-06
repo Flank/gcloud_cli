@@ -125,7 +125,7 @@ class SetMinCpuPlatformTest(sdk_test_base.WithFakeAuth,
             --format=disable
           """)
 
-    self.assertEquals('operation-X', result.name)
+    self.assertEqual('operation-X', result.name)
 
     self.AssertOutputEquals('')
     self.AssertErrEquals(
@@ -147,7 +147,7 @@ class SetMinCpuPlatformTest(sdk_test_base.WithFakeAuth,
             --async
             --format=disable
           """)
-      self.assertEquals('operation-X', result.name)
+      self.assertEqual('operation-X', result.name)
 
 
 if __name__ == '__main__':

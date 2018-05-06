@@ -31,10 +31,6 @@ COMMANDS
      add-labels
         (ALPHA) Add labels to Google Compute Engine virtual machine instances.
 
-     add-maintenance-policies
-        (ALPHA) Adds maintenance policies to Google Compute Engine VM
-        instances.
-
      add-metadata
         (ALPHA) Add or update instance metadata.
 
@@ -76,10 +72,6 @@ COMMANDS
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine virtual machine
-        instances.
-
-     remove-maintenance-policies
-        (ALPHA) Removes maintenance policies to Google Compute Engine VM
         instances.
 
      remove-metadata

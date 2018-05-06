@@ -11,7 +11,7 @@ gcloud alpha compute target\-ssl\-proxies update \- update a target SSL proxy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute target\-ssl\-proxies update\fR \fINAME\fR [\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR] [\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...]] [\fB\-\-clear\-ssl\-policy\fR\ |\ \fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute target\-ssl\-proxies update\fR \fINAME\fR [\fB\-\-backend\-service\fR=\fIBACKEND_SERVICE\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR] [\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]] [\fB\-\-clear\-ssl\-policy\fR\ |\ \fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -62,7 +62,7 @@ Enables PROXY protocol (version 1) for passing client connection information.
 .RE
 .sp
 .TP 2m
-\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...]
+\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
 References to at most 10 SSL certificate resources that are used for
 server\-side authentication. The first SSL certificate in this list is
 considered the primary SSL certificate associated with the load balancer. The

@@ -55,7 +55,7 @@ OPTIONAL FLAGS
             can handle. There are two ways to specify max RPS: --max-rate which
             defines the max RPS for the whole group or --max-rate-per-instance,
             which defines the max RPS on a per-instance basis. Available only
-            for HTTP based protocols.
+            for HTTP-based protocols.
          UTILIZATION
             Relies on the CPU utilization of the instances in the group when
             balancing load. Use --max-utilization to set a maximum target CPU
@@ -96,7 +96,7 @@ OPTIONAL FLAGS
 
        --instance-group-region=INSTANCE_GROUP_REGION
           The region of the instance group to update the backend service. If
-          not specified, you will be prompted to select a region.
+          not specified, you may be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -116,7 +116,7 @@ OPTIONAL FLAGS
 
        --instance-group-zone=INSTANCE_GROUP_ZONE
           The zone of the instance group to update the backend service. If not
-          specified and the compute/zone property isn't set, you will be
+          specified and the compute/zone property isn't set, you may be
           prompted to select a zone.
 
           To avoid prompting when this flag is omitted, you can set the

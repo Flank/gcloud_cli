@@ -14,6 +14,8 @@
 
 """Tests for the debug API wrapper module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.debug import transforms
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import sdk_test_base

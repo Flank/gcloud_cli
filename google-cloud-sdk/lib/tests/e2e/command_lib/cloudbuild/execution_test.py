@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for cloudbuild execution handlers."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import threading
 import time
 
@@ -66,7 +68,7 @@ class ExecutionTest(test_case.TestCase):
 
     # Check that the handler began to execute.
     with winners_lock:
-      self.assertEquals(winners, ['startup'])
+      self.assertEqual(winners, ['startup'])
 
     # Call the handler for the third time, triggering the backup handler.
     t3 = threading.Thread(target=MashTrigger)
@@ -76,12 +78,12 @@ class ExecutionTest(test_case.TestCase):
     time.sleep(.1)
 
     with winners_lock:
-      self.assertEquals(winners, ['startup', 'backup'])
+      self.assertEqual(winners, ['startup', 'backup'])
 
     time.sleep(2)
 
     with winners_lock:
-      self.assertEquals(winners, ['startup', 'backup', 'sleep'])
+      self.assertEqual(winners, ['startup', 'backup', 'sleep'])
 
     t1.join()
     t2.join()

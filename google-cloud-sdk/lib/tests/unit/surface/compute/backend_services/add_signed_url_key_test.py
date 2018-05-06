@@ -18,7 +18,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import backend_services_test_base
 
 
-class BackendServiceAddSignedUrlKeyTest(
+class BackendServiceAddSignedUrlKeyTestBeta(
     backend_services_test_base.BackendServicesTestBase):
 
   # Arbitrary base64url encoded 128-bit key.
@@ -27,10 +27,13 @@ class BackendServiceAddSignedUrlKeyTest(
   KEY = '1KKDjXtxmwHrltVtXJPoLQ=='
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+    self._SetUpReleaseTrack()
     self.key_file = self.Touch(self.temp_path, 'test.key', contents=self.KEY)
     self.key_file_with_new_line = self.Touch(
         self.temp_path, 'test2.key', contents=self.KEY + '\n\n\r\n')
+
+  def _SetUpReleaseTrack(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
   def testValidKey(self):
     """Tests adding a valid key is successful."""
@@ -97,6 +100,13 @@ class BackendServiceAddSignedUrlKeyTest(
       self.RunBackendServices('add-signed-url-key ' +
                               backend_service_ref.Name() + ' --key-name key1 '
                               '--key-file non-existent-file')
+
+
+class BackendServiceAddSignedUrlKeyTestAlpha(
+    BackendServiceAddSignedUrlKeyTestBeta):
+
+  def _SetUpReleaseTrack(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

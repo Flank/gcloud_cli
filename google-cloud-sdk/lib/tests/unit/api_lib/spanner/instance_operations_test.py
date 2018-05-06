@@ -50,7 +50,7 @@ class InstanceOperationsClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesOperationsGetRequest(
             name='resultname'),
         response=instance)
-    self.assertEquals(
+    self.assertEqual(
         instance_operations.Await(not_done, ''), instance)
 
   def testCancel(self):
@@ -66,7 +66,7 @@ class InstanceOperationsClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesOperationsCancelRequest(
             name=ref.RelativeName()),
         response=response)
-    self.assertEquals(
+    self.assertEqual(
         instance_operations.Cancel('insId', 'opId'), response)
 
   def testGet(self):
@@ -82,7 +82,7 @@ class InstanceOperationsClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesOperationsGetRequest(
             name=ref.RelativeName()),
         response=response)
-    self.assertEquals(
+    self.assertEqual(
         instance_operations.Get('insId', 'opId'), response)
 
   def testList(self):

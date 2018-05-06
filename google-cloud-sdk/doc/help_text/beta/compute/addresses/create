@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud beta compute addresses create [NAME ...] [--description=DESCRIPTION]
-        [--subnet=SUBNET]
+        [--network-tier=NETWORK_TIER] [--subnet=SUBNET]
         [--addresses=ADDRESS,[ADDRESS,...] | --ip-version=IP_VERSION]
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
@@ -21,6 +21,10 @@ POSITIONAL ARGUMENTS
 FLAGS
      --description=DESCRIPTION
         An optional textual description for the addresses.
+
+     --network-tier=NETWORK_TIER
+        The network tier to assign to the reserved IP addresses. NETWORK_TIER
+        must be one of: PREMIUM, STANDARD. The default value is PREMIUM.
 
      --subnet=SUBNET
         If specified, the subnet name in which the address(es) should be

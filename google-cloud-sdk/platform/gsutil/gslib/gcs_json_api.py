@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 
 from contextlib import contextmanager
+import functools
 import httplib
 import json
 import logging
@@ -30,14 +31,14 @@ from apitools.base.py import exceptions as apitools_exceptions
 from apitools.base.py import http_wrapper as apitools_http_wrapper
 from apitools.base.py import transfer as apitools_transfer
 from apitools.base.py.util import CalculateWaitForRetry
-
 from boto import config
+import httplib2
+import oauth2client
 
 from gslib.cloud_api import AccessDeniedException
 from gslib.cloud_api import ArgumentException
 from gslib.cloud_api import BadRequestException
 from gslib.cloud_api import CloudApi
-from gslib.cloud_api import CryptoTuple
 from gslib.cloud_api import EncryptionException
 from gslib.cloud_api import NotEmptyException
 from gslib.cloud_api import NotFoundException
@@ -49,12 +50,7 @@ from gslib.cloud_api import ResumableUploadAbortException
 from gslib.cloud_api import ResumableUploadException
 from gslib.cloud_api import ResumableUploadStartOverException
 from gslib.cloud_api import ServiceException
-from gslib.cloud_api_helper import ListToGetFields
-from gslib.cloud_api_helper import ValidateDstObjectMetadata
-from gslib.encryption_helper import Base64Sha256FromBase64EncryptionKey
-from gslib.encryption_helper import FindMatchingCryptoKey
-from gslib.gcs_json_credentials import CheckAndGetCredentials
-from gslib.gcs_json_credentials import GetCredentialStoreKeyDict
+from gslib.gcs_json_credentials import SetUpJsonCredentialsAndCache
 from gslib.gcs_json_media import BytesTransferredContainer
 from gslib.gcs_json_media import DownloadCallbackConnectionClassFactory
 from gslib.gcs_json_media import HttpWithDownloadStream
@@ -72,28 +68,29 @@ from gslib.tracker_file import GetRewriteTrackerFilePath
 from gslib.tracker_file import HashRewriteParameters
 from gslib.tracker_file import ReadRewriteTrackerFile
 from gslib.tracker_file import WriteRewriteTrackerFile
-from gslib.translation_helper import CreateBucketNotFoundException
-from gslib.translation_helper import CreateNotFoundExceptionForObjectWrite
-from gslib.translation_helper import CreateObjectNotFoundException
-from gslib.translation_helper import DEFAULT_CONTENT_TYPE
-from gslib.translation_helper import PRIVATE_DEFAULT_OBJ_ACL
-from gslib.translation_helper import REMOVE_CORS_CONFIG
-from gslib.util import AddAcceptEncodingGzipIfNeeded
-from gslib.util import GetCertsFile
-from gslib.util import GetCredentialStoreFilename
-from gslib.util import GetJsonResumableChunkSize
-from gslib.util import GetMaxRetryDelay
-from gslib.util import GetNewHttp
-from gslib.util import GetNumRetries
-from gslib.util import GetPrintableExceptionString
-from gslib.util import JsonResumableChunkSizeDefined
-from gslib.util import LogAndHandleRetries
-from gslib.util import NUM_OBJECTS_PER_LIST_PAGE
-
-import httplib2
-import oauth2client
-from oauth2client.contrib import multistore_file
-
+from gslib.utils.boto_util import GetCertsFile
+from gslib.utils.boto_util import GetGcsJsonApiVersion
+from gslib.utils.boto_util import GetJsonResumableChunkSize
+from gslib.utils.boto_util import GetMaxRetryDelay
+from gslib.utils.boto_util import GetNewHttp
+from gslib.utils.boto_util import GetNumRetries
+from gslib.utils.boto_util import JsonResumableChunkSizeDefined
+from gslib.utils.cloud_api_helper import ListToGetFields
+from gslib.utils.cloud_api_helper import ValidateDstObjectMetadata
+from gslib.utils.constants import NUM_OBJECTS_PER_LIST_PAGE
+from gslib.utils.encryption_helper import Base64Sha256FromBase64EncryptionKey
+from gslib.utils.encryption_helper import CryptoKeyType
+from gslib.utils.encryption_helper import CryptoKeyWrapperFromKey
+from gslib.utils.encryption_helper import FindMatchingCSEKInBotoConfig
+from gslib.utils.metadata_util import AddAcceptEncodingGzipIfNeeded
+from gslib.utils.retry_util import LogAndHandleRetries
+from gslib.utils.text_util import GetPrintableExceptionString
+from gslib.utils.translation_helper import CreateBucketNotFoundException
+from gslib.utils.translation_helper import CreateNotFoundExceptionForObjectWrite
+from gslib.utils.translation_helper import CreateObjectNotFoundException
+from gslib.utils.translation_helper import DEFAULT_CONTENT_TYPE
+from gslib.utils.translation_helper import PRIVATE_DEFAULT_OBJ_ACL
+from gslib.utils.translation_helper import REMOVE_CORS_CONFIG
 
 # pylint: disable=invalid-name
 Notification = apitools_messages.Notification
@@ -101,11 +98,8 @@ NotificationCustomAttributesValue = Notification.CustomAttributesValue
 NotificationAdditionalProperty = (NotificationCustomAttributesValue
                                   .AdditionalProperty)
 
-
 # Implementation supports only 'gs' URLs, so provider is unused.
 # pylint: disable=unused-argument
-
-DEFAULT_GCS_JSON_VERSION = 'v1'
 
 NUM_BUCKETS_PER_LIST_PAGE = 1000
 
@@ -143,11 +137,9 @@ _ACL_FIELDS_SET = set(['acl', 'defaultObjectAcl', 'items/acl',
 # Fields that may be encrypted.
 _ENCRYPTED_HASHES_SET = set(['crc32c', 'md5Hash'])
 
-
 # During listing, if we attempt to decrypt an object but it has been removed,
 # we skip including the object in the listing.
 _SKIP_LISTING_OBJECT = 'skip'
-
 
 _INSUFFICIENT_OAUTH2_SCOPE_MESSAGE = (
     'Insufficient OAuth2 scope to perform this operation.')
@@ -179,22 +171,10 @@ class GcsJsonApi(CloudApi):
         bucket_storage_uri_class, logger, status_queue, provider='gs',
         debug=debug, trace_token=trace_token, perf_trace_token=perf_trace_token,
         user_project=user_project)
-    no_op_credentials = False
-    if not credentials:
-      loaded_credentials = CheckAndGetCredentials(logger)
-
-      if not loaded_credentials:
-        loaded_credentials = NoOpCredentials()
-        no_op_credentials = True
-    else:
-      if isinstance(credentials, NoOpCredentials):
-        no_op_credentials = True
-
-    self.credentials = credentials or loaded_credentials
 
     self.certs_file = GetCertsFile()
-
     self.http = GetNewHttp()
+    SetUpJsonCredentialsAndCache(self, logger, credentials=credentials)
 
     # Re-use download and upload connections. This class is only called
     # sequentially, but we can share TCP warmed-up connections across calls.
@@ -207,7 +187,6 @@ class GcsJsonApi(CloudApi):
     else:
       self.authorized_download_http = self.download_http
       self.authorized_upload_http = self.upload_http
-
     WrapDownloadHttpRequest(self.authorized_download_http)
     WrapUploadHttpRequest(self.authorized_upload_http)
 
@@ -238,28 +217,17 @@ class GcsJsonApi(CloudApi):
     else:
       self.host_port = ':' + config.get('Credentials', 'gs_json_port')
 
-    self.api_version = config.get('GSUtil', 'json_api_version',
-                                  DEFAULT_GCS_JSON_VERSION)
+    self.api_version = GetGcsJsonApiVersion()
     self.url_base = (self.http_base + self.host_base + self.host_port + '/' +
                      'storage/' + self.api_version + '/')
-
-    credential_store_key_dict = GetCredentialStoreKeyDict(self.credentials,
-                                                          self.api_version)
-
-    self.credentials.set_store(
-        multistore_file.get_credential_storage_custom_key(
-            GetCredentialStoreFilename(), credential_store_key_dict))
-
-    self.num_retries = GetNumRetries()
-    self.max_retry_wait = GetMaxRetryDelay()
-
-    log_request = (debug >= 3)
-    log_response = (debug >= 3)
 
     self.global_params = apitools_messages.StandardQueryParameters(
         trace='token:%s' % trace_token) if trace_token else None
     additional_http_headers = {}
     self._AddPerfTraceTokenToHeaders(additional_http_headers)
+
+    log_request = (debug >= 3)
+    log_response = (debug >= 3)
 
     self.api_client = apitools_client.StorageV1(
         url=self.url_base, http=self.http, log_request=log_request,
@@ -267,12 +235,16 @@ class GcsJsonApi(CloudApi):
         version=self.api_version, default_global_params=self.global_params,
         additional_http_headers=additional_http_headers)
 
+    self.max_retry_wait = GetMaxRetryDelay()
     self.api_client.max_retry_wait = self.max_retry_wait
+
+    self.num_retries = GetNumRetries()
     self.api_client.num_retries = self.num_retries
+
     self.api_client.retry_func = LogAndHandleRetries(
         status_queue=self.status_queue)
 
-    if no_op_credentials:
+    if isinstance(self.credentials, NoOpCredentials):
       # This API key is not secret and is used to identify gsutil during
       # anonymous requests.
       self.api_client.AddGlobalParam('key',
@@ -301,8 +273,13 @@ class GcsJsonApi(CloudApi):
     """
     return fields is None or _ACL_FIELDS_SET.intersection(set(fields))
 
-  def _ValidateEncryptionFields(self, fields=None):
+  def _ValidateEncryptionFieldsForMetadataGetRequest(self, fields=None):
     """Ensures customerEncryption field is included if hashes are requested."""
+    # In the context of fetching object metadata, we only need to check for
+    # customerEncryption, the field present if an object is CSEK-encrypted. Note
+    # that if the object is KMS-encrypted, no field checks are necessary; a
+    # metadata get request will be able to access the object's stored kmsKeyName
+    # field to access the key needed to decrypt hash fields).
     if (fields
         and _ENCRYPTED_HASHES_SET.intersection(set(fields))
         and 'customerEncryption' not in fields):
@@ -412,6 +389,7 @@ class GcsJsonApi(CloudApi):
     # them out to apitools so it will send/erase them.
     apitools_include_fields = []
     for metadata_field in ('billing',
+                           'encryption',
                            'lifecycle',
                            'logging',
                            'metadata',
@@ -590,6 +568,7 @@ class GcsJsonApi(CloudApi):
         # We may need to make a follow-up request to decrypt the hashes,
         # so ensure the required fields are present.
         fields.add('items/customerEncryption')
+        fields.add('items/kmsKeyName')
         fields.add('items/generation')
         fields.add('items/name')
       global_params.fields = ','.join(fields)
@@ -634,8 +613,14 @@ class GcsJsonApi(CloudApi):
                                fields=None):
     """Attempts to decrypt object metadata.
 
-    This function issues a GetObjectMetadata request with a decryption key if
-    a matching one is found.
+    Helps fetch encrypted object metadata fields (if requested) for API method
+    calls that requested them but did not receive them; this occurs for
+    ListObjects(), along with GetObjectMetadata() calls for which the object is
+    CSEK-encrypted but no decryption information was supplied.
+
+    This method issues a StorageObjectsGetRequest (if object hash fields were
+    requested but not retrieved), formatted appropriately depending on the
+    encryption method.
 
     Args:
       bucket_name: String of bucket containing the object.
@@ -644,25 +629,49 @@ class GcsJsonApi(CloudApi):
       fields: ListObjects-format fields to return.
 
     Returns:
-      apitools Object with decrypted hashes if decryption was performed,
-      None if the object was not encrypted or a matching decryption key was not
-      found, or _SKIP_LISTING_OBJECT if the object no longer exists.
+      - apitools_messages.Object with decrypted hash fields if decryption was
+      performed.
+      - None if the object was not encrypted, or CSEK-encrypted but we could not
+      find a matching decryption key.
+      - gcs_json_api._SKIP_LISTING_OBJECT if the object no longer exists.
     """
     get_fields = ListToGetFields(list_fields=fields)
-    if self._ShouldTryWithEncryptionKey(object_metadata, fields=get_fields):
-      decryption_key = FindMatchingCryptoKey(
-          object_metadata.customerEncryption.keySha256)
+
+    if not self._ObjectIsEncrypted(object_metadata):
+      self._RaiseIfNoDesiredHashesPresentForUnencryptedObject(
+          object_metadata, fields=get_fields)
+      return None
+
+    # If we reach this point, we know the object is encrypted.
+    get_metadata_func = None
+    if self._ObjectKMSEncryptedAndNeedHashes(
+        object_metadata, fields=get_fields):
+      # For CMK-encrypted objects, we can just call GetObjectMetadata.
+      get_metadata_func = functools.partial(
+          self._GetObjectMetadataHelper, bucket_name, object_metadata.name,
+          generation=object_metadata.generation, fields=get_fields)
+    elif self._ObjectCSEKEncryptedAndNeedHashes(
+        object_metadata, fields=get_fields):
+      # For CSEK-encrypted objects, we can do almost the same thing as above,
+      # but we also need to add some info about the decryption key (if it's
+      # available) into the request.
+      decryption_key = FindMatchingCSEKInBotoConfig(
+          object_metadata.customerEncryption.keySha256, config)
       if decryption_key:
-        # Issue a get request per-object with the encryption key.
-        # This requires an API call per-object and may be slow.
-        try:
-          return self._GetObjectMetadataWithDecryptionKey(
-              bucket_name, object_metadata.name, CryptoTuple(decryption_key),
-              object_metadata.generation, fields=get_fields)
-        except NotFoundException:
-          # If the object was deleted between the listing request and
-          # the get request, do not include it in the list.
-          return _SKIP_LISTING_OBJECT
+        get_metadata_func = functools.partial(
+            self._GetObjectMetadataHelper, bucket_name, object_metadata.name,
+            generation=object_metadata.generation, fields=get_fields,
+            decryption_tuple=CryptoKeyWrapperFromKey(decryption_key))
+
+    if get_metadata_func is None:
+      return
+
+    try:
+      return get_metadata_func()
+    except NotFoundException:
+      # If the object was deleted between the listing request and
+      # the get request, do not include it in the list.
+      return _SKIP_LISTING_OBJECT
 
   def _YieldObjectsAndPrefixes(self, object_list):
     # ls depends on iterating objects before prefixes for proper display.
@@ -688,7 +697,7 @@ class GcsJsonApi(CloudApi):
   def _EncryptionHeadersFromTuple(self, crypto_tuple=None):
     """Returns headers dict matching crypto_tuple, or empty dict."""
     headers = {}
-    if crypto_tuple:
+    if crypto_tuple and crypto_tuple.crypto_type == CryptoKeyType.CSEK:
       headers['x-goog-encryption-algorithm'] = crypto_tuple.crypto_alg
       headers['x-goog-encryption-key'] = crypto_tuple.crypto_key
       headers['x-goog-encryption-key-sha256'] = (
@@ -699,49 +708,55 @@ class GcsJsonApi(CloudApi):
                                       encryption_tuple=None):
     """Returns headers dict matching the provided tuples, or empty dict."""
     headers = {}
-    if decryption_tuple:
+    if decryption_tuple and decryption_tuple.crypto_type == CryptoKeyType.CSEK:
       headers['x-goog-copy-source-encryption-algorithm'] = (
           decryption_tuple.crypto_alg)
       headers['x-goog-copy-source-encryption-key'] = (
           decryption_tuple.crypto_key)
       headers['x-goog-copy-source-encryption-key-sha256'] = (
-          Base64Sha256FromBase64EncryptionKey(decryption_tuple.crypto_key))
+          decryption_tuple.crypto_key_sha256)
 
-    if encryption_tuple:
+    if encryption_tuple and encryption_tuple.crypto_type == CryptoKeyType.CSEK:
       headers['x-goog-encryption-algorithm'] = encryption_tuple.crypto_alg
       headers['x-goog-encryption-key'] = encryption_tuple.crypto_key
       headers['x-goog-encryption-key-sha256'] = (
-          Base64Sha256FromBase64EncryptionKey(encryption_tuple.crypto_key))
+          encryption_tuple.crypto_key_sha256)
 
     return headers
 
-  def _GetObjectMetadataWithDecryptionKey(
-      self, bucket_name, object_name, decryption_tuple, generation=None,
-      fields=None):
-    """Helper function to get encrypted object metadata.
+  def _GetObjectMetadataHelper(
+      self, bucket_name, object_name, generation=None, fields=None,
+      decryption_tuple=None):
+    """Get metadata, adding necessary headers for CSEK decryption if necessary.
 
     Args:
-      bucket_name: Bucket containing the object.
-      object_name: Object name.
-      decryption_tuple: CryptoTuple with decryption key.
-      generation: Generation of the object to retrieve.
-      fields: If present, return only these Object metadata fields, for
-              example, ['acl', 'updated'].
+      bucket_name: (str) Bucket containing the object.
+      object_name: (str) Object name.
+      generation: (int) Generation of the object to retrieve.
+      fields: (list<str>) If present, return only these Object metadata fields,
+          for example: ['acl', 'updated'].
+      decryption_tuple: (gslib.utils.encryption_helper.CryptoKeyWrapper) The
+          CryptoKeyWrapper for the desired decryption key.
 
     Raises:
       ArgumentException for errors during input validation.
       ServiceException for errors interacting with cloud storage providers.
 
     Returns:
-      Object object.
+      (apitools_message.Object) The retrieved object metadata.
     """
-    apitools_request = self._GetApitoolsObjectMetadataRequest(
+    apitools_request = self._CreateApitoolsObjectMetadataGetRequest(
         bucket_name, object_name, generation=generation, fields=fields)
     global_params = self._GetApitoolsObjectMetadataGlobalParams(fields=fields)
 
     try:
-      with self._ApitoolsRequestHeaders(
-          self._EncryptionHeadersFromTuple(crypto_tuple=decryption_tuple)):
+      # Add special headers if fetching metadata for a CSEK-encrypted object.
+      if decryption_tuple:
+        with self._ApitoolsRequestHeaders(
+            self._EncryptionHeadersFromTuple(crypto_tuple=decryption_tuple)):
+          return self.api_client.objects.Get(
+              apitools_request, global_params=global_params)
+      else:
         return self.api_client.objects.Get(
             apitools_request, global_params=global_params)
     except TRANSLATABLE_APITOOLS_EXCEPTIONS, e:
@@ -749,15 +764,14 @@ class GcsJsonApi(CloudApi):
                                        object_name=object_name,
                                        generation=generation)
 
-  def _GetApitoolsObjectMetadataRequest(self, bucket_name, object_name,
-                                        generation=None, fields=None):
-    self._ValidateEncryptionFields(fields=fields)
+  def _CreateApitoolsObjectMetadataGetRequest(self, bucket_name, object_name,
+                                              generation=None, fields=None):
+    self._ValidateEncryptionFieldsForMetadataGetRequest(fields=fields)
     projection = (apitools_messages.StorageObjectsGetRequest
                   .ProjectionValueValuesEnum.noAcl)
     if self._FieldsContainsAclField(fields):
       projection = (apitools_messages.StorageObjectsGetRequest
                     .ProjectionValueValuesEnum.full)
-
     if generation:
       generation = long(generation)
 
@@ -774,63 +788,94 @@ class GcsJsonApi(CloudApi):
   def GetObjectMetadata(self, bucket_name, object_name, generation=None,
                         provider=None, fields=None):
     """See CloudApi class for function doc strings."""
-    apitools_request = self._GetApitoolsObjectMetadataRequest(
-        bucket_name, object_name, generation=generation, fields=fields)
-    global_params = self._GetApitoolsObjectMetadataGlobalParams(fields=fields)
-
     try:
-      object_metadata = self.api_client.objects.Get(apitools_request,
-                                                    global_params=global_params)
-      if self._ShouldTryWithEncryptionKey(object_metadata, fields=fields):
-        key_sha256 = object_metadata.customerEncryption.keySha256
-        decryption_key = FindMatchingCryptoKey(key_sha256)
-        if not decryption_key:
-          raise EncryptionException(
-              'Missing decryption key with SHA256 hash %s. No decryption key '
-              'matches object %s://%s/%s' % (key_sha256, self.provider,
-                                             bucket_name, object_name))
-        return self._GetObjectMetadataWithDecryptionKey(
-            bucket_name, object_name, CryptoTuple(decryption_key),
-            generation=generation, fields=fields)
-      else:
+      object_metadata = self._GetObjectMetadataHelper(
+          bucket_name, object_name, generation=generation, fields=fields)
+      if not self._ObjectCSEKEncryptedAndNeedHashes(object_metadata,
+                                                    fields=fields):
         return object_metadata
+
+      # CSEK-encrypted objects require corresponding decryption information to
+      # be added to the StorageObjectsGetRequest in order to retrieve hash
+      # fields.
+      key_sha256 = object_metadata.customerEncryption.keySha256
+      decryption_key = FindMatchingCSEKInBotoConfig(key_sha256, config)
+      if not decryption_key:
+        raise EncryptionException(
+            'Missing decryption key with SHA256 hash %s. No decryption key '
+            'matches object %s://%s/%s' % (key_sha256, self.provider,
+                                           bucket_name, object_name))
+      return self._GetObjectMetadataHelper(
+          bucket_name, object_name, generation=generation, fields=fields,
+          decryption_tuple=CryptoKeyWrapperFromKey(decryption_key))
     except TRANSLATABLE_APITOOLS_EXCEPTIONS, e:
       self._TranslateExceptionAndRaise(e, bucket_name=bucket_name,
                                        object_name=object_name,
                                        generation=generation)
 
-  def _ShouldTryWithEncryptionKey(self, object_metadata, fields=None):
-    """Checks if a metadata request should be re-issued with a decryption key.
+  def _ObjectIsEncrypted(self, object_metadata):
+    return bool(object_metadata.customerEncryption or
+                object_metadata.kmsKeyName)
+
+  def _RaiseIfNoDesiredHashesPresentForUnencryptedObject(
+      self, object_metadata, fields=None):
+    """Raise an exception if none of the desired hash fields are present."""
+    if fields is None:
+      return
+
+    md5_requested_but_missing = ('md5Hash' in fields and
+                                 not object_metadata.md5Hash)
+    crc32c_requested_but_missing = ('crc32c' in fields and
+                                    not object_metadata.crc32c)
+
+    # md5 not available for composite objects; in this case, don't raise an
+    # exception if that was the only hash we requested.
+    if (md5_requested_but_missing and not object_metadata.componentCount and
+        crc32c_requested_but_missing):
+      raise ServiceException(
+          'Service did not provide requested hashes in metadata for '
+          'unencrypted object %s' % object_metadata.name)
+
+  def _ObjectKMSEncryptedAndNeedHashes(self, object_metadata, fields=None):
+    """Checks if an object is KMS-encrypted and lacking requested hash fields.
 
     Args:
-      object_metadata: apitools Object metadata from a request without a
-          decryption key; must include customerEncryption field if hashes
-          are requested.
-      fields: Requested fields.
+      object_metadata: (apitools_messages.Object) Object metadata returned from
+          an API call; may or may not contain hash-related metadata fields.
+      fields: (list<str>) Requested object metadata fields.
 
     Returns:
-      True if request requires a decryption key and should be re-issued, False
-      otherwise.
-
-    Raises:
-      ServiceException if service did not provide at least one of the requested
-      hashes or the customerEncryption field.
+      True if a GetObjectMetadata request should be issued on the KMS-encrypted
+      object in order to retrieve encrypted hash fields, False otherwise.
     """
     if fields is not None and not _ENCRYPTED_HASHES_SET.intersection(fields):
-      # No potentially encrypted metadata requested.
+      # No potentially encrypted metadata fields were requested.
       return False
 
-    if object_metadata.customerEncryption:
-      # Object is encrypted.
-      return True
+    return (object_metadata.kmsKeyName and
+            not object_metadata.crc32c and
+            not object_metadata.md5Hash)
 
-    need_hash = fields is None or 'md5Hash' in fields or 'crc32c' in fields
-    has_hash = object_metadata.md5Hash or object_metadata.crc32c
-    if need_hash and not has_hash:
-      raise ServiceException('Service did not provide requested hashes, '
-                             'but customerEncryption field is missing.')
+  def _ObjectCSEKEncryptedAndNeedHashes(self, object_metadata, fields=None):
+    """Checks if an object is CSEK-encrypted and lacking requested hash fields.
 
-    return False
+    Args:
+      object_metadata: (apitools_messages.Object) Object metadata returned from
+          an API call; may or may not contain hash-related metadata fields.
+      fields: (list<str>) Requested object metadata fields.
+
+    Returns:
+      True if a GetObjectMetadata request including a decryption key should be
+      issued on the CSEK-encrypted object in order to retrieve encrypted hash
+      fields, False otherwise.
+    """
+    if fields is None or not _ENCRYPTED_HASHES_SET.intersection(fields):
+      # No potentially encrypted metadata fields were requested.
+      return False
+
+    return (object_metadata.customerEncryption and
+            not object_metadata.crc32c and
+            not object_metadata.md5Hash)
 
   def GetObjectMedia(
       self, bucket_name, object_name, download_stream,
@@ -1062,7 +1107,7 @@ class GcsJsonApi(CloudApi):
                     provider=None, fields=None, serialization_data=None,
                     tracker_callback=None, progress_callback=None,
                     apitools_strategy=apitools_transfer.SIMPLE_UPLOAD,
-                    total_size=0):
+                    total_size=0, gzip_encoded=False):
     # pylint: disable=g-doc-args
     """Upload implementation. Cloud API arguments, plus two more.
 
@@ -1134,7 +1179,7 @@ class GcsJsonApi(CloudApi):
         # One-shot upload.
         apitools_upload = apitools_transfer.Upload(
             upload_stream, content_type, total_size=size, auto_transfer=True,
-            num_retries=self.num_retries)
+            num_retries=self.num_retries, gzip_encoded=gzip_encoded)
         apitools_upload.strategy = apitools_strategy
         apitools_upload.bytes_http = self.authorized_upload_http
 
@@ -1155,7 +1200,7 @@ class GcsJsonApi(CloudApi):
             upload_stream, self.authorized_upload_http, content_type, size,
             serialization_data, apitools_strategy, apitools_request,
             global_params, bytes_uploaded_container, tracker_callback,
-            additional_headers, progress_callback)
+            additional_headers, progress_callback, gzip_encoded)
     except TRANSLATABLE_APITOOLS_EXCEPTIONS, e:
       not_found_exception = CreateNotFoundExceptionForObjectWrite(
           self.provider, object_metadata.bucket)
@@ -1167,13 +1212,13 @@ class GcsJsonApi(CloudApi):
       self, upload_stream, authorized_upload_http, content_type, size,
       serialization_data, apitools_strategy, apitools_request, global_params,
       bytes_uploaded_container, tracker_callback, addl_headers,
-      progress_callback):
+      progress_callback, gzip_encoded):
     try:
       if serialization_data:
         # Resuming an existing upload.
         apitools_upload = apitools_transfer.Upload.FromData(
             upload_stream, serialization_data, self.api_client.http,
-            num_retries=self.num_retries)
+            num_retries=self.num_retries, gzip_encoded=gzip_encoded)
         apitools_upload.chunksize = GetJsonResumableChunkSize()
         apitools_upload.bytes_http = authorized_upload_http
       else:
@@ -1181,7 +1226,7 @@ class GcsJsonApi(CloudApi):
         apitools_upload = apitools_transfer.Upload(
             upload_stream, content_type, total_size=size,
             chunksize=GetJsonResumableChunkSize(), auto_transfer=False,
-            num_retries=self.num_retries)
+            num_retries=self.num_retries, gzip_encoded=gzip_encoded)
         apitools_upload.strategy = apitools_strategy
         apitools_upload.bytes_http = authorized_upload_http
         with self._ApitoolsRequestHeaders(addl_headers):
@@ -1213,9 +1258,13 @@ class GcsJsonApi(CloudApi):
           # TODO: On retry, this will seek to the bytes that the server has,
           # causing the hash to be recalculated. Make HashingFileUploadWrapper
           # save a digest according to json_resumable_chunk_size.
-          if size and not JsonResumableChunkSizeDefined():
-            # If size is known, we can send it all in one request and avoid
-            # making a round-trip per chunk.
+          if not gzip_encoded and size and not JsonResumableChunkSizeDefined():
+            # If size is known and the request doesn't need to be compressed,
+            # we can send it all in one request and avoid making a
+            # round-trip per chunk. Compression is not supported for
+            # non-chunked streaming uploads because supporting resumability
+            # for that feature results in degraded upload performance and
+            # adds significant complexity to the implementation.
             http_response = apitools_upload.StreamMedia(
                 callback=_NoOpCallback, finish_callback=_NoOpCallback,
                 additional_headers=addl_headers)
@@ -1286,18 +1335,20 @@ class GcsJsonApi(CloudApi):
 
   def UploadObject(self, upload_stream, object_metadata, canned_acl=None,
                    size=None, preconditions=None, progress_callback=None,
-                   encryption_tuple=None, provider=None, fields=None):
+                   encryption_tuple=None, provider=None, fields=None,
+                   gzip_encoded=False):
     """See CloudApi class for function doc strings."""
     return self._UploadObject(
         upload_stream, object_metadata, canned_acl=canned_acl,
         size=size, preconditions=preconditions,
         progress_callback=progress_callback, encryption_tuple=encryption_tuple,
-        fields=fields, apitools_strategy=apitools_transfer.SIMPLE_UPLOAD)
+        fields=fields, apitools_strategy=apitools_transfer.SIMPLE_UPLOAD,
+        gzip_encoded=gzip_encoded)
 
   def UploadObjectStreaming(
       self, upload_stream, object_metadata, canned_acl=None, preconditions=None,
       progress_callback=None, encryption_tuple=None, provider=None,
-      fields=None):
+      fields=None, gzip_encoded=False):
     """See CloudApi class for function doc strings."""
     # Streaming indicated by not passing a size.
     # Resumable capabilities are present up to the resumable chunk size using
@@ -1306,13 +1357,14 @@ class GcsJsonApi(CloudApi):
         upload_stream, object_metadata, canned_acl=canned_acl,
         preconditions=preconditions, progress_callback=progress_callback,
         encryption_tuple=encryption_tuple, fields=fields,
-        apitools_strategy=apitools_transfer.RESUMABLE_UPLOAD, total_size=None)
+        apitools_strategy=apitools_transfer.RESUMABLE_UPLOAD, total_size=None,
+        gzip_encoded=gzip_encoded)
 
   def UploadObjectResumable(
       self, upload_stream, object_metadata, canned_acl=None, preconditions=None,
       size=None, serialization_data=None, tracker_callback=None,
       progress_callback=None, encryption_tuple=None, provider=None,
-      fields=None):
+      fields=None, gzip_encoded=False):
     """See CloudApi class for function doc strings."""
     return self._UploadObject(
         upload_stream, object_metadata, canned_acl=canned_acl,
@@ -1320,7 +1372,8 @@ class GcsJsonApi(CloudApi):
         serialization_data=serialization_data,
         tracker_callback=tracker_callback, progress_callback=progress_callback,
         encryption_tuple=encryption_tuple,
-        apitools_strategy=apitools_transfer.RESUMABLE_UPLOAD)
+        apitools_strategy=apitools_transfer.RESUMABLE_UPLOAD,
+        gzip_encoded=gzip_encoded)
 
   def CopyObject(self, src_obj_metadata, dst_obj_metadata, src_generation=None,
                  canned_acl=None, preconditions=None, progress_callback=None,
@@ -1355,12 +1408,16 @@ class GcsJsonApi(CloudApi):
         new_fields.add('resource/' + field)
       global_params.fields = ','.join(set(new_fields))
 
-    dec_key_sha256 = (
-        Base64Sha256FromBase64EncryptionKey(decryption_tuple.crypto_key)
-        if decryption_tuple else None)
-    enc_key_sha256 = (
-        Base64Sha256FromBase64EncryptionKey(encryption_tuple.crypto_key)
-        if encryption_tuple else None)
+    dec_key_sha256 = None
+    if decryption_tuple and decryption_tuple.crypto_type == CryptoKeyType.CSEK:
+      dec_key_sha256 = decryption_tuple.crypto_key_sha256
+
+    enc_key_sha256 = None
+    if encryption_tuple:
+      if encryption_tuple.crypto_type == CryptoKeyType.CSEK:
+        enc_key_sha256 = encryption_tuple.crypto_key_sha256
+      elif encryption_tuple.crypto_type == CryptoKeyType.CMEK:
+        dst_obj_metadata.kmsKeyName = encryption_tuple.crypto_key
 
     # Check to see if we are resuming a rewrite.
     tracker_file_name = GetRewriteTrackerFilePath(
@@ -1387,6 +1444,9 @@ class GcsJsonApi(CloudApi):
               sourceBucket=src_obj_metadata.bucket,
               sourceObject=src_obj_metadata.name,
               destinationBucket=dst_obj_metadata.bucket,
+              # TODO(KMS): Remove the destinationKmsKeyName parameter once the
+              # API begins pulling key name from the dest obj metadata.
+              destinationKmsKeyName=dst_obj_metadata.kmsKeyName,
               destinationObject=dst_obj_metadata.name,
               projection=projection, object=dst_obj_metadata,
               sourceGeneration=src_generation,

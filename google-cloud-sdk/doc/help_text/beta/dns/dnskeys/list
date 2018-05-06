@@ -1,16 +1,19 @@
 NAME
-    gcloud beta dns dnskeys list - view the list of all your DnsKeys
+    gcloud beta dns dnskeys list - list DNS key resources
 
 SYNOPSIS
     gcloud beta dns dnskeys list --zone=ZONE, -z ZONE [--filter=EXPRESSION]
         [--limit=LIMIT] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) View the list of all your DnsKeys.
+    (BETA) (DEPRECATED) The gcloud beta dnskeys commands are deprecated; please
+    use the gcloud beta dnskeys commands instead.
+
+    List DNS key resources in a managed zone.
 
 REQUIRED FLAGS
      --zone=ZONE, -z ZONE
-        The name of the managed-zone you want to list DnsKeys for.
+        The name of the managed-zone you want to list DNSKEY records for.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -37,9 +40,15 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 EXAMPLES
-    To see the list of all DnsKeys for a managed-zone, run:
+    To see the list of all DNS key resources for a managed zone my_zone, run:
 
-        $ gcloud beta dns dnskeys list my_zone
+        $ gcloud beta dns dnskeys list --zone my_zone
+
+    To see the DS records for every key-signing DnsKey in a managed zone, run:
+
+        $ gcloud beta dns dnskeys list --zone my_zone 3 \
+            --format 'value(ds_record())'               \
+            --filter 'type=keySigning'
 
 NOTES
     This command is currently in BETA and may change without notice.

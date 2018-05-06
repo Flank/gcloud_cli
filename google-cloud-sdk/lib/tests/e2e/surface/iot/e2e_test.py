@@ -12,7 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """E2E tests for `gcloud iot` commands."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import contextlib
 
 from tests.lib import cli_test_base

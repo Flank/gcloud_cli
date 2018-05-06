@@ -17,6 +17,7 @@
 
 """Test suite for external runtime loaders."""
 
+from __future__ import absolute_import
 import os
 import shutil
 import socket
@@ -84,7 +85,7 @@ class LoaderTests(sdk_test_base.SdkBase):
   def _CommitFile(self, contents, commit_message, branch=None):
     blob = objects.Blob.from_string(contents)
     tree = objects.Tree()
-    tree.add(b'myfile', 0100644, blob.id)
+    tree.add(b'myfile', 0o100644, blob.id)
     self.repo.object_store.add_object(blob)
     self.repo.object_store.add_object(tree)
     commit_id = self.repo.do_commit(tree=tree.id, message=commit_message,

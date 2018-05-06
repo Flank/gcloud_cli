@@ -11,7 +11,7 @@ gcloud alpha compute health\-checks create http \- create a HTTP health check to
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute health\-checks create http\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-port\fR=\fIPORT\fR;\ default=80] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR;\ default="/"] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute health\-checks create http\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-port\fR=\fIPORT\fR;\ default=80] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-port\-specification\fR=\fIPORT_SPECIFICATION\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR;\ default="/"] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -70,6 +70,28 @@ The TCP port number that this health check monitors. The default value is 80.
 \fB\-\-port\-name\fR=\fIPORT_NAME\fR
 The port name that this health check monitors. By default, this is empty.
 
+.TP 2m
+\fB\-\-port\-specification\fR=\fIPORT_SPECIFICATION\fR
+Specifies how port is selected for health checking. If not specified, HTTP2
+health check follows behavior specified in \-\-port and \-port\-name fields.
+\fIPORT_SPECIFICATION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBuse\-fixed\-port\fR
+\-\-port is used for health checking.
+.TP 2m
+\fBuse\-named\-port\fR
+\-\-port\-name is used for health checking.
+.TP 2m
+\fBuse\-serving\-port\fR
+For NetworkEndpointGroup, the port specified for each network endpoint is used
+for health checking. For other backends, the port or named port specified in the
+Backend Service is used for health checking.
+
+
+.RE
+.sp
 .TP 2m
 \fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR; default="NONE"
 The type of proxy protocol header to be sent to the backend. \fIPROXY_HEADER\fR

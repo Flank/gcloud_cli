@@ -21,10 +21,10 @@ from googlecloudsdk.api_lib.firebase.test.android import catalog_manager
 from googlecloudsdk.calliope import exceptions as core_exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import fake_args
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test.android import unit_base
 
 
-class AndroidArgsTests(unit_base.TestMockClientTest):
+class AndroidArgsTests(unit_base.AndroidMockClientTest):
   """Unit tests for api_lib/test/android/arg_manager.py."""
 
   # Tests on arg rules data structures

@@ -11,7 +11,7 @@ gcloud compute disks create \- create Google Compute Engine persistent disks
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -68,6 +68,47 @@ more details.
 An optional, textual description for the disks being created.
 
 .TP 2m
+\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]
+This parameter enables one or more features for VM instances that use the image
+for their boot disks. The following features are available:
+
+.RS 2m
+.IP "\(em" 2m
+MULTI_IP_SUBNET \- For configuring interfaces with a netmask other than /32.
+
+.IP "\(em" 2m
+SECURE_BOOT \- Enables UEFI secure boot, which restrics unsigned software from
+booting or unsigned drivers from loading on the VM instance.
+
+.IP "\(em" 2m
+UEFI_COMPATIBLE \- Enables UEFI booting, which is an alternative system boot
+method. Most public images use the GRUB bootloader as their primary boot method.
+
+.IP "\(em" 2m
+VIRTIO_SCSI_MULTIQUEUE \- Enables multiqueue SCSI capabilities for Local SSD
+devices. This option is an alternative to NVMe.
+.RS 2m
+.IP "\(bu" 2m
+For Linux images, you can enable VIRTIO_SCSI_MULTIQUEUE on images with kernel
+versions 3.17 and higher.
+.IP "\(bu" 2m
+For Windows images, you can enable VIRTIO_SCSI_MULTIQUEUE on images with driver
+version 1.2.0.1621 or higher.
+
+.RE
+.sp
+.IP "\(em" 2m
+WINDOWS \- Required for Windows Server images. Newer public images for Windows
+server include the WINDOWS parameter to indicate that it is a Windows image.
+
+.RE
+.RE
+.sp
+\fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR, \fBSECURE_BOOT\fR,
+\fBUEFI_COMPATIBLE\fR, \fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR.
+
+.RS 2m
+.TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
 
@@ -103,7 +144,7 @@ Specifies the type of disk to create. To get a list of available disk types, run
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 The zone of the disks to create. If not specified and the
-\f5\fIcompute/zone\fR\fR property isn't set, you will be prompted to select a
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
 zone.
 
 To avoid prompting when this flag is omitted, you can set the

@@ -14,7 +14,12 @@
 
 """Command that tests if filters get serialized or unserialized resources."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class Resource(object):

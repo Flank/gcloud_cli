@@ -265,7 +265,7 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
                 ),
             ],
             kind=u'sql#sslCertsList',))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ResourceNotFoundError,
         r'no ssl cert named \[noncert\] for instance \[https://'
         r'www.googleapis.com/sql/v1beta4/projects/{0}/'

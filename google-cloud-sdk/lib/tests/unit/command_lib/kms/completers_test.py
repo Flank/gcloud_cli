@@ -14,6 +14,8 @@
 
 """Unit tests for kms completers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.kms import completers
 from tests.lib import completer_test_base
 from tests.lib.surface.iam import unit_test_base

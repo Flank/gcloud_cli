@@ -14,6 +14,8 @@
 
 """Base classes for container tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 import os
 
@@ -25,6 +27,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import config as core_config
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import platforms
 from googlecloudsdk.core.util import times
@@ -71,6 +74,8 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   ZONE = 'us-central1-f'
   REGION = 'us-central1'
   PROJECT_ID = 'fake-project-id'
+  PROJECT_REF = resources.REGISTRY.Create('container.projects',
+                                          projectsId=PROJECT_ID)
   PROJECT_NUM = 123456789012
   NUM_NODES = 3
   AUTH_USER = 'admin'
@@ -78,7 +83,7 @@ class UnitTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   OPERATION_TARGET = '/projects/{0}/zones/{1}/clusters/{2}'
   TARGET_LINK = 'https://container.googleapis.com/{0}/projects/{1}/zones/{2}/clusters/{3}'  # pylint: disable=line-too-long
   NODE_POOL_TARGET_LINK = 'https://container.googleapis.com/{0}/projects/{1}/zones/{2}/clusters/{3}/nodePools/{4}'  # pylint: disable=line-too-long
-  MOCK_OPERATION_ID = u'operation-1414184316101-d4546dd2'
+  MOCK_OPERATION_ID = 'operation-1414184316101-d4546dd2'
   MOCK_OPERATION_TARGET = OPERATION_TARGET.format(
       PROJECT_NUM, ZONE, CLUSTER_NAME)
   ENDPOINT = '130.211.191.49'
@@ -515,356 +520,6 @@ class TestBaseV1(TestBase):
                           exception=None, zone=None):
     if not zone:
       zone = self.ZONE
-    self.mocked_client.projects_zones_clusters.Create.Expect(
-        self.messages.ContainerProjectsZonesClustersCreateRequest(
-            createClusterRequest=self.messages.CreateClusterRequest(
-                cluster=cluster),
-            projectId=self.PROJECT_ID,
-            zone=zone),
-        response=response,
-        exception=exception)
-
-  def ExpectDeleteCluster(self,
-                          cluster_name,
-                          response=None,
-                          exception=None,
-                          zone=None):
-    if not zone:
-      zone = self.ZONE
-    self.mocked_client.projects_zones_clusters.Delete.Expect(
-        self.messages.ContainerProjectsZonesClustersDeleteRequest(
-            clusterId=cluster_name, projectId=self.PROJECT_ID, zone=zone),
-        response=response,
-        exception=exception)
-
-  def ExpectGetCluster(self, cluster, exception=None, zone=None):
-    if not zone:
-      zone = self.ZONE
-    if exception:
-      response = None
-    else:
-      response = cluster
-    self.mocked_client.projects_zones_clusters.Get.Expect(
-        self.messages.ContainerProjectsZonesClustersGetRequest(
-            # use the response operation name/zone same as request
-            clusterId=cluster.name,
-            projectId=self.PROJECT_ID,
-            zone=zone),
-        response,
-        exception=exception)
-
-  def ExpectListClusters(self,
-                         clusters,
-                         zone=None,
-                         project_id=None,
-                         missing=None):
-    if not project_id:
-      project_id = self.PROJECT_ID
-    if not zone:
-      zone = '-'
-    if not missing:
-      missing = []
-    self.mocked_client.projects_zones_clusters.List.Expect(
-        self.messages.ContainerProjectsZonesClustersListRequest(
-            projectId=project_id, zone=zone),
-        self.messages.ListClustersResponse(
-            clusters=clusters, missingZones=missing))
-
-  def ExpectCreateNodePool(self,
-                           node_pool,
-                           response=None,
-                           exception=None,
-                           zone=None):
-    if not zone:
-      zone = self.ZONE
-    self.mocked_client.projects_zones_clusters_nodePools.Create.Expect(
-        self.messages.ContainerProjectsZonesClustersNodePoolsCreateRequest(
-            createNodePoolRequest=self.messages.CreateNodePoolRequest(
-                nodePool=node_pool),
-            projectId=self.PROJECT_ID,
-            zone=zone,
-            clusterId=self.CLUSTER_NAME),
-        response=response,
-        exception=exception)
-
-  def ExpectGetNodePool(self, node_pool_id, response=None,
-                        exception=None, zone=None):
-    if not zone:
-      zone = self.ZONE
-    self.mocked_client.projects_zones_clusters_nodePools.Get.Expect(
-        self.messages.ContainerProjectsZonesClustersNodePoolsGetRequest(
-            nodePoolId=node_pool_id,
-            # use the response operation name/zone same as request
-            clusterId=self.CLUSTER_NAME,
-            projectId=self.PROJECT_ID,
-            zone=zone),
-        response=response,
-        exception=exception)
-
-  def ExpectDeleteNodePool(self,
-                           node_pool_name,
-                           response=None,
-                           exception=None,
-                           zone=None):
-    if not zone:
-      zone = self.ZONE
-    self.mocked_client.projects_zones_clusters_nodePools.Delete.Expect(
-        self.messages.ContainerProjectsZonesClustersNodePoolsDeleteRequest(
-            nodePoolId=node_pool_name,
-            clusterId=self.CLUSTER_NAME,
-            projectId=self.PROJECT_ID,
-            zone=zone),
-        response=response,
-        exception=exception)
-
-  def ExpectUpdateNodePool(self,
-                           node_pool_name,
-                           node_management,
-                           response=None,
-                           exception=None,
-                           zone=None):
-    if not zone:
-      zone = self.ZONE
-    (self.mocked_client.projects_zones_clusters_nodePools.
-     SetManagement.Expect(
-         self.messages.
-         ContainerProjectsZonesClustersNodePoolsSetManagementRequest(
-             nodePoolId=node_pool_name,
-             clusterId=self.CLUSTER_NAME,
-             projectId=self.PROJECT_ID,
-             zone=zone,
-             setNodePoolManagementRequest=self.messages.
-             SetNodePoolManagementRequest(management=node_management)),
-         response=response,
-         exception=exception))
-
-  def ExpectListNodePools(self,
-                          response=None,
-                          exception=None,
-                          zone=None):
-    if not zone:
-      zone = self.ZONE
-    self.mocked_client.projects_zones_clusters_nodePools.List.Expect(
-        self.messages.ContainerProjectsZonesClustersNodePoolsListRequest(
-            clusterId=self.CLUSTER_NAME, projectId=self.PROJECT_ID, zone=zone),
-        response=response,
-        exception=exception)
-
-  def ExpectResizeNodePool(self, node_pool_name, size, response=None,
-                           exception=None, zone=None):
-    if not zone:
-      zone = self.ZONE
-    size_req = self.messages.SetNodePoolSizeRequest(nodeCount=size)
-    req = self.messages.ContainerProjectsZonesClustersNodePoolsSetSizeRequest(
-        clusterId=self.CLUSTER_NAME,
-        nodePoolId=node_pool_name,
-        projectId=self.PROJECT_ID,
-        setNodePoolSizeRequest=size_req,
-        zone=zone
-    )
-    self.mocked_client.projects_zones_clusters_nodePools.SetSize.Expect(
-        req,
-        response=response,
-        exception=exception)
-
-  def ExpectRollbackOperation(self, node_pool_name, response=None,
-                              exception=None, zone=None):
-    if not zone:
-      zone = self.ZONE
-    self.mocked_client.projects_zones_clusters_nodePools.Rollback.Expect(
-        self.messages.ContainerProjectsZonesClustersNodePoolsRollbackRequest(
-            clusterId=self.CLUSTER_NAME,
-            projectId=self.PROJECT_ID,
-            nodePoolId=node_pool_name,
-            zone=zone),
-        response=response,
-        exception=exception)
-
-  def ExpectGetOperation(self, response, exception=None):
-    # use the response operation name/zone same as request
-    req = self.messages.ContainerProjectsZonesOperationsGetRequest(
-        operationId=response.name,
-        projectId=self.PROJECT_ID,
-        zone=response.zone)
-    if exception:
-      response = None
-    self.mocked_client.projects_zones_operations.Get.Expect(
-        req, response=response, exception=exception)
-
-  def ExpectListOperation(self, zone, response, exception=None):
-    req = self.messages.ContainerProjectsZonesOperationsListRequest(
-        projectId=self.PROJECT_ID, zone=zone)
-    if exception:
-      response = None
-    self.mocked_client.projects_zones_operations.List.Expect(
-        req, response=response, exception=exception)
-
-  def ExpectCancelOperation(self, op=None, exception=None):
-    self.mocked_client.projects_zones_operations.Cancel.Expect(
-        self.messages.ContainerProjectsZonesOperationsCancelRequest(
-            projectId=self.PROJECT_ID,
-            operationId=op.name,
-            zone=self.ZONE),
-        response=self.messages.Empty(),
-        exception=exception)
-
-  def ExpectSetLabels(self,
-                      cluster_name,
-                      resource_labels,
-                      fingerprint,
-                      response=None, zone=None):
-    if not zone:
-      zone = self.ZONE
-    self.mocked_client.projects_zones_clusters.ResourceLabels.Expect(
-        self.messages.ContainerProjectsZonesClustersResourceLabelsRequest(
-            clusterId=cluster_name,
-            projectId=self.PROJECT_ID,
-            setLabelsRequest=self.messages.SetLabelsRequest(
-                resourceLabels=resource_labels, labelFingerprint=fingerprint),
-            zone=zone), response)
-
-  def ExpectUpgradeCluster(self, cluster_name, update, response, location=None):
-    if not location:
-      location = self.ZONE
-    self.mocked_client.projects_zones_clusters.Update.Expect(
-        self.msgs.ContainerProjectsZonesClustersUpdateRequest(
-            clusterId=cluster_name,
-            zone=location,
-            projectId=self.PROJECT_ID,
-            updateClusterRequest=self.msgs.UpdateClusterRequest(
-                update=update)),
-        response=response)
-
-  def ExpectUpdateCluster(self, cluster_name, update, response):
-    self.mocked_client.projects_zones_clusters.Update.Expect(
-        self.msgs.ContainerProjectsZonesClustersUpdateRequest(
-            clusterId=cluster_name,
-            zone=self.ZONE,
-            projectId=self.PROJECT_ID,
-            updateClusterRequest=self.msgs.UpdateClusterRequest(
-                update=update)),
-        response=response)
-
-  def ExpectSetMasterAuth(self,
-                          cluster_name,
-                          action,
-                          update,
-                          response=None,
-                          exception=None):
-    self.mocked_client.projects_zones_clusters.SetMasterAuth.Expect(
-        self.msgs.ContainerProjectsZonesClustersSetMasterAuthRequest(
-            clusterId=cluster_name,
-            zone=self.ZONE,
-            projectId=self.PROJECT_ID,
-            setMasterAuthRequest=self.msgs.SetMasterAuthRequest(
-                action=action, update=update)),
-        response=response,
-        exception=exception)
-
-  def ExpectLegacyAbac(self, cluster_name, enabled, response):
-    self.mocked_client.projects_zones_clusters.LegacyAbac.Expect(
-        self.msgs.ContainerProjectsZonesClustersLegacyAbacRequest(
-            clusterId=cluster_name,
-            zone=self.ZONE,
-            projectId=self.PROJECT_ID,
-            setLegacyAbacRequest=self.msgs.
-            SetLegacyAbacRequest(enabled=enabled)),
-        response=response)
-
-  def ExpectStartIpRotation(self, cluster_name, response=None, exception=None):
-    self.mocked_client.projects_zones_clusters.StartIpRotation.Expect(
-        self.msgs.ContainerProjectsZonesClustersStartIpRotationRequest(
-            clusterId=cluster_name, zone=self.ZONE, projectId=self.PROJECT_ID),
-        response=response,
-        exception=exception)
-
-  def ExpectCompleteIpRotation(self,
-                               cluster_name,
-                               response=None,
-                               exception=None):
-    self.mocked_client.projects_zones_clusters.CompleteIpRotation.Expect(
-        self.msgs.ContainerProjectsZonesClustersCompleteIpRotationRequest(
-            clusterId=cluster_name, zone=self.ZONE, projectId=self.PROJECT_ID),
-        response=response,
-        exception=exception)
-
-  def ExpectSetNetworkPolicy(self, cluster_name, enabled=True, response=None):
-    request = self.msgs.SetNetworkPolicyRequest(
-        networkPolicy=self.msgs.NetworkPolicy(
-            enabled=enabled,
-            provider=self.msgs.NetworkPolicy.ProviderValueValuesEnum.CALICO))
-
-    self.mocked_client.projects_zones_clusters.SetNetworkPolicy.Expect(
-        self.msgs.ContainerProjectsZonesClustersSetNetworkPolicyRequest(
-            clusterId=cluster_name,
-            zone=self.ZONE,
-            projectId=self.PROJECT_ID,
-            setNetworkPolicyRequest=request),
-        response=response)
-
-  def ExpectSetLoggingService(self,
-                              cluster_name,
-                              logging_service,
-                              response=None,
-                              exception=None):
-    self.mocked_client.projects_zones_clusters.Logging.Expect(
-        self.msgs.ContainerProjectsZonesClustersLoggingRequest(
-            clusterId=cluster_name,
-            zone=self.ZONE,
-            projectId=self.PROJECT_ID,
-            setLoggingServiceRequest=self.msgs.SetLoggingServiceRequest(
-                loggingService=logging_service)),
-        response=response,
-        exception=exception)
-
-  def ExpectSetMaintenanceWindow(self, cluster_name, policy=None,
-                                 response=None):
-    request = self.msgs.SetMaintenancePolicyRequest(
-        maintenancePolicy=policy)
-
-    self.mocked_client.projects_zones_clusters.SetMaintenancePolicy.Expect(
-        self.msgs.ContainerProjectsZonesClustersSetMaintenancePolicyRequest(
-            projectId=self.PROJECT_ID,
-            zone=self.ZONE,
-            clusterId=cluster_name,
-            setMaintenancePolicyRequest=request),
-        response=response)
-
-  def ExpectGetServerConfig(self, location):
-    response = self.messages.ServerConfig(
-        buildClientInfo='changelist 12345', defaultClusterVersion='1.2.3',
-        validMasterVersions=['1.3.2'])
-    self.mocked_client.projects_zones.GetServerconfig.Expect(
-        self.messages.ContainerProjectsZonesGetServerconfigRequest(
-            projectId=self.PROJECT_ID, zone=location),
-        response=response)
-
-
-class TestBaseV1Beta1(TestBase):
-  """Mixin class for testing v1beta1."""
-  API_VERSION = 'v1beta1'
-
-  def _MakeCluster(self, **kwargs):
-    cluster = TestBase._MakeCluster(self, **kwargs)
-    cluster.auditConfig = kwargs.get('auditConfig')
-    return cluster
-
-  def _MakeNodePool(self, **kwargs):
-    node_pool = TestBase._MakeNodePool(self, **kwargs)
-    node_pool.config.workloadMetadataConfig = kwargs.get(
-        'workloadMetadataConfig')
-    return node_pool
-
-  def _MakeIPAllocationPolicy(self, **kwargs):
-    policy = TestBase._MakeIPAllocationPolicy(self, **kwargs)
-    if 'allowRouteOverlap' in kwargs:
-      policy.allowRouteOverlap = kwargs.get('allowRouteOverlap')
-    return policy
-
-  def ExpectCreateCluster(self, cluster, response=None,
-                          exception=None, zone=None):
-    if not zone:
-      zone = self.ZONE
     self.mocked_client.projects_locations_clusters.Create.Expect(
         self.messages.CreateClusterRequest(
             cluster=cluster,
@@ -1098,11 +753,16 @@ class TestBaseV1Beta1(TestBase):
             enabled=enabled),
         response=response)
 
-  def ExpectStartIpRotation(self, cluster_name, response=None, exception=None):
+  def ExpectStartIpRotation(self,
+                            cluster_name,
+                            rotate_credentials=False,
+                            response=None,
+                            exception=None):
     self.mocked_client.projects_locations_clusters.StartIpRotation.Expect(
         self.msgs.StartIPRotationRequest(
-            name=api_adapter.ProjectLocationCluster(
-                self.PROJECT_ID, self.ZONE, cluster_name)),
+            name=api_adapter.ProjectLocationCluster(self.PROJECT_ID, self.ZONE,
+                                                    cluster_name),
+            rotateCredentials=rotate_credentials),
         response=response,
         exception=exception)
 
@@ -1161,6 +821,28 @@ class TestBaseV1Beta1(TestBase):
         response=response)
 
 
+class TestBaseV1Beta1(TestBaseV1):
+  """Mixin class for testing v1beta1."""
+  API_VERSION = 'v1beta1'
+
+  def _MakeCluster(self, **kwargs):
+    cluster = TestBaseV1._MakeCluster(self, **kwargs)
+    cluster.auditConfig = kwargs.get('auditConfig')
+    return cluster
+
+  def _MakeNodePool(self, **kwargs):
+    node_pool = TestBaseV1._MakeNodePool(self, **kwargs)
+    node_pool.config.workloadMetadataConfig = kwargs.get(
+        'workloadMetadataConfig')
+    return node_pool
+
+  def _MakeIPAllocationPolicy(self, **kwargs):
+    policy = TestBaseV1._MakeIPAllocationPolicy(self, **kwargs)
+    if 'allowRouteOverlap' in kwargs:
+      policy.allowRouteOverlap = kwargs.get('allowRouteOverlap')
+    return policy
+
+
 class TestBaseV1Alpha1(TestBaseV1Beta1):
   """Mixin class for testing v1alpha1."""
   API_VERSION = 'v1alpha1'
@@ -1178,6 +860,41 @@ class TestBaseV1Alpha1(TestBaseV1Beta1):
       node_pool.config.localSsdVolumeConfigs = kwargs.get(
           'localSsdVolumeConfigs')
     return node_pool
+
+  def _MakeUsableSubnet(self, **kwargs):
+    # cluster.auditConfig = kwargs.get('auditConfig')
+    # Construct the default pool, if we don't have any passed in. We
+    # can't know all the possible permutations, so any tests involving
+    # multiple nodepools must construct them prior to _MakeCluster.
+    # if kwargs.get('nodePools') is None:
+    #   pool = self._MakeDefaultNodePool(**kwargs)
+    #   kwargs['nodePools'] = [pool]
+    #   kwargs['instanceGroupUrls'] = pool.instanceGroupUrls
+    network = resources.REGISTRY.Create('compute.networks',
+                                        project=self.PROJECT_ID,
+                                        network=kwargs.get('network'))
+    subnetwork = resources.REGISTRY.Create('compute.subnetworks',
+                                           project=self.PROJECT_ID,
+                                           region=self.REGION,
+                                           subnetwork=kwargs.get('subnetwork'))
+    return self.messages.UsableSubnetwork(
+        subnetwork=subnetwork.RelativeName(),
+        network=network.RelativeName(),
+        ipCidrRange=kwargs.get('ipCidrRange')
+    )
+
+  def _MakeListUsableSubnetworksResponse(self, subnets):
+    return self.messages.ListUsableSubnetworksResponse(subnetworks=subnets)
+
+  def _ExpectListUsableSubnets(self, response, exception=None):
+    req = self.messages.ContainerProjectsAggregatedUsableSubnetworksListRequest(
+        parent=self.PROJECT_REF.RelativeName(),
+        pageSize=500,
+        filter='')
+    if exception:
+      response = None
+    self.mocked_client.projects_aggregated_usableSubnetworks.List.Expect(
+        req, response=response, exception=exception)
 
 
 class GATestBase(cli_test_base.CliTestBase):
@@ -1300,4 +1017,12 @@ class GetServerConfigTestBase(UnitTestBase):
   def SetUp(self):
     self.get_server_config_command_base = (self.COMMAND_BASE +
                                            ' get-server-config')
+    self.msgs = core_apis.GetMessagesModule('container', self.API_VERSION)
+
+
+class SubnetsTestBase(UnitTestBase):
+  """Base class for subnets command tests."""
+
+  def SetUp(self):
+    self.subnets_command_base = self.COMMAND_BASE + ' subnets'
     self.msgs = core_apis.GetMessagesModule('container', self.API_VERSION)

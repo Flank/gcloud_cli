@@ -111,7 +111,7 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
                 'timestamp': '2017-01-20T17:28:19.002754Z'}
     log_generator = self._GetGenerator([log_entry])
     generator = log_utils.SplitMultiline(log_generator)
-    self.assertEquals(log_dict, generator.next())
+    self.assertEqual(log_dict, generator.next())
     with self.assertRaises(StopIteration):
       generator.next()
 
@@ -129,8 +129,8 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
                  'timestamp': '2017-01-20T17:28:19.002754Z'}
     log_generator = self._GetGenerator([log_entry])
     generator = log_utils.SplitMultiline(log_generator)
-    self.assertEquals(log_dict1, generator.next())
-    self.assertEquals(log_dict2, generator.next())
+    self.assertEqual(log_dict1, generator.next())
+    self.assertEqual(log_dict2, generator.next())
     with self.assertRaises(StopIteration):
       generator.next()
 
@@ -144,7 +144,7 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
                 'timestamp': '2017-01-20T17:28:19.002754Z',}
     log_generator = self._GetGenerator([log_entry])
     generator = log_utils.SplitMultiline(log_generator, allow_multiline=True)
-    self.assertEquals(log_dict, generator.next())
+    self.assertEqual(log_dict, generator.next())
     with self.assertRaises(StopIteration):
       generator.next()
 
@@ -165,7 +165,7 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
         'trial_id': 'my_trial',
         'message': 'foo'
     }
-    self.assertEquals(log_utils._EntryToDict(log_entry), log_dict)
+    self.assertEqual(log_utils._EntryToDict(log_entry), log_dict)
 
     log_entry = Log(
         timestamp='2016-09-20T17:28:23.929735908Z',
@@ -183,7 +183,7 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
         'trial_id': 'my_trial',
         'message': 'foo'
     }
-    self.assertEquals(log_utils._EntryToDict(log_entry), log_dict)
+    self.assertEqual(log_utils._EntryToDict(log_entry), log_dict)
 
   def testFormatLogWithoutLabels(self):
     log_entry = Log(
@@ -199,7 +199,7 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
         'message': 'no_label',
 
     }
-    self.assertEquals(log_utils._EntryToDict(log_entry), log_dict)
+    self.assertEqual(log_utils._EntryToDict(log_entry), log_dict)
 
   def testFormatLogWithJsonPayload(self):
     log_entry = Log(
@@ -230,7 +230,7 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
             'pathname': '/runcloudml.py'
         }
     }
-    self.assertEquals(log_utils._EntryToDict(log_entry), log_dict)
+    self.assertEqual(log_utils._EntryToDict(log_entry), log_dict)
 
   def testFormatLogWithNoneJsonPayload(self):
     log_entry = Log(
@@ -249,7 +249,7 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
         'task_name': 'unknown_task',
         'message': ''
     }
-    self.assertEquals(log_utils._EntryToDict(log_entry), log_dict)
+    self.assertEqual(log_utils._EntryToDict(log_entry), log_dict)
 
   def testFormatLogWithNoneTextPayload(self):
     log_entry = Log(
@@ -272,7 +272,7 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
         'message': '',
         'json': {}
     }
-    self.assertEquals(log_utils._EntryToDict(log_entry), log_dict)
+    self.assertEqual(log_utils._EntryToDict(log_entry), log_dict)
 
 
 if __name__ == '__main__':

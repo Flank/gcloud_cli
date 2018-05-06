@@ -11,7 +11,7 @@ gcloud alpha tasks create\-app\-engine\-task \- create and add a task to an App 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks create\-app\-engine\-task\fR [\fB\-\-header\fR=\fIHEADER_FIELD\fR:\ \fIHEADER_VALUE\fR] [\fB\-\-id\fR=\fITASK_ID\fR] [\fB\-\-method\fR=\fIMETHOD\fR] [\fB\-\-queue\fR=\fIQUEUE\fR] [\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[\fIKEY\fR:\fIVALUE\fR,...]] [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-url\fR=\fIURL\fR] [\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR\ |\ \fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks create\-app\-engine\-task\fR [\fB\-\-header\fR=\fIHEADER_FIELD\fR:\ \fIHEADER_VALUE\fR] [\fB\-\-id\fR=\fITASK_ID\fR] [\fB\-\-method\fR=\fIMETHOD\fR] [\fB\-\-queue\fR=\fIQUEUE\fR] [\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-url\fR=\fIURL\fR] [\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR\ |\ \fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -51,7 +51,7 @@ The HTTP method to use for the request. If not specified, "POST" will be used.
 The queue the task belongs to.
 
 .TP 2m
-\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[\fIKEY\fR:\fIVALUE\fR,...]
+\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[...]
 The route to be used for this task. KEY must be at least one of: [service,
 version, instance]. Any missing keys will use the default.
 

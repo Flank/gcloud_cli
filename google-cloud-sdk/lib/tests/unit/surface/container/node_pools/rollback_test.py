@@ -14,6 +14,8 @@
 
 """Tests for 'node-pools rollback' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import time
 
 from googlecloudsdk.api_lib.container import util
@@ -64,6 +66,9 @@ class RollbackTestGA(base.TestBaseV1,
 
   def testRollbackNodePool(self):
     self._TestRollbackNodePool(self.ZONE)
+
+  def testRollbackNodePoolRegional(self):
+    self._TestRollbackNodePool(self.REGION)
 
   def testRollbackError(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -151,9 +156,6 @@ class RollbackTestAlphaV1Alpha1API(
 
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(False)
-
-  def testRollbackNodePoolRegional(self):
-    self._TestRollbackNodePool(self.REGION)
 
 
 if __name__ == '__main__':

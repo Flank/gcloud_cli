@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Test of the 'pubsub topics publish' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.pubsub import topics
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
@@ -78,7 +83,7 @@ class TopicsPublishTest(base.CloudPubsubTestBase):
                        ' --attribute attr0=0,attr1=1').format(
                            self.message_data[0]))
 
-    self.assertEquals(result.messageIds, ['123456'])
+    self.assertEqual(result.messageIds, ['123456'])
 
   def testTopicsPublishMessageWithOnlyAttributes(self):
     topic_ref = util.ParseTopic('topic1', self.Project())
@@ -96,10 +101,10 @@ class TopicsPublishTest(base.CloudPubsubTestBase):
         response=self.msgs.PublishResponse(messageIds=self.message_ids[0:1]))
 
     result = self.Run('pubsub topics publish topic1 --attribute attr0=0')
-    self.assertEquals(result.messageIds, ['123456'])
+    self.assertEqual(result.messageIds, ['123456'])
 
   def testTopicsPublishEmptyMessageShouldFail(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         topics.EmptyMessageException,
         'You cannot send an empty message. You must specify either a '
         'MESSAGE, one or more ATTRIBUTE, or both.'):

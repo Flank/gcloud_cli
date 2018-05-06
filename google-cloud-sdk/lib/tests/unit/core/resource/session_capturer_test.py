@@ -17,9 +17,9 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 import io
 import json
-import StringIO
 
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import session_capturer
@@ -65,7 +65,7 @@ class SessionCapturerTest(sdk_test_base.SdkBase):
     self._capturer.Print(None, SessionCapturerTest.MockPrinter)
     headers.pop('user-agent')
     headers.pop('Authorization')
-    self.assertEquals(self.MockPrinter.GetRecords(), [{
+    self.assertEqual(self.MockPrinter.GetRecords(), [{
         'request': {
             'uri': uri,
             'method': method,
@@ -82,7 +82,7 @@ class SessionCapturerTest(sdk_test_base.SdkBase):
     content = 'Some text\n   content.  '
     self._capturer.CaptureHttpResponse(headers, content)
     self._capturer.Print(None, SessionCapturerTest.MockPrinter)
-    self.assertEquals(self.MockPrinter.GetRecords(), [{
+    self.assertEqual(self.MockPrinter.GetRecords(), [{
         'response': {
             'response': headers,
             'content': [content]
@@ -108,7 +108,7 @@ class SessionCapturerTest(sdk_test_base.SdkBase):
 
     self._capturer.CaptureArgs(TestArgs())
     self._capturer.Print(None, SessionCapturerTest.MockPrinter)
-    self.assertEquals(self.MockPrinter.GetRecords(), [{
+    self.assertEqual(self.MockPrinter.GetRecords(), [{
         'args': {
             'command': 'some command name',
             'specified_args': {
@@ -121,8 +121,8 @@ class SessionCapturerTest(sdk_test_base.SdkBase):
     self._capturer.CaptureState()
     self._capturer.Print(None, SessionCapturerTest.MockPrinter)
     records = self.MockPrinter.GetRecords()
-    self.assertEquals(len(records), 1)
-    self.assertEquals(list(records[0].keys()), ['state'])
+    self.assertEqual(len(records), 1)
+    self.assertEqual(list(records[0].keys()), ['state'])
     for state_key in records[0]['state'].keys():
       self.assertIn(state_key, self._capturer.STATE_MOCKS)
 
@@ -140,7 +140,7 @@ class SessionCapturerTest(sdk_test_base.SdkBase):
     self._capturer.Print(None, SessionCapturerTest.MockPrinter)
     property_values['core'].pop('capture_session_file')
     property_values['core'].pop('account')
-    self.assertEquals(self.MockPrinter.GetRecords(), [{
+    self.assertEqual(self.MockPrinter.GetRecords(), [{
         'properties': property_values
     }])
 
@@ -148,12 +148,16 @@ class SessionCapturerTest(sdk_test_base.SdkBase):
     exc = Exception('some message')
     self._capturer.CaptureException(exc)
     self._capturer.Print(None, SessionCapturerTest.MockPrinter)
-    self.assertEquals(self.MockPrinter.GetRecords(), [{
+    module_path = 'Exception'
+    actual = self.MockPrinter.GetRecords()
+    actual[0]['exception']['type'] = module_path
+    self.assertEqual([{
         'exception': {
-            'type': '<type \'exceptions.Exception\'>',
+            'type': module_path,
             'message': 'some message'
         }
-    }])
+    }],
+                     actual)
 
   def testJsonList(self):
     headers = '\n'.join({
@@ -171,7 +175,7 @@ class SessionCapturerTest(sdk_test_base.SdkBase):
     }
     result = self._capturer._ToList(
         headers + json.dumps(json_content) + '\n\r\n')
-    self.assertEquals(result, [headers, {'json': json_content}, '\n\r\n'])
+    self.assertEqual(result, [headers, {'json': json_content}, '\n\r\n'])
 
   def testListNoneBatch(self):
     json_content = {
@@ -182,21 +186,21 @@ class SessionCapturerTest(sdk_test_base.SdkBase):
         'key4': 'val\nue4'
     }
     result = self._capturer._ToList(json.dumps(json_content))
-    self.assertEquals(result, [{'json': json_content}])
+    self.assertEqual(result, [{'json': json_content}])
 
 
 class StreamCapturerTest(sdk_test_base.SdkBase):
 
   def testWrite(self):
-    real_stream = StringIO.StringIO()
+    real_stream = io.StringIO()
     stream = session_capturer.OutputStreamCapturer(real_stream)
     text = 'Some text\n\n to write.  '
     lines = ['Some\n', 'lines\n', 'to\n', 'write\n', '\n', '.\n']
     stream.write(text)
     stream.writelines(lines)
-    self.assertEquals(text + ''.join(lines), stream.GetValue())
-    self.assertEquals(stream.GetValue(), real_stream.getvalue())
-    self.assertEquals(stream.isatty(), True)
+    self.assertEqual(text + ''.join(lines), stream.GetValue())
+    self.assertEqual(stream.GetValue(), real_stream.getvalue())
+    self.assertEqual(stream.isatty(), True)
 
 
 class FileIoCapturerTest(sdk_test_base.SdkBase):
@@ -209,7 +213,7 @@ class FileIoCapturerTest(sdk_test_base.SdkBase):
       file_io_capturer = session_capturer.FileIoCapturer()
     with open('some_file', 'w') as f:
       f.write('some text')
-    self.assertEquals(file_io_capturer.GetOutputs(), [{
+    self.assertEqual(file_io_capturer.GetOutputs(), [{
         'name': 'some_file',
         'content': 'some text'
     }])
@@ -222,8 +226,8 @@ class FileIoCapturerTest(sdk_test_base.SdkBase):
         six.moves.builtins, 'open', side_effect=_SideEffect):
       file_io_capturer = session_capturer.FileIoCapturer()
     with open('some_file', 'r') as f:
-      self.assertEquals(f.read(), 'some text')
-    self.assertEquals(file_io_capturer.GetInputs(), [{
+      self.assertEqual(f.read(), 'some text')
+    self.assertEqual(file_io_capturer.GetInputs(), [{
         'name': 'some_file',
         'content': 'some text'
     }])
@@ -240,7 +244,7 @@ class FileIoCapturerTest(sdk_test_base.SdkBase):
                                return_value='session.yaml'):
       with open('session.yaml', 'w') as f:
         f.write('some text')
-    self.assertEquals(file_io_capturer.GetOutputs(), [])
+    self.assertEqual(file_io_capturer.GetOutputs(), [])
     file_io_capturer.Unmock()
 
 

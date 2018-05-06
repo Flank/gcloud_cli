@@ -13,6 +13,8 @@
 # limitations under the License.
 """beta ml vision tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base
@@ -23,12 +25,12 @@ from tests.lib.surface.ml.vision import base as vision_base
 
 
 @parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA),
-    ('Beta', base.ReleaseTrack.BETA),
-    ('GA', base.ReleaseTrack.GA))
-class DetectTextTest(vision_base.MlVisionTestBase):
+    ('Alpha', base.ReleaseTrack.ALPHA, 'builtin/stable'),
+    ('Beta', base.ReleaseTrack.BETA, 'builtin/stable'),
+    ('GA', base.ReleaseTrack.GA, None))
+class DetectTextCommonTest(vision_base.MlVisionTestBase):
 
-  def testDetectText_Success(self, track):
+  def testDetectText_Success(self, track, model):
     """Test `gcloud vision detect-text` runs & displays correctly."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
@@ -36,7 +38,8 @@ class DetectTextTest(vision_base.MlVisionTestBase):
         path_to_image,
         self.messages.Feature.TypeValueValuesEnum.TEXT_DETECTION,
         'textAnnotations',
-        results=['hello', 'world'])
+        results=['hello', 'world'],
+        model=model)
     self.Run('ml vision detect-text {path}'.format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
         {
@@ -57,7 +60,7 @@ class DetectTextTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectText_LocalPath(self, track):
+  def testDetectText_LocalPath(self, track, model):
     """Test `gcloud vision detect-text` with a local image path."""
     self.track = track
     tempdir = self.CreateTempDir()
@@ -67,7 +70,8 @@ class DetectTextTest(vision_base.MlVisionTestBase):
         self.messages.Feature.TypeValueValuesEnum.TEXT_DETECTION,
         'textAnnotations',
         results=['hello', 'world'],
-        contents=bytes('image'))
+        contents=b'image',
+        model=model)
     self.Run('ml vision detect-text {path}'.format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
         {
@@ -88,7 +92,7 @@ class DetectTextTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectText_LanguageHints(self, track):
+  def testDetectText_LanguageHints(self, track, model):
     """Test `gcloud vision detect-text` with --language-hints flag."""
     self.track = track
     path_to_image = 'https://example.com/fake-file'
@@ -97,7 +101,8 @@ class DetectTextTest(vision_base.MlVisionTestBase):
         self.messages.Feature.TypeValueValuesEnum.TEXT_DETECTION,
         'textAnnotations',
         language_hints=['fr', 'es'],
-        results=['bonjour', 'adios'])
+        results=['bonjour', 'adios'],
+        model=model)
     self.Run('ml vision detect-text {path} --language-hints fr,es'
              .format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
@@ -119,7 +124,7 @@ class DetectTextTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectText_Error(self, track):
+  def testDetectText_Error(self, track, model):
     """Test `gcloud vision detect-text` when an error is returned."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
@@ -127,10 +132,29 @@ class DetectTextTest(vision_base.MlVisionTestBase):
         path_to_image,
         self.messages.Feature.TypeValueValuesEnum.TEXT_DETECTION,
         'textAnnotations',
-        error_message='Not found.')
+        error_message='Not found.',
+        model=model)
     with self.AssertRaisesExceptionMatches(exceptions.Error,
                                            'Code: [400] Message: [Not found.]'):
       self.Run('ml vision detect-text {path}'.format(path=path_to_image))
+
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA),
+    ('Beta', base.ReleaseTrack.BETA))
+class DetectTextAlphaBetaTest(vision_base.MlVisionTestBase):
+
+  def testDetectText_ModelVersion(self, track):
+    self.track = track
+    path_to_image = 'https://example.com/fake-file'
+    self._ExpectEntityAnnotationRequest(
+        path_to_image,
+        self.messages.Feature.TypeValueValuesEnum.TEXT_DETECTION,
+        'textAnnotations',
+        results=['bonjour', 'adios'],
+        model='builtin/latest')
+    self.Run('ml vision detect-text {path} --model-version builtin/latest'
+             .format(path=path_to_image))
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ gcloud alpha compute target\-https\-proxies update \- update a target HTTPS prox
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute target\-https\-proxies update\fR \fINAME\fR [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR] [\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...]] [\fB\-\-url\-map\fR=\fIURL_MAP\fR] [\fB\-\-clear\-ssl\-policy\fR\ |\ \fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute target\-https\-proxies update\fR \fINAME\fR [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR] [\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]] [\fB\-\-url\-map\fR=\fIURL_MAP\fR] [\fB\-\-clear\-ssl\-policy\fR\ |\ \fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,7 +64,7 @@ Allows Google to control when QUIC is rolled out.
 .RE
 .sp
 .TP 2m
-\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[\fISSL_CERTIFICATE\fR,...]
+\fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
 References to at most 10 SSL certificate resources that are used for
 server\-side authentication. The first SSL certificate in this list is
 considered the primary SSL certificate associated with the load balancer. The

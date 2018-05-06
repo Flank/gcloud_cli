@@ -33,7 +33,7 @@ COMMANDS
         (ALPHA) Show metadata for an organization.
 
      get-iam-policy
-        (ALPHA) Get IAM policy for an organization.
+        (ALPHA) Get the IAM policy for an organization.
 
      list
         (ALPHA) List organizations accessible by the active account.

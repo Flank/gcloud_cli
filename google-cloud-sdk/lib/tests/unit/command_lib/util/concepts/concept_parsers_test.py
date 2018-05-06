@@ -14,6 +14,8 @@
 
 """Tests for the concepts.concept_parsers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import arg_parsers
@@ -518,7 +520,7 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
         self.resource_spec,
         'The second book to act upon.',
         prefixes=True)
-    with self.assertRaisesRegexp(ValueError, re.escape('[BOOK, OTHER]')):
+    with self.assertRaisesRegex(ValueError, re.escape('[BOOK, OTHER]')):
       concept_parsers.ConceptParser([resource, other_resource])
 
   def testTwoResourceArgsConflict(self):
@@ -531,7 +533,7 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
         '--book',
         self.resource_spec,
         'The second book to act upon.')
-    with self.assertRaisesRegexp(ValueError, re.escape('[BOOK, --book]')):
+    with self.assertRaisesRegex(ValueError, re.escape('[BOOK, --book]')):
       concept_parsers.ConceptParser([resource, other_resource])
 
   def testTwoResourceArgsConflictingFlags(self):
@@ -546,7 +548,7 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
         self.resource_spec,
         'The second book to act upon.',
         prefixes=False)
-    with self.assertRaisesRegexp(ValueError, re.escape('[--shelf]')):
+    with self.assertRaisesRegex(ValueError, re.escape('[--shelf]')):
       concept_parsers.ConceptParser([resource, other_resource])
 
   def testPresentationSpecConceptInfo(self):
@@ -603,6 +605,41 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
         expected_args_required,
         resource.args_required)
 
+  @parameterized.named_parameters(
+      ('Required', True, False, False),
+      ('NotRequired', False, True, False))
+  def testPresentationSpecConceptInfoSomeFallthroughs(self, required,
+                                                      expected_allow_empty,
+                                                      expected_args_required):
+    """Tests args_required is False if no args without fallthroughs."""
+    def Fallthrough():
+      return '!'
+    spec = concepts.ResourceSpec(
+        'example.projects.shelves.books',
+        'project',
+        projectsId=concepts.ResourceParameterAttributeConfig(
+            name='project', help_text='Auxilio aliis.'),
+        shelvesId=concepts.ResourceParameterAttributeConfig(
+            name='shelf', help_text='Auxilio aliis.',
+            fallthroughs=[deps.Fallthrough(Fallthrough, hint='hint')]),
+        booksId=concepts.ResourceParameterAttributeConfig(
+            name='book', help_text='Auxilio aliis.'))
+    resource = concept_parsers.ResourcePresentationSpec(
+        # Rename so that the attributes without fallthroughs have no args.
+        '',
+        spec,
+        'The book to act upon.',
+        prefixes=False,
+        required=required)
+    concept_info = resource.GetInfo()
+
+    self.assertEqual(
+        expected_allow_empty,
+        concept_info.allow_empty)
+    self.assertEqual(
+        expected_args_required,
+        resource.args_required)
+
   def testConceptParserAddsCompleter(self):
     """Tests that the concept parser adds completers to attribute args."""
     concept_parser = concept_parsers.ConceptParser.ForResource(
@@ -634,25 +671,25 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
                       'the book.'],
                      help_text)
 
-  def testSingleArgUsesGroupHelp(self):
-    """Tests that concept parser uses group help for single argument in a group.
-    """
-    resource_spec = concept_parsers.ResourcePresentationSpec(
-        '--book',
-        self.resource_spec,
-        'The book to act upon.',
-        flag_name_overrides={'shelf': ''})
-
-    help_text = [
-        arg.kwargs.get('help', None)
-        for arg in resource_spec.GetAttributeArgs()]
-
-    self.assertEqual(['The book to act upon.'], help_text)
-
-  def testGroupHelp(self):
+  @parameterized.named_parameters(
+      ('Flag', '--a-book'),
+      ('Positional', 'A_BOOK'))
+  def testTitle(self, name):
     """Tests that the presentation spec generates group help correctly."""
     presentation_spec = concept_parsers.ResourcePresentationSpec(
-        '--a-book',
+        name,
+        self.resource_spec,
+        'The book to act upon.',
+        flag_name_overrides={'project': '--book-project'})
+    self.assertEqual('A BOOK', presentation_spec.title)
+
+  @parameterized.named_parameters(
+      ('Flag', '--a-book'),
+      ('Positional', 'A_BOOK'))
+  def testGroupHelp(self, name):
+    """Tests that the presentation spec generates group help correctly."""
+    presentation_spec = concept_parsers.ResourcePresentationSpec(
+        name,
         self.resource_spec,
         'The book to act upon.',
         flag_name_overrides={'project': '--book-project'})
@@ -660,11 +697,13 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
                 'can be used to specify the attributes of this resource.')
     self.assertEqual(expected, presentation_spec.GetGroupHelp())
 
-  def testGroupHelpSkippedFlag(self):
-    """Tests presentation spec generates group help when some flags are skipped.
-    """
+  @parameterized.named_parameters(
+      ('Flag', '--a-book'),
+      ('Positional', 'A_BOOK'))
+  def testGroupHelpSkippedFlags(self, name):
+    """Tests presentation spec group help when flags are skipped."""
     presentation_spec = concept_parsers.ResourcePresentationSpec(
-        '--a-book',
+        name,
         self.resource_spec,
         'The book to act upon.')
     expected = ('A BOOK - The book to act upon. The arguments in this group '
@@ -673,6 +712,23 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
                 'but can be set in other ways. To set the [project] attribute: '
                 'Set the property [core/project] or provide the flag '
                 '[--project] on the command line.')
+    self.assertEqual(expected, presentation_spec.GetGroupHelp())
+
+  @parameterized.named_parameters(
+      ('Flag', '--a-book'),
+      ('Positional', 'A_BOOK'))
+  def testGroupHelpSingleArg(self, name):
+    """Tests presentation spec group help when flags are skipped."""
+    presentation_spec = concept_parsers.ResourcePresentationSpec(
+        name,
+        self.resource_spec,
+        'The book to act upon.',
+        flag_name_overrides={'project': '', 'shelf': ''})
+    expected = ('A BOOK - The book to act upon. This represents a Cloud '
+                'resource. (NOTE) Some attributes are not given arguments in '
+                'this group but can be set in other ways. To set the [project] '
+                'attribute: Set the property [core/project] or provide the '
+                'flag [--project] on the command line.')
     self.assertEqual(expected, presentation_spec.GetGroupHelp())
 
   def testGetExampleArgListFlag(self):

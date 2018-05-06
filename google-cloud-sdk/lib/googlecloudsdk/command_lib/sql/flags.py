@@ -29,12 +29,15 @@ from __future__ import division
 from __future__ import print_function
 
 from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.util import completers
 
 
-_CIDR_REGEX = (r'(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})'
-               r'(\.(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})){3}'
-               r'(\/([0-9]|[1-2][0-9]|3[0-2]))$')
+_IP_ADDRESS_PART = r'(25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})'  # Match decimal 0-255
+_CIDR_PREFIX_PART = r'([0-9]|[1-2][0-9]|3[0-2])'  # Match decimal 0-32
+# Matches either IPv4 range in CIDR notation or a naked IPv4 address.
+_CIDR_REGEX = r'{addr_part}(\.{addr_part}){{3}}(\/{prefix_part})?$'.format(
+    addr_part=_IP_ADDRESS_PART, prefix_part=_CIDR_PREFIX_PART)
 
 
 class DatabaseCompleter(completers.ListCommandCompleter):
@@ -107,16 +110,19 @@ def AddHost(parser):
 
 
 def AddAvailabilityType(parser):
-  parser.add_argument(
+  """Add the '--availability-type' flag to the parser."""
+  availabilty_type_flag = base.ChoiceArgument(
       '--availability-type',
       required=False,
       choices={
-          'REGIONAL': 'Provides high availability and is recommended for '
+          'regional': 'Provides high availability and is recommended for '
                       'production instances; instance automatically fails over '
                       'to another zone within your selected region.',
-          'ZONAL': 'Provides no failover capability. This is the default.'
+          'zonal': 'Provides no failover capability. This is the default.'
       },
-      help='Specifies level of availability. Only applies to PSQL instances.')
+      help_str=('Specifies level of availability. Only applies to PostgreSQL '
+                'instances.'))
+  availabilty_type_flag.AddToParser(parser)
 
 
 def AddPassword(parser):
@@ -261,7 +267,7 @@ def AddMaintenanceReleaseChannel(parser):
                      'their compatibility with your application prior '
                      'to the production release.'
       },
-      type=str.lower,
+      type=lambda val: val.lower(),
       help="Which channel's updates to apply during the maintenance window. "
            "If not specified, Cloud SQL chooses the timing of updates to your "
            "instance.")

@@ -1,0 +1,74 @@
+
+.TH "GCLOUD_ALPHA_KMS_KEYS_VERSIONS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha kms keys versions create \- create a new version
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha kms keys versions create\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-primary\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Creates a new version within the given key.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-key\fR=\fIKEY\fR
+The containing key.
+
+.TP 2m
+\fB\-\-primary\fR
+If specified, immediately make the new version primary.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a new version within the \f5frodo\fR key,
+\f5fellowship\fR keyring, and \f5global\fR location and sets it as the primary
+version:
+
+.RS 2m
+$ gcloud alpha kms keys versions create \-\-location global \e
+    \-\-keyring fellowship \e
+    \-\-key frodo \-\-primary
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud kms keys versions create
+$ gcloud beta kms keys versions create
+.RE
+

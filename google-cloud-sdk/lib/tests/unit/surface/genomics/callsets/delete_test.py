@@ -44,7 +44,7 @@ class DeleteTest(base.GenomicsUnitTest):
   def testCallsetsDeleteCancel(self):
     self.WriteInput('n\n')
     self.expectGetRequest()
-    with self.assertRaisesRegexp(GenomicsError, 'Deletion aborted by user.'):
+    with self.assertRaisesRegex(GenomicsError, 'Deletion aborted by user.'):
       self.RunGenomics(['callsets', 'delete', '1000'])
     self.AssertErrContains(
         'Deleting call set 1000 (callset-name) will delete all objects')
@@ -65,8 +65,8 @@ class DeleteTest(base.GenomicsUnitTest):
     self.mocked_client.callsets.Delete.Expect(
         request=self.messages.GenomicsCallsetsDeleteRequest(callSetId='1000'),
         exception=self.MakeHttpError(404, 'Callset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Callset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Callset not found: 1000'):
       self.RunGenomics(['callsets', 'delete', '1000'],
                        ['--quiet'])
 

@@ -27,9 +27,9 @@ from gslib.exception import CommandException
 from gslib.exception import InvalidUrlError
 from gslib.storage_url import StorageUrlFromString
 from gslib.third_party.storage_apitools import storage_v1_messages as apitools_messages
-from gslib.util import InsistAscii
-from gslib.util import NO_MAX
-from gslib.util import NormalizeStorageClass
+from gslib.utils.constants import NO_MAX
+from gslib.utils.text_util import InsistAscii
+from gslib.utils.text_util import NormalizeStorageClass
 
 
 _SYNOPSIS = """
@@ -95,7 +95,7 @@ _DETAILED_HELP_TEXT = ("""
   -c class          Specifies the default storage class. Default is "Standard".
 
   -l location       Can be any multi-regional or regional location. See
-                    https://cloud.google.com/storage/docs/storage-classes
+                    https://cloud.google.com/storage/docs/bucket-locations
                     for a discussion of this distinction. Default is US.
                     Locations are case insensitive.
 

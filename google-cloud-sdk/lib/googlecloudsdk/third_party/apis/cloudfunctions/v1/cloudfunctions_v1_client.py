@@ -24,7 +24,7 @@ class CloudfunctionsV1(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new cloudfunctions handle."""
     url = url or self.BASE_URL
     super(CloudfunctionsV1, self).__init__(
@@ -33,7 +33,8 @@ class CloudfunctionsV1(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.operations = self.OperationsService(self)
     self.projects_locations_functions = self.ProjectsLocationsFunctionsService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
@@ -49,74 +50,8 @@ class CloudfunctionsV1(base_api.BaseApiClient):
       self._upload_configs = {
           }
 
-    def Cancel(self, request, global_params=None):
-      """Starts asynchronous cancellation on a long-running operation.  The server.
-makes a best effort to cancel the operation, but success is not
-guaranteed.  If the server doesn't support this method, it returns
-`google.rpc.Code.UNIMPLEMENTED`.  Clients can use
-Operations.GetOperation or
-other methods to check whether the cancellation succeeded or whether the
-operation completed despite cancellation. On successful cancellation,
-the operation is not deleted; instead, it becomes an operation with
-an Operation.error value with a google.rpc.Status.code of 1,
-corresponding to `Code.CANCELLED`.
-
-      Args:
-        request: (CloudfunctionsOperationsCancelRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Empty) The response message.
-      """
-      config = self.GetMethodConfig('Cancel')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Cancel.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/operations/{operationsId}:cancel',
-        http_method=u'POST',
-        method_id=u'cloudfunctions.operations.cancel',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1/{+name}:cancel',
-        request_field=u'cancelOperationRequest',
-        request_type_name=u'CloudfunctionsOperationsCancelRequest',
-        response_type_name=u'Empty',
-        supports_download=False,
-    )
-
-    def Delete(self, request, global_params=None):
-      """Deletes a long-running operation. This method indicates that the client is.
-no longer interested in the operation result. It does not cancel the
-operation. If the server doesn't support this method, it returns
-`google.rpc.Code.UNIMPLEMENTED`.
-
-      Args:
-        request: (CloudfunctionsOperationsDeleteRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Empty) The response message.
-      """
-      config = self.GetMethodConfig('Delete')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Delete.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/operations/{operationsId}',
-        http_method=u'DELETE',
-        method_id=u'cloudfunctions.operations.delete',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1/{+name}',
-        request_field='',
-        request_type_name=u'CloudfunctionsOperationsDeleteRequest',
-        response_type_name=u'Empty',
-        supports_download=False,
-    )
-
     def Get(self, request, global_params=None):
-      """Gets the latest state of a long-running operation.  Clients can use this.
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
 method to poll the operation result at intervals as recommended by the API
 service.
 
@@ -145,7 +80,7 @@ service.
     )
 
     def List(self, request, global_params=None):
-      """Lists operations that match the specified filter in the request. If the.
+      r"""Lists operations that match the specified filter in the request. If the.
 server doesn't support this method, it returns `UNIMPLEMENTED`.
 
 NOTE: the `name` binding allows API services to override the binding
@@ -190,7 +125,7 @@ is the parent resource, without the operations collection id.
           }
 
     def Call(self, request, global_params=None):
-      """Invokes synchronously deployed function. To be used for testing, very.
+      r"""Invokes synchronously deployed function. To be used for testing, very.
 limited traffic allowed.
 
       Args:
@@ -218,7 +153,7 @@ limited traffic allowed.
     )
 
     def Create(self, request, global_params=None):
-      """Creates a new function. If a function with the given name already exists in.
+      r"""Creates a new function. If a function with the given name already exists in.
 the specified project, the long running operation will return
 `ALREADY_EXISTS` error.
 
@@ -247,7 +182,7 @@ the specified project, the long running operation will return
     )
 
     def Delete(self, request, global_params=None):
-      """Deletes a function with the given name from the specified project. If the.
+      r"""Deletes a function with the given name from the specified project. If the.
 given function is used by some trigger, the trigger will be updated to
 remove this function.
 
@@ -276,7 +211,7 @@ remove this function.
     )
 
     def GenerateDownloadUrl(self, request, global_params=None):
-      """Returns a signed URL for downloading deployed function source code.
+      r"""Returns a signed URL for downloading deployed function source code.
 The URL is only valid for a limited period and should be used within
 minutes after generation.
 For more information about the signed URL usage see:
@@ -307,7 +242,7 @@ https://cloud.google.com/storage/docs/access-control/signed-urls
     )
 
     def GenerateUploadUrl(self, request, global_params=None):
-      """Returns a signed URL for uploading a function source code.
+      r"""Returns a signed URL for uploading a function source code.
 For more information about the signed URL usage see:
 https://cloud.google.com/storage/docs/access-control/signed-urls.
 Once the function source code upload is complete, the used signed
@@ -323,7 +258,7 @@ these restrictions:
 When making a HTTP PUT request, these two headers need to be specified:
 
 * `content-type: application/zip`
-* `x-google-content-length-range: 0,104857600`
+* `x-goog-content-length-range: 0,104857600`
 
       Args:
         request: (CloudfunctionsProjectsLocationsFunctionsGenerateUploadUrlRequest) input message
@@ -350,7 +285,7 @@ When making a HTTP PUT request, these two headers need to be specified:
     )
 
     def Get(self, request, global_params=None):
-      """Returns a function with the given name from the requested project.
+      r"""Returns a function with the given name from the requested project.
 
       Args:
         request: (CloudfunctionsProjectsLocationsFunctionsGetRequest) input message
@@ -377,7 +312,7 @@ When making a HTTP PUT request, these two headers need to be specified:
     )
 
     def List(self, request, global_params=None):
-      """Returns a list of functions that belong to the requested project.
+      r"""Returns a list of functions that belong to the requested project.
 
       Args:
         request: (CloudfunctionsProjectsLocationsFunctionsListRequest) input message
@@ -404,7 +339,7 @@ When making a HTTP PUT request, these two headers need to be specified:
     )
 
     def Patch(self, request, global_params=None):
-      """Updates existing function.
+      r"""Updates existing function.
 
       Args:
         request: (CloudfunctionsProjectsLocationsFunctionsPatchRequest) input message
@@ -440,35 +375,8 @@ When making a HTTP PUT request, these two headers need to be specified:
       self._upload_configs = {
           }
 
-    def Get(self, request, global_params=None):
-      """Get information about a location.
-
-      Args:
-        request: (CloudfunctionsProjectsLocationsGetRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (Location) The response message.
-      """
-      config = self.GetMethodConfig('Get')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Get.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1/projects/{projectsId}/locations/{locationsId}',
-        http_method=u'GET',
-        method_id=u'cloudfunctions.projects.locations.get',
-        ordered_params=[u'name'],
-        path_params=[u'name'],
-        query_params=[],
-        relative_path=u'v1/{+name}',
-        request_field='',
-        request_type_name=u'CloudfunctionsProjectsLocationsGetRequest',
-        response_type_name=u'Location',
-        supports_download=False,
-    )
-
     def List(self, request, global_params=None):
-      """Lists information about the supported locations for this service.
+      r"""Lists information about the supported locations for this service.
 
       Args:
         request: (CloudfunctionsProjectsLocationsListRequest) input message

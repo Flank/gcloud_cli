@@ -15,10 +15,14 @@
 """Data objects to support the yaml command schema."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import module_util
+
+import six
 
 
 class Error(Exception):
@@ -153,7 +157,7 @@ def ParseAction(action, flag_name):
   if not action:
     return None
 
-  if isinstance(action, basestring):
+  if isinstance(action, six.string_types):
     if action in STATIC_ACTIONS:
       return action
     return Hook.FromPath(action)
@@ -168,7 +172,7 @@ def ParseAction(action, flag_name):
 BUILTIN_TYPES = {
     'str': str,
     'int': int,
-    'long': long,
+    'long': long if six.PY2 else int,
     'float': float,
     'bool': bool,
 }
@@ -189,7 +193,7 @@ def ParseType(t):
   if not t:
     return None
 
-  if isinstance(t, basestring):
+  if isinstance(t, six.string_types):
     builtin_type = BUILTIN_TYPES.get(t)
     if builtin_type:
       return builtin_type
@@ -206,7 +210,7 @@ class Choice(object):
 
   def __init__(self, data):
     self.arg_value = data['arg_value']
-    if isinstance(self.arg_value, basestring):
+    if isinstance(self.arg_value, six.string_types):
       # We always do a case insensitive comparison.
       self.arg_value = self.arg_value.lower()
     self.enum_value = data['enum_value']
@@ -347,7 +351,7 @@ class FlattenedArgDict(arg_utils.RepeatedMessageBindableType):
       """Inner method that argparse actually calls."""
       result = arg_dict(arg_value)
       messages = []
-      for k, v in sorted(result.iteritems()):
+      for k, v in sorted(six.iteritems(result)):
         message_instance = message()
         arg_utils.SetFieldInMessage(
             message_instance, self.key_spec.api_field,

@@ -3,7 +3,7 @@ NAME
         managed-zone
 
 SYNOPSIS
-    gcloud beta dns managed-zones update ZONE_NAME
+    gcloud beta dns managed-zones update ZONE
         [--denial-of-existence=DENIAL_OF_EXISTENCE] [--description=DESCRIPTION]
         [--dnssec-state=DNSSEC_STATE] [--ksk-algorithm=KSK_ALGORITHM]
         [--ksk-key-length=KSK_KEY_LENGTH] [--update-labels=[KEY=VALUE,...]]
@@ -14,8 +14,14 @@ DESCRIPTION
     (BETA) Update an existing Cloud DNS managed-zone.
 
 POSITIONAL ARGUMENTS
-     ZONE_NAME
-        The name of the managed-zone to be updated..
+     ZONE - The name of the managed-zone to be updated. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       ZONE
+          The ID of the zone or a fully qualified identifier for the zone.
 
 FLAGS
      --denial-of-existence=DENIAL_OF_EXISTENCE
@@ -86,5 +92,8 @@ EXAMPLES
             --description="Hello, world!"
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud dns managed-zones update
 

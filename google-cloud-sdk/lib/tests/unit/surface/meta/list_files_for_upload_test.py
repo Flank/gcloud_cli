@@ -34,7 +34,7 @@ class ListFilesForUploadSanityTest(cli_test_base.CliTestBase):
   def testListFilesForUpload_EmptyDirectory(self):
     results = self.Run('meta list-files-for-upload ' + self.temp_path)
 
-    self.assertEquals(results, [])
+    self.assertEqual(results, [])
 
   def testListFilesForUpload(self):
     self.Touch(self.temp_path, '.gcloudignore', contents='foo')
@@ -43,8 +43,8 @@ class ListFilesForUploadSanityTest(cli_test_base.CliTestBase):
 
     results = self.Run('meta list-files-for-upload ' + self.temp_path)
 
-    self.assertEquals(results,
-                      ['.gcloudignore', os.path.join('bar', 'baz')])
+    self.assertEqual(results,
+                     ['.gcloudignore', os.path.join('bar', 'baz')])
 
 
 def _CombineFormats(fmts, vals):
@@ -131,7 +131,7 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
       self._GitInit()
       git_uploaded_files = self._GitAddDryRun()
     uploaded_files = self._RunListFilesForUpload(self.temp_path)
-    self.assertEquals(set(uploaded_files), set(git_uploaded_files))
+    self.assertEqual(set(uploaded_files), set(git_uploaded_files))
 
   @parameterized.named_parameters(
       ('NoGitFiles', ['a', 'b'], None),

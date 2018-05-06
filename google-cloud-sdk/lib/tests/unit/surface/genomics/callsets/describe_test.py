@@ -30,8 +30,8 @@ class DescribeTest(base.GenomicsUnitTest):
     self.mocked_client.callsets.Get.Expect(
         request=self.messages.GenomicsCallsetsGetRequest(callSetId=callset.id),
         response=callset,)
-    self.assertEquals(callset,
-                      self.RunGenomics(['callsets', 'describe', callset.id]))
+    self.assertEqual(callset,
+                     self.RunGenomics(['callsets', 'describe', callset.id]))
     self.AssertOutputContains(callset.name)
 
   def testCallsetsDescribeNotExists(self):
@@ -42,8 +42,8 @@ class DescribeTest(base.GenomicsUnitTest):
     self.mocked_client.callsets.Get.Expect(
         request=self.messages.GenomicsCallsetsGetRequest(callSetId=callset.id),
         exception=self.MakeHttpError(404, 'Callset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Callset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Callset not found: 1000'):
       self.RunGenomics(['callsets', 'describe', callset.id])
 
 if __name__ == '__main__':

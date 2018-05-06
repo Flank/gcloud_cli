@@ -13,6 +13,8 @@
 # limitations under the License.
 """Bigtable instance API helper."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.bigtable import util
 
 
@@ -36,3 +38,22 @@ def Upgrade(instance):
           instance=instance,
           name=instance_ref.RelativeName(),
           updateMask='type'))
+
+
+def GetIamPolicy(instance_ref):
+  """Get IAM policy for a given instance."""
+  client = util.GetAdminClient()
+  msgs = util.GetAdminMessages()
+  req = msgs.BigtableadminProjectsInstancesGetIamPolicyRequest(
+      resource=instance_ref.RelativeName())
+  return client.projects_instances.GetIamPolicy(req)
+
+
+def SetPolicy(instance_ref, policy):
+  """Sets the given policy on the instance, overwriting what exists."""
+  client = util.GetAdminClient()
+  msgs = util.GetAdminMessages()
+  req = msgs.BigtableadminProjectsInstancesSetIamPolicyRequest(
+      resource=instance_ref.RelativeName(),
+      setIamPolicyRequest=msgs.SetIamPolicyRequest(policy=policy))
+  return client.projects_instances.SetIamPolicy(req)

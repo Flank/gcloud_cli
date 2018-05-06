@@ -13,8 +13,8 @@
 # limitations under the License.
 
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
 from tests.lib.surface.firebase.test import e2e_base
+from tests.lib.surface.firebase.test.android import commands
 
 
 class VersionsTests(e2e_base.TestIntegrationTestBase):
@@ -22,7 +22,6 @@ class VersionsTests(e2e_base.TestIntegrationTestBase):
   def SetUp(self):
     pass
 
-  @test_case.Filters.skip('Failing', 'b/73120615')
   def testAndroidVersionsList(self):
     self.Run(commands.ANDROID_VERSIONS_LIST)
     self.AssertOutputMatches(r'^OS_VERSION_ID | VERSION | CODENAME',

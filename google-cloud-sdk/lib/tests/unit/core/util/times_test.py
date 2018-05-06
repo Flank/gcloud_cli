@@ -15,6 +15,10 @@
 
 """Tests for googlecloudsdk.core.util.times."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+
 import datetime
 
 from googlecloudsdk.core.util import iso_duration
@@ -23,8 +27,15 @@ from tests.lib import parameterized
 from tests.lib import subtests
 from tests.lib import test_case
 
+import six
+
 
 FORMAT = '%Y-%m-%dT%H:%M:%S.%f%z'
+
+
+def _Stringize(v):
+  """For this test module only!!!"""
+  return str(v).replace("u'", "'")
 
 
 class TimeZoneTest(test_case.TestCase):
@@ -65,9 +76,9 @@ class TimeZoneTest(test_case.TestCase):
     self.assertIsNotNone(tz3)
     tz4 = times.GetTimeZone('America/Los_Angeles')
     self.assertIsNotNone(tz4)
-    self.assertNotEqual(str(tz1), str(tz2))
-    self.assertEqual(str(tz1), str(tz3))
-    self.assertEqual(str(tz2), str(tz4))
+    self.assertNotEqual(_Stringize(tz1), _Stringize(tz2))
+    self.assertEqual(_Stringize(tz1), _Stringize(tz3))
+    self.assertEqual(_Stringize(tz2), _Stringize(tz4))
 
   def testGetTimeZoneUTCStd(self):
     ts = 1234567890.123456
@@ -76,7 +87,7 @@ class TimeZoneTest(test_case.TestCase):
     expected = '2009-02-13T23:31:30.123456+0000'
     actual = times.FormatDateTime(dt, FORMAT)
     self.assertEqual(expected, actual)
-    expected = str(ts)
+    expected = _Stringize(ts)
     actual = times.FormatDateTime(dt, '%s')
     self.assertEqual(expected, actual)
     self.assertEqual(ts, times.GetTimeStampFromDateTime(dt))
@@ -88,7 +99,7 @@ class TimeZoneTest(test_case.TestCase):
     expected = '2009-06-09T17:18:10.123456+0000'
     actual = times.FormatDateTime(dt, FORMAT)
     self.assertEqual(expected, actual)
-    expected = str(ts)
+    expected = _Stringize(ts)
     actual = times.FormatDateTime(dt, '%s')
     self.assertEqual(expected, actual)
     self.assertEqual(ts, times.GetTimeStampFromDateTime(dt))
@@ -100,7 +111,7 @@ class TimeZoneTest(test_case.TestCase):
     expected = '2009-06-09T17:18:10.999999+0000'
     actual = times.FormatDateTime(dt, FORMAT)
     self.assertEqual(expected, actual)
-    expected = str(ts)
+    expected = _Stringize(ts)
     actual = times.FormatDateTime(dt, '%s')
     self.assertEqual(expected, actual)
     self.assertEqual(ts, times.GetTimeStampFromDateTime(dt))
@@ -112,7 +123,7 @@ class TimeZoneTest(test_case.TestCase):
     expected = '2009-02-13T18:31:30.123456-0500'
     actual = times.FormatDateTime(dt, FORMAT)
     self.assertEqual(expected, actual)
-    expected = str(ts)
+    expected = _Stringize(ts)
     actual = times.FormatDateTime(dt, '%s')
     self.assertEqual(expected, actual)
     self.assertEqual(ts, times.GetTimeStampFromDateTime(dt))
@@ -124,7 +135,7 @@ class TimeZoneTest(test_case.TestCase):
     expected = '2009-06-09T13:18:10.123456-0400'
     actual = times.FormatDateTime(dt, FORMAT)
     self.assertEqual(expected, actual)
-    expected = str(ts)
+    expected = _Stringize(ts)
     actual = times.FormatDateTime(dt, '%s')
     self.assertEqual(expected, actual)
     self.assertEqual(ts, times.GetTimeStampFromDateTime(dt))
@@ -137,7 +148,7 @@ class TimeZoneTest(test_case.TestCase):
     expected = '2009-06-09T10:18:10.123456-0700'
     actual = times.FormatDateTime(dt, FORMAT, tz_out)
     self.assertEqual(expected, actual)
-    expected = str(ts)
+    expected = _Stringize(ts)
     actual = times.FormatDateTime(dt, '%s')
     self.assertEqual(expected, actual)
     self.assertEqual(ts, times.GetTimeStampFromDateTime(dt))
@@ -149,59 +160,74 @@ class TimeZoneTest(test_case.TestCase):
     expected = '2009-06-09T13:18:10.999999-0400'
     actual = times.FormatDateTime(dt, FORMAT)
     self.assertEqual(expected, actual)
-    expected = str(ts)
+    expected = _Stringize(ts)
     actual = times.FormatDateTime(dt, '%s')
     self.assertEqual(expected, actual)
     self.assertEqual(ts, times.GetTimeStampFromDateTime(dt))
 
 
-class TimeZoneWIthNonAsciiNameTest(test_case.TestCase):
+class TimeZoneWIthNonAsciiNameTest(test_case.WithOutputCapture):
   """Tests the non-ascii timezone name code paths for the %Z strftime format."""
 
+  def Encode(self, text, encoding):
+    return text.encode(encoding) if six.PY2 else text
+
   def testFormatTzNameAsciiTzUnaware(self):
+    encoding = 'ascii'
+    self.SetEncoding(encoding)
     expected = 'ascii'
     ts = 1244567890.999999
     tz = times.TzOffset(60, expected)
     dt = times.GetDateTimeFromTimeStamp(ts)
     actual = times.FormatDateTime(dt, '%Z', tz)
-    self.assertEqual(expected, actual)
+    self.assertRegexpMatches(actual, r'ascii|\+01:00')
 
   def testFormatTzNameAscii(self):
+    encoding = 'ascii'
+    self.SetEncoding(encoding)
     expected = 'ascii'
     ts = 1244567890.999999
     tz = times.TzOffset(60, expected)
     dt = times.GetDateTimeFromTimeStamp(ts, tz)
     actual = times.FormatDateTime(dt, '%Z')
-    self.assertEqual(expected, actual)
+    self.assertRegexpMatches(actual, r'ascii|\+01:00')
 
   def testFormatTzNameIso8859_1Unaware(self):
-    expected = u'ÜñîçòÐé'
+    encoding = 'iso8859-1'
+    self.SetEncoding(encoding)
+    expected = 'ÜñîçòÐé'
     ts = 1244567890.999999
-    tz = times.TzOffset(60, expected.encode('iso8859-1'))
+    tz = times.TzOffset(60, self.Encode(expected, encoding))
     dt = times.GetDateTimeFromTimeStamp(ts)
     actual = times.FormatDateTime(dt, '%Z', tz)
     self.assertEqual(expected, actual)
 
   def testFormatTzNameIso8859_1(self):
-    expected = u'ÜñîçòÐé'
+    encoding = 'iso8859-1'
+    self.SetEncoding(encoding)
+    expected = 'ÜñîçòÐé'
     ts = 1244567890.999999
-    tz = times.TzOffset(60, expected.encode('iso8859-1'))
+    tz = times.TzOffset(60, self.Encode(expected, encoding))
     dt = times.GetDateTimeFromTimeStamp(ts, tz)
     actual = times.FormatDateTime(dt, '%Z')
     self.assertEqual(expected, actual)
 
   def testFormatTzNameUtf8Unaware(self):
-    expected = u'Ṳᾔḯ¢◎ⅾℯ'
+    encoding = 'utf-8'
+    self.SetEncoding(encoding)
+    expected = 'Ṳᾔḯ¢◎ⅾℯ'
     ts = 1244567890.999999
-    tz = times.TzOffset(60, expected.encode('utf8'))
+    tz = times.TzOffset(60, self.Encode(expected, encoding))
     dt = times.GetDateTimeFromTimeStamp(ts)
     actual = times.FormatDateTime(dt, '%Z', tz)
     self.assertEqual(expected, actual)
 
   def testFormatTzNameUtf8(self):
-    expected = u'Ṳᾔḯ¢◎ⅾℯ'
+    encoding = 'utf-8'
+    self.SetEncoding(encoding)
+    expected = 'Ṳᾔḯ¢◎ⅾℯ'
     ts = 1244567890.999999
-    tz = times.TzOffset(60, expected.encode('utf8'))
+    tz = times.TzOffset(60, self.Encode(expected, encoding))
     dt = times.GetDateTimeFromTimeStamp(ts, tz)
     actual = times.FormatDateTime(dt, '%Z')
     self.assertEqual(expected, actual)
@@ -213,7 +239,7 @@ class ParseDateTimeTest(subtests.Base):
                  parse_fmt=None, timestamp=False):
     if tz:
       tzinfo = times.GetTimeZone(tz)
-    if isinstance(subject, (int, long, float)):
+    if isinstance(subject, (six.integer_types, float)):
       dt = times.GetDateTimeFromTimeStamp(subject, tzinfo=tzinfo)
     else:
       dt = times.ParseDateTime(subject, fmt=parse_fmt, tzinfo=tzinfo)
@@ -326,7 +352,6 @@ class ParseDateTimeTest(subtests.Base):
     self.Run('2009-02-13T23:31:00.000Z', '2009-02-13 23:31Z')
 
   def testParseDateTimeExceptions(self):
-    self.Run(None, '1776-07-04T12:00:00', exception=times.DateTimeValueError)
     self.Run(None, '0000-00-00T00:00:00', exception=times.DateTimeSyntaxError)
     self.Run(None, '0000-00-00T00:00:00', fmt='%Y-%m-%dT%H:%M:%S',
              exception=times.DateTimeSyntaxError)
@@ -343,6 +368,12 @@ class ParseDateTimeTest(subtests.Base):
     self.Run(None, '99999999', exception=times.DateTimeSyntaxError)
     self.Run(None, '99999999', fmt='%Y-%m-%d',
              exception=times.DateTimeSyntaxError)
+
+  def testParseDateTime2vs3(self):
+    if six.PY2:
+      self.Run(None, '1776-07-04T12:00:00Z', exception=times.DateTimeValueError)
+    else:
+      self.Run('1776-07-04T12:00:00.000Z', '1776-07-04T12:00:00Z')
 
   def testFormatDateTimeFractionExtensions(self):
     self.Run('000000', '2016-03-02T08:26:46.000000-05:00', fmt='%f')
@@ -609,9 +640,9 @@ class ConvertDateTimeTest(test_case.TestCase):
     self.assertEqual(expected, actual)
 
   def testParseDateDurationDefaultTzInfo(self):
-    def fake_now(tzinfo=None):
+    def _FakeNow(tzinfo=None):
       return datetime.datetime(2017, 4, 5, 15, 9, 1, 999000, tzinfo)
-    self.StartObjectPatch(times, 'Now', side_effect=fake_now)
+    self.StartObjectPatch(times, 'Now', side_effect=_FakeNow)
 
     t1 = times.ParseDateTime('-PT10M', tzinfo=times.LOCAL)
     self.assertEqual(t1.tzinfo, times.LOCAL)
@@ -1205,7 +1236,7 @@ class DurationForJsonTest(test_case.TestCase, parameterized.TestCase):
       (iso_duration.Duration(minutes=1, microseconds=123456), '60.123456s'),
   )
   def testFormatDurationForJson(self, duration, expected):
-    self.assertEquals(times.FormatDurationForJson(duration), expected)
+    self.assertEqual(times.FormatDurationForJson(duration), expected)
 
 
 if __name__ == '__main__':

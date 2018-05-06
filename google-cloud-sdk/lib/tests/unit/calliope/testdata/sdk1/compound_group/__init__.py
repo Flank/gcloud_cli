@@ -13,6 +13,8 @@
 # limitations under the License.
 """A group with an underscore in it."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 

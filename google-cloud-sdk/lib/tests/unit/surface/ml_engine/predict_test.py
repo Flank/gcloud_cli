@@ -109,18 +109,18 @@ class PredictTest(PredictTestBase):
         model_ref, [{'images': [0, 1], 'key': 3}])
 
   def testPredictEmptyFile(self):
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'No valid instance was found.'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'No valid instance was found.'):
       self._RunWithInstances('', 'json')
 
   def testPredictTooManyInstances(self):
     test_instances = '\n'.join(['{"images": [0, 1], "key": 3}'] * 101)
-    with self.assertRaisesRegexp(core_exceptions.Error, 'no more than 100'):
+    with self.assertRaisesRegex(core_exceptions.Error, 'no more than 100'):
       self._RunWithInstances(test_instances, 'json')
 
   def testPredictNonJSON(self):
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Input instances are not in JSON format.'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Input instances are not in JSON format.'):
       self._RunWithInstances('abcd', 'json')
 
   def testPredictTextFile(self):
@@ -153,24 +153,24 @@ class PredictTest(PredictTestBase):
          '{"images": [2, 1], "key": 1}'])
 
   def testPredictNewlineOnlyJson(self):
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Empty line is not allowed'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Empty line is not allowed'):
       self._RunWithInstances('\n', 'json')
 
   def testPredictNewlineOnlyText(self):
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Empty line is not allowed'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Empty line is not allowed'):
       self._RunWithInstances('\n', 'text')
 
   def testPredictEmptyLineJson(self):
     test_instances = '{"images": [0, 1], "key": 3}\n\n'
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Empty line is not allowed'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Empty line is not allowed'):
       self._RunWithInstances(test_instances, 'text')
 
   def testPredictEmptyLineText(self):
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Empty line is not allowed'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Empty line is not allowed'):
       self._RunWithInstances('2, 3\n\n', 'text')
 
 

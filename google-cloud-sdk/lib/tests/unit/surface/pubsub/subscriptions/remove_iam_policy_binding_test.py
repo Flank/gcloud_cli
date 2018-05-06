@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Test of the 'pubsub subscriptions remove-iam-policy-binding' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.pubsub import util
 from tests.lib import test_case
 from tests.lib.surface.pubsub import base
@@ -35,7 +40,7 @@ class SubscriptionsRemoveIamPolicyBindingTest(base.CloudPubsubTestBase):
                 role=remove_role,
                 members=[remove_member])
         ],
-        etag='unique_tag',
+        etag=b'unique_tag',
         version=1)
 
     new_policy = self.msgs.Policy(
@@ -44,7 +49,7 @@ class SubscriptionsRemoveIamPolicyBindingTest(base.CloudPubsubTestBase):
                 role='roles/pubsub.subscriber',
                 members=['user:bar@google.com', remove_member])
         ],
-        etag='unique_tag',
+        etag=b'unique_tag',
         version=1)
 
     self.svc.GetIamPolicy.Expect(

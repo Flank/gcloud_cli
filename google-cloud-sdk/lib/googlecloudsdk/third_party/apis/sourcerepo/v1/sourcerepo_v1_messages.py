@@ -12,7 +12,7 @@ package = 'sourcerepo'
 
 
 class AuditConfig(_messages.Message):
-  """Specifies the audit configuration for a service. The configuration
+  r"""Specifies the audit configuration for a service. The configuration
   determines which permission types are logged, and what identities, if any,
   are exempted from logging. An AuditConfig must have one or more
   AuditLogConfigs.  If there are AuditConfigs for both `allServices` and a
@@ -35,7 +35,6 @@ class AuditConfig(_messages.Message):
 
   Fields:
     auditLogConfigs: The configuration for logging of each type of permission.
-      Next ID: 4
     service: Specifies a service that will be enabled for audit logging. For
       example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
       `allServices` is a special value that covers all services.
@@ -46,7 +45,7 @@ class AuditConfig(_messages.Message):
 
 
 class AuditLogConfig(_messages.Message):
-  """Provides the configuration for logging a type of permissions. Example:
+  r"""Provides the configuration for logging a type of permissions. Example:
   {       "audit_log_configs": [         {           "log_type": "DATA_READ",
   "exempted_members": [             "user:foo@gmail.com"           ]
   },         {           "log_type": "DATA_WRITE",         }       ]     }
@@ -63,7 +62,7 @@ class AuditLogConfig(_messages.Message):
   """
 
   class LogTypeValueValuesEnum(_messages.Enum):
-    """The log type that this config enables.
+    r"""The log type that this config enables.
 
     Values:
       LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
@@ -81,7 +80,7 @@ class AuditLogConfig(_messages.Message):
 
 
 class Binding(_messages.Message):
-  """Associates `members` with a `role`.
+  r"""Associates `members` with a `role`.
 
   Fields:
     members: Specifies the identities requesting access for a Cloud Platform
@@ -91,8 +90,8 @@ class Binding(_messages.Message):
       identifier that represents anyone    who is authenticated with a Google
       account or a service account.  * `user:{emailid}`: An email address that
       represents a specific Google    account. For example, `alice@gmail.com`
-      or `joe@example.com`.   * `serviceAccount:{emailid}`: An email address
-      that represents a service    account. For example, `my-other-
+      .   * `serviceAccount:{emailid}`: An email address that represents a
+      service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
       * `domain:{domain}`: A Google Apps domain name that represents all the
@@ -106,7 +105,7 @@ class Binding(_messages.Message):
 
 
 class Empty(_messages.Message):
-  """A generic empty message that you can re-use to avoid defining duplicated
+  r"""A generic empty message that you can re-use to avoid defining duplicated
   empty messages in your APIs. A typical example is to use it as the request
   or the response type of an API method. For instance:      service Foo {
   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);     }  The
@@ -116,7 +115,7 @@ class Empty(_messages.Message):
 
 
 class ListReposResponse(_messages.Message):
-  """Response for ListRepos.  The size is not set in the returned
+  r"""Response for ListRepos.  The size is not set in the returned
   repositories.
 
   Fields:
@@ -131,7 +130,7 @@ class ListReposResponse(_messages.Message):
 
 
 class MirrorConfig(_messages.Message):
-  """Configuration to automatically mirror a repository from another hosting
+  r"""Configuration to automatically mirror a repository from another hosting
   service, for example GitHub or Bitbucket.
 
   Fields:
@@ -151,19 +150,24 @@ class MirrorConfig(_messages.Message):
 
 
 class Policy(_messages.Message):
-  """Defines an Identity and Access Management (IAM) policy. It is used to
+  r"""Defines an Identity and Access Management (IAM) policy. It is used to
   specify access control policies for Cloud Platform resources.   A `Policy`
-  consists of a list of `bindings`. A `Binding` binds a list of `members` to a
+  consists of a list of `bindings`. A `binding` binds a list of `members` to a
   `role`, where the members can be user accounts, Google groups, Google
   domains, and service accounts. A `role` is a named list of permissions
-  defined by IAM.  **Example**      {       "bindings": [         {
+  defined by IAM.  **JSON Example**      {       "bindings": [         {
   "role": "roles/owner",           "members": [
   "user:mike@example.com",             "group:admins@example.com",
   "domain:google.com",             "serviceAccount:my-other-
-  app@appspot.gserviceaccount.com",           ]         },         {
+  app@appspot.gserviceaccount.com"           ]         },         {
   "role": "roles/viewer",           "members": ["user:sean@example.com"]
-  }       ]     }  For a description of IAM and its features, see the [IAM
-  developer's guide](https://cloud.google.com/iam/docs).
+  }       ]     }  **YAML Example**      bindings:     - members:       -
+  user:mike@example.com       - group:admins@example.com       -
+  domain:google.com       - serviceAccount:my-other-
+  app@appspot.gserviceaccount.com       role: roles/owner     - members:
+  - user:sean@example.com       role: roles/viewer   For a description of IAM
+  and its features, see the [IAM developer's
+  guide](https://cloud.google.com/iam/docs).
 
   Fields:
     auditConfigs: Specifies cloud audit logging configuration for this policy.
@@ -187,9 +191,95 @@ class Policy(_messages.Message):
   version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
 
 
+class ProjectConfig(_messages.Message):
+  r"""Cloud Source Repositories configuration of a project.
+
+  Messages:
+    PubsubConfigsValue: How this project publishes a change in the
+      repositories through Cloud Pub/Sub. Keyed by the topic names.
+
+  Fields:
+    enablePrivateKeyCheck: Reject a Git push that contains a private key.
+    name: The name of the project. Values are of the form
+      `projects/<project>`.
+    pubsubConfigs: How this project publishes a change in the repositories
+      through Cloud Pub/Sub. Keyed by the topic names.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class PubsubConfigsValue(_messages.Message):
+    r"""How this project publishes a change in the repositories through Cloud
+    Pub/Sub. Keyed by the topic names.
+
+    Messages:
+      AdditionalProperty: An additional property for a PubsubConfigsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type PubsubConfigsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a PubsubConfigsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A PubsubConfig attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('PubsubConfig', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  enablePrivateKeyCheck = _messages.BooleanField(1)
+  name = _messages.StringField(2)
+  pubsubConfigs = _messages.MessageField('PubsubConfigsValue', 3)
+
+
+class PubsubConfig(_messages.Message):
+  r"""Configuration to publish a Cloud Pub/Sub message.
+
+  Enums:
+    MessageFormatValueValuesEnum: The format of the Cloud Pub/Sub messages.
+
+  Fields:
+    messageFormat: The format of the Cloud Pub/Sub messages.
+    serviceAccountEmail: Email address of the service account used for
+      publishing Cloud Pub/Sub messages. This service account needs to be in
+      the same project as the PubsubConfig. When added, the caller needs to
+      have iam.serviceAccounts.actAs permission on this service account. If
+      unspecified, it defaults to the compute engine default service account.
+    topic: A topic of Cloud Pub/Sub. Values are of the form
+      `projects/<project>/topics/<topic>`. The project needs to be the same
+      project as this config is in.
+  """
+
+  class MessageFormatValueValuesEnum(_messages.Enum):
+    r"""The format of the Cloud Pub/Sub messages.
+
+    Values:
+      MESSAGE_FORMAT_UNSPECIFIED: Unspecified.
+      PROTOBUF: The message payload is a serialized protocol buffer of
+        SourceRepoEvent.
+      JSON: The message payload is a JSON string of SourceRepoEvent.
+    """
+    MESSAGE_FORMAT_UNSPECIFIED = 0
+    PROTOBUF = 1
+    JSON = 2
+
+  messageFormat = _messages.EnumField('MessageFormatValueValuesEnum', 1)
+  serviceAccountEmail = _messages.StringField(2)
+  topic = _messages.StringField(3)
+
+
 class Repo(_messages.Message):
-  """A repository (or repo) is a Git repository storing versioned source
+  r"""A repository (or repo) is a Git repository storing versioned source
   content.
+
+  Messages:
+    PubsubConfigsValue: How this repository publishes a change in the
+      repository through Cloud Pub/Sub. Keyed by the topic names.
 
   Fields:
     mirrorConfig: How this repository mirrors a repository managed by another
@@ -197,20 +287,49 @@ class Repo(_messages.Message):
     name: Resource name of the repository, of the form
       `projects/<project>/repos/<repo>`.  The repo name may contain slashes.
       eg, `projects/myproject/repos/name/with/slash`
+    pubsubConfigs: How this repository publishes a change in the repository
+      through Cloud Pub/Sub. Keyed by the topic names.
     size: The disk usage of the repo, in bytes. Read-only field. Size is only
       returned by GetRepo.
     url: URL to clone the repository from Google Cloud Source Repositories.
       Read-only field.
   """
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class PubsubConfigsValue(_messages.Message):
+    r"""How this repository publishes a change in the repository through Cloud
+    Pub/Sub. Keyed by the topic names.
+
+    Messages:
+      AdditionalProperty: An additional property for a PubsubConfigsValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type PubsubConfigsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a PubsubConfigsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A PubsubConfig attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('PubsubConfig', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   mirrorConfig = _messages.MessageField('MirrorConfig', 1)
   name = _messages.StringField(2)
-  size = _messages.IntegerField(3)
-  url = _messages.StringField(4)
+  pubsubConfigs = _messages.MessageField('PubsubConfigsValue', 3)
+  size = _messages.IntegerField(4)
+  url = _messages.StringField(5)
 
 
 class SetIamPolicyRequest(_messages.Message):
-  """Request message for `SetIamPolicy` method.
+  r"""Request message for `SetIamPolicy` method.
 
   Fields:
     policy: REQUIRED: The complete policy to be applied to the `resource`. The
@@ -227,8 +346,19 @@ class SetIamPolicyRequest(_messages.Message):
   updateMask = _messages.StringField(2)
 
 
+class SourcerepoProjectsGetConfigRequest(_messages.Message):
+  r"""A SourcerepoProjectsGetConfigRequest object.
+
+  Fields:
+    name: The name of the requested project. Values are of the form
+      `projects/<project>`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
 class SourcerepoProjectsReposCreateRequest(_messages.Message):
-  """A SourcerepoProjectsReposCreateRequest object.
+  r"""A SourcerepoProjectsReposCreateRequest object.
 
   Fields:
     parent: The project in which to create the repo. Values are of the form
@@ -241,7 +371,7 @@ class SourcerepoProjectsReposCreateRequest(_messages.Message):
 
 
 class SourcerepoProjectsReposDeleteRequest(_messages.Message):
-  """A SourcerepoProjectsReposDeleteRequest object.
+  r"""A SourcerepoProjectsReposDeleteRequest object.
 
   Fields:
     name: The name of the repo to delete. Values are of the form
@@ -252,7 +382,7 @@ class SourcerepoProjectsReposDeleteRequest(_messages.Message):
 
 
 class SourcerepoProjectsReposGetIamPolicyRequest(_messages.Message):
-  """A SourcerepoProjectsReposGetIamPolicyRequest object.
+  r"""A SourcerepoProjectsReposGetIamPolicyRequest object.
 
   Fields:
     resource: REQUIRED: The resource for which the policy is being requested.
@@ -264,7 +394,7 @@ class SourcerepoProjectsReposGetIamPolicyRequest(_messages.Message):
 
 
 class SourcerepoProjectsReposGetRequest(_messages.Message):
-  """A SourcerepoProjectsReposGetRequest object.
+  r"""A SourcerepoProjectsReposGetRequest object.
 
   Fields:
     name: The name of the requested repository. Values are of the form
@@ -275,7 +405,7 @@ class SourcerepoProjectsReposGetRequest(_messages.Message):
 
 
 class SourcerepoProjectsReposListRequest(_messages.Message):
-  """A SourcerepoProjectsReposListRequest object.
+  r"""A SourcerepoProjectsReposListRequest object.
 
   Fields:
     name: The project ID whose repos should be listed. Values are of the form
@@ -292,8 +422,22 @@ class SourcerepoProjectsReposListRequest(_messages.Message):
   pageToken = _messages.StringField(3)
 
 
+class SourcerepoProjectsReposPatchRequest(_messages.Message):
+  r"""A SourcerepoProjectsReposPatchRequest object.
+
+  Fields:
+    name: The name of the requested repository. Values are of the form
+      `projects/<project>/repos/<repo>`.
+    updateRepoRequest: A UpdateRepoRequest resource to be passed as the
+      request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  updateRepoRequest = _messages.MessageField('UpdateRepoRequest', 2)
+
+
 class SourcerepoProjectsReposSetIamPolicyRequest(_messages.Message):
-  """A SourcerepoProjectsReposSetIamPolicyRequest object.
+  r"""A SourcerepoProjectsReposSetIamPolicyRequest object.
 
   Fields:
     resource: REQUIRED: The resource for which the policy is being specified.
@@ -308,7 +452,7 @@ class SourcerepoProjectsReposSetIamPolicyRequest(_messages.Message):
 
 
 class SourcerepoProjectsReposTestIamPermissionsRequest(_messages.Message):
-  """A SourcerepoProjectsReposTestIamPermissionsRequest object.
+  r"""A SourcerepoProjectsReposTestIamPermissionsRequest object.
 
   Fields:
     resource: REQUIRED: The resource for which the policy detail is being
@@ -322,8 +466,22 @@ class SourcerepoProjectsReposTestIamPermissionsRequest(_messages.Message):
   testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
 
 
+class SourcerepoProjectsUpdateConfigRequest(_messages.Message):
+  r"""A SourcerepoProjectsUpdateConfigRequest object.
+
+  Fields:
+    name: The name of the requested project. Values are of the form
+      `projects/<project>`.
+    updateProjectConfigRequest: A UpdateProjectConfigRequest resource to be
+      passed as the request body.
+  """
+
+  name = _messages.StringField(1, required=True)
+  updateProjectConfigRequest = _messages.MessageField('UpdateProjectConfigRequest', 2)
+
+
 class StandardQueryParameters(_messages.Message):
-  """Query parameters accepted by all methods.
+  r"""Query parameters accepted by all methods.
 
   Enums:
     FXgafvValueValuesEnum: V1 error format.
@@ -352,7 +510,7 @@ class StandardQueryParameters(_messages.Message):
   """
 
   class AltValueValuesEnum(_messages.Enum):
-    """Data format for response.
+    r"""Data format for response.
 
     Values:
       json: Responses with Content-Type of application/json
@@ -364,7 +522,7 @@ class StandardQueryParameters(_messages.Message):
     proto = 2
 
   class FXgafvValueValuesEnum(_messages.Enum):
-    """V1 error format.
+    r"""V1 error format.
 
     Values:
       _1: v1 error format
@@ -390,7 +548,7 @@ class StandardQueryParameters(_messages.Message):
 
 
 class TestIamPermissionsRequest(_messages.Message):
-  """Request message for `TestIamPermissions` method.
+  r"""Request message for `TestIamPermissions` method.
 
   Fields:
     permissions: The set of permissions to check for the `resource`.
@@ -403,7 +561,7 @@ class TestIamPermissionsRequest(_messages.Message):
 
 
 class TestIamPermissionsResponse(_messages.Message):
-  """Response message for `TestIamPermissions` method.
+  r"""Response message for `TestIamPermissions` method.
 
   Fields:
     permissions: A subset of `TestPermissionsRequest.permissions` that the
@@ -411,6 +569,34 @@ class TestIamPermissionsResponse(_messages.Message):
   """
 
   permissions = _messages.StringField(1, repeated=True)
+
+
+class UpdateProjectConfigRequest(_messages.Message):
+  r"""Request for UpdateProjectConfig.
+
+  Fields:
+    projectConfig: The new configuration for the project.
+    updateMask: A FieldMask specifying which fields of the project_config to
+      modify. Only the fields in the mask will be modified. If no mask is
+      provided, this request is no-op.
+  """
+
+  projectConfig = _messages.MessageField('ProjectConfig', 1)
+  updateMask = _messages.StringField(2)
+
+
+class UpdateRepoRequest(_messages.Message):
+  r"""Request for UpdateRepo.
+
+  Fields:
+    repo: The new configuration for the repository.
+    updateMask: A FieldMask specifying which fields of the repo to modify.
+      Only the fields in the mask will be modified. If no mask is provided,
+      this request is no-op.
+  """
+
+  repo = _messages.MessageField('Repo', 1)
+  updateMask = _messages.StringField(2)
 
 
 encoding.AddCustomJsonFieldMapping(

@@ -13,12 +13,15 @@
 # limitations under the License.
 """Tests for sourcerepo API wrapper module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.source.repos import sourcerepo
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import sdk_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 def _GetRelativeName(project, repo_name):
@@ -53,7 +56,7 @@ class _SourceRepoMockApiTest(sdk_test_base.WithFakeAuth):
         name=res.RelativeName())
     self.mocked_client.projects_repos.List.Expect(
         request=request, response=self.messages.ListReposResponse(repos=[]))
-    self.assertEquals([], list(self.source_handler.ListRepos(res)))
+    self.assertEqual([], list(self.source_handler.ListRepos(res)))
 
   def testListReposReturnsBackendList(self):
     res = resources.REGISTRY.Parse(
@@ -72,7 +75,7 @@ class _SourceRepoMockApiTest(sdk_test_base.WithFakeAuth):
     self.mocked_client.projects_repos.List.Expect(
         request=request,
         response=self.messages.ListReposResponse(repos=repo_list))
-    self.assertEquals(repo_list, list(self.source_handler.ListRepos(res)))
+    self.assertEqual(repo_list, list(self.source_handler.ListRepos(res)))
 
   def testGetRepo(self):
     res = resources.REGISTRY.Parse(
@@ -86,7 +89,7 @@ class _SourceRepoMockApiTest(sdk_test_base.WithFakeAuth):
     request = self.messages.SourcerepoProjectsReposGetRequest(
         name=_GetRelativeName('testproject', 'test_repo'))
     self.mocked_client.projects_repos.Get.Expect(request=request, response=repo)
-    self.assertEquals(repo, self.source_handler.GetRepo(res))
+    self.assertEqual(repo, self.source_handler.GetRepo(res))
 
   def testCreateRepo(self):
     proj_res = resources.REGISTRY.Create(
@@ -102,7 +105,7 @@ class _SourceRepoMockApiTest(sdk_test_base.WithFakeAuth):
         name=res.RelativeName(), size=0, url='http://')
     self.mocked_client.projects_repos.Create.Expect(
         request=request, response=response)
-    self.assertEquals(response, self.source_handler.CreateRepo(res))
+    self.assertEqual(response, self.source_handler.CreateRepo(res))
 
   def testGetIamPolicy(self):
     res = resources.REGISTRY.Parse(
@@ -114,7 +117,7 @@ class _SourceRepoMockApiTest(sdk_test_base.WithFakeAuth):
     response = self.messages.Policy()
     self.mocked_client.projects_repos.GetIamPolicy.Expect(
         request=request, response=response)
-    self.assertEquals(response, self.source_handler.GetIamPolicy(res))
+    self.assertEqual(response, self.source_handler.GetIamPolicy(res))
 
   def testSetIamPolicy(self):
     res = resources.REGISTRY.Parse(
@@ -127,7 +130,7 @@ class _SourceRepoMockApiTest(sdk_test_base.WithFakeAuth):
         resource=res.RelativeName(), setIamPolicyRequest=set_req)
     self.mocked_client.projects_repos.SetIamPolicy.Expect(
         request=request, response=policy)
-    self.assertEquals(policy, self.source_handler.SetIamPolicy(res, policy))
+    self.assertEqual(policy, self.source_handler.SetIamPolicy(res, policy))
 
   def testParseRepoFails(self):
     properties.VALUES.core.project.Set(None)

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'dataflow metrics list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 
 from googlecloudsdk.api_lib.dataflow import exceptions
@@ -21,6 +23,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.dataflow import base
+import six
 
 JOB_1_ID = base.JOB_1_ID
 
@@ -585,7 +588,7 @@ updateTime: '2015-01-15 12:31:07'
     msg = base.MESSAGE_MODULE
     context = msg.MetricStructuredName.ContextValue(additionalProperties=[
         msg.MetricStructuredName.ContextValue.AdditionalProperty(
-            key=k, value=v) for (k, v) in (props or {}).iteritems()
+            key=k, value=v) for (k, v) in six.iteritems((props or {}))
     ])
 
     if not update_time:

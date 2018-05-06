@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for 'clusters get-credentials' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib.surface.container import base
 
@@ -32,15 +34,6 @@ class CreateTestGA(base.TestBaseV1, base.GATestBase, base.ClustersTestBase):
     self.AssertErrContains('kubeconfig entry generated for {0}'.format(
         self.CLUSTER_NAME))
 
-
-# Mixin class must come in first to have the correct multi-inheritance behavior.
-class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
-  """gcloud Beta track using container v1 API."""
-
-  def SetUp(self):
-    properties.VALUES.container.use_v1_api.Set(True)
-    self.api_mismatch = True
-
   def testGetCredentialsRegional(self):
     self.ExpectGetCluster(
         self._RunningCluster(name=self.CLUSTER_NAME, zone=self.REGION),
@@ -55,6 +48,15 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
       self.AssertErrContains('You invoked')
     else:
       self.AssertErrNotContains('You invoked')
+
+
+# Mixin class must come in first to have the correct multi-inheritance behavior.
+class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
+  """gcloud Beta track using container v1 API."""
+
+  def SetUp(self):
+    properties.VALUES.container.use_v1_api.Set(True)
+    self.api_mismatch = True
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.

@@ -35,8 +35,8 @@ class UsersListTest(base.SqlMockTestBeta):
         ]))
     properties.VALUES.core.user_output_enabled.Set(False)
     result = self.Run('sql users list --instance my_instance')
-    self.assertEquals(result[0].name, 'my_username')
-    self.assertEquals(result[0].host, 'my_host')
+    self.assertEqual(result[0].name, 'my_username')
+    self.assertEqual(result[0].host, 'my_host')
 
 
 if __name__ == '__main__':

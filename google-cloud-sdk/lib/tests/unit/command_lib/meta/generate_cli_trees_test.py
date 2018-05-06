@@ -1473,7 +1473,7 @@ class LoadAllTest(calliope_test_base.CalliopeTestBase):
     # Load all CLI trees into one tree. 'gcloud' is not pre-populated in this
     # test, 'cat' is from CliTreeConfigDir.
     tree = generate_cli_trees.LoadAll()
-    self.assertEquals(['cat'], tree[cli_tree.LOOKUP_COMMANDS].keys())
+    self.assertEqual(['cat'], tree[cli_tree.LOOKUP_COMMANDS].keys())
 
 
 if __name__ == '__main__':

@@ -97,7 +97,24 @@ https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
 
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR, \fB\-m\fR \fIMACHINE_TYPE\fR
-The type of machine to use for nodes. Defaults to n1\-standard\-1
+The type of machine to use for nodes. Defaults to n1\-standard\-1. The list of
+predefined machine types is available using the following command:
+
+.RS 2m
+$ gcloud compute machine\-types list
+.RE
+
+You can also specify custom machine types with the string "custom\-CPUS\-RAM"
+where ``CPUS`` is the number of virtual CPUs and ``RAM`` is the amount of RAM in
+MiB.
+
+For example, to create a node pool using custom machines with 2 vCPUs and 12 GiB
+of RAM:
+
+.RS 2m
+$ gcloud container node\-pools create high\-mem\-pool \e
+    \-\-machine\-type=custom\-2\-12288
+.RE
 
 .TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR
@@ -232,8 +249,9 @@ Options to specify the node identity. At most one of these may be specified:
 .TP 2m
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
 The Google Cloud Platform Service Account to be used by the node VMs. If a
-service account is specified, the cloud\-platform scope is used. If no Service
-Account is specified, the project default service account is used.
+service account is specified, the cloud\-platform and userinfo.email scopes are
+used. If no Service Account is specified, the project default service account is
+used.
 
 .TP 2m
 

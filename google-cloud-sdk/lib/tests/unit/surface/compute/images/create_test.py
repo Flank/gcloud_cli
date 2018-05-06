@@ -290,7 +290,7 @@ class ImagesCreateTest(test_base.BaseTest):
     private_key_fname = self.WriteKeyFile()
 
     image_uri = self.compute_uri + '/projects/my-project/global/images/my-image'
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         csek_utils.MissingCsekKeyException,
         r'Key required for resource \[{0}\], but none found.'.format(
             image_uri)):
@@ -313,7 +313,7 @@ class ImagesCreateTest(test_base.BaseTest):
     private_key_fname = self.WriteKeyFile()
 
     image_uri = self.compute_uri + '/projects/my-project/global/images/my-image'
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         csek_utils.MissingCsekKeyException,
         r'Key required for resource \[{0}\], but none found.'.format(
             image_uri)):
@@ -371,8 +371,8 @@ class ImagesCreateTest(test_base.BaseTest):
   def testCreateImageFromDiskCsekEncryptedRsaWrapped(self):
     private_key_fname = self.WriteKeyFile(include_rsa_encrypted=True)
 
-    with self.assertRaisesRegexp(csek_utils.BadKeyTypeException,
-                                 r'Invalid key type \[rsa-encrypted\]'):
+    with self.assertRaisesRegex(csek_utils.BadKeyTypeException,
+                                r'Invalid key type \[rsa-encrypted\]'):
       self.Run("""
           compute images create my-image
             --source-disk wrappedkeydisk --source-disk-zone central2-a

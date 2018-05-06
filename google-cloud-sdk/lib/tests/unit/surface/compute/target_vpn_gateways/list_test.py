@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the target-vpn-gateways list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.command_lib.compute.target_vpn_gateways import flags

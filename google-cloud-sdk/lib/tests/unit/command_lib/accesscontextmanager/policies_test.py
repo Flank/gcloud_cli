@@ -59,7 +59,7 @@ class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
     result = policies.GetDefaultPolicy()
 
-    self.assertEquals(result, None)
+    self.assertEqual(result, None)
     self.AssertLogContains('account property is not set')
 
   @parameterized.parameters(
@@ -71,7 +71,7 @@ class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
     result = policies.GetDefaultPolicy()
 
-    self.assertEquals(result, None)
+    self.assertEqual(result, None)
     self.AssertLogContains('Unable to resolve domain')
 
   def testGetDefaultPolicy(self):
@@ -81,13 +81,13 @@ class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
     result = policies.GetDefaultPolicy()
 
-    self.assertEquals(result, 'accessPolicies/3')
+    self.assertEqual(result, 'accessPolicies/3')
 
     # Try again without expecting another Search/List call to make sure it's
     # cached
     result = policies.GetDefaultPolicy()
 
-    self.assertEquals(result, 'accessPolicies/3')
+    self.assertEqual(result, 'accessPolicies/3')
 
   @parameterized.parameters(
       (0, 'No matching organizations'),
@@ -99,7 +99,7 @@ class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
     result = policies.GetDefaultPolicy()
 
-    self.assertEquals(result, None)
+    self.assertEqual(result, None)
     self.AssertLogContains(error)
 
   def testGetDefaultPolicy_OrganizationsSearchFails(self):
@@ -108,7 +108,7 @@ class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
     result = policies.GetDefaultPolicy()
 
-    self.assertEquals(result, None)
+    self.assertEqual(result, None)
     self.AssertLogContains('Unable to resolve organization for domain')
 
   @parameterized.parameters(
@@ -122,7 +122,7 @@ class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
     result = policies.GetDefaultPolicy()
 
-    self.assertEquals(result, None)
+    self.assertEqual(result, None)
     self.AssertLogContains(error)
 
   def testGetDefaultPolicy_PoliciesListFails(self):
@@ -133,8 +133,15 @@ class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
     result = policies.GetDefaultPolicy()
 
-    self.assertEquals(result, None)
+    self.assertEqual(result, None)
     self.AssertLogContains('Unable to resolve policy for organization')
+
+
+class GetDefaultPolicyNoCacheTest(accesscontextmanager.Base):
+
+  def testGetDefaultPolicy_NoCache_NoPolicy(self):
+    result = policies.GetDefaultPolicy()
+    self.assertIsNone(result)
 
 
 if __name__ == '__main__':

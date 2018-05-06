@@ -74,7 +74,8 @@ EXAMPLES
     policy role and member types.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam service-accounts add-iam-policy-binding
         $ gcloud beta iam service-accounts add-iam-policy-binding
 

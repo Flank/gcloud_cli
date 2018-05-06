@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from googlecloudsdk.core.util import platforms
+from tests.lib import parameterized
 from tests.lib import test_case
 
 
@@ -24,21 +25,21 @@ class PlatformsTest(test_case.TestCase):
 
   def testParseOperatingSystem(self):
     os = platforms.OperatingSystem.FromId('WINDOWS')
-    self.assertEquals(os, platforms.OperatingSystem.WINDOWS)
+    self.assertEqual(os, platforms.OperatingSystem.WINDOWS)
 
   def testParseArchitecture(self):
     os = platforms.Architecture.FromId('x86')
-    self.assertEquals(os, platforms.Architecture.x86)
+    self.assertEqual(os, platforms.Architecture.x86)
 
   def testFailedParseOperatingSystem(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         platforms.InvalidEnumValue,
         r'Could not parse \[asdf\] into a valid Operating System.  Valid '
         r'values are \[WINDOWS, MACOSX, LINUX, CYGWIN, MSYS\]'):
       platforms.OperatingSystem.FromId('asdf')
 
   def testFailedParseArchitecture(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         platforms.InvalidEnumValue,
         r'Could not parse \[asdf\] into a valid Architecture.  Valid values '
         r'are \[x86, x86_64, PPC, arm\]'):
@@ -55,50 +56,49 @@ class PlatformsTest(test_case.TestCase):
     self.assertEqual(is_windows, platforms.OperatingSystem.IsWindows())
 
 
-class PythonVersionTest(test_case.WithOutputCapture):
+class PythonVersionTest(test_case.WithOutputCapture, parameterized.TestCase):
 
-  def testIsCompatible(self):
-    self.assertTrue(
-        platforms.PythonVersion((2, 6)).IsCompatible(print_errors=True))
-    self.AssertErrContains('WARNING:  Python 2.6.x is no longer')
-    self.ClearErr()
-    self.assertTrue(
-        platforms.PythonVersion((2, 7)).IsCompatible(print_errors=True))
-    self.AssertErrEquals('')
-    self.ClearErr()
-    self.assertFalse(
-        platforms.PythonVersion((3, 0)).IsCompatible(print_errors=True))
-    self.AssertErrContains('Please use a Python 2.7.x version.')
-    self.ClearErr()
-    self.assertFalse(
-        platforms.PythonVersion((4, 0)).IsCompatible(print_errors=True))
-    self.AssertErrContains('Please use a Python 2.7.x version.')
-    self.ClearErr()
-    self.assertFalse(
-        platforms.PythonVersion((2, 5)).IsCompatible(print_errors=True))
-    self.AssertErrContains('Python 2.5 is not compatible')
-    self.AssertErrContains('Please upgrade to Python 2.7.x')
-    self.AssertErrNotContains('WARNING')
-    self.ClearErr()
-    ver = platforms.PythonVersion()
-    ver.version = None
-    self.assertFalse(ver.IsCompatible(print_errors=True))
-    self.AssertErrContains('Please upgrade to Python 2.7.x')
-    self.ClearErr()
+  @parameterized.parameters([
+      ((2, 5), False, False, 'ERROR: Python 2.5 is not compatible '),
+      ((2, 6), False, True, 'WARNING:  Python 2.6.x is no longer'),
+      ((2, 7), False, True, ''),
+      ((3, 0), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((3, 1), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((3, 2), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((3, 3), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((3, 4), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((3, 5), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((3, 6), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((3, 7), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((4, 0), False, False, 'ERROR: Python 3 and later is not compatible'),
+      ((2, 5), True, False, 'ERROR: Python 2.5 is not compatible '),
+      ((2, 6), True, True, 'WARNING:  Python 2.6.x is no longer'),
+      ((2, 7), True, True, ''),
+      ((3, 0), True, False, 'ERROR: Python 3.0 is not compatible '),
+      ((3, 1), True, False, 'ERROR: Python 3.1 is not compatible '),
+      ((3, 2), True, False, 'ERROR: Python 3.2 is not compatible '),
+      ((3, 3), True, False, 'ERROR: Python 3.3 is not compatible '),
+      ((3, 4), True, True, ''),
+      ((3, 5), True, True, ''),
+      ((3, 6), True, True, ''),
+      ((3, 7), True, True, ''),
+      ((4, 0), True, True, ''),
+  ])
+  def testIsCompatible(self, version, allow_py3, is_compatible, error_string):
+    self.assertEqual(
+        is_compatible,
+        platforms.PythonVersion(version).IsCompatible(allow_py3=allow_py3))
+    if error_string:
+      self.AssertErrContains(error_string)
+    else:
+      self.AssertErrEquals('')
 
-    self.assertFalse(
-        platforms.PythonVersion((3, 0)).IsCompatible(print_errors=False))
-    self.AssertErrEquals('')
-    self.ClearErr()
-    self.assertTrue(
-        platforms.PythonVersion((2, 6)).IsCompatible(print_errors=False))
-    self.AssertErrEquals('')
-
-  def testIsSupported(self):
-    self.assertFalse(platforms.PythonVersion((2, 6)).IsSupported())
-    self.assertTrue(platforms.PythonVersion((2, 7)).IsSupported())
-    self.assertFalse(platforms.PythonVersion((3, 0)).IsSupported())
-    self.assertFalse(platforms.PythonVersion((4, 0)).IsSupported())
+  @parameterized.parameters([True, False])
+  def testUnknownVersion(self, allow_py3):
+    version = platforms.PythonVersion()
+    version.version = None
+    self.assertFalse(version.IsCompatible(allow_py3=allow_py3))
+    self.AssertErrContains('ERROR: Your current version of Python is not ')
 
 
 if __name__ == '__main__':

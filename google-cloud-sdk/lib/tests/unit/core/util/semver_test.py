@@ -26,24 +26,24 @@ class SemverTest(test_case.TestCase):
   def Less(self, version1, version2, expected=True):
     semver1 = semver.SemVer(version1)
     semver2 = semver.SemVer(version2)
-    self.assertEquals(expected, semver1 < semver2)
-    self.assertEquals(expected, semver2 > semver1)
-    self.assertEquals(not expected, semver1 >= semver2)
-    self.assertEquals(not expected, semver2 <= semver1)
+    self.assertEqual(expected, semver1 < semver2)
+    self.assertEqual(expected, semver2 > semver1)
+    self.assertEqual(not expected, semver1 >= semver2)
+    self.assertEqual(not expected, semver2 <= semver1)
 
   def Equal(self, version1, version2, expected=True):
     semver1 = semver.SemVer(version1)
     semver2 = semver.SemVer(version2)
-    self.assertEquals(expected, semver1 == semver2)
-    self.assertEquals(not expected, semver1 != semver2)
+    self.assertEqual(expected, semver1 == semver2)
+    self.assertEqual(not expected, semver1 != semver2)
 
   def Distance(self, version1, version2, expected):
     semver1 = semver.SemVer(version1)
     semver2 = semver.SemVer(version2)
     major, minor, patch = semver1.Distance(semver2)
-    self.assertEquals(major, expected[0])
-    self.assertEquals(minor, expected[1])
-    self.assertEquals(patch, expected[2])
+    self.assertEqual(major, expected[0])
+    self.assertEqual(minor, expected[1])
+    self.assertEqual(patch, expected[2])
 
   def testDistance(self):
     self.Distance('1.0.0', '1.0.0', [0, 0, 0])

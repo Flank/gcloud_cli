@@ -15,6 +15,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     app-profiles
+        (BETA) Manage Cloud Bigtable app_profiles.
+
      clusters
         (BETA) Manage Cloud Bigtable clusters.
 

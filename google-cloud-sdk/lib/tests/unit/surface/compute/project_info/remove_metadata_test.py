@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the project-info remove-metadata subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -61,22 +63,20 @@ class ProjectInfoRemoveMetadataTest(test_base.BaseTest):
 
   def testWithExistingMetadata(self):
     self.make_requests.side_effect = iter([
-        [messages.Project(
-            name='my-project',
-            commonInstanceMetadata=messages.Metadata(
-                fingerprint='my-fingerprint',
-                items=[
-                    messages.Metadata.ItemsValueListEntry(
-                        key='a',
-                        value='b'),
-                    messages.Metadata.ItemsValueListEntry(
-                        key='hello',
-                        value='world'),
-                    messages.Metadata.ItemsValueListEntry(
-                        key='x',
-                        value='y'),
-                ]))],
-
+        [
+            messages.Project(
+                name='my-project',
+                commonInstanceMetadata=messages.Metadata(
+                    fingerprint=b'my-fingerprint',
+                    items=[
+                        messages.Metadata.ItemsValueListEntry(
+                            key='a', value='b'),
+                        messages.Metadata.ItemsValueListEntry(
+                            key='hello', value='world'),
+                        messages.Metadata.ItemsValueListEntry(
+                            key='x', value='y'),
+                    ]))
+        ],
         [],
     ])
 
@@ -85,42 +85,34 @@ class ProjectInfoRemoveMetadataTest(test_base.BaseTest):
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.projects,
-          'Get',
-          messages.ComputeProjectsGetRequest(
-              project='my-project'))],
-
-        [(self.compute_v1.projects,
-          'SetCommonInstanceMetadata',
+        [(self.compute_v1.projects, 'Get',
+          messages.ComputeProjectsGetRequest(project='my-project'))],
+        [(self.compute_v1.projects, 'SetCommonInstanceMetadata',
           messages.ComputeProjectsSetCommonInstanceMetadataRequest(
               metadata=messages.Metadata(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[
-                      messages.Metadata.ItemsValueListEntry(
-                          key='a',
-                          value='b'),
+                      messages.Metadata.ItemsValueListEntry(key='a', value='b'),
                   ]),
               project='my-project'))],
     )
 
   def testWithExistingMetadataAndNoChanges(self):
     self.make_requests.side_effect = iter([
-        [messages.Project(
-            name='my-project',
-            commonInstanceMetadata=messages.Metadata(
-                fingerprint='my-fingerprint',
-                items=[
-                    messages.Metadata.ItemsValueListEntry(
-                        key='x',
-                        value='y'),
-                    messages.Metadata.ItemsValueListEntry(
-                        key='hello',
-                        value='world'),
-                    messages.Metadata.ItemsValueListEntry(
-                        key='a',
-                        value='b'),
-                ]))],
-
+        [
+            messages.Project(
+                name='my-project',
+                commonInstanceMetadata=messages.Metadata(
+                    fingerprint=b'my-fingerprint',
+                    items=[
+                        messages.Metadata.ItemsValueListEntry(
+                            key='x', value='y'),
+                        messages.Metadata.ItemsValueListEntry(
+                            key='hello', value='world'),
+                        messages.Metadata.ItemsValueListEntry(
+                            key='a', value='b'),
+                    ]))
+        ],
         [],
     ])
 
@@ -137,22 +129,20 @@ class ProjectInfoRemoveMetadataTest(test_base.BaseTest):
 
   def testWithAllOption(self):
     self.make_requests.side_effect = iter([
-        [messages.Project(
-            name='my-project',
-            commonInstanceMetadata=messages.Metadata(
-                fingerprint='my-fingerprint',
-                items=[
-                    messages.Metadata.ItemsValueListEntry(
-                        key='a',
-                        value='b'),
-                    messages.Metadata.ItemsValueListEntry(
-                        key='hello',
-                        value='world'),
-                    messages.Metadata.ItemsValueListEntry(
-                        key='x',
-                        value='y'),
-                ]))],
-
+        [
+            messages.Project(
+                name='my-project',
+                commonInstanceMetadata=messages.Metadata(
+                    fingerprint=b'my-fingerprint',
+                    items=[
+                        messages.Metadata.ItemsValueListEntry(
+                            key='a', value='b'),
+                        messages.Metadata.ItemsValueListEntry(
+                            key='hello', value='world'),
+                        messages.Metadata.ItemsValueListEntry(
+                            key='x', value='y'),
+                    ]))
+        ],
         [],
     ])
 
@@ -161,17 +151,12 @@ class ProjectInfoRemoveMetadataTest(test_base.BaseTest):
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.projects,
-          'Get',
-          messages.ComputeProjectsGetRequest(
-              project='my-project'))],
-
-        [(self.compute_v1.projects,
-          'SetCommonInstanceMetadata',
+        [(self.compute_v1.projects, 'Get',
+          messages.ComputeProjectsGetRequest(project='my-project'))],
+        [(self.compute_v1.projects, 'SetCommonInstanceMetadata',
           messages.ComputeProjectsSetCommonInstanceMetadataRequest(
               metadata=messages.Metadata(
-                  fingerprint='my-fingerprint',
-                  items=[]),
+                  fingerprint=b'my-fingerprint', items=[]),
               project='my-project'))],
     )
 

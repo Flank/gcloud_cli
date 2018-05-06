@@ -13,6 +13,8 @@
 # limitations under the License.
 """Update cluster command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.container import api_adapter
@@ -26,6 +28,7 @@ from googlecloudsdk.command_lib.container import container_command_util
 from googlecloudsdk.command_lib.container import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core.console import console_io
+from six.moves import input  # pylint: disable=redefined-builtin
 
 
 class InvalidAddonValueError(util.Error):
@@ -68,7 +71,6 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
       'are: "monitoring.googleapis.com" (the Google Cloud Monitoring '
       'service),  "none" (no metrics will be exported from the cluster)')
 
-  # Network policy is only for alpha/beta
   if release_track in [base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA]:
     mutex_group.add_argument(
         '--update-addons',
@@ -100,16 +102,19 @@ def _AddMutuallyExclusiveArgs(mutex_group, release_track):
             api_adapter.INGRESS: _ParseAddonDisabled,
             api_adapter.HPA: _ParseAddonDisabled,
             api_adapter.DASHBOARD: _ParseAddonDisabled,
+            api_adapter.NETWORK_POLICY: _ParseAddonDisabled,
         }),
         dest='disable_addons',
         metavar='ADDON=ENABLED|DISABLED',
         help="""Cluster addons to enable or disable. Options are
 {hpa}=ENABLED|DISABLED
 {ingress}=ENABLED|DISABLED
-{dashboard}=ENABLED|DISABLED""".format(
+{dashboard}=ENABLED|DISABLED
+{network_policy}=ENABLED|DISABLED""".format(
     hpa=api_adapter.HPA,
     ingress=api_adapter.INGRESS,
-    dashboard=api_adapter.DASHBOARD))
+    dashboard=api_adapter.DASHBOARD,
+    network_policy=api_adapter.NETWORK_POLICY,))
 
   mutex_group.add_argument(
       '--generate-password',
@@ -176,10 +181,13 @@ class Update(base.UpdateCommand):
     _AddMutuallyExclusiveArgs(group, base.ReleaseTrack.GA)
     flags.AddNodeLocationsFlag(group_locations)
     flags.AddClusterAutoscalingFlags(parser, group)
-    flags.AddMasterAuthorizedNetworksFlags(parser, group)
+    flags.AddMasterAuthorizedNetworksFlags(parser,
+                                           enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
     flags.AddStartIpRotationFlag(group)
+    flags.AddStartCredentialRotationFlag(group)
     flags.AddCompleteIpRotationFlag(group)
+    flags.AddCompleteCredentialRotationFlag(group)
     flags.AddUpdateLabelsFlag(group)
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
@@ -240,7 +248,7 @@ class Update(base.UpdateCommand):
       else:
         password = args.password
         if args.password is None:
-          password = raw_input('Please enter the new password:')
+          password = input('Please enter the new password:')
         options = api_adapter.SetMasterAuthOptions(
             action=api_adapter.SetMasterAuthOptions.SET_PASSWORD,
             password=password)
@@ -267,30 +275,52 @@ class Update(base.UpdateCommand):
         op_ref = adapter.SetNetworkPolicy(cluster_ref, options)
       except apitools_exceptions.HttpError as error:
         raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
-    elif args.start_ip_rotation:
+    elif args.start_ip_rotation or args.start_credential_rotation:
+      if args.start_ip_rotation:
+        msg_tmpl = """This will start an IP Rotation on cluster [{name}]. The \
+master will be updated to serve on a new IP address in addition to the current \
+IP address. Kubernetes Engine will then recreate all nodes ({num_nodes} nodes) \
+to point to the new IP address. This operation is long-running and will block \
+other operations on the cluster (including delete) until it has run to \
+completion."""
+        rotate_credentials = False
+      elif args.start_credential_rotation:
+        msg_tmpl = """This will start an IP and Credentials Rotation on cluster\
+ [{name}]. The master will be updated to serve on a new IP address in addition \
+to the current IP address, and cluster credentials will be rotated. Kubernetes \
+Engine will then recreate all nodes ({num_nodes} nodes) to point to the new IP \
+address. This operation is long-running and will block other operations on the \
+cluster (including delete) until it has run to completion."""
+        rotate_credentials = True
       console_io.PromptContinue(
-          message='This will start an IP Rotation on cluster [{name}]. The '
-          'master will be updated to serve on a new IP address in addition to '
-          'the current IP address. Kubernetes Engine will then recreate all '
-          'nodes ({num_nodes} nodes) to point to the new IP address. This '
-          'operation is long-running and will block other operations on the '
-          'cluster (including delete) until it has run to completion.'.format(
+          message=msg_tmpl.format(
               name=cluster.name, num_nodes=cluster.currentNodeCount),
           cancel_on_no=True)
       try:
-        op_ref = adapter.StartIpRotation(cluster_ref)
+        op_ref = adapter.StartIpRotation(
+            cluster_ref, rotate_credentials=rotate_credentials)
       except apitools_exceptions.HttpError as error:
         raise exceptions.HttpException(error, util.HTTP_ERROR_FORMAT)
-    elif args.complete_ip_rotation:
+    elif args.complete_ip_rotation or args.complete_credential_rotation:
+      if args.complete_ip_rotation:
+        msg_tmpl = """This will complete the in-progress IP Rotation on \
+cluster [{name}]. The master will be updated to stop serving on the old IP \
+address and only serve on the new IP address. Make sure all API clients have \
+been updated to communicate with the new IP address (e.g. by running `gcloud \
+container clusters get-credentials --project {project} --zone {zone} {name}`). \
+This operation is long-running and will block other operations on the cluster \
+(including delete) until it has run to completion."""
+      elif args.complete_credential_rotation:
+        msg_tmpl = """This will complete the in-progress Credential Rotation on\
+ cluster [{name}]. The master will be updated to stop serving on the old IP \
+address and only serve on the new IP address. Old cluster credentials will be \
+invalidated. Make sure all API clients have been updated to communicate with \
+the new IP address (e.g. by running `gcloud container clusters get-credentials \
+--project {project} --zone {zone} {name}`). This operation is long-running and \
+will block other operations on the cluster (including delete) until it has run \
+to completion."""
       console_io.PromptContinue(
-          message='This will complete the in-progress IP Rotation on cluster '
-          '[{name}]. The master will be updated to stop serving on the old IP '
-          'address and only serve on the new IP address. Make sure all API '
-          'clients have been updated to communicate with the new IP address '
-          '(e.g. by running `gcloud container clusters get-credentials '
-          '--project {project} --zone {zone} {name}`). This operation is long-'
-          'running and will block other operations on the cluster (including '
-          'delete) until it has run to completion.'.format(
+          message=msg_tmpl.format(
               name=cluster.name,
               project=cluster_ref.projectId,
               zone=cluster.zone),
@@ -337,12 +367,13 @@ class Update(base.UpdateCommand):
       log.status.Print(
           'To inspect the contents of your cluster, go to: ' + cluster_url)
 
-      if args.start_ip_rotation or args.complete_ip_rotation:
+      if (args.start_ip_rotation or args.complete_ip_rotation or
+          args.start_credential_rotation or args.complete_credential_rotation):
         cluster = adapter.GetCluster(cluster_ref)
         try:
           util.ClusterConfig.Persist(cluster, cluster_ref.projectId)
         except kconfig.MissingEnvVarError as error:
-          log.warning(error.message)
+          log.warning(error)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -358,10 +389,13 @@ class UpdateBeta(Update):
     group_locations = group.add_mutually_exclusive_group()
     _AddAdditionalZonesArg(group_locations, deprecated=True)
     flags.AddNodeLocationsFlag(group_locations)
-    flags.AddMasterAuthorizedNetworksFlags(parser, group)
+    flags.AddMasterAuthorizedNetworksFlags(parser,
+                                           enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
     flags.AddStartIpRotationFlag(group)
+    flags.AddStartCredentialRotationFlag(group)
     flags.AddCompleteIpRotationFlag(group)
+    flags.AddCompleteCredentialRotationFlag(group)
     flags.AddUpdateLabelsFlag(group)
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)
@@ -388,10 +422,13 @@ class UpdateAlpha(Update):
     group_locations = group.add_mutually_exclusive_group()
     _AddAdditionalZonesArg(group_locations, deprecated=True)
     flags.AddNodeLocationsFlag(group_locations)
-    flags.AddMasterAuthorizedNetworksFlags(parser, group)
+    flags.AddMasterAuthorizedNetworksFlags(parser,
+                                           enable_group_for_update=group)
     flags.AddEnableLegacyAuthorizationFlag(group)
     flags.AddStartIpRotationFlag(group)
+    flags.AddStartCredentialRotationFlag(group)
     flags.AddCompleteIpRotationFlag(group)
+    flags.AddCompleteCredentialRotationFlag(group)
     flags.AddUpdateLabelsFlag(group)
     flags.AddRemoveLabelsFlag(group)
     flags.AddNetworkPolicyFlags(group)

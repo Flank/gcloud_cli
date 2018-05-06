@@ -14,6 +14,8 @@
 
 """Tests for DM labels utility."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.deployment_manager import dm_labels
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base
@@ -31,17 +33,15 @@ class DmLabelsTest(unit_test_base.DmV2UnitTestBase):
     labels = dm_labels.UpdateLabels(None,
                                     self.messages.DeploymentLabelEntry,
                                     update_labels=create_labels)
-    expected = """\
-[<DeploymentLabelEntry
- key: 'key1'
- value: 'value1'>, <DeploymentLabelEntry
- key: 'key2'
- value: 'value2'>]"""
-    self.assertEqual(expected, str(labels))
+    expected = [
+        self.messages.DeploymentLabelEntry(key='key1', value='value1'),
+        self.messages.DeploymentLabelEntry(key='key2', value='value2')]
+    self.assertEqual(expected, labels)
 
   def testUpdateLabels(self):
-    labels = [self.messages.DeploymentLabelEntry(key='key1', value='value1'),
-              self.messages.DeploymentLabelEntry(key='key2', value='value2')]
+    labels = [
+        self.messages.DeploymentLabelEntry(key='key1', value='value1'),
+        self.messages.DeploymentLabelEntry(key='key2', value='value2')]
     update_labels = {
         'key2': 'update2',
         'key3': 'value3',
@@ -53,32 +53,28 @@ class DmLabelsTest(unit_test_base.DmV2UnitTestBase):
                                             self.messages.DeploymentLabelEntry,
                                             update_labels=update_labels,
                                             remove_labels=remove_labels)
-    expected = """\
-[<DeploymentLabelEntry
- key: 'key2'
- value: 'update2'>, <DeploymentLabelEntry
- key: 'key3'
- value: 'value3'>]"""
-    self.assertEqual(expected, str(updated_labels))
+    expected = [
+        self.messages.DeploymentLabelEntry(key='key2', value='update2'),
+        self.messages.DeploymentLabelEntry(key='key3', value='value3')]
+    self.assertEqual(expected, updated_labels)
 
   def testNoOpLabels(self):
-    labels = [self.messages.DeploymentLabelEntry(key='key2', value='update2'),
-              self.messages.DeploymentLabelEntry(key='key3', value='value3')]
+    labels = [
+        self.messages.DeploymentLabelEntry(key='key2', value='update2'),
+        self.messages.DeploymentLabelEntry(key='key3', value='value3')]
     updated_labels = dm_labels.UpdateLabels(labels,
                                             self.messages.DeploymentLabelEntry)
 
-    expected = """\
-[<DeploymentLabelEntry
- key: 'key2'
- value: 'update2'>, <DeploymentLabelEntry
- key: 'key3'
- value: 'value3'>]"""
+    expected = [
+        self.messages.DeploymentLabelEntry(key='key2', value='update2'),
+        self.messages.DeploymentLabelEntry(key='key3', value='value3')]
 
-    self.assertEqual(expected, str(updated_labels))
+    self.assertEqual(expected, updated_labels)
 
   def testRemoveLabels(self):
-    labels = [self.messages.DeploymentLabelEntry(key='key2', value='value2'),
-              self.messages.DeploymentLabelEntry(key='key3', value='value3')]
+    labels = [
+        self.messages.DeploymentLabelEntry(key='key2', value='value2'),
+        self.messages.DeploymentLabelEntry(key='key3', value='value3')]
     remove_labels = [
         'key2',
         'key3',
@@ -87,8 +83,8 @@ class DmLabelsTest(unit_test_base.DmV2UnitTestBase):
     updated_labels = dm_labels.UpdateLabels(labels,
                                             self.messages.DeploymentLabelEntry,
                                             remove_labels=remove_labels)
-    expected = '[]'
-    self.assertEqual(expected, str(updated_labels))
+    expected = []
+    self.assertEqual(expected, updated_labels)
 
 
 if __name__ == '__main__':

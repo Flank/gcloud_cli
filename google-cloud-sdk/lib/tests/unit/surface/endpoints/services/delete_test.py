@@ -62,8 +62,8 @@ class EndpointsDeleteTest(unit_test_base.EV1UnitTestBase):
 
   def testServicesDeleteCancelled(self):
     self.WriteInput('n\n')
-    with self.assertRaisesRegexp(console_io.OperationCancelledError,
-                                 'Aborted by user.'):
+    with self.assertRaisesRegex(console_io.OperationCancelledError,
+                                'Aborted by user.'):
       self.Run('endpoints services delete ' + self.DEFAULT_SERVICE_NAME)
 
   def testServicesDeleteForced(self):

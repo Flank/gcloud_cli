@@ -48,7 +48,7 @@ class InstanceTemplatesTestBase(e2e_test_base.BaseTest):
   def _CreateSubnetGA(self, cidr_range):
     name = self._name_generator.next()
     self._CreateResourceScheduleCleanUp(name, 'networks', e2e_test_base.GLOBAL,
-                                        '--mode custom')
+                                        '--subnet-mode custom')
     self._CreateResourceScheduleCleanUp(
         name, 'networks subnets', e2e_test_base.REGIONAL,
         '--network {0} --range {1} --region {2}'.format(

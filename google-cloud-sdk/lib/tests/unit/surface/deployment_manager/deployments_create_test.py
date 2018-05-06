@@ -14,15 +14,18 @@
 
 """Unit tests for deployments create command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.deployment_manager import dm_api_util
 from googlecloudsdk.api_lib.deployment_manager import exceptions
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 DEPLOYMENT_NAME = 'deployment-name'
-FINGERPRINT = '123456'
+FINGERPRINT = b'123456'
 MANIFEST_NAME = 'manifest-name'
 FINGERPRINT_ENCODED = 'MTIzNDU2'
 OPERATION_NAME = 'operation-12345-67890'
@@ -62,10 +65,10 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
                               'use list command to show all of the resources.'
                               % dm_api_util.MAX_RESOURCE_TO_DISPLAY)
     self.AssertBasicOutputs()
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
     if self.track is base.ReleaseTrack.ALPHA:
-      for i in xrange(4):
+      for i in range(4):
         self.AssertOutputContains('action_name-' + str(i))
       self.AssertOutputContains('RUNTIME_POLICIES')
       self.AssertOutputContains('UPDATE_ON_CHANGE')
@@ -74,6 +77,54 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
       self.AssertOutputContains('N/A')
     else:
       self.AssertOutputContains('INTENT')
+
+  def testDeploymentsCreate_WithWarning(self):
+    config_file_path = self.Resource('tests', 'lib', 'surface',
+                                     'deployment_manager', 'test_data',
+                                     'simple_configs', 'simple.yaml')
+    deployment = self.BuildDeploymentObjectFromConfigFile(config_file_path)
+    self.expectDeploymentInsert(deployment)
+    self.expectBasicDeploymentGet()
+    for _ in range(2):
+      # Operation is pending for a while
+      self.ExpectOperationGet()
+
+    # WaitForOperation throws an error, so create does not do an extra Get
+    # call on the Operation. Only one 'DONE' get to expect here.
+    self.mocked_client.operations.Get.Expect(
+        request=self.messages.DeploymentmanagerOperationsGetRequest(
+            project=self.Project(),
+            operation=OPERATION_NAME,
+        ),
+        response=self.messages.Operation(
+            name=OPERATION_NAME,
+            operationType='create',
+            status='DONE',
+            warnings=[
+                self.messages.Operation.WarningsValueListEntry(
+                    message='warning')
+            ]))
+    # Once the operation completes successfully, expect:
+    # - A list call to display completed resources.
+    # - A get deployment call to get the manifest name.
+    # - A get manifest call to get the layout.
+    self.expectResourceGet()
+    self.expectBasicDeploymentGet()
+    self.expectManifestGetRequestWithLayoutResponse()
+
+    self.Run('deployment-manager deployments create ' + DEPLOYMENT_NAME +
+             ' --config "' + config_file_path + '"')
+    self.AssertErrContains(FINGERPRINT_ENCODED)
+    self.AssertErrContains(OPERATION_NAME)
+    self.AssertErrContains('WARNING: Create operation operation-12345-67890 '
+                           'completed with warnings:')
+    self.AssertErrContains('message: warning')
+    self.AssertOutputNotContains('PENDING')
+    self.AssertOutputContains('OUTPUT')
+    self.AssertOutputContains('the-only-output')
+    self.AssertOutputContains('successful-output')
+    for i in range(4):
+      self.AssertOutputContains('resource-' + str(i))
 
   def testDeploymentsCreate_TruncatedResources(self):
     config_file_path = self.Resource('tests',
@@ -107,7 +158,7 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
       self.AssertOutputContains('RUNTIME_POLICIES')
     else:
       self.AssertOutputContains('INTENT')
-    for i in xrange(dm_api_util.MAX_RESOURCE_TO_DISPLAY):
+    for i in range(dm_api_util.MAX_RESOURCE_TO_DISPLAY):
       self.AssertOutputContains('resource-' + str(i))
     self.AssertOutputNotContains('resource-' + str(resource_count))
 
@@ -145,7 +196,7 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
       self.AssertOutputContains('RUNTIME_POLICIES')
     else:
       self.AssertOutputContains('INTENT')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
 
   def testDeploymentsCreate_NoResources(self):
@@ -230,7 +281,7 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
     self.AssertErrContains(OPERATION_NAME)
     self.AssertOutputContains('COMPLETED')
     self.AssertOutputNotContains('PENDING')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
 
     self.AssertOutputNotContains('OUTPUT')
@@ -319,7 +370,7 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
     self.AssertErrContains(OPERATION_NAME)
     self.AssertOutputContains('COMPLETED')
     self.AssertOutputNotContains('PENDING')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
 
     self.AssertOutputNotContains('OUTPUT')
@@ -352,7 +403,7 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
              + ' --description "' + description + '"')
     self.AssertBasicOutputs()
     self.AssertOutputContains('COMPLETED')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
 
   def testDeploymentsCreate_Async(self):
@@ -385,7 +436,7 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
     deployment = self.BuildDeploymentObjectFromConfigFile(config_file_path)
     self.expectDeploymentInsert(deployment)
     self.expectBasicDeploymentGet()
-    for _ in xrange(2):
+    for _ in range(2):
       # Operation is pending for a while
       self.ExpectOperationGet()
 
@@ -400,23 +451,24 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
             name=OPERATION_NAME,
             operationType='create',
             status='DONE',
-            error=self.messages.Operation.ErrorValue(
-                errors=[
-                    self.messages.Operation.ErrorValue.ErrorsValueListEntry(
-                        message=error_string)
-                ]
-            )
-        )
-    )
+            error=self.messages.Operation.ErrorValue(errors=[
+                self.messages.Operation.ErrorValue.ErrorsValueListEntry(
+                    message=error_string)
+            ]),
+            warnings=[
+                self.messages.Operation.WarningsValueListEntry(
+                    message='warning')
+            ]))
     try:
       self.Run('deployment-manager deployments create ' + DEPLOYMENT_NAME
                + ' --config "' + config_file_path + '"')
 
       self.fail('Expected gcloud error for create operation with error.')
     except exceptions.OperationError as e:
-      self.assertTrue(error_string in unicode(e))
-      self.assertTrue(OPERATION_NAME in unicode(e))
+      self.assertTrue(error_string in str(e))
+      self.assertTrue(OPERATION_NAME in str(e))
     self.AssertErrContains(FINGERPRINT_ENCODED)
+    self.AssertOutputNotContains('WARNING:')
 
   def testDeploymentsCreate_WithErrorAndRollback(self):
     config_file_path = self.Resource('tests',
@@ -434,7 +486,7 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
     # get fingerprint
     self.expectBasicDeploymentGet()
 
-    for _ in xrange(2):
+    for _ in range(2):
       # Operation is pending for a while
       self.ExpectOperationGet()
 
@@ -469,11 +521,11 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
         )
     )
 
-    for _ in xrange(2):
+    for _ in range(2):
       # Operation is pending for a while
       self.ExpectOperationGet('PENDING', delete_operation_name)
 
-    for _ in xrange(2):
+    for _ in range(2):
       # Operation complete: one 'DONE' response to end poll, one Get to display.
       self.ExpectOperationGet('DONE', delete_operation_name)
 
@@ -500,8 +552,9 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
              + ' --automatic-rollback-on-error --config "' + config_file_path
              + '"')
 
+    self.AssertErrContains("""MTIzNDU2""")
     self.AssertErrContains(
-        """The fingerprint of the deployment is MTIzNDU2
+        """
 <START PROGRESS TRACKER>Waiting for create [operation-12345-67890]
 <END PROGRESS TRACKER>FAILURE
 WARNING: There was an error deploying deployment-name:
@@ -515,9 +568,9 @@ Error in Operation [operation-12345-67890]: errors:
         normalize_space='.')
 
     self.AssertOutputEquals(
-        """NAME                   TYPE    STATUS  TARGET  ERRORS
-operation-12345-67890  create  DONE            []
-operation-delete       create  DONE            []
+        """NAME                   TYPE    STATUS  TARGET  ERRORS  WARNINGS
+operation-12345-67890  create  DONE            []      []
+operation-delete       create  DONE            []      []
 """)
 
   def testDeploymentsCreate_SuccessWithAutoRollback(self):
@@ -554,7 +607,7 @@ operation-delete       create  DONE            []
       self.AssertOutputContains('RUNTIME_POLICIES')
     else:
       self.AssertOutputContains('INTENT')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
 
   def testDeploymentsCreate_WithImports(self):
@@ -604,7 +657,7 @@ operation-delete       create  DONE            []
       self.AssertOutputContains('RUNTIME_POLICIES')
     else:
       self.AssertOutputContains('INTENT')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
 
   def testDeploymentsCreate_InvalidConfigName(self):
@@ -620,8 +673,8 @@ operation-delete       create  DONE            []
                + ' --config "' + config_file_path + '"')
       self.fail('Expected ImportFileError for nonexistent import file.')
     except exceptions.ConfigError as e:
-      self.assertTrue('config' in unicode(e))
-      self.assertTrue(config_file_path in unicode(e))
+      self.assertTrue('config' in str(e))
+      self.assertTrue(config_file_path in str(e))
     self.AssertErrNotContains(FINGERPRINT_ENCODED)
 
   def testDeploymentsCreate_WithImportError(self):
@@ -637,8 +690,8 @@ operation-delete       create  DONE            []
                + ' --config "' + config_file_path + '"')
       self.fail('Expected ImportFileError for nonexistent import file.')
     except exceptions.ConfigError as e:
-      self.assertTrue('Unable to read file' in unicode(e))
-      self.assertTrue('filethatdoesnotexist.py' in unicode(e))
+      self.assertTrue('Unable to read file' in str(e))
+      self.assertTrue('filethatdoesnotexist.py' in str(e))
     self.AssertErrNotContains(FINGERPRINT_ENCODED)
 
   def testDeploymentsCreate_Preview(self):
@@ -668,10 +721,10 @@ operation-delete       create  DONE            []
     self.AssertBasicOutputs()
     self.AssertOutputContains('IN_PREVIEW')
     self.AssertOutputContains('INTENT')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
     if self.track is base.ReleaseTrack.ALPHA:
-      for i in xrange(4):
+      for i in range(4):
         self.AssertOutputContains('action_name-' + str(i))
       self.AssertOutputContains('DELETE/NOT_RUN')
       self.AssertOutputContains('CREATE_OR_ACQUIRE/TO_RUN')
@@ -948,7 +1001,7 @@ class DeploymentsCreateAlphaTest(DeploymentsCreateTest):
     self.AssertOutputContains('COMPLETED')
     self.AssertOutputNotContains('PENDING')
     self.AssertOutputContains('RUNTIME_POLICIES')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-{}'.format(i))
 
   def testDeploymentsCreate_withCredential_noType(self):
@@ -964,7 +1017,7 @@ class DeploymentsCreateAlphaTest(DeploymentsCreateTest):
           'deployment-manager deployments create {} --config {} --credential {}'
           .format(DEPLOYMENT_NAME, config_file_path, credential_input))
     except calliope_exceptions.InvalidArgumentException as e:
-      self.assertIn(error_string, unicode(e))
+      self.assertIn(error_string, str(e))
 
   def testDeploymentsCreate_withCredential_projectDefault(self):
     credential_input = 'PROJECT_DEFAULT'
@@ -998,7 +1051,7 @@ class DeploymentsCreateAlphaTest(DeploymentsCreateTest):
     self.AssertOutputContains('COMPLETED')
     self.AssertOutputNotContains('PENDING')
     self.AssertOutputContains('RUNTIME_POLICIES')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-{}'.format(i))
 
 

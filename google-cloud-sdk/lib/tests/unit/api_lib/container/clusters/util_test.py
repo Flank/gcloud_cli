@@ -14,6 +14,8 @@
 
 """Test for container util functions."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import stat
 
@@ -131,11 +133,11 @@ class KubeconfigTestsV1(base.TestBaseV1, base.UnitTestBase):
     self.assertTrue(os.path.isfile(path))
     st = os.stat(path)
     # the oct() is just to make reading failures easier
-    self.assertEquals(
+    self.assertEqual(
         oct(st.st_mode),
         oct(stat.S_IFREG | stat.S_IWUSR | stat.S_IRUSR))
     with open(path, 'r') as fp:
-      self.assertEquals(fp.read(), _EMPTY_KUBECONFIG)
+      self.assertEqual(fp.read(), _EMPTY_KUBECONFIG)
 
   def testEmptyDefaultKubeconfig(self):
     path = kconfig.Kubeconfig.DefaultPath()
@@ -147,7 +149,7 @@ class KubeconfigTestsV1(base.TestBaseV1, base.UnitTestBase):
     data = yaml.load_path(path)
     self.assertIsNotNone(data)
     with open(path, 'r') as fp:
-      self.assertEquals(fp.read(), _EMPTY_KUBECONFIG)
+      self.assertEqual(fp.read(), _EMPTY_KUBECONFIG)
 
   def testPartialDefaultKubeconfig(self):
     path = kconfig.Kubeconfig.DefaultPath()
@@ -157,7 +159,7 @@ class KubeconfigTestsV1(base.TestBaseV1, base.UnitTestBase):
     self.assertTrue(os.path.isfile(path))
     kconfig.Kubeconfig.Default()
     with open(path, 'r') as fp:
-      self.assertEquals(fp.read(), _EMPTY_KUBECONFIG)
+      self.assertEqual(fp.read(), _EMPTY_KUBECONFIG)
 
   def testKubeconfigEnvvar(self):
     default_path = kconfig.Kubeconfig.DefaultPath()
@@ -167,23 +169,23 @@ class KubeconfigTestsV1(base.TestBaseV1, base.UnitTestBase):
     with open(default_path, 'w') as fp:
       fp.write(_EXISTING_KUBECONFIG)
     kubeconfig = kconfig.Kubeconfig.Default()
-    self.assertEquals(kubeconfig.current_context, 'existing-context')
+    self.assertEqual(kubeconfig.current_context, 'existing-context')
     # We overwrite $HOME in base.UnitTestBase.SetUp
     os.environ['KUBECONFIG'] = env_path
     kubeconfig = kconfig.Kubeconfig.Default()
-    self.assertEquals(kubeconfig.current_context, '')
+    self.assertEqual(kubeconfig.current_context, '')
     with open(default_path, 'r') as fp:
-      self.assertEquals(fp.read(), _EXISTING_KUBECONFIG)
+      self.assertEqual(fp.read(), _EXISTING_KUBECONFIG)
     with open(env_path, 'r') as fp:
-      self.assertEquals(fp.read(), _EMPTY_KUBECONFIG)
+      self.assertEqual(fp.read(), _EMPTY_KUBECONFIG)
 
   @test_case.Filters.DoNotRunOnWindows
   def testDefaultPathNix(self):
     self.StartDictPatch('os.environ',
                         {'HOME': 'foo', 'HOMEDRIVE': 'bar', 'HOMEPATH': 'baz',
                          'USERPROFILE': 'junk'})
-    self.assertEquals(kconfig.Kubeconfig.DefaultPath(),
-                      os.path.join('foo', '.kube', 'config'))
+    self.assertEqual(kconfig.Kubeconfig.DefaultPath(),
+                     os.path.join('foo', '.kube', 'config'))
     self.StartDictPatch('os.environ', {'HOME': ''})
     with self.assertRaises(kconfig.MissingEnvVarError):
       kconfig.Kubeconfig.DefaultPath()
@@ -193,14 +195,14 @@ class KubeconfigTestsV1(base.TestBaseV1, base.UnitTestBase):
     self.StartDictPatch('os.environ',
                         {'HOME': 'foo', 'HOMEDRIVE': 'C:', 'HOMEPATH': 'bar',
                          'USERPROFILE': 'baz'})
-    self.assertEquals(kconfig.Kubeconfig.DefaultPath(),
-                      os.path.join('foo', '.kube', 'config'))
+    self.assertEqual(kconfig.Kubeconfig.DefaultPath(),
+                     os.path.join('foo', '.kube', 'config'))
     self.StartDictPatch('os.environ', {'HOME': ''})
-    self.assertEquals(kconfig.Kubeconfig.DefaultPath(),
-                      os.path.join('C:', 'bar', '.kube', 'config'))
+    self.assertEqual(kconfig.Kubeconfig.DefaultPath(),
+                     os.path.join('C:', 'bar', '.kube', 'config'))
     self.StartDictPatch('os.environ', {'HOMEDRIVE': '', 'HOMEPATH': ''})
-    self.assertEquals(kconfig.Kubeconfig.DefaultPath(),
-                      os.path.join('baz', '.kube', 'config'))
+    self.assertEqual(kconfig.Kubeconfig.DefaultPath(),
+                     os.path.join('baz', '.kube', 'config'))
     self.StartDictPatch('os.environ', {'USERPROFILE': ''})
     with self.assertRaises(kconfig.MissingEnvVarError):
       kconfig.Kubeconfig.DefaultPath()
@@ -223,10 +225,10 @@ class KubeconfigTestsV1(base.TestBaseV1, base.UnitTestBase):
 
     # reload
     kubeconfig = kconfig.Kubeconfig.Default()
-    self.assertEquals(kubeconfig.users[user['name']], user)
-    self.assertEquals(kubeconfig.contexts[context['name']], context)
+    self.assertEqual(kubeconfig.users[user['name']], user)
+    self.assertEqual(kubeconfig.contexts[context['name']], context)
     for c in cluster1, cluster2:
-      self.assertEquals(kubeconfig.clusters[c['name']], c)
+      self.assertEqual(kubeconfig.clusters[c['name']], c)
 
     self.assertTrue(
         kubeconfig.clusters['cluster2']['cluster']['insecure-skip-tls-verify'])
@@ -324,26 +326,17 @@ class ClusterConfigTest(
         statusMessage='Running',
         endpoint=self.ENDPOINT,
         zone=self.ZONE,
-        clusterApiVersion='1.1.1',
         ca_data='base64cadata',
-        cert_data='base64certdata',
-        key_data='base64keydata',
     )
     config = c_util.ClusterConfig.Persist(cluster, self.PROJECT_ID)
     self.assertIsNotNone(config)
-    self.assertTrue(config.has_certs)
-    self.assertTrue(config.has_cert_data)
-    self.assertEquals(config.ca_data, 'base64cadata')
-    self.assertEquals(config.client_cert_data, 'base64certdata')
-    self.assertEquals(config.client_key_data, 'base64keydata')
+    self.assertEqual(config.ca_data, 'base64cadata')
+    self.assertEqual(config.auth_provider, 'gcp')
 
     loaded = c_util.ClusterConfig.Load(
         self.CLUSTER_NAME, self.ZONE, self.PROJECT_ID)
-    self.assertTrue(loaded.has_cert_data)
-    self.assertTrue(loaded.has_certs)
-    self.assertEquals(config.ca_data, loaded.ca_data)
-    self.assertEquals(config.client_key_data, loaded.client_key_data)
-    self.assertEquals(config.client_cert_data, loaded.client_cert_data)
+    self.assertEqual(config.ca_data, loaded.ca_data)
+    self.assertEqual(config.auth_provider, loaded.auth_provider['name'])
 
   def testPersistNoCertDataNotLegacyVersion(self):
     cluster = self._MakeCluster(
@@ -381,7 +374,7 @@ class ClusterConfigTest(
     kubeconfig = kconfig.Kubeconfig.Default()
     # current-context should be cleared, since it was set to the cluster
     # that got purged
-    self.assertEquals(kubeconfig._data, existing._data)
+    self.assertEqual(kubeconfig._data, existing._data)
 
   def testExistingKubeconfig(self):
     path = kconfig.Kubeconfig.DefaultPath()
@@ -401,10 +394,10 @@ class ClusterConfigTest(
         config.kube_context, config.kube_context, config.kube_context)
 
     # verify added kubeconfig data is correct
-    self.assertEquals(kubeconfig.clusters[config.kube_context], cluster)
-    self.assertEquals(kubeconfig.users[config.kube_context], user)
-    self.assertEquals(kubeconfig.contexts[config.kube_context], context)
-    self.assertEquals(kubeconfig.current_context, config.kube_context)
+    self.assertEqual(kubeconfig.clusters[config.kube_context], cluster)
+    self.assertEqual(kubeconfig.users[config.kube_context], user)
+    self.assertEqual(kubeconfig.contexts[config.kube_context], context)
+    self.assertEqual(kubeconfig.current_context, config.kube_context)
 
     # verify purge clears cluster data from kubeconfig
     c_util.ClusterConfig.Purge(
@@ -414,7 +407,7 @@ class ClusterConfigTest(
     # Purge unsets current-context if it was set to the deleted
     # cluster's context
     existing.SetCurrentContext('')
-    self.assertEquals(kubeconfig._data, existing._data)
+    self.assertEqual(kubeconfig._data, existing._data)
 
   def testLoadInvalidKubeconfigFails(self):
     properties.VALUES.container.use_client_certificate.Set(True)
@@ -456,18 +449,15 @@ class ClusterConfigTest(
         clusterApiVersion='1.1.2',
         zone=self.ZONE,
         endpoint=self.ENDPOINT,
-        ca_data='cadata',
-        key_data='keydata',
-        cert_data='certdata')
+        ca_data='cadata')
     self.ExpectGetCluster(cluster)
     self.Run(self.COMMAND_BASE + ' clusters get-credentials ' + name)
     c_config = c_util.ClusterConfig.Load(name, self.ZONE, self.PROJECT_ID)
     self.assertIsNotNone(c_config)
     self.assertEqual(kconfig.Kubeconfig.Default().current_context,
                      c_config.kube_context)
-    self.assertEquals(c_config.ca_data, 'cadata')
-    self.assertEquals(c_config.client_cert_data, 'certdata')
-    self.assertEquals(c_config.client_key_data, 'keydata')
+    self.assertEqual(c_config.ca_data, 'cadata')
+    self.assertEqual(c_config.auth_provider['name'], 'gcp')
     self.assertEqual(kconfig.Kubeconfig.Default().current_context,
                      c_config.kube_context)
     self.AssertErrContains(c_util.KUBECONFIG_USAGE_FMT.format(
@@ -529,49 +519,25 @@ class ClusterConfigTest(
     self.AssertErrContains(
         'cluster newcluster is missing endpoint. Is it still PROVISIONING?')
 
-  def testGetCredentialsDefaultAuthOldCluster(self):
-    properties.VALUES.container.use_client_certificate.Set(None)
-    c_config = self. _TestGetCredentials(
-        self._RunningClusterForVersion('1.2.0'))
-    self.assertTrue(c_config.has_certs)
-    self.assertTrue(c_config.has_ca_cert)
-
-  def testGetCredentialsClientCertAuthOldCluster(self):
+  def testGetCredentialsClientCertAuth(self):
     properties.VALUES.container.use_client_certificate.Set(True)
-    c_config = self. _TestGetCredentials(
-        self._RunningClusterForVersion('1.2.0'))
+    c_config = self._TestGetCredentials(self._RunningCluster())
     self.assertTrue(c_config.has_certs)
     self.assertTrue(c_config.has_ca_cert)
 
-  def testGetCredentialsGCPAuthOldCluster(self):
-    properties.VALUES.container.use_client_certificate.Set(False)
-    c_config = self. _TestGetCredentials(
-        self._RunningClusterForVersion('1.2.0'))
-    self.assertTrue(c_config.has_certs)
-    self.assertTrue(c_config.has_ca_cert)
-
-  def testGetCredentialsDefaultAuthNewCluster(self):
-    properties.VALUES.compute.zone.Set(self.ZONE)
-    c_config = self. _TestGetCredentials(
-        self._RunningClusterForVersion('1.3.0'))
-    self.assertFalse(c_config.has_certs)
-    self.assertTrue(c_config.has_ca_cert)
-
-  def testGetCredentialsClientCertAuthNewCluster(self):
-    properties.VALUES.container.use_client_certificate.Set(True)
-    c_config = self. _TestGetCredentials(
-        self._RunningClusterForVersion('1.3.0'))
-    self.assertTrue(c_config.has_certs)
-    self.assertTrue(c_config.has_ca_cert)
-
-  def testGetCredentialsGCPAuthNewCluster(self):
+  def testGetCredentialsGCPAuth(self):
     properties.VALUES.container.use_app_default_credentials.Set(None)
-    c_config = self. _TestGetCredentials(
-        self._RunningClusterForVersion('1.3.0'))
+    c_config = self._TestGetCredentials(self._RunningCluster())
     self.assertFalse(c_config.has_certs)
     self.assertTrue(c_config.has_ca_cert)
     self.assertIsNotNone(c_config.auth_provider)
     self.assertEqual(c_config.auth_provider.get('name'), 'gcp')
+
+  def testUserGCPAuthProvider(self):
+    user = kconfig.User(name='user', auth_provider='gcp')
+    self.assertIsNotNone(user)
+    self.assertEqual(user['name'], 'user')
+    self.assertEqual(user['user']['auth-provider']['name'], 'gcp')
 
 
 class ClusterConfigTestAlpha(ClusterConfigTest, base.AlphaTestBase):

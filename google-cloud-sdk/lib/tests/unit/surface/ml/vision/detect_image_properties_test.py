@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """beta ml vision tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import textwrap
 
@@ -23,14 +27,11 @@ from tests.lib import test_case
 from tests.lib.surface.ml.vision import base as vision_base
 
 
-@parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA),
-    ('Beta', base.ReleaseTrack.BETA),
-    ('GA', base.ReleaseTrack.GA))
-class DetectImagePropertiesTest(vision_base.MlVisionTestBase):
+class DetectImagePropertiesBase(vision_base.MlVisionTestBase):
 
   def _ExpectDetectImagePropertiesRequest(self, image_path, success=False,
-                                          error_message=None, contents=None):
+                                          error_message=None, contents=None,
+                                          model=None):
     """Build expected requests/responses for image-properties command.
 
     Args:
@@ -40,6 +41,7 @@ class DetectImagePropertiesTest(vision_base.MlVisionTestBase):
       error_message: str, the error message expected from the API (if any).
       contents: bytes, the content field of the Image message to be expected
           (if any). Alternative to image_path.
+      model: str, the model version to use for the feature.
     """
     ftype = self.messages.Feature.TypeValueValuesEnum.IMAGE_PROPERTIES
     image = self.messages.Image()
@@ -49,7 +51,7 @@ class DetectImagePropertiesTest(vision_base.MlVisionTestBase):
       image.content = contents
     request = self.messages.BatchAnnotateImagesRequest(
         requests=[self.messages.AnnotateImageRequest(
-            features=[self.messages.Feature(type=ftype)],
+            features=[self.messages.Feature(type=ftype, model=model)],
             image=image)])
     responses = []
     if success:
@@ -77,11 +79,19 @@ class DetectImagePropertiesTest(vision_base.MlVisionTestBase):
     self.client.images.Annotate.Expect(request,
                                        response=response)
 
-  def testDetectImageProperties_Successful(self, track):
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA, 'builtin/stable'),
+    ('Beta', base.ReleaseTrack.BETA, 'builtin/stable'),
+    ('GA', base.ReleaseTrack.GA, None))
+class DetectImagePropertiesCommonTest(DetectImagePropertiesBase):
+
+  def testDetectImageProperties_Successful(self, track, model):
     """Test `vision detect-image-properties` runs & outputs correctly."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
-    self._ExpectDetectImagePropertiesRequest(path_to_image, success=True)
+    self._ExpectDetectImagePropertiesRequest(path_to_image, success=True,
+                                             model=model)
     self.Run('ml vision detect-image-properties {path}'
              .format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
@@ -109,13 +119,14 @@ class DetectImagePropertiesTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectImageProperties_LocalPath(self, track):
+  def testDetectImageProperties_LocalPath(self, track, model):
     """Test `detect-image-properties` with a local image path."""
     self.track = track
     tempdir = self.CreateTempDir()
     path_to_image = self.Touch(tempdir, name='imagefile', contents='image')
     self._ExpectDetectImagePropertiesRequest(None, success=True,
-                                             contents=bytes('image'))
+                                             contents=b'image',
+                                             model=model)
     self.Run('ml vision detect-image-properties {path}'
              .format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
@@ -143,16 +154,55 @@ class DetectImagePropertiesTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectImageProperties_Error(self, track):
+  def testDetectImageProperties_Error(self, track, model):
     """Test `gcloud ml vision detect-image-properties` with an error message."""
     self.track = track
     path_to_image = 'https://example.com/fake-file'
     self._ExpectDetectImagePropertiesRequest(path_to_image,
-                                             error_message='Not found.')
+                                             error_message='Not found.',
+                                             model=model)
     with self.AssertRaisesExceptionMatches(exceptions.Error,
                                            'Code: [400] Message: [Not found.]'):
       self.Run('ml vision detect-image-properties {path}'.format(
           path=path_to_image))
+
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA),
+    ('Beta', base.ReleaseTrack.BETA))
+class DetectImagePropertiesAlphaBetaTest(DetectImagePropertiesBase):
+
+  def testDetectImageProperties_ModelVersion(self, track):
+    self.track = track
+    path_to_image = 'gs://fake-bucket/fake-file'
+    self._ExpectDetectImagePropertiesRequest(path_to_image, success=True,
+                                             model='builtin/latest')
+    self.Run('ml vision detect-image-properties {path} '
+             '--model-version builtin/latest'.format(path=path_to_image))
+    self.AssertOutputEquals(textwrap.dedent("""\
+        {
+          "responses": [
+            {
+              "imagePropertiesAnnotation": {
+                "dominantColors": {
+                  "colors": [
+                    {
+                      "color": {
+                        "alpha": 0.5,
+                        "blue": 0.5,
+                        "green": 0.5,
+                        "red": 0.5
+                      },
+                      "pixelFraction": 0.5,
+                      "score": 0.5
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+    """))
 
 
 if __name__ == '__main__':

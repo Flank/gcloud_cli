@@ -14,6 +14,8 @@
 
 """Helper class for commands which upload files to Google Cloud Storage."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import hashlib
 
 from apitools.base.py.testing import mock as api_mock
@@ -21,6 +23,10 @@ from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
+import six
+from six.moves import map  # pylint:disable=redefined-builtin
+from six.moves import range  # pylint:disable=redefined-builtin
+
 
 storage_v1 = core_apis.GetMessagesModule('storage', 'v1')
 
@@ -33,7 +39,8 @@ def GetSha(content):
   Returns:
     A string containing the hex digest of the SHA1 checksum of the content.
   """
-  return files.Checksum(algorithm=hashlib.sha1).AddContents(content).HexDigest()
+  return files.Checksum(
+      algorithm=hashlib.sha1).AddContents(content.encode('utf-8')).HexDigest()
 
 
 class WithGCSCalls(sdk_test_base.SdkBase):
@@ -67,7 +74,7 @@ class WithGCSCalls(sdk_test_base.SdkBase):
     for _, content in file_list:
       sha_to_size[GetSha(content)] = len(content)
 
-    for sha, size in sorted(sha_to_size.iteritems()):
+    for sha, size in sorted(six.iteritems(sha_to_size)):
       self.apitools_client.objects.Insert.Expect(
           storage_v1.StorageObjectsInsertRequest(
               bucket=self._BUCKET_NAME,
@@ -101,7 +108,7 @@ class WithGCSCalls(sdk_test_base.SdkBase):
       file_list_list: A list of lists of 2-tuples containing the filename and
       the content of the file.
     """
-    page_tokens = map(str, range(len(file_list_list) - 1))
+    page_tokens = list(map(str, list(range(len(file_list_list) - 1))))
     for idx, file_list in enumerate(file_list_list):
       next_page_token = None
       if idx < len(file_list_list) - 1:

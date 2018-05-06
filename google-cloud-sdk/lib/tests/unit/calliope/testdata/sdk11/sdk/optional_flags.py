@@ -13,7 +13,12 @@
 # limitations under the License.
 """gcloud sdk tests command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 @base.UnicodeIsSupported
@@ -30,7 +35,7 @@ class OptionalFlags(base.Command):
     parser.add_argument(
         '--number-with-choices',
         type=int,
-        choices=range(1, 4),
+        choices=list(range(1, 4)),
         help='number from 1 to 4')
 
     parser.add_argument(
@@ -44,12 +49,31 @@ class OptionalFlags(base.Command):
 
 
 class Pirate(object):
+  """A testing class."""
 
   def __init__(self, value):
     self.value = int(value)
 
+  def __hash__(self):
+    return hash(self.value)
+
   def __str__(self):
-    return u'\u2620{}'.format(self.value)
+    return '\u2620{}'.format(self.value)
 
   def __eq__(self, other):
     return other.value == self.value
+
+  def __ne__(self, other):
+    return not self == other
+
+  def __lt__(self, other):
+    return self.value < other.value
+
+  def __gt__(self, other):
+    return self.value > other.value
+
+  def __le__(self, other):
+    return not self > other
+
+  def __ge__(self, other):
+    return not self < other

@@ -2,7 +2,7 @@ NAME
     gcloud beta bigtable clusters list - list existing Bigtable clusters
 
 SYNOPSIS
-    gcloud beta bigtable clusters list [--instances=[INSTANCE,...]]
+    gcloud beta bigtable clusters list --instances=[INSTANCES,...]
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
@@ -10,9 +10,14 @@ DESCRIPTION
     (BETA) List existing Bigtable clusters.
 
 FLAGS
-     --instances=[INSTANCE,...]
-        ID of the instances. If no instances are provided, all clusters in the
-        project will be listed by default.
+     INSTANCES - The instances to list clusters for. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line.
+
+       --instances=[INSTANCES,...]
+          The ID of the instance or a fully qualified identifier for the
+          instance.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

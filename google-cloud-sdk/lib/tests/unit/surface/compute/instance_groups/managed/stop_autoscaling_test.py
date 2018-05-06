@@ -57,7 +57,7 @@ class InstanceGroupManagersStopAutoscalingZonalTest(test_base.BaseTest):
         self.AUTOSCALERS[1:],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         r'The managed instance group is not autoscaled\.'):
       self.Run('compute instance-groups managed stop-autoscaling group-1 '
@@ -97,7 +97,7 @@ class InstanceGroupManagersStopAutoscalingZonalTest(test_base.BaseTest):
       yield
     self.make_requests.side_effect = MakeRequests
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         'Could not fetch resource:'):
       self.Run('compute instance-groups managed stop-autoscaling group-1 '
@@ -142,7 +142,7 @@ class InstanceGroupManagersStopAutoscalingRegionalTest(test_base.BaseTest):
         self.AUTOSCALERS[1:],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         r'The managed instance group is not autoscaled\.'):
       self.Run("""
@@ -184,7 +184,7 @@ class InstanceGroupManagersStopAutoscalingRegionalTest(test_base.BaseTest):
       yield
     self.make_requests.side_effect = MakeRequests
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         'Could not fetch resource:'):
       self.Run('compute instance-groups managed stop-autoscaling group-1 '

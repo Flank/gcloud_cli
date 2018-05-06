@@ -211,7 +211,7 @@ XṲᾔḯ¢◎ⅾℯ Xṧʊ¢кṧ
     log.warning('Xღ'.encode('utf8'))
     self.AssertErrEquals('ФXФWARNING: ღ\nWARNING: Xღ\n')
     file_contents = self.GetLogFileContents()
-    self.assertEquals(file_contents, """\
+    self.assertEqual(file_contents, """\
 2017-01-01 00:00:00,000 INFO     ___FILE_ONLY___ Ṳᾔḯ¢◎ⅾℯ
 2017-01-01 00:00:00,000 INFO     ___FILE_ONLY___ XṲᾔḯ¢◎ⅾℯ
 
@@ -268,7 +268,7 @@ X??????? X?????
     self.AssertErrEquals('?X?WARNING: ?\nWARNING: X?\n')
     file_contents = self.GetLogFileContents()
     # Log file contents are always utf-8 so all information is retained.
-    self.assertEquals(file_contents, """\
+    self.assertEqual(file_contents, """\
 2017-01-01 00:00:00,000 INFO     ___FILE_ONLY___ Ṳᾔḯ¢◎ⅾℯ
 2017-01-01 00:00:00,000 INFO     ___FILE_ONLY___ XṲᾔḯ¢◎ⅾℯ
 
@@ -485,11 +485,11 @@ X??????? X?????
     log_manager_instance = log._LogManager()
     properties.VALUES.core.max_log_days.Set(10)
     self.addCleanup(properties.VALUES.core.max_log_days.Set, None)
-    self.assertEquals(log_manager_instance._GetMaxLogDays(), 10)
+    self.assertEqual(log_manager_instance._GetMaxLogDays(), 10)
 
   def testGetMaxLogDaysNotSetReturnsDefaultValue(self):
     log_manager_instance = log._LogManager()
-    self.assertEquals(log_manager_instance._GetMaxLogDays(), 30)
+    self.assertEqual(log_manager_instance._GetMaxLogDays(), 30)
 
   def testGetMaxLogDaysReturnsFalse(self):
     log_manager_instance = log._LogManager()
@@ -508,14 +508,14 @@ X??????? X?????
     properties.VALUES.core.max_log_days.Set(10)
     self.addCleanup(properties.VALUES.core.max_log_days.Set, None)
     days_in_seconds = 60 * 60 * 24 * 10
-    self.assertEquals(log_manager_instance._GetMaxAge(), days_in_seconds)
+    self.assertEqual(log_manager_instance._GetMaxAge(), days_in_seconds)
 
   def testGetMaxAgeTimeDelta(self):
     log_manager_instance = log._LogManager()
     properties.VALUES.core.max_log_days.Set(10)
     self.addCleanup(properties.VALUES.core.max_log_days.Set, None)
-    self.assertEquals(log_manager_instance._GetMaxAgeTimeDelta(),
-                      datetime.timedelta(10))
+    self.assertEqual(log_manager_instance._GetMaxAgeTimeDelta(),
+                     datetime.timedelta(10))
 
   def testShouldDeleteDirDirDoesNotExist(self):
     log_manager_instance = log._LogManager()
@@ -595,7 +595,7 @@ class LoggingConfigNoOutCaptureTest(sdk_test_base.WithOutputCapture,
     return dir_path, file_paths
 
   def testNoDirs(self):
-    self.assertEquals(0, len(os.listdir(self.logs)))
+    self.assertEqual(0, len(os.listdir(self.logs)))
     log._log_manager._CleanLogsDir(self.logs)
 
   def testNewDir(self):
@@ -605,7 +605,7 @@ class LoggingConfigNoOutCaptureTest(sdk_test_base.WithOutputCapture,
     log._log_manager._CleanLogsDir(self.logs)
 
     # Don't delete, it's not old enough.
-    self.assertEquals(1, len(os.listdir(self.logs)))
+    self.assertEqual(1, len(os.listdir(self.logs)))
     self.assertTrue(os.path.exists(dir1))
     self.assertTrue(os.path.exists(files1[0]))
 
@@ -618,7 +618,7 @@ class LoggingConfigNoOutCaptureTest(sdk_test_base.WithOutputCapture,
     self.file_paths[files2[0]] = True
     log._log_manager._CleanLogsDir(self.logs)
 
-    self.assertEquals(1, len(os.listdir(self.logs)))
+    self.assertEqual(1, len(os.listdir(self.logs)))
     self.assertTrue(os.path.exists(dir1))
     self.assertTrue(os.path.exists(files1[0]))
     self.assertFalse(os.path.exists(dir2))
@@ -632,7 +632,7 @@ class LoggingConfigNoOutCaptureTest(sdk_test_base.WithOutputCapture,
     log._log_manager._CleanLogsDir(self.logs)
 
     # Dir stays around, old file1 gets removed.
-    self.assertEquals(1, len(os.listdir(self.logs)))
+    self.assertEqual(1, len(os.listdir(self.logs)))
     self.assertTrue(os.path.exists(dir1))
     self.assertFalse(os.path.exists(files1[0]))
     self.assertTrue(os.path.exists(files1[1]))
@@ -644,7 +644,7 @@ class LoggingConfigNoOutCaptureTest(sdk_test_base.WithOutputCapture,
     log._log_manager._CleanLogsDir(self.logs)
 
     # Dir stays around, and files don't get processed.
-    self.assertEquals(1, len(os.listdir(self.logs)))
+    self.assertEqual(1, len(os.listdir(self.logs)))
     self.assertTrue(os.path.exists(dir1))
     self.assertTrue(os.path.exists(files1[0]))
 
@@ -719,16 +719,16 @@ class LogResourceChangeTest(sdk_test_base.WithOutputCapture):
                          'region [us-east1]: Permission denied.\n')
 
   def testCreatedAsync(self):
-    log.CreatedResource('my-cluster', async=True)
+    log.CreatedResource('my-cluster', is_async=True)
     self.AssertErrEquals('Create in progress for [my-cluster].\n')
 
   def testCreatedKindAsync(self):
-    log.CreatedResource('my-cluster', kind='cluster', async=True)
+    log.CreatedResource('my-cluster', kind='cluster', is_async=True)
     self.AssertErrEquals('Create in progress for cluster [my-cluster].\n')
 
   def testCreatedKindDetailsAsync(self):
     log.CreatedResource('my-cluster', kind='cluster',
-                        details='in region [us-east1]', async=True)
+                        details='in region [us-east1]', is_async=True)
     self.AssertErrEquals(
         'Create in progress for cluster [my-cluster] in region [us-east1].\n')
 
@@ -737,7 +737,7 @@ class LogResourceChangeTest(sdk_test_base.WithOutputCapture):
     self.AssertErrEquals('Deleted [my-cluster].\n')
 
   def testDeletedAsync(self):
-    log.DeletedResource('my-cluster', async=True)
+    log.DeletedResource('my-cluster', is_async=True)
     self.AssertErrEquals('Delete in progress for [my-cluster].\n')
 
   def testRestored(self):
@@ -745,7 +745,7 @@ class LogResourceChangeTest(sdk_test_base.WithOutputCapture):
     self.AssertErrEquals('Restored [my-cluster].\n')
 
   def testRestoredAsync(self):
-    log.RestoredResource('my-cluster', async=True)
+    log.RestoredResource('my-cluster', is_async=True)
     self.AssertErrEquals('Restore in progress for [my-cluster].\n')
 
   def testUpdated(self):
@@ -753,7 +753,7 @@ class LogResourceChangeTest(sdk_test_base.WithOutputCapture):
     self.AssertErrEquals('Updated [my-cluster].\n')
 
   def testUpdatedAsync(self):
-    log.UpdatedResource('my-cluster', async=True)
+    log.UpdatedResource('my-cluster', is_async=True)
     self.AssertErrEquals('Update in progress for [my-cluster].\n')
 
   def testReset(self):
@@ -761,7 +761,7 @@ class LogResourceChangeTest(sdk_test_base.WithOutputCapture):
     self.AssertErrEquals('Reset [mytpu].\n')
 
   def testResetAsync(self):
-    log.ResetResource('mytpu', async=True)
+    log.ResetResource('mytpu', is_async=True)
     self.AssertErrEquals('Reset in progress for [mytpu].\n')
 
 
@@ -1246,7 +1246,7 @@ class FileOrStdoutTests(sdk_test_base.WithOutputCapture):
         '-',
         b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n',
         binary=True)
-    self.assertEquals(
+    self.assertEqual(
         self.GetOutputBytes(),
         b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n')
 
@@ -1260,7 +1260,7 @@ class FileOrStdoutTests(sdk_test_base.WithOutputCapture):
     contents = b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n'
     path = os.path.join(self.temp_path, self.RandomFileName())
     file_utils.WriteFileContents(path, contents, binary=True)
-    self.assertEquals(file_utils.GetFileContents(path, binary=True), contents)
+    self.assertEqual(file_utils.GetFileContents(path, binary=True), contents)
 
 
 if __name__ == '__main__':

@@ -72,7 +72,7 @@ class EndpointsConfigsDescribeTest(unit_test_base.EV1UnitTestBase):
     self._doDescribe(None, self.config_id_input)
 
   def testServicesConfigsDescribeResourceUriIncomplete(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         parser_errors.RequiredError,
         'argument --service: Must be specified.'):
       self.Run('endpoints configs describe {0}'.format(CONFIG_ID))

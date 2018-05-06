@@ -25,15 +25,15 @@ tested.
 
     def testOnePlusOneEqualsTwo(self):
       actual = self.calculator.Eval('1+1')
-      self.assertEquals(2, actual)
+      self.assertEqual(2, actual)
 
     def testOnePlusOneEqualsTwoWithSpaces(self):
       actual = self.calculator.Eval('1 + 1')
-      self.assertEquals(2, actual)
+      self.assertEqual(2, actual)
 
     def testOnePlusOneEqualsTwoWithParentheses(self):
       actual = self.calculator.Eval('(1 + 1)')
-      self.assertEquals(2, actual)
+      self.assertEqual(2, actual)
 
 (2) versus using subtests:
 
@@ -179,13 +179,13 @@ class Base(test_case.Base):
       expected_exception_type = None
       expected_exception_message = None
     matches = kwargs.pop('matches', operator.eq)
+    exception_type = None
+    exception_message = None
     try:
       actual = self.RunSubTest(*args, **kwargs)
-      exception_message = None
-      exception_type = None
     except Exception as e:  # pylint: disable=broad-except
-      exception_message = six.text_type(e)
       exception_type = type(e)
+      exception_message = six.text_type(e)
 
     argv = ["'" + six.text_type(a) + "'" for a in args]
     for name, value in sorted(six.iteritems(kwargs)):

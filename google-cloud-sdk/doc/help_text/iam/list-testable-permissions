@@ -40,7 +40,8 @@ EXAMPLES
             https://www.googleapis.com/compute/v1/projects/example-project
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam list-testable-permissions
         $ gcloud beta iam list-testable-permissions
 

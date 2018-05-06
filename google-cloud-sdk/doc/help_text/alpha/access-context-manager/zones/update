@@ -48,7 +48,7 @@ FLAGS
         export data amongst themselves. A project may belong to at most one
         regular access zone.
 
-        A bridge access zone llows resources in different regular access zones
+        A bridge access zone allows resources in different regular access zones
         to import and export data between each other. A project may belong to
         multiple bridge access zones (only if it also belongs to a regular
         access zone). Both restricted and unrestricted service lists, as well
@@ -74,8 +74,8 @@ FLAGS
           Completely replace the current access levels with the given values.
 
      These flags modify the member resources of this zone. Resources must be
-     projects, in the form project/<projectnumber>. At most one of these may be
-     specified:
+     projects, in the form projects/<projectnumber>. At most one of these may
+     be specified:
 
        --add-resources=[RESOURCES,...]
           Append the given values to the current resources.

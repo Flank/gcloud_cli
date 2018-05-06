@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for gcloud app firewall-rules."""
 
+from __future__ import absolute_import
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib.surface.app import firewall_rules_base
@@ -61,9 +62,9 @@ class FirewallCreateTest(firewall_rules_base.FirewallRulesBase):
                           --source-range=192.0.2.1
                           --description=descrip
                           --action=allow""")
-    self.assertEquals(result.priority, 1000)
-    self.assertEquals(result.sourceRange, '192.0.2.1')
-    self.assertEquals(result.description, 'descrip')
+    self.assertEqual(result.priority, 1000)
+    self.assertEqual(result.sourceRange, '192.0.2.1')
+    self.assertEqual(result.description, 'descrip')
 
   def testCreateFirewallRule_defaultRuleFails(self):
     with self.assertRaises(exceptions.InvalidArgumentException):

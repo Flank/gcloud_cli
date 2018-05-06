@@ -212,7 +212,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                                    self.blank_config_report_response)
 
   def testDeployFailsOnMissingFile(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.BadFileException,
         r'Could not open service config file \[missing-file\]'):
       self.Run('{0} missing-file'.format(self.base_cmd))
@@ -220,7 +220,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
   def testDeployFailsOnBadFileExceptionErrors(self):
     self._config_file_path = self.Touch(
         self.temp_path, name='file-with-no-extension', contents=TEST_CONFIG)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.BadFileException,
         'Could not determine the content type of file'):
       self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
@@ -229,7 +229,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
         self.temp_path,
         name='file-with-bad-contents.json',
         contents='!foo-bar-contents!')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.BadFileException,
         'Could not read JSON or YAML from service config file'):
       self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
@@ -238,14 +238,14 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
         self.temp_path,
         name='valid-json-but-no-api-spec-in-contents.json',
         contents='{"foo": "bar"}')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.BadFileException,
         'Unable to parse Open API, or Google Service Configuration '):
       self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
 
     self._config_file_path = self._config_file_path = self.Touch(
         self.temp_path, name='service.json', contents=TEST_CONFIG)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.BadFileException,
         'Ambiguous input. Found normalized service configuration in file'):
       self.Run('{0} {1} {2}'.format(self.base_cmd,
@@ -528,6 +528,11 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     self.AssertErrContains(
         ('Service Configuration [{0}] uploaded for service [{1}]').format(
             SERVICE_VERSION, SERVICE_NAME))
+
+    # TODO(b/77867100): remove after deprecation period.
+    self.AssertErrContains(
+        'Support for uploading uncompiled .proto files is deprecated and will '
+        'soon be removed. Use compiled descriptor sets (.pb) instead.')
 
     self._AssertManagementUrlDisplayed()
 

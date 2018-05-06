@@ -137,7 +137,7 @@ class UntagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self._AssertNamesInResult(result, [_TAG_V1, _TAG_PROD])
 
     # Assert that the digest was resolved from the tags.
-    self.assertEquals(self.mock_digest_from_tag.call_count, 2)
+    self.assertEqual(self.mock_digest_from_tag.call_count, 2)
     self.mock_digest_from_tag.assert_has_calls(
         [mock.call(_TAG_V1), mock.call(_TAG_PROD)], any_order=True)
 

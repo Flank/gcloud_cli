@@ -235,13 +235,13 @@ test  frontend
     self.AssertOutputEquals(expected)
 
   def testListFromJsonFileNotFound(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         r'Cannot read \[unknown.unknown]:'):
       self.Run(['meta', 'list-from-json', 'unknown.unknown'])
 
   def testListFromJsonFileEmpty(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         r'Cannot read \[.*]: No JSON object could be decoded'):
       self.Run(['meta', 'list-from-json', os.devnull])
@@ -250,7 +250,7 @@ test  frontend
     try:
       sys_stdin = sys.stdin
       sys.stdin = open(os.devnull, 'r')
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           exceptions.BadFileException,
           'Cannot read the standard input: No JSON object could be decoded'):
         self.Run(['meta', 'list-from-json'])

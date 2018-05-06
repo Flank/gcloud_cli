@@ -45,7 +45,7 @@ class ManagedZonesDeleteBetaTest(base.DnsMockBetaTest):
         self.messages_beta.DnsManagedZonesDeleteRequest(
             managedZone=test_zone.name,
             project=self.Project()),
-        self.messages_beta.ManagedZonesDeleteResponse())
+        self.messages_beta.DnsManagedZonesDeleteResponse())
 
     self.Run('dns managed-zones delete {0}'.format(test_zone.name))
     self.AssertOutputContains('')

@@ -28,10 +28,13 @@ class InstancesCreateDiskTest(e2e_instances_test_base.InstancesTestBase):
     self.Run('compute instances create {0} '
              '--create-disk size=10GB,name={0}-3,mode=rw,'
              'device-name=data,auto-delete=yes,image=debian-8 '
+             '--create-disk size=10GB,name={0}-4,mode=rw,'
+             'device-name=data-2,auto-delete=no '
              '--zone {1}'.format(self.instance_name, self.zone))
     self.Run('compute instances describe {0} --zone {1}'.format(
         self.instance_name, self.zone))
-    self.AssertNewOutputContainsAll(['deviceName: data', 'mode: READ_WRITE'])
+    self.AssertNewOutputContainsAll(
+        ['deviceName: data', 'mode: READ_WRITE', 'deviceName: data-2'])
 
 
 if __name__ == '__main__':

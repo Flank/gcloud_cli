@@ -13,6 +13,8 @@
 # limitations under the License.
 """CLI internal command tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 

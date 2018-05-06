@@ -29,7 +29,8 @@ DESCRIPTION
     To copy a remote directory, ~/narnia, from example-instance to the
     ~/wardrobe directory of your local host, run:
 
-        $ gcloud alpha compute scp example-instance:~/narnia ~/wardrobe
+        $ gcloud alpha compute scp --recurse example-instance:~/narnia \
+            ~/wardrobe
 
     Conversely, files from your local computer can be copied to a virtual
     machine:
@@ -40,8 +41,8 @@ DESCRIPTION
     If the zone cannot be determined, you will be prompted for it. Use the
     --zone flag to avoid being prompted:
 
-        $ gcloud alpha compute scp example-instance:~/narnia ~/wardrobe \
-            --zone us-central1-a
+        $ gcloud alpha compute scp --recurse example-instance:~/narnia \
+            ~/wardrobe --zone us-central1-a
 
     Under the covers, scp(1) is used to facilitate the transfer.
 
@@ -97,7 +98,7 @@ FLAGS
      --zone=ZONE
         The zone of the instance to copy files to/from.
 
-        If not specified and the compute/zone property isn't set, you will be
+        If not specified and the compute/zone property isn't set, you may be
         prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the

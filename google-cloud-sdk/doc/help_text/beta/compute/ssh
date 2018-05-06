@@ -127,7 +127,7 @@ FLAGS
 
      --zone=ZONE
         The zone of the instance to connect to. If not specified and the
-        compute/zone property isn't set, you will be prompted to select a zone.
+        compute/zone property isn't set, you may be prompted to select a zone.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/zone property:

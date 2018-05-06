@@ -1,0 +1,117 @@
+
+.TH "GCLOUD_BETA_BIGTABLE_APP\-PROFILES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta bigtable app\-profiles create \- create a new Bigtable app_profile
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta bigtable app\-profiles create\fR (\fIAPP_PROFILE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) (\fB\-\-route\-any\fR\ |\ [\fB\-\-route\-to\fR=\fIROUTE_TO\fR\ :\ \fB\-\-transactional\-writes\fR]) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-force\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Create a new Bigtable app_profile.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+APP PROFILE \- The app profile to create. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: Set the property [core/project] or provide the flag [\-\-project] on
+the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIAPP_PROFILE\fR
+The ID of the app\-profile or a fully qualified identifier for the app\-profile.
+This positional must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+The Cloud Bigtable instance for the app\-profile.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Multi Cluster Routing Policy
+
+.RS 2m
+.TP 2m
+\fB\-\-route\-any\fR
+Use Multi Cluster Routing policy.
+
+.RE
+.sp
+.TP 2m
+
+Single Cluster Routing Policy
+
+.RS 2m
+.TP 2m
+\fB\-\-route\-to\fR=\fIROUTE_TO\fR
+Cluster ID to route to using Single Cluster Routing policy. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-transactional\-writes\fR
+Allow transactional writes with a Single Cluster Routing policy.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Friendly name of the app\-profile.
+
+.TP 2m
+\fB\-\-force\fR
+Ignore warnings and force create.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

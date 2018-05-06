@@ -2,7 +2,7 @@ NAME
     gcloud beta compute operations list - list Google Compute Engine operations
 
 SYNOPSIS
-    gcloud beta compute operations list [NAME ...] [--accounts] [--global]
+    gcloud beta compute operations list [NAME ...] [--global]
         [--regexp=REGEXP, -r REGEXP] [--regions=[REGION,...]]
         [--zones=[ZONE,...]] [--filter=EXPRESSION] [--limit=LIMIT]
         [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
@@ -12,9 +12,9 @@ DESCRIPTION
     (BETA) gcloud beta compute operations list displays all Google Compute
     Engine operations in a project.
 
-    By default, all global, regional, zonal and Compute Accounts operations are
-    listed. The results can be narrowed by providing combinations of the
-    --zones, --regions, --global and --accounts flags.
+    By default, all global, regional, and zonal operations are listed. The
+    results can be narrowed by providing combinations of the --zones,
+    --regions, and --global flags.
 
     Note: gcloud beta compute operations list displays operations fewer than 14
     days old, up to a maximum of 5000.
@@ -28,9 +28,6 @@ POSITIONAL ARGUMENTS
         instead.
 
 FLAGS
-     --accounts
-        If provided, all accounts resources are shown.
-
      --global
         If provided, all global resources are shown.
 
@@ -110,10 +107,6 @@ EXAMPLES
 
         $ gcloud beta compute operations list --zones us-central1-a \
            --regions us-central1,europe-west1
-
-    To list all Compute Accounts operations, run:
-
-        $ gcloud beta compute operations list --accounts
 
 NOTES
     This command is currently in BETA and may change without notice. These

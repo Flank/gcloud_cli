@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'delete' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
@@ -23,7 +25,7 @@ class DeleteCommandTest(base.BigtableV2TestBase,
                         test_case.WithInput):
 
   def SetUp(self):
-    self.cmd = 'instances delete theinstance'
+    self.cmd = 'bigtable instances delete theinstance'
     self.svc = self.client.projects_instances.Delete
     self.msg = self.msgs.BigtableadminProjectsInstancesDeleteRequest(
         name='projects/{0}/instances/theinstance'.format(self.Project()))
@@ -32,34 +34,35 @@ class DeleteCommandTest(base.BigtableV2TestBase,
 
   def _RunSuccessTest(self):
     self.svc.Expect(request=self.msg, response=self.msgs.Empty())
-    self.RunBT(self.cmd)
+    self.Run(self.cmd)
 
   def testDelete(self):
     self._RunSuccessTest()
 
   def testDeleteByUri(self):
-    self.cmd = ('instances delete https://bigtableadmin.googleapis.com/v2/'
-                'projects/{0}/instances/theinstance'.format(self.Project()))
+    self.cmd = (
+        'bigtable instances delete https://bigtableadmin.googleapis.com/v2/'
+        'projects/{0}/instances/theinstance'.format(self.Project()))
     self._RunSuccessTest()
 
   def testDeleteWarning(self):
-    self.cmd = 'instances delete theinstance theotherinstance'
+    self.cmd = 'bigtable instances delete theinstance theotherinstance'
     # Confirm the deletion of both instances.
     self.WriteInput('y\n')
     self.WriteInput('y\n')
     self.svc.Expect(request=self.msg, response=self.msgs.Empty())
     self.svc.Expect(request=self.other_msg, response=self.msgs.Empty())
-    self.RunBT(self.cmd)
+    self.Run(self.cmd)
 
   def testDeleteNoConfirmation(self):
-    self.cmd = 'instances delete theinstance'
+    self.cmd = 'bigtable instances delete theinstance'
     # Reject the deletion of the instance.
     self.WriteInput('n\n')
-    self.RunBT(self.cmd)
+    self.Run(self.cmd)
 
   def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.msg):
-      self.RunBT(self.cmd)
+      self.Run(self.cmd)
 
 
 if __name__ == '__main__':

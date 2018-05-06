@@ -15,7 +15,7 @@ SYNOPSIS
         [--local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE]]
         [--machine-type=MACHINE_TYPE] [--maintenance-policy=MAINTENANCE_POLICY]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
-        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]]
+        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
         [--network-interface=[PROPERTY=VALUE,...]] [--preemptible]
         [--region=REGION] [--no-restart-on-failure] [--subnet=SUBNET]
@@ -176,7 +176,7 @@ FLAGS
             Same as startup-script except that the script contents are pulled
             from a publicly-accessible location on the web.
 
-     --metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]
+     --metadata-from-file=KEY=LOCAL_FILE_PATH,[...]
         Same as --metadata except that the value for the entry will be read
         from a local file. This is useful for values that are too large such as
         startup-script contents.
@@ -253,7 +253,7 @@ FLAGS
         instances can not be restarted and will not migrate.
 
      --region=REGION
-        The region of the subnetwork to attach. If not specified, you will be
+        The region of the subnetwork to attach. If not specified, you may be
         prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
@@ -422,12 +422,6 @@ FLAGS
 
               taskqueue
                 - https://www.googleapis.com/auth/taskqueue
-
-              useraccounts-ro
-                - https://www.googleapis.com/auth/cloud.useraccounts.readonly
-
-              useraccounts-rw
-                - https://www.googleapis.com/auth/cloud.useraccounts
 
               userinfo-email
                 - https://www.googleapis.com/auth/userinfo.email

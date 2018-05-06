@@ -24,13 +24,12 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.container.binauthz import binauthz_util as binauthz_command_util
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
-from tests.lib.surface.container.binauthz.base import (
-    BinauthzUnitTestBase)
+from tests.lib.surface.container.binauthz import base as binauthz_test_base
 
 
 class BinauthzAttestationsSurfaceTest(sdk_test_base.WithFakeAuth,
                                       cli_test_base.CliTestBase,
-                                      BinauthzUnitTestBase):
+                                      binauthz_test_base.BinauthzUnitTestBase):
 
   def SetUp(self):
     # We don't get our track from the base binauthz test because `CliTestBase`
@@ -77,3 +76,7 @@ class BinauthzAttestationsSurfaceTest(sdk_test_base.WithFakeAuth,
           '--artifact-url',
           'docker.io/nginblah@sha256:123',
       ])
+
+
+if __name__ == '__main__':
+  sdk_test_base.main()

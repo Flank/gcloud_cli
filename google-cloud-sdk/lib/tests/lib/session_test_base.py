@@ -322,14 +322,14 @@ class SessionTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def GetNextSessionEntry(self, key):
     entry = next(self._session)
-    self.assertEquals(list(six.iterkeys(entry)), [key])
+    self.assertEqual(list(six.iterkeys(entry)), [key])
     if self._regen:
       self._records.append(entry)
     return entry[key]
 
   def AssertNextSessionEntryMatches(self, key, **kwargs):
     session_entry = next(self._session)
-    self.assertEquals(list(six.iterkeys(session_entry)), [key])
+    self.assertEqual(list(six.iterkeys(session_entry)), [key])
     if self._regen:
       self._records.append({key: {k: v for k, v in six.iteritems(kwargs) if v}})
     else:
@@ -338,7 +338,7 @@ class SessionTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
           if isinstance(v, six.string_types):
             self.assertMultiLineEqual(session_entry[key].get(k), v)
           else:
-            self.assertEquals(session_entry[key].get(k), v)
+            self.assertEqual(session_entry[key].get(k), v)
 
   def GetNewSession(self):
     self.assertTrue(self._regen,

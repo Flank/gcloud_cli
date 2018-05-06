@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha compute tpus locations describe - describe a Cloud TPU
+        Location
+
+SYNOPSIS
+    gcloud alpha compute tpus locations describe [ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Describe a Cloud TPU Location.
+
+    To get a list of available locations for your project run:
+
+        $ gcloud alpha compute tpus locations list
+
+POSITIONAL ARGUMENTS
+     ZONE - The Cloud TPU Location you want to describe. This represents a
+     Cloud resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute: Set
+     the property [core/project] or provide the flag [--project] on the command
+     line.
+
+       [ZONE]
+          The ID of the location or a fully qualified identifier for the
+          location.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the tpu/v1alpha1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/tpu/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta compute tpus locations describe
+

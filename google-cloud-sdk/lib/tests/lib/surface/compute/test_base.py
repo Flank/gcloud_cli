@@ -13,6 +13,8 @@
 # limitations under the License.
 """Module for test base classes."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 import difflib
 import os
@@ -28,6 +30,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.compute import list_test_utils
 import mock
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 SAMPLE_WRAPPED_CSEK_KEY = ('ea2QS4AIhWKprsmuk/mh7g3vdBDGiTcSynFASvJC/rs/3BmOnW'
@@ -104,11 +107,6 @@ class BaseTest(cli_test_base.CliTestBase, sdk_test_base.WithOutputCapture):
       setattr(self, 'compute_' + api_version, client)
       setattr(self, api_version + '_messages',
               core_apis.GetMessagesModule('compute', api_version))
-
-    self.accounts_api = 'beta'
-    self.accounts = api_cache.GetClientInstance('clouduseraccounts', 'beta')
-    self.accounts_messages = core_apis.GetMessagesModule(
-        'clouduseraccounts', 'beta')
 
     make_requests_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.MakeRequests',

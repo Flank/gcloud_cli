@@ -14,6 +14,8 @@
 
 """Integration tests for container clusters."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 import json
 import logging
@@ -37,8 +39,8 @@ class ClustersTestGA(base.IntegrationTestBase):
   # so we run this test only in bundle.
   @sdk_test_base.Filters.RunOnlyInBundle
   def testClustersCreateListDelete(self):
-    self.cluster_name = e2e_utils.GetResourceNameGenerator(
-        prefix='container-test').next()
+    self.cluster_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='container-test'))
     self.DoTestClusterCreation(self.ZONE, self.releasetrack)
     self.DoTestListClusters(self.releasetrack)
     self.DoTestClusterDeletion(self.ZONE, self.releasetrack)
@@ -48,6 +50,7 @@ class ClustersTestGA(base.IntegrationTestBase):
   @sdk_test_base.Filters.RunOnlyInBundle
   def testCleanup(self):
     self.DoTestCleanup(self.ZONE, self.releasetrack)
+    self.DoTestCleanup(self.REGION, self.releasetrack)
 
   def DoTestCleanup(self, location, track):
     # The minimum age for a leaked cluster is 3 hours.
@@ -98,6 +101,16 @@ class ClustersTestGA(base.IntegrationTestBase):
     self.Run('container clusters list', track=track)
     self.AssertOutputContains(self.cluster_name)
 
+  # We need to write a kubeconfig entry that has the executable path to gcloud,
+  # so we run this test only in bundle.
+  @sdk_test_base.Filters.RunOnlyInBundle
+  def testRegionalClustersCreateListDelete(self):
+    self.cluster_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='container-test'))
+    self.DoTestClusterCreation(self.REGION, self.releasetrack)
+    self.DoTestListClusters(self.releasetrack)
+    self.DoTestClusterDeletion(self.REGION, self.releasetrack)
+
 
 class ClustersTestBeta(ClustersTestGA):
 
@@ -105,22 +118,9 @@ class ClustersTestBeta(ClustersTestGA):
     self.releasetrack = ReleaseTrack.BETA
     # Required to call v1beta1 API.
     self.Run('config set container/use_v1_api false')
+    self.ZONE = 'us-east1-d'  # pylint: disable=invalid-name
+    self.REGION = 'us-east1'  # pylint: disable=invalid-name
 
-  # We need to write a kubeconfig entry that has the executable path to gcloud,
-  # so we run this test only in bundle.
-  @sdk_test_base.Filters.RunOnlyInBundle
-  def testRegionalClustersCreateListDelete(self):
-    self.cluster_name = e2e_utils.GetResourceNameGenerator(
-        prefix='container-test').next()
-    self.DoTestClusterCreation(self.REGION, self.releasetrack)
-    self.DoTestListClusters(self.releasetrack)
-    self.DoTestClusterDeletion(self.REGION, self.releasetrack)
-
-  # This test will cleanup the leaked clusters.
-  # Delete clusters that are older than 1h.
-  @sdk_test_base.Filters.RunOnlyInBundle
-  def testCleanup(self):
-    self.DoTestCleanup(self.REGION, self.releasetrack)
 
 if __name__ == '__main__':
   test_case.main()

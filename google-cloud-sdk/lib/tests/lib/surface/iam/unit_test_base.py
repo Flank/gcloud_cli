@@ -112,7 +112,7 @@ class BaseTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     Raises:
       AssertionError: The MockFileWrite wasn't written with the correct data.
     """
-    for tmp_file, expected in self._file_write_mocks.iteritems():
+    for tmp_file, expected in self._file_write_mocks.items():
       with open(tmp_file, 'rb') as handle:
         actual = handle.read()
         if expected != actual:

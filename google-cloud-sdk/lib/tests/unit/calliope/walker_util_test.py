@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for core/util/walker_util."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import walker_util
@@ -20,6 +22,7 @@ from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.resource import resource_printer
 from tests.lib import calliope_test_base
 from tests.lib import test_case
+import six
 
 
 class WalkerUtilTest(calliope_test_base.CalliopeTestBase,
@@ -191,7 +194,7 @@ toc:
   - title: "gcloud version"
     path: /sdk/gcloud/reference/version
 """)}
-    for name, (contains, expected) in files.iteritems():
+    for name, (contains, expected) in six.iteritems(files):
       path = os.path.join(devsite_directory, name)
       with open(path, 'r') as f:
         actual = f.read()
@@ -1114,7 +1117,7 @@ toc:
   - title: "gcloud version"
     path: /sdk/gcloud/reference/version
 """)}
-    for name, (contains, expected) in files.iteritems():
+    for name, (contains, expected) in six.iteritems(files):
       path = os.path.join(devsite_directory, name)
       with open(path, 'r') as f:
         actual = f.read()

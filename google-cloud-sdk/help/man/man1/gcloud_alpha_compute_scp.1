@@ -44,7 +44,8 @@ To copy a remote directory, \f5~/narnia\fR, from \f5\fIexample\-instance\fR\fR
 to the \f5~/wardrobe\fR directory of your local host, run:
 
 .RS 2m
-$ gcloud alpha compute scp example\-instance:~/narnia ~/wardrobe
+$ gcloud alpha compute scp \-\-recurse example\-instance:~/narnia \e
+    ~/wardrobe
 .RE
 
 Conversely, files from your local computer can be copied to a virtual machine:
@@ -58,8 +59,8 @@ If the zone cannot be determined, you will be prompted for it. Use the
 \f5\-\-zone\fR flag to avoid being prompted:
 
 .RS 2m
-$ gcloud alpha compute scp example\-instance:~/narnia ~/wardrobe \e
-    \-\-zone us\-central1\-a
+$ gcloud alpha compute scp \-\-recurse example\-instance:~/narnia \e
+    ~/wardrobe \-\-zone us\-central1\-a
 .RE
 
 Under the covers, \fBscp(1)\fR is used to facilitate the transfer.
@@ -136,8 +137,8 @@ instance, and will be set to 'yes' for all subsequent connections.
 \fB\-\-zone\fR=\fIZONE\fR
 The zone of the instance to copy files to/from.
 
-If not specified and the \f5\fIcompute/zone\fR\fR property isn't set, you will
-be prompted to select a zone.
+If not specified and the \f5\fIcompute/zone\fR\fR property isn't set, you may be
+prompted to select a zone.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/zone\fR\fR property:

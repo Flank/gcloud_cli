@@ -13,13 +13,16 @@
 # limitations under the License.
 """Tests for the SSL policies delete alpha command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import ssl_policies_test_base
 from tests.lib.surface.compute import utils
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
-class SslPolicyDeleteBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
+class SslPolicyDeleteGATest(ssl_policies_test_base.SslPoliciesTestBase):
 
   def SetUp(self):
     self._SetUpReleaseTrack()
@@ -31,7 +34,7 @@ class SslPolicyDeleteBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
     self.api_mock.batch_responder.AssertDone()
 
   def _SetUpReleaseTrack(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def _MakeOperationGetRequest(self, operation_ref):
     return (self.global_operations, 'Get',
@@ -86,6 +89,12 @@ class SslPolicyDeleteBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
         operation_refs[n]), done_operations[n]) for n in range(0, 3)])
 
     self.Run('compute ssl-policies delete {}'.format(' '.join(names)))
+
+
+class SslPolicyDeleteBetaTest(SslPolicyDeleteGATest):
+
+  def _SetUpReleaseTrack(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class SslPolicyDeleteAlphaTest(SslPolicyDeleteBetaTest):

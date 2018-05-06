@@ -17,7 +17,8 @@ gcloud alpha spanner instances set\-iam\-policy \- set the IAM policy for a Clou
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Set the IAM policy for a Cloud Spanner instance.
+\fB(ALPHA)\fR Set the IAM policy for a Cloud Spanner instance given a instance
+ID and a file encoded in JSON or YAML that contains the IAM policy.
 
 
 
@@ -25,12 +26,23 @@ gcloud alpha spanner instances set\-iam\-policy \- set the IAM policy for a Clou
 
 .RS 2m
 .TP 2m
-\fIINSTANCE\fR
-Cloud Spanner instance ID.
 
+INSTANCE \- The Spanner instance to set the IAM policy for. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: Set the property
+[core/project] or provide the flag [\-\-project] on the command line. This must
+be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+The ID of the instance or a fully qualified identifier for the instance.
+
+.RE
+.sp
 .TP 2m
 \fIPOLICY_FILE\fR
-Name of JSON or YAML file with the IAM policy.
+Path to a local JSON or YAML formatted file containing a valid policy.
 
 
 .RE
@@ -42,6 +54,29 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBspanner/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/spanner/
+
+
+
+.SH "EXAMPLES"
+
+The following command reads an IAM policy defined in a JSON file
+\f5policy.json\fR and sets it for a spanner instance with the ID
+\f5example\-instance\fR:
+
+$ gcloud alpha spanner instances set\-iam\-policy example\-instance \e.RS 2m
+policy.json
+
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
 
 
 

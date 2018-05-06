@@ -10,8 +10,11 @@ DESCRIPTION
     (ALPHA) Delete a given access policy.
 
 POSITIONAL ARGUMENTS
-     [POLICY]
-        The access level you want to delete.
+     POLICY - The access level you want to delete. This represents a Cloud
+     resource.
+
+       [POLICY]
+          The ID of the policy or a fully qualified identifier for the policy.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -214,7 +214,7 @@ add //mock/tmp/dir/base-2.suffix
     # Assertion failure messages should be immune to ascii encoding errors.
     sys.stdout.buffer.write(u'Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
     expected = u'stdout does not equal the expected value.*\\u1e72'
-    with self.assertRaisesRegexp(AssertionError, expected):
+    with self.assertRaisesRegex(AssertionError, expected):
       self.AssertOutputEquals('unicode')
 
   def testAssertOutputContainsUTF8WithUTF8EncodingMismatch(self):
@@ -321,7 +321,7 @@ tests/unit/tests_lib/testdata/isnt-golden.dir does not contain the expected valu
     self.assertTrue(absolute.endswith(package))
     expected = os.path.join(
         'tests', 'unit', 'tests_lib', 'testdata', 'is-golden.dir')
-    self.assertEquals(expected, package)
+    self.assertEqual(expected, package)
 
 
 class StripLongestCommonSpaceSuffixTest(test_case.Base):
@@ -418,8 +418,8 @@ class TestSkipDecorator(test_case.Base):
     def foo():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest,
-                                 self.expected_regex):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest,
+                                self.expected_regex):
       foo()
 
   def testSkipIfTrue(self):
@@ -427,8 +427,8 @@ class TestSkipDecorator(test_case.Base):
     def foo():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest,
-                                 self.expected_regex):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest,
+                                self.expected_regex):
       foo()
 
   def testSkipIfFalse(self):
@@ -436,22 +436,22 @@ class TestSkipDecorator(test_case.Base):
     def foo():
       return 42
 
-    self.assertEquals(42, foo())
+    self.assertEqual(42, foo())
 
   def testSkipUnlessTrue(self):
     @test_case.Filters.skipUnless(True, self.why, self.bug)
     def foo():
       return 42
 
-    self.assertEquals(42, foo())
+    self.assertEqual(42, foo())
 
   def testSkipUnlessFalse(self):
     @test_case.Filters.skipUnless(False, self.why, self.bug)
     def foo():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest,
-                                 self.expected_regex):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest,
+                                self.expected_regex):
       foo()
 
   def testSkipNoExplanation(self):
@@ -557,7 +557,7 @@ class TestSkipDecorator(test_case.Base):
     def foo():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest, '.*Dummy Skip.*'):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest, '.*Dummy Skip.*'):
       foo()
 
   def testCannedSkipNonDefault(self):
@@ -565,7 +565,7 @@ class TestSkipDecorator(test_case.Base):
     def foo():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest, '.*Explaining.*'):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest, '.*Explaining.*'):
       foo()
 
   def testRunOnlyWithEnvEmpty(self):
@@ -576,7 +576,7 @@ class TestSkipDecorator(test_case.Base):
     def bar():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest, '.*FOO.*'):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest, '.*FOO.*'):
       bar()
 
   def testRunOnlyWithEnvFalse(self):
@@ -587,7 +587,7 @@ class TestSkipDecorator(test_case.Base):
     def bar():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest, '.*FOO.*'):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest, '.*FOO.*'):
       bar()
 
   def testRunOnlyWithEnvFalseString(self):
@@ -599,7 +599,7 @@ class TestSkipDecorator(test_case.Base):
     def bar():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest, '.*FOO.*'):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest, '.*FOO.*'):
       bar()
 
   def testRunOnlyWithEnvTrue(self):
@@ -610,7 +610,7 @@ class TestSkipDecorator(test_case.Base):
     def bar():
       return 42
 
-    self.assertEquals(42, bar())
+    self.assertEqual(42, bar())
 
   def testRunOnlyIfLongrunning(self):
     env = self.StartPatch('os.environ')
@@ -621,7 +621,7 @@ class TestSkipDecorator(test_case.Base):
     def bar():
       return 42
 
-    self.assertEquals(42, bar())
+    self.assertEqual(42, bar())
 
   def testRunOnlyIfLongrunningFalse(self):
     env = self.StartPatch('os.environ')
@@ -631,8 +631,8 @@ class TestSkipDecorator(test_case.Base):
     def bar():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest,
-                                 '.*marked as longrunning.*'):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest,
+                                '.*marked as longrunning.*'):
       bar()
 
   def testRunOnlyIfLongrunningFalseReason(self):
@@ -643,8 +643,8 @@ class TestSkipDecorator(test_case.Base):
     def bar():
       return 42
 
-    with self.assertRaisesRegexp(test_case.unittest.SkipTest,
-                                 '.*reason.*'):
+    with self.assertRaisesRegex(test_case.unittest.SkipTest,
+                                '.*reason.*'):
       bar()
 
 
@@ -692,7 +692,7 @@ class OSSkipsTest(test_case.Base):
     except test_case.unittest.SkipTest:
       pass
 
-    self.assertEquals(1, count['os'])
+    self.assertEqual(1, count['os'])
 
 
 if __name__ == '__main__':

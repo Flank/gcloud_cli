@@ -151,8 +151,8 @@ class TransformManifestsTest(test_case.TestCase):
     for t in transformed:
       if t['digest'] != 'digest1':
         continue
-      self.assertEquals([pvo], t[pvo.kind])
-      self.assertEquals([bdo], t[bdo.kind])
+      self.assertEqual([pvo], t[pvo.kind])
+      self.assertEqual([bdo], t[bdo.kind])
 
     for t in transformed:
       self.assertEqual(t['tags'], response[t['digest']]['tag'])
@@ -247,8 +247,8 @@ class FetchOccurrencesTest(cli_test_base.CliTestBase,
 
     # occurrences is a map from resource url to occurrences list
     occurrences = util.FetchOccurrences(self._repository)
-    self.assertEquals([bdo], occurrences[bdo.resourceUrl])
-    self.assertEquals([pvo], occurrences[pvo.resourceUrl])
+    self.assertEqual([bdo], occurrences[bdo.resourceUrl])
+    self.assertEqual([pvo], occurrences[pvo.resourceUrl])
 
   def testFetchOccurrencesWithChunking(self):
     resource_url1 = 'https://{repository}@digest1'.format(
@@ -290,8 +290,8 @@ class FetchOccurrencesTest(cli_test_base.CliTestBase,
     # occurrences is a map from resource url to occurrences list
     occurrences = util.FetchOccurrences(
         self._repository, resource_urls=[resource_url1, resource_url2])
-    self.assertEquals([pvo1], occurrences[pvo1.resourceUrl])
-    self.assertEquals([pvo2], occurrences[pvo2.resourceUrl])
+    self.assertEqual([pvo1], occurrences[pvo1.resourceUrl])
+    self.assertEqual([pvo2], occurrences[pvo2.resourceUrl])
 
 
 class GetDigestFromNameTest(cli_test_base.CliTestBase,
@@ -304,7 +304,7 @@ class GetDigestFromNameTest(cli_test_base.CliTestBase,
         repo=repo, hex_str=hex_str))
     digest = util.GetDigestFromName(str(expected_digest))
 
-    self.assertEquals(expected_digest, digest)
+    self.assertEqual(expected_digest, digest)
 
   @mock.patch('containerregistry.client.v2.docker_image.FromRegistry')
   @mock.patch('containerregistry.client.v2_2.docker_image.FromRegistry')
@@ -324,7 +324,7 @@ class GetDigestFromNameTest(cli_test_base.CliTestBase,
         False)
 
     digest = util.GetDigestFromName(repo + ':foo')
-    self.assertEquals(expected_digest, digest)
+    self.assertEqual(expected_digest, digest)
 
   @mock.patch('containerregistry.client.v2.docker_image.FromRegistry')
   @mock.patch('containerregistry.client.v2_2.docker_image.FromRegistry')
@@ -343,7 +343,7 @@ class GetDigestFromNameTest(cli_test_base.CliTestBase,
         False)
 
     digest = util.GetDigestFromName(repo)
-    self.assertEquals(expected_digest, digest)
+    self.assertEqual(expected_digest, digest)
 
   @mock.patch('containerregistry.client.v2.docker_image.FromRegistry')
   @mock.patch('containerregistry.client.v2_2.docker_image.FromRegistry')
@@ -363,7 +363,7 @@ class GetDigestFromNameTest(cli_test_base.CliTestBase,
         expected_digest.digest)
 
     digest = util.GetDigestFromName(repo + ':foo')
-    self.assertEquals(expected_digest, digest)
+    self.assertEqual(expected_digest, digest)
 
   @mock.patch('containerregistry.client.v2.docker_image.FromRegistry')
   @mock.patch('containerregistry.client.v2_2.docker_image.FromRegistry')
@@ -411,7 +411,7 @@ class RecoverProjectIdTest(cli_test_base.CliTestBase,
     digest = docker_name.Digest('{repo}@sha256:{hex_str}'.format(
         repo=repo, hex_str=hex_str))
     project = util.RecoverProjectId(digest)
-    self.assertEquals(expected_project, project)
+    self.assertEqual(expected_project, project)
 
 if __name__ == '__main__':
   test_case.main()

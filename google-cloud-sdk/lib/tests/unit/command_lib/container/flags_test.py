@@ -14,5 +14,6 @@
 """Tests for googlecloudsdk/command_lib/container/flags.py."""
 
 
+from __future__ import unicode_literals
 if __name__ == '__main__':
   pass

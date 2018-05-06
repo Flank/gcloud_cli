@@ -62,7 +62,7 @@ class SetIamPolicyTest(base.GenomicsUnitTest):
 
   def testBadJsonSetIamPolicyProject(self):
     file_path = '/some/bad/path/to/non/existent/file'
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.Error,
         r'Failed to load YAML from \[{0}\]'.format(file_path),
         self.RunGenomics, ['datasets', 'set-iam-policy', '1000', file_path])

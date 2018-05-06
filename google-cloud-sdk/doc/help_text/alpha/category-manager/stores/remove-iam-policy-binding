@@ -10,8 +10,12 @@ DESCRIPTION
     (ALPHA) Add iam policy binding to a taxonomy store.
 
 POSITIONAL ARGUMENTS
-     ORGANIZATION_ID
-        Your organization's id.
+     ORGANIZATION ID - Your organization's id. This represents a Cloud
+     resource. This must be specified.
+
+       ORGANIZATION_ID
+          The ID of the organization or a fully qualified identifier for the
+          organization.
 
 REQUIRED FLAGS
      --member=MEMBER

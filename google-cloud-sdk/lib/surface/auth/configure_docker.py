@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Register gcloud as a Docker credential helper."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import json
 
@@ -28,7 +32,8 @@ class ConfigureDockerError(exceptions.Error):
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA,
-                    base.ReleaseTrack.BETA)
+                    base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class ConfigureDocker(base.Command):
   """Registers gcloud as a Docker credential helper.
 
@@ -46,19 +51,28 @@ class ConfigureDocker(base.Command):
 
   def Run(self, args):
     """Run the configure-docker command."""
-    if not file_utils.SearchForExecutableOnPath('gcloud'):
-      log.warning('gcloud not in system PATH.\n'
-                  'gcloud Docker Credential Helper can be configured but it '
-                  'will not work until this is corrected.')
+    if not file_utils.SearchForExecutableOnPath('docker-credential-gcloud'):
+      log.warning('`docker-credential-gcloud` not in system PATH.\n'
+                  'gcloud\'s Docker credential helper can be configured but '
+                  'it will not work until this is corrected.')
 
     current_config = cred_utils.Configuration.ReadFromDisk()
 
-    if not current_config.SupportsRegistryHelpers():
-      raise ConfigureDockerError(
-          'Invalid Docker Version: The version of your Docker client is [{}]; '
-          'version [{}] or higher is required to support Docker credential '
-          'helpers.'.format(current_config.version,
-                            cred_utils.MIN_DOCKER_CONFIG_HELPER_VERSION))
+    if file_utils.SearchForExecutableOnPath('docker'):
+      if not current_config.SupportsRegistryHelpers():
+        raise ConfigureDockerError(
+            'Invalid Docker version: The version of your Docker client is '
+            '[{}]; version [{}] or higher is required to support Docker '
+            'credential helpers.'.format(
+                current_config.DockerVersion(),
+                cred_utils.MIN_DOCKER_CONFIG_HELPER_VERSION))
+    else:
+      log.warning(
+          '`docker` not in system PATH.\n'
+          '`docker` and `docker-credential-gcloud` need to be in the same PATH '
+          'in order to work correctly together.\n'
+          'gcloud\'s Docker credential helper can be configured but '
+          'it will not work until this is corrected.')
 
     current_helpers = current_config.GetRegisteredCredentialHelpers()
     new_helpers = cred_utils.GetGcloudCredentialHelperConfig()

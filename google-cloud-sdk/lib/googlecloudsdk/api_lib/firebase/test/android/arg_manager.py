@@ -71,6 +71,7 @@ def SharedArgRules():
   return {
       'required': ['type', 'app'],
       'optional': [
+          'additional_apks',
           'app_package',
           'async',
           'auto_google_login',
@@ -83,6 +84,7 @@ def SharedArgRules():
           'obb_files',
           'orientations',
           'os_version_ids',
+          'other_files',
           'performance_metrics',
           'record_video',
           'results_bucket',

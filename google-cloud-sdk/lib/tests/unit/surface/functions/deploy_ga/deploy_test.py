@@ -71,8 +71,8 @@ class DeployTestBase(base.FunctionsTestBase):
       del http, retries, max_retry_wait, redirections, retry_func
       if empty_response:  # Handle empty server response edge case.
         check_response_func(None)
-      self.assertEquals('PUT', request.http_method)
-      self.assertEquals('foo', request.url)
+      self.assertEqual('PUT', request.http_method)
+      self.assertEqual('foo', request.url)
       fname_suffix = self.RandomFileName()
       tmp_zip_file = self.Touch(self.temp_path,
                                 'tmp_{}.zip'.format(fname_suffix),
@@ -353,7 +353,7 @@ class PackagingTest(DeployTestBase):
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source {} --quiet'.format(path))
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   @parameterized.parameters([True, False])
@@ -379,7 +379,7 @@ class PackagingTest(DeployTestBase):
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source {} --quiet'.format(path))
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   @parameterized.parameters([True, False])
@@ -388,7 +388,7 @@ class PackagingTest(DeployTestBase):
         write_extra_files=True, use_node_modules=use_node_modules)
     self.RemoveIgnoreFile(path)
     self.MockGetExistingFunction(response=None)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.OversizedDeployment,
         (r'Uncompressed deployment is \d+B, bigger than maximum allowed '
          r'size of \d+B')):
@@ -420,7 +420,7 @@ class PackagingTest(DeployTestBase):
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source {} --quiet'.format(path))
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testPackageWithInvalidFiles(self):
@@ -429,7 +429,7 @@ class PackagingTest(DeployTestBase):
     self.MockGetExistingFunction(response=None)
     self.StartObjectPatch(files, 'GetTreeSizeBytes', side_effect=OSError(
         'No such file or directory: foo'))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.FunctionsError,
         (r'Could not validate source files: '
          r'\[No such file or directory: foo\]')):
@@ -474,7 +474,7 @@ class CoreTest(DeployTestBase):
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source {source} {bucket} --quiet'.format(
                           source=path, bucket=staging_bucket_flag))
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testLocalSourceImplied(self):
@@ -499,7 +499,7 @@ class CoreTest(DeployTestBase):
 
     with files.ChDir(path):
       result = self.Run('functions deploy my-test --trigger-http --quiet')
-      self.assertEquals(result, function)
+      self.assertEqual(result, function)
       self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testGcsSource(self):
@@ -520,7 +520,32 @@ class CoreTest(DeployTestBase):
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source gs://my-bucket/function.zip --quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
+    self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
+
+  def testGcsSourceWithoutExtensionWarns(self):
+    self.MockGetExistingFunction(response=None)
+    location = self.GetLocationResource()
+    function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        https_trigger=self.messages.HttpsTrigger(),
+        source_archive='gs://my-bucket/')
+    create_request = self.GetFunctionsCreateRequest(function, location)
+    operation = self._GenerateActiveOperation('operations/operation')
+    self.mock_client.projects_locations_functions.Create.Expect(
+        create_request, operation)
+
+    self.MockLongRunningOpResult('operations/operation')
+    self.MockGetExistingFunction(response=function)
+
+    result = self.Run('functions deploy my-test --trigger-http '
+                      '--source gs://my-bucket/ --quiet')
+    self.assertEqual(result, function)
+    self.AssertErrContains(
+        '[gs://my-bucket/] does not end with extension `.zip`')
+    # Users may have .zip archives with unusual names, and we don't want to
+    # prevent those from being deployed; the deployment should go through
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testCodeRepositorySource(self):
@@ -546,13 +571,13 @@ class CoreTest(DeployTestBase):
         '--source https://source.developers.google.com/projects/my-project/'
         'repos/my-repo/fixed-aliases/rc0.0.9 '
         '--quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testLocalSourceFailsOnPathDoesNotExist(self):
     self.StartObjectPatch(os.path, 'exists', return_value=False)
     self.MockGetExistingFunction(response=None)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.FunctionsError,
         'argument --source: Provided directory does not exist.'):
       self.Run(
@@ -581,7 +606,7 @@ class CoreTest(DeployTestBase):
         'functions deploy my-test --trigger-topic topic '
         '--entry-point foo --region {} --memory 512MB  --retry '
         '--source gs://my-bucket/function.zip --quiet'.format(_DEFAULT_REGION))
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testValidLabels(self):
@@ -605,12 +630,12 @@ class CoreTest(DeployTestBase):
     result = self.Run('functions deploy my-test --trigger-topic topic '
                       '--update-labels=foo=bar,fizz=buzz '
                       '--source gs://my-bucket/function.zip --quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   @parameterized.parameters(['deployment-tool=foobar'])
   def testInvalidLabelsRaisesError(self, labels):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.InvalidArgumentException,
         r'Invalid value for \[--update-labels\]: Label keys starting with '
         r'`deployment` are reserved for use by deployment tools and cannot '
@@ -626,7 +651,7 @@ class CoreTest(DeployTestBase):
     self.MockGeneratedApiUploadUrl()
     self.MockUploadToSignedUrl(status_code=400)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.FunctionsError,
         r'Failed to upload the function source code to signed url: '
         r'foo. Status: \[400:\]'):
@@ -641,7 +666,7 @@ class TriggerTests(DeployTestBase):
   def testNoTriggerFails(self):
     self.MockGetExistingFunction(response=None)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.OneOfArgumentsRequiredException,
         'You must specify a trigger when deploying a new function.'):
       self.Run('functions deploy my-test '
@@ -655,7 +680,7 @@ class TriggerTests(DeployTestBase):
       '--trigger-bucket gs://foo --trigger-http'
   ])
   def testMultipleTriggersFails(self, triggers):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         r'At most one of --trigger-bucket | --trigger-http | '
         r'--trigger-provider | --trigger-topic may be specified.'):
@@ -665,7 +690,7 @@ class TriggerTests(DeployTestBase):
                '--quiet'.format(triggers))
 
   def testWithHttpTriggerAndRetryFails(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.ConflictingArgumentsException,
         'arguments not allowed simultaneously: --trigger-http, --retry'):
       self.Run('functions deploy my-test '
@@ -713,7 +738,7 @@ class TriggerTests(DeployTestBase):
         '--trigger-resource {resource} '
         '--source gs://my-bucket/function.zip --quiet'.format(
             event=trigger_event, resource=trigger_resource))
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testPubSubTriggerWithDefaultBehavior(self):
@@ -735,7 +760,7 @@ class TriggerTests(DeployTestBase):
 
     result = self.Run('functions deploy my-test --trigger-topic topic --retry '
                       '--source gs://my-bucket/function.zip --quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testGcsTriggerWithDefaultTriggerEvent(self):
@@ -758,7 +783,7 @@ class TriggerTests(DeployTestBase):
     result = self.Run(
         'functions deploy my-test --trigger-bucket {} '
         '--source gs://my-bucket/function.zip --quiet'.format(_TEST_GS_BUCKET))
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testGcsTriggerWithFullyQualifiedBucketUrl(self):
@@ -803,7 +828,7 @@ class TriggerTests(DeployTestBase):
 
     result = self.Run('functions deploy my-test --trigger-http '
                       '--source gs://my-bucket/function.zip --quiet')
-    self.assertEquals(result, function)
+    self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
 
@@ -1367,7 +1392,7 @@ class UpdateTests(DeployTestBase):
 
   def testUpdateDeploymentLabelFails(self):
     """Test that updating deployment label raises exception."""
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.InvalidArgumentException,
         'Label keys starting with `deployment` are reserved for use by '
         'deployment tools and cannot be specified manually.'):
@@ -1376,7 +1401,7 @@ class UpdateTests(DeployTestBase):
 
   def testRemoveDeploymentLabelFails(self):
     """Test that removing deployment label raises exception."""
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.InvalidArgumentException,
         'Label keys starting with `deployment` are reserved for use by '
         'deployment tools and cannot be specified manually.'):

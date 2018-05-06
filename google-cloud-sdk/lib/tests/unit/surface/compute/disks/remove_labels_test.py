@@ -14,6 +14,7 @@
 """Tests for the disks remove-labels subcommand."""
 
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import disks_labels_test_base
@@ -153,12 +154,13 @@ class RemoveLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     self.AssertErrNotContains('georgia')
 
 
-class RemoveLabelsTestAlpha(disks_labels_test_base.DisksLabelsTestBase):
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
+class RemoveLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
+                                parameterized.TestCase):
 
-  def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
-
-  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self):
+  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self, track):
+    self._SetUp(track)
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
@@ -181,7 +183,8 @@ class RemoveLabelsTestAlpha(disks_labels_test_base.DisksLabelsTestBase):
         .format(disk_ref.SelfLink()))
     self.assertEqual(response, updated_disk)
 
-  def testScopePromptWithRegionAndZone(self):
+  def testScopePromptWithRegionAndZone(self, track):
+    self._SetUp(track)
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
     disk = self._MakeDiskProto(disk_ref, labels=[])
     self._ExpectGetRequest(disk_ref, disk)

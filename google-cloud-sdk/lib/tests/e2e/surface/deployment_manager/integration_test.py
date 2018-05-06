@@ -14,6 +14,9 @@
 
 """Integration tests for Deployment Manager V2 examples."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 import io
 import os
 import re
@@ -65,8 +68,8 @@ class IntegrationTest(e2e_base.WithServiceAuth):
     """
     # Generate deployment name with a random suffix to allow for multiple
     # simultaneous runs of the integration tests
-    self.deployment_name = e2e_utils.GetResourceNameGenerator(
-        prefix='dm').next()
+    self.deployment_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='dm'))
     deployed = False
     try:
       # Call deployments create, should return only after operation completion.
@@ -94,7 +97,7 @@ class IntegrationTest(e2e_base.WithServiceAuth):
       # Don't wait for this to finish, move on to the next test while the
       # delete is processed, since delete is a slow operation.
       if not deployed:
-        print('Deployment %s was not deployed.', self.deployment_name)
+        print(('Deployment %s was not deployed.', self.deployment_name))
       else:
         self.ClearOutput()
         self.Run('deployment-manager deployments delete -q --async '
@@ -125,8 +128,8 @@ class IntegrationTest(e2e_base.WithServiceAuth):
     """
     # Generate deployment name with a random suffix to allow for multiple
     # simultaneous runs of the integration tests
-    self.deployment_name = e2e_utils.GetResourceNameGenerator(
-        prefix='dm').next()
+    self.deployment_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='dm'))
 
     deployed = False
     updated = False
@@ -223,8 +226,8 @@ class IntegrationTest(e2e_base.WithServiceAuth):
       # Don't wait for this to finish, move on to the next test while the
       # delete is processed, since delete is a slow operation.
       if not deployed or not updated:
-        print('Deployment %s was not %s', self.deployment_name,
-              'deployed' if not deployed else 'updated')
+        print(('Deployment %s was not %s', self.deployment_name,
+               'deployed' if not deployed else 'updated'))
       else:
         self.ClearOutput()
         self.Run('deployment-manager deployments delete -q --async '

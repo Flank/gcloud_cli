@@ -4,11 +4,12 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute interconnects attachments provider update NAME
-        [--bandwidth=BANDWIDTH] [--description=DESCRIPTION]
-        [--partner-interconnect-name=PARTNER_INTERCONNECT_NAME]
-        [--partner-name=PARTNER_NAME] [--partner-portal-url=PARTNER_PORTAL_URL]
-        [--region=REGION] [--update-labels=[KEY=VALUE,...]]
-        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+        [--bandwidth=BANDWIDTH] [--description=DESCRIPTION] [--region=REGION]
+        [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--partner-interconnect-name=PARTNER_INTERCONNECT_NAME
+          --partner-name=PARTNER_NAME --partner-portal-url=PARTNER_PORTAL_URL]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute interconnects attachments provider update is
@@ -48,23 +49,9 @@ FLAGS
      --description=DESCRIPTION
         Human-readable plain-text description of attachment.
 
-     --partner-interconnect-name=PARTNER_INTERCONNECT_NAME
-        Plain text name of the Interconnect this attachment is connected to, as
-        displayed in the Partner's portal. For instance "Chicago 1".
-
-     --partner-name=PARTNER_NAME
-        Plain text name of the Partner providing this attachment. This value
-        may be validated to match approved Partner values.
-
-     --partner-portal-url=PARTNER_PORTAL_URL
-        URL of the Partner's portal for this Attachment. The Partner may wish
-        to customise this to be a deep-link to the specific resource on the
-        Partner portal. This value may be validated to match approved Partner
-        values.
-
      --region=REGION
         The region of the interconnect attachment to patch. If not specified,
-        you will be prompted to select a region.
+        you may be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the
         compute/region property:
@@ -105,6 +92,22 @@ FLAGS
        --remove-labels=[KEY,...]
           A list of label keys to remove. If a label does not exist it is
           silently ignored.
+
+     Partner metadata.
+
+       --partner-interconnect-name=PARTNER_INTERCONNECT_NAME
+          Plain text name of the Interconnect this attachment is connected to,
+          as displayed in the Partner's portal. For instance "Chicago 1".
+
+       --partner-name=PARTNER_NAME
+          Plain text name of the Partner providing this attachment. This value
+          may be validated to match approved Partner values.
+
+       --partner-portal-url=PARTNER_PORTAL_URL
+          URL of the Partner's portal for this Attachment. The Partner may wish
+          to customise this to be a deep-link to the specific resource on the
+          Partner portal. This value may be validated to match approved Partner
+          values.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

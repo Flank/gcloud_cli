@@ -14,13 +14,15 @@
 # limitations under the License.
 """ml-engine models get-iam-policy tests."""
 
-from googlecloudsdk.command_lib.ml_engine import models_util
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 
-import mock
 
-
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class GetIamPolicyUnitTest(base.MlGaPlatformTestBase):
 
   def SetUp(self):
@@ -43,17 +45,20 @@ class GetIamPolicyUnitTest(base.MlGaPlatformTestBase):
         ],
         etag='abcd'
     )
-    self.get_iam_policy = self.StartObjectPatch(
-        models_util, 'GetIamPolicy', return_value=self.policy)
+    self.client.projects_models.GetIamPolicy.Expect(
+        request=self.msgs.MlProjectsModelsGetIamPolicyRequest(
+            resource='projects/{}/models/myModel'.format(self.Project())),
+        response=self.policy)
 
-  def testGetIamPolicy(self):
+  def testGetIamPolicy(self, track):
+    self.track = track
     response = self.Run('ml-engine models get-iam-policy myModel '
                         '    --format disable')
 
-    self.assertEquals(response, self.policy)
-    self.get_iam_policy.assert_called_once_with(mock.ANY, 'myModel')
+    self.assertEqual(response, self.policy)
 
-  def testGetIamPolicyOutput(self):
+  def testGetIamPolicyOutput(self, track):
+    self.track = track
     self.Run('ml-engine models get-iam-policy myModel')
 
     self.AssertOutputEquals("""\
@@ -68,9 +73,9 @@ class GetIamPolicyUnitTest(base.MlGaPlatformTestBase):
         role: roles/owner
         etag: YWJjZA==
         """, normalize_space=True)
-    self.get_iam_policy.assert_called_once_with(mock.ANY, 'myModel')
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
+    self.track = track
     self.Run("""
         ml-engine models get-iam-policy myModel
         --flatten=bindings[].members
@@ -81,27 +86,17 @@ class GetIamPolicyUnitTest(base.MlGaPlatformTestBase):
     self.AssertOutputEquals(
         'user:test-owner1@gmail.com\nuser:test-owner2@gmail.com\n')
 
-  def testGetIamPolicyModelRequired(self):
+
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class GetIamPolicyErrorUnitTest(base.MlGaPlatformTestBase):
+
+  def testGetIamPolicyModelRequired(self, track):
+    self.track = track
     with self.AssertRaisesArgumentErrorMatches(
         'argument MODEL: Must be specified.'):
       self.Run('ml-engine models get-iam-policy')
-
-
-class GetIamPolicyIntegrationTestBase(base.MlGaPlatformTestBase):
-
-  def testGetIamPolicy(self):
-    policy = self.msgs.GoogleIamV1Policy(
-        bindings=[
-            self.msgs.GoogleIamV1Binding(
-                members=['user:email1@gmail.com'],
-                role='roles/owner')],
-        etag='abcd')
-    self.client.projects_models.GetIamPolicy.Expect(
-        request=self.msgs.MlProjectsModelsGetIamPolicyRequest(
-            resource='projects/{}/models/myModel'.format(self.Project())),
-        response=policy)
-
-    self.Run('ml-engine models get-iam-policy myModel')
 
 
 if __name__ == '__main__':

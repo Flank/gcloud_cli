@@ -11,7 +11,7 @@ gcloud alpha compute instances detach\-disk \- detach disks from Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances detach\-disk\fR \fIINSTANCE_NAME\fR (\fB\-\-device\-name\fR=\fIDEVICE_NAME\fR\ |\ \fB\-\-disk\fR=\fIDISK\fR) [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances detach\-disk\fR \fIINSTANCE_NAME\fR (\fB\-\-device\-name\fR=\fIDEVICE_NAME\fR\ |\ \fB\-\-disk\fR=\fIDISK\fR) [\fB\-\-disk\-scope\fR=\fIDISK_SCOPE\fR;\ default="zonal"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -71,6 +71,23 @@ by persistent disk name, then you must not specify its device name using the
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-disk\-scope\fR=\fIDISK_SCOPE\fR; default="zonal"
+The scope of the disk. \fIDISK_SCOPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBregional\fR
+The disk specified in \-\-disk is interpreted as a regional disk in the same
+region as the instance. Ignored if a full URI is provided to the \f5\-\-disk\fR
+flag.
+.TP 2m
+\fBzonal\fR
+The disk specified in \-\-disk is interpreted as a zonal disk in the same zone
+as the instance. Ignored if a full URI is provided to the \f5\-\-disk\fR flag.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 The zone of the instance to operate on. If not specified, you may be prompted to

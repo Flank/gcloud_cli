@@ -11,7 +11,7 @@ gcloud alpha compute backend\-services create \- create a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[\fIHEALTH_CHECK\fR,...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[\fIHTTP_HEALTH_CHECK\fR,...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[\fIHTTPS_HEALTH_CHECK\fR,...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[\fIQUERY_STRING\fR,...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -124,18 +124,18 @@ number, traffic arriving at the load\-balanced IP will be directed to the
 failover backend(s). Not compatible with the \-\-global flag.
 
 .TP 2m
-\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[\fIHEALTH_CHECK\fR,...]
+\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]
 Specifies a list of health check objects for checking the health of the backend
 service. Health checks need not be for the same protocol as that of the backend
 service.
 
 .TP 2m
-\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[\fIHTTP_HEALTH_CHECK\fR,...]
+\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]
 Specifies a list of HTTP health check objects for checking the health of the
 backend service.
 
 .TP 2m
-\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[\fIHTTPS_HEALTH_CHECK\fR,...]
+\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]
 Specifies a list of HTTPS health check objects for checking the health of the
 backend service.
 
@@ -241,7 +241,7 @@ keys. All other parameters will be included. Either specify
 encoded and not treated as delimiters. Can only be applied for global resources.
 
 .TP 2m
-\fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[\fIQUERY_STRING\fR,...]
+\fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]
 Specifies a comma separated list of query string parameters to include in cache
 keys. All other parameters will be excluded. Either specify
 \-\-cache\-key\-query\-string\-whitelist or

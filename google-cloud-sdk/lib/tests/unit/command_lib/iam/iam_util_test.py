@@ -240,7 +240,7 @@ class IAMUtilTest(test_case.WithInput):
   def testRemoveNonExistingBindingFromIamPolicy(self):
     policy = pickle.loads(pickle.dumps(self.TEST_IAM_POLICY))
     message = 'Policy binding with the specified member and role not found!'
-    with self.assertRaisesRegexp(iam_util.IamPolicyBindingNotFound, message):
+    with self.assertRaisesRegex(iam_util.IamPolicyBindingNotFound, message):
       iam_util.RemoveBindingFromIamPolicy(policy,
                                           'user:lick@gmail.com',
                                           'roles/owner')
@@ -269,7 +269,7 @@ class IAMUtilTest(test_case.WithInput):
     self.assertEqual(policy, expected_policy)
 
   def testParseIamPolicyMissingPolicyFile(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         r'Failed to load YAML from \[fake_policy.json\]'):
       iam_util.ParsePolicyFile('fake_policy.json', self.messages.Policy)
@@ -278,7 +278,7 @@ class IAMUtilTest(test_case.WithInput):
     bad_file = self.Touch(self.dir.path,
                           name='bad_yaml.json',
                           contents='NOT YAML OR JSON')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         gcloud_exceptions.BadFileException, r'Policy file \[.*\] is not a '
                                             'properly formatted YAML or JSON '
                                             'policy file.'):
@@ -301,11 +301,20 @@ class IAMUtilTest(test_case.WithInput):
     bad_file = self.Touch(self.dir.path,
                           name='bad_yaml.json',
                           contents=bad_contents)
-    with self.assertRaisesRegexp(iam_util.IamEtagReadError,
-                                 r'The etag of policy file \[.*\] is not '
-                                 'properly formatted. Base64 decoding error: '
-                                 'Incorrect padding'):
+    with self.assertRaisesRegex(iam_util.IamEtagReadError,
+                                r'The etag of policy file \[.*\] is not '
+                                'properly formatted. Base64 decoding error: '
+                                'Incorrect padding'):
       iam_util.ParsePolicyFile(bad_file, self.messages.Policy)
+
+  def testParseIamPolicyWithMask(self):
+    policy_file = self._CreateIAMPolicyFile(etag='abcd')
+    expected_policy = self._GetTestIAMPolicy(etag='abcd')
+    policy, update_mask = iam_util.ParsePolicyFileWithUpdateMask(
+        policy_file, self.messages.Policy)
+
+    self.assertEqual(policy, expected_policy)
+    self.assertEqual(update_mask, 'bindings,etag,version')
 
 
 class LogSetIamPolicyTest(sdk_test_base.WithLogCapture):

@@ -285,7 +285,7 @@ class RedeployTest(DeployE2ETestBase):
               region=region, timeout=timeout, labels=newlabels))
       describe_result = self.Run('functions describe {}'.format(
           function_name))
-      self.assertEquals(512, describe_result.availableMemoryMb)
+      self.assertEqual(512, describe_result.availableMemoryMb)
       updated_labels = self._ParseLabels(describe_result)
       self.assertIn('foo', updated_labels,)
       self.assertIn('guess', updated_labels)
@@ -325,6 +325,7 @@ class MiscWorkflowTest(DeployE2ETestBase):
         'Called function: {} - Hello World!'.format(function_name))
     self.AssertOutputContains(function_name)
 
+  @test_case.Filters.skip('Failing consistently', 'b/78307868')
   def testLogRead(self):
     """Test deploy and read logs."""
     with self._DeployFunction('--trigger-http',

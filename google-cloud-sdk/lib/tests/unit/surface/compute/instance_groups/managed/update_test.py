@@ -321,7 +321,7 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
   def testUpdateWhenIgmDoesNotExist_throws(self):
     self._setNoInitialIgm()
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         managed_instance_groups_utils.ResourceNotFoundException,
         'Could not fetch resource:'):
       self.Run("""

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,8 @@
 
 """Tests for the http module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import socket
 import uuid
@@ -31,6 +34,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 import httplib2
 import mock
+import six
 import socks
 
 
@@ -47,11 +51,23 @@ class _UncopyableObject(object):
 
 class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
 
+  def _EncodeValue(self, value):
+    if isinstance(value, six.text_type):
+      value = value.encode('utf8')
+    return value
+
+  def _EncodeHeaders(self, headers):
+    return {
+        self._EncodeValue(k): self._EncodeValue(v)
+        for k, v in six.iteritems(headers)}
+
   def SetUp(self):
     self.old_version = config.CLOUD_SDK_VERSION
     config.CLOUD_SDK_VERSION = '10.0.0'
     self.StartObjectPatch(console_io, 'IsRunFromShellScript',
                           return_value=False)
+
+    self.default_response = ({}, b'response content')
 
   def TearDown(self):
     config.CLOUD_SDK_VERSION = self.old_version
@@ -75,7 +91,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
                                  python_version,
                                  platform,
                                  fromscript)
-    return user_agent
+    return user_agent.encode('utf8')
 
   def testUserAgent(self):
     request_mock = self.StartObjectPatch(httplib2.Http, 'request')
@@ -89,14 +105,16 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     headers = {}
     http_client = http.Http()
     url = 'http://foo.com'
+    request_mock.return_value = self.default_response
     http_client.request(url, headers=headers, uncopyable=_UncopyableObject())
     expect_user_agent = self.UserAgent('10.0.0',
                                        'None',
                                        uuid_mock.return_value.hex,
                                        python_version,
                                        False)
+    expect_headers = self._EncodeHeaders({'user-agent': expect_user_agent})
     request_mock.assert_called_once_with(
-        url, headers={'user-agent': expect_user_agent}, uncopyable=mock.ANY)
+        url, headers=expect_headers, uncopyable=mock.ANY)
     request_mock.reset_mock()
     # Make sure our wrapping did not actually affect args we pass into request.
     # If it does, we could accidentally be modifying global state.
@@ -105,27 +123,31 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     cmd_path = 'a.b.c.d'
     properties.VALUES.metrics.command_name.Set(cmd_path)
     http_client = http.Http()
+    request_mock.return_value = self.default_response
     http_client.request(url)
     expect_user_agent = self.UserAgent('10.0.0',
                                        cmd_path,
                                        uuid_mock.return_value.hex,
                                        python_version,
                                        False)
+    headers = self._EncodeHeaders({'user-agent': expect_user_agent})
     request_mock.assert_called_once_with(
-        url, headers={'user-agent': expect_user_agent})
+        url, headers=headers)
     request_mock.reset_mock()
 
     cmd_path = 'a.b.e.d'
     properties.VALUES.metrics.command_name.Set(cmd_path)
     http_client = http.Http()
-    http_client.request(url, headers={'user-agent': 'hello'})
-    expect_user_agent = 'hello ' + self.UserAgent('10.0.0',
-                                                  cmd_path,
-                                                  uuid_mock.return_value.hex,
-                                                  python_version,
-                                                  False)
+    expect_headers = self._EncodeHeaders({'user-agent': 'hello'})
+    request_mock.return_value = self.default_response
+    http_client.request(url, headers=expect_headers)
+    expect_user_agent = b'hello ' + self.UserAgent('10.0.0',
+                                                   cmd_path,
+                                                   uuid_mock.return_value.hex,
+                                                   python_version,
+                                                   False)
     request_mock.assert_called_once_with(
-        url, headers={'user-agent': expect_user_agent})
+        url, headers=self._EncodeHeaders({'user-agent': expect_user_agent}))
 
   def testUserAgent_SpacesInVersion(self):
     # This is similar to what the versions look like for some internal builds
@@ -140,6 +162,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
 
     http_client = http.Http()
     url = 'http://foo.com'
+    request_mock.return_value = self.default_response
     http_client.request(url)
     expect_user_agent = self.UserAgent('Mon_Sep_12_08:35:01_2016',
                                        'None',
@@ -147,7 +170,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
                                        python_version,
                                        False)
     request_mock.assert_called_once_with(
-        url, headers={'user-agent': expect_user_agent})
+        url, headers=self._EncodeHeaders({'user-agent': expect_user_agent}))
     request_mock.reset_mock()
 
   def testTraces(self):
@@ -164,9 +187,10 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
                                        uuid_mock.return_value.hex,
                                        python_version,
                                        False)
-    expect_headers = {'user-agent': expect_user_agent}
+    expect_headers = self._EncodeHeaders({'user-agent': expect_user_agent})
     http_client = http.Http()
     url = 'http://foo.com'
+    request_mock.return_value = self.default_response
     http_client.request(url)
     request_mock.assert_called_once_with(url, headers=expect_headers)
     request_mock.reset_mock()
@@ -174,6 +198,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     trace_token = 'hello'
     properties.VALUES.core.trace_token.Set(trace_token)
     http_client = http.Http()
+    request_mock.return_value = self.default_response
     http_client.request(url)
     expect_url = '{0}?trace=token%3A{1}'.format(url, trace_token)
     request_mock.assert_called_once_with(expect_url, headers=expect_headers)
@@ -183,6 +208,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     trace_email = 'hello'
     properties.VALUES.core.trace_email.Set(trace_email)
     http_client = http.Http()
+    request_mock.return_value = self.default_response
     http_client.request(url)
     expect_url = '{0}?trace=email%3A{1}'.format(url, trace_email)
     request_mock.assert_called_once_with(expect_url, headers=expect_headers)
@@ -191,15 +217,21 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
 
     properties.VALUES.core.trace_log.Set(True)
     http_client = http.Http()
+    request_mock.return_value = self.default_response
     http_client.request(url)
     expect_url = '{0}?trace=log'.format(url)
     request_mock.assert_called_once_with(expect_url, headers=expect_headers)
     properties.VALUES.core.trace_log.Set(None)
 
+  def _FormatHeaderOutput(self, headers):
+    return '\n'.join(
+        ['{0}: {1}'.format(k, v) for k, v in sorted(six.iteritems(headers))])
+
   def testRequestResponseDump(self):
     request_mock = self.StartObjectPatch(httplib2.Http, 'request')
-    request_mock.return_value = (
-        {'header1': 'value1', 'header2': 'value2'}, 'response content')
+    response_headers = self._EncodeHeaders(
+        {'header1': 'value1', 'header2': 'value2'})
+    request_mock.return_value = (response_headers, 'response content')
     uuid_mock = self.StartObjectPatch(uuid, 'uuid4')
     uuid_mock.return_value = uuid.UUID('12345678123456781234567812345678')
     is_interactive_mock = self.StartObjectPatch(console_io, 'IsInteractive')
@@ -212,7 +244,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
                                        uuid_mock.return_value.hex,
                                        python_version,
                                        False)
-    expect_headers = {'user-agent': expect_user_agent}
+    user_agent_header = self._EncodeHeaders({'user-agent': expect_user_agent})
     log_mock = self.StartObjectPatch(log.status, 'Print')
     properties.VALUES.core.log_http.Set(True)
     capture_session_file = os.path.join(self.CreateTempDir(), 'session.yaml')
@@ -225,7 +257,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     time_mock.side_effect = [1.0, 1.1, 3.0, 3.1]
     http_client.request(url, method='GET', body='Request Body')
     request_mock.assert_called_once_with(
-        url, method='GET', headers=expect_headers, body='Request Body',)
+        url, method='GET', headers=user_agent_header, body='Request Body',)
     request_mock.reset_mock()
 
     expected_output = """\
@@ -234,7 +266,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
 uri: http://foo.com
 method: GET
 == headers start ==
-user-agent: {0}
+{0}
 == headers end ==
 == body start ==
 Request Body
@@ -242,15 +274,15 @@ Request Body
 ==== request end ====
 ---- response start ----
 -- headers start --
-header1: value1
-header2: value2
+{1}
 -- headers end --
 -- body start --
 response content
 -- body end --
 total round trip time (request+response): 2.000 secs
 ---- response end ----
-----------------------""".format(expect_user_agent)
+----------------------""".format(self._FormatHeaderOutput(user_agent_header),
+                                 self._FormatHeaderOutput(response_headers))
 
     log_mock.assert_has_calls(
         [mock.call(line) for line in expected_output.split('\n')])
@@ -260,7 +292,8 @@ total round trip time (request+response): 2.000 secs
     time_mock.side_effect = [1.0, 1.1, 5.0, 5.1]
 
     # Test with positional argument list.
-    http_client.request(url, 'GET', 'Request Body', {'req_header1': 'val1'})
+    request_headers = self._EncodeHeaders({'req_header1': 'val1'})
+    http_client.request(url, 'GET', 'Request Body', request_headers)
 
     expected_output = """\
 =======================
@@ -268,8 +301,7 @@ total round trip time (request+response): 2.000 secs
 uri: http://foo.com
 method: GET
 == headers start ==
-req_header1: val1
-user-agent: {0}
+{0}
 == headers end ==
 == body start ==
 Request Body
@@ -277,15 +309,15 @@ Request Body
 ==== request end ====
 ---- response start ----
 -- headers start --
-header1: value1
-header2: value2
+{1}
 -- headers end --
 -- body start --
 response content
 -- body end --
 total round trip time (request+response): 4.000 secs
 ---- response end ----
-----------------------""".format(expect_user_agent)
+----------------------""".format(self._FormatHeaderOutput(request_headers),
+                                 self._FormatHeaderOutput(response_headers))
 
     with open(capture_session_file, 'w') as fp:
       session_capturer.SessionCapturer.capturer.Print(fp)
@@ -317,8 +349,12 @@ total round trip time (request+response): 4.000 secs
       request_mock.reset_mock()
 
     # Test authorization header is redacted.
-    run('https://fake.googleapis.com/foo', {'Authorization': 'Bearer mytoken'})
-    self.AssertErrNotContains('mytoken')
+    run('https://fake.googleapis.com/foo', {
+        'Authorization': 'Bearer oauth2token',
+        'x-goog-iam-authorization-token': 'iamtoken',
+    })
+    self.AssertErrNotContains('oauth2token')
+    self.AssertErrNotContains('iamtoken')
     self.AssertErrContains('request content')
     self.AssertErrContains('response content')
     self.ClearErr()
@@ -336,6 +372,25 @@ total round trip time (request+response): 4.000 secs
     self.AssertErrNotContains('response content')
     self.ClearErr()
 
+  def testRequestReason(self):
+    properties.VALUES.core.request_reason.Set('my request justification')
+    request_mock = self.StartObjectPatch(httplib2.Http, 'request')
+    request_mock.return_value = (
+        {'header1': 'value1', 'header2': 'value2'}, 'response content')
+    http_client = http.Http()
+
+    http_client.request(
+        'http://www.example.com/foo', method='GET', body='request content',
+        headers={})
+
+    expected_headers = {
+        b'user-agent': mock.ANY,
+        b'X-Goog-Request-Reason': b'my request justification'
+    }
+    request_mock.assert_called_once_with(
+        'http://www.example.com/foo', method='GET', body='request content',
+        headers=expected_headers)
+
   def testDefaultTimeout(self):
     timeout_mock = self.StartObjectPatch(http, 'GetDefaultTimeout')
     timeout_mock.return_value = 0.001
@@ -349,7 +404,7 @@ total round trip time (request+response): 4.000 secs
     properties.VALUES.proxy.address.Set('123.123.123.123')
     properties.VALUES.proxy.port.Set('4321')
     pi = http_proxy.GetHttpProxyInfo()
-    self.assertEquals(
+    self.assertEqual(
         (socks.PROXY_TYPE_SOCKS4, '123.123.123.123', 4321, True, None, None,
          None),
         pi.astuple())
@@ -371,7 +426,7 @@ total round trip time (request+response): 4.000 secs
     properties.VALUES.proxy.proxy_type.Set(None)
     properties.VALUES.proxy.address.Set('123.123.123.123')
     properties.VALUES.proxy.port.Set('4321')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         properties.InvalidValueError,
         'Please set all or none of the following properties: '
         'proxy/type, proxy/address and proxy/port'):
@@ -380,7 +435,7 @@ total round trip time (request+response): 4.000 secs
   def testProxyHttpProxyInfoNoProperties(self):
     pi = http_proxy.GetHttpProxyInfo()
     self.assertTrue(callable(pi))
-    self.assertEquals(None, pi('http'))
+    self.assertEqual(None, pi('http'))
 
   def testProxyHttpProxyInfoEnvVar(self):
     self.StartEnvPatch(
@@ -389,11 +444,11 @@ total round trip time (request+response): 4.000 secs
          'NO_PROXY': 'someaddress.com,otheraddress.com'})
     pi = http_proxy.GetHttpProxyInfo()
     self.assertTrue(callable(pi))
-    self.assertEquals(
+    self.assertEqual(
         (socks.PROXY_TYPE_HTTP, 'awesome_proxy', 8080, True, 'user', 'pass',
          None),
         pi('http').astuple())
-    self.assertEquals(
+    self.assertEqual(
         (socks.PROXY_TYPE_HTTP, 'secure_proxy', 8081, True, 'suser', 'spass',
          None),
         pi('https').astuple())
@@ -407,7 +462,8 @@ total round trip time (request+response): 4.000 secs
     self.assertFalse(pi('https').bypass_host('google.com'))
 
   def testRPCDurationReporting(self):
-    self.StartObjectPatch(httplib2.Http, 'request')
+    request_mock = self.StartObjectPatch(httplib2.Http, 'request')
+    request_mock.return_value = self.default_response
 
     time_mock = self.StartPatch('time.time', autospec=True)
     time_mock.side_effect = [1.0, 4.0]
@@ -417,6 +473,17 @@ total round trip time (request+response): 4.000 secs
     http_client = http.Http()
     http_client.request('http://foo.com', method='GET', body='Request Body')
     duration_mock.assert_called_once_with(3.0)
+
+  def testResponseEncoding(self):
+    request_mock = self.StartObjectPatch(httplib2.Http, 'request')
+    request_mock.return_value = (
+        {}, b'\xe1\x95\x95( \xe1\x90\x9b )\xe1\x95\x97')
+
+    http_client = http.Http(response_encoding='utf-8')
+    _, content = http_client.request('http://foo.com',
+                                     method='GET',
+                                     body='Request Body')
+    self.assertEqual('ᕕ( ᐛ )ᕗ', content)
 
 
 if __name__ == '__main__':

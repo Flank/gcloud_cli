@@ -1,0 +1,219 @@
+
+.TH "GCLOUD_ALPHA_MONITORING_POLICIES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha monitoring policies update \- updates an alerting policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha monitoring policies update\fR \fINAME\fR [\fB\-\-fields\fR=[\fIfield\fR,...]\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR\ \fB\-\-[no\-]enabled\fR\ \fB\-\-add\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-clear\-notification\-channels\fR\ |\ \fB\-\-remove\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-set\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ \fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR\ \fB\-\-documentation\fR=\fIDOCUMENTATION\fR\ |\ \fB\-\-documentation\-from\-file\fR=\fIDOCUMENTATION_FROM_FILE\fR\ \fB\-\-update\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-user\-labels\fR\ |\ \fB\-\-remove\-user\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-policy\fR=\fIPOLICY\fR\ |\ \fB\-\-policy\-from\-file\fR=\fIPOLICY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Updates an alerting policy.
+
+If \f5\-\-policy\fR or \f5\-\-policy\-from\-file\fR are specified:
+
+.RS 2m
+.IP "\(bu" 2m
+If \f5\-\-fields\fR is specified, the only the specified fields will be updated.
+.IP "\(bu" 2m
+Else, the policy will be replaced with the provided policy. The policy can be
+modified further using the flags from the Policy Settings group below.
+.RE
+.sp
+
+Otherwise, the policy will be updated with the values specified in the flags
+from the Policy Settings group.
+
+For information about the JSON/YAML format of an alerting policy:
+https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+NAME \- Name of the Alert Policy to be updated. This represents a Cloud
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: Set the property
+[core/project] or provide the flag [\-\-project] on the command line. This must
+be specified.
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The ID of the Alert Policy or a fully qualified identifier for the Alert Policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-fields\fR=[\fIfield\fR,...]
+The list of fields to update. Must specify \f5\-\-policy\fR or
+\f5\-\-policy\-from\-file\fR if using this flag. \fIfield\fR must be one of:
+\fBdisabled\fR, \fBnotificationChannels\fR.
+
+.TP 2m
+
+Policy Settings. If any of these are specified, they will overwrite fields in
+the \f5\-\-policy\fR or \f5\-\-policy\-from\-file\fR flags if specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+The display name for the Alert Policy.
+
+.TP 2m
+\fB\-\-[no\-]enabled\fR
+If the policy is enabled. Use \fB\-\-enabled\fR to enable and
+\fB\-\-no\-enabled\fR to disable.
+
+.TP 2m
+
+These flags modify the member Notification Channels of this Alert Policy. At
+most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]
+Append the given values to the current Notification Channels.
+
+.TP 2m
+\fB\-\-clear\-notification\-channels\fR
+Empty the current Notification Channels.
+
+.TP 2m
+\fB\-\-remove\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]
+Remove the given values from the current Notification Channels.
+
+.TP 2m
+\fB\-\-set\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]
+Completely replace the current Notification Channels with the given values.
+
+.RE
+.sp
+.TP 2m
+
+Documentation
+
+.RS 2m
+.TP 2m
+\fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR
+The MIME type that should be used with \f5\-\-documentation\fR or
+\f5\-\-documentation\-from\-file\fR. Currently, only "text/markdown" is
+supported.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-documentation\fR=\fIDOCUMENTATION\fR
+The documentation to be included with the policy.
+
+.TP 2m
+\fB\-\-documentation\-from\-file\fR=\fIDOCUMENTATION_FROM_FILE\fR
+The path to a file containing the documentation to be included with the policy.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+User Labels
+
+.RS 2m
+.TP 2m
+\fB\-\-update\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-user\-labels\fR
+Removes all labels. If \f5\-\-update\-user\-labels\fR is also specified then
+\f5\-\-clear\-user\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha monitoring policies update \-\-clear\-user\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha monitoring policies update \-\-clear\-user\-labels \e
+  \-\-update\-user\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-user\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+.RE
+.RE
+.RE
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-policy\fR=\fIPOLICY\fR
+The policy as a string. In either JSON or YAML format.
+
+.TP 2m
+\fB\-\-policy\-from\-file\fR=\fIPOLICY_FROM_FILE\fR
+The path to a JSON or YAML file containing the policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

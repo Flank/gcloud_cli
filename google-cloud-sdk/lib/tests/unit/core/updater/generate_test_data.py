@@ -13,6 +13,8 @@
 # limitations under the License.
 """A script to generate .tar files and snapshots for testing the updater."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 import os
 import shutil

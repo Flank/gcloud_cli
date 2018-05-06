@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta compute disks snapshot DISK_NAME [DISK_NAME ...] [--async]
         [--csek-key-file=FILE] [--description=DESCRIPTION] [--guest-flush]
-        [--snapshot-names=SNAPSHOT_NAME,[SNAPSHOT_NAME,...]] [--zone=ZONE]
+        [--snapshot-names=SNAPSHOT_NAME,[...]] [--region=REGION | --zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -43,7 +43,7 @@ FLAGS
         prepare for the snapshot process. Currently only supported on Windows
         instances using the Volume Shadow Copy Service (VSS).
 
-     --snapshot-names=SNAPSHOT_NAME,[SNAPSHOT_NAME,...]
+     --snapshot-names=SNAPSHOT_NAME,[...]
         Names to assign to the snapshots. Without this option, the name of each
         snapshot will be a random, 16-character hexadecimal number that starts
         with a letter. The values of this option run parallel to the disks
@@ -55,25 +55,48 @@ FLAGS
         will result in my-disk-1 being snapshotted as snapshot-1, my-disk-2 as
         snapshot-2, and so on.
 
-     --zone=ZONE
-        The zone of the disks to operate on. If not specified and the
-        compute/zone property isn't set, you will be prompted to select a zone.
+     At most one of these may be specified:
 
-        To avoid prompting when this flag is omitted, you can set the
-        compute/zone property:
+       --region=REGION
+          The region of the disks to operate on. If not specified, you may be
+          prompted to select a region.
 
-            $ gcloud config set compute/zone ZONE
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
 
-        A list of zones can be fetched by running:
+              $ gcloud config set compute/region REGION
 
-            $ gcloud compute zones list
+          A list of regions can be fetched by running:
 
-        To unset the property, run:
+              $ gcloud compute regions list
 
-            $ gcloud config unset compute/zone
+          To unset the property, run:
 
-        Alternatively, the zone can be stored in the environment variable
-        CLOUDSDK_COMPUTE_ZONE.
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+       --zone=ZONE
+          The zone of the disks to operate on. If not specified and the
+          compute/zone property isn't set, you may be prompted to select a
+          zone.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
+
+              $ gcloud config set compute/zone ZONE
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

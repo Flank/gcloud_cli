@@ -14,14 +14,16 @@
 # limitations under the License.
 """Tests for the health-checks create tcp subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
 class HealthChecksCreateTcpTest(test_base.BaseTest):
-
-  def SetUp(self):
-    self.AllowUnicode()
 
   def testDefaultOptions(self):
     self.Run("""
@@ -71,52 +73,48 @@ class HealthChecksCreateTcpTest(test_base.BaseTest):
     )
 
   def testRequestOptionUnicode(self):
-    self.Run(u"""
+    self.Run("""
         compute health-checks create tcp my-health-check --request Ṳᾔḯ¢◎ⅾℯ
         """)
 
     self.CheckRequests(
-        [(self.compute.healthChecks,
-          'Insert',
+        [(self.compute.healthChecks, 'Insert',
           self.messages.ComputeHealthChecksInsertRequest(
               healthCheck=self.messages.HealthCheck(
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.TCP,
                   tcpHealthCheck=self.messages.TCPHealthCheck(
-                      request=u'Ṳᾔḯ¢◎ⅾℯ',
+                      request='Ṳᾔḯ¢◎ⅾℯ',
                       port=80,
-                      proxyHeader=(self.messages.TCPHealthCheck
-                                   .ProxyHeaderValueValuesEnum.NONE)),
+                      proxyHeader=(self.messages.TCPHealthCheck.
+                                   ProxyHeaderValueValuesEnum.NONE)),
                   checkIntervalSec=5,
                   timeoutSec=5,
                   healthyThreshold=2,
                   unhealthyThreshold=2),
-              project='my-project'))],
-    )
+              project='my-project'))],)
 
   def testResponseOptionUnicode(self):
-    self.Run(u"""
+    self.Run("""
         compute health-checks create tcp my-health-check --response Ṳᾔḯ¢◎ⅾℯ
         """)
 
     self.CheckRequests(
-        [(self.compute.healthChecks,
-          'Insert',
+        [(self.compute.healthChecks, 'Insert',
           self.messages.ComputeHealthChecksInsertRequest(
               healthCheck=self.messages.HealthCheck(
                   name='my-health-check',
                   type=self.messages.HealthCheck.TypeValueValuesEnum.TCP,
                   tcpHealthCheck=self.messages.TCPHealthCheck(
-                      response=u'Ṳᾔḯ¢◎ⅾℯ',
+                      response='Ṳᾔḯ¢◎ⅾℯ',
                       port=80,
-                      proxyHeader=(self.messages.TCPHealthCheck
-                                   .ProxyHeaderValueValuesEnum.NONE)),
+                      proxyHeader=(self.messages.TCPHealthCheck.
+                                   ProxyHeaderValueValuesEnum.NONE)),
                   checkIntervalSec=5,
                   timeoutSec=5,
                   healthyThreshold=2,
                   unhealthyThreshold=2),
-              project='my-project'))],
-    )
+              project='my-project'))],)
 
   def testPortOption(self):
     self.Run("""
@@ -311,6 +309,93 @@ class HealthChecksCreateTcpTest(test_base.BaseTest):
                   unhealthyThreshold=2),
               project='my-project'))],
     )
+
+
+class HealthChecksCreateTcpTestBetaTest(HealthChecksCreateTcpTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+
+
+class HealthChecksCreateTcpTestAlphaTest(HealthChecksCreateTcpTestBetaTest,
+                                         parameterized.TestCase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
+
+  @parameterized.parameters(
+      ('USE_FIXED_PORT', '--port 80', 80, None),
+      ('USE_NAMED_PORT', '--port-name my-port', None, 'my-port'),
+      ('USE_SERVING_PORT', '', None, None))
+  def testPortSpecificationOption(self, enum_value, additional_flags, port,
+                                  port_name):
+    self.Run("""
+        compute health-checks create tcp my-health-check
+          --port-specification {0} {1}
+        """.format(enum_value, additional_flags))
+
+    self.CheckRequests([(
+        self.compute.healthChecks, 'Insert',
+        self.messages.ComputeHealthChecksInsertRequest(
+            healthCheck=self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.TCP,
+                tcpHealthCheck=self.messages.TCPHealthCheck(
+                    port=port,
+                    portName=port_name,
+                    portSpecification=(self.messages.TCPHealthCheck
+                                       .PortSpecificationValueValuesEnum(
+                                           enum_value)),
+                    proxyHeader=(self.messages.TCPHealthCheck
+                                 .ProxyHeaderValueValuesEnum.NONE)),
+                checkIntervalSec=5,
+                timeoutSec=5,
+                healthyThreshold=2,
+                unhealthyThreshold=2),
+            project='my-project'))],)
+
+  @parameterized.parameters('USE_NAMED_PORT', 'USE_SERVING_PORT')
+  def testPortSpecificationOptionPortOverride(self, enum_value):
+    self.Run("""
+        compute health-checks create tcp my-health-check
+          --port-specification {}
+        """.format(enum_value))
+
+    self.CheckRequests([(
+        self.compute.healthChecks, 'Insert',
+        self.messages.ComputeHealthChecksInsertRequest(
+            healthCheck=self.messages.HealthCheck(
+                name='my-health-check',
+                type=self.messages.HealthCheck.TypeValueValuesEnum.TCP,
+                tcpHealthCheck=self.messages.TCPHealthCheck(
+                    portSpecification=(self.messages.TCPHealthCheck
+                                       .PortSpecificationValueValuesEnum(
+                                           enum_value)),
+                    proxyHeader=(self.messages.TCPHealthCheck
+                                 .ProxyHeaderValueValuesEnum.NONE)),
+                checkIntervalSec=5,
+                timeoutSec=5,
+                healthyThreshold=2,
+                unhealthyThreshold=2),
+            project='my-project'))],)
+
+  @parameterized.parameters(
+      ('USE_FIXED_PORT', '--port-name', 'my-port'),
+      ('USE_NAMED_PORT', '--port', 80),
+      ('USE_SERVING_PORT', '--port-name', 'my-port'),
+      ('USE_SERVING_PORT', '--port', 80))
+  def testPortSpecificationOptionErrors(self, enum_value, flag, flag_value):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--port-specification]: {0} cannot be specified '
+        'when using: {1}'.format(flag, enum_value)):
+      self.Run("""
+          compute health-checks create tcp my-health-check
+            --port-specification {0} {1} {2}
+          """.format(enum_value, flag, flag_value))
+
 
 if __name__ == '__main__':
   test_case.main()

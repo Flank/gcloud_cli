@@ -14,6 +14,8 @@
 
 # Tests for the console_pager module.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_pager
 from tests.lib import test_case
@@ -53,7 +55,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
     expected = contents
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals(['q'], self.raw_keys)
+    self.assertEqual(['q'], self.raw_keys)
 
   def testPagerUnderQuit(self):
     self.SetRawKeys(['q'])
@@ -61,7 +63,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
     expected = contents
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals(['q'], self.raw_keys)
+    self.assertEqual(['q'], self.raw_keys)
 
   def testPagerAtQuit(self):
     self.SetRawKeys(['q'])
@@ -69,7 +71,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
     expected = contents
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals(['q'], self.raw_keys)
+    self.assertEqual(['q'], self.raw_keys)
 
   def testPagerOverQuit(self):
     self.SetRawKeys(['q'])
@@ -77,7 +79,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
     expected = '1\n2\n3\n4\n5\n6\n7\n8\n9\n%s' % self.Prompt(81)
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerOverHelpQuit(self):
     self.SetRawKeys(['h', 'X', 'q'])
@@ -90,7 +92,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                     self.Prompt(81)))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerOverNextQuit(self):
     self.SetRawKeys([' ', 'q'])
@@ -100,7 +102,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                                  self.Prompt(100))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerOverNextBoundaryQuit(self):
     self.SetRawKeys([' ', ' ', 'q'])
@@ -110,7 +112,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                 '%s') % (self.Prompt(81), self.Prompt(100), self.Prompt(100))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerThreePagesBackAndForthBoundary(self):
     self.SetRawKeys([' ', ' ', ' ', 'b', 'b', 'b', ' ', ' ', ' ', 'q'])
@@ -138,7 +140,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                          self.Prompt(100))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerThreePagesForwardSearch(self):
     self.SetRawKeys(['/', '^', '.', '1', '\n', '/', '\n', 'n', 'n', 'N', 'N',
@@ -165,7 +167,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                          self.Prompt(70))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerThreePagesBackwardSearch(self):
     self.SetRawKeys(['G', '?', '^', '.', '1', '\n', '?', '\n', 'n', 'n', 'N',
@@ -193,7 +195,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                          self.Prompt(100))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerOnePagePlusTwoLinesBoundaryBanger(self):
     self.SetRawKeys(['f', 'f', 'j', 'j', 'j', 'k', 'k', 'k', 'b', 'f', 'f',
@@ -224,7 +226,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                          self.Prompt(100))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerOnePagePlusTwoLinesBoundaryBangerViaFunctionKeys(self):
     self.SetRawKeys(['<PAGE-DOWN>', '<PAGE-DOWN>', '<DOWN-ARROW>',
@@ -257,7 +259,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                          self.Prompt(100))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerOnePagePlusTwoWithWidesLines(self):
     self.SetRawKeys(['f', 'f', 'k', 'k', 'k', 'k', 'q'])
@@ -318,7 +320,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                  self.Prompt(77))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerBadSearchPattern(self):
     self.SetRawKeys(['/', '*', '1', '\n', 'q'])
@@ -329,7 +331,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                     self.Prompt(81))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
   def testPagerCountPosition(self):
     self.SetRawKeys(['1', '0', 'g', 'q'])
@@ -345,7 +347,7 @@ class ConsolePagerTests(test_case.WithOutputCapture):
                     self.Prompt(100))
     console_pager.Pager(contents).Run()
     self.AssertOutputEquals(expected)
-    self.assertEquals([], self.raw_keys)
+    self.assertEqual([], self.raw_keys)
 
 
 if __name__ == '__main__':

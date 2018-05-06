@@ -11,12 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for the Cloud Pub/Sub Topics library."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.pubsub import topics
 from googlecloudsdk.command_lib.pubsub import util
 from tests.lib import test_case
 from tests.lib.api_lib.util import list_slicer
 from tests.lib.surface.pubsub import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class TopicsTest(base.CloudPubsubTestBase):
@@ -57,7 +65,7 @@ class TopicsTest(base.CloudPubsubTestBase):
         self.msgs.PubsubProjectsTopicsGetRequest(
             topic=topic_ref.RelativeName()),
         topic)
-    self.assertEquals(self.topics_client.Get(topic_ref), topic)
+    self.assertEqual(self.topics_client.Get(topic_ref), topic)
 
   def testList(self):
     project_ref = util.ParseProject(self.Project())
@@ -97,7 +105,7 @@ class TopicsTest(base.CloudPubsubTestBase):
 
   def testPublish(self):
     topic_ref = util.ParseTopic('topic1', self.Project())
-    message_body = 'Pubsub message'
+    message_body = b'Pubsub message'
     attributes = [
         self.msgs.PubsubMessage.AttributesValue.AdditionalProperty(
             key='key',
@@ -132,7 +140,7 @@ class TopicsTest(base.CloudPubsubTestBase):
                 topic=topic,
                 updateMask='labels')),
         topic)
-    self.assertEquals(self.topics_client.Patch(topic_ref, labels), topic)
+    self.assertEqual(self.topics_client.Patch(topic_ref, labels), topic)
 
   def testPatchNoFieldsSpecified(self):
     topic_ref = util.ParseTopic('topic1', self.Project())

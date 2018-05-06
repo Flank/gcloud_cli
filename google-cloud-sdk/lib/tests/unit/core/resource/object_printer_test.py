@@ -65,100 +65,100 @@ class ObjectPrinterTest(resource_printer_test_base.Base):
 
   def testrPrintList(self):
     self.Print(style='object', resource=self._RESOURCE_LIST)
-    self.AssertOutputContains("""\
-[u'Moe', u"We're gettin' no place fast."]\
-[u'Larry', u"I didn't wanna say yes, but I couldn't say no."]\
-[u'Shemp', u'Hey, Moe! Hey, Larry!']\
-[u'Curly', u'Soitenly!']\
-[u'Joe', [u'Oh, cut it ouuuuuut!', 1]]\
-[u'Curly Joe', {u"One of these days, you're gonna poke my eyes out.": 2}]\
+    self.AssertOutputMatches("""\
+\\[u?'Moe', u?"We're gettin' no place fast."]\
+\\[u?'Larry', u?"I didn't wanna say yes, but I couldn't say no."]\
+\\[u?'Shemp', u?'Hey, Moe! Hey, Larry!']\
+\\[u?'Curly', u?'Soitenly!']\
+\\[u?'Joe', \\[u?'Oh, cut it ouuuuuut!', 1]]\
+\\[u?'Curly Joe', {u?"One of these days, you're gonna poke my eyes out.": 2}]\
 """)
 
   def testrPrintListTerminator(self):
     self.Print(
         style='object[terminator=""]', resource=self._RESOURCE_LIST)
-    self.AssertOutputContains("""\
-[u'Moe', u"We're gettin' no place fast."]
-[u'Larry', u"I didn't wanna say yes, but I couldn't say no."]
-[u'Shemp', u'Hey, Moe! Hey, Larry!']
-[u'Curly', u'Soitenly!']
-[u'Joe', [u'Oh, cut it ouuuuuut!', 1]]
-[u'Curly Joe', {u"One of these days, you're gonna poke my eyes out.": 2}]
+    self.AssertOutputMatches("""\
+\\[u?'Moe', u?"We're gettin' no place fast."]
+\\[u?'Larry', u?"I didn't wanna say yes, but I couldn't say no."]
+\\[u?'Shemp', u?'Hey, Moe! Hey, Larry!']
+\\[u?'Curly', u?'Soitenly!']
+\\[u?'Joe', \\[u?'Oh, cut it ouuuuuut!', 1]]
+\\[u?'Curly Joe', {u?"One of these days, you're gonna poke my eyes out.": 2}]
 """)
 
   def testrPrintDict(self):
     self.Print(style='object', resource=self._RESOURCE_DICT)
-    self.AssertOutputContains("""\
-{u'Moe': u"We're gettin' no place fast."}\
-{u'Larry': u"I didn't wanna say yes, but I couldn't say no."}\
-{u'Shemp': u'Hey, Moe! Hey, Larry!'}\
-{u'Curly': u'Soitenly!'}\
-{u'Joe': [u'Oh, cut it ouuuuuut!', 1]}\
-{u'Curly Joe': {u"One of these days, you're gonna poke my eyes out.": 2}}\
+    self.AssertOutputMatches("""\
+{u?'Moe': u?"We're gettin' no place fast."}\
+{u?'Larry': u?"I didn't wanna say yes, but I couldn't say no."}\
+{u?'Shemp': u?'Hey, Moe! Hey, Larry!'}\
+{u?'Curly': u?'Soitenly!'}\
+{u?'Joe': \\[u?'Oh, cut it ouuuuuut!', 1]}\
+{u?'Curly Joe': {u?"One of these days, you're gonna poke my eyes out.": 2}}\
 """)
 
   def testrPrintDictSeparatorEmpty(self):
     self.Print(style='object[separator=""]', resource=self._RESOURCE_DICT)
-    self.AssertOutputContains("""\
-{u'Moe': u"We're gettin' no place fast."}
-{u'Larry': u"I didn't wanna say yes, but I couldn't say no."}
-{u'Shemp': u'Hey, Moe! Hey, Larry!'}
-{u'Curly': u'Soitenly!'}
-{u'Joe': [u'Oh, cut it ouuuuuut!', 1]}
-{u'Curly Joe': {u"One of these days, you're gonna poke my eyes out.": 2}}\
+    self.AssertOutputMatches("""\
+{u?'Moe': u?"We're gettin' no place fast."}
+{u?'Larry': u?"I didn't wanna say yes, but I couldn't say no."}
+{u?'Shemp': u?'Hey, Moe! Hey, Larry!'}
+{u?'Curly': u?'Soitenly!'}
+{u?'Joe': \\[u?'Oh, cut it ouuuuuut!', 1]}
+{u?'Curly Joe': {u?"One of these days, you're gonna poke my eyes out.": 2}}\
 """)
 
   def testrPrintDictTerminatorEmpty(self):
     self.Print(style='object[terminator=""]', resource=self._RESOURCE_DICT)
-    self.AssertOutputContains("""\
-{u'Moe': u"We're gettin' no place fast."}
-{u'Larry': u"I didn't wanna say yes, but I couldn't say no."}
-{u'Shemp': u'Hey, Moe! Hey, Larry!'}
-{u'Curly': u'Soitenly!'}
-{u'Joe': [u'Oh, cut it ouuuuuut!', 1]}
-{u'Curly Joe': {u"One of these days, you're gonna poke my eyes out.": 2}}
+    self.AssertOutputMatches("""\
+{u?'Moe': u?"We're gettin' no place fast."}
+{u?'Larry': u?"I didn't wanna say yes, but I couldn't say no."}
+{u?'Shemp': u?'Hey, Moe! Hey, Larry!'}
+{u?'Curly': u?'Soitenly!'}
+{u?'Joe': \\[u?'Oh, cut it ouuuuuut!', 1]}
+{u?'Curly Joe': {u?"One of these days, you're gonna poke my eyes out.": 2}}
 """)
 
   def testrPrintDictSeparator(self):
     self.Print(
         style='object[separator="<SEPARATOR>"]', resource=self._RESOURCE_DICT)
-    self.AssertOutputContains("""\
-{u'Moe': u"We're gettin' no place fast."}<SEPARATOR>
-{u'Larry': u"I didn't wanna say yes, but I couldn't say no."}<SEPARATOR>
-{u'Shemp': u'Hey, Moe! Hey, Larry!'}<SEPARATOR>
-{u'Curly': u'Soitenly!'}<SEPARATOR>
-{u'Joe': [u'Oh, cut it ouuuuuut!', 1]}<SEPARATOR>
-{u'Curly Joe': {u"One of these days, you're gonna poke my eyes out.": 2}}\
+    self.AssertOutputMatches("""\
+{u?'Moe': u?"We're gettin' no place fast."}<SEPARATOR>
+{u?'Larry': u?"I didn't wanna say yes, but I couldn't say no."}<SEPARATOR>
+{u?'Shemp': u?'Hey, Moe! Hey, Larry!'}<SEPARATOR>
+{u?'Curly': u?'Soitenly!'}<SEPARATOR>
+{u?'Joe': \\[u?'Oh, cut it ouuuuuut!', 1]}<SEPARATOR>
+{u?'Curly Joe': {u?"One of these days, you're gonna poke my eyes out.": 2}}\
 """)
 
   def testrPrintDictTerminator(self):
     self.Print(
         style='object[terminator="<TERMINATOR>"]', resource=self._RESOURCE_DICT)
-    self.AssertOutputContains("""\
-{u'Moe': u"We're gettin' no place fast."}<TERMINATOR>
-{u'Larry': u"I didn't wanna say yes, but I couldn't say no."}<TERMINATOR>
-{u'Shemp': u'Hey, Moe! Hey, Larry!'}<TERMINATOR>
-{u'Curly': u'Soitenly!'}<TERMINATOR>
-{u'Joe': [u'Oh, cut it ouuuuuut!', 1]}<TERMINATOR>
-{u'Curly Joe': {u"One of these days, you're gonna poke my eyes out.": 2}}<TERMINATOR>
+    self.AssertOutputMatches("""\
+{u?'Moe': u?"We're gettin' no place fast."}<TERMINATOR>
+{u?'Larry': u?"I didn't wanna say yes, but I couldn't say no."}<TERMINATOR>
+{u?'Shemp': u?'Hey, Moe! Hey, Larry!'}<TERMINATOR>
+{u?'Curly': u?'Soitenly!'}<TERMINATOR>
+{u?'Joe': \\[u?'Oh, cut it ouuuuuut!', 1]}<TERMINATOR>
+{u?'Curly Joe': {u?"One of these days, you're gonna poke my eyes out.": 2}}<TERMINATOR>
 """)
 
   def testrPrintDictSeparatorAndTerminator(self):
     self.Print(
         style='object[separator="<SEPARATOR>",terminator="<TERMINATOR>"]',
         resource=self._RESOURCE_DICT)
-    self.AssertOutputContains("""\
-{u'Moe': u"We're gettin' no place fast."}<TERMINATOR>
+    self.AssertOutputMatches("""\
+{u?'Moe': u?"We're gettin' no place fast."}<TERMINATOR>
 <SEPARATOR>
-{u'Larry': u"I didn't wanna say yes, but I couldn't say no."}<TERMINATOR>
+{u?'Larry': u?"I didn't wanna say yes, but I couldn't say no."}<TERMINATOR>
 <SEPARATOR>
-{u'Shemp': u'Hey, Moe! Hey, Larry!'}<TERMINATOR>
+{u?'Shemp': u?'Hey, Moe! Hey, Larry!'}<TERMINATOR>
 <SEPARATOR>
-{u'Curly': u'Soitenly!'}<TERMINATOR>
+{u?'Curly': u?'Soitenly!'}<TERMINATOR>
 <SEPARATOR>
-{u'Joe': [u'Oh, cut it ouuuuuut!', 1]}<TERMINATOR>
+{u?'Joe': \\[u?'Oh, cut it ouuuuuut!', 1]}<TERMINATOR>
 <SEPARATOR>
-{u'Curly Joe': {u"One of these days, you're gonna poke my eyes out.": 2}}<TERMINATOR>
+{u?'Curly Joe': {u?"One of these days, you're gonna poke my eyes out.": 2}}<TERMINATOR>
 """)
 
   def testrPrintObject(self):

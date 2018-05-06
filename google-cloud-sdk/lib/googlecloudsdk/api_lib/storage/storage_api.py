@@ -19,7 +19,9 @@ tool. We use the command-line tool for syncing the contents of buckets as well
 as listing the contents. We use the API for checking ACLs.
 """
 
-import cStringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from io import BytesIO
 import mimetypes
 import os
 
@@ -228,7 +230,7 @@ class StorageClient(object):
     Returns:
       file-like object containing the data read.
     """
-    data = cStringIO.StringIO()
+    data = BytesIO()
     download = transfer.Download.FromStream(data)
     get_req = self.messages.StorageObjectsGetRequest(
         bucket=object_ref.bucket,
@@ -276,25 +278,25 @@ class StorageClient(object):
           bucket=bucket,
       ))
 
-  def ListBucket(self, bucket_ref):
+  def ListBucket(self, bucket_ref, prefix=None):
     """Lists the contents of a cloud storage bucket.
 
     Args:
       bucket_ref: The reference to the bucket.
-    Returns:
-      A set of names of items.
+      prefix: str, Filter results to those whose names begin with this prefix.
+    Yields:
+      Object messages.
     """
-    request = self.messages.StorageObjectsListRequest(bucket=bucket_ref.bucket)
-    items = set()
+    request = self.messages.StorageObjectsListRequest(
+        bucket=bucket_ref.bucket, prefix=prefix)
     try:
       # batch_size=None gives us the API default
-      for item in list_pager.YieldFromList(self.client.objects, request,
-                                           batch_size=None):
-        items.add(item.name)
+      for obj in list_pager.YieldFromList(self.client.objects,
+                                          request, batch_size=None):
+        yield obj
     except api_exceptions.HttpError as e:
       raise UploadError('Error uploading files: {e}'.format(
           e=http_exc.HttpException(e)))
-    return items
 
   def DeleteObject(self, bucket_ref, object_path):
     """Delete the specified object.

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'dataflow jobs export-steps' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from tests.lib import sdk_test_base

@@ -217,15 +217,15 @@ class BackendBucketUpdateGaTest(test_base.BaseTest):
               project='my-project'))])
 
 
-class BackendBucketUpdateAlphaTest(BackendBucketUpdateGaTest):
+class BackendBucketUpdateBetaTest(BackendBucketUpdateGaTest):
 
   def SetUp(self):
-    self.SelectApi('alpha')
-    self._backend_buckets = test_resources.BACKEND_BUCKETS_ALPHA
+    self.SelectApi('beta')
+    self._backend_buckets = test_resources.BACKEND_BUCKETS_BETA
 
   def RunUpdate(self, command):
     """Runs the compute backend-buckets update command with the arguments."""
-    self.Run('alpha compute backend-buckets update ' + command)
+    self.Run('beta compute backend-buckets update ' + command)
 
   def CheckRequestMadeWithCdnPolicy(self, expected_cdn_policy):
     """Verifies the request was made with the expected CDN policy."""
@@ -335,15 +335,15 @@ class BackendBucketUpdateAlphaTest(BackendBucketUpdateGaTest):
           'backend-bucket-2-enable-cdn-true --signed-url-cache-max-age -1')
 
 
-class BackendBucketUpdateBetaTest(BackendBucketUpdateGaTest):
+class BackendBucketUpdateAlphaTest(BackendBucketUpdateBetaTest):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self._backend_buckets = test_resources.BACKEND_BUCKETS_BETA
+    self.SelectApi('alpha')
+    self._backend_buckets = test_resources.BACKEND_BUCKETS_ALPHA
 
   def RunUpdate(self, command):
     """Runs the compute backend-buckets update command with the arguments."""
-    self.Run('beta compute backend-buckets update ' + command)
+    self.Run('alpha compute backend-buckets update ' + command)
 
 
 if __name__ == '__main__':

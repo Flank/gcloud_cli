@@ -13,8 +13,7 @@ SYNOPSIS
         [--clear-max-tasks-dispatched-per-second
           | --max-tasks-dispatched-per-second=MAX_TASKS_DISPATCHED_PER_SECOND]
         [--clear-min-backoff | --min-backoff=MIN_BACKOFF]
-        [--clear-routing-override
-          | --routing-override=KEY:VALUE,[KEY:VALUE,...]]
+        [--clear-routing-override | --routing-override=KEY:VALUE,[...]]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -22,8 +21,10 @@ DESCRIPTION
     Engine queue that are mutable. Attempting to use this command on a
     different type of queue will result in an error.
 
-    For more information about the different queue target types, see:
-    https://cloud.google.com/cloud-tasks/docs/queue-types
+    If you have early access to Cloud Tasks, refer to the following guide for
+    more information about the different queue target types:
+    https://cloud.google.com/cloud-tasks/docs/queue-types. For access, sign up
+    here: https://goo.gl/Ya0AZd
 
 POSITIONAL ARGUMENTS
      QUEUE
@@ -106,7 +107,7 @@ FLAGS
        --clear-routing-override
           Clear the field corresponding to --routing-override.
 
-       --routing-override=KEY:VALUE,[KEY:VALUE,...]
+       --routing-override=KEY:VALUE,[...]
           If provided, the specified route is used for all tasks in the queue,
           no matter what is set is at the task-level.
 

@@ -11,12 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for `gcloud iot devices configs get-value`."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.iot import util
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
@@ -26,7 +33,7 @@ class ConfigsGetValueTest(base.CloudIotBase):
 
   def testGetValue(self, track):
     self.track = track
-    data = ''.join(map(chr, range(256)))
+    data = bytes(range(256))
     device_config = self.messages.DeviceConfig(binaryData=data)
     self._ExpectGet(config=device_config)
 
@@ -50,7 +57,7 @@ class ConfigsGetValueTest(base.CloudIotBase):
     self.SetEncoding('ISO-8859-1')
     # We want to test this handles binary data. Values 0-126 work between both
     # Windows and UNIX systems.
-    data = ''.join(map(chr, range(126)))
+    data = bytes(range(126))
     unicode_data = data.decode('ISO-8859-1')
     device_config = self.messages.DeviceConfig(
         binaryData=data,
@@ -97,7 +104,7 @@ class ConfigsGetValueTest(base.CloudIotBase):
 
   def testGetValue_RelativeName(self, track):
     self.track = track
-    data = ''.join(map(chr, range(256)))
+    data = bytes(range(256))
     device_config = self.messages.DeviceConfig(binaryData=data)
     self._ExpectGet(config=device_config)
 

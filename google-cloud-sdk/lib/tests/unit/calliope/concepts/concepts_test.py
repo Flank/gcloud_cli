@@ -14,6 +14,8 @@
 
 """Tests for the concepts module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.util import resource as resource_util
@@ -21,12 +23,14 @@ from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.calliope.concepts import concepts_test_base
 from tests.lib.calliope.concepts import util
 
 
-class ConceptsTest(concepts_test_base.ConceptsTestBase):
+class ConceptsTest(concepts_test_base.ConceptsTestBase,
+                   parameterized.TestCase):
 
   def testCreateResourceSpecFromCollection(self):
     """Tests creating resource from the collection with no config overrides."""
@@ -47,7 +51,6 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase):
                                          help_text=concepts.ANCHOR_HELP,
                                          required=True)],
                      resource_spec.attributes)
-    self.assertEqual('book', resource_spec.name)
     self.assertEqual(
         concepts.Attribute(
             name='name',
@@ -58,6 +61,15 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase):
     self.assertEqual('projectsId', resource_spec.ParamName('projectsId'))
     self.assertEqual('shelvesId', resource_spec.ParamName('shelvesId'))
     self.assertEqual('booksId', resource_spec.ParamName('name'))
+
+  @parameterized.named_parameters(
+      ('Name', {'resource_name': 'book'}, 'book'),
+      ('NoName', {}, 'resource'))
+  def testResourceSpecName(self, kwargs, expected_name):
+    resource_spec = concepts.ResourceSpec(
+        'example.projects.shelves.books',
+        **kwargs)
+    self.assertEqual(resource_spec.name, expected_name)
 
   def testNoParamsCollectionRaises(self):
     """Tests creating resource from the collection with no config overrides."""
@@ -255,7 +267,7 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase):
         '- Provide the flag [--book-project] on the command line\n'
         '- Set the property [core/project] or provide the flag [--project] on '
         'the command line')
-    with self.assertRaisesRegexp(concepts.InitializationError, msg):
+    with self.assertRaisesRegex(concepts.InitializationError, msg):
       resource_spec.Initialize(deps_object)
 
 

@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """ml products reference-images list tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -38,10 +43,10 @@ class ListTest(base.MlProductsTestBase):
     self.assertEqual(results, expected_results)
 
   def testListWithBadProductId(self):
-    with self.assertRaisesRegexp(cli_test_base.MockArgumentError,
-                                 (r'Product Id is restricted to 255 characters '
-                                  r'including letters, numbers, underscore '
-                                  r'\( _ \) and hyphen \(-\)')):
+    with self.assertRaisesRegex(cli_test_base.MockArgumentError,
+                                (r'Product Id is restricted to 255 characters '
+                                 r'including letters, numbers, underscore '
+                                 r'\( _ \) and hyphen \(-\)')):
       self.RunProductsCommand(
           'reference-images', 'list --catalog=12345 --product-id=B@D*ID')
 

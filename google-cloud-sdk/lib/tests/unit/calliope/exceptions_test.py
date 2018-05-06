@@ -11,6 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+
+import errno
 import os
 import socket
 import ssl
@@ -27,6 +33,8 @@ from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.calliope import util
 
+import six
+
 
 class ExceptionsTest(util.Base, sdk_test_base.WithOutputCapture):
   """Tests basic exception handling behavior."""
@@ -38,9 +46,13 @@ class ExceptionsTest(util.Base, sdk_test_base.WithOutputCapture):
     log.Reset()
 
   def testUnknownToolException(self):
-    sys.exc_clear()
+    if six.PY2:
+      # In PY2 sys.exc_info() remains set outside of try:except scope, in PY3
+      # it's unset outside try:except. The unit tests throw multiple exceptions
+      # and get confused if one is laying around from a previous test.
+      sys.exc_clear()
     unknown = exceptions.ToolException.FromCurrent()
-    self.assertEqual(unknown.message, 'An unknown error has occurred')
+    self.assertEqual(six.text_type(unknown), 'An unknown error has occurred')
     unknown = exceptions.ToolException.FromCurrent('some', 'args')
     self.assertEqual(unknown.args, ('some', 'args'))
     content = self.GetLogFileContents()
@@ -57,7 +69,7 @@ class ExceptionsTest(util.Base, sdk_test_base.WithOutputCapture):
     # Make sure the wrapper exception was constructed correctly
     self.assertEqual(original.args, tool.args)
     self.assertEqual(tool_args.args, ('new message',))
-    self.assertEqual(tool_args.message, 'new message')
+    self.assertEqual(six.text_type(tool_args), 'new message')
 
     # Make sure the inner exception is logged only to the file with traceback
     content = self.GetLogFileContents()
@@ -72,7 +84,7 @@ class ExceptionsTest(util.Base, sdk_test_base.WithOutputCapture):
     self.assertIsInstance(new_err, exceptions.HttpException)
     self.assertTrue(print_exc)
 
-    err = socket.error('error')
+    err = socket.error(errno.ECONNREFUSED, 'error')
     new_err, print_exc = exceptions.ConvertKnownError(err)
     self.assertIsInstance(new_err, core_exceptions.NetworkIssueError)
     self.assertTrue(print_exc)
@@ -170,7 +182,7 @@ class TruncateToLineWidthTest(test_case.TestCase):
         exceptions._TruncateToLineWidth(self.string,
                                         self.middle_idx,
                                         self.width,
-                                        fill='.' * (self.width / 2)),
+                                        fill='.' * int(self.width / 2)),
         self.string)
 
 
@@ -181,34 +193,34 @@ class FormatNonAsciiMarkerString(test_case.TestCase):
 
   def testFormatNonAsciiMarkerString(self):
     self.term_size_mock.return_value = (80, 80)
-    args = ['command', '--foo', '\xce\x94']
+    args = ['command', '--foo', b'\xce\x94']
     marker_string = exceptions._FormatNonAsciiMarkerString(args)
     self.assertEqual(marker_string,
-                     (u'command --foo \\u0394\n'
-                      u'              ^ invalid character'))
+                     ('command --foo \\u0394\n'
+                      '              ^ invalid character'))
 
   def testFormatNonAsciiMarkerStringSmallScreen(self):
     # len('^ invalid character') < 30
     self.term_size_mock.return_value = (30, 80)
-    args = ['command', '--foo', '\xce\x94']
+    args = ['command', '--foo', b'\xce\x94']
     marker_string = exceptions._FormatNonAsciiMarkerString(args)
     self.assertEqual(marker_string,
-                     (u'...d --foo \\u0394\n'
-                      u'           ^ invalid character'))
+                     ('...d --foo \\u0394\n'
+                      '           ^ invalid character'))
 
   def testFormatNonAsciiMarkerStringReallySmallScreen(self):
     # 10 < len('^ invalid character')
     self.term_size_mock.return_value = (10, 80)
-    args = ['command', '--foo', '\xce\x94']
+    args = ['command', '--foo', b'\xce\x94']
     marker_string = exceptions._FormatNonAsciiMarkerString(args)
     self.assertEqual(marker_string,
-                     (u'command --foo \\u0394\n'
-                      u'              ^ invalid character'))
+                     ('command --foo \\u0394\n'
+                      '              ^ invalid character'))
 
   def testFormatNonAsciiMarkerStringAllAscii(self):
     self.term_size_mock.return_value = (80, 80)
     args = ['command', '--foo', 'bar']
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, r'The command line is composed entirely of ASCII '
         r'characters\.'):
       exceptions._FormatNonAsciiMarkerString(args)
@@ -217,35 +229,35 @@ class FormatNonAsciiMarkerString(test_case.TestCase):
 class InvalidCharacterInArgExceptionTest(test_case.TestCase):
 
   def testInvalidCharacterInArgException(self):
-    args = ['command', '--foo', '\xce\x94']
+    args = ['command', '--foo', b'\xce\x94']
     exc = exceptions.InvalidCharacterInArgException(args, args[-1])
     self.assertRegexpMatches(
-        exc.message,
-        u'Failed to read command line argument \\[\\\\u0394\\]')
-    self.assertTrue(exc.message.endswith(
-        (u'\n'
-         u'command --foo \\u0394\n'
-         u'              ^ invalid character')))
+        six.text_type(exc),
+        'Failed to read command line argument \\[\\\\u0394\\]')
+    self.assertTrue(six.text_type(exc).endswith(
+        ('\n'
+         'command --foo \\u0394\n'
+         '              ^ invalid character')))
 
   def testInvalidCharacterInArgException_ComplexPath(self):
     command_path = os.path.join('path', 'to', 'command.py')
-    args = [command_path, '--foo', '\xce\x94']
+    args = [command_path, '--foo', b'\xce\x94']
     exc = exceptions.InvalidCharacterInArgException(args, args[-1])
     self.assertRegexpMatches(
-        exc.message,
-        u'Failed to read command line argument \\[\\\\u0394\\]')
-    self.assertTrue(exc.message.endswith(
-        (u'\n'
-         u'command --foo \\u0394\n'
-         u'              ^ invalid character')))
-    self.assertNotIn('path', exc.message)
+        six.text_type(exc),
+        'Failed to read command line argument \\[\\\\u0394\\]')
+    self.assertTrue(six.text_type(exc).endswith(
+        ('\n'
+         'command --foo \\u0394\n'
+         '              ^ invalid character')))
+    self.assertNotIn('path', six.text_type(exc))
 
 
 class RaiseExceptionInsteadOfTest(cli_test_base.CliTestBase):
 
   def testRaiseErrorInsteadOf(self):
 
-    with self.assertRaisesRegexp(core_exceptions.Error, "something's fishy"):
+    with self.assertRaisesRegex(core_exceptions.Error, "something's fishy"):
 
       @exceptions.RaiseErrorInsteadOf(
           core_exceptions.Error, AttributeError, ValueError)
@@ -265,7 +277,7 @@ class RaiseExceptionInsteadOfTest(cli_test_base.CliTestBase):
       BadFun()
 
   def testRaiseArgumentErrorOutsideOfArgparseNoCrash(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         parser_errors.ArgumentError,
         'argument --some-flag: Must be specified.'):
       self.Run(['meta', 'test', '--argumenterror-outside-argparse'])

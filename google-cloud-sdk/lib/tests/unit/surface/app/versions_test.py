@@ -54,8 +54,8 @@ class VersionsDescribeTest(VersionsApiTestBase):
   def testDescribe_NoProject(self):
     """Test `describe` command fails if project not set."""
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app versions describe --service service1 version1')
 
   def testDescribe(self):
@@ -102,8 +102,8 @@ class VersionsListTest(VersionsApiTestBase):
   def testList_NoProject(self):
     """Test that error is raised correctly if project not set."""
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app versions list')
 
   def testList_NoResponse(self):
@@ -256,8 +256,8 @@ class VersionsListTest(VersionsApiTestBase):
     """
     services = self._Services()
     self.ExpectListServicesRequest(self.Project(), services)
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 r'Service \[notfound] not found\.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                r'Service \[notfound] not found\.'):
       self.Run('app versions list --service=notfound')
 
   def testList_SelectService_NotFound_Uri(self):
@@ -269,8 +269,8 @@ class VersionsListTest(VersionsApiTestBase):
     """
     services = self._Services()
     self.ExpectListServicesRequest(self.Project(), services)
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 r'Service \[notfound] not found\.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                r'Service \[notfound] not found\.'):
       self.Run('app versions list --service=notfound --uri')
 
 
@@ -383,15 +383,15 @@ class VersionsStopTest(VersionsApiTestBase):
   def testStop_OneVersionServiceNotFound(self):
     """Tests error raised if --service flag has service that doesn't exist."""
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 r'Service \[badservice\] not found.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                r'Service \[badservice\] not found.'):
       self.Run('app versions stop --service=badservice v1')
 
   def testStop_MultiVersionServiceNotFound(self):
     """Same as above, with two versions given."""
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 r'Service \[badservice\] not found.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                r'Service \[badservice\] not found.'):
       self.Run('app versions stop --service=badservice v1 v2')
 
   def testStop_ResourcePath(self):
@@ -465,15 +465,15 @@ class VersionsStartTest(VersionsApiTestBase):
   def testStart_OneVersionServiceNotFound(self):
     """Test with --service flag if service does not exist."""
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 r'Service \[badservice\] not found.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                r'Service \[badservice\] not found.'):
       self.Run('app versions start --service=badservice v1')
 
   def testStart_MultiVersionServiceNotFound(self):
     """Same as above, but with multiple versions."""
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 r'Service \[badservice\] not found.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                r'Service \[badservice\] not found.'):
       self.Run('app versions start --service=badservice v1 v2')
 
   def testStart_ResourcePath(self):
@@ -539,7 +539,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
     delete_version = self.StartObjectPatch(
         appengine_api_client.AppengineApiClient, 'DeleteVersion')
     delete_version.side_effect = operations_util.OperationError('foo')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         r'Issue deleting version: \[service1/v1\]\n\n'
         r'\[service1/v1\]: foo'):
@@ -558,7 +558,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
   def testDelete_DefaultServiceAllVersions(self):
     """Ensure `delete` command raises if default versions would be deleted."""
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         r'The default service \(module\) may not be deleted, and must '
         r'comprise at least one version.'):
@@ -624,7 +624,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
   def testDelete_WithTrafficVersion(self):
     """Test `delete` raises error if a version to delete has 100% of traffic."""
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         r'Version \[v3\] is currently serving 100.00% of traffic for service '
         r'\[service1\]'):
@@ -637,7 +637,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
     should raise an error if --service flag is not given.
     """
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         r'Version \[v3\] is currently serving 100.00% of traffic for service '
         r'\[service1\]'):
@@ -646,7 +646,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
   def testDelete_MultiVersionOneWithTraffic(self):
     """Same as above with two version args, where one cannot be deleted."""
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         r'Version \[v3\] is currently serving 100.00% of traffic for service '
         r'\[service1\]'):
@@ -687,8 +687,8 @@ class VersionsDeleteTest(VersionsApiTestBase):
   def testDelete_ServiceNotFound(self):
     """Test that `delete` fails if service does not exist."""
     self._ExpectListAllServicesAndVersions()
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 r'Service \[notfound\] not found.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                r'Service \[notfound\] not found.'):
       self.Run('app versions delete --service=notfound v1')
 
   def testDelete_NoVersionsFound(self):
@@ -719,8 +719,8 @@ class BrowseTest(VersionsApiTestBase):
   def testBrowse_NoProject(self):
     """Ensure `browse` raises if project not set."""
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app versions browse v1')
 
   def testBrowse_NoArgs(self):

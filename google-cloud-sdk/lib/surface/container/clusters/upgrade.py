@@ -14,6 +14,8 @@
 
 """Upgrade cluster command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.container import api_adapter
@@ -136,6 +138,7 @@ class Upgrade(base.Command):
     location_get = self.context['location_get']
     location = location_get(args)
     cluster_ref = adapter.ParseCluster(args.name, location)
+    concurrent_node_count = getattr(args, 'concurrent_node_count', None)
 
     # Make sure it exists (will raise appropriate error if not)
     cluster = adapter.GetCluster(cluster_ref)
@@ -147,13 +150,15 @@ class Upgrade(base.Command):
         node_pool=args.node_pool,
         image_type=args.image_type,
         image=args.image,
-        image_project=args.image_project)
+        image_project=args.image_project,
+        concurrent_node_count=concurrent_node_count)
 
     upgrade_message = container_command_util.ClusterUpgradeMessage(
         cluster,
         master=args.master,
         node_pool=args.node_pool,
-        new_version=options.version)
+        new_version=options.version,
+        concurrent_node_count=concurrent_node_count)
 
     console_io.PromptContinue(
         message=upgrade_message,
@@ -223,3 +228,4 @@ class UpgradeAlpha(Upgrade):
   @staticmethod
   def Args(parser):
     _Args(parser)
+    flags.AddConcurrentNodeCountFlag(parser)

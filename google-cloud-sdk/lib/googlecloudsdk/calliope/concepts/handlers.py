@@ -13,12 +13,15 @@
 # limitations under the License.
 """Classes for runtime handling of concept arguments."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import abc
 
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps as deps_lib
 from googlecloudsdk.calliope.concepts import util
 from googlecloudsdk.core import exceptions
+import six
 
 
 class Error(exceptions.Error):
@@ -44,6 +47,7 @@ class RuntimeHandler(object):
     # This is set by the ArgumentInterceptor later.
     self.parsed_args = None
     self._arg_name_lookup = {}
+    self._all_concepts = []
 
   def ParsedArgs(self):
     """Basically a lazy property to use during lazy concept parsing."""
@@ -70,18 +74,23 @@ class RuntimeHandler(object):
           return self.parse(self.arg_getter())
         except concepts.InitializationError as e:
           if required:
-            raise ParseError(name, e.message)
+            raise ParseError(name, six.text_type(e))
           return None
 
     setattr(self, name, LazyParse(concept_info.Parse, self.ParsedArgs))
-    for _, arg_name in concept_info.attribute_to_args_map.iteritems():
+    self._all_concepts.append(concept_info)
+    for _, arg_name in six.iteritems(concept_info.attribute_to_args_map):
       self._arg_name_lookup[util.NormalizeFormat(arg_name)] = concept_info
 
   def ArgNameToConceptInfo(self, arg_name):
     return self._arg_name_lookup.get(util.NormalizeFormat(arg_name))
 
+  def Reset(self):
+    for concept_info in self._all_concepts:
+      concept_info.ClearCache()
 
-class ConceptInfo(object):
+
+class ConceptInfo(six.with_metaclass(abc.ABCMeta, object)):
   """Holds information for a concept argument.
 
   The ConceptInfo object is responsible for holding information about the
@@ -94,7 +103,6 @@ class ConceptInfo(object):
       flags.
     fallthroughs_map: A map of attributes to non-argument fallthroughs.
   """
-  __metaclass__ = abc.ABCMeta
 
   @abc.abstractmethod
   def Parse(self, parsed_args=None):
@@ -117,6 +125,10 @@ class ConceptInfo(object):
     Returns:
       [str], a list of string hints.
     """
+
+  def ClearCache(self):
+    """Clear cache if it exists. Override where needed."""
+    pass
 
 
 class ResourceInfo(object):
@@ -145,6 +157,7 @@ class ResourceInfo(object):
 
     self._result = None
     self._result_computed = False
+    self.sentinel = 0
 
   @property
   def resource_spec(self):
@@ -271,3 +284,7 @@ class ResourceInfo(object):
       return resources
     return self.concept_spec.Initialize(deps_lib.Deps(
         fallthroughs_map))
+
+  def ClearCache(self):
+    self._result = None
+    self._result_computed = False

@@ -30,7 +30,7 @@ class DeleteTestBase(object):
         self.msgs.GoogleProtobufEmpty()
     )
     self.WriteInput('y')
-    self.assertEquals(
+    self.assertEqual(
         self.Run('ml-engine operations delete opId'),
         self.msgs.GoogleProtobufEmpty())
 

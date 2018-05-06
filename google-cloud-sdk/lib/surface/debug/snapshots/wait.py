@@ -14,6 +14,8 @@
 
 """Wait command for gcloud debug snapshots command group."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.debug import debug
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
@@ -36,6 +38,8 @@ class Wait(base.ListCommand):
 
   @staticmethod
   def Args(parser):
+    base.URI_FLAG.RemoveFromParser(parser)
+    base.PAGE_SIZE_FLAG.RemoveFromParser(parser)
     parser.add_argument(
         'ids', metavar='ID', nargs='*',
         help="""\

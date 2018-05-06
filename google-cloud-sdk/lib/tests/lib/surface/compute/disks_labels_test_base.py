@@ -30,7 +30,7 @@ class DisksLabelsTestBase(sdk_test_base.WithFakeAuth,
     """Setup common test components.
 
     Args:
-      release_track: Release track the test is targetting.
+      release_track: Release track the test is targeting.
     """
     api_name = 'v1'
     if release_track == calliope_base.ReleaseTrack.ALPHA:
@@ -50,9 +50,8 @@ class DisksLabelsTestBase(sdk_test_base.WithFakeAuth,
     self.resources.RegisterApiByName('compute', api_name)
     self.track = release_track
     self.zone_operations = self.apitools_client.zoneOperations
-    self.region_operations = None
-    if release_track == calliope_base.ReleaseTrack.ALPHA:
-      self.region_operations = self.apitools_client.regionOperations
+    self.region_operations = getattr(self.apitools_client, 'regionOperations',
+                                     None)
     self.StartPatch('time.sleep')
 
   def _GetDiskRef(self, name, zone=None, region=None):

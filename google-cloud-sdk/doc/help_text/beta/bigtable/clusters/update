@@ -3,20 +3,28 @@ NAME
         name and serving nodes
 
 SYNOPSIS
-    gcloud beta bigtable clusters update CLUSTER --instance=INSTANCE
+    gcloud beta bigtable clusters update (CLUSTER : --instance=INSTANCE)
         --num-nodes=NUM_NODES [--async] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Update a Bigtable cluster's friendly name and serving nodes.
 
 POSITIONAL ARGUMENTS
-     CLUSTER
-        ID of the cluster.
+     CLUSTER - The cluster to update. The arguments in this group can be used
+     to specify the attributes of this resource. (NOTE) Some attributes are not
+     given arguments in this group but can be set in other ways. To set the
+     [project] attribute: Set the property [core/project] or provide the flag
+     [--project] on the command line. This must be specified.
+
+       CLUSTER
+          The ID of the cluster or a fully qualified identifier for the
+          cluster. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --instance=INSTANCE
+          The Cloud Bigtable instance for the cluster.
 
 REQUIRED FLAGS
-     --instance=INSTANCE
-        ID of the instance.
-
      --num-nodes=NUM_NODES
         Number of nodes to serve.
 

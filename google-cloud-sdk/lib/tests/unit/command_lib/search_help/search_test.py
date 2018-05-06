@@ -63,7 +63,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
       return ' '.join(command[lookup.PATH])
     self.StartObjectPatch(search.Searcher, 'PossiblyGetResult',
                           side_effect=FakeSearch)
-    self.assertEquals(
+    self.assertEqual(
         [
             'gcloud',
             'gcloud alpha',
@@ -149,7 +149,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     expected_result.update(
         {lookup.SUMMARY: expected_summary,
          lookup.COMMANDS: []})
-    self.assertEquals(expected_result, result)
+    self.assertEqual(expected_result, result)
 
   def testPossiblyGetResultSingleTermPositional(self):
     """Test PossiblyGetResult with a single term that matches a positional."""
@@ -164,7 +164,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     expected_result.update(
         {lookup.SUMMARY: expected_summary,
          lookup.COMMANDS: []})
-    self.assertEquals(expected_result, result)
+    self.assertEqual(expected_result, result)
 
   def testPossiblyGetResultSingleTermFlagName(self):
     """Test PossiblyGetResult with a single term that matches a flag name."""
@@ -181,7 +181,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     expected_result.update(
         {lookup.SUMMARY: expected_summary,
          lookup.COMMANDS: []})
-    self.assertEquals(expected_result, result)
+    self.assertEqual(expected_result, result)
 
   def testPossiblyGetResultSingleTermFlagDefault(self):
     """Test PossiblyGetResult with a single term that matches a flag default.
@@ -198,7 +198,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     expected_result.update(
         {lookup.SUMMARY: expected_summary,
          lookup.COMMANDS: []})
-    self.assertEquals(expected_result, result)
+    self.assertEqual(expected_result, result)
 
   def testPossiblyGetResultMultipleTerms(self):
     """Test PossiblyGetResult with multiple terms."""
@@ -216,7 +216,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     expected_result.update(
         {lookup.SUMMARY: expected_summary,
          lookup.COMMANDS: []})
-    self.assertEquals(expected_result, result)
+    self.assertEqual(expected_result, result)
 
   def testPossiblyGetResultWithExcerpt(self):
     """Test PossiblyGetResult correctly excerpts long descriptions."""
@@ -234,7 +234,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     expected_result.update(
         {lookup.SUMMARY: expected_summary,
          lookup.COMMANDS: []})
-    self.assertEquals(expected_result, result)
+    self.assertEqual(expected_result, result)
 
   def testPossiblyGetResultWithExcerptTwoTerms(self):
     """Test PossiblyGetResult correctly excerpts when multiple terms match."""
@@ -255,7 +255,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     expected_result.update(
         {lookup.SUMMARY: expected_summary,
          lookup.COMMANDS: []})
-    self.assertEquals(expected_result, result)
+    self.assertEqual(expected_result, result)
 
   def testPossiblyGetResultCommandGroup(self):
     """Test PossiblyGetResult works with a command group."""
@@ -271,7 +271,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
         {lookup.SUMMARY: expected_summary,
          lookup.COMMANDS: ['long-help', 'second-level-command-1',
                            'second-level-command-b', 'subgroup', 'xyzzy']})
-    self.assertEquals(expected_result, result)
+    self.assertEqual(expected_result, result)
 
   def testPossiblyGetResultCommandGroupSubCommands(self):
     """Test command groups don't match if term is only present in subcommand."""
@@ -304,7 +304,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     expected_result.update({lookup.COMMANDS: [],
                             lookup.SUMMARY: expected_summary})
     result = search.RunSearch(['castle'], self.test_cli)
-    self.assertEquals([expected_result], result)
+    self.assertEqual([expected_result], result)
 
   def testRunSearchMultipleTerms(self):
     """Overall test of search with three search terms."""
@@ -320,7 +320,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
                             lookup.SUMMARY: expected_summary})
     result = search.RunSearch(['second', 'xyzzy', 'long'],
                               self.test_cli)
-    self.assertEquals([expected_result], result)
+    self.assertEqual([expected_result], result)
 
 
 if __name__ == '__main__':

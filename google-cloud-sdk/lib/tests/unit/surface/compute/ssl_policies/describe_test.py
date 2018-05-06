@@ -13,15 +13,17 @@
 # limitations under the License.
 """Tests for the SSL policies describe alpha command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import ssl_policies_test_base
 
 
-class SslPolicyDescribeBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
+class SslPolicyDescribeGATest(ssl_policies_test_base.SslPoliciesTestBase):
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def testDescribeNonCustomProfile(self):
     name = 'my-ssl-policy'
@@ -38,7 +40,7 @@ class SslPolicyDescribeBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
         profile=profile_enum,
         minTlsVersion=min_tls_version_enum,
         customFeatures=[],
-        fingerprint='SOME_FINGERPRINT',
+        fingerprint=b'SOME_FINGERPRINT',
         selfLink=ssl_policy_ref.SelfLink())
 
     self.ExpectGetRequest(ssl_policy_ref, result_ssl_policy)
@@ -63,13 +65,19 @@ class SslPolicyDescribeBetaTest(ssl_policies_test_base.SslPoliciesTestBase):
         profile=profile_enum,
         minTlsVersion=min_tls_version_enum,
         customFeatures=custom_features,
-        fingerprint='SOME_FINGERPRINT',
+        fingerprint=b'SOME_FINGERPRINT',
         selfLink=ssl_policy_ref.SelfLink())
 
     self.ExpectGetRequest(ssl_policy_ref, result_ssl_policy)
 
     response = self.Run('compute ssl-policies describe {}'.format(name))
     self.assertEqual(response, result_ssl_policy)
+
+
+class SslPolicyDescribeBetaTest(SslPolicyDescribeGATest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class SslPolicyDescribeAlphaTest(SslPolicyDescribeBetaTest):

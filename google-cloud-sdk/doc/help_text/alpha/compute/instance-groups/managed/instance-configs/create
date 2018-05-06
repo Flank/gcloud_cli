@@ -114,8 +114,7 @@ OPTIONAL FLAGS
 
        --region=REGION
           The region of the managed instance group to create per instance
-          config for. If not specified, you will be prompted to select a
-          region.
+          config for. If not specified, you may be prompted to select a region.
 
           A list of regions can be fetched by running:
 

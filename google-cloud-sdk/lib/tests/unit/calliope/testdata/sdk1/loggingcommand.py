@@ -13,6 +13,8 @@
 # limitations under the License.
 """This is a command for testing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from googlecloudsdk.calliope import base

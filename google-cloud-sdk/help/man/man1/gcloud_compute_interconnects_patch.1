@@ -17,9 +17,13 @@ gcloud compute interconnects patch \- patch a Google Compute Engine interconnect
 
 .SH "DESCRIPTION"
 
+\fB(DEPRECATED)\fR Patch a Google Compute Engine interconnect.
+
+This command is deprecated.
+
 \fBgcloud compute interconnects patch\fR is used to patch interconnects. An
 interconnect represents a single specific connection between Google and the
-customer
+customer.
 
 
 
@@ -28,7 +32,7 @@ customer
 .RS 2m
 .TP 2m
 \fINAME\fR
-The name of the interconnect to patch.
+The name of the interconnect to update.
 
 
 .RE
@@ -71,10 +75,9 @@ help\fR for details.
 
 .SH "NOTES"
 
-These variants are also available:
+This variant is also available:
 
 .RS 2m
-$ gcloud alpha compute interconnects patch
 $ gcloud beta compute interconnects patch
 .RE
 

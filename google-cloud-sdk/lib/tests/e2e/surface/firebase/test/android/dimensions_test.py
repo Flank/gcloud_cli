@@ -15,8 +15,8 @@
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
 from tests.lib.surface.firebase.test import e2e_base
+from tests.lib.surface.firebase.test.android import commands
 
 
 class ArgDimensionConflictsIntegrationTests(e2e_base.TestIntegrationTestBase):
@@ -50,7 +50,6 @@ class ArgDimensionConflictsIntegrationTests(e2e_base.TestIntegrationTestBase):
 
     self.AssertErrContains('allowed simultaneously: --locales, --device')
 
-  @test_case.Filters.skip('Failing', 'b/73120615')
   def testArgConflicts_OrientationsWithDevice(self):
     with self.assertRaises(calliope_exceptions.ConflictingArgumentsException):
       self.Run(
@@ -61,7 +60,6 @@ class ArgDimensionConflictsIntegrationTests(e2e_base.TestIntegrationTestBase):
 
     self.AssertErrContains('allowed simultaneously: --orientations, --device')
 
-  @test_case.Filters.skip('Failing', 'b/73120615')
   def testArgConflicts_BadDimensionNameInArgFile(self):
     with self.assertRaises(exceptions.InvalidDimensionNameError):
       self.Run(
@@ -71,7 +69,6 @@ class ArgDimensionConflictsIntegrationTests(e2e_base.TestIntegrationTestBase):
 
     self.AssertErrContains("'brand' is not a valid dimension name.")
 
-  @test_case.Filters.skip('Failing', 'b/73120615')
   def testArgConflicts_BadDimensionNameInFlag(self):
     with self.assertRaises(exceptions.InvalidDimensionNameError):
       self.Run(

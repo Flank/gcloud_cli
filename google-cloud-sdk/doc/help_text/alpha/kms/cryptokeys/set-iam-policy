@@ -1,0 +1,55 @@
+NAME
+    gcloud alpha kms cryptokeys set-iam-policy - set the IAM policy for a
+        CryptoKey
+
+SYNOPSIS
+    gcloud alpha kms cryptokeys set-iam-policy KEY POLICY_FILE
+        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) (REMOVED) Set the IAM policy for a CryptoKey.
+
+    The command group cryptokeys is deprecated, please use the keys command
+    group.
+
+    Sets the IAM policy for the given CryptoKey as defined in a JSON or YAML
+    file.
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of the
+    policy file format and contents.
+
+POSITIONAL ARGUMENTS
+     KEY
+        Name of the key whose IAM policy to update.
+
+     POLICY_FILE
+        JSON or YAML file with the IAM policy
+
+FLAGS
+     --keyring=KEYRING
+        The containing keyring.
+
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will read an IAM policy defined in a JSON file
+    'policy.json' and set it for the CryptoKey frodo with the KeyRing
+    fellowship and Location global:
+
+        $ gcloud alpha kms cryptokeys set-iam-policy frodo policy.json \
+            --keyring fellowship --location global
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

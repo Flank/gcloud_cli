@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Test of the 'pubsub subscriptions seek' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
@@ -36,8 +41,8 @@ class SubscriptionsSeekTest(base.CloudPubsubTestBase):
     self.svc.Expect(request=seek_req, response=self.msgs.SeekResponse())
 
     result = self.Run('pubsub subscriptions seek sub --snapshot snap')
-    self.assertEquals(result['subscriptionId'], sub_ref.RelativeName())
-    self.assertEquals(result['snapshotId'], snap_ref.RelativeName())
+    self.assertEqual(result['subscriptionId'], sub_ref.RelativeName())
+    self.assertEqual(result['snapshotId'], snap_ref.RelativeName())
     self.assertNotIn('time', result)
 
   def testSeekToSnapshotFullUri(self):
@@ -51,8 +56,8 @@ class SubscriptionsSeekTest(base.CloudPubsubTestBase):
 
     result = self.Run('pubsub subscriptions seek {} --snapshot {}'
                       .format(sub_ref.SelfLink(), snap_ref.SelfLink()))
-    self.assertEquals(result['subscriptionId'], sub_ref.RelativeName())
-    self.assertEquals(result['snapshotId'], snap_ref.RelativeName())
+    self.assertEqual(result['subscriptionId'], sub_ref.RelativeName())
+    self.assertEqual(result['snapshotId'], snap_ref.RelativeName())
     self.assertNotIn('time', result)
 
   def testSeekToCrossProjectSnapshot(self):
@@ -67,8 +72,8 @@ class SubscriptionsSeekTest(base.CloudPubsubTestBase):
     result = self.Run('pubsub subscriptions seek sub'
                       '    --snapshot snap'
                       '    --snapshot-project other-proj')
-    self.assertEquals(result['subscriptionId'], sub_ref.RelativeName())
-    self.assertEquals(result['snapshotId'], snap_ref.RelativeName())
+    self.assertEqual(result['subscriptionId'], sub_ref.RelativeName())
+    self.assertEqual(result['snapshotId'], snap_ref.RelativeName())
     self.assertNotIn('time', result)
 
   def testSeekToTime(self):
@@ -81,8 +86,8 @@ class SubscriptionsSeekTest(base.CloudPubsubTestBase):
 
     result = self.Run('pubsub subscriptions seek sub'
                       '    --time 2016-10-31T12:34:56Z')
-    self.assertEquals(result['subscriptionId'], sub_ref.RelativeName())
-    self.assertEquals(result['time'], '2016-10-31T12:34:56.000000Z')
+    self.assertEqual(result['subscriptionId'], sub_ref.RelativeName())
+    self.assertEqual(result['time'], '2016-10-31T12:34:56.000000Z')
     self.assertNotIn('snapshotId', result)
 
 if __name__ == '__main__':

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base for all Dataflow e2e tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from tests.lib import e2e_base

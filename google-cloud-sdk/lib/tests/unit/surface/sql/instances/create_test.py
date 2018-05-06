@@ -17,9 +17,11 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
+import getpass
 
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_io
+from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.sql import base
@@ -449,6 +451,28 @@ tiered-instance MYSQL_5_6        us-central db-n1-standard-2 0.0.0.0 RUNNABLE
     self.Run('sql instances create created-instance')
     self.AssertErrContains('you will need to specify either a region or a zone')
 
+  def testCreateHighAvailabilityInstance(self):
+    diff = {
+        'name': 'custom-instance1',
+        'databaseVersion': 'POSTGRES_9_6',
+        'settings': {
+            'availabilityType': 'REGIONAL',
+            'tier': 'db-custom-1-1024'
+        }
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+
+    self.Run('sql instances create custom-instance1 '
+             '--database-version=POSTGRES_9_6 --memory=1024MiB --cpu=1 '
+             '--availability-type=REGIONAL')
+
+  def testMySQLHighAvailabilityError(self):
+    with self.assertRaises(exceptions.InvalidArgumentException):
+      self.Run('sql instances create custom-instance1 '
+               '--database-version=MYSQL_5_7 --availability-type=REGIONAL')
+
 
 class InstancesCreateGATest(_BaseInstancesCreateTest, base.SqlMockTestGA):
   pass
@@ -531,27 +555,218 @@ class InstancesCreateBetaTest(_BaseInstancesCreateTest, base.SqlMockTestBeta):
     self.Run('sql instances create create-instance '
              '--database-flags first=one,second=2')
 
-  def testCreateHighAvailabilityInstance(self):
+  def testCreateExternalMasterWithDefaultPort(self):
     diff = {
-        'name': 'custom-instance1',
-        'databaseVersion': 'POSTGRES_9_6',
-        'settings': {
-            'availabilityType': 'REGIONAL',
-            'tier': 'db-custom-1-1024'
-        }
+        'name':
+            'xm-instance',
+        'onPremisesConfiguration':
+            self.messages.OnPremisesConfiguration(hostPort='127.0.0.1:3306')
     }
-    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectInstanceInsert(self.GetExternalMasterRequestInstance(), diff)
     self.ExpectDoneCreateOperationGet()
-    self.ExpectInstanceGet(self.GetPostgresInstance(), diff)
+    self.ExpectInstanceGet(self.GetExternalMasterInstance(), diff)
+    self.Run('sql instances create xm-instance '
+             '--source-ip-address=127.0.0.1')
 
-    self.Run('sql instances create custom-instance1 '
-             '--database-version=POSTGRES_9_6 --memory=1024MiB --cpu=1 '
-             '--availability-type=REGIONAL')
+  def testCreateExternalMasterWithCustomPort(self):
+    diff = {
+        'name':
+            'xm-instance',
+        'onPremisesConfiguration':
+            self.messages.OnPremisesConfiguration(hostPort='127.0.0.1:8080')
+    }
+    self.ExpectInstanceInsert(self.GetExternalMasterRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetExternalMasterInstance(), diff)
+    self.Run('sql instances create xm-instance '
+             '--source-ip-address=127.0.0.1 --source-port=8080')
 
-  def testMySQLHighAvailabilityError(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.Run('sql instances create custom-instance1 '
-               '--database-version=MYSQL_5_7 --availability-type=REGIONAL')
+  def testCreateExternalMasterReplicaWithoutSSL(self):
+    master_diff = {
+        'name': 'xm-instance',
+        'databaseVersion': 'MYSQL_5_7',
+        'region': 'us-west1',
+    }
+    replica_diff = {
+        'name':
+            'xm-instance-replica',
+        'settings': {
+            'replicationType': 'ASYNCHRONOUS',
+        },
+        'databaseVersion':
+            'MYSQL_5_7',
+        'region':
+            'us-west1',
+        'masterInstanceName':
+            'xm-instance',
+        'replicaConfiguration':
+            self.messages.ReplicaConfiguration(
+                mysqlReplicaConfiguration=self.messages.
+                MySqlReplicaConfiguration(
+                    username='root',
+                    password='somepword',
+                    dumpFilePath='gs://xm-bucket/dumpfile.sql'))
+    }
+    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
+    self.Run('sql instances create xm-instance-replica '
+             '--master-username=root --master-password=somepword '
+             '--master-dump-file-path=gs://xm-bucket/dumpfile.sql '
+             '--master-instance-name=xm-instance')
+
+  def testCreateExternalMasterReplicaWithPasswordPrompt(self):
+    # The password prompt flag should cause getpass to get called.
+    self.StartObjectPatch(getpass, 'getpass', return_value='somepword')
+    master_diff = {
+        'name': 'xm-instance',
+        'databaseVersion': 'MYSQL_5_7',
+        'region': 'us-west1',
+    }
+    replica_diff = {
+        'name':
+            'xm-instance-replica',
+        'settings': {
+            'replicationType': 'ASYNCHRONOUS',
+        },
+        'databaseVersion':
+            'MYSQL_5_7',
+        'region':
+            'us-west1',
+        'masterInstanceName':
+            'xm-instance',
+        'replicaConfiguration':
+            self.messages.ReplicaConfiguration(
+                mysqlReplicaConfiguration=self.messages.
+                MySqlReplicaConfiguration(
+                    username='root',
+                    password='somepword',
+                    dumpFilePath='gs://xm-bucket/dumpfile.sql'))
+    }
+    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
+    self.Run('sql instances create xm-instance-replica '
+             '--master-username=root --prompt-for-master-password '
+             '--master-dump-file-path=gs://xm-bucket/dumpfile.sql '
+             '--master-instance-name=xm-instance')
+
+  def testCreateExternalMasterReplicaWithCACert(self):
+    # Need file read mock to get cert file contents.
+    read_file_mock = self.StartObjectPatch(
+        files, 'GetFileContents', return_value='file_data')
+    master_diff = {
+        'name': 'xm-instance',
+        'databaseVersion': 'MYSQL_5_7',
+        'region': 'us-west1',
+    }
+    replica_diff = {
+        'name':
+            'xm-instance-replica',
+        'settings': {
+            'replicationType': 'ASYNCHRONOUS',
+        },
+        'databaseVersion':
+            'MYSQL_5_7',
+        'region':
+            'us-west1',
+        'masterInstanceName':
+            'xm-instance',
+        'replicaConfiguration':
+            self.messages.ReplicaConfiguration(
+                mysqlReplicaConfiguration=self.messages.
+                MySqlReplicaConfiguration(
+                    username='root',
+                    password='somepword',
+                    dumpFilePath='gs://xm-bucket/dumpfile.sql',
+                    caCertificate='file_data'))
+    }
+    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
+    self.Run('sql instances create xm-instance-replica '
+             '--master-username=root --master-password=somepword '
+             '--master-dump-file-path=gs://xm-bucket/dumpfile.sql '
+             '--master-instance-name=xm-instance '
+             '--master-ca-certificate-path=/path/to/ca_cert.pem')
+
+    # File contents should be read once, for the CA Cert.
+    self.assertEqual(read_file_mock.call_count, 1)
+
+  def testCreateExternalMasterWithCAAndClientCerts(self):
+    # Need file read mock to get cert file contents.
+    read_file_mock = self.StartObjectPatch(
+        files, 'GetFileContents', return_value='file_data')
+    master_diff = {
+        'name': 'xm-instance',
+        'databaseVersion': 'MYSQL_5_7',
+        'region': 'us-west1',
+    }
+    replica_diff = {
+        'name':
+            'xm-instance-replica',
+        'settings': {
+            'replicationType': 'ASYNCHRONOUS',
+        },
+        'databaseVersion':
+            'MYSQL_5_7',
+        'region':
+            'us-west1',
+        'masterInstanceName':
+            'xm-instance',
+        'replicaConfiguration':
+            self.messages.ReplicaConfiguration(
+                mysqlReplicaConfiguration=self.messages.
+                MySqlReplicaConfiguration(
+                    username='root',
+                    password='somepword',
+                    dumpFilePath='gs://xm-bucket/dumpfile.sql',
+                    caCertificate='file_data',
+                    clientCertificate='file_data',
+                    clientKey='file_data'))
+    }
+    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    self.ExpectInstanceInsert(self.GetRequestInstance(), replica_diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV2Instance(), replica_diff)
+    self.Run('sql instances create xm-instance-replica '
+             '--master-username=root --master-password=somepword '
+             '--master-dump-file-path=gs://xm-bucket/dumpfile.sql '
+             '--master-instance-name=xm-instance '
+             '--client-certificate-path=/path/to/client_cert.pem '
+             '--client-key-path=/path/to/client_key.pem '
+             '--master-ca-certificate-path=/path/to/ca_cert.pem')
+
+    # File contents should be read three times, one for each cert.
+    self.assertEqual(read_file_mock.call_count, 3)
+
+  def testCreateExternalMasterReplicaWithoutMasterId(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.RequiredArgumentException,
+        r'To create a read replica of an external master instance, '
+        r'\[--master-instance-name\] must be specified'):
+      self.Run('sql instances create xm-instance-replica '
+               '--master-username=root --master-password=somepword '
+               '--master-dump-file-path=gs://xm-bucket/dumpfile.sql ')
+
+  def testCreateExternalMasterReplicaWithoutPassword(self):
+    master_diff = {
+        'name': 'xm-instance',
+        'databaseVersion': 'MYSQL_5_7',
+        'region': 'us-west1',
+    }
+    self.ExpectInstanceGet(self.GetExternalMasterInstance(), master_diff)
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.RequiredArgumentException,
+        r'To create a read replica of an external master instance, '
+        r'\[--master-password\] or \[--prompt-for-master-password\] '
+        r'must be specified'):
+      self.Run('sql instances create xm-instance-replica '
+               '--master-username=root --master-instance-name=xm-instance '
+               '--master-dump-file-path=gs://xm-bucket/dumpfile.sql ')
 
 
 if __name__ == '__main__':

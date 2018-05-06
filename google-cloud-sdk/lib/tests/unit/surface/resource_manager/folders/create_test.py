@@ -57,7 +57,7 @@ class FoldersCreateTest(testbase.FoldersUnitTestBase):
         done=False, name='operations/fc.123')
     self.mock_folders.Create.Expect(self.ExpectedCreateRequest(),
                                     test_create_operation)
-    self.assertEqual(self.DoCommand(async=True), test_create_operation)
+    self.assertEqual(self.DoCommand(is_async=True), test_create_operation)
 
   def ExpectedCreateRequest(self):
     messages = folders.FoldersMessages()
@@ -75,7 +75,7 @@ class FoldersCreateTest(testbase.FoldersUnitTestBase):
                 use_org_parent=True,
                 use_folder_parent=False,
                 use_display_name=True,
-                async=False):
+                is_async=False):
     folder_parent_args = ['--folder', '528852'] if use_folder_parent else []
     org_parent_args = [
         '--organization', self.TEST_FOLDER.parent[len('organizations/'):]
@@ -83,7 +83,7 @@ class FoldersCreateTest(testbase.FoldersUnitTestBase):
     display_name_args = [
         '--display-name', self.TEST_FOLDER.displayName
     ] if use_display_name else []
-    async_args = ['--async'] if async else []
+    async_args = ['--async'] if is_async else []
     all_args = (
         folder_parent_args + org_parent_args + display_name_args + async_args)
     return self.RunFolders('create', *all_args)

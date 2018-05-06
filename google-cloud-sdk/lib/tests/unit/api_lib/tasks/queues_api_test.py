@@ -219,8 +219,7 @@ class QueuesTest(test_base.CloudTasksTestBase):
     expected_policy = self.messages.Policy()
     expected_request = (
         self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
-            resource=self.queue_ref.RelativeName(),
-            getIamPolicyRequest=self.messages.GetIamPolicyRequest()))
+            resource=self.queue_ref.RelativeName()))
     self.queues_service.GetIamPolicy.Expect(expected_request, expected_policy)
     actual_policy = self.queues_client.GetIamPolicy(self.queue_ref)
     self.assertEqual(actual_policy, expected_policy)

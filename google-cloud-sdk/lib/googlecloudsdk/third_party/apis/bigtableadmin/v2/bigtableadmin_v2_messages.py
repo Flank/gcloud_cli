@@ -11,8 +11,104 @@ from apitools.base.py import extra_types
 package = 'bigtableadmin'
 
 
+class AppProfile(_messages.Message):
+  r"""A configuration object describing how Cloud Bigtable should treat
+  traffic from a particular end user application.
+
+  Fields:
+    description: Optional long form description of the use case for this
+      AppProfile.
+    etag: Strongly validated etag for optimistic concurrency control. Preserve
+      the value returned from `GetAppProfile` when calling `UpdateAppProfile`
+      to fail the request if there has been a modification in the mean time.
+      The `update_mask` of the request need not include `etag` for this
+      protection to apply. See
+      [Wikipedia](https://en.wikipedia.org/wiki/HTTP_ETag) and [RFC
+      7232](https://tools.ietf.org/html/rfc7232#section-2.3) for more details.
+    multiClusterRoutingUseAny: Use a multi-cluster routing policy that may
+      pick any cluster.
+    name: (`OutputOnly`) The unique name of the app profile. Values are of the
+      form `projects/<project>/instances/<instance>/appProfiles/_a-zA-Z0-9*`.
+    singleClusterRouting: Use a single-cluster routing policy.
+  """
+
+  description = _messages.StringField(1)
+  etag = _messages.StringField(2)
+  multiClusterRoutingUseAny = _messages.MessageField('MultiClusterRoutingUseAny', 3)
+  name = _messages.StringField(4)
+  singleClusterRouting = _messages.MessageField('SingleClusterRouting', 5)
+
+
+class AuditConfig(_messages.Message):
+  r"""Specifies the audit configuration for a service. The configuration
+  determines which permission types are logged, and what identities, if any,
+  are exempted from logging. An AuditConfig must have one or more
+  AuditLogConfigs.  If there are AuditConfigs for both `allServices` and a
+  specific service, the union of the two AuditConfigs is used for that
+  service: the log_types specified in each AuditConfig are enabled, and the
+  exempted_members in each AuditLogConfig are exempted.  Example Policy with
+  multiple AuditConfigs:      {       "audit_configs": [         {
+  "service": "allServices"           "audit_log_configs": [             {
+  "log_type": "DATA_READ",               "exempted_members": [
+  "user:foo@gmail.com"               ]             },             {
+  "log_type": "DATA_WRITE",             },             {
+  "log_type": "ADMIN_READ",             }           ]         },         {
+  "service": "fooservice.googleapis.com"           "audit_log_configs": [
+  {               "log_type": "DATA_READ",             },             {
+  "log_type": "DATA_WRITE",               "exempted_members": [
+  "user:bar@gmail.com"               ]             }           ]         }
+  ]     }  For fooservice, this policy enables DATA_READ, DATA_WRITE and
+  ADMIN_READ logging. It also exempts foo@gmail.com from DATA_READ logging,
+  and bar@gmail.com from DATA_WRITE logging.
+
+  Fields:
+    auditLogConfigs: The configuration for logging of each type of permission.
+    service: Specifies a service that will be enabled for audit logging. For
+      example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
+      `allServices` is a special value that covers all services.
+  """
+
+  auditLogConfigs = _messages.MessageField('AuditLogConfig', 1, repeated=True)
+  service = _messages.StringField(2)
+
+
+class AuditLogConfig(_messages.Message):
+  r"""Provides the configuration for logging a type of permissions. Example:
+  {       "audit_log_configs": [         {           "log_type": "DATA_READ",
+  "exempted_members": [             "user:foo@gmail.com"           ]
+  },         {           "log_type": "DATA_WRITE",         }       ]     }
+  This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+  foo@gmail.com from DATA_READ logging.
+
+  Enums:
+    LogTypeValueValuesEnum: The log type that this config enables.
+
+  Fields:
+    exemptedMembers: Specifies the identities that do not cause logging for
+      this type of permission. Follows the same format of Binding.members.
+    logType: The log type that this config enables.
+  """
+
+  class LogTypeValueValuesEnum(_messages.Enum):
+    r"""The log type that this config enables.
+
+    Values:
+      LOG_TYPE_UNSPECIFIED: Default case. Should never be this.
+      ADMIN_READ: Admin reads. Example: CloudIAM getIamPolicy
+      DATA_WRITE: Data writes. Example: CloudSQL Users create
+      DATA_READ: Data reads. Example: CloudSQL Users list
+    """
+    LOG_TYPE_UNSPECIFIED = 0
+    ADMIN_READ = 1
+    DATA_WRITE = 2
+    DATA_READ = 3
+
+  exemptedMembers = _messages.StringField(1, repeated=True)
+  logType = _messages.EnumField('LogTypeValueValuesEnum', 2)
+
+
 class BigtableadminOperationsCancelRequest(_messages.Message):
-  """A BigtableadminOperationsCancelRequest object.
+  r"""A BigtableadminOperationsCancelRequest object.
 
   Fields:
     name: The name of the operation resource to be cancelled.
@@ -22,7 +118,7 @@ class BigtableadminOperationsCancelRequest(_messages.Message):
 
 
 class BigtableadminOperationsDeleteRequest(_messages.Message):
-  """A BigtableadminOperationsDeleteRequest object.
+  r"""A BigtableadminOperationsDeleteRequest object.
 
   Fields:
     name: The name of the operation resource to be deleted.
@@ -32,7 +128,7 @@ class BigtableadminOperationsDeleteRequest(_messages.Message):
 
 
 class BigtableadminOperationsGetRequest(_messages.Message):
-  """A BigtableadminOperationsGetRequest object.
+  r"""A BigtableadminOperationsGetRequest object.
 
   Fields:
     name: The name of the operation resource.
@@ -42,7 +138,7 @@ class BigtableadminOperationsGetRequest(_messages.Message):
 
 
 class BigtableadminOperationsProjectsOperationsListRequest(_messages.Message):
-  """A BigtableadminOperationsProjectsOperationsListRequest object.
+  r"""A BigtableadminOperationsProjectsOperationsListRequest object.
 
   Fields:
     filter: The standard list filter.
@@ -57,8 +153,88 @@ class BigtableadminOperationsProjectsOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
+class BigtableadminProjectsInstancesAppProfilesCreateRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesAppProfilesCreateRequest object.
+
+  Fields:
+    appProfile: A AppProfile resource to be passed as the request body.
+    appProfileId: The ID to be used when referring to the new app profile
+      within its instance, e.g., just `myprofile` rather than
+      `projects/myproject/instances/myinstance/appProfiles/myprofile`.
+    ignoreWarnings: If true, ignore safety checks when creating the app
+      profile.
+    parent: The unique name of the instance in which to create the new app
+      profile. Values are of the form
+      `projects/<project>/instances/<instance>`.
+  """
+
+  appProfile = _messages.MessageField('AppProfile', 1)
+  appProfileId = _messages.StringField(2)
+  ignoreWarnings = _messages.BooleanField(3)
+  parent = _messages.StringField(4, required=True)
+
+
+class BigtableadminProjectsInstancesAppProfilesDeleteRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesAppProfilesDeleteRequest object.
+
+  Fields:
+    ignoreWarnings: If true, ignore safety checks when deleting the app
+      profile.
+    name: The unique name of the app profile to be deleted. Values are of the
+      form
+      `projects/<project>/instances/<instance>/appProfiles/<app_profile>`.
+  """
+
+  ignoreWarnings = _messages.BooleanField(1)
+  name = _messages.StringField(2, required=True)
+
+
+class BigtableadminProjectsInstancesAppProfilesGetRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesAppProfilesGetRequest object.
+
+  Fields:
+    name: The unique name of the requested app profile. Values are of the form
+      `projects/<project>/instances/<instance>/appProfiles/<app_profile>`.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class BigtableadminProjectsInstancesAppProfilesListRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesAppProfilesListRequest object.
+
+  Fields:
+    pageToken: The value of `next_page_token` returned by a previous call.
+    parent: The unique name of the instance for which a list of app profiles
+      is requested. Values are of the form
+      `projects/<project>/instances/<instance>`.
+  """
+
+  pageToken = _messages.StringField(1)
+  parent = _messages.StringField(2, required=True)
+
+
+class BigtableadminProjectsInstancesAppProfilesPatchRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesAppProfilesPatchRequest object.
+
+  Fields:
+    appProfile: A AppProfile resource to be passed as the request body.
+    ignoreWarnings: If true, ignore safety checks when updating the app
+      profile.
+    name: (`OutputOnly`) The unique name of the app profile. Values are of the
+      form `projects/<project>/instances/<instance>/appProfiles/_a-zA-Z0-9*`.
+    updateMask: The subset of app profile fields which should be replaced. If
+      unset, all fields will be replaced.
+  """
+
+  appProfile = _messages.MessageField('AppProfile', 1)
+  ignoreWarnings = _messages.BooleanField(2)
+  name = _messages.StringField(3, required=True)
+  updateMask = _messages.StringField(4)
+
+
 class BigtableadminProjectsInstancesClustersCreateRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesClustersCreateRequest object.
+  r"""A BigtableadminProjectsInstancesClustersCreateRequest object.
 
   Fields:
     cluster: A Cluster resource to be passed as the request body.
@@ -76,7 +252,7 @@ class BigtableadminProjectsInstancesClustersCreateRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesClustersDeleteRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesClustersDeleteRequest object.
+  r"""A BigtableadminProjectsInstancesClustersDeleteRequest object.
 
   Fields:
     name: The unique name of the cluster to be deleted. Values are of the form
@@ -87,7 +263,7 @@ class BigtableadminProjectsInstancesClustersDeleteRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesClustersGetRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesClustersGetRequest object.
+  r"""A BigtableadminProjectsInstancesClustersGetRequest object.
 
   Fields:
     name: The unique name of the requested cluster. Values are of the form
@@ -98,7 +274,7 @@ class BigtableadminProjectsInstancesClustersGetRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesClustersListRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesClustersListRequest object.
+  r"""A BigtableadminProjectsInstancesClustersListRequest object.
 
   Fields:
     pageToken: The value of `next_page_token` returned by a previous call.
@@ -114,7 +290,7 @@ class BigtableadminProjectsInstancesClustersListRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesDeleteRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesDeleteRequest object.
+  r"""A BigtableadminProjectsInstancesDeleteRequest object.
 
   Fields:
     name: The unique name of the instance to be deleted. Values are of the
@@ -124,8 +300,23 @@ class BigtableadminProjectsInstancesDeleteRequest(_messages.Message):
   name = _messages.StringField(1, required=True)
 
 
+class BigtableadminProjectsInstancesGetIamPolicyRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesGetIamPolicyRequest object.
+
+  Fields:
+    getIamPolicyRequest: A GetIamPolicyRequest resource to be passed as the
+      request body.
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See the operation documentation for the appropriate value for this
+      field.
+  """
+
+  getIamPolicyRequest = _messages.MessageField('GetIamPolicyRequest', 1)
+  resource = _messages.StringField(2, required=True)
+
+
 class BigtableadminProjectsInstancesGetRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesGetRequest object.
+  r"""A BigtableadminProjectsInstancesGetRequest object.
 
   Fields:
     name: The unique name of the requested instance. Values are of the form
@@ -136,7 +327,7 @@ class BigtableadminProjectsInstancesGetRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesListRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesListRequest object.
+  r"""A BigtableadminProjectsInstancesListRequest object.
 
   Fields:
     pageToken: The value of `next_page_token` returned by a previous call.
@@ -149,7 +340,7 @@ class BigtableadminProjectsInstancesListRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesPartialUpdateInstanceRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesPartialUpdateInstanceRequest object.
+  r"""A BigtableadminProjectsInstancesPartialUpdateInstanceRequest object.
 
   Fields:
     instance: A Instance resource to be passed as the request body.
@@ -164,8 +355,38 @@ class BigtableadminProjectsInstancesPartialUpdateInstanceRequest(_messages.Messa
   updateMask = _messages.StringField(3)
 
 
+class BigtableadminProjectsInstancesSetIamPolicyRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesSetIamPolicyRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See the operation documentation for the appropriate value for this
+      field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class BigtableadminProjectsInstancesTablesCheckConsistencyRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesTablesCheckConsistencyRequest object.
+
+  Fields:
+    checkConsistencyRequest: A CheckConsistencyRequest resource to be passed
+      as the request body.
+    name: The unique name of the Table for which to check replication
+      consistency. Values are of the form
+      `projects/<project>/instances/<instance>/tables/<table>`.
+  """
+
+  checkConsistencyRequest = _messages.MessageField('CheckConsistencyRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
 class BigtableadminProjectsInstancesTablesCreateRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesTablesCreateRequest object.
+  r"""A BigtableadminProjectsInstancesTablesCreateRequest object.
 
   Fields:
     createTableRequest: A CreateTableRequest resource to be passed as the
@@ -179,7 +400,7 @@ class BigtableadminProjectsInstancesTablesCreateRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesTablesDeleteRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesTablesDeleteRequest object.
+  r"""A BigtableadminProjectsInstancesTablesDeleteRequest object.
 
   Fields:
     name: The unique name of the table to be deleted. Values are of the form
@@ -190,7 +411,7 @@ class BigtableadminProjectsInstancesTablesDeleteRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesTablesDropRowRangeRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesTablesDropRowRangeRequest object.
+  r"""A BigtableadminProjectsInstancesTablesDropRowRangeRequest object.
 
   Fields:
     dropRowRangeRequest: A DropRowRangeRequest resource to be passed as the
@@ -204,8 +425,24 @@ class BigtableadminProjectsInstancesTablesDropRowRangeRequest(_messages.Message)
   name = _messages.StringField(2, required=True)
 
 
+class BigtableadminProjectsInstancesTablesGenerateConsistencyTokenRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesTablesGenerateConsistencyTokenRequest
+  object.
+
+  Fields:
+    generateConsistencyTokenRequest: A GenerateConsistencyTokenRequest
+      resource to be passed as the request body.
+    name: The unique name of the Table for which to create a consistency
+      token. Values are of the form
+      `projects/<project>/instances/<instance>/tables/<table>`.
+  """
+
+  generateConsistencyTokenRequest = _messages.MessageField('GenerateConsistencyTokenRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
 class BigtableadminProjectsInstancesTablesGetRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesTablesGetRequest object.
+  r"""A BigtableadminProjectsInstancesTablesGetRequest object.
 
   Enums:
     ViewValueValuesEnum: The view to be applied to the returned table's
@@ -219,26 +456,28 @@ class BigtableadminProjectsInstancesTablesGetRequest(_messages.Message):
   """
 
   class ViewValueValuesEnum(_messages.Enum):
-    """The view to be applied to the returned table's fields. Defaults to
+    r"""The view to be applied to the returned table's fields. Defaults to
     `SCHEMA_VIEW` if unspecified.
 
     Values:
       VIEW_UNSPECIFIED: <no description>
       NAME_ONLY: <no description>
       SCHEMA_VIEW: <no description>
+      REPLICATION_VIEW: <no description>
       FULL: <no description>
     """
     VIEW_UNSPECIFIED = 0
     NAME_ONLY = 1
     SCHEMA_VIEW = 2
-    FULL = 3
+    REPLICATION_VIEW = 3
+    FULL = 4
 
   name = _messages.StringField(1, required=True)
   view = _messages.EnumField('ViewValueValuesEnum', 2)
 
 
 class BigtableadminProjectsInstancesTablesListRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesTablesListRequest object.
+  r"""A BigtableadminProjectsInstancesTablesListRequest object.
 
   Enums:
     ViewValueValuesEnum: The view to be applied to the returned tables'
@@ -254,19 +493,21 @@ class BigtableadminProjectsInstancesTablesListRequest(_messages.Message):
   """
 
   class ViewValueValuesEnum(_messages.Enum):
-    """The view to be applied to the returned tables' fields. Defaults to
+    r"""The view to be applied to the returned tables' fields. Defaults to
     `NAME_ONLY` if unspecified; no others are currently supported.
 
     Values:
       VIEW_UNSPECIFIED: <no description>
       NAME_ONLY: <no description>
       SCHEMA_VIEW: <no description>
+      REPLICATION_VIEW: <no description>
       FULL: <no description>
     """
     VIEW_UNSPECIFIED = 0
     NAME_ONLY = 1
     SCHEMA_VIEW = 2
-    FULL = 3
+    REPLICATION_VIEW = 3
+    FULL = 4
 
   pageToken = _messages.StringField(1)
   parent = _messages.StringField(2, required=True)
@@ -274,7 +515,8 @@ class BigtableadminProjectsInstancesTablesListRequest(_messages.Message):
 
 
 class BigtableadminProjectsInstancesTablesModifyColumnFamiliesRequest(_messages.Message):
-  """A BigtableadminProjectsInstancesTablesModifyColumnFamiliesRequest object.
+  r"""A BigtableadminProjectsInstancesTablesModifyColumnFamiliesRequest
+  object.
 
   Fields:
     modifyColumnFamiliesRequest: A ModifyColumnFamiliesRequest resource to be
@@ -288,8 +530,73 @@ class BigtableadminProjectsInstancesTablesModifyColumnFamiliesRequest(_messages.
   name = _messages.StringField(2, required=True)
 
 
+class BigtableadminProjectsInstancesTestIamPermissionsRequest(_messages.Message):
+  r"""A BigtableadminProjectsInstancesTestIamPermissionsRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See the operation documentation for the appropriate value for
+      this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class Binding(_messages.Message):
+  r"""Associates `members` with a `role`.
+
+  Fields:
+    members: Specifies the identities requesting access for a Cloud Platform
+      resource. `members` can have the following values:  * `allUsers`: A
+      special identifier that represents anyone who is    on the internet;
+      with or without a Google account.  * `allAuthenticatedUsers`: A special
+      identifier that represents anyone    who is authenticated with a Google
+      account or a service account.  * `user:{emailid}`: An email address that
+      represents a specific Google    account. For example, `alice@gmail.com`
+      .   * `serviceAccount:{emailid}`: An email address that represents a
+      service    account. For example, `my-other-
+      app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
+      that represents a Google group.    For example, `admins@example.com`.
+      * `domain:{domain}`: A Google Apps domain name that represents all the
+      users of that domain. For example, `google.com` or `example.com`.
+    role: Role that is assigned to `members`. For example, `roles/viewer`,
+      `roles/editor`, or `roles/owner`. Required
+  """
+
+  members = _messages.StringField(1, repeated=True)
+  role = _messages.StringField(2)
+
+
+class CheckConsistencyRequest(_messages.Message):
+  r"""Request message for
+  google.bigtable.admin.v2.BigtableTableAdmin.CheckConsistency
+
+  Fields:
+    consistencyToken: The token created using GenerateConsistencyToken for the
+      Table.
+  """
+
+  consistencyToken = _messages.StringField(1)
+
+
+class CheckConsistencyResponse(_messages.Message):
+  r"""Response message for
+  google.bigtable.admin.v2.BigtableTableAdmin.CheckConsistency
+
+  Fields:
+    consistent: True only if the token is consistent. A token is consistent if
+      replication has caught up with the restrictions specified in the
+      request.
+  """
+
+  consistent = _messages.BooleanField(1)
+
+
 class Cluster(_messages.Message):
-  """A resizable group of nodes in a particular cloud location, capable of
+  r"""A resizable group of nodes in a particular cloud location, capable of
   serving all Tables in the parent Instance.
 
   Enums:
@@ -314,7 +621,7 @@ class Cluster(_messages.Message):
   """
 
   class DefaultStorageTypeValueValuesEnum(_messages.Enum):
-    """(`CreationOnly`) The type of storage used by this cluster to serve its
+    r"""(`CreationOnly`) The type of storage used by this cluster to serve its
     parent instance's tables, unless explicitly overridden.
 
     Values:
@@ -327,7 +634,7 @@ class Cluster(_messages.Message):
     HDD = 2
 
   class StateValueValuesEnum(_messages.Enum):
-    """(`OutputOnly`) The current state of the cluster.
+    r"""(`OutputOnly`) The current state of the cluster.
 
     Values:
       STATE_NOT_KNOWN: The state of the cluster could not be determined.
@@ -357,8 +664,47 @@ class Cluster(_messages.Message):
   state = _messages.EnumField('StateValueValuesEnum', 5)
 
 
+class ClusterState(_messages.Message):
+  r"""The state of a table's data in a particular cluster.
+
+  Enums:
+    ReplicationStateValueValuesEnum: (`OutputOnly`) The state of replication
+      for the table in this cluster.
+
+  Fields:
+    replicationState: (`OutputOnly`) The state of replication for the table in
+      this cluster.
+  """
+
+  class ReplicationStateValueValuesEnum(_messages.Enum):
+    r"""(`OutputOnly`) The state of replication for the table in this cluster.
+
+    Values:
+      STATE_NOT_KNOWN: The replication state of the table is unknown in this
+        cluster.
+      INITIALIZING: The cluster was recently created, and the table must
+        finish copying over pre-existing data from other clusters before it
+        can begin receiving live replication updates and serving Data API
+        requests.
+      PLANNED_MAINTENANCE: The table is temporarily unable to serve Data API
+        requests from this cluster due to planned internal maintenance.
+      UNPLANNED_MAINTENANCE: The table is temporarily unable to serve Data API
+        requests from this cluster due to unplanned or emergency maintenance.
+      READY: The table can serve Data API requests from this cluster.
+        Depending on replication delay, reads may not immediately reflect the
+        state of the table in other clusters.
+    """
+    STATE_NOT_KNOWN = 0
+    INITIALIZING = 1
+    PLANNED_MAINTENANCE = 2
+    UNPLANNED_MAINTENANCE = 3
+    READY = 4
+
+  replicationState = _messages.EnumField('ReplicationStateValueValuesEnum', 1)
+
+
 class ColumnFamily(_messages.Message):
-  """A set of columns within a table which share a common configuration.
+  r"""A set of columns within a table which share a common configuration.
 
   Fields:
     gcRule: Garbage collection rule specified as a protobuf. Must serialize to
@@ -371,7 +717,7 @@ class ColumnFamily(_messages.Message):
 
 
 class CreateClusterMetadata(_messages.Message):
-  """The metadata for the Operation returned by CreateCluster.
+  r"""The metadata for the Operation returned by CreateCluster.
 
   Fields:
     finishTime: The time at which the operation failed or was completed
@@ -387,7 +733,7 @@ class CreateClusterMetadata(_messages.Message):
 
 
 class CreateClusterRequest(_messages.Message):
-  """Request message for BigtableInstanceAdmin.CreateCluster.
+  r"""Request message for BigtableInstanceAdmin.CreateCluster.
 
   Fields:
     cluster: The cluster to be created. Fields marked `OutputOnly` must be
@@ -406,7 +752,7 @@ class CreateClusterRequest(_messages.Message):
 
 
 class CreateInstanceMetadata(_messages.Message):
-  """The metadata for the Operation returned by CreateInstance.
+  r"""The metadata for the Operation returned by CreateInstance.
 
   Fields:
     finishTime: The time at which the operation failed or was completed
@@ -422,7 +768,7 @@ class CreateInstanceMetadata(_messages.Message):
 
 
 class CreateInstanceRequest(_messages.Message):
-  """Request message for BigtableInstanceAdmin.CreateInstance.
+  r"""Request message for BigtableInstanceAdmin.CreateInstance.
 
   Messages:
     ClustersValue: The clusters to be created within the instance, mapped by
@@ -448,7 +794,7 @@ class CreateInstanceRequest(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ClustersValue(_messages.Message):
-    """The clusters to be created within the instance, mapped by desired
+    r"""The clusters to be created within the instance, mapped by desired
     cluster ID, e.g., just `mycluster` rather than
     `projects/myproject/instances/myinstance/clusters/mycluster`. Fields
     marked `OutputOnly` must be left blank. Currently exactly one cluster must
@@ -462,7 +808,7 @@ class CreateInstanceRequest(_messages.Message):
     """
 
     class AdditionalProperty(_messages.Message):
-      """An additional property for a ClustersValue object.
+      r"""An additional property for a ClustersValue object.
 
       Fields:
         key: Name of the additional property.
@@ -481,7 +827,7 @@ class CreateInstanceRequest(_messages.Message):
 
 
 class CreateTableRequest(_messages.Message):
-  """Request message for
+  r"""Request message for
   google.bigtable.admin.v2.BigtableTableAdmin.CreateTable
 
   Fields:
@@ -508,7 +854,7 @@ class CreateTableRequest(_messages.Message):
 
 
 class DropRowRangeRequest(_messages.Message):
-  """Request message for
+  r"""Request message for
   google.bigtable.admin.v2.BigtableTableAdmin.DropRowRange
 
   Fields:
@@ -523,7 +869,7 @@ class DropRowRangeRequest(_messages.Message):
 
 
 class Empty(_messages.Message):
-  """A generic empty message that you can re-use to avoid defining duplicated
+  r"""A generic empty message that you can re-use to avoid defining duplicated
   empty messages in your APIs. A typical example is to use it as the request
   or the response type of an API method. For instance:      service Foo {
   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);     }  The
@@ -533,7 +879,7 @@ class Empty(_messages.Message):
 
 
 class GcRule(_messages.Message):
-  """Rule for determining which cells to delete during garbage collection.
+  r"""Rule for determining which cells to delete during garbage collection.
 
   Fields:
     intersection: Delete cells that would be deleted by every nested rule.
@@ -550,8 +896,30 @@ class GcRule(_messages.Message):
   union = _messages.MessageField('Union', 4)
 
 
+class GenerateConsistencyTokenRequest(_messages.Message):
+  r"""Request message for
+  google.bigtable.admin.v2.BigtableTableAdmin.GenerateConsistencyToken
+  """
+
+
+
+class GenerateConsistencyTokenResponse(_messages.Message):
+  r"""Response message for
+  google.bigtable.admin.v2.BigtableTableAdmin.GenerateConsistencyToken
+
+  Fields:
+    consistencyToken: The generated consistency token.
+  """
+
+  consistencyToken = _messages.StringField(1)
+
+
+class GetIamPolicyRequest(_messages.Message):
+  r"""Request message for `GetIamPolicy` method."""
+
+
 class Instance(_messages.Message):
-  """A collection of Bigtable Tables and the resources that serve them. All
+  r"""A collection of Bigtable Tables and the resources that serve them. All
   tables in an instance are served from a single Cluster.
 
   Enums:
@@ -590,7 +958,7 @@ class Instance(_messages.Message):
   """
 
   class StateValueValuesEnum(_messages.Enum):
-    """(`OutputOnly`) The current state of the instance.
+    r"""(`OutputOnly`) The current state of the instance.
 
     Values:
       STATE_NOT_KNOWN: The state of the instance could not be determined.
@@ -604,7 +972,7 @@ class Instance(_messages.Message):
     CREATING = 2
 
   class TypeValueValuesEnum(_messages.Enum):
-    """The type of the instance. Defaults to `PRODUCTION`.
+    r"""The type of the instance. Defaults to `PRODUCTION`.
 
     Values:
       TYPE_UNSPECIFIED: The type of the instance is unspecified. If set when
@@ -626,7 +994,7 @@ class Instance(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
-    """Labels are a flexible and lightweight mechanism for organizing cloud
+    r"""Labels are a flexible and lightweight mechanism for organizing cloud
     resources into groups that reflect a customer's organizational needs and
     deployment strategies. They can be used to filter resources and aggregate
     metrics.  * Label keys must be between 1 and 63 characters long and must
@@ -644,7 +1012,7 @@ class Instance(_messages.Message):
     """
 
     class AdditionalProperty(_messages.Message):
-      """An additional property for a LabelsValue object.
+      r"""An additional property for a LabelsValue object.
 
       Fields:
         key: Name of the additional property.
@@ -664,7 +1032,7 @@ class Instance(_messages.Message):
 
 
 class Intersection(_messages.Message):
-  """A GcRule which deletes cells matching all of the given rules.
+  r"""A GcRule which deletes cells matching all of the given rules.
 
   Fields:
     rules: Only delete cells which would be deleted by every element of
@@ -674,8 +1042,22 @@ class Intersection(_messages.Message):
   rules = _messages.MessageField('GcRule', 1, repeated=True)
 
 
+class ListAppProfilesResponse(_messages.Message):
+  r"""Response message for BigtableInstanceAdmin.ListAppProfiles.
+
+  Fields:
+    appProfiles: The list of requested app profiles.
+    nextPageToken: Set if not all app profiles could be returned in a single
+      response. Pass this value to `page_token` in another request to get the
+      next page of results.
+  """
+
+  appProfiles = _messages.MessageField('AppProfile', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
 class ListClustersResponse(_messages.Message):
-  """Response message for BigtableInstanceAdmin.ListClusters.
+  r"""Response message for BigtableInstanceAdmin.ListClusters.
 
   Fields:
     clusters: The list of requested clusters.
@@ -694,7 +1076,7 @@ class ListClustersResponse(_messages.Message):
 
 
 class ListInstancesResponse(_messages.Message):
-  """Response message for BigtableInstanceAdmin.ListInstances.
+  r"""Response message for BigtableInstanceAdmin.ListInstances.
 
   Fields:
     failedLocations: Locations from which Instance information could not be
@@ -714,7 +1096,7 @@ class ListInstancesResponse(_messages.Message):
 
 
 class ListOperationsResponse(_messages.Message):
-  """The response message for Operations.ListOperations.
+  r"""The response message for Operations.ListOperations.
 
   Fields:
     nextPageToken: The standard List next-page token.
@@ -727,7 +1109,7 @@ class ListOperationsResponse(_messages.Message):
 
 
 class ListTablesResponse(_messages.Message):
-  """Response message for
+  r"""Response message for
   google.bigtable.admin.v2.BigtableTableAdmin.ListTables
 
   Fields:
@@ -742,7 +1124,7 @@ class ListTablesResponse(_messages.Message):
 
 
 class Modification(_messages.Message):
-  """A create, update, or delete of a particular column family.
+  r"""A create, update, or delete of a particular column family.
 
   Fields:
     create: Create a new column family with the specified schema, or fail if
@@ -761,7 +1143,7 @@ class Modification(_messages.Message):
 
 
 class ModifyColumnFamiliesRequest(_messages.Message):
-  """Request message for
+  r"""Request message for
   google.bigtable.admin.v2.BigtableTableAdmin.ModifyColumnFamilies
 
   Fields:
@@ -774,9 +1156,18 @@ class ModifyColumnFamiliesRequest(_messages.Message):
   modifications = _messages.MessageField('Modification', 1, repeated=True)
 
 
+class MultiClusterRoutingUseAny(_messages.Message):
+  r"""Read/write requests may be routed to any cluster in the instance, and
+  will fail over to another cluster in the event of transient errors or
+  delays. Choosing this option sacrifices read-your-writes consistency to
+  improve availability.
+  """
+
+
+
 class Operation(_messages.Message):
-  """This resource represents a long-running operation that is the result of a
-  network API call.
+  r"""This resource represents a long-running operation that is the result of
+  a network API call.
 
   Messages:
     MetadataValue: Service-specific metadata associated with the operation.
@@ -817,7 +1208,7 @@ class Operation(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class MetadataValue(_messages.Message):
-    """Service-specific metadata associated with the operation.  It typically
+    r"""Service-specific metadata associated with the operation.  It typically
     contains progress information and common metadata such as create time.
     Some services might not provide such metadata.  Any method that returns a
     long-running operation should document the metadata type, if any.
@@ -831,7 +1222,7 @@ class Operation(_messages.Message):
     """
 
     class AdditionalProperty(_messages.Message):
-      """An additional property for a MetadataValue object.
+      r"""An additional property for a MetadataValue object.
 
       Fields:
         key: Name of the additional property.
@@ -845,7 +1236,7 @@ class Operation(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ResponseValue(_messages.Message):
-    """The normal response of the operation in case of success.  If the
+    r"""The normal response of the operation in case of success.  If the
     original method returns no data on success, such as `Delete`, the response
     is `google.protobuf.Empty`.  If the original method is standard
     `Get`/`Create`/`Update`, the response should be the resource.  For other
@@ -862,7 +1253,7 @@ class Operation(_messages.Message):
     """
 
     class AdditionalProperty(_messages.Message):
-      """An additional property for a ResponseValue object.
+      r"""An additional property for a ResponseValue object.
 
       Fields:
         key: Name of the additional property.
@@ -882,7 +1273,7 @@ class Operation(_messages.Message):
 
 
 class PartialUpdateInstanceRequest(_messages.Message):
-  """Request message for BigtableInstanceAdmin.PartialUpdateInstance.
+  r"""Request message for BigtableInstanceAdmin.PartialUpdateInstance.
 
   Fields:
     instance: The Instance which will (partially) replace the current value.
@@ -894,8 +1285,85 @@ class PartialUpdateInstanceRequest(_messages.Message):
   updateMask = _messages.StringField(2)
 
 
+class Policy(_messages.Message):
+  r"""Defines an Identity and Access Management (IAM) policy. It is used to
+  specify access control policies for Cloud Platform resources.   A `Policy`
+  consists of a list of `bindings`. A `binding` binds a list of `members` to a
+  `role`, where the members can be user accounts, Google groups, Google
+  domains, and service accounts. A `role` is a named list of permissions
+  defined by IAM.  **JSON Example**      {       "bindings": [         {
+  "role": "roles/owner",           "members": [
+  "user:mike@example.com",             "group:admins@example.com",
+  "domain:google.com",             "serviceAccount:my-other-
+  app@appspot.gserviceaccount.com"           ]         },         {
+  "role": "roles/viewer",           "members": ["user:sean@example.com"]
+  }       ]     }  **YAML Example**      bindings:     - members:       -
+  user:mike@example.com       - group:admins@example.com       -
+  domain:google.com       - serviceAccount:my-other-
+  app@appspot.gserviceaccount.com       role: roles/owner     - members:
+  - user:sean@example.com       role: roles/viewer   For a description of IAM
+  and its features, see the [IAM developer's
+  guide](https://cloud.google.com/iam/docs).
+
+  Fields:
+    auditConfigs: Specifies cloud audit logging configuration for this policy.
+    bindings: Associates a list of `members` to a `role`. `bindings` with no
+      members will result in an error.
+    etag: `etag` is used for optimistic concurrency control as a way to help
+      prevent simultaneous updates of a policy from overwriting each other. It
+      is strongly suggested that systems make use of the `etag` in the read-
+      modify-write cycle to perform policy updates in order to avoid race
+      conditions: An `etag` is returned in the response to `getIamPolicy`, and
+      systems are expected to put that etag in the request to `setIamPolicy`
+      to ensure that their change will be applied to the same version of the
+      policy.  If no `etag` is provided in the call to `setIamPolicy`, then
+      the existing policy is overwritten blindly.
+    version: Deprecated.
+  """
+
+  auditConfigs = _messages.MessageField('AuditConfig', 1, repeated=True)
+  bindings = _messages.MessageField('Binding', 2, repeated=True)
+  etag = _messages.BytesField(3)
+  version = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+
+
+class SetIamPolicyRequest(_messages.Message):
+  r"""Request message for `SetIamPolicy` method.
+
+  Fields:
+    policy: REQUIRED: The complete policy to be applied to the `resource`. The
+      size of the policy is limited to a few 10s of KB. An empty policy is a
+      valid policy but certain Cloud Platform services (such as Projects)
+      might reject them.
+    updateMask: OPTIONAL: A FieldMask specifying which fields of the policy to
+      modify. Only the fields in the mask will be modified. If no mask is
+      provided, the following default mask is used: paths: "bindings, etag"
+      This field is only used by Cloud IAM.
+  """
+
+  policy = _messages.MessageField('Policy', 1)
+  updateMask = _messages.StringField(2)
+
+
+class SingleClusterRouting(_messages.Message):
+  r"""Unconditionally routes all read/write requests to a specific cluster.
+  This option preserves read-your-writes consistency, but does not improve
+  availability.
+
+  Fields:
+    allowTransactionalWrites: Whether or not `CheckAndMutateRow` and
+      `ReadModifyWriteRow` requests are allowed by this app profile. It is
+      unsafe to send these requests to the same table/row/column in multiple
+      clusters.
+    clusterId: The cluster to which read/write requests should be routed.
+  """
+
+  allowTransactionalWrites = _messages.BooleanField(1)
+  clusterId = _messages.StringField(2)
+
+
 class Split(_messages.Message):
-  """An initial split point for a newly created table.
+  r"""An initial split point for a newly created table.
 
   Fields:
     key: Row key to use as an initial tablet boundary.
@@ -905,7 +1373,7 @@ class Split(_messages.Message):
 
 
 class StandardQueryParameters(_messages.Message):
-  """Query parameters accepted by all methods.
+  r"""Query parameters accepted by all methods.
 
   Enums:
     FXgafvValueValuesEnum: V1 error format.
@@ -934,7 +1402,7 @@ class StandardQueryParameters(_messages.Message):
   """
 
   class AltValueValuesEnum(_messages.Enum):
-    """Data format for response.
+    r"""Data format for response.
 
     Values:
       json: Responses with Content-Type of application/json
@@ -946,7 +1414,7 @@ class StandardQueryParameters(_messages.Message):
     proto = 2
 
   class FXgafvValueValuesEnum(_messages.Enum):
-    """V1 error format.
+    r"""V1 error format.
 
     Values:
       _1: v1 error format
@@ -972,7 +1440,7 @@ class StandardQueryParameters(_messages.Message):
 
 
 class Status(_messages.Message):
-  """The `Status` type defines a logical error model that is suitable for
+  r"""The `Status` type defines a logical error model that is suitable for
   different programming environments, including REST APIs and RPC APIs. It is
   used by [gRPC](https://github.com/grpc). The error model is designed to be:
   - Simple to use and understand for most users - Flexible enough to meet
@@ -1020,7 +1488,7 @@ class Status(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class DetailsValueListEntry(_messages.Message):
-    """A DetailsValueListEntry object.
+    r"""A DetailsValueListEntry object.
 
     Messages:
       AdditionalProperty: An additional property for a DetailsValueListEntry
@@ -1032,7 +1500,7 @@ class Status(_messages.Message):
     """
 
     class AdditionalProperty(_messages.Message):
-      """An additional property for a DetailsValueListEntry object.
+      r"""An additional property for a DetailsValueListEntry object.
 
       Fields:
         key: Name of the additional property.
@@ -1050,37 +1518,46 @@ class Status(_messages.Message):
 
 
 class Table(_messages.Message):
-  """A collection of user data indexed by row, column, and timestamp. Each
+  r"""A collection of user data indexed by row, column, and timestamp. Each
   table is served using the resources of its parent cluster.
 
   Enums:
-    GranularityValueValuesEnum: (`CreationOnly`) The granularity (e.g.
-      `MILLIS`, `MICROS`) at which timestamps are stored in this table.
-      Timestamps not matching the granularity will be rejected. If unspecified
-      at creation time, the value will be set to `MILLIS`. Views:
-      `SCHEMA_VIEW`, `FULL`
+    GranularityValueValuesEnum: (`CreationOnly`) The granularity (i.e.
+      `MILLIS`) at which timestamps are stored in this table. Timestamps not
+      matching the granularity will be rejected. If unspecified at creation
+      time, the value will be set to `MILLIS`. Views: `SCHEMA_VIEW`, `FULL`
 
   Messages:
+    ClusterStatesValue: (`OutputOnly`) Map from cluster ID to per-cluster
+      table state. If it could not be determined whether or not the table has
+      data in a particular cluster (for example, if its zone is unavailable),
+      then there will be an entry for the cluster with UNKNOWN
+      `replication_status`. Views: `REPLICATION_VIEW`, `FULL`
     ColumnFamiliesValue: (`CreationOnly`) The column families configured for
       this table, mapped by column family ID. Views: `SCHEMA_VIEW`, `FULL`
 
   Fields:
+    clusterStates: (`OutputOnly`) Map from cluster ID to per-cluster table
+      state. If it could not be determined whether or not the table has data
+      in a particular cluster (for example, if its zone is unavailable), then
+      there will be an entry for the cluster with UNKNOWN
+      `replication_status`. Views: `REPLICATION_VIEW`, `FULL`
     columnFamilies: (`CreationOnly`) The column families configured for this
       table, mapped by column family ID. Views: `SCHEMA_VIEW`, `FULL`
-    granularity: (`CreationOnly`) The granularity (e.g. `MILLIS`, `MICROS`) at
-      which timestamps are stored in this table. Timestamps not matching the
+    granularity: (`CreationOnly`) The granularity (i.e. `MILLIS`) at which
+      timestamps are stored in this table. Timestamps not matching the
       granularity will be rejected. If unspecified at creation time, the value
       will be set to `MILLIS`. Views: `SCHEMA_VIEW`, `FULL`
     name: (`OutputOnly`) The unique name of the table. Values are of the form
       `projects/<project>/instances/<instance>/tables/_a-zA-Z0-9*`. Views:
-      `NAME_ONLY`, `SCHEMA_VIEW`, `FULL`
+      `NAME_ONLY`, `SCHEMA_VIEW`, `REPLICATION_VIEW`, `FULL`
   """
 
   class GranularityValueValuesEnum(_messages.Enum):
-    """(`CreationOnly`) The granularity (e.g. `MILLIS`, `MICROS`) at which
-    timestamps are stored in this table. Timestamps not matching the
-    granularity will be rejected. If unspecified at creation time, the value
-    will be set to `MILLIS`. Views: `SCHEMA_VIEW`, `FULL`
+    r"""(`CreationOnly`) The granularity (i.e. `MILLIS`) at which timestamps
+    are stored in this table. Timestamps not matching the granularity will be
+    rejected. If unspecified at creation time, the value will be set to
+    `MILLIS`. Views: `SCHEMA_VIEW`, `FULL`
 
     Values:
       TIMESTAMP_GRANULARITY_UNSPECIFIED: The user did not specify a
@@ -1092,8 +1569,37 @@ class Table(_messages.Message):
     MILLIS = 1
 
   @encoding.MapUnrecognizedFields('additionalProperties')
+  class ClusterStatesValue(_messages.Message):
+    r"""(`OutputOnly`) Map from cluster ID to per-cluster table state. If it
+    could not be determined whether or not the table has data in a particular
+    cluster (for example, if its zone is unavailable), then there will be an
+    entry for the cluster with UNKNOWN `replication_status`. Views:
+    `REPLICATION_VIEW`, `FULL`
+
+    Messages:
+      AdditionalProperty: An additional property for a ClusterStatesValue
+        object.
+
+    Fields:
+      additionalProperties: Additional properties of type ClusterStatesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ClusterStatesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A ClusterState attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('ClusterState', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
   class ColumnFamiliesValue(_messages.Message):
-    """(`CreationOnly`) The column families configured for this table, mapped
+    r"""(`CreationOnly`) The column families configured for this table, mapped
     by column family ID. Views: `SCHEMA_VIEW`, `FULL`
 
     Messages:
@@ -1105,7 +1611,7 @@ class Table(_messages.Message):
     """
 
     class AdditionalProperty(_messages.Message):
-      """An additional property for a ColumnFamiliesValue object.
+      r"""An additional property for a ColumnFamiliesValue object.
 
       Fields:
         key: Name of the additional property.
@@ -1117,13 +1623,38 @@ class Table(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  columnFamilies = _messages.MessageField('ColumnFamiliesValue', 1)
-  granularity = _messages.EnumField('GranularityValueValuesEnum', 2)
-  name = _messages.StringField(3)
+  clusterStates = _messages.MessageField('ClusterStatesValue', 1)
+  columnFamilies = _messages.MessageField('ColumnFamiliesValue', 2)
+  granularity = _messages.EnumField('GranularityValueValuesEnum', 3)
+  name = _messages.StringField(4)
+
+
+class TestIamPermissionsRequest(_messages.Message):
+  r"""Request message for `TestIamPermissions` method.
+
+  Fields:
+    permissions: The set of permissions to check for the `resource`.
+      Permissions with wildcards (such as '*' or 'storage.*') are not allowed.
+      For more information see [IAM
+      Overview](https://cloud.google.com/iam/docs/overview#permissions).
+  """
+
+  permissions = _messages.StringField(1, repeated=True)
+
+
+class TestIamPermissionsResponse(_messages.Message):
+  r"""Response message for `TestIamPermissions` method.
+
+  Fields:
+    permissions: A subset of `TestPermissionsRequest.permissions` that the
+      caller is allowed.
+  """
+
+  permissions = _messages.StringField(1, repeated=True)
 
 
 class Union(_messages.Message):
-  """A GcRule which deletes cells matching any of the given rules.
+  r"""A GcRule which deletes cells matching any of the given rules.
 
   Fields:
     rules: Delete cells which would be deleted by any element of `rules`.
@@ -1132,8 +1663,12 @@ class Union(_messages.Message):
   rules = _messages.MessageField('GcRule', 1, repeated=True)
 
 
+class UpdateAppProfileMetadata(_messages.Message):
+  r"""The metadata for the Operation returned by UpdateAppProfile."""
+
+
 class UpdateClusterMetadata(_messages.Message):
-  """The metadata for the Operation returned by UpdateCluster.
+  r"""The metadata for the Operation returned by UpdateCluster.
 
   Fields:
     finishTime: The time at which the operation failed or was completed
@@ -1149,7 +1684,7 @@ class UpdateClusterMetadata(_messages.Message):
 
 
 class UpdateInstanceMetadata(_messages.Message):
-  """The metadata for the Operation returned by UpdateInstance.
+  r"""The metadata for the Operation returned by UpdateInstance.
 
   Fields:
     finishTime: The time at which the operation failed or was completed

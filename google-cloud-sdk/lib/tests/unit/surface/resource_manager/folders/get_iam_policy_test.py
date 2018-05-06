@@ -13,13 +13,18 @@
 # limitations under the License.
 
 from googlecloudsdk.api_lib.resource_manager import folders
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
 class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):
 
-  def testGetIamPolicyFolder(self):
+  def testGetIamPolicyFolder(self, track):
+    self.track = track
     test_policy = self.messages.Policy(
         bindings=[
             self.messages.Binding(
@@ -33,7 +38,8 @@ class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):
     self.mock_folders.GetIamPolicy.Expect(self.ExpectedRequest(), test_policy)
     self.assertEqual(self.DoRequest(), test_policy)
 
-  def testGetIamPolicyFolderListCommandFilter(self):
+  def testGetIamPolicyFolderListCommandFilter(self, track):
+    self.track = track
     test_policy = self.messages.Policy(
         bindings=[
             self.messages.Binding(
@@ -53,12 +59,14 @@ class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):
     self.DoRequest(args)
     self.AssertOutputEquals('user:admin@foo.com\n')
 
-  def testGetIamPolicyFolder_raisesFolderNotFoundError(self):
+  def testGetIamPolicyFolder_raisesFolderNotFoundError(self, track):
+    self.track = track
     self.SetupGetIamPolicyFailure(testbase.HTTP_404_ERR)
     self.AssertRaisesHttpExceptionMatches(
         'Folder [BAD_ID] not found: Resource not found.', self.DoRequest)
 
-  def testGetIamPolicyFolder_raisesFolderAccessError(self):
+  def testGetIamPolicyFolder_raisesFolderAccessError(self, track):
+    self.track = track
     self.SetupGetIamPolicyFailure(testbase.HTTP_403_ERR)
     self.AssertRaisesHttpExceptionMatches(
         'User [{}] does not have permission to access folder [SECRET_ID] '
@@ -71,11 +79,10 @@ class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):
 
   def ExpectedRequest(self):
     return self.messages.CloudresourcemanagerFoldersGetIamPolicyRequest(
-        foldersId=folders.FolderIdToName(self.TEST_FOLDER.name),
-        getIamPolicyRequest=self.messages.GetIamPolicyRequest())
+        foldersId=folders.FolderNameToId(self.TEST_FOLDER.name))
 
   def DoRequest(self, args=None):
-    command = ['get-iam-policy', folders.FolderIdToName(self.TEST_FOLDER.name)]
+    command = ['get-iam-policy', folders.FolderNameToId(self.TEST_FOLDER.name)]
     if args:
       command += args
     return self.RunFolders(*command)

@@ -63,7 +63,7 @@ response:
     --batch_aYZb40_7Ims_AADDT3X45lM
     Content-Type: application/http
     Content-ID: <response-fc132838-4054-4968-b731-f99fa11773a8+0>
-    
+
     HTTP/1.1 200 OK
     ETag: "9-5NfnC1jwDHrZ87A_AuCkdDc60/B8izYF2OHnw-6Y4LL_ThRQxDnac"
     Content-Type: application/json; charset=UTF-8
@@ -71,7 +71,7 @@ response:
     Expires: Tue, 31 Oct 2017 18:43:38 GMT
     Cache-Control: private, max-age=0
     Content-Length: 2506
-    
+
   - json:
       canIpForward: false
       cpuPlatform: Intel Haswell
@@ -116,7 +116,6 @@ response:
       serviceAccounts:
       - email: 529254013417-compute@developer.gserviceaccount.com
         scopes:
-        - https://www.googleapis.com/auth/cloud.useraccounts.readonly
         - https://www.googleapis.com/auth/devstorage.read_only
         - https://www.googleapis.com/auth/logging.write
         - https://www.googleapis.com/auth/monitoring.write
@@ -131,7 +130,7 @@ response:
       zone: http://www.googleapis.com/compute/v1/projects/fake-project/zones/us-east1-b
   - |2
 
-    
+
     --batch_aYZb40_7Ims_AADDT3X45lM--
   response:
     cache-control: no-cache, no-store, max-age=0, must-revalidate

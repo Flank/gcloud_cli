@@ -14,10 +14,11 @@
 
 """Tests for the console_attr_os module."""
 
-import __builtin__
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
+import io
 import os
-import StringIO
 import struct
 import subprocess
 import sys
@@ -27,19 +28,22 @@ from googlecloudsdk.core.console import console_attr_os
 from googlecloudsdk.core.util import encoding
 from tests.lib import test_case
 
+from six.moves import range  # pylint: disable=redefined-builtin
+import six.moves.builtins
+
 
 class ImportMocker(object):
 
   def __init__(self):
     self.sys_modules = sys.modules
     sys.modules = copy.copy(sys.modules)
-    self.builtin_import = __builtin__.__import__
-    __builtin__.__import__ = self.Import
+    self.builtin_import = six.moves.builtins.__import__
+    six.moves.builtins.__import__ = self.Import
     self.imports = {}
 
   # pylint: disable=invalid-name
   def Done(self):
-    __builtin__.__import__ = self.builtin_import
+    six.moves.builtins.__import__ = self.builtin_import
     sys.modules = self.sys_modules
 
   # pylint: disable=invalid-name,redefined-builtin
@@ -68,7 +72,7 @@ class ConsoleAttrOsGetTermsizePosixTests(test_case.Base):
     def ioctl(self, fd, unused_op, unused_value):
       if fd < 3:
         raise IOError
-      return struct.pack('hh', 25, 81)
+      return struct.pack(b'hh', 25, 81)
 
   class MockTermiosModule(object):
 
@@ -87,7 +91,7 @@ class ConsoleAttrOsGetTermsizePosixTests(test_case.Base):
     if not self.has_os_ctermid:
       setattr(os, 'ctermid', None)
     self.ctermid = self.StartObjectPatch(os, 'ctermid')
-    self.ctermid.side_effect = os.devnull
+    self.ctermid.return_value = os.devnull
 
   def TearDown(self):
     if not self.has_os_ctermid:
@@ -121,7 +125,8 @@ class ConsoleAttrOsGetTermsizeWindowsTests(test_case.Base):
     class StringBuffer(object):
 
       def __init__(self):
-        self.raw = struct.pack('hhhhHhhhhhh', 1, 2, 3, 4, 5, 1, 1, 82, 26, 6, 7)
+        self.raw = struct.pack(b'hhhhHhhhhhh', 1, 2, 3, 4, 5, 1, 1, 82, 26, 6,
+                               7)
 
     def __init__(self):
       self.windll = self.MockWinDllModule()
@@ -150,7 +155,8 @@ class ConsoleAttrOsGetTermsizeWindowsTests(test_case.Base):
     class StringBuffer(object):
 
       def __init__(self):
-        self.raw = struct.pack('hhhhHhhhhhh', 1, 2, 3, 4, 5, 1, 1, 82, 26, 6, 7)
+        self.raw = struct.pack(b'hhhhHhhhhhh', 1, 2, 3, 4, 5, 1, 1, 82, 26, 6,
+                               7)
 
     def __init__(self):
       self.windll = self.MockWinDllModule()
@@ -284,8 +290,8 @@ class ConsoleAttrOsGetRawKeyFunctionPosixTests(test_case.Base):
     self.imports.SetImport('msvcrt', None)
     self.imports.SetImport('termios', self.MockTermiosModule)
     self.stdin = sys.stdin
-    sys.stdin = StringIO.StringIO('A\x1bA\x1bB\x1bD\x1bC\x1b5~\x1b6~\x1bH\x1bF'
-                                  '\x1bM\x1bS\x1bT\x1b\x1b\x04\x1a/?\n')
+    sys.stdin = io.StringIO('A\x1bA\x1bB\x1bD\x1bC\x1b5~\x1b6~\x1bH\x1bF'
+                            '\x1bM\x1bS\x1bT\x1b\x1b\x04\x1a/?\n')
     sys.stdin.fileno = self.MockFileNo
 
   def TearDown(self):
@@ -331,8 +337,8 @@ class ConsoleAttrOsGetRawKeyFunctionWindowsCodeTests(test_case.Base):
   class MockMsvcrtModule(object):
 
     def __init__(self):
-      self.rawin = StringIO.StringIO('A\xe0H\xe0P\xe0K\xe0M\xe0I\xe0Q\xe0G\xe0O'
-                                     '\x1b\x04\x1a/?\n')
+      self.rawin = io.StringIO(
+          'A\xe0H\xe0P\xe0K\xe0M\xe0I\xe0Q\xe0G\xe0O\x1b\x04\x1a/?\n')
 
     # pylint: disable=invalid-name
     def getch(self):
@@ -379,7 +385,7 @@ class ConsoleAttrOsGetRawKeyFunctionFallBackTests(test_case.Base):
     self.imports.SetImport('termios', None)
     self.imports.SetImport('tty', None)
     self.stdin = sys.stdin
-    sys.stdin = StringIO.StringIO('??\n')
+    sys.stdin = io.StringIO('??\n')
 
   def TearDown(self):
     sys.stdin = self.stdin

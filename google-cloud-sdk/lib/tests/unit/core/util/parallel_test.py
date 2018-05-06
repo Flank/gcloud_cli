@@ -19,7 +19,6 @@ import contextlib
 import sys
 import traceback
 
-from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.util import parallel
 from tests.lib import test_case
 import six
@@ -62,7 +61,7 @@ def _ReturnNone(_):
 
 
 def _RaiseError(_):
-  exceptions.reraise(MyException(_UNICODE_TEST_STRING))
+  raise MyException(_UNICODE_TEST_STRING)
 
 
 def _ReturnUnpickleableObject(_):
@@ -70,7 +69,7 @@ def _ReturnUnpickleableObject(_):
 
 
 def _RaiseUnpickleableError(_):
-  exceptions.reraise(UnpickleableError(_UNICODE_TEST_STRING))
+  raise UnpickleableError(_UNICODE_TEST_STRING)
 
 
 try:

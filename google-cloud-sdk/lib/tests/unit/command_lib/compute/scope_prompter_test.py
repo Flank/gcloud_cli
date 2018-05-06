@@ -34,7 +34,7 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
 
     resource = collections.namedtuple('Resource', ['name'])
     def ScopeLister(scopes, unused_underspecified_names):
-      self.assertEquals([compute_scope.ScopeEnum.REGION], scopes)
+      self.assertEqual([compute_scope.ScopeEnum.REGION], scopes)
       return {
           compute_scope.ScopeEnum.REGION:
               [resource(name='north-sea'), resource(name='baltic')]
@@ -54,7 +54,7 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
           [2] north-sea
         Please enter your numeric choice:
         """, normalize_space=True)
-    self.assertEquals((compute_scope.ScopeEnum.REGION, 'baltic'), result)
+    self.assertEqual((compute_scope.ScopeEnum.REGION, 'baltic'), result)
 
   def testMultiScope(self):
     resource_name = 'forwarding rule'
@@ -65,7 +65,7 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
     resource = collections.namedtuple('Resource', ['name'])
 
     def ScopeLister(scopes, unused_underspecified_names):
-      self.assertEquals(
+      self.assertEqual(
           {compute_scope.ScopeEnum.REGION, compute_scope.ScopeEnum.GLOBAL},
           set(scopes))
       return {
@@ -91,7 +91,7 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
         Please enter your numeric choice:
         """, normalize_space=True)
 
-    self.assertEquals((compute_scope.ScopeEnum.GLOBAL, ''), result)
+    self.assertEqual((compute_scope.ScopeEnum.GLOBAL, ''), result)
 
   def testSingleScope_WithRegionGce(self):
     resource_name = 'forwarding rule'
@@ -114,7 +114,7 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
          Did you mean region [{0}] for forwarding rule: \
          [salmon, herring] (Y/n)?
          """.format(region), normalize_space=True)
-    self.assertEquals((compute_scope.ScopeEnum.REGION, region), result)
+    self.assertEqual((compute_scope.ScopeEnum.REGION, region), result)
 
   def testSingleScope_WithZoneGce(self):
     resource_name = 'forwarding rule'
@@ -137,7 +137,7 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
          Did you mean zone [{0}] for forwarding rule: \
          [salmon, herring] (Y/n)?
          """.format(zone), normalize_space=True)
-    self.assertEquals((compute_scope.ScopeEnum.ZONE, zone), result)
+    self.assertEqual((compute_scope.ScopeEnum.ZONE, zone), result)
 
   def testSingleScope_WithNoGceResolution(self):
     resource_name = 'forwarding rule'
@@ -157,7 +157,7 @@ class ScopePrompterTests(sdk_test_base.WithOutputCapture, test_case.WithInput):
          No zone specified. Using zone [{0}] \
          for forwarding rules: [salmon, herring].
          """.format(zone), normalize_space=True)
-    self.assertEquals((compute_scope.ScopeEnum.ZONE, zone), result)
+    self.assertEqual((compute_scope.ScopeEnum.ZONE, zone), result)
 
 
 if __name__ == '__main__':

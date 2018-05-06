@@ -16,7 +16,6 @@
 
 from __future__ import absolute_import
 
-from gslib import aclhelpers
 from gslib import metrics
 from gslib.cloud_api import AccessDeniedException
 from gslib.cloud_api import BadRequestException
@@ -30,11 +29,12 @@ from gslib.cs_api_map import ApiSelector
 from gslib.exception import CommandException
 from gslib.help_provider import CreateHelpText
 from gslib.storage_url import StorageUrlFromString
+from gslib.storage_url import UrlsAreForSingleProvider
 from gslib.third_party.storage_apitools import storage_v1_messages as apitools_messages
-from gslib.translation_helper import PRIVATE_DEFAULT_OBJ_ACL
-from gslib.util import NO_MAX
-from gslib.util import Retry
-from gslib.util import UrlsAreForSingleProvider
+from gslib.utils import acl_helper
+from gslib.utils.constants import NO_MAX
+from gslib.utils.retry_util import Retry
+from gslib.utils.translation_helper import PRIVATE_DEFAULT_OBJ_ACL
 
 _SET_SYNOPSIS = """
   gsutil defacl set file-or-canned_acl_name url...
@@ -222,15 +222,15 @@ class DefAclCommand(Command):
       for o, a in self.sub_opts:
         if o == '-g':
           self.changes.append(
-              aclhelpers.AclChange(a, scope_type=aclhelpers.ChangeType.GROUP))
+              acl_helper.AclChange(a, scope_type=acl_helper.ChangeType.GROUP))
         if o == '-u':
           self.changes.append(
-              aclhelpers.AclChange(a, scope_type=aclhelpers.ChangeType.USER))
+              acl_helper.AclChange(a, scope_type=acl_helper.ChangeType.USER))
         if o == '-p':
           self.changes.append(
-              aclhelpers.AclChange(a, scope_type=aclhelpers.ChangeType.PROJECT))
+              acl_helper.AclChange(a, scope_type=acl_helper.ChangeType.PROJECT))
         if o == '-d':
-          self.changes.append(aclhelpers.AclDel(a))
+          self.changes.append(acl_helper.AclDel(a))
 
     if not self.changes:
       raise CommandException(
@@ -267,11 +267,7 @@ class DefAclCommand(Command):
     # permission they'll get an AccessDeniedException.
     current_acl = bucket.defaultObjectAcl
 
-    modification_count = 0
-    for change in self.changes:
-      modification_count += change.Execute(
-          url, current_acl, 'defacl', self.logger)
-    if modification_count == 0:
+    if self._ApplyAclChangesAndReturnChangeCount(url, current_acl) == 0:
       self.logger.info('No changes to %s', url)
       return
 
@@ -286,6 +282,7 @@ class DefAclCommand(Command):
       self.gsutil_api.PatchBucket(url.bucket_name, bucket_metadata,
                                   preconditions=preconditions,
                                   provider=url.scheme, fields=['id'])
+      self.logger.info('Updated default ACL on %s', url)
     except BadRequestException as e:
       # Don't retry on bad requests, e.g. invalid email address.
       raise CommandException('Received bad request from server: %s' % str(e))
@@ -294,7 +291,12 @@ class DefAclCommand(Command):
       raise CommandException('Failed to set acl for %s. Please ensure you have '
                              'OWNER-role access to this resource.' % url)
 
-    self.logger.info('Updated default ACL on %s', url)
+  def _ApplyAclChangesAndReturnChangeCount(self, storage_url, defacl_message):
+    modification_count = 0
+    for change in self.changes:
+      modification_count += change.Execute(
+          storage_url, defacl_message, 'defacl', self.logger)
+    return modification_count
 
   def RunCommand(self):
     """Command entry point for the defacl command."""

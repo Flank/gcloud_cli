@@ -15,6 +15,8 @@
 
 """Unit tests for 'type-providers update' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.deployment_manager import exceptions
@@ -54,14 +56,14 @@ class TypeProvidersUpdateTest(unit_test_base.DmV2UnitTestBase):
   def testAsync(self):
     self.Run(self.updateCommand() + ' --async')
     self.AssertOutputContains('Operation [op-123] running...')
-    self.AssertErrEquals('Update in progress for type_provider [tp1].\n')
+    self.AssertErrContains('Update in progress for type_provider [tp1].\n')
 
   def testOperationFailed(self):
     self.WithOperationPolling(poll_attempts=0,
                               error=self.OperationErrorFor('something bad'),
                               operation_type='update')
-    with self.assertRaisesRegexp(exceptions.OperationError,
-                                 re.compile(r'.*something bad.*')):
+    with self.assertRaisesRegex(exceptions.OperationError,
+                                re.compile(r'.*something bad.*')):
       self.Run(self.updateCommand())
 
   def updateCommand(self):

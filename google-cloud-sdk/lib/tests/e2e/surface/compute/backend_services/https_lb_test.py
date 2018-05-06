@@ -63,6 +63,7 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     self.https_health_check_names_used = []
     self.https_rule_names_used = []
     self.ssl_cert_names_used = []
+    self.ssl_policy_names_used = []
     self.url_map_names_used = []
     self.web_https_proxy_names_used = []
     self.ssl_config_fname = os.path.join(self.CreateTempDir(), 'ssl.cnf')
@@ -107,6 +108,8 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     self.https_health_check_name = self.UniqueName('https-health-checks')
     self.https_rule_name = self.UniqueName('https-rule')
     self.ssl_cert_name = self.UniqueName('www-ssl-cert')
+    self.ssl_policy_name_1 = self.UniqueName('www-ssl-polcy-1')
+    self.ssl_policy_name_2 = self.UniqueName('www-ssl-polcy-2')
     self.url_map_name = self.UniqueName('url-map')
     self.web_https_proxy_name = self.UniqueName('web-https-proxy')
     self.backend_bucket_names_used.append(self.backend_bucket_name)
@@ -114,6 +117,8 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     self.https_health_check_names_used.append(self.https_health_check_name)
     self.https_rule_names_used.append(self.https_rule_name)
     self.ssl_cert_names_used.append(self.ssl_cert_name)
+    self.ssl_policy_names_used.append(self.ssl_policy_name_1)
+    self.ssl_policy_names_used.append(self.ssl_policy_name_2)
     self.url_map_names_used.append(self.url_map_name)
     self.web_https_proxy_names_used.append(self.web_https_proxy_name)
 
@@ -122,6 +127,9 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     self.Run('compute ssl-certificates create {0} '
              '--certificate {1} --private-key {2}'.format(
                  self.ssl_cert_name, self.crt_fname, self.key_fname))
+
+    self.Run('compute ssl-policies create {}'.format(self.ssl_policy_name_1))
+    self.Run('compute ssl-policies create {}'.format(self.ssl_policy_name_2))
 
     self.Run('compute https-health-checks create {0}'.format(
         self.https_health_check_name))
@@ -150,9 +158,9 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
                  self.backend_bucket_name))
 
     self.Run('compute target-https-proxies create {0} '
-             '--url-map {1}  --ssl-certificates {2}'.format(
+             '--url-map {1}  --ssl-certificates {2} --ssl-policy {3}'.format(
                  self.web_https_proxy_name, self.url_map_name,
-                 self.ssl_cert_name))
+                 self.ssl_cert_name, self.ssl_policy_name_1))
 
     self.Run('compute target-https-proxies update {0} '
              '--ssl-certificates {1}'.format(self.web_https_proxy_name,
@@ -166,6 +174,21 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
              '--url-map {1}  --ssl-certificates {2}'.format(
                  self.web_https_proxy_name, self.url_map_name,
                  self.ssl_cert_name))
+
+    # Update the associated SSL policy.
+    self.Run('compute target-https-proxies update {} '
+             '--ssl-policy {}'.format(self.web_https_proxy_name,
+                                      self.ssl_policy_name_2))
+    result = self.Run('compute target-https-proxies describe {}'.format(
+        self.web_https_proxy_name))
+    self.assertTrue(result.sslPolicy.endswith(self.ssl_policy_name_2))
+
+    # Clear the associated SSL policy.
+    self.Run('compute target-https-proxies update {} '
+             '--clear-ssl-policy'.format(self.web_https_proxy_name))
+    result = self.Run('compute target-https-proxies describe {}'.format(
+        self.web_https_proxy_name))
+    self.assertEqual(None, result.sslPolicy)
 
     self.Run('compute forwarding-rules create {0} --global '
              '--target-https-proxy {1} '
@@ -209,26 +232,26 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     result = self.Run('compute backend-services add-signed-url-key {0} '
                       '--key-name key1 --key-file {1}'.format(
                           self.backend_service_name, signed_url_key_file1))
-    self.assertEquals(['key1'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key1'], result.cdnPolicy.signedUrlKeyNames)
     result = self.Run('compute backend-services describe {0} '
                       '--global'.format(self.backend_service_name))
-    self.assertEquals(['key1'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key1'], result.cdnPolicy.signedUrlKeyNames)
 
     result = self.Run('compute backend-services add-signed-url-key {0} '
                       '--key-name key2 --key-file {1}'.format(
                           self.backend_service_name, signed_url_key_file2))
-    self.assertEquals(['key1', 'key2'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key1', 'key2'], result.cdnPolicy.signedUrlKeyNames)
     result = self.Run('compute backend-services describe {0} '
                       '--global'.format(self.backend_service_name))
-    self.assertEquals(['key1', 'key2'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key1', 'key2'], result.cdnPolicy.signedUrlKeyNames)
 
     # Delete CDN Signed URL keys from the backend service.
     result = self.Run('compute backend-services delete-signed-url-key {0} '
                       '--key-name key1'.format(self.backend_service_name))
-    self.assertEquals(['key2'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key2'], result.cdnPolicy.signedUrlKeyNames)
     result = self.Run('compute backend-services describe {0} '
                       '--global'.format(self.backend_service_name))
-    self.assertEquals(['key2'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key2'], result.cdnPolicy.signedUrlKeyNames)
 
     # Update CDN Signed URL Cache Max Age for the backend service.
     result = self.Run('compute backend-services update {0} '
@@ -251,26 +274,26 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     result = self.Run('compute backend-buckets add-signed-url-key {0} '
                       '--key-name key1 --key-file {1}'.format(
                           self.backend_bucket_name, signed_url_key_file1))
-    self.assertEquals(['key1'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key1'], result.cdnPolicy.signedUrlKeyNames)
     result = self.Run(
         'compute backend-buckets describe {0}'.format(self.backend_bucket_name))
-    self.assertEquals(['key1'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key1'], result.cdnPolicy.signedUrlKeyNames)
 
     result = self.Run('compute backend-buckets add-signed-url-key {0} '
                       '--key-name key2 --key-file {1}'.format(
                           self.backend_bucket_name, signed_url_key_file2))
-    self.assertEquals(['key1', 'key2'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key1', 'key2'], result.cdnPolicy.signedUrlKeyNames)
     result = self.Run(
         'compute backend-buckets describe {0}'.format(self.backend_bucket_name))
-    self.assertEquals(['key1', 'key2'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key1', 'key2'], result.cdnPolicy.signedUrlKeyNames)
 
     # Delete CDN Signed URL keys from the backend bucket.
     result = self.Run('compute backend-buckets delete-signed-url-key {0} '
                       '--key-name key1'.format(self.backend_bucket_name))
-    self.assertEquals(['key2'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key2'], result.cdnPolicy.signedUrlKeyNames)
     result = self.Run(
         'compute backend-buckets describe {0}'.format(self.backend_bucket_name))
-    self.assertEquals(['key2'], result.cdnPolicy.signedUrlKeyNames)
+    self.assertEqual(['key2'], result.cdnPolicy.signedUrlKeyNames)
 
     # Update CDN Signed URL Cache Max Age for the backend bucket.
     result = self.Run('compute backend-buckets update {0} '
@@ -350,6 +373,9 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
     for name in self.ssl_cert_names_used:
       self.CleanUpResource(name, 'ssl-certificates',
                            scope=e2e_test_base.GLOBAL)
+    for name in self.ssl_policy_names_used:
+      self.CleanUpResource(name, 'ssl-policies',
+                           scope=e2e_test_base.GLOBAL)
 
     # Delete the GCS Buckets
     self.DeleteResources(self.gcs_bucket_names_used,
@@ -396,6 +422,8 @@ class HttpsLoadBalancingTestBeta(HttpsLoadBalancingTestBase):
     self.EnableCdnTests()
     self.CustomKeysTests()
     self.CacheInvalidationTests()
+    self.CdnSignedUrlTestsBackendServices()
+    self.CdnSignedUrlTestsBackendBuckets()
     self.HttpsLbDeleteTests()
 
 

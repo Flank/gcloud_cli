@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the SSL policies list-available-features alpha command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -20,11 +22,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute import ssl_policies_test_base
 
 
-class SslPolicyListAvailableFeaturesBetaTest(
+class SslPolicyListAvailableFeaturesGATest(
     ssl_policies_test_base.SslPoliciesTestBase):
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.BETA)
+    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def testListAvailableFeatures(self):
     result_features = [
@@ -44,6 +46,13 @@ class SslPolicyListAvailableFeaturesBetaTest(
         TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
         TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
         """))
+
+
+class SslPolicyListAvailableFeaturesBetaTest(
+    SslPolicyListAvailableFeaturesGATest):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
 
 class SslPolicyListAvailableFeaturesAlphaTest(

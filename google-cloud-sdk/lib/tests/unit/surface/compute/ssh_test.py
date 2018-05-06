@@ -1848,7 +1848,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
         [self.project_resource],
     ])
     self.ssh_run.side_effect = ssh.CommandError('ssh', return_code=255)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ssh.CommandError,
         r'\[ssh\] exited with return code \[255\].'):
       self.Run("""

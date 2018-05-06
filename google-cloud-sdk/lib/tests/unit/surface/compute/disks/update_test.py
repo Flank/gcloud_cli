@@ -15,6 +15,7 @@
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import disks_labels_test_base
 
@@ -26,7 +27,7 @@ class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
 
   def testUpdateMissingNameOrLabels(self):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.RequiredArgumentException,
         'At least one of --update-labels, '
         '--remove-labels, or --clear-labels must be specified.'):
@@ -166,12 +167,13 @@ class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     self.AssertErrNotContains('georgia')
 
 
-class UpdateLabelsTestAlpha(disks_labels_test_base.DisksLabelsTestBase):
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
+class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
+                                parameterized.TestCase):
 
-  def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
-
-  def testZonalUpdateValidDisksWithLabelsAndRemoveLabels(self):
+  def testZonalUpdateValidDisksWithLabelsAndRemoveLabels(self, track):
+    self._SetUp(track)
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
@@ -200,7 +202,8 @@ class UpdateLabelsTestAlpha(disks_labels_test_base.DisksLabelsTestBase):
                       for pair in update_labels])))
     self.assertEqual(response, updated_disk)
 
-  def testZonalUpdateValidDisksWithNoUpdate(self):
+  def testZonalUpdateValidDisksWithNoUpdate(self, track):
+    self._SetUp(track)
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
@@ -218,7 +221,8 @@ class UpdateLabelsTestAlpha(disks_labels_test_base.DisksLabelsTestBase):
                       for pair in disk_labels])))
     self.assertEqual(response, disk)
 
-  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self):
+  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self, track):
+    self._SetUp(track)
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
@@ -247,7 +251,8 @@ class UpdateLabelsTestAlpha(disks_labels_test_base.DisksLabelsTestBase):
                       for pair in update_labels])))
     self.assertEqual(response, updated_disk)
 
-  def testScopePromptWithRegionAndZone(self):
+  def testScopePromptWithRegionAndZone(self, track):
+    self._SetUp(track)
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
     disk = self._MakeDiskProto(disk_ref, labels=[])
     self._ExpectGetRequest(disk_ref, disk)

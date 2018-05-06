@@ -10,8 +10,11 @@ DESCRIPTION
     (ALPHA) List all service access zones in an access policy object.
 
 FLAGS
-     --policy=POLICY
-        The access policy you want to list the access zones for.
+     POLICY - The access policy you want to list the access zones for. This
+     represents a Cloud resource.
+
+       --policy=POLICY
+          The ID of the policy or a fully qualified identifier for the policy.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

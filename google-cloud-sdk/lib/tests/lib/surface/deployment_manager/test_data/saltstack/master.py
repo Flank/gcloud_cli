@@ -18,12 +18,13 @@
 #%   type: string
 #%   description: Zone to create the resources in.
 #%   required: true
-
 """Generates config for a VM running a SaltStack master.
 
 Just for fun this template is in Python, while the others in this
 directory are in Jinja2.
 """
+
+from __future__ import unicode_literals
 
 
 def GenerateConfig(evaluation_context):

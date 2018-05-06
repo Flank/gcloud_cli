@@ -14,6 +14,8 @@
 
 """Flags and helpers for the container related commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import constants as compute_constants
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util
@@ -21,6 +23,7 @@ from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container import constants
+from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 
 
@@ -401,19 +404,10 @@ def AddEnableBinAuthzFlag(parser, hidden=True):
   )
 
 
-def AddZoneFlag(parser):
+def AddZoneAndRegionFlags(parser, region_hidden=False):
+  """Adds the --zone and --region flags to the parser."""
   # TODO(b/33343238): Remove the short form of the zone flag.
   # TODO(b/18105938): Add zone prompting
-  """Adds the --zone flag to the parser."""
-  parser.add_argument(
-      '--zone',
-      '-z',
-      help='The compute zone (e.g. us-central1-a) for the cluster',
-      action=actions.StoreProperty(properties.VALUES.compute.zone))
-
-
-def AddZoneAndRegionFlags(parser):
-  """Adds the --zone and --region flags to the parser."""
   group = parser.add_mutually_exclusive_group()
   group.add_argument(
       '--zone',
@@ -422,6 +416,7 @@ def AddZoneAndRegionFlags(parser):
       action=actions.StoreProperty(properties.VALUES.compute.zone))
   group.add_argument(
       '--region',
+      hidden=region_hidden,
       help='The compute region (e.g. us-central1) for the cluster.')
 
 
@@ -670,7 +665,7 @@ def AddTagsFlag(parser, help_text):
       help=help_text)
 
 
-def AddMasterAuthorizedNetworksFlags(parser, update_group=None, hidden=False):
+def AddMasterAuthorizedNetworksFlags(parser, enable_group_for_update=None):
   """Adds Master Authorized Networks related flags to parser.
 
   Master Authorized Networks related flags are:
@@ -678,31 +673,49 @@ def AddMasterAuthorizedNetworksFlags(parser, update_group=None, hidden=False):
 
   Args:
     parser: A given parser.
-    update_group: An optional group of mutually exclusive flag options
-        to which an --enable-master-authorized-networks flag is added.
-    hidden: If true, suppress help text for added options.
+    enable_group_for_update: An optional group of mutually exclusive flag
+        options to which an --enable-master-authorized-networks flag is added
+        in an update command. If given, the flag will default to None instead
+        of False.
   """
-  group = parser.add_argument_group('Master Authorized Networks')
-  authorized_networks_group = group if update_group is None else update_group
-  authorized_networks_group.add_argument(
+  if enable_group_for_update is None:
+    # Flags are being added to the same group.
+    master_flag_group = parser.add_argument_group('Master Authorized Networks')
+    enable_flag_group = master_flag_group
+    enable_default = False
+  else:
+    # Flags are being added to different groups, so the new one should have no
+    # help text (has only one arg).
+    master_flag_group = parser.add_argument_group('')
+    enable_flag_group = enable_group_for_update
+    enable_default = None
+
+  enable_flag_group.add_argument(
       '--enable-master-authorized-networks',
-      default=None if update_group else False,
-      help='Allow only Authorized Networks (specified by the '
-      '`--master-authorized-networks` flag) and Google Compute Engine Public '
-      'IPs to connect to Kubernetes master through HTTPS. By default public  '
-      'internet (0.0.0.0/0) is allowed to connect to Kubernetes master through '
-      'HTTPS.',
-      hidden=hidden,
+      default=enable_default,
+      help="""\
+Allow only specified set of CIDR blocks (specified by the
+`--master-authorized-networks` flag) to connect to Kubernetes master through
+HTTPS. Besides these blocks, the following have access as well:\n
+  1) The private network the cluster connects to if
+  `--private-cluster` is specified.
+  2) Google Compute Engine Public IPs if `--private-cluster` is not
+  specified.\n
+When disabled, public internet (0.0.0.0/0) is allowed to connect to Kubernetes
+master through HTTPS.
+""",
       action='store_true')
-  group.add_argument(
+  master_flag_group.add_argument(
       '--master-authorized-networks',
-      type=arg_parsers.ArgList(min_length=1, max_length=10),
+      type=arg_parsers.ArgList(
+          min_length=1,
+          max_length=api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS),
       metavar='NETWORK',
-      help='The list of external networks (up to 10) that are allowed to '
-      'connect to Kubernetes master through HTTPS. Specified in CIDR notation '
-      '(e.g. 1.2.3.4/30). Can not be specified unless '
-      '`--enable-master-authorized-networks` is also specified.',
-      hidden=hidden)
+      help='The list of CIDR blocks (up to {max}) that are allowed to connect '
+      'to Kubernetes master through HTTPS. Specified in CIDR notation (e.g. '
+      '1.2.3.4/30). Can not be specified unless '
+      '`--enable-master-authorized-networks` is also specified.'.format(
+          max=api_adapter.MAX_AUTHORIZED_NETWORKS_CIDRS))
 
 
 def AddNetworkPolicyFlags(parser, hidden=False):
@@ -795,6 +808,23 @@ to point to the new IP."""
       help=help_text)
 
 
+def AddStartCredentialRotationFlag(parser, hidden=False):
+  """Adds a --start-credential-rotation flag to parser."""
+  help_text = """\
+Start the rotation of IP and credentials for this cluster. For example:
+
+  $ {command} example-cluster --start-credential-rotation
+
+This causes the cluster to serve on two IPs, and will initiate a node upgrade \
+to point to the new IP."""
+  parser.add_argument(
+      '--start-credential-rotation',
+      action='store_true',
+      default=False,
+      hidden=hidden,
+      help=help_text)
+
+
 def AddCompleteIpRotationFlag(parser, hidden=False):
   """Adds a --complete-ip-rotation flag to parser."""
   help_text = """\
@@ -806,6 +836,23 @@ This causes the cluster to stop serving its old IP, and return to a single IP \
 state."""
   parser.add_argument(
       '--complete-ip-rotation',
+      action='store_true',
+      default=False,
+      hidden=hidden,
+      help=help_text)
+
+
+def AddCompleteCredentialRotationFlag(parser, hidden=False):
+  """Adds a --complete-credential-rotation flag to parser."""
+  help_text = """\
+Complete the IP and credential rotation for this cluster. For example:
+
+  $ {command} example-cluster --complete-credential-rotation
+
+This causes the cluster to stop serving its old IP, return to a single IP, and \
+invalidate old credentials."""
+  parser.add_argument(
+      '--complete-credential-rotation',
       action='store_true',
       default=False,
       hidden=hidden,
@@ -938,9 +985,8 @@ def AddIPAliasFlags(parser):
       default=None,
       help="""\
 Enable use of alias IPs (https://cloud.google.com/compute/docs/alias-ip/)
-for pod IPs. This will create two new subnetworks, one for the
-instance and pod IPs, and another to reserve space for the services
-range.
+for pod IPs. This will create two secondary ranges, one for the pod IPs
+and another to reserve space for the services range.
 """)
   parser.add_argument(
       '--services-ipv4-cidr',
@@ -952,7 +998,8 @@ Can be specified as a netmask size (e.g. '/20') or as in CIDR notion
 (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
 be chosen automatically from the available space in the network.
 
-If unspecified, the services CIDR range will use automatic defaults.
+If unspecified, the services CIDR range will be chosen with a default
+mask size.
 
 Can not be specified unless '--enable-ip-alias' is also specified.
 """)
@@ -969,8 +1016,8 @@ pairs.
 
 'range' specifies the IP range for the new subnetwork. This can either
 be a netmask size (e.g. '/20') or a CIDR range (e.g. '10.0.0.0/20').
-If a netmask size is specified, the IP is automatically taken from
-the free space in the cluster's network.
+If a netmask size is specified, the IP is automatically taken from the
+free space in the cluster's network.
 
 Examples:
 
@@ -1009,9 +1056,9 @@ with --create-subnetwork.
       '--services-secondary-range-name',
       metavar='NAME',
       help="""\
-Set the secondary range to be used for services
-(e.g. ClusterIPs). NAME must be the name of an existing secondary
-range in the cluster subnetwork.
+Set the secondary range to be used for services (e.g. ClusterIPs).
+NAME must be the name of an existing secondary range in the cluster
+subnetwork.
 
 Must be used in conjunction with '--enable-ip-alias'. Cannot be used
 with --create-subnetwork.
@@ -1126,9 +1173,12 @@ def AddNodeLocationsFlag(parser):
       metavar='ZONE',
       help="""\
 The set of zones in which the specified node footprint should be replicated.
-All zones must be in the same region as the cluster's primary zone, specified by
-the --zone flag. --node-locations must contain the primary zone.
-If node-locations is not specified, all nodes will be in the primary zone.
+All zones must be in the same region as the cluster's master(s), specified by
+the `--zone` or `--region` flag. Additionally, for zonal clusters,
+`--node-locations` must contain the cluster's primary zone. If not specified,
+all nodes will be in the cluster's primary zone (for zonal clusters) or spread
+across three randomly chosen zones within the cluster's region (for regional
+clusters).
 
 Note that `NUM_NODES` nodes will be created in each zone, such that if you
 specify `--num-nodes=4` and choose two locations, 8 nodes will be created.
@@ -1242,11 +1292,11 @@ property is set to true.
       default=True,
       help=cloud_endpoints_help_text)
 
-  sa_help_text = """\
-The Google Cloud Platform Service Account to be used by the node VMs.  If a \
-service account is specified, the cloud-platform scope is used. If no Service \
-Account is specified, the project default service account is used.
-"""
+  sa_help_text = (
+      'The Google Cloud Platform Service Account to be used by the node VMs. '
+      'If a service account is specified, the cloud-platform and '
+      'userinfo.email scopes are used. If no Service Account is specified, the '
+      'project default service account is used.')
   node_identity_group.add_argument('--service-account', help=sa_help_text)
 
 
@@ -1305,10 +1355,9 @@ def AddDeprecatedNodePoolNodeIdentityFlags(parser):
       new_behavior=False)
 
 
-def AddAddonsFlags(parser, add_disable_addons_flag=False):
-  """Adds the --addons and --disable-addons flags to the parser."""
-  group = parser.add_mutually_exclusive_group()
-  group.add_argument(
+def AddAddonsFlags(parser):
+  """Adds the --addons flag to the parser."""
+  parser.add_argument(
       '--addons',
       type=arg_parsers.ArgList(choices=api_adapter.ADDONS_OPTIONS),
       metavar='ADDON',
@@ -1319,18 +1368,6 @@ Default set of addons includes {0}. Addons
 are additional Kubernetes cluster components. Addons specified by this flag will
 be enabled. The others will be disabled.
 """.format(', '.join(api_adapter.DEFAULT_ADDONS)))
-  action = actions.DeprecationAction(
-      'disable-addons',
-      removed=not add_disable_addons_flag,
-      warn='This flag is deprecated. '
-      'Use --addons instead.')
-  group.add_argument(
-      '--disable-addons',
-      type=arg_parsers.ArgList(choices=api_adapter.ADDONS_OPTIONS),
-      metavar='DISABLE_ADDON',
-      action=action,
-      help='List of cluster addons to disable. Options are {0}'.format(
-          ', '.join(api_adapter.ADDONS_OPTIONS)))
 
 
 def AddPodSecurityPolicyFlag(parser, hidden=False):
@@ -1492,3 +1529,56 @@ def ValidateIstioConfigUpdateArgs(istio_config_args, disable_addons_args):
       raise exceptions.InvalidArgumentException(
           '--istio-config', '--update-addons=Istio=ENABLED must be specified '
           'when --istio-config is given')
+
+
+def AddConcurrentNodeCountFlag(parser):
+  help_text = """\
+The number of nodes to upgrade concurrently. Valid values are [1, {max}].
+It is a recommended best practice to set this value to no higher than 3% of
+your cluster size.'
+""".format(max=api_adapter.MAX_CONCURRENT_NODE_COUNT)
+
+  parser.add_argument(
+      '--concurrent-node-count',
+      type=arg_parsers.BoundedInt(1, api_adapter.MAX_CONCURRENT_NODE_COUNT),
+      # TODO(b/76150055): Un-hide once this is ready for release.
+      hidden=True,
+      help=help_text)
+
+
+# TODO(b/76157677): Drop this warning when changing the default value of the
+# flag.
+def WarnForUnspecifiedAutorepair(args):
+  if not args.IsSpecified('enable_autorepair'):
+    log.warning(
+        'Currently node auto repairs are disabled by default. In the future '
+        'this will change and they will be enabled by default. Use '
+        '`--[no-]enable-autorepair` flag  to suppress this warning.')
+
+
+def AddMachineTypeFlag(parser):
+  """Adds --machine-type flag to the parser.
+
+  Args:
+    parser: A given parser.
+  """
+
+  help_text = """\
+The type of machine to use for nodes. Defaults to n1-standard-1.
+The list of predefined machine types is available using the following command:
+
+  $ gcloud compute machine-types list
+
+You can also specify custom machine types with the string "custom-CPUS-RAM"
+where ``CPUS`` is the number of virtual CPUs and ``RAM`` is the amount of RAM in
+MiB.
+
+For example, to create a node pool using custom machines with 2 vCPUs and 12 GiB
+of RAM:
+
+  $ {command} high-mem-pool --machine-type=custom-2-12288
+"""
+
+  parser.add_argument(
+      '--machine-type', '-m',
+      help=help_text)

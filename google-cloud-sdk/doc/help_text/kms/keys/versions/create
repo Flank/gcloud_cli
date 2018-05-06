@@ -35,7 +35,8 @@ EXAMPLES
             --key frodo --primary
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys versions create
         $ gcloud beta kms keys versions create
 

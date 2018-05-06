@@ -11,7 +11,7 @@ gcloud alpha tasks queues update\-app\-engine\-queue \- update an App Engine que
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks queues update\-app\-engine\-queue\fR \fIQUEUE\fR [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-tasks\fR\ |\ \fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-max\-tasks\-dispatched\-per\-second\fR\ |\ \fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[\fIKEY\fR:\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks queues update\-app\-engine\-queue\fR \fIQUEUE\fR [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-tasks\fR\ |\ \fB\-\-max\-concurrent\-tasks\fR=\fIMAX_CONCURRENT_TASKS\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-max\-tasks\-dispatched\-per\-second\fR\ |\ \fB\-\-max\-tasks\-dispatched\-per\-second\fR=\fIMAX_TASKS_DISPATCHED_PER_SECOND\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -21,8 +21,10 @@ gcloud alpha tasks queues update\-app\-engine\-queue \- update an App Engine que
 Engine queue that are mutable. Attempting to use this command on a different
 type of queue will result in an error.
 
-For more information about the different queue target types, see:
-https://cloud.google.com/cloud\-tasks/docs/queue\-types
+If you have early access to Cloud Tasks, refer to the following guide for more
+information about the different queue target types:
+https://cloud.google.com/cloud\-tasks/docs/queue\-types. For access, sign up
+here: https://goo.gl/Ya0AZd
 
 
 
@@ -170,7 +172,7 @@ At most one of these may be specified:
 Clear the field corresponding to \f5\-\-routing\-override\fR.
 
 .TP 2m
-\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[\fIKEY\fR:\fIVALUE\fR,...]
+\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]
 If provided, the specified route is used for all tasks in the queue, no matter
 what is set is at the task\-level.
 

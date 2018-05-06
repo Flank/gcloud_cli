@@ -2,8 +2,15 @@
 #
 # Copyright 2013 Google Inc. All Rights Reserved.
 #
-# This is script no longer needed as of release 133.0.0
-# It is here so that git repositories set before this version continue to work.
+# This Git credential helper (see gitcredentials(7)) can be used for accessing
+# Google Cloud Source Repositories:
+# https://cloud.google.com/source-repositories/docs/adding-repositories-as-remotes
+#
+# It is also possible to configure Git to use gcloud as a credential helper
+# directly, as "gcloud source repos clone" does:
+#
+# [credential "https://source.developers.google.com"]
+#   helper = !gcloud auth git-helper --ignore-unknown \"$@\"
 
 # <cloud-sdk-sh-preamble>
 #

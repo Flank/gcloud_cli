@@ -13,6 +13,9 @@
 # limitations under the License.
 """Module with utils for testing lister.Invoke calls."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import collections
 import copy
 
@@ -21,6 +24,7 @@ import sys
 from googlecloudsdk.core import resources
 
 import mock
+import six
 
 
 class Helper(object):
@@ -106,8 +110,8 @@ def _ImplementationConceptCheck(implementation):
 def _FrontendConceptCheck(frontend):
   """Checks if given object is a valid frontend."""
   sentinel = object()
-  if not isinstance(getattr(frontend, 'filter', sentinel), (type(None),
-                                                            basestring)):
+  if not isinstance(
+      getattr(frontend, 'filter', sentinel), (type(None), six.string_types)):
     raise AssertionError(
         'frontend must have filter property of type str or None')
   if not isinstance(getattr(frontend, 'max_results', None), (type(None), int)):

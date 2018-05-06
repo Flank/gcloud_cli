@@ -27,17 +27,14 @@ from __future__ import absolute_import
 from hashlib import md5
 import os
 import pickle
-import Queue
 import StringIO
 
 import crcmod
-from gslib.copy_helper import PARALLEL_UPLOAD_STATIC_SALT
-from gslib.copy_helper import PARALLEL_UPLOAD_TEMP_NAMESPACE
+from six.moves import queue as Queue
+
 from gslib.cs_api_map import ApiSelector
 from gslib.parallel_tracker_file import ObjectFromTracker
 from gslib.parallel_tracker_file import WriteParallelUploadTrackerFile
-from gslib.parallelism_framework_util import PutToQueueWithTimeout
-from gslib.parallelism_framework_util import ZERO_TASKS_TO_DO_ARGUMENT
 from gslib.storage_url import StorageUrlFromString
 import gslib.tests.testcase as testcase
 from gslib.tests.testcase.integration_testcase import SkipForS3
@@ -65,13 +62,17 @@ from gslib.ui_controller import MainThreadUIQueue
 from gslib.ui_controller import MetadataManager
 from gslib.ui_controller import UIController
 from gslib.ui_controller import UIThread
-from gslib.util import HumanReadableWithDecimalPlaces
-from gslib.util import MakeHumanReadable
-from gslib.util import ONE_KIB
-from gslib.util import Retry
-from gslib.util import START_CALLBACK_PER_BYTES
-from gslib.util import UsingCrcmodExtension
-from gslib.util import UTF8
+from gslib.utils.boto_util import UsingCrcmodExtension
+from gslib.utils.constants import START_CALLBACK_PER_BYTES
+from gslib.utils.constants import UTF8
+from gslib.utils.copy_helper import PARALLEL_UPLOAD_STATIC_SALT
+from gslib.utils.copy_helper import PARALLEL_UPLOAD_TEMP_NAMESPACE
+from gslib.utils.parallelism_framework_util import PutToQueueWithTimeout
+from gslib.utils.parallelism_framework_util import ZERO_TASKS_TO_DO_ARGUMENT
+from gslib.utils.retry_util import Retry
+from gslib.utils.unit_util import HumanReadableWithDecimalPlaces
+from gslib.utils.unit_util import MakeHumanReadable
+from gslib.utils.unit_util import ONE_KIB
 
 DOWNLOAD_SIZE = 300
 UPLOAD_SIZE = 400
@@ -722,7 +723,7 @@ class TestUi(testcase.GsUtilIntegrationTestCase):
     with SetBotoConfigForTest(boto_config_for_test):
       stderr = self.RunGsUtil(['-m', 'rewrite', '-k', '-I'], stdin=stdin_arg,
                               return_stderr=True)
-    self.AssertObjectUsesEncryptionKey(stdin_arg, TEST_ENCRYPTION_KEY2)
+    self.AssertObjectUsesCSEK(stdin_arg, TEST_ENCRYPTION_KEY2)
     num_objects = 1
     total_size = len('bar')
     CheckUiOutputWithMFlag(self, stderr, num_objects, total_size)
@@ -744,7 +745,7 @@ class TestUi(testcase.GsUtilIntegrationTestCase):
     with SetBotoConfigForTest(boto_config_for_test):
       stderr = self.RunGsUtil(['rewrite', '-k', '-I'], stdin=stdin_arg,
                               return_stderr=True)
-    self.AssertObjectUsesEncryptionKey(stdin_arg, TEST_ENCRYPTION_KEY2)
+    self.AssertObjectUsesCSEK(stdin_arg, TEST_ENCRYPTION_KEY2)
     num_objects = 1
     total_size = len('bar')
     CheckUiOutputWithNoMFlag(self, stderr, num_objects, total_size)

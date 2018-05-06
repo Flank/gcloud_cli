@@ -11,16 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Command for setting IAM policies for registries."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.cloudiot import registries
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.command_lib.iot import flags
 from googlecloudsdk.command_lib.iot import resource_args
-from googlecloudsdk.core import log
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 class SetIamPolicy(base.Command):
   """Set the IAM policy for a device registry.
 
@@ -52,6 +56,5 @@ class SetIamPolicy(base.Command):
     response = client.SetIamPolicy(
         registry_ref,
         set_iam_policy_request=messages.SetIamPolicyRequest(policy=policy))
-    log.status.Print(
-        'Set IAM policy for registry [{}].'.format(registry_ref.Name()))
+    iam_util.LogSetIamPolicy(registry_ref.Name(), 'registry')
     return response

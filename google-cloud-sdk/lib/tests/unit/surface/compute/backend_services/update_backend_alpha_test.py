@@ -16,6 +16,7 @@
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -64,8 +65,9 @@ class BackendServicesUpdateBackendTest(test_base.BaseTest):
 
   def testWithNoFlags(self):
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --instance-group: Must be specified.'
-        ):
+        'Exactly one of ([--instance-group : --instance-group-region | '
+        '--instance-group-zone] | [--network-endpoint-group : '
+        '--network-endpoint-group-zone]) must be specified.'):
       self.Run("""
           compute backend-services update-backend backend-service-2
           """)
@@ -794,7 +796,7 @@ class BackendServicesUpdateBackendTest(test_base.BaseTest):
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-connections.*cannot be set with RATE balancing mode'):
       self.Run("""
@@ -812,7 +814,7 @@ class BackendServicesUpdateBackendTest(test_base.BaseTest):
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-rate.*cannot be set with CONNECTION balancing mode'):
       self.Run("""
@@ -1038,6 +1040,252 @@ class BackendServicesUpdateBackendTest(test_base.BaseTest):
                   selfLink=(self.compute_uri + '/projects/'
                             'my-project/global/backendServices/'
                             'regional-instance-group-service'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
+
+class BackendServicesUpdateBackendWithNEGTest(test_base.BaseTest,
+                                              parameterized.TestCase):
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+    self.backend_service = self.messages.BackendService(
+        backends=[
+            self.messages.Backend(
+                balancingMode=self._connection,
+                description='max connections',
+                group=(
+                    'https://www.googleapis.com/compute/'
+                    'alpha/projects/my-project/zones/zone-1/'
+                    'networkEndpointGroups/neg-1'),
+                maxConnectionsPerEndpoint=100),
+            self.messages.Backend(
+                balancingMode=self._rate,
+                description='max connections',
+                group=(
+                    'https://www.googleapis.com/compute/'
+                    'alpha/projects/my-project/zones/zone-2/'
+                    'networkEndpointGroups/neg-2'),
+                maxRatePerEndpoint=0.9),
+            self.messages.Backend(
+                balancingMode=self._utilization,
+                description='utilziation with conneciton',
+                group=(
+                    'https://www.googleapis.com/compute/'
+                    'alpha/projects/my-project/zones/zone-1/'
+                    'instanceGroups/ig-1'),
+                maxUtilization=1.0,
+                maxConnections=10),
+        ],
+        healthChecks=[
+            ('https://www.googleapis.com/compute/alpha/projects/'
+             'my-project/global/healthChecks/my-health-check')
+        ],
+        name='my-backend-service',
+        portName='http',
+        protocol=self.messages.BackendService.ProtocolValueValuesEnum.HTTP,
+        selfLink=(self.compute_uri + '/projects/my-project'
+                  '/global/backendServices/my-backend-service'),
+        timeoutSec=30)
+
+  def testUtilizationBalancingModeIncompatibleWithNeg(self):
+    self.make_requests.side_effect = iter([
+        [self.backend_service],
+        [],
+    ])
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [--network-endpoint-group]: cannot be set with '
+        'UTILIZATION balancing mode'):
+      self.Run("""
+          compute backend-services update-backend my-backend-service
+            --network-endpoint-group neg-1
+            --network-endpoint-group-zone zone-1
+            --balancing-mode UTILIZATION
+            --global
+          """)
+
+  def testInstanceGroupAndNetworkEndpointGroupMutualExclusion(self):
+    self.make_requests.side_effect = iter([
+        [self.backend_service],
+        [],
+    ])
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of ([--instance-group : --instance-group-region | '
+        '--instance-group-zone] | [--network-endpoint-group : '
+        '--network-endpoint-group-zone]) must be specified.'):
+      self.Run("""
+          compute backend-services update-backend my-backend-service
+            --network-endpoint-group neg-2
+            --network-endpoint-group-zone zone-1
+            --instance-group my-group
+            --instance-group-zone us-central1-f
+            --balancing-mode CONNECTION
+            --max-connections 100
+            --global
+          """)
+
+  @parameterized.parameters(
+      ('--network-endpoint-group', 'neg-1', 'CONNECTION',
+       '--max-connections-per-instance'),
+      ('--network-endpoint-group', 'neg-1', 'RATE', '--max-rate-per-instance'),
+      ('--instance-group', 'ig-1', 'CONNECTION',
+       '--max-connections-per-endpoint'),
+      ('--instance-group', 'ig-1', 'RATE', '--max-rate-per-endpoint'),)
+  def testGroupResourceMatchesFlags(self, group_flag, resource_name,
+                                    balancing_mode, incomptaible_flag):
+    self.make_requests.side_effect = iter([
+        [self.backend_service],
+        [],
+    ])
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Invalid value for [{0}]: cannot be set with {1}'.format(
+            incomptaible_flag, group_flag)):
+      self.Run("""
+          compute backend-services update-backend my-backend-service
+            {0} {1}
+            {0}-zone zone-1
+            --balancing-mode {2}
+            {3} 100
+            --global
+          """.format(
+              group_flag, resource_name, balancing_mode, incomptaible_flag))
+
+  def testWithBalancingModeConnectionsBeingChangedToRate(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self.backend_service],
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services update-backend my-backend-service
+          --network-endpoint-group neg-1
+          --network-endpoint-group-zone zone-1
+          --balancing-mode RATE
+          --max-rate-per-endpoint 230
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices,
+          'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service',
+              project='my-project'))],
+        [(self.compute.backendServices,
+          'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  backends=[
+                      messages.Backend(
+                          balancingMode=self._rate,
+                          description='max connections',
+                          group=(
+                              'https://www.googleapis.com/compute/'
+                              'alpha/projects/my-project/zones/zone-1/'
+                              'networkEndpointGroups/neg-1'),
+                          maxRatePerEndpoint=230),
+                      messages.Backend(
+                          balancingMode=self._rate,
+                          description='max connections',
+                          group=(
+                              'https://www.googleapis.com/compute/'
+                              'alpha/projects/my-project/zones/zone-2/'
+                              'networkEndpointGroups/neg-2'),
+                          maxRatePerEndpoint=0.9),
+                      messages.Backend(
+                          balancingMode=self._utilization,
+                          description='utilziation with conneciton',
+                          group=(
+                              'https://www.googleapis.com/compute/'
+                              'alpha/projects/my-project/zones/zone-1/'
+                              'instanceGroups/ig-1'),
+                          maxUtilization=1.0,
+                          maxConnections=10),
+                  ],
+                  healthChecks=[
+                      ('https://www.googleapis.com/compute/alpha/projects/'
+                       'my-project/global/healthChecks/my-health-check')
+                  ],
+                  name='my-backend-service',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/my-project'
+                            '/global/backendServices/my-backend-service'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
+  def testWithBalancingModeRateBeingChangedToConnections(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self.backend_service],
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services update-backend my-backend-service
+          --network-endpoint-group neg-2
+          --network-endpoint-group-zone zone-2
+          --balancing-mode CONNECTION
+          --max-connections-per-endpoint 320
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices,
+          'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service',
+              project='my-project'))],
+        [(self.compute.backendServices,
+          'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  backends=[
+                      messages.Backend(
+                          balancingMode=self._connection,
+                          description='max connections',
+                          group=(
+                              'https://www.googleapis.com/compute/'
+                              'alpha/projects/my-project/zones/zone-1/'
+                              'networkEndpointGroups/neg-1'),
+                          maxConnectionsPerEndpoint=100),
+                      messages.Backend(
+                          balancingMode=self._connection,
+                          description='max connections',
+                          group=(
+                              'https://www.googleapis.com/compute/'
+                              'alpha/projects/my-project/zones/zone-2/'
+                              'networkEndpointGroups/neg-2'),
+                          maxConnectionsPerEndpoint=320),
+                      messages.Backend(
+                          balancingMode=self._utilization,
+                          description='utilziation with conneciton',
+                          group=(
+                              'https://www.googleapis.com/compute/'
+                              'alpha/projects/my-project/zones/zone-1/'
+                              'instanceGroups/ig-1'),
+                          maxUtilization=1.0,
+                          maxConnections=10),
+                  ],
+                  healthChecks=[
+                      ('https://www.googleapis.com/compute/alpha/projects/'
+                       'my-project/global/healthChecks/my-health-check')
+                  ],
+                  name='my-backend-service',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/my-project'
+                            '/global/backendServices/my-backend-service'),
                   timeoutSec=30),
               project='my-project'))],
     )

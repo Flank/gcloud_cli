@@ -15,6 +15,8 @@
 
 """Unit tests for 'types create' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.deployment_manager import exceptions
@@ -55,15 +57,15 @@ class TypesCreateTest(unit_test_base.CompositeTypesUnitTestBase):
     self.withExpectedInsert()
     self.Run(self.createCommand() + ' --async')
     self.AssertOutputEquals('Operation [op-123] running....\n')
-    self.AssertErrEquals('Create in progress for composite_type [ct1].\n')
+    self.AssertErrContains('Create in progress for composite_type [ct1].\n')
 
   def testOperationFailed(self):
     self.withExpectedInsert()
     self.WithOperationPolling(poll_attempts=0,
                               error=self.OperationErrorFor('something bad'),
                               operation_type='create')
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 re.compile(r'.*something bad.*')):
+    with self.assertRaisesRegex(exceptions.Error,
+                                re.compile(r'.*something bad.*')):
       self.Run(self.createCommand())
 
   def createCommand(self):

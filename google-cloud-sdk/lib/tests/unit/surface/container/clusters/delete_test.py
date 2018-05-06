@@ -14,6 +14,8 @@
 
 """Tests for 'clusters delete' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from apitools.base.py import exceptions as api_exceptions
@@ -25,6 +27,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.surface.container import base
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class DeleteTestGA(base.TestBaseV1,
@@ -92,6 +95,9 @@ class DeleteTestGA(base.TestBaseV1,
 
   def testDeleteOneCluster(self):
     self._TestDeleteOneCluster(self.ZONE)
+
+  def testDeleteOneRegionalCluster(self):
+    self._TestDeleteOneCluster(self.REGION)
 
   def testDeleteAsync(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -228,16 +234,18 @@ class DeleteTestGA(base.TestBaseV1,
       self.assertIsNone(c_util.ClusterConfig.Load(
           cluster.name, self.ZONE, self.PROJECT_ID))
     self.AssertErrContains('Some requests did not succeed:')
-    self.AssertErrContains(api_adapter.WRONG_ZONE_ERROR_MSG.format(
+    for line in api_adapter.WRONG_ZONE_ERROR_MSG.format(
         error=exceptions.HttpException(base.NOT_FOUND_ERROR,
                                        c_util.HTTP_ERROR_FORMAT),
         name=wrong_zone.name,
         wrong_zone=self.ZONE,
-        zone='other-zone'))
-    self.AssertErrContains(api_adapter.NO_SUCH_CLUSTER_ERROR_MSG.format(
+        zone='other-zone').splitlines():
+      self.AssertErrContains(line)
+    for line in api_adapter.NO_SUCH_CLUSTER_ERROR_MSG.format(
         error=exceptions.HttpException(base.NOT_FOUND_ERROR,
                                        c_util.HTTP_ERROR_FORMAT),
-        name=not_found.name, project=self.PROJECT_ID))
+        name=not_found.name, project=self.PROJECT_ID).splitlines():
+      self.AssertErrContains(line)
     self.AssertErrContains('delete failed')
 
   def testDeleteHttpError(self):
@@ -334,9 +342,6 @@ class DeleteTestBetaV1API(base.BetaTestBase, DeleteTestGA):
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(True)
     self.api_mismatch = True
-
-  def testDeleteOneRegionalCluster(self):
-    self._TestDeleteOneCluster(self.REGION)
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.

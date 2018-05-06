@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for target ssl proxies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import subprocess
 
@@ -42,8 +44,8 @@ basicConstraints        = CA:FALSE
 class SslProxyTest(e2e_test_base.BaseTest):
 
   def UniqueName(self, name):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='compute-ssl-proxy-test-' + name).next()
+    return next(e2e_utils.GetResourceNameGenerator(
+        prefix='compute-ssl-proxy-test-' + name))
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
@@ -51,6 +53,7 @@ class SslProxyTest(e2e_test_base.BaseTest):
     self.backend_service_names = []
     self.health_check_names = []
     self.ssl_cert_names = []
+    self.ssl_policy_names = []
     self.target_ssl_proxy_names = []
     self.forwarding_rule_names = []
     self.ssl_config_fname = os.path.join(self.CreateTempDir(), 'ssl.cnf')
@@ -76,8 +79,8 @@ class SslProxyTest(e2e_test_base.BaseTest):
     name = self.UniqueName('tcp-hc')
     result = self.Run('compute health-checks create tcp {0}'.format(name))
     result_list = list(result)
-    self.assertEquals(1, len(result_list))
-    self.assertEquals(name, result_list[0].name)
+    self.assertEqual(1, len(result_list))
+    self.assertEqual(name, result_list[0].name)
     self.health_check_names.append(name)
     return name
 
@@ -87,8 +90,8 @@ class SslProxyTest(e2e_test_base.BaseTest):
                       '--global '
                       '--protocol TCP '
                       '--health-checks {1}'.format(name, health_check_name))
-    self.assertEquals(1, len(result))
-    self.assertEquals(name, result[0].name)
+    self.assertEqual(1, len(result))
+    self.assertEqual(name, result[0].name)
     self.backend_service_names.append(name)
     return name
 
@@ -98,25 +101,35 @@ class SslProxyTest(e2e_test_base.BaseTest):
                       '--certificate {1} --private-key {2}'.format(
                           name, self.crt_fname, self.key_fname))
     result_list = list(result)
-    self.assertEquals(1, len(result_list))
-    self.assertEquals(name, result_list[0].name)
+    self.assertEqual(1, len(result_list))
+    self.assertEqual(name, result_list[0].name)
     self.ssl_cert_names.append(name)
+    return name
+
+  def CreateSslPolicies(self):
+    name = self.UniqueName('ssl-pol')
+    result = self.Run('compute ssl-policies create {}'.format(name))
+    self.assertEqual(name, result.name)
+    self.ssl_policy_names.append(name)
     return name
 
   def testSslProxy(self):
     hc_name = self.CreateHealthCheck()
     bs_name = self.CreateTcpBackendService(hc_name)
     cert_name = self.CreateSslCertificate()
+    ssl_policy_name_1 = self.CreateSslPolicies()
+    ssl_policy_name_2 = self.CreateSslPolicies()
 
     # Create target ssl proxy.
     target_name = self.UniqueName('ssl-proxy')
     result = self.Run('compute target-ssl-proxies create {0} '
                       '--backend-service {1} '
-                      '--ssl-certificates {2}'.format(target_name, bs_name,
-                                                      cert_name))
+                      '--ssl-certificates {2} '
+                      '--ssl-policy {3}'.format(target_name, bs_name, cert_name,
+                                                ssl_policy_name_1))
     result_list = list(result)
-    self.assertEquals(1, len(result_list))
-    self.assertEquals(target_name, result_list[0].name)
+    self.assertEqual(1, len(result_list))
+    self.assertEqual(target_name, result_list[0].name)
     self.target_ssl_proxy_names.append(target_name)
 
     # Create forwarding rule for the target ssl proxy.
@@ -124,8 +137,8 @@ class SslProxyTest(e2e_test_base.BaseTest):
     result = self.Run('compute forwarding-rules create {0} --global '
                       '--target-ssl-proxy {1} --ports 443 '.format(fr_name,
                                                                    target_name))
-    self.assertEquals(1, len(result))
-    self.assertEquals(fr_name, result[0].name)
+    self.assertEqual(1, len(result))
+    self.assertEqual(fr_name, result[0].name)
     self.forwarding_rule_names.append(fr_name)
 
     # Update the target ssl proxy.
@@ -143,11 +156,25 @@ class SslProxyTest(e2e_test_base.BaseTest):
         target_name))
     self.assertTrue(result.sslCertificates[0].endswith(cert2_name))
 
+    # Update the associated SSL policy.
+    self.Run('compute target-ssl-proxies update {0} '
+             '--ssl-policy {1}'.format(target_name, ssl_policy_name_2))
+    result = self.Run(
+        'compute target-ssl-proxies describe {0}'.format(target_name))
+    self.assertTrue(result.sslPolicy.endswith(ssl_policy_name_2))
+
+    # Clear the associated SSL policy.
+    self.Run('compute target-ssl-proxies update {0} '
+             '--clear-ssl-policy'.format(target_name))
+    result = self.Run(
+        'compute target-ssl-proxies describe {0}'.format(target_name))
+    self.assertEqual(None, result.sslPolicy)
+
     result = self.Run('compute target-ssl-proxies update {0} '
                       '--proxy-header PROXY_V1'.format(target_name))
     result = self.Run('compute target-ssl-proxies describe {0}'.format(
         target_name))
-    self.assertEquals('PROXY_V1', str(result.proxyHeader))
+    self.assertEqual('PROXY_V1', str(result.proxyHeader))
 
   def TearDown(self):
     for name in self.forwarding_rule_names:
@@ -165,6 +192,8 @@ class SslProxyTest(e2e_test_base.BaseTest):
       self.CleanUpResource(name, 'health-checks', scope=e2e_test_base.GLOBAL)
     for name in self.ssl_cert_names:
       self.CleanUpResource(name, 'ssl-certificates', scope=e2e_test_base.GLOBAL)
+    for name in self.ssl_policy_names:
+      self.CleanUpResource(name, 'ssl-policies', scope=e2e_test_base.GLOBAL)
 
 
 if __name__ == '__main__':

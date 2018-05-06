@@ -20,6 +20,9 @@ GROUPS
      dedicated
         (ALPHA) Create or manipulate dedicated interconnect attachments.
 
+     partner
+        (ALPHA) Create or manipulate partner interconnect attachments.
+
 COMMANDS
     COMMAND is one of the following:
 

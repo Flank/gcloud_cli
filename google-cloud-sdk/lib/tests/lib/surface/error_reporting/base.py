@@ -14,6 +14,8 @@
 
 """Base class for all Error Reporting tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -49,13 +51,13 @@ class ErrorReportingTestBase(cli_test_base.CliTestBase,
   def RunWithoutProject(self, cmd):
     """Test the command without a set project."""
     properties.PersistProperty(properties.VALUES.core.project, None)
-    with self.assertRaisesRegexp(Exception, self.NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, self.NO_PROJECT_REGEXP):
       self.RunCmd(cmd)
 
   def RunWithoutAuth(self, cmd):
     """Test the command without authentication."""
     self.FakeAuthSetCredentialsPresent(False)
-    with self.assertRaisesRegexp(Exception, self.NO_AUTH_REGEXP):
+    with self.assertRaisesRegex(Exception, self.NO_AUTH_REGEXP):
       self.RunCmd(cmd)
 
 

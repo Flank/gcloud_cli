@@ -15,9 +15,9 @@
       "is_required": false, 
       "platform": {
         "operating_systems": [
-          "MACOSX", 
-          "LINUX", 
           "CYGWIN", 
+          "LINUX", 
+          "MACOSX", 
           "MSYS"
         ]
       }, 
@@ -27,11 +27,11 @@
       }
     }
   ], 
-  "revision": 20180309150215, 
+  "revision": 20180430221132, 
   "schema_version": {
     "no_update": false, 
     "url": "https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz", 
     "version": 3
   }, 
-  "version": "193.0.0"
+  "version": "200.0.0"
 }

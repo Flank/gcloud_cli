@@ -76,7 +76,7 @@ connections on a per\-instance basis. Available for all services.
 Spreads load based on how many requests per second (RPS) the group can handle.
 There are two ways to specify max RPS: \fB\-\-max\-rate\fR which defines the max
 RPS for the whole group or \fB\-\-max\-rate\-per\-instance\fR, which defines the
-max RPS on a per\-instance basis. Available only for HTTP based protocols.
+max RPS on a per\-instance basis. Available only for HTTP\-based protocols.
 .TP 2m
 \fBUTILIZATION\fR
 Relies on the CPU utilization of the instances in the group when balancing load.
@@ -133,7 +133,7 @@ At most one of these may be specified:
 .TP 2m
 \fB\-\-instance\-group\-region\fR=\fIINSTANCE_GROUP_REGION\fR
 The region of the instance group to update the backend service. If not
-specified, you will be prompted to select a region.
+specified, you may be prompted to select a region.
 
 To avoid prompting when this flag is omitted, you can set the
 \f5\fIcompute/region\fR\fR property:
@@ -160,7 +160,7 @@ Alternatively, the region can be stored in the environment variable
 .TP 2m
 \fB\-\-instance\-group\-zone\fR=\fIINSTANCE_GROUP_ZONE\fR
 The zone of the instance group to update the backend service. If not specified
-and the \f5\fIcompute/zone\fR\fR property isn't set, you will be prompted to
+and the \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to
 select a zone.
 
 To avoid prompting when this flag is omitted, you can set the

@@ -13,6 +13,8 @@
 # limitations under the License.
 """This is a command for testing flag deprecation."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import actions as calliope_actions
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import log

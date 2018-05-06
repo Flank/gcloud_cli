@@ -34,7 +34,7 @@ class ProjectsListTest(base.ProjectsUnitTestBase):
         self.messages.ListProjectsResponse(projects=[test_project]))
     results_generator = self.RunProjects('list')
     results = [x for x in results_generator]
-    self.assertEquals([test_project], results)
+    self.assertEqual([test_project], results)
 
   def testListMultipleProjects(self):
     test_projects = util.GetTestActiveProjectsList()
@@ -45,7 +45,7 @@ class ProjectsListTest(base.ProjectsUnitTestBase):
         self.messages.ListProjectsResponse(projects=test_projects))
     results_generator = self.RunProjects('list')
     results = [x for x in results_generator]
-    self.assertEquals(test_projects, results)
+    self.assertEqual(test_projects, results)
 
   def testListMultipleProjectsBeta(self):
     test_projects = util.GetTestActiveProjectsList()
@@ -56,7 +56,7 @@ class ProjectsListTest(base.ProjectsUnitTestBase):
         self.messages.ListProjectsResponse(projects=test_projects))
     results_generator = self.RunProjectsBeta('list')
     results = [x for x in results_generator]
-    self.assertEquals(test_projects, results)
+    self.assertEqual(test_projects, results)
 
 
 if __name__ == '__main__':

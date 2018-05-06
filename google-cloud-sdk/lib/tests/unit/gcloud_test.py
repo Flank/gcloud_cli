@@ -79,7 +79,7 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
     msg = 'Example exception message text'
     exception = Exception(msg)
     self.cli.side_effect = exception
-    self.assertRaisesRegexp(Exception, msg, gcloud.main)
+    self.assertRaisesRegex(Exception, msg, gcloud.main)
     self.report_error_mock.assert_called_once_with(exception, is_crash=True)
 
   def testExceptionImportErrorRunCommand(self):
@@ -120,7 +120,7 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
     with mock.patch.dict('sys.modules', {module_path: None}):
       with self.assertRaises(SystemExit) as cm:
         gcloud.main()
-      self.assertEquals(1, cm.exception.code)
+      self.assertEqual(1, cm.exception.code)
       self.report_error_mock.assert_not_called()
     self.assertMultiLineEqual("""\
 ERROR: gcloud failed to load: No module named gcloud_main
@@ -149,7 +149,7 @@ the instructions here:
                           side_effect=Exception('Exception message'))
     with self.assertRaises(SystemExit) as cm:
       gcloud.main()
-    self.assertEquals(1, cm.exception.code)
+    self.assertEqual(1, cm.exception.code)
     self.report_error_mock.assert_not_called()
     self.maxDiff = None
     self.assertMultiLineEqual("""\

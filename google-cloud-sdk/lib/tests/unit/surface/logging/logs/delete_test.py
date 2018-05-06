@@ -24,7 +24,7 @@ class LogsDeleteTest(base.LoggingTestBase):
 
   def testDeletePromptNo(self):
     self.WriteInput('n')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         console_io.OperationCancelledError, 'Aborted by user.'):
       self.RunLogging('logs delete my-log')
 

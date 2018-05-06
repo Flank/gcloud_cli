@@ -17,9 +17,11 @@ gcloud alpha tasks queues \- manage Cloud Tasks queues
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Commands for managing Google Cloud Tasks queues. For more
-information about the different queue target types, see:
-https://cloud.google.com/cloud\-tasks/docs/queue\-types
+\fB(ALPHA)\fR Commands for managing Google Cloud Tasks queues. If you have early
+access to Cloud Tasks, refer to the following guide for more information about
+the different queue target types:
+https://cloud.google.com/cloud\-tasks/docs/queue\-types. For access, sign up
+here: https://goo.gl/Ya0AZd
 
 
 
@@ -83,7 +85,7 @@ help\fR for details.
 
 .TP 2m
 \fBset\-iam\-policy\fR
-\fB(ALPHA)\fR Set IAM policy for a queue.
+\fB(ALPHA)\fR Set the IAM policy for a queue.
 
 .TP 2m
 \fBupdate\-app\-engine\-queue\fR
@@ -103,5 +105,9 @@ This command is currently in ALPHA and may change without notice. Usually, users
 of ALPHA commands and flags need to apply for access, agree to applicable terms,
 and have their projects whitelisted. Contact Google or sign up on a product's
 page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/.
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta tasks queues
+.RE
 

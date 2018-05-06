@@ -13,3 +13,6 @@
 # limitations under the License.
 
 """Unittests for utility functions for Cloud Pub/Sub component."""
+
+from __future__ import unicode_literals
+

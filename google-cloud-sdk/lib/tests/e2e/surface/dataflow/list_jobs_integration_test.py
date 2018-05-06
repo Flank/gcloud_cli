@@ -14,6 +14,8 @@
 
 """Integration test for the 'dataflow jobs list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.dataflow import e2e_base
 

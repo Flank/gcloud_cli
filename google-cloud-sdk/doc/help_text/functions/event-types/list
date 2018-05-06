@@ -6,6 +6,9 @@ SYNOPSIS
     gcloud functions event-types list [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
+    gcloud functions event-types list displays types of events that can be a
+    trigger for a Google Cloud Function.
+
       o For an event type, EVENT_TYPE_DEFAULT marks whether the given event
         type is the default for its provider (in which case the --event-type
         flag may be omitted).

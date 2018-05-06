@@ -13,6 +13,9 @@
 # limitations under the License.
 """Unit tests for the archive module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import re
 import zipfile
@@ -39,20 +42,20 @@ class ArchiveTest(test_case.TestCase):
   def testZipDirEmpty(self):
     with files.TemporaryDirectory() as src_dir:
       name_list = self._MakeZip(src_dir)
-    self.assertEquals([], name_list)
+    self.assertEqual([], name_list)
 
   def testZipDirSingleEmptyDir(self):
     with files.TemporaryDirectory() as src_dir:
       os.makedirs(os.path.join(src_dir, 'empty_dir'))
       name_list = self._MakeZip(src_dir)
-    self.assertEquals([('empty_dir/', '')], name_list)
+    self.assertEqual([('empty_dir/', b'')], name_list)
 
   def testZipDirSingleFile(self):
     with files.TemporaryDirectory() as src_dir:
       with open(os.path.join(src_dir, 'sample.txt'), 'a'):
         pass
       name_list = self._MakeZip(src_dir)
-    self.assertEquals([('sample.txt', '')], name_list)
+    self.assertEqual([('sample.txt', b'')], name_list)
 
   def testZipDirFull(self):
     with files.TemporaryDirectory() as src_dir:
@@ -66,10 +69,10 @@ class ArchiveTest(test_case.TestCase):
       with open(os.path.join(full_dir, 'sample2.txt'), 'a') as f:
         f.write('Hello')
       name_list = self._MakeZip(src_dir)
-    self.assertEquals([('empty_dir/', ''), ('full_dir/', ''),
-                       ('full_dir/sample1.txt', ''),
-                       ('full_dir/sample2.txt', 'Hello'),
-                       ('sample.txt', '')], sorted(name_list))
+    self.assertEqual([('empty_dir/', b''), ('full_dir/', b''),
+                      ('full_dir/sample1.txt', b''),
+                      ('full_dir/sample2.txt', b'Hello'),
+                      ('sample.txt', b'')], sorted(name_list))
 
   def testZipDirFullWithFilter(self):
 
@@ -102,11 +105,11 @@ class ArchiveTest(test_case.TestCase):
           name_list = [(name, zf.read(name)) for name in zf.namelist()]
         finally:
           zf.close()
-    self.assertEquals([('full_dir/', ''),
-                       ('full_directory/', ''),
-                       ('full_directory/sample1.txt', ''),
-                       ('full_directory/sample2.txt', 'Hello'),
-                       ('sample.txt', '')], sorted(name_list))
+    self.assertEqual([('full_dir/', b''),
+                      ('full_directory/', b''),
+                      ('full_directory/sample1.txt', b''),
+                      ('full_directory/sample2.txt', b'Hello'),
+                      ('sample.txt', b'')], sorted(name_list))
 
 
 if __name__ == '__main__':

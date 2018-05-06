@@ -1,4 +1,4 @@
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,14 @@
 # limitations under the License.
 """Unit tests for arg parsing utilities for services."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.services import arg_parsers
 
 from tests.lib import test_case
-from tests.lib.surface.services import unit_test_base
 
 
-class ServicesArgParsersTest(unit_test_base.SV1UnitTestBase):
+class ServicesArgParsersTest(object):
   """Unit tests for service management arg parsing utilities."""
 
   def testGetServiceNameFromArg(self):

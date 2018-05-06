@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Test of the 'pubsub subscriptions pull' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.pubsub import util
@@ -116,6 +120,8 @@ class SubscriptionsPullTest(base.CloudPubsubTestBase):
 |                |            | attr1=1    |        |
 | World on Fire! | 654321     | attr0=0    | 1      |
 |                |            | attr1=1    |        |
+| Hello ?        | 987654     | attr0=0    | 2      |
+|                |            | attr1=1    |        |
 +----------------+------------+------------+--------+
         """, normalize_space=True)
 
@@ -188,7 +194,7 @@ class SubscriptionsPullTest(base.CloudPubsubTestBase):
     # decoded if the standard base64 implementation is used.
     exp_received_message = self.msgs.ReceivedMessage(
         ackId='000', message=self.msgs.PubsubMessage(
-            data='3c?'))
+            data=b'3c?'))
     exp_received_message.message.messageId = '654321'
 
     self.svc.Expect(

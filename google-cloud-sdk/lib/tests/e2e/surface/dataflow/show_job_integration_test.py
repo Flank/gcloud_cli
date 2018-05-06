@@ -13,9 +13,16 @@
 # limitations under the License.
 """Integration test for the 'dataflow jobs show' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import datetime
 from googlecloudsdk.command_lib.dataflow import dataflow_util
 from tests.lib import test_case
 from tests.lib.surface.dataflow import e2e_base
+
+
+def CheckTimestampIsValid(timestamp):
+  datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
 
 
 class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
@@ -51,12 +58,12 @@ class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
     self.assertTrue(job.type == 'Streaming' or job.type == 'Batch')
 
     # Are the timestamps valid
-    self.assertGreater(job.stateTime, 0)
-    self.assertGreater(job.creationTime, 0)
+    CheckTimestampIsValid(job.stateTime)
+    CheckTimestampIsValid(job.creationTime)
 
     # Make sure that the jobs are similar
-    self.assertEquals(test_job.type, job.type)
-    self.assertEquals(test_job.creationTime, job.creationTime)
+    self.assertEqual(test_job.type, job.type)
+    self.assertEqual(test_job.creationTime, job.creationTime)
 
   def testShowJobWithRegion(self):
     try:
@@ -79,12 +86,12 @@ class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
     self.assertTrue(job.type == 'Streaming' or job.type == 'Batch')
 
     # Are the timestamps valid
-    self.assertGreater(job.stateTime, 0)
-    self.assertGreater(job.creationTime, 0)
+    CheckTimestampIsValid(job.stateTime)
+    CheckTimestampIsValid(job.creationTime)
 
     # Make sure that the jobs are similar
-    self.assertEquals(test_job.type, job.type)
-    self.assertEquals(test_job.creationTime, job.creationTime)
+    self.assertEqual(test_job.type, job.type)
+    self.assertEqual(test_job.creationTime, job.creationTime)
 
   def testShowJobWithUri(self):
     try:
@@ -106,9 +113,9 @@ class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
     # Does the job have a valid type?
     self.assertTrue(job.type == 'Streaming' or job.type == 'Batch')
 
-    # Are the timestamps parsable?
-    self.assertGreater(job.stateTime, 0)
-    self.assertGreater(job.creationTime, 0)
+    # Are the timestamps valid
+    CheckTimestampIsValid(job.stateTime)
+    CheckTimestampIsValid(job.creationTime)
 
   def testShowJobWithUriWithRegion(self):
     try:
@@ -131,9 +138,9 @@ class ShowJobIntegrationTest(e2e_base.DataflowIntegrationTestBase):
     # Does the job have a valid type?
     self.assertTrue(job.type == 'Streaming' or job.type == 'Batch')
 
-    # Are the timestamps parsable?
-    self.assertGreater(job.stateTime, 0)
-    self.assertGreater(job.creationTime, 0)
+    # Are the timestamps valid
+    CheckTimestampIsValid(job.stateTime)
+    CheckTimestampIsValid(job.creationTime)
 
 
 if __name__ == '__main__':

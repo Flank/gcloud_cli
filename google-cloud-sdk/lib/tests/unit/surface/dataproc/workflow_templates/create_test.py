@@ -55,17 +55,10 @@ class WorkflowTemplateCreateUnitTestBeta(WorkflowTemplateCreateUnitTest):
         'workflow-templates create {0}'.format(self.WORKFLOW_TEMPLATE))
     self.AssertMessagesEqual(workflow_template, result)
 
-  def testCreateWorkflowTemplatesWithZone(self):
-    workflow_template = self.MakeWorkflowTemplate()
-    self.ExpectCreateWorkflowTemplate(workflow_template, workflow_template)
-    result = self.RunDataproc('workflow-templates create {0} --zone {1}'.format(
-        self.WORKFLOW_TEMPLATE, self.ZONE))
-    self.AssertMessagesEqual(workflow_template, result)
-
   def testCreateWorkflowTemplatesWithRegion(self):
-    properties.VALUES.dataproc.region.Set('us-west1-a')
-    parent = self.WorkflowTemplateParentName(region='us-west1-a')
-    template_name = self.WorkflowTemplateName(region='us-west1-a')
+    properties.VALUES.dataproc.region.Set('us-test1')
+    parent = self.WorkflowTemplateParentName(region='us-test1')
+    template_name = self.WorkflowTemplateName(region='us-test1')
     workflow_template = self.MakeWorkflowTemplate(name=template_name)
     self.ExpectCreateWorkflowTemplate(workflow_template, workflow_template,
                                       parent)

@@ -36,8 +36,8 @@ class RetryTest(test_case.TestCase):
                                           should_retry_if=False,
                                           sleep_ms=1000))
 
-    self.assertEquals(1, sample_mock.call_count)
-    self.assertEquals(0, self.sleep_mock.call_count)
+    self.assertEqual(1, sample_mock.call_count)
+    self.assertEqual(0, self.sleep_mock.call_count)
 
   def testNoRetryOnExceptionWhenMaxRetriesIsNotSet(self):
     retryer = retry.Retryer()
@@ -46,8 +46,8 @@ class RetryTest(test_case.TestCase):
 
     self.assertTrue(retryer.RetryOnException(sample_mock, [], sleep_ms=1000))
 
-    self.assertEquals(1, sample_mock.call_count)
-    self.assertEquals(0, self.sleep_mock.call_count)
+    self.assertEqual(1, sample_mock.call_count)
+    self.assertEqual(0, self.sleep_mock.call_count)
 
   def testSingleRetryOnResult(self):
     retryer = retry.Retryer(jitter_ms=None)
@@ -59,7 +59,7 @@ class RetryTest(test_case.TestCase):
                               [],
                               should_retry_if=lambda x, s: not x,
                               sleep_ms=1000))
-    self.assertEquals(2, sample_mock.call_count)
+    self.assertEqual(2, sample_mock.call_count)
     args, unused_kwargs = self.sleep_mock.call_args
     self.assertAlmostEqual(1.0, args[0])
 
@@ -68,13 +68,13 @@ class RetryTest(test_case.TestCase):
 
     sample_mock = mock.Mock(side_effect=['a', 'b'])
 
-    self.assertEquals(
+    self.assertEqual(
         'b',
         retryer.RetryOnResult(sample_mock,
                               [],
                               should_retry_if=lambda x, s: s.retrial != 1,
                               sleep_ms=1000))
-    self.assertEquals(2, sample_mock.call_count)
+    self.assertEqual(2, sample_mock.call_count)
     args, unused_kwargs = self.sleep_mock.call_args
     self.assertAlmostEqual(1.0, args[0])
 
@@ -83,9 +83,9 @@ class RetryTest(test_case.TestCase):
 
     sample_mock = mock.Mock(side_effect=[Exception('raised'), 7])
 
-    self.assertEquals(7, retryer.RetryOnException(sample_mock, [],
-                                                  sleep_ms=1000))
-    self.assertEquals(2, sample_mock.call_count)
+    self.assertEqual(7, retryer.RetryOnException(sample_mock, [],
+                                                 sleep_ms=1000))
+    self.assertEqual(2, sample_mock.call_count)
     args, unused_kwargs = self.sleep_mock.call_args
     self.assertAlmostEqual(1.0, args[0])
 
@@ -94,13 +94,13 @@ class RetryTest(test_case.TestCase):
 
     sample_mock = mock.Mock(side_effect=[Exception('1'), Exception('2')])
 
-    with self.assertRaisesRegexp(Exception, r'^2$'):
+    with self.assertRaisesRegex(Exception, r'^2$'):
       retryer.RetryOnException(
           sample_mock,
           [],
           sleep_ms=1000,
           should_retry_if=lambda t, v, tr, s: str(v) != '2')
-    self.assertEquals(2, sample_mock.call_count)
+    self.assertEqual(2, sample_mock.call_count)
     args, unused_kwargs = self.sleep_mock.call_args
     self.assertAlmostEqual(1.0, args[0])
 
@@ -112,8 +112,8 @@ class RetryTest(test_case.TestCase):
     self.assertTrue(retryer.RetryOnResult(
         sample_mock, [], should_retry_if=False, sleep_ms=1000))
 
-    self.assertEquals(1, sample_mock.call_count)
-    self.assertEquals(0, self.sleep_mock.call_count)
+    self.assertEqual(1, sample_mock.call_count)
+    self.assertEqual(0, self.sleep_mock.call_count)
 
   def testSingleRetryWhenRetriesNotAllowed(self):
     retryer = retry.Retryer(max_retrials=0, jitter_ms=None)
@@ -126,8 +126,8 @@ class RetryTest(test_case.TestCase):
                             should_retry_if=lambda x, s: not x,
                             sleep_ms=1000)
     self.assertFalse(context.exception.last_result)
-    self.assertEquals(0, context.exception.state.retrial)
-    self.assertEquals(1000, context.exception.state.time_passed_ms)
+    self.assertEqual(0, context.exception.state.retrial)
+    self.assertEqual(1000, context.exception.state.time_passed_ms)
     self.assertIn('time_passed_ms', str(context.exception))
 
   def testMultipleRetriesAndTimeout(self):
@@ -140,9 +140,9 @@ class RetryTest(test_case.TestCase):
       retryer.RetryOnResult(sample_mock, (), should_retry_if=False,
                             sleep_ms=1000)
 
-    self.assertEquals(2000, context.exception.state.time_passed_ms)
-    self.assertEquals(1000, context.exception.state.time_to_wait_ms)
-    self.assertEquals(1, context.exception.state.retrial)
+    self.assertEqual(2000, context.exception.state.time_passed_ms)
+    self.assertEqual(1000, context.exception.state.time_to_wait_ms)
+    self.assertEqual(1, context.exception.state.retrial)
     self.assertFalse(context.exception.last_result)
     self.assertIn('time_passed_ms', str(context.exception))
 
@@ -161,13 +161,13 @@ class RetryTest(test_case.TestCase):
 
     for idx, mock_call in enumerate(status_update_mock.call_args_list):
       result, state = mock_call[0][:2]
-      self.assertEquals(False, result)
-      self.assertEquals(idx, state.retrial)
-      self.assertEquals((idx + 1) * 1000, state.time_passed_ms)
-      self.assertEquals(2000, state.time_to_wait_ms)
+      self.assertEqual(False, result)
+      self.assertEqual(idx, state.retrial)
+      self.assertEqual((idx + 1) * 1000, state.time_passed_ms)
+      self.assertEqual(2000, state.time_to_wait_ms)
 
-    self.assertEquals(4, sample_mock.call_count)
-    self.assertEquals(3, self.sleep_mock.call_count)
+    self.assertEqual(4, sample_mock.call_count)
+    self.assertEqual(3, self.sleep_mock.call_count)
 
   def testSleepIterable(self):
     status_update_mock = mock.Mock()
@@ -184,13 +184,13 @@ class RetryTest(test_case.TestCase):
 
     for idx, mock_call in enumerate(status_update_mock.call_args_list):
       result, state = mock_call[0][:2]
-      self.assertEquals(False, result)
-      self.assertEquals(idx, state.retrial)
-      self.assertEquals((idx + 1) * 1000, state.time_passed_ms)
-      self.assertEquals((idx + 1) * 100, state.time_to_wait_ms)
+      self.assertEqual(False, result)
+      self.assertEqual(idx, state.retrial)
+      self.assertEqual((idx + 1) * 1000, state.time_passed_ms)
+      self.assertEqual((idx + 1) * 100, state.time_to_wait_ms)
 
-    self.assertEquals(4, sample_mock.call_count)
-    self.assertEquals(3, self.sleep_mock.call_count)
+    self.assertEqual(4, sample_mock.call_count)
+    self.assertEqual(3, self.sleep_mock.call_count)
 
   def testExponential(self):
     retryer = retry.Retryer(exponential_sleep_multiplier=2, jitter_ms=None)
@@ -201,8 +201,8 @@ class RetryTest(test_case.TestCase):
         retryer.RetryOnResult(sample_mock, [], should_retry_if=False,
                               sleep_ms=1000))
 
-    self.assertEquals(5, sample_mock.call_count)
-    self.assertEquals(
+    self.assertEqual(5, sample_mock.call_count)
+    self.assertEqual(
         [mock.call(1.0), mock.call(2.0), mock.call(4.0), mock.call(8.0)],
         self.sleep_mock.call_args_list)
 
@@ -216,8 +216,8 @@ class RetryTest(test_case.TestCase):
         retryer.RetryOnResult(sample_mock, [], should_retry_if=False,
                               sleep_ms=1000))
 
-    self.assertEquals(5, sample_mock.call_count)
-    self.assertEquals(
+    self.assertEqual(5, sample_mock.call_count)
+    self.assertEqual(
         [mock.call(1.0), mock.call(2.0), mock.call(3.0), mock.call(3.0)],
         self.sleep_mock.call_args_list)
 
@@ -232,7 +232,7 @@ class RetryTest(test_case.TestCase):
 
     retryer = retry.Retryer()
     result = retryer.RetryOnException(F, [42], {'y': 312})
-    self.assertEquals((42, 312), result)
+    self.assertEqual((42, 312), result)
 
   def testRetryOnExceptionDecoratorOk(self):
     count = [2]
@@ -244,7 +244,7 @@ class RetryTest(test_case.TestCase):
         raise ValueError
       return count[0]
 
-    self.assertEquals(0, F())
+    self.assertEqual(0, F())
 
   def testRetryOnExceptionDecoratorTooManyRetrials(self):
     count = [2]

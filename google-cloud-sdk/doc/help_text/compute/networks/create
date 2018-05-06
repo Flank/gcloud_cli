@@ -53,10 +53,10 @@ FLAGS
      At most one of these may be specified:
 
        --mode=NETWORK_TYPE
-          (DEPRECATED) The network type.
+          (REMOVED) The network type.
 
-          mode is deprecated. Please use subnet-mode instead. NETWORK_TYPE must
-          be one of:
+          mode has been removed. Please use subnet-mode instead. NETWORK_TYPE
+          must be one of:
 
        auto
           Subnets are created automatically. This is the recommended selection.

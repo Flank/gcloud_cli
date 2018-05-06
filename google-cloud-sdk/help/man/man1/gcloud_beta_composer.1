@@ -1,0 +1,73 @@
+
+.TH "GCLOUD_BETA_COMPOSER" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta composer \- cloud Composer command groups
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta composer\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Cloud Composer is a managed Apache Airflow service that helps you
+create, schedule, monitor and manage workflows. Cloud Composer automation helps
+you create Airflow environments quickly and use Airflow\-native tools, such as
+the powerful Airflow web interface and command line tools, so you can focus on
+your workflows and not your infrastructure.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBenvironments\fR
+\fB(BETA)\fR Create and manage Cloud Composer environments.
+
+.TP 2m
+\fBoperations\fR
+\fB(BETA)\fR Manage Cloud Composer operations.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To see how to create and manage environments, run:
+
+.RS 2m
+$ gcloud beta composer environments \-\-help
+.RE
+
+To see how to manage long\-running operations, run:
+
+.RS 2m
+$ gcloud beta composer operations \-\-help
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

@@ -13,6 +13,8 @@
 # limitations under the License.
 """A group for testing how well required/not-required arguments are handled."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
@@ -23,6 +25,9 @@ class Lotsofargs(base.Group):
   def Args(parser):
     parser.display_info.AddFormat('table(mid)')
     parser.display_info.AddAliases({'ALL': 'mid', 'MID': 'Mid'})
-    parser.add_argument(
-        '--group-required-test', required=True, help='Auxilio aliis.')
-    parser.add_argument('--group-not-required-test', help='Auxilio aliis.')
+    parser.add_argument('--group-required-test',
+                        required=True,
+                        help='Auxilio aliis.')
+    parser.add_argument('--group-not-required-test',
+                        default='9999',
+                        help='Auxilio aliis.')

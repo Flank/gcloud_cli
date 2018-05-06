@@ -57,7 +57,7 @@ class DeleteTest(unit_test_base.BaseTest):
                               '[test@test-project.iam.gserviceaccount.com]')
 
   def testDeleteInvalidName(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         r'Not a valid service account identifier. It should be either a '
         r'numeric string representing the unique_id or an email of the form: '

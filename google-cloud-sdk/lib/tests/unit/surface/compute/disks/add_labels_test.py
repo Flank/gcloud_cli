@@ -14,17 +14,19 @@
 """Tests for disks add-labels."""
 
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import disks_labels_test_base
 
 
-class AddLabelsTestAlpha(disks_labels_test_base.DisksLabelsTestBase):
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA)
+class AddLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
+                             parameterized.TestCase):
 
-  def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
-
-  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self):
+  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self, track):
+    self._SetUp(track)
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'))
@@ -53,7 +55,8 @@ class AddLabelsTestAlpha(disks_labels_test_base.DisksLabelsTestBase):
                       for pair in add_labels])))
     self.assertEqual(response, updated_disk)
 
-  def testScopePromptWithRegionAndZone(self):
+  def testScopePromptWithRegionAndZone(self, track):
+    self._SetUp(track)
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
 
     # Make a disk that already has labels and add-labels later

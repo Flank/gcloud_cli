@@ -25,7 +25,7 @@ class ResourcesTest(test_case.TestCase):
         collections = list(
             apis_internal._GetApiCollections(api_name, api_version))
         for collection in collections:
-          self.assertEquals(api_name, collection.api_name)
+          self.assertEqual(api_name, collection.api_name)
 
 
 if __name__ == '__main__':

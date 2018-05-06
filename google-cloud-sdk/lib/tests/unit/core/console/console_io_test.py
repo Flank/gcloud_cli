@@ -15,6 +15,8 @@
 
 # Tests for the console_io module.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import subprocess
 import sys
@@ -29,6 +31,9 @@ from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class StdinTests(sdk_test_base.SdkBase, test_case.WithInput):
@@ -49,13 +54,13 @@ class StdinTests(sdk_test_base.SdkBase, test_case.WithInput):
 
   def testStdinRead(self):
     self.WriteInput('abc123')
-    self.assertEquals(
+    self.assertEqual(
         console_io.ReadFromFileOrStdin('-', binary=False), 'abc123\n')
 
   def testStdinReadBinary(self):
     self.WriteBinaryInput(
         b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n')
-    self.assertEquals(
+    self.assertEqual(
         console_io.ReadFromFileOrStdin('-', binary=True),
         b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n')
 
@@ -97,8 +102,8 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
     self.assertTrue(result)
     result = console_io.PromptContinue(default=False)
     self.assertFalse(result)
-    with self.assertRaisesRegexp(console_io.UnattendedPromptError,
-                                 'This prompt could not be answered'):
+    with self.assertRaisesRegex(console_io.UnattendedPromptError,
+                                'This prompt could not be answered'):
       result = console_io.PromptContinue(throw_if_unattended=True)
     result = console_io.PromptResponse(message='')
     self.assertEqual(result, None)
@@ -165,14 +170,14 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
       self.assertFalse(result)
     num = self.SetAnswers('n', 'N', 'no', 'NO', 'No', 'n ', 'N ', ' n')
     for _ in range(num):
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           console_io.OperationCancelledError, 'Aborted by user.'):
         console_io.PromptContinue(message='prompt', cancel_on_no=True)
       self.assertIn('prompt', self.GetErr())
 
   def testPromptCancelMessage(self):
     self.SetAnswers('n')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         console_io.OperationCancelledError,
         "I'm sorry Dave, I'm afraid I can't do that"):
       console_io.PromptContinue(
@@ -248,7 +253,7 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
                                      message='message',
                                      prompt_string='prompt',
                                      allow_freeform=True)
-    self.assertEquals(textwrap.dedent("""\
+    self.assertEqual(textwrap.dedent("""\
         message
          [1] a
          [2] b
@@ -327,7 +332,7 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
   def testLongPrompt(self):
     self.SetAnswers('list', '1', 'value10', '1', '2', '3', '1', '101')
 
-    indices = range(1, 101)
+    indices = list(range(1, 101))
     values = ['value{x}'.format(x=x) for x in indices]
 
     options_lines = [' [{index}] {value}'.format(index=index, value=value)
@@ -420,14 +425,14 @@ class PrompterTests(test_case.WithOutputCapture, test_case.WithInput):
     self.assertEqual(result, 1)
 
   def testChoiceErrors(self):
-    with self.assertRaisesRegexp(ValueError, r'at least one option'):
+    with self.assertRaisesRegex(ValueError, r'at least one option'):
       console_io.PromptChoice([])
-    with self.assertRaisesRegexp(ValueError, r'at least one option'):
+    with self.assertRaisesRegex(ValueError, r'at least one option'):
       console_io.PromptChoice(None)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, r'Default option \[-1\] is not a valid index '):
       console_io.PromptChoice(['a', 'b', 'c'], default=-1)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, r'Default option \[3\] is not a valid index'):
       console_io.PromptChoice(['a', 'b', 'c'], default=3)
 

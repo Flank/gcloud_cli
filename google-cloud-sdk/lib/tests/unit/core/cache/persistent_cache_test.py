@@ -15,6 +15,8 @@
 
 """Unit tests for the core persistent cache implementation module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.core.cache import exceptions
@@ -530,38 +532,38 @@ class CacheTableTests(CacheBase):
   def testTableUnicodeColumnValues(self):
     table = self.cache.Table(_TEST_TABLE_NAME_1, columns=2, keys=1)
     table.AddRows((
-        (u'Ṁöë', u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"),
-        (u'Larry', u"ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ."),
-        (u'Shemp', u'Hey, Ṁöë! Hey, Larry!'),
-        (u'Curly', u'Søɨŧɇnłɏ!')))
+        ('Ṁöë', ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"),
+        ('Larry', "ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ."),
+        ('Shemp', 'Hey, Ṁöë! Hey, Larry!'),
+        ('Curly', 'Søɨŧɇnłɏ!')))
     table.Validate()
     self.AssertRowsEqual(
-        [(u'Ṁöë', u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW")],
-        table.Select((u'Ṁöë',)))
+        [('Ṁöë', ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW")],
+        table.Select(('Ṁöë',)))
     self.AssertRowsEqual(
-        [(u'Larry', u"ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ.")],
-        table.Select((u'Larry',)))
+        [('Larry', "ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ.")],
+        table.Select(('Larry',)))
     self.AssertRowsEqual(
-        [(u'Ṁöë', u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"),
-         (u'Larry', u"ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ."),
-         (u'Shemp', u'Hey, Ṁöë! Hey, Larry!'),
-         (u'Curly', u'Søɨŧɇnłɏ!')],
+        [('Ṁöë', ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"),
+         ('Larry', "ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ."),
+         ('Shemp', 'Hey, Ṁöë! Hey, Larry!'),
+         ('Curly', 'Søɨŧɇnłɏ!')],
         table.Select())
     self.cache.Close()
     self.cache = self.CACHE_MODULE.Cache(self.cache_name)
 
     table = self.cache.Table(_TEST_TABLE_NAME_1)
     self.AssertRowsEqual(
-        [(u'Ṁöë', u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW")],
-        table.Select((u'Ṁöë',)))
+        [('Ṁöë', ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW")],
+        table.Select(('Ṁöë',)))
     self.AssertRowsEqual(
-        [(u'Larry', u"ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ.")],
-        table.Select((u'Larry',)))
+        [('Larry', "ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ.")],
+        table.Select(('Larry',)))
     self.AssertRowsEqual(
-        [(u'Ṁöë', u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"),
-         (u'Larry', u"ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ."),
-         (u'Shemp', u'Hey, Ṁöë! Hey, Larry!'),
-         (u'Curly', u'Søɨŧɇnłɏ!')],
+        [('Ṁöë', ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"),
+         ('Larry', "ι ∂ι∂η'т ωαηηα ѕαу уєѕ, вυт ι ¢συℓ∂η'т ѕαу ησ."),
+         ('Shemp', 'Hey, Ṁöë! Hey, Larry!'),
+         ('Curly', 'Søɨŧɇnłɏ!')],
         table.Select())
 
 

@@ -37,7 +37,8 @@ EXAMPLES
         $ gcloud iam roles delete --project myproject viewer
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam roles delete
         $ gcloud beta iam roles delete
 

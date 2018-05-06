@@ -50,14 +50,14 @@ FLAGS
         Do not wait for the operation to complete.
 
      --availability-type=AVAILABILITY_TYPE
-        Specifies level of availability. Only applies to PSQL instances.
+        Specifies level of availability. Only applies to PostgreSQL instances.
         AVAILABILITY_TYPE must be one of:
 
-         REGIONAL
+         regional
             Provides high availability and is recommended for production
             instances; instance automatically fails over to another zone within
             your selected region.
-         ZONAL
+         zonal
             Provides no failover capability. This is the default.
 
      --cpu=CPU

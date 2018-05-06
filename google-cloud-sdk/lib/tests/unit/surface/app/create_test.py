@@ -76,8 +76,8 @@ class CreateAppTest(api_test_util.ApiTestBase, test_case.WithInput):
   def testCreateApp_NoProject(self):
     """Test create app errors if no project is set."""
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app create --region={0}'.format(self.REGION))
 
   def testCreateApp_Region(self):
@@ -142,8 +142,8 @@ class CreateAppTest(api_test_util.ApiTestBase, test_case.WithInput):
   def testCreateApp_NonInteractiveNoRegion(self):
     """Tests create app errors if prompting disabled and region not given."""
     properties.VALUES.core.disable_prompts.Set(True)
-    with self.assertRaisesRegexp(create_util.UnspecifiedRegionError,
-                                 r'Prompts are disabled'):
+    with self.assertRaisesRegex(create_util.UnspecifiedRegionError,
+                                r'Prompts are disabled'):
       self.Run('app create')
     self.AssertErrNotContains(self.CHOOSE_REGION_MSG)
     self.AssertErrNotContains(
@@ -155,7 +155,7 @@ class CreateAppTest(api_test_util.ApiTestBase, test_case.WithInput):
     # Inject a HTTP 409 Conflict error (signifying that app already exists)
     err = http_error.MakeHttpError(code=409)
     self._ExpectCreateAppRequest(self.REGION, err)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         create_util.AppAlreadyExistsError, r'The project \[{project}\] already '
         r'contains an App Engine application'.format(project=self.Project())):
       self.Run('app create --region={0}'.format(self.REGION))

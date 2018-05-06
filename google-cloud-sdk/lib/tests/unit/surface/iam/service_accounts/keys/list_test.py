@@ -124,7 +124,7 @@ class ListTest(unit_test_base.BaseTest):
     self.AssertOutputNotContains('2015-09-30T09:39:49Z')
 
   def testListAccountKeysInvalidAccount(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         r'Not a valid service account identifier. It should be either a '
         r'numeric string representing the unique_id or an email of the form: '

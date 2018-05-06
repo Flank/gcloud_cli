@@ -14,6 +14,8 @@
 
 """Tests for 'get-server-config' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -32,7 +34,14 @@ class GetServerConfigTestGA(base.TestBaseV1,
     self.AssertOutputContains('changelist 12345')
     self.AssertOutputContains('validMasterVersions:')
 
-  def testMissingZone(self):
+  def testRegion(self):
+    self.ExpectGetServerConfig(self.REGION)
+    self.Run(self.get_server_config_command_base +
+             ' --region={0}'.format(self.REGION))
+    self.AssertOutputContains('changelist 12345')
+    self.AssertOutputContains('validMasterVersions:')
+
+  def testMissingZoneAndRegion(self):
     with self.assertRaises(exceptions.MinimumArgumentException):
       self.Run(self.get_server_config_command_base)
 
@@ -53,17 +62,6 @@ class GetServerConfigTestBetaV1Beta1API(base.TestBaseV1Beta1,
 
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(False)
-
-  def testRegion(self):
-    self.ExpectGetServerConfig(self.REGION)
-    self.Run(self.get_server_config_command_base +
-             ' --region={0}'.format(self.REGION))
-    self.AssertOutputEquals(
-        'buildClientInfo: changelist 12345\n'
-        'defaultClusterVersion: 1.2.3\n'
-        'validMasterVersions:\n'
-        '- 1.3.2\n')
-    self.AssertErrEquals('Fetching server config for us-central1\n')
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.

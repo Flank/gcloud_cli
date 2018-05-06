@@ -72,7 +72,8 @@ class FewSmallFilesTest(e2e_base.WithServiceAuth):
 
   @retry.RetryOnException(max_retrials=_NUM_RETRIES, sleep_ms=_WAIT_MS)
   def _AssertFilesUploaded(self, bucket_ref, expected_files):
-    remote_files = self.storage_client.ListBucket(bucket_ref)
+    remote_files = set(o.name for o in
+                       self.storage_client.ListBucket(bucket_ref))
     self.assertSetEqual(set(remote_files), set(expected_files))
 
   def _RunTest(self, num_threads):

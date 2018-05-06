@@ -14,6 +14,8 @@
 
 """Unit tests for the parser_errors module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import parser_errors
 from tests.lib import test_case
 
@@ -22,19 +24,19 @@ class ArgumentErrorTest(test_case.Base):
 
   def testArgumentErrorOK(self):
     e = parser_errors.ArgumentError('abc [{info}] xyz', info='TEST INFO')
-    self.assertEquals('abc [TEST INFO] xyz', str(e))
+    self.assertEqual('abc [TEST INFO] xyz', str(e))
 
   def testArgumentErrorUnknownKey(self):
     e = parser_errors.ArgumentError('abc [{info}] xyz', data='TEST INFO')
-    self.assertEquals('abc [{info}] xyz', str(e))
+    self.assertEqual('abc [{info}] xyz', str(e))
 
   def testArgumentErrorBadSpec(self):
     e = parser_errors.ArgumentError('abc [{:3}] xyz')
-    self.assertEquals('abc [{:3}] xyz', str(e))
+    self.assertEqual('abc [{:3}] xyz', str(e))
 
   def testArgumentErrorUnbalanced(self):
     e = parser_errors.ArgumentError('abc [{info] xyz', info='TEST INFO')
-    self.assertEquals('abc [{info] xyz', str(e))
+    self.assertEqual('abc [{info] xyz', str(e))
 
 
 if __name__ == '__main__':

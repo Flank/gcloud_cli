@@ -40,8 +40,7 @@ class OperationsListBetaTest(test_base.BaseTest):
         resource_projector.MakeSerializable(
             (test_resources.BETA_GLOBAL_OPERATIONS +
              test_resources.BETA_REGIONAL_OPERATIONS +
-             test_resources.BETA_ZONAL_OPERATIONS +
-             test_resources.ACCOUNT_OPERATIONS)),
+             test_resources.BETA_ZONAL_OPERATIONS)),
     ]
 
     self.Run("""
@@ -52,11 +51,6 @@ class OperationsListBetaTest(test_base.BaseTest):
         requests=[(self.compute_beta.globalOperations,
                    'AggregatedList',
                    beta_messages.ComputeGlobalOperationsAggregatedListRequest(
-                       project='my-project')),
-                  (self.accounts.globalAccountsOperations,
-                   'List',
-                   self.accounts_messages.
-                   ClouduseraccountsGlobalAccountsOperationsListRequest(
                        project='my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
@@ -67,7 +61,6 @@ class OperationsListBetaTest(test_base.BaseTest):
             https://www.googleapis.com/compute/beta/projects/my-project/global/operations/operation-1
             https://www.googleapis.com/compute/beta/projects/my-project/regions/region-1/operations/operation-2
             https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/operations/operation-3
-            https://www.googleapis.com/clouduseraccounts/beta/projects/my-project/global/operations/operation-1
             """))
 
   def testWithGlobalFlag(self):
@@ -171,8 +164,7 @@ class OperationsListBetaTest(test_base.BaseTest):
         resource_projector.MakeSerializable(
             (test_resources.BETA_GLOBAL_OPERATIONS +
              test_resources.BETA_REGIONAL_OPERATIONS +
-             test_resources.BETA_ZONAL_OPERATIONS +
-             test_resources.ACCOUNT_OPERATIONS)),
+             test_resources.BETA_ZONAL_OPERATIONS)),
     ]
 
     self.Run("""
@@ -185,7 +177,6 @@ class OperationsListBetaTest(test_base.BaseTest):
             operation-1 insert resource-1                   200         DONE    2014-09-04T09:55:33.679-07:00
             operation-2 insert region-1/resource/resource-2 200         DONE    2014-09-04T09:53:33.679-07:00
             operation-3 insert zone-1/resource/resource-3   409         DONE    2014-09-04T09:56:33.679-07:00
-            operation-1 insert test-1                       200         DONE    2014-09-04T09:55:33.679-07:00
             """), normalize_space=True)
 
   def testRegionsAndGlobal(self):
@@ -396,41 +387,16 @@ class OperationsListBetaTest(test_base.BaseTest):
         batch_url=self.batch_url,
         errors=[])
 
-  def testWithAccountsFlag(self):
-    self.list_json.side_effect = [
-        resource_projector.MakeSerializable(test_resources.ACCOUNT_OPERATIONS),
-    ]
-
-    self.Run("""
-        compute operations list --uri --accounts
-        """)
-
-    self.list_json.assert_called_once_with(
-        requests=[(self.accounts.globalAccountsOperations,
-                   'List',
-                   self.accounts_messages.
-                   ClouduseraccountsGlobalAccountsOperationsListRequest(
-                       project='my-project'))],
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            https://www.googleapis.com/clouduseraccounts/beta/projects/my-project/global/operations/operation-1
-            """))
-
   def testComplexTabularOutputBeta(self):
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(
             test_resources.BETA_GLOBAL_OPERATIONS +
             test_resources.BETA_REGIONAL_OPERATIONS +
-            test_resources.BETA_ZONAL_OPERATIONS +
-            test_resources.ACCOUNT_OPERATIONS),
+            test_resources.BETA_ZONAL_OPERATIONS),
     ]
 
     self.Run("""
-        compute operations list --zones us-central1-a,us-central1-b --regions us-central1 --global --accounts
+        compute operations list --zones us-central1-a,us-central1-b --regions us-central1 --global
         """)
     self.list_json.assert_called_once_with(
         requests=[(self.compute_beta.globalOperations,
@@ -451,12 +417,7 @@ class OperationsListBetaTest(test_base.BaseTest):
                    'List',
                    beta_messages.ComputeZoneOperationsListRequest(
                        project='my-project',
-                       zone='us-central1-b')),
-                  (self.accounts.globalAccountsOperations,
-                   'List',
-                   self.accounts_messages.
-                   ClouduseraccountsGlobalAccountsOperationsListRequest(
-                       project='my-project'))],
+                       zone='us-central1-b'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -467,7 +428,6 @@ class OperationsListBetaTest(test_base.BaseTest):
             operation-1 insert resource-1                   200         DONE   2014-09-04T09:55:33.679-07:00
             operation-2 insert region-1/resource/resource-2 200         DONE   2014-09-04T09:53:33.679-07:00
             operation-3 insert zone-1/resource/resource-3   409         DONE   2014-09-04T09:56:33.679-07:00
-            operation-1 insert test-1                       200         DONE   2014-09-04T09:55:33.679-07:00
             """), normalize_space=True)
 
 

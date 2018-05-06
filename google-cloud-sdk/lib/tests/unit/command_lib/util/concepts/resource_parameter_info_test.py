@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the resource_parameter_info module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.api_lib.util import apis

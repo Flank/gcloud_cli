@@ -1,0 +1,66 @@
+
+.TH "GCLOUD_BETA_COMPOSER_OPERATIONS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta composer operations delete \- deletes one or more completed Cloud Composer operations
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta composer operations delete\fR (\fIOPERATIONS\fR\ [\fIOPERATIONS\fR\ ...]\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Deletes operations that are done. If more than one operation is
+specified, all deletes will be attempted. If any of the deletes fail, those
+operations and their failure messages will be listed on the standard error, and
+the command will exit with a non\-zero status.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+OPERATIONS \- The operations to delete. The arguments in this group can be used
+to specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: Set the property [core/project] or provide the flag [\-\-project] on
+the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIOPERATIONS\fR [\fIOPERATIONS\fR ...]
+The ID of the operation or a fully qualified identifier for the operation. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The Cloud location for the operation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

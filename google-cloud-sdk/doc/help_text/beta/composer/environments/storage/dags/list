@@ -1,0 +1,36 @@
+NAME
+    gcloud beta composer environments storage dags list - list the DAG files
+        for a Cloud Composer environment
+
+SYNOPSIS
+    gcloud beta composer environments storage dags list
+        (--environment=ENVIRONMENT : --location=LOCATION)
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) List the DAG files for a Cloud Composer environment.
+
+REQUIRED FLAGS
+     ENVIRONMENT - The environment for which to list DAGs.. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       --environment=ENVIRONMENT
+          The ID of the environment or a fully qualified identifier for the
+          environment. This flag must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          The Cloud location for the environment.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

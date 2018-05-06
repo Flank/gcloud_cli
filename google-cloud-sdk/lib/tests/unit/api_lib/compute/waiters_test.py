@@ -14,8 +14,9 @@
 
 """Unit tests for the waiters module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
-import httplib
 
 from googlecloudsdk.api_lib.compute import waiters
 from googlecloudsdk.api_lib.util import apis
@@ -23,6 +24,10 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import mock
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
+import six.moves.http_client
+
 
 COMPUTE_V1_MESSAGES = apis.GetMessagesModule('compute', 'v1')
 DONE = COMPUTE_V1_MESSAGES.Operation.StatusValueValuesEnum.DONE
@@ -50,7 +55,7 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
         autospec=True)
     self.addCleanup(time_patcher.stop)
     self.time = time_patcher.start()
-    self.time.side_effect = iter(xrange(0, 1000, 5))
+    self.time.side_effect = iter(range(0, 1000, 5))
 
     sleep_patcher = mock.patch(
         'googlecloudsdk.command_lib.util.time_util.Sleep',
@@ -95,7 +100,7 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     return operations_data
 
   def CreateOperations(self, statuses, ids=None, operation_type=None):
-    ids = ids or range(len(statuses))
+    ids = ids or list(range(len(statuses)))
     assert len(ids) == len(statuses)
 
     operation_type = operation_type or 'insert'
@@ -313,7 +318,7 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     # sent before the clock is checked, so with a 59 second timeout,
     # we expect to make 12 calls.
     calls = []
-    for _ in xrange(12):
+    for _ in range(12):
       calls.append(Call(
           requests=self.CreateOperationGetRequests([0, 1, 2]),
           responses=self.CreateOperations([PENDING, PENDING, PENDING])))
@@ -345,7 +350,7 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     # sent before the clock is checked, so with a 59 second timeout,
     # we expect to make 12 calls.
     calls = []
-    for _ in xrange(12):
+    for _ in range(12):
       calls.append(Call(
           requests=self.CreateOperationGetRequests([0, 1, 2]),
           responses=self.CreateOperations(
@@ -361,7 +366,7 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
     error_ops = self.CreateOperations([DONE, DONE, DONE])
     for i, operation in enumerate(error_ops):
       operation.httpErrorMessage = 'CONFLICT'
-      operation.httpErrorStatusCode = httplib.CONFLICT
+      operation.httpErrorStatusCode = six.moves.http_client.CONFLICT
       operation.error = self.messages.Operation.ErrorValue(
           errors=[self.messages.Operation.ErrorValue.ErrorsValueListEntry(
               message='resource instance-' + str(i) + ' already exists')])
@@ -377,11 +382,11 @@ class WaitForOperationsTest(sdk_test_base.SdkBase):
         self.Wait(operations_data=self.CreateOperationsData(
             [PENDING, PENDING, PENDING])), [])
     self.AssertSleeps(1, 2)
-    self.assertEqual(
-        self.errors,
-        [(httplib.CONFLICT, 'resource instance-0 already exists'),
-         (httplib.CONFLICT, 'resource instance-1 already exists'),
-         (httplib.CONFLICT, 'resource instance-2 already exists')])
+    self.assertEqual(self.errors, [
+        (six.moves.http_client.CONFLICT, 'resource instance-0 already exists'),
+        (six.moves.http_client.CONFLICT, 'resource instance-1 already exists'),
+        (six.moves.http_client.CONFLICT, 'resource instance-2 already exists')
+    ])
     self.assertEqual(self.warnings, [])
 
   def testErrorCapturingWithoutHttpErrorStatusCodeBeingSet(self):

@@ -27,8 +27,8 @@ class BrowseTest(api_test_util.ApiTestBase):
 
   def testOpenConsole_NoProject(self):
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app open-console')
 
   def testOpenConsole_NoArgs(self):
@@ -58,8 +58,8 @@ class BrowseTest(api_test_util.ApiTestBase):
   # The following tests are for testing the --logs flag
   def testOpenConsoleLogs_NoProject(self):
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app open-console --logs')
 
   def testOpenConsoleLogs_NoArgs(self):

@@ -14,10 +14,13 @@
 
 """Unit tests for operations wait command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.deployment_manager import exceptions
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 messages = core_apis.GetMessagesModule('deploymentmanager', 'v2')
 
@@ -95,9 +98,9 @@ class OperationsWaitTest(unit_test_base.DmV2UnitTestBase):
       self.fail('expected exceptions.OperationError because of operation with'
                 ' error field set.')
     except exceptions.OperationError as e:
-      self.assertEquals(
+      self.assertEqual(
           'Operation %s failed to complete or has errors.' % OPERATION_NAME,
-          e.message)
+          str(e))
 
   def testOperationsWait_OperationErrorsMultiple(self):
     num_bad_operations = 3
@@ -135,10 +138,10 @@ class OperationsWaitTest(unit_test_base.DmV2UnitTestBase):
                 'error field set.')
     except exceptions.OperationError as e:
       self.assertTrue(
-          'Some operations failed to complete without errors' in e.message)
+          'Some operations failed to complete without errors' in str(e))
       for bad_operation in bad_operations:
-        self.assertTrue(bad_operation.name in e.message)
-      self.assertFalse(ok_operation.name in e.message)
+        self.assertTrue(bad_operation.name in str(e))
+      self.assertFalse(ok_operation.name in str(e))
 
 
 if __name__ == '__main__':

@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for deployable services and configs."""
+from __future__ import absolute_import
 import os
 
 from googlecloudsdk.api_lib.app import build
 from googlecloudsdk.api_lib.app import deploy_app_command_util
 from googlecloudsdk.api_lib.app import deploy_command_util
 from googlecloudsdk.api_lib.app import runtime_builders
+from googlecloudsdk.api_lib.app import util
 from googlecloudsdk.api_lib.app import version_util
 from googlecloudsdk.api_lib.app import yaml_parsing
 from googlecloudsdk.calliope import base
@@ -53,7 +55,7 @@ class GetRuntimeBuilderStrategyTest(sdk_test_base.SdkBase):
     self.assertEqual(
         deploy_util.GetRuntimeBuilderStrategy(self.GA),
         runtime_builders.RuntimeBuilderStrategy.WHITELIST_GA)
-    with self.assertRaisesRegexp(ValueError, 'Unrecognized release track'):
+    with self.assertRaisesRegex(ValueError, 'Unrecognized release track'):
       deploy_util.GetRuntimeBuilderStrategy(self.ALPHA)
 
   def testGetRuntimeBuilderStrategy_PropertyTrue(self):
@@ -152,21 +154,43 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     """If build image on client, and non-hermetic service, upload files."""
     mock_service_info = mock.MagicMock()
     mock_service_info.is_hermetic = False
-    self.StartObjectPatch(deploy_app_command_util, 'CopyFilesToCodeBucket')
+    mock_service_info.env = util.Environment.FLEX
+    copy_files_mock = self.StartObjectPatch(
+        deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
         None, mock_service_info, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.assertIsNotNone(result)
+    copy_files_mock.assert_called_once_with(
+        mock_service_info, None, None, max_file_size=None)
 
   def testPossiblyUploadFiles_BuildOnServer(self):
     """If build image on server, and non-hermetic service, upload files."""
     mock_service_info = mock.MagicMock()
     mock_service_info.is_hermetic = False
-    self.StartObjectPatch(deploy_app_command_util, 'CopyFilesToCodeBucket')
+    mock_service_info.env = util.Environment.FLEX
+    copy_files_mock = self.StartObjectPatch(
+        deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
         None, mock_service_info, None, None,
         deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.assertIsNotNone(result)
+    copy_files_mock.assert_called_once_with(
+        mock_service_info, None, None, max_file_size=None)
+
+  def testPossiblyUploadFiles_Standard(self):
+    """Check the standard path, specifically file size limit."""
+    mock_service_info = mock.MagicMock()
+    mock_service_info.is_hermetic = False
+    mock_service_info.env = util.Environment.STANDARD
+    copy_files_mock = self.StartObjectPatch(
+        deploy_app_command_util, 'CopyFilesToCodeBucket')
+    result = self.deployer._PossiblyUploadFiles(
+        None, mock_service_info, None, None, None)
+    self.assertIsNotNone(result)
+    # Check that the file size limitation is in effect
+    copy_files_mock.assert_called_once_with(
+        mock_service_info, None, None, max_file_size=32 * 1024 * 1024)
 
 
 class PrintPostDeployHintsTest(sdk_test_base.WithLogCapture):

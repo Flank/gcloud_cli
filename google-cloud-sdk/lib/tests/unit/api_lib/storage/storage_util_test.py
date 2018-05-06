@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.storage.storage_util."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 import io
 import string
@@ -52,12 +54,12 @@ class RunGsutilCommandTest(subtests.Base):
     popen_mock = self._MockPopen()
     self._MockFindExecutableOnPath()
     storage_util.RunGsutilCommand(
-        'cp', [r'C:\Users\foo\file.txt', 'gs://bucket/my-file.txt'])
+        'cp', ['C:\\Users\\foo\\file.txt', 'gs://bucket/my-file.txt'])
     self.assertEqual(popen_mock.call_count, 1)
     args, _ = popen_mock.call_args
     self.assertEqual(
         args[0][-3:],
-        ['cp', r'C:\Users\foo\file.txt', 'gs://bucket/my-file.txt'])
+        ['cp', 'C:\\Users\\foo\\file.txt', 'gs://bucket/my-file.txt'])
 
 
 class BucketReferenceFromArgumentTest(subtests.Base):
@@ -387,11 +389,11 @@ class ObjectReferenceTests(subtests.Base):
     self.assertEqual(object_ref.ToUrl(), 'gs://bucket/')
 
   def testObjectReference_FromArgument_Error(self):
-    with self.assertRaisesRegexp(argparse.ArgumentTypeError,
-                                 'Must be of form gs://bucket/object'):
+    with self.assertRaisesRegex(argparse.ArgumentTypeError,
+                                'Must be of form gs://bucket/object'):
       storage_util.ObjectReference.FromArgument('asdf')
-    with self.assertRaisesRegexp(argparse.ArgumentTypeError,
-                                 'Empty object name is not allowed'):
+    with self.assertRaisesRegex(argparse.ArgumentTypeError,
+                                'Empty object name is not allowed'):
       storage_util.ObjectReference.FromArgument('gs://bucket')
 
 

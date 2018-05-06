@@ -41,8 +41,8 @@ class DatastoreTest(test_base.BaseTest):
     self.StartObjectPatch(util, 'PrefixOutput')
 
     self.Run('beta emulators datastore start')
-    self.assertEquals('::1', ret.get('host'))
-    self.assertEquals('12345', ret.get('port'))
+    self.assertEqual('::1', ret.get('host'))
+    self.assertEqual('12345', ret.get('port'))
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute interconnects patch \- patch a Google Compute Engine interconnect
+gcloud beta compute interconnects patch \- update a Google Compute Engine interconnect
 
 
 
@@ -17,9 +17,14 @@ gcloud beta compute interconnects patch \- patch a Google Compute Engine interco
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR \fBgcloud beta compute interconnects patch\fR is used to patch
-interconnects. An interconnect represents a single specific connection between
-Google and the customer
+\fB(BETA)\fR \fB(DEPRECATED)\fR Update a Google Compute Engine interconnect.
+
+This command is deprecated. Please use \f5gcloud beta compute interconnects
+update\fR instead.
+
+\fBgcloud beta compute interconnects patch\fR is used to update interconnects.
+An interconnect represents a single specific connection between Google and the
+customer.
 
 
 
@@ -28,7 +33,7 @@ Google and the customer
 .RS 2m
 .TP 2m
 \fINAME\fR
-The name of the interconnect to patch.
+The name of the interconnect to update.
 
 
 .RE
@@ -105,11 +110,10 @@ help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. These variants
-are also available:
+This command is currently in BETA and may change without notice. This variant is
+also available:
 
 .RS 2m
 $ gcloud compute interconnects patch
-$ gcloud alpha compute interconnects patch
 .RE
 

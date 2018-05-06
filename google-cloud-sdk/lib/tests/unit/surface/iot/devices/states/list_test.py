@@ -11,11 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for `gcloud iot states list`."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
@@ -29,7 +36,7 @@ class StatesListTest(base.CloudIotBase):
       states.append(
           self.messages.DeviceState(
               updateTime='2017-01-{:02d}T00:00Z'.format(idx+1),
-              binaryData=str(idx)
+              binaryData=bytes(idx)
           )
       )
     return states

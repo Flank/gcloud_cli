@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'operations cancel' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.datastore import operations
 from tests.lib import test_case
 from tests.lib.surface.datastore import base

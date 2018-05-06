@@ -14,6 +14,8 @@
 
 """Tests for error reporting."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.error_reporting import util
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -60,12 +62,12 @@ class ErrorReportingTest(base.ErrorReportingTestBase):
         self.ERROR_MESSAGE, self.SERVICE, self.VERSION)
 
   def testGetGcloudProject(self):
-    self.assertEquals(
+    self.assertEqual(
         self.error_report_instance._GetGcloudProject(),
         self.PROJECT)
 
   def testMakeProjectName(self):
-    self.assertEquals(
+    self.assertEqual(
         self.error_report_instance._MakeProjectName(self.PROJECT),
         self.PROJECT_NAME)
 

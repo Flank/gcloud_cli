@@ -14,6 +14,8 @@
 
 """deployments create command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.deployment_manager import dm_api_util
@@ -31,6 +33,7 @@ from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+import six
 
 # Number of seconds (approximately) to wait for create operation to complete.
 OPERATION_TIMEOUT = 20 * 60  # 20 mins
@@ -192,14 +195,14 @@ class Create(base.CreateCommand, dm_base.DmCommand):
     else:
       op_name = operation.name
       try:
-        dm_write.WaitForOperation(self.client,
-                                  self.messages,
-                                  op_name,
-                                  operation_description='create',
-                                  project=dm_base.GetProject(),
-                                  timeout=OPERATION_TIMEOUT)
-        log.status.Print('Create operation ' + op_name
-                         + ' completed successfully.')
+        operation = dm_write.WaitForOperation(
+            self.client,
+            self.messages,
+            op_name,
+            operation_description='create',
+            project=dm_base.GetProject(),
+            timeout=OPERATION_TIMEOUT)
+        dm_util.LogOperationStatus(operation, 'Create')
       except apitools_exceptions.HttpError as error:
         # TODO(b/37911296): Use gcloud default error handling.
         raise exceptions.HttpException(error, dm_api_util.HTTP_ERROR_FORMAT)
@@ -252,7 +255,7 @@ class Create(base.CreateCommand, dm_base.DmCommand):
     if label_dict:
       deployment.labels = [
           self.messages.DeploymentLabelEntry(key=k, value=v)
-          for k, v in sorted(label_dict.iteritems())
+          for k, v in sorted(six.iteritems(label_dict))
       ]
 
   def _PerformRollback(self, deployment_name, error_message):

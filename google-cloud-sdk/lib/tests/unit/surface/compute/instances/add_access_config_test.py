@@ -301,7 +301,7 @@ class InstancesAddAccessConfigWithPublicPtrTest(test_base.BaseTest):
             --zone central2-a
           """)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ConflictingArgumentsException,
         r'arguments not allowed simultaneously: --public-ptr-domain, '
         r'--no-public-ptr'):
@@ -437,7 +437,7 @@ class InstancesAddAccessConfigWithPublicDnsTest(test_base.BaseTest):
           """)
 
 
-class InstancesAddAccessConfigWithNetworkTierTest(test_base.BaseTest):
+class InstancesAddAccessConfigWithNetworkTierAlphaTest(test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -507,6 +507,69 @@ class InstancesAddAccessConfigWithNetworkTierTest(test_base.BaseTest):
           'AddAccessConfig',
           self.CreateRequestWithNetworkTier('STANDARD'))],
     )
+
+  def testNetworkTierNotSupported(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Invalid value for \[--network-tier\]: Invalid network tier '
+        r'\[RANDOM-NETWORK-TIER\]'):
+      self.Run("""
+          compute instances add-access-config instance-1
+            --zone central2-a
+            --network-tier random-network-tier
+          """)
+
+
+class InstancesAddAccessConfigWithNetworkTierBetaTest(test_base.BaseTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+
+  def CreateRequestWithNetworkTier(self, network_tier):
+    m = core_apis.GetMessagesModule('compute', 'beta')
+    if network_tier:
+      network_tier_enum = m.AccessConfig.NetworkTierValueValuesEnum(
+          network_tier)
+    else:
+      network_tier_enum = None
+    return m.ComputeInstancesAddAccessConfigRequest(
+        accessConfig=m.AccessConfig(
+            name='external-nat',
+            type=m.AccessConfig.TypeValueValuesEnum.ONE_TO_ONE_NAT,
+            networkTier=network_tier_enum),
+        instance='instance-1',
+        networkInterface='nic0',
+        project='my-project',
+        zone='central2-a')
+
+  def testWithDefaultNetworkTier(self):
+    self.Run("""
+        compute instances add-access-config instance-1
+          --zone central2-a
+        """)
+
+    self.CheckRequests([(self.compute_beta.instances, 'AddAccessConfig',
+                         self.CreateRequestWithNetworkTier(None))],)
+
+  def testWithPremiumNetworkTier(self):
+    self.Run("""
+        compute instances add-access-config instance-1
+          --zone central2-a
+          --network-tier PREMIUM
+        """)
+
+    self.CheckRequests([(self.compute_beta.instances, 'AddAccessConfig',
+                         self.CreateRequestWithNetworkTier('PREMIUM'))],)
+
+  def testWithStandardNetworkTier(self):
+    self.Run("""
+        compute instances add-access-config instance-1
+          --zone central2-a
+          --network-tier standard
+        """)
+
+    self.CheckRequests([(self.compute_beta.instances, 'AddAccessConfig',
+                         self.CreateRequestWithNetworkTier('STANDARD'))],)
 
   def testNetworkTierNotSupported(self):
     with self.AssertRaisesToolExceptionRegexp(

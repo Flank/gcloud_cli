@@ -13,6 +13,7 @@ from googlecloudsdk.api_lib.app import wrapper_util
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core.updater import update_manager
+from googlecloudsdk.core.util import platforms
 
 
 def main():
@@ -37,6 +38,15 @@ def main():
         '--google_analytics_client_id={}'.format(google_analytics_client_id),
         '--google_analytics_user_agent={}'.format(google_analytics_user_agent)
     ])
+
+  # Pass the path to cloud datastore emulator to dev_appserver.
+  sdk_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+  emulator_dir = os.path.join(sdk_root, 'platform', 'cloud-datastore-emulator')
+  emulator_script = (
+      'cloud_datastore_emulator.cmd' if platforms.OperatingSystem.IsWindows()
+      else 'cloud_datastore_emulator')
+  args.append('--datastore_emulator_cmd={}'.format(
+      os.path.join(emulator_dir, emulator_script)))
 
   bootstrapping.ExecutePythonTool(
       os.path.join('platform', 'google_appengine'), 'dev_appserver.py', *args)

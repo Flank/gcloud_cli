@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for gcloud app ssl-certificates."""
 
+from __future__ import absolute_import
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.app import ssl_certificates_base
 
@@ -32,8 +33,8 @@ class SslCertificatesCommandTest(ssl_certificates_base.SslCertificatesBase):
   def testDescribeSslCertificate(self):
     self.ExpectGetSslCertificate('1234', 'example.com', 'cert_data', 'key_data')
     result = self.Run('app ssl-certificates describe 1234')
-    self.assertEquals('1234', result.id)
-    self.assertEquals('example.com', result.displayName)
+    self.assertEqual('1234', result.id)
+    self.assertEqual('example.com', result.displayName)
 
 
 class SslCertificatesCommandBetaTest(
@@ -49,5 +50,5 @@ class SslCertificatesCommandBetaTest(
   def testDescribeSslCertificate(self):
     self.ExpectGetSslCertificate('1234', 'example.com', 'cert_data', 'key_data')
     result = self.Run('app ssl-certificates describe 1234')
-    self.assertEquals('1234', result.id)
-    self.assertEquals('example.com', result.displayName)
+    self.assertEqual('1234', result.id)
+    self.assertEqual('example.com', result.displayName)

@@ -41,7 +41,7 @@ class RoutersTest(e2e_test_base.BaseTest):
 
   def testBasicCommands(self):
     # TODO(b/62286653) Add a context manager to handle test resource creation.
-    self.Run('compute networks create {0} --mode custom'.format(
+    self.Run('compute networks create {0} --subnet-mode custom'.format(
         self.network_name))
 
     self.Run('compute routers create {0} --network {1} --region {2} '
@@ -106,9 +106,9 @@ class RoutersTest(e2e_test_base.BaseTest):
 
     result = self.Run('compute routers describe {0} --region {1} --format '
                       'disable'.format(self.router_name, self.region))
-    self.assertEquals(result.bgp.advertiseMode.name, 'CUSTOM')
-    self.assertEquals(result.bgp.advertisedGroups[0].name, 'ALL_SUBNETS')
-    self.assertEquals(result.bgp.advertisedIpRanges[0].range, '10.0.10.0/30')
+    self.assertEqual(result.bgp.advertiseMode.name, 'CUSTOM')
+    self.assertEqual(result.bgp.advertisedGroups[0].name, 'ALL_SUBNETS')
+    self.assertEqual(result.bgp.advertisedIpRanges[0].range, '10.0.10.0/30')
 
     # Retry deletion in case resource was not ready yet.
     cmd = 'compute routers delete {0} --region {1}'.format(
@@ -139,11 +139,11 @@ class RoutersTest(e2e_test_base.BaseTest):
     result = self.Run(
         'compute routers describe {0} --region {1} --format disable'.format(
             self.router_name, self.region))
-    self.assertEquals(result.bgpPeers[0].advertiseMode.name, 'CUSTOM')
-    self.assertEquals(result.bgpPeers[0].advertisedGroups[0].name,
-                      'ALL_SUBNETS')
-    self.assertEquals(result.bgpPeers[0].advertisedIpRanges[0].range,
-                      '10.0.10.0/30')
+    self.assertEqual(result.bgpPeers[0].advertiseMode.name, 'CUSTOM')
+    self.assertEqual(result.bgpPeers[0].advertisedGroups[0].name,
+                     'ALL_SUBNETS')
+    self.assertEqual(result.bgpPeers[0].advertisedIpRanges[0].range,
+                     '10.0.10.0/30')
 
     # Retry deletion in case resource was not ready yet.
     cmd = 'compute routers delete {0} --region {1}'.format(

@@ -3,8 +3,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute addresses create [NAME ...]
-        [--description=DESCRIPTION] [--network-tier=NETWORK_TIER]
-        [--subnet=SUBNET]
+        [--description=DESCRIPTION] [--network=NETWORK]
+        [--network-tier=NETWORK_TIER] [--prefix-length=PREFIX_LENGTH]
+        [--purpose=PURPOSE] [--subnet=SUBNET]
         [--addresses=ADDRESS,[ADDRESS,...] | --ip-version=IP_VERSION]
         [--global | --region=REGION] [GCLOUD_WIDE_FLAG ...]
 
@@ -23,9 +24,27 @@ FLAGS
      --description=DESCRIPTION
         An optional textual description for the addresses.
 
+     --network=NETWORK
+        If specified, the network resource in which the address(es) should be
+        reserved.
+
+        This is only available for global internal address, which represents an
+        internal IP range reservation from within the network.
+
      --network-tier=NETWORK_TIER
         The network tier to assign to the reserved IP addresses. NETWORK_TIER
         must be one of: PREMIUM, STANDARD. The default value is PREMIUM.
+
+     --prefix-length=PREFIX_LENGTH
+        The prefix length of the IP range. It must be a value between 8 and 30
+        inclusive. If not present, it means the address field is a single IP
+        address.
+
+        This field is not applicable to external addresses.
+
+     --purpose=PURPOSE
+        The purpose of the address resource. This field is not applicable to
+        external addresses. PURPOSE must be one of: VPC_PEERING, GCE_ENDPOINT.
 
      --subnet=SUBNET
         If specified, the subnet name in which the address(es) should be
@@ -91,6 +110,20 @@ EXAMPLES
 
         $ gcloud alpha compute addresses create SUBNET-ADDRESS-1 \
             --region us-central1 --subnet default
+
+    To reserve an IP range 10.110.0.0/16 from the network default for
+    VPC_PEERING, run:
+
+        $ gcloud alpha compute addresses create IP-RANGE-1 --global \
+            --addresses 10.110.0.0 --prefix-length 16
+        --purpose VPC_PEERING --network default
+
+    To reserve any IP range with prefix length 16 from the network default for
+    VPC_PEERING, run:
+
+        $ gcloud alpha compute addresses create IP-RANGE-1 --global \
+            --prefix-length 16 --purpose VPC_PEERING
+        --network default
 
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,

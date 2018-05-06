@@ -64,7 +64,8 @@ EXAMPLES
             --ciphertext-file path/to/output/ciphertext
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms encrypt
         $ gcloud beta kms encrypt
 

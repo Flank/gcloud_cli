@@ -9,8 +9,11 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute sole-tenancy hosts list displays all Google
-    Compute Engine hosts in a project.
+    (ALPHA) (DEPRECATED) This command group is deprecated. Please use gcloud
+    alpha compute sole-tenancy node-groups instead.
+
+    gcloud alpha compute sole-tenancy hosts list displays all Google Compute
+    Engine hosts in a project.
 
     By default, hosts from all zones are listed. The results can be narrowed
     down using a filter: --filter="zone:( ZONE ... )".

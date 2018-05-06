@@ -55,7 +55,7 @@ class PredictTestBase(object):
 
     self.mock_http.request.assert_called_once_with(
         uri=url, method=method, body=self.expected_body, headers=headers)
-    self.assertEquals(json.loads(self.http_body), result)
+    self.assertEqual(json.loads(self.http_body), result)
 
   def testPredictMultipleJsonInstances(self):
     self.mock_http.request.return_value = [self.http_response, self.http_body]
@@ -84,7 +84,7 @@ class PredictTestBase(object):
               '{"images": [2, 3], "key": 2}, '
               '{"images": [3, 1], "key": 1}]}'),
         headers=headers)
-    self.assertEquals(json.loads(self.http_body), result)
+    self.assertEqual(json.loads(self.http_body), result)
 
   def testPredictNoVersion(self):
     self.mock_http.request.return_value = [self.http_response, self.http_body]
@@ -98,16 +98,16 @@ class PredictTestBase(object):
 
     self.mock_http.request.assert_called_once_with(
         uri=url, method=method, body=self.expected_body, headers=headers)
-    self.assertEquals(json.loads(self.http_body), result)
+    self.assertEqual(json.loads(self.http_body), result)
 
   def testPredictInvalidResponse(self):
     invalid_http_body = 'abcd'  # invalid json dump
     self.mock_http.request.return_value = [self.http_response,
                                            invalid_http_body]
 
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'No JSON object could be decoded from the '
-                                 'HTTP response body: abcd'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'No JSON object could be decoded from the '
+                                'HTTP response body: abcd'):
       predict.Predict(self.version_ref, self.test_instances)
 
   def testPredictFailedRequest(self):
@@ -116,8 +116,8 @@ class PredictTestBase(object):
     self.mock_http.request.return_value = [failed_response,
                                            failed_response_body]
 
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'HTTP request failed. Response: Error 502'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'HTTP request failed. Response: Error 502'):
       predict.Predict(self.version_ref, self.test_instances)
 
   def testPredictTextInstances(self):
@@ -132,7 +132,7 @@ class PredictTestBase(object):
 
     self.mock_http.request.assert_called_once_with(
         uri=url, method=method, body='{"instances": ["2, 3"]}', headers=headers)
-    self.assertEquals(json.loads(self.http_body), result)
+    self.assertEqual(json.loads(self.http_body), result)
 
   def testPredictTextInstancesWithJSON(self):
     self.mock_http.request.return_value = [self.http_response, self.http_body]
@@ -155,11 +155,11 @@ class PredictTestBase(object):
               '"{\\"images\\": [0.3, 0.2], \\"key\\": 2}", '
               '"{\\"images\\": [0.2, 0.1], \\"key\\": 1}"]}'),
         headers=headers)
-    self.assertEquals(json.loads(self.http_body), result)
+    self.assertEqual(json.loads(self.http_body), result)
 
   def testPredictNonUtf8Instances(self):
-    with self.assertRaisesRegexp(core_exceptions.Error,
-                                 'Instances cannot be JSON encoded'):
+    with self.assertRaisesRegex(core_exceptions.Error,
+                                'Instances cannot be JSON encoded'):
       predict.Predict(self.version_ref, ['\x89PNG'])
 
 

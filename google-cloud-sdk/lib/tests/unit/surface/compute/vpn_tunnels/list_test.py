@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for the vpn-tunnels list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.command_lib.compute.vpn_tunnels import flags

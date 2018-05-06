@@ -1,0 +1,38 @@
+NAME
+    gcloud beta composer operations delete - deletes one or more completed
+        Cloud Composer operations
+
+SYNOPSIS
+    gcloud beta composer operations delete
+        (OPERATIONS [OPERATIONS ...] : --location=LOCATION)
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Deletes operations that are done. If more than one operation is
+    specified, all deletes will be attempted. If any of the deletes fail, those
+    operations and their failure messages will be listed on the standard error,
+    and the command will exit with a non-zero status.
+
+POSITIONAL ARGUMENTS
+     OPERATIONS - The operations to delete. The arguments in this group can be
+     used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
+
+       OPERATIONS [OPERATIONS ...]
+          The ID of the operation or a fully qualified identifier for the
+          operation. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          The Cloud location for the operation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

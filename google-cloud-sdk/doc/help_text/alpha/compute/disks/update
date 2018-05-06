@@ -4,8 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute disks update DISK_NAME
-        [--update-labels=[KEY=VALUE,...]] [--zone=ZONE]
-        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+        [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute disks update updates a Google Compute Engine
@@ -35,26 +36,6 @@ FLAGS
         A list of label KEY=VALUE pairs to update. If a label exists its value
         is modified, otherwise a new label is created.
 
-     --zone=ZONE
-        The zone of the disk to update. If not specified and the compute/zone
-        property isn't set, you will be prompted to select a zone.
-
-        To avoid prompting when this flag is omitted, you can set the
-        compute/zone property:
-
-            $ gcloud config set compute/zone ZONE
-
-        A list of zones can be fetched by running:
-
-            $ gcloud compute zones list
-
-        To unset the property, run:
-
-            $ gcloud config unset compute/zone
-
-        Alternatively, the zone can be stored in the environment variable
-        CLOUDSDK_COMPUTE_ZONE.
-
      At most one of these may be specified:
 
        --clear-labels
@@ -73,6 +54,48 @@ FLAGS
        --remove-labels=[KEY,...]
           A list of label keys to remove. If a label does not exist it is
           silently ignored.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the disk to update. If not specified, you may be
+          prompted to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+       --zone=ZONE
+          The zone of the disk to update. If not specified and the compute/zone
+          property isn't set, you may be prompted to select a zone.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
+
+              $ gcloud config set compute/zone ZONE
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

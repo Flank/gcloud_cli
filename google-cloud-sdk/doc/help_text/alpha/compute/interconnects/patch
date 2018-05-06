@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute interconnects patch - patch a Google Compute Engine
+    gcloud alpha compute interconnects patch - update a Google Compute Engine
         interconnect
 
 SYNOPSIS
@@ -10,13 +10,13 @@ SYNOPSIS
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute interconnects patch is used to patch
-    interconnects. An interconnect represents a single specific connection
-    between Google and the customer
+    (ALPHA) (REMOVED) Update a Google Compute Engine interconnect.
+
+    This command has been removed.
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the interconnect to patch.
+        The name of the interconnect to update.
 
 FLAGS
      --admin-enabled
@@ -64,11 +64,13 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in ALPHA and may change without notice. Usually,
-    users of ALPHA commands and flags need to apply for access, agree to
-    applicable terms, and have their projects whitelisted. Contact Google or
-    sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. These variants are also available:
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/. These variants
+    are also available:
 
         $ gcloud compute interconnects patch
         $ gcloud beta compute interconnects patch

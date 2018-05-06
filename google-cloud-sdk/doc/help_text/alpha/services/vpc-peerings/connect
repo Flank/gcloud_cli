@@ -1,0 +1,55 @@
+NAME
+    gcloud alpha services vpc-peerings connect - connect to a service via VPC
+        peering for a project network
+
+SYNOPSIS
+    gcloud alpha services vpc-peerings connect --network=NETWORK
+        --reserved-ranges=RESERVED_RANGES --service=SERVICE [--async]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command connects a network to a service via VPC peering for a
+    project.
+
+REQUIRED FLAGS
+     --network=NETWORK
+        The network in the current project to be peered with the service
+
+     --reserved-ranges=RESERVED_RANGES
+        The reserved IP CIDR ranges for service to use
+
+     --service=SERVICE
+        The service to connect to
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To connect a network called my-network on the current project to a service
+    called your-service with reserved IP CIDR ranges
+    10.197.0.0/20,10.198.0.0/20 for the service to use, run:
+
+        $ gcloud alpha services vpc-peerings connect --network my-network \
+            --service your-service \
+            --reserved-ranges 10.197.0.0/20,10.198.0.0/20
+
+    To run the same command asynchronously (non-blocking), run:
+
+        $ gcloud alpha services vpc-peerings connect --network my-network \
+            --service your-service \
+            --reserved-ranges 10.197.0.0/20,10.198.0.0/20 --async
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

@@ -11,15 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Base class for all gcloud ml video tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
-from googlecloudsdk.api_lib.ml.video import video_client
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.ml.video import util
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class MlVideoTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
@@ -28,15 +34,15 @@ class MlVideoTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   def _MockClients(self, video_api_version):
     """Creates mock client and adds Unmock on cleanup."""
     self.client = mock.Client(
-        apis.GetClientClass(video_client.VIDEO_API, video_api_version))
+        apis.GetClientClass(util.VIDEO_API, video_api_version))
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-    self._MockClients(video_client.VIDEO_API_VERSION)
+    self._MockClients(util.VIDEO_API_VERSION)
     self.messages = apis.GetMessagesModule(
-        video_client.VIDEO_API, video_client.VIDEO_API_VERSION)
+        util.VIDEO_API, util.VIDEO_API_VERSION)
 
     # shorten messages
     self.req_msg = (

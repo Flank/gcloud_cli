@@ -15,6 +15,8 @@
 
 """A command in a unicode not supported group."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
@@ -24,7 +26,7 @@ class No(base.Command):
   @staticmethod
   def Args(parser):
     parser.add_argument(
-        u'--never', default=u'уeѕ', help=u'This will never work.')
+        '--never', default='уeѕ', help='This will never work.')
 
   def Run(self, args):
     return [args.never]

@@ -17,6 +17,7 @@ import logging
 
 from googlecloudsdk.calliope import base
 from tests.lib import e2e_utils
+from tests.lib import parameterized
 from tests.lib.surface.compute import e2e_test_base
 
 
@@ -229,13 +230,12 @@ class DisksLabelsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputNotContains('abc: xyz')
 
 
-class DisksTestRegional(e2e_test_base.BaseTest):
+class DisksTestRegional(e2e_test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
     self.disk_size = 10
     self.instance_names_used = []
     self.disk_names_used = []
-    self.track = base.ReleaseTrack.ALPHA
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')
@@ -255,15 +255,15 @@ class DisksTestRegional(e2e_test_base.BaseTest):
         prefix='gcloud-compute-test-disk').next()
     self.disk_names_used.append(self.disk_name)
 
-  def testDisks(self):
+  @parameterized.parameters(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+  def testDisks(self, track):
+    self.track = track
     self.GetInstanceName()
     self.CreateInstance(self.instance_name)
     self._TestDiskCreation()
     self._TestDiskAttach()
     self._TestDiskResize()
-    # TODO(b/62473471) Detach regional disk when gcloud support it again
-    # self._TestDiskDetach()
-    # TODO(b/62473471) Delete instance after disk deletion
+    self._TestDiskDetach()
     self.DeleteInstance(self.instance_name)
     self._TestDiskDeletion()
 
@@ -277,9 +277,9 @@ class DisksTestRegional(e2e_test_base.BaseTest):
     self.AssertNewOutputContains(self.disk_name)
     result = self.Run('compute disks describe {0} --region {1} --format=disable'
                       .format(self.disk_name, self.region))
-    self.assertEquals(self.disk_name, result.name)
-    self.assertEquals('READY', str(result.status))
-    self.assertEquals(self.disk_size, result.sizeGb)
+    self.assertEqual(self.disk_name, result.name)
+    self.assertEqual('READY', str(result.status))
+    self.assertEqual(self.disk_size, result.sizeGb)
 
   def _TestDiskAttach(self):
     self.Run('compute instances attach-disk {0} --disk {1} --zone {2} '
@@ -300,16 +300,17 @@ class DisksTestRegional(e2e_test_base.BaseTest):
     self.AssertNewOutputContains("sizeGb: '100'")
     result = self.Run('compute disks describe {0} --region {1} --format=disable'
                       .format(self.disk_name, self.region))
-    self.assertEquals(self.disk_name, result.name)
-    self.assertEquals(100, result.sizeGb)
+    self.assertEqual(self.disk_name, result.name)
+    self.assertEqual(100, result.sizeGb)
 
   def _TestDiskDetach(self):
-    self.Run('compute instances detach-disk {0} --disk {1} --zone {2}'
+    self.Run('compute instances detach-disk {0} --disk {1} --zone {2} '
+             '--disk-scope regional'
              .format(self.instance_name, self.disk_name, self.zone))
     result = self.Run(
         'compute instances describe {0} --zone {1} --format=disable'
         .format(self.instance_name, self.zone))
-    self.assertEquals(len(result.disks), 1)
+    self.assertEqual(len(result.disks), 1)
 
   def _TestDiskDeletion(self):
     self.Run('compute disks list')

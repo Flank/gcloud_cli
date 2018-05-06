@@ -29,14 +29,14 @@ class VariablesDescribeTest(base.RuntimeConfigTestBase):
     wanted_result = self.messages.Variable(
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1',
+        value='welcome1',
     )
 
     self.variable_client.Get.Expect(request, wanted_result)
     got_result = self.RunRuntimeConfig(
         'variables describe var1 --config-name foo')
 
-    self.assertEqual(util.FormatVariable(wanted_result), got_result)
+    self.assertEqual(util.FormatVariable(wanted_result, True), got_result)
 
   def testDescribeMultiSegmentName(self):
     var_name = 'projects/{0}/configs/foo/variables/var1/var2'.format(
@@ -47,14 +47,14 @@ class VariablesDescribeTest(base.RuntimeConfigTestBase):
     wanted_result = self.messages.Variable(
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1',
+        value='d2VsY29tZSE=',
     )
 
     self.variable_client.Get.Expect(request, wanted_result)
     got_result = self.RunRuntimeConfig(
         'variables describe var1/var2 --config-name foo')
 
-    self.assertEqual(util.FormatVariable(wanted_result), got_result)
+    self.assertEqual(util.FormatVariable(wanted_result, True), got_result)
 
   def testDescribeNotFound(self):
     var_name = 'projects/{0}/configs/foo/variables/var1'.format(self.Project())

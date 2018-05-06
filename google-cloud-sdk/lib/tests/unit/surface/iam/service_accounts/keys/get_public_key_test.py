@@ -59,7 +59,7 @@ class GetPublicKeyTest(unit_test_base.BaseTest):
         key_id, iam_account, tmp_file))
 
   def testGetServiceAccountPublicKeyInvalidAccount(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         r'Not a valid service account identifier. It should be either a '
         r'numeric string representing the unique_id or an email of the form: '

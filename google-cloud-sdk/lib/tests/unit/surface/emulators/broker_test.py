@@ -63,8 +63,8 @@ class BrokerTest(test_case.TestCase):
         mock_client.request.side_effect = conn_reset
         b = broker.Broker('host:1234', broker_dir='dir')
         b._SendJsonRequest('GET', '/')
-      self.assertEquals(broker.SocketConnResetErrno(),
-                        ar_context.exception.errno)
+      self.assertEqual(broker.SocketConnResetErrno(),
+                       ar_context.exception.errno)
 
   def testSendJsonResponse_RequestRaisesHTTPException(self):
     with mock.patch.object(broker, 'httplib2') as mock_httplib2:

@@ -36,7 +36,7 @@ class InstancesClientTest(base.SpannerTestBase):
                     displayName='name',
                     nodeCount=3))),
         response=response)
-    self.assertEquals(
+    self.assertEqual(
         instances.Create('insId', 'cfgId', 'name', 3), response)
 
   def testDelete(self):
@@ -49,7 +49,7 @@ class InstancesClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesDeleteRequest(
             name=ref.RelativeName()),
         response=response)
-    self.assertEquals(instances.Delete('insId'), response)
+    self.assertEqual(instances.Delete('insId'), response)
 
   def testGet(self):
     response = self.msgs.Instance()
@@ -61,7 +61,7 @@ class InstancesClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesGetRequest(
             name=ref.RelativeName()),
         response=response)
-    self.assertEquals(instances.Get('insId'), response)
+    self.assertEqual(instances.Get('insId'), response)
 
   def testList(self):
     instance_list = [self.msgs.Instance()]
@@ -86,5 +86,5 @@ class InstancesClientTest(base.SpannerTestBase):
                 instance=self.msgs.Instance(
                     displayName='name', nodeCount=3))),
         response=response)
-    self.assertEquals(
+    self.assertEqual(
         instances.Patch('insId', description='name', nodes=3), response)

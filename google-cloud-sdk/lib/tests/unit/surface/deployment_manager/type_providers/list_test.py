@@ -14,6 +14,8 @@
 
 """Unit tests for type-providers list command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base
 

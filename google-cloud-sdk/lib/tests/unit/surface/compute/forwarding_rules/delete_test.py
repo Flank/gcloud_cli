@@ -22,7 +22,7 @@ from tests.lib.surface.compute import test_base
 class GlobalForwardingRulesDeleteTest(test_base.BaseTest):
 
   def testMissingRuleErrorPrintsTwoFlags(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         compute_flags.UnderSpecifiedResourceError,
         r'Underspecified resource \[forwarding-rule-9]. Specify one of the '
         r'\[--global, --region] flags.'):

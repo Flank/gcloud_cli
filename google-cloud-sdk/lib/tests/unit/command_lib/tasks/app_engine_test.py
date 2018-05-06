@@ -42,6 +42,8 @@ class ResolveAppLocationTestBase(test_base.CloudTasksTestBase):
     self.app_id = self.Project()
     self.app_name = 'apps/{0}'.format(self.app_id)
 
+    self.StartPatch('time.sleep')
+
 
 class ResolveExistingAppLocationTests(ResolveAppLocationTestBase):
 
@@ -77,7 +79,7 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
 
   def _ExpectCreateAppRequest(self):
     app_msg = self.app_engine_messages.Application(id=self.app_id,
-                                                   locationId='us-central1')
+                                                   locationId='us-central')
     op_name = app_api_test_util.AppOperationName(self.app_id)
     intermediate_response = self.app_engine_messages.Operation(name=op_name)
     final_response = self.app_engine_messages.Operation(
@@ -96,7 +98,7 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
 
   def testResolveLocation_CreateApp(self):
     self.WriteInput('y')  # Would you like to create one (Y/n)?
-    self.WriteInput('1')  # [1] us-central1   (supports standard and flexible)
+    self.WriteInput('1')  # [1] us-central   (supports standard and flexible)
     self._ExpectCreateAppRequest()
     self.app_engine_apitools_mock_client.apps.Get.Expect(
         self.app_engine_messages.AppengineAppsGetRequest(name=self.app_name),
@@ -115,10 +117,10 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
 
   def testResolveLocation_CreateApp_RaceCollision(self):
     self.WriteInput('y')  # Would you like to create one (Y/n)?
-    self.WriteInput('1')  # [1] us-central1   (supports standard and flexible)
+    self.WriteInput('1')  # [1] us-central   (supports standard and flexible)
     self.app_engine_apitools_mock_client.apps.Create.Expect(
         self.app_engine_messages.Application(id=self.app_id,
-                                             locationId='us-central1'),
+                                             locationId='us-central'),
         exception=http_error.MakeHttpError(code=409))
 
     with self.assertRaises(create_util.AppAlreadyExistsError):

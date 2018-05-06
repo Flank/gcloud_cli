@@ -14,6 +14,9 @@
 
 """Tests for the core.util.keyboard_interrupt module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 import os
 import subprocess
 import sys
@@ -23,6 +26,8 @@ from googlecloudsdk.core.util import encoding
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 @test_case.Filters.DoNotRunOnWindows(
@@ -68,12 +73,12 @@ class IsInteractiveBundle(cli_test_base.CliTestBase):
     # it -- we would never see it here.
     try:
       stderr_path = os.path.join(self.temp_path, 'stderr')
-      stderr = open(stderr_path, 'w')
+      stderr = io.open(stderr_path, 'w')
       command_args = ['/bin/bash', self.ptyshell, scenario]
       subprocess.check_call(command_args, stderr=stderr, env=env)
     finally:
       stderr.close()
-      stderr = open(stderr_path, 'r')
+      stderr = io.open(stderr_path, 'r')
       # Write the subprocess stderr to the buffer stream used by the
       # WithOutputCapture mixin.
       sys.stderr.write(stderr.read())

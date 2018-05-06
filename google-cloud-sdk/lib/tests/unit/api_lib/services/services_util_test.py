@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests of the services_util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib.surface.services import unit_test_base
 
 

@@ -14,8 +14,10 @@
 
 """Tests for the backend services beta create subcommand."""
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute.backend_services import backend_services_utils
+from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -24,11 +26,14 @@ class CreateTestBase(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
 
   def RunCreate(self, command, use_global=True):
     suffix = ' --global' if use_global else ''
-    super(CreateTestBase, self).Run(
-        'beta compute backend-services create ' + command + suffix)
+    super(CreateTestBase,
+          self).Run('compute backend-services create ' + command + suffix)
 
 
 class WithHealthcheckApiTest(CreateTestBase):
@@ -286,6 +291,38 @@ class WithHealthcheckApiTest(CreateTestBase):
         )
     )],)
 
+  def testSimpleCaseWithHeader(self):
+    messages = self.messages
+    self.RunCreate("""
+          my-backend-service
+          --global
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --custom-request-header 'Test-Header:'
+          --custom-request-header 'Test-Header2: {CLIENT_REGION}'
+        """)
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                description='My backend service',
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-1'),
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-2')
+                ],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                timeoutSec=30,
+                customRequestHeaders=[
+                    'Test-Header:', 'Test-Header2: {CLIENT_REGION}'
+                ]),
+            project='my-project'))],)
+
 
 class WithConnectionDrainingTimeoutApiTest(CreateTestBase):
 
@@ -515,14 +552,14 @@ class WithIAPApiTest(CreateTestBase):
         oauth2ClientSecret='SEC=RET'))
 
   def testInvalidIAPEmpty(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'^Invalid value for \[--iap\]: Must provide value when specifying '
         r'--iap$',
         self.RunCreate, self._create_service_cmd_line + ' --iap=""')
 
   def testInvalidIapArgCombinationEnabledDisabled(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Must specify only one '
         'of \\[enabled\\] or \\[disabled\\]$',
@@ -530,7 +567,7 @@ class WithIAPApiTest(CreateTestBase):
         self._create_service_cmd_line + ' --iap enabled,disabled')
 
   def testInvalidIapArgCombinationEnabledOnlyClientId(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -539,7 +576,7 @@ class WithIAPApiTest(CreateTestBase):
         ' --iap enabled,oauth2-client-id=CLIENTID')
 
   def testInvalidIapArgCombinationEnabledOnlyClientSecret(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -548,7 +585,7 @@ class WithIAPApiTest(CreateTestBase):
         ' --iap enabled,oauth2-client-secret=SECRET')
 
   def testInvalidIapArgCombinationEmptyIdValue(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -557,7 +594,7 @@ class WithIAPApiTest(CreateTestBase):
         ' --iap enabled,oauth2-client-id=,oauth2-client-secret=SECRET')
 
   def testInvalidIapArgCombinationEmptySecretValue(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '^Invalid value for \\[--iap\\]: Both \\[oauth2-client-id\\] and '
         '\\[oauth2-client-secret\\] must be specified together$',
@@ -566,7 +603,7 @@ class WithIAPApiTest(CreateTestBase):
         ' --iap enabled,oauth2-client-id=CLIENTID,oauth2-client-secret=')
 
   def testInvalidIapArgInvalidSubArg(self):
-    self.assertRaisesRegexp(
+    self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         r'^Invalid value for \[--iap\]: Invalid sub-argument \'invalid-arg1\'$',
         self.RunCreate,
@@ -761,7 +798,7 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
               project='my-project'))],)
 
   def testEnableWhitelistWithExcludeQueryString(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         backend_services_utils.CacheKeyQueryStringException,
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
@@ -773,7 +810,7 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
     self.CheckRequests()
 
   def testEnableBlacklistWithExcludeQueryString(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         backend_services_utils.CacheKeyQueryStringException,
         'cache-key-query-string-whitelist and cache-key-query-string-blacklist'
         ' may only be set when cache-key-include-query-string is enabled.'):
@@ -783,6 +820,146 @@ class WithCustomCacheKeyApiTest(CreateTestBase):
             --cache-key-query-string-blacklist=campaignid
           """)
     self.CheckRequests()
+
+
+class WithCdnSignedUrlApiTest(CreateTestBase):
+
+  def CheckRequestMadeWithCdnPolicy(self, expected_message):
+    """Verifies the request was made with the expected CDN policy."""
+    messages = self.messages
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Insert',
+          messages.ComputeBackendServicesInsertRequest(
+              backendService=messages.BackendService(
+                  backends=[],
+                  cdnPolicy=expected_message,
+                  description='My backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check-1'),
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  timeoutSec=30),
+              project='my-project'))])
+
+  def testCreateWithoutCacheMaxAge(self):
+    """Tests creating backend service without cache max age."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        """)
+    self.CheckRequestMadeWithCdnPolicy(None)
+
+  def testCreateWithCacheMaxAgeZero(self):
+    """Tests creating backend service with cache max age of 0."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 0
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=0))
+
+  def testCreateWithCacheMaxAgeSeconds(self):
+    """Tests creating backend service with cache max age in seconds."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 7890s
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=7890))
+
+  def testCreateWithCacheMaxAgeMinutes(self):
+    """Tests creating backend service with cache max age in minutes."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 234m
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=234 * 60))
+
+  def testCreateWithCacheMaxAgeHours(self):
+    """Tests creating backend service with cache max age in hours."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 38h
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=38 * 60 *
+                                              60))
+
+  def testCreateWithCacheMaxAgeDays(self):
+    """Tests creating backend service with cache max age in days."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 99d
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(signedUrlCacheMaxAgeSec=99 * 24 *
+                                              60 * 60))
+
+  def testSetInvalidCacheMaxAge(self):
+    """Tests creating backend service with an invalid cache max age."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --signed-url-cache-max-age: given value must be of the form '
+        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: '
+        r'invalid-value'):
+      self.Run("""
+          compute backend-services create backend-service-1
+          --global
+          --http-health-checks my-health-check-1
+          --signed-url-cache-max-age invalid-value
+          """)
+
+  def testSetCacheMaxAgeNegative(self):
+    """Tests creating backend service with a negative cache max age."""
+    with self.AssertRaisesArgumentErrorRegexp(
+        r'argument --signed-url-cache-max-age: given value must be of the form '
+        r'INTEGER\[UNIT\] where units can be one of s, m, h, d; received: -1'):
+      self.Run("""
+          compute backend-services create backend-service-1
+          --global
+          --http-health-checks my-health-check-1
+          --description "My backend service"
+          --signed-url-cache-max-age -1
+          """)
+
+  def testWithCacheMaxAgeAndCacheKeyPolicy(self):
+    """Tests creating backend service with both cache max age and cache keys."""
+    self.Run("""
+        compute backend-services create backend-service-1
+        --global
+        --http-health-checks my-health-check-1
+        --description "My backend service"
+        --signed-url-cache-max-age 1234
+        --cache-key-query-string-whitelist=foo,bar,baz
+        """)
+    self.CheckRequestMadeWithCdnPolicy(
+        self.messages.BackendServiceCdnPolicy(
+            signedUrlCacheMaxAgeSec=1234,
+            cacheKeyPolicy=self.messages.CacheKeyPolicy(
+                includeHost=True,
+                includeProtocol=True,
+                includeQueryString=True,
+                queryStringWhitelist=['foo', 'bar', 'baz'])))
 
 
 if __name__ == '__main__':

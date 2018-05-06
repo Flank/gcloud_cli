@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise rotation-related 'gcloud kms keys *' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 

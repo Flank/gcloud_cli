@@ -8,6 +8,7 @@ SYNOPSIS
         [--description=DESCRIPTION]
         [--healthy-threshold=HEALTHY_THRESHOLD; default=2]
         [--port=PORT; default=80] [--port-name=PORT_NAME]
+        [--port-specification=PORT_SPECIFICATION]
         [--proxy-header=PROXY_HEADER; default="NONE"] [--request=REQUEST]
         [--response=RESPONSE] [--timeout=TIMEOUT; default="5s"]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2]
@@ -46,6 +47,21 @@ FLAGS
      --port-name=PORT_NAME
         The port name that this health check monitors. By default, this is
         empty.
+
+     --port-specification=PORT_SPECIFICATION
+        Specifies how port is selected for health checking. If not specified,
+        HTTP2 health check follows behavior specified in --port and -port-name
+        fields. PORT_SPECIFICATION must be one of:
+
+         use-fixed-port
+            --port is used for health checking.
+         use-named-port
+            --port-name is used for health checking.
+         use-serving-port
+            For NetworkEndpointGroup, the port specified for each network
+            endpoint is used for health checking. For other backends, the port
+            or named port specified in the Backend Service is used for health
+            checking.
 
      --proxy-header=PROXY_HEADER; default="NONE"
         The type of proxy protocol header to be sent to the backend.

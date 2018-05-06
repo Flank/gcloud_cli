@@ -29,7 +29,7 @@ class ApisMapTemplateTest(test_case.Base):
     expected_repr = ('APIDef("fruits.orange.v1", "orange_v1_client.OrangeV1", '
                      '"orange_v1_messages", True)')
 
-    self.assertEquals(expected_repr, str(api_definition))
+    self.assertEqual(expected_repr, str(api_definition))
 
 
 if __name__ == '__main__':

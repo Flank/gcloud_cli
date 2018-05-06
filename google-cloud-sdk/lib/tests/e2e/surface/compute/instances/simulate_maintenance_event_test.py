@@ -14,14 +14,12 @@
 """Integration tests for simulating maintenance on instances."""
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
 class SimulateMaintenanceEventTest(e2e_instances_test_base.InstancesTestBase):
 
-  @test_case.Filters.skip('Failing', 'b/63753934')
   def testSimulateMaintenanceEvent(self):
     self.GetInstanceName()
     self.Run('compute instances create {} --zone {} '.format(
@@ -29,7 +27,7 @@ class SimulateMaintenanceEventTest(e2e_instances_test_base.InstancesTestBase):
     self.Run(
         'compute instances simulate-maintenance-event {} '
         '--zone {} '.format(self.instance_name, self.zone),
-        track=calliope_base.ReleaseTrack.ALPHA)
+        track=calliope_base.ReleaseTrack.BETA)
     operations = self.Run(
         'compute operations list --filter="targetLink={}/instances/{}" '
         '--filter=operationType=compute.instances.migrateOnHostMaintenance '
@@ -38,8 +36,9 @@ class SimulateMaintenanceEventTest(e2e_instances_test_base.InstancesTestBase):
     found = False
     for entry in list(operations):
       if (entry['operationType'] == 'compute.instances.migrateOnHostMaintenance'
-         ) and (entry['targetLink'] == '{}/instances/{}'.format(
-             self.zone, self.instance_name)):
+         ) and (entry['targetLink'].endswith(
+             'cloud-sdk-integration-testing/zones/{}/instances/{}'.format(
+                 self.zone, self.instance_name))):
         # The expectation is that when the SimulateMaintenanceEvent RPC
         # returns, the associated migration should be completed.  Therefore,
         # the migrateOnHostMaintenance entry should be DONE.

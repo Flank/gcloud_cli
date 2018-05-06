@@ -37,7 +37,8 @@ EXAMPLES
             --keyring fellowship --location global
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys set-primary-version
         $ gcloud beta kms keys set-primary-version
 

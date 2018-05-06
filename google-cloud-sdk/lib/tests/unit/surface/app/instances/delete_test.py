@@ -14,6 +14,7 @@
 
 """Tests for gcloud app instances delete."""
 
+from __future__ import absolute_import
 from tests.lib.surface.app import instances_base
 
 

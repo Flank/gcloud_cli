@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'update' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
@@ -21,8 +23,8 @@ from tests.lib.surface.bigtable import base
 class UpdateCommandTest(base.BigtableV2TestBase):
 
   def SetUp(self):
-    self.cmd = ('clusters update --instance theinstance thecluster --num-nodes '
-                '5 --async')
+    self.cmd = ('bigtable clusters update --instance theinstance thecluster '
+                '--num-nodes 5 --async')
     self.svc = self.client.projects_instances_clusters.Update
     cluster_ref = resources.REGISTRY.Create(
         'bigtableadmin.projects.instances.clusters',
@@ -34,13 +36,13 @@ class UpdateCommandTest(base.BigtableV2TestBase):
 
   def testUpdate(self):
     self.svc.Expect(request=self.msg, response=self.msgs.Operation())
-    self.RunBT(self.cmd)
+    self.Run(self.cmd)
     self.AssertOutputEquals('')
-    self.AssertErrEquals('Update in progress for cluster [thecluster].\n')
+    self.AssertErrContains('Update in progress for cluster [thecluster].\n')
 
   def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.msg):
-      self.RunBT(self.cmd)
+      self.Run(self.cmd)
     self.AssertErrContains('Resource not found.')
 
 

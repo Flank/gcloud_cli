@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for `gcloud iot devices create`."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import itertools
 from dateutil import tz
 
@@ -193,7 +198,7 @@ class DevicesCreateTest(base.CloudIotBase, parameterized.TestCase):
     self.track = track
     new_credential_path = self.Touch(self.temp_path, 'certificate.pub',
                                      contents=self.PUBLIC_KEY_CONTENTS)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, r'Invalid key type \[bad-key-type\]'):
       self.Run(
           ('iot devices create my-device '

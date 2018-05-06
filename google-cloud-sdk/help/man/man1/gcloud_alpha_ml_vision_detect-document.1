@@ -11,7 +11,7 @@ gcloud alpha ml vision detect\-document \- detect dense text in an image
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml vision detect\-document\fR \fIIMAGE_PATH\fR [\fB\-\-language\-hints\fR=[\fILANGUAGE_HINTS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml vision detect\-document\fR \fIIMAGE_PATH\fR [\fB\-\-language\-hints\fR=[\fILANGUAGE_HINTS\fR,...]] [\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR;\ default="builtin/stable"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -59,6 +59,11 @@ Vision. If you provide a URL, it must be in Google Cloud Storage format
 .TP 2m
 \fB\-\-language\-hints\fR=[\fILANGUAGE_HINTS\fR,...]
 List of languages to use for text detection.
+
+.TP 2m
+\fB\-\-model\-version\fR=\fIMODEL_VERSION\fR; default="builtin/stable"
+The model version to use for the feature. Supported values include
+"builtin/stable" and "builtin/latest".
 
 
 .RE

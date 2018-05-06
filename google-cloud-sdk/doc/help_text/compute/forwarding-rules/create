@@ -22,8 +22,7 @@ SYNOPSIS
         [--backend-service-region=BACKEND_SERVICE_REGION
           | --global-backend-service] [--global | --region=REGION]
         [--port-range=[PORT | START_PORT-END_PORT] | --ports=[PORT
-          | START_PORT-END_PORT],[[PORT | START_PORT-END_PORT],...]]
-        [GCLOUD_WIDE_FLAG ...]
+          | START_PORT-END_PORT],[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute forwarding-rules create is used to create a forwarding rule.
@@ -85,7 +84,7 @@ REQUIRED FLAGS
           target instance must be in a zone that's in the forwarding rule's
           region. Global forwarding rules may not direct traffic to target
           instances. If not specified and the compute/zone property isn't set,
-          you will be prompted to select a zone.
+          you may be prompted to select a zone.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/zone property:
@@ -221,8 +220,8 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --address-region=ADDRESS_REGION
-          The region of the address to operate on. If not specified, you will
-          be prompted to select a region.
+          The region of the address to operate on. If not specified, you may be
+          prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -260,7 +259,7 @@ OPTIONAL FLAGS
 
        --region=REGION
           The region of the forwarding rule to create. If not specified, you
-          will be prompted to select a region.
+          may be prompted to select a region.
 
           To avoid prompting when this flag is omitted, you can set the
           compute/region property:
@@ -289,7 +288,7 @@ OPTIONAL FLAGS
           Either an individual port (--port-range 80) or a range of ports
           (--port-range 3000-3100) may be specified.
 
-       --ports=[PORT | START_PORT-END_PORT],[[PORT | START_PORT-END_PORT],...]
+       --ports=[PORT | START_PORT-END_PORT],[...]
           If specified, only packets addressed to ports in the specified list
           will be forwarded. If not specified for regional forwarding rules,
           all ports are matched. This flag is required for global forwarding

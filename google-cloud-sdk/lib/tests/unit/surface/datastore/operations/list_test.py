@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'operations list' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.datastore import operations
 from tests.lib import test_case
 from tests.lib.surface.datastore import base
@@ -246,7 +248,7 @@ class ListTest(base.DatastoreCommandUnitTest):
             'type:IMPORT_ENTITIES AND namespace:n AND '
             'label.k:v AND label.k2:v2 AND kind:k')))
     self.assertEqual(1, len(actual))
-    self.assertEquals(operation_name, actual[0].name)
+    self.assertEqual(operation_name, actual[0].name)
 
   def GetMockListRequest(self,
                          operation_filter=None,

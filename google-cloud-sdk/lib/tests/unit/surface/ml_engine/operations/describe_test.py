@@ -31,7 +31,7 @@ class DescribeTestBase(object):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def testDescribe(self):
-    self.assertEquals(
+    self.assertEqual(
         self.Run('ml-engine operations describe opId'),
         self._GetOperation())
 

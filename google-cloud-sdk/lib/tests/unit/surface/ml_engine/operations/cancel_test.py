@@ -28,7 +28,7 @@ class CancelTestBase(object):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def testCancel(self):
-    self.assertEquals(
+    self.assertEqual(
         self.Run('ml-engine operations cancel opId'),
         self.msgs.GoogleProtobufEmpty())
 

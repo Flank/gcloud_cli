@@ -60,58 +60,58 @@ class WaitInfoTest(test_case.TestCase):
 
   def testV1CreateWaitText(self):
     igm = self._CreateInstanceGroupManager('v1')
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitText(igm),
         'Waiting for group to become stable')
 
   def testV1CreateWaitTextWithCurrentActions(self):
     igm = self._CreateInstanceGroupManager('v1', current_operations=1)
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitText(igm),
         'Waiting for group to become stable, current operations: creating: 1')
 
   def testBetaCreateWaitText(self):
     igm = self._CreateInstanceGroupManager('beta')
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitText(igm),
         'Waiting for group to become stable')
 
   def testBetaCreateWaitTextWithCurrentActions(self):
     igm = self._CreateInstanceGroupManager('beta', current_operations=1)
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitText(igm),
         'Waiting for group to become stable, current operations: creating: 1')
 
   def testAlphaCreateWaitText(self):
     igm = self._CreateInstanceGroupManager('alpha')
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitText(igm),
         'Waiting for group to become stable')
 
   def testAlphaCreateWaitTextWithOneCurrentActions(self):
     igm = self._CreateInstanceGroupManager('alpha', current_operations=1)
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitText(igm),
         'Waiting for group to become stable, current operations: creating: 1')
 
   def testAlphaCreateWaitTextWithTwoCurrentActions(self):
     igm = self._CreateInstanceGroupManager('alpha', current_operations=1)
     igm.currentActions.deleting = 1
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitText(igm),
         'Waiting for group to become stable, current operations: creating: 1, '
         'deleting: 1')
 
   def testAlphaCreateWaitTextWithPendingActions(self):
     igm = self._CreateInstanceGroupManager('alpha', pending_operations=1)
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitTextAlpha(igm),
         'Waiting for group to become stable, pending operations: creating: 1')
 
   def testAlphaCreateWaitTextWithCurrentAndPendingActions(self):
     igm = self._CreateInstanceGroupManager(
         'alpha', current_operations=1, pending_operations=1)
-    self.assertEquals(
+    self.assertEqual(
         wait_info.CreateWaitTextAlpha(igm),
         'Waiting for group to become stable, current operations: creating: 1, '
         'pending operations: creating: 1')

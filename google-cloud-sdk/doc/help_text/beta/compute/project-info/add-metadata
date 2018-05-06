@@ -5,8 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta compute project-info add-metadata
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
-        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute project-info add-metadata can be used to add or
@@ -44,7 +43,7 @@ FLAGS
 
     At least one of [--metadata] or [--metadata-from-file] is required.
 
-     --metadata-from-file=KEY=LOCAL_FILE_PATH,[KEY=LOCAL_FILE_PATH,...]
+     --metadata-from-file=KEY=LOCAL_FILE_PATH,[...]
         Same as --metadata except that the value for the entry will be read
         from a local file. This is useful for values that are too large such as
         startup-script contents.

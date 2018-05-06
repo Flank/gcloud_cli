@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration test for the 'dataflow metrics list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.dataflow import e2e_base
 
@@ -71,7 +73,7 @@ class ListMetricsIntegrationTest(e2e_base.DataflowIntegrationTestBase):
                       'Metric missing a value: %s' % metric.name)
 
       # Proper origin types.
-      self.assertEquals(metric.name.origin, 'dataflow/v1b3')
+      self.assertEqual(metric.name.origin, 'dataflow/v1b3')
 
 
 if __name__ == '__main__':

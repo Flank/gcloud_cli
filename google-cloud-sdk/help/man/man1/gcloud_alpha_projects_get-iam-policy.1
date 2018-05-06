@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha projects get\-iam\-policy \- get IAM policy for a project
+gcloud alpha projects get\-iam\-policy \- get the IAM policy for a project
 
 
 
@@ -17,7 +17,11 @@ gcloud alpha projects get\-iam\-policy \- get IAM policy for a project
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Gets the IAM policy for a project, given a project ID.
+\fB(ALPHA)\fR \fBgcloud alpha projects get\-iam\-policy\fR displays the IAM
+policy associated with a project. If formatted as JSON, the output can be edited
+and used as a policy file for set\-iam\-policy. The output includes an "etag"
+field identifying the version emitted and allowing detection of concurrent
+policy updates; see $ {parent} set\-iam\-policy for additional details.
 
 
 
@@ -25,10 +29,17 @@ gcloud alpha projects get\-iam\-policy \- get IAM policy for a project
 
 .RS 2m
 .TP 2m
+
+PROJECT ID \- The project for which to display the IAM policy. This represents a
+Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
 \fIPROJECT_ID\fR
-ID for the project you want to get IAM policy for.
+The ID of the project or a fully qualified identifier for the project.
 
 
+.RE
 .RE
 .sp
 
@@ -77,13 +88,19 @@ help\fR for details.
 
 
 
+.SH "API REFERENCE"
+
+This command uses the \fBcloudresourcemanager/v1\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/resource\-manager
+
+
+
 .SH "EXAMPLES"
 
-The following command prints the IAM policy for a project with the ID
-\f5example\-project\-id\-1\fR:
+To print the IAM policy for a given project, run:
 
 .RS 2m
-$ gcloud alpha projects get\-iam\-policy example\-project\-id\-1
+$ gcloud alpha projects get\-iam\-policy my\-project
 .RE
 
 

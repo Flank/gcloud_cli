@@ -45,7 +45,7 @@ class SignUrlTestsBase(cli_test_base.CliTestBase):
           time.strptime('2017 Jan 15 22:37:45', '%Y %b %d %H:%M:%S')))
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self._SetUpReleaseTrack()
     self.key_file = self.Touch(
         self.temp_path, 'test.key', contents=base64.urlsafe_b64encode(self.KEY))
     self.key_file_with_new_line = self.Touch(
@@ -81,8 +81,11 @@ class SignUrlTestsBase(cli_test_base.CliTestBase):
       return self.Run(' '.join(['compute sign-url'] + args_list))
 
 
-class SigningTests(SignUrlTestsBase):
-  """Tests related to Signing the URL using 'sign-url' command."""
+class SigningTestsBeta(SignUrlTestsBase):
+  """Tests related to signing the URL using beta 'sign-url' command."""
+
+  def _SetUpReleaseTrack(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _VerifySignedUrl(self, input_url, has_query_params,
                        expected_expires_in_seconds, actual_signed_url):
@@ -240,7 +243,7 @@ class SigningTests(SignUrlTestsBase):
   def testSigningFailureInvalidUrlSchema(self):
     """Verifies failure when signing a HTTP URL."""
     input_url = 'ftp://www.example.com/foo/bar'
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         sign_url_utils.InvalidCdnSignedUrlError,
         sign_url_utils._URL_SCHEME_MUST_BE_HTTP_HTTPS_MESSAGE):
       self._RunSignUrl([
@@ -251,7 +254,7 @@ class SigningTests(SignUrlTestsBase):
   def testSigningFailureUrlWithoutScheme(self):
     """Verifies failure when signing a URL without a scheme."""
     input_url = 'www.example.com/foo/bar?q1=abc'
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         sign_url_utils.InvalidCdnSignedUrlError,
         sign_url_utils._URL_SCHEME_MUST_BE_HTTP_HTTPS_MESSAGE):
       self._RunSignUrl([
@@ -262,7 +265,7 @@ class SigningTests(SignUrlTestsBase):
   def testSigningFailureUrlWithFragment(self):
     """Verifies failure when signing a URL with a fragment."""
     input_url = '\'https://www.example.com/foo/bar?q1=abc#frag\''
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         sign_url_utils.InvalidCdnSignedUrlError,
         sign_url_utils._URL_MUST_NOT_HAVE_FRAGMENT_MESSAGE):
       self._RunSignUrl([
@@ -273,7 +276,7 @@ class SigningTests(SignUrlTestsBase):
   def testSigningFailureUrlWithExpiresQuery(self):
     """Verifies failure when signing a URL containing an 'Expires' query."""
     input_url = 'https://www.example.com/foo/bar?q1=abc&Expires=future&q2=def'
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         sign_url_utils.InvalidCdnSignedUrlError,
         sign_url_utils._URL_MUST_NOT_HAVE_PARAM_MESSAGE.format('Expires')):
       self._RunSignUrl([
@@ -284,7 +287,7 @@ class SigningTests(SignUrlTestsBase):
   def testSigningFailureUrlWithKeyNameQuery(self):
     """Verifies failure when signing a URL containing a 'Name' query."""
     input_url = 'https://www.example.com/foo/bar?q1=abc&KeyName=someKey&q2=def'
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         sign_url_utils.InvalidCdnSignedUrlError,
         sign_url_utils._URL_MUST_NOT_HAVE_PARAM_MESSAGE.format('KeyName')):
       self._RunSignUrl([
@@ -295,7 +298,7 @@ class SigningTests(SignUrlTestsBase):
   def testSigningFailureUrlWithSignatureQuery(self):
     """Verifies failure when signing a URL containing a 'Signature' query."""
     input_url = 'https://www.example.com/foo/bar?q1=abc&Signature=sig&q2=def'
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         sign_url_utils.InvalidCdnSignedUrlError,
         sign_url_utils._URL_MUST_NOT_HAVE_PARAM_MESSAGE.format('Signature')):
       self._RunSignUrl([
@@ -304,15 +307,25 @@ class SigningTests(SignUrlTestsBase):
       ])
 
 
-class ValidationTests(SignUrlTestsBase):
-  """Tests related to Validating the URL signed using 'sign-url' command."""
+class SigningTestsAlpha(SigningTestsBeta):
+  """Tests related to signing the URL using alpha 'sign-url' command."""
+
+  def _SetUpReleaseTrack(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class ValidationTestsBeta(SignUrlTestsBase):
+  """Tests related to validating the URL using beta 'sign-url' command."""
 
   def SetUp(self):
-    super(ValidationTests, self).SetUp()
+    super(ValidationTestsBeta, self).SetUp()
     self.http_request_mock = self.StartObjectPatch(
         httplib2.Http, 'request', autospec=True)
     self.http_response_mock = self.StartObjectPatch(
         httplib2, 'Response', autospec=True)
+
+  def _SetUpReleaseTrack(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _MockResponseForRequest(self, url, response_code):
     """Mocks the response for the specified request URL."""
@@ -353,6 +366,13 @@ class ValidationTests(SignUrlTestsBase):
     ])
     self._VerifyValidationRequest(expected_signed_url)
     self.assertEqual(result['validationResponseCode'], 403)
+
+
+class ValidationTestsAlpha(ValidationTestsBeta):
+  """Tests related to validating the URL using alpha 'sign-url' command."""
+
+  def _SetUpReleaseTrack(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

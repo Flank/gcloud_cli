@@ -14,6 +14,8 @@
 
 """Tests for DM type_providers command_lib."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.deployment_manager import type_providers
 from googlecloudsdk.core import yaml
 from tests.lib.surface.deployment_manager import unit_test_base

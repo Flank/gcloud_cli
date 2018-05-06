@@ -14,6 +14,8 @@
 
 """Test base for the Calliope concepts library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.calliope import parser_arguments
 from googlecloudsdk.calliope import parser_extensions

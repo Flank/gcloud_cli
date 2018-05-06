@@ -3,7 +3,7 @@ NAME
         virtual machine instances
 
 SYNOPSIS
-    gcloud compute instances COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud compute instances GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Read and manipulate Google Compute Engine virtual machine instances.
@@ -12,6 +12,12 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     network-interfaces
+        Read and manipulate Google Compute Engine instance network interfaces.
 
 COMMANDS
     COMMAND is one of the following:

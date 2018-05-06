@@ -14,20 +14,18 @@
 """Tests for the disk-types describe subcommand."""
 import textwrap
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base
 from tests.lib import completer_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
-messages = core_apis.GetMessagesModule('compute', 'v1')
-messages_alpha = core_apis.GetMessagesModule('compute', 'alpha')
-
 
 class DiskTypesDescribeTest(test_base.BaseTest,
                             completer_test_base.CompleterBase,
-                            test_case.WithOutputCapture):
+                            test_case.WithOutputCapture,
+                            parameterized.TestCase):
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -39,9 +37,9 @@ class DiskTypesDescribeTest(test_base.BaseTest,
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.diskTypes,
+        [(self.compute.diskTypes,
           'Get',
-          messages.ComputeDiskTypesGetRequest(
+          self.messages.ComputeDiskTypesGetRequest(
               diskType='pd-standard',
               project='my-project',
               zone='zone-1'))],
@@ -55,9 +53,11 @@ class DiskTypesDescribeTest(test_base.BaseTest,
             zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
-  def testSimpleRegionalCase(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
+  @parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
+                            (base.ReleaseTrack.BETA, 'beta'))
+  def testSimpleRegionalCase(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
     mock = object()
     self.make_requests.side_effect = [
         [mock],
@@ -70,9 +70,9 @@ class DiskTypesDescribeTest(test_base.BaseTest,
         """)
 
     self.CheckRequests(
-        [(self.compute_alpha.regionDiskTypes,
+        [(self.compute.regionDiskTypes,
           'Get',
-          messages_alpha.ComputeRegionDiskTypesGetRequest(
+          self.messages.ComputeRegionDiskTypesGetRequest(
               diskType='pd-standard',
               project='my-project',
               region='region-1'))],
@@ -88,23 +88,25 @@ class DiskTypesDescribeTest(test_base.BaseTest,
     ]
 
     result = self.Run("""
-        compute disk-types describe https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/diskTypes/pd-standard
+        compute disk-types describe {}/projects/my-project/regions/region-1/diskTypes/pd-standard
         --format=disable
-        """)
+        """.format(self.compute_uri))
 
     self.CheckRequests(
-        [(self.compute_alpha.regionDiskTypes,
+        [(self.compute.regionDiskTypes,
           'Get',
-          messages_alpha.ComputeRegionDiskTypesGetRequest(
+          self.messages.ComputeRegionDiskTypesGetRequest(
               diskType='pd-standard',
               project='my-project',
               region='region-1'))],
     )
     self.assertIs(result, mock)
 
-  def testPromptRegionalCase(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
+  @parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
+                            (base.ReleaseTrack.BETA, 'beta'))
+  def testPromptRegionalCase(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
     mock = object()
     self.make_requests.side_effect = [
         [mock],
@@ -118,7 +120,7 @@ class DiskTypesDescribeTest(test_base.BaseTest,
         return_value=[])
     self.StartPatch(
         'googlecloudsdk.api_lib.compute.regions.service.List',
-        return_value=[messages.Region(name='region-1')])
+        return_value=[self.messages.Region(name='region-1')])
 
     result = self.Run("""
         compute disk-types describe pd-standard
@@ -126,9 +128,9 @@ class DiskTypesDescribeTest(test_base.BaseTest,
         """)
 
     self.CheckRequests(
-        [(self.compute_alpha.regionDiskTypes,
+        [(self.compute.regionDiskTypes,
           'Get',
-          messages_alpha.ComputeRegionDiskTypesGetRequest(
+          self.messages.ComputeRegionDiskTypesGetRequest(
               diskType='pd-standard',
               project='my-project',
               region='region-1'))],

@@ -47,7 +47,7 @@ class ResourceArgumentTestBase(cli_test_base.CliTestBase):
     return self.parser.parse_args(cmd_line)
 
   def _AssertArgs(self, expected, actual):
-    self.assertEquals(
+    self.assertEqual(
         set(expected + ['project']),
         set([attr for attr in dir(actual) if attr[0].islower()]))
 
@@ -104,12 +104,12 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
     self._AssertArgs(['name'], args)
 
     ref = resource_arg.ResolveAsResource(args, self.registry)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/global/'
         'backendServices/fish', ref.SelfLink())
-    self.assertEquals('fish', ref.Name())
-    self.assertEquals('atlantic', ref.project)
-    self.assertEquals('fish', ref.backendService)
+    self.assertEqual('fish', ref.Name())
+    self.assertEqual('atlantic', ref.project)
+    self.assertEqual('fish', ref.backendService)
     self.AssertErrEquals('')
 
   def testOptionalPositional_AsGlobal(self):
@@ -122,12 +122,12 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
     self._AssertArgs(['backend_service'], args)
 
     ref = resource_arg.ResolveAsResource(args, self.registry)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/global/'
         'backendServices/fish', ref.SelfLink())
-    self.assertEquals('fish', ref.Name())
-    self.assertEquals('atlantic', ref.project)
-    self.assertEquals('fish', ref.backendService)
+    self.assertEqual('fish', ref.Name())
+    self.assertEqual('atlantic', ref.project)
+    self.assertEqual('fish', ref.backendService)
     self.AssertErrEquals('')
 
   def testOptionalPositional_AsRegionals(self):
@@ -143,12 +143,12 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
 
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.REGION)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/north-sea-1/forwardingRules/fish', ref.SelfLink())
-    self.assertEquals('fish', ref.Name())
-    self.assertEquals('atlantic', ref.project)
-    self.assertEquals('fish', ref.forwardingRule)
+    self.assertEqual('fish', ref.Name())
+    self.assertEqual('atlantic', ref.project)
+    self.assertEqual('fish', ref.forwardingRule)
     self.AssertErrEquals('')
 
   def testRequiredPositional_AsRegionalWithoutRegion(self):
@@ -160,7 +160,7 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
     self.assertEqual('fish', args.name)
     self._AssertArgs(['name', 'region'], args)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         flags.UnderSpecifiedResourceError,
         r'Underspecified resource \[fish\]. Specify the \[--region\] flag.'):
       resource_arg.ResolveAsResource(
@@ -179,13 +179,13 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
 
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.REGION)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/north-sea-2/operations/fish', ref.SelfLink())
-    self.assertEquals('fish', ref.Name())
-    self.assertEquals('atlantic', ref.project)
-    self.assertEquals('north-sea-2', ref.region)
-    self.assertEquals('fish', ref.operation)
+    self.assertEqual('fish', ref.Name())
+    self.assertEqual('atlantic', ref.project)
+    self.assertEqual('north-sea-2', ref.region)
+    self.assertEqual('fish', ref.operation)
     self.AssertErrEquals('')
 
   def testRequiredPositional_AsRegionalViaProperty(self):
@@ -198,7 +198,7 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
 
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.REGION)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/north-sea-2/operations/fish', ref.SelfLink())
 
@@ -215,12 +215,12 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
 
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.REGION)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'global/forwardingRules/fish', ref.SelfLink())
-    self.assertEquals('fish', ref.Name())
-    self.assertEquals('atlantic', ref.project)
-    self.assertEquals('fish', ref.forwardingRule)
+    self.assertEqual('fish', ref.Name())
+    self.assertEqual('atlantic', ref.project)
+    self.assertEqual('fish', ref.forwardingRule)
     self.AssertErrEquals('')
 
   def testRequiredPositionalURL_AsRegionalAndGlobal(self):
@@ -237,7 +237,7 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
     # Try to resolve this as default global resource even when we got regional.
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.GLOBAL)
-    self.assertEquals(resource_uri, ref.SelfLink())
+    self.assertEqual(resource_uri, ref.SelfLink())
     self.AssertErrEquals('')
 
   def testRequiredPositionalURL_AsRaiseIfUnexpectedCollection(self):
@@ -247,7 +247,7 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
     resource_uri = ('https://www.googleapis.com/compute/v1/projects/atlantic/'
                     'regions/north-sea-3/forwardingRules/fish')
     args = self._ParseArgs([resource_arg], [resource_uri])
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.WrongResourceCollectionException,
         r'wrong collection: expected \[compute.globalForwardingRules\], '
         r'got \[compute.forwardingRules\], for path \[{0}\]'
@@ -277,23 +277,23 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
 
     ref1 = resource_arg1.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.GLOBAL)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/north-sea-3/forwardingRules/fish', ref1.SelfLink())
-    self.assertEquals('fish', ref1.Name())
-    self.assertEquals('atlantic', ref1.project)
-    self.assertEquals('north-sea-3', ref1.region)
-    self.assertEquals('fish', ref1.forwardingRule)
+    self.assertEqual('fish', ref1.Name())
+    self.assertEqual('atlantic', ref1.project)
+    self.assertEqual('north-sea-3', ref1.region)
+    self.assertEqual('fish', ref1.forwardingRule)
 
     ref2 = resource_arg2.ResolveAsResource(
         args, self.registry, default_scope=None)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'zones/skagerrak/operations/viking', ref2.SelfLink())
-    self.assertEquals('viking', ref2.Name())
-    self.assertEquals('atlantic', ref2.project)
-    self.assertEquals('skagerrak', ref2.zone)
-    self.assertEquals('viking', ref2.operation)
+    self.assertEqual('viking', ref2.Name())
+    self.assertEqual('atlantic', ref2.project)
+    self.assertEqual('skagerrak', ref2.zone)
+    self.assertEqual('viking', ref2.operation)
 
     self.AssertErrEquals('')
 
@@ -311,7 +311,7 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
 
     refs = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.REGION)
-    self.assertEquals(
+    self.assertEqual(
         ['https://www.googleapis.com/compute/v1/projects/atlantic/'
          'global/forwardingRules/{0}'.format(name)
          for name in ['fish', 'shark', 'whale']],
@@ -335,7 +335,7 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
 
     refs = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.REGION)
-    self.assertEquals(
+    self.assertEqual(
         ['https://www.googleapis.com/compute/v1/projects/atlantic/'
          'global/forwardingRules/{0}'.format(name)
          for name in ['fish', 'shark', 'whale']],
@@ -356,7 +356,7 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
                       'global_forwarding_rule'], args)
     self.assertEqual('fish', args.forwarding_rule)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         flags.UnderSpecifiedResourceError,
         r'Underspecified resource \[fish\]. '
         r'Specify one of the \[--forwarding-rule-region, '
@@ -380,7 +380,7 @@ class ResourceArgumentTest(ResourceArgumentTestBase):
     self._AssertArgs(['instance_group', 'instance_group_zone'], args)
     self.assertEqual(None, args.instance_group)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         r'Can\'t specify --instance-group-zone without specifying resource via '
         r'instance_group'):
@@ -409,14 +409,14 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
 
     resource = collections.namedtuple('Resource', ['name'])
     def ScopeLister(scopes, unused_underspecified_names):
-      self.assertEquals([compute_scope.ScopeEnum.REGION], scopes)
+      self.assertEqual([compute_scope.ScopeEnum.REGION], scopes)
       return {
           compute_scope.ScopeEnum.REGION:
               [resource(name='north-sea'), resource(name='baltic')]}
     self.WriteInput('1')
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=None, scope_lister=ScopeLister)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/baltic/forwardingRules/fish',
         ref.SelfLink())
@@ -446,7 +446,7 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
 
     resource = collections.namedtuple('Resource', ['name'])
     def ScopeLister(scopes, unused_underspecified_names):
-      self.assertEquals(
+      self.assertEqual(
           {compute_scope.ScopeEnum.REGION, compute_scope.ScopeEnum.GLOBAL},
           set(scopes))
       return {
@@ -467,7 +467,7 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
           [3] region: indian
         Please enter your numeric choice:
         """, normalize_space=True)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'global/forwardingRules/fish',
         ref.SelfLink())
@@ -495,7 +495,7 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
     self.WriteInput('Y')
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=None)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/{0}/forwardingRules/fish'.format(region),
         ref.SelfLink())
@@ -526,7 +526,7 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
     self.WriteInput('Y')
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=None)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'zones/{0}/instanceGroups/fish'.format(zone),
         ref.SelfLink())
@@ -552,7 +552,7 @@ class ResourceArgumentWithPromptingTest(ResourceArgumentTestBase):
 
     ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=None)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'zones/{0}/instanceGroups/fish'.format(zone),
         ref.SelfLink())
@@ -564,7 +564,7 @@ class ResourceResolverTest(sdk_test_base.WithOutputCapture):
     resolver = flags.ResourceResolver.FromMap(
         'instance',
         {compute_scope.ScopeEnum.ZONE: 'compute.instances'})
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         flags.BadArgumentException,
         r'Expected names to be a list but it is \'instance-x\''):
       resolver.ResolveResources('instance-x',
@@ -577,7 +577,7 @@ class ResourceResolverTest(sdk_test_base.WithOutputCapture):
     resolver = flags.ResourceResolver.FromMap(
         'instance',
         {compute_scope.ScopeEnum.ZONE: 'compute.instances'})
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         flags.BadArgumentException,
         'Unexpected value for default_scope ScopeEnum.REGION, '
         'expected None or ZONE'):

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the firewall-rules list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.firewall_rules import flags
@@ -159,15 +161,6 @@ class BetaFirewallRulesListTest(FirewallRulesListTest):
     self.mock_get_global_resources = self.StartPatch(
         'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
         return_value=resource_projector.MakeSerializable(self.GetFirewall()))
-
-
-class AlphaFirewallRulesListTest(BetaFirewallRulesListTest):
-
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
     self.mock_get_global_resources = self.StartPatch(
         'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
         return_value=resource_projector.MakeSerializable(
@@ -233,7 +226,74 @@ class AlphaFirewallRulesListTest(BetaFirewallRulesListTest):
   def testTableOutputWithAllFields(self):
     self.Run("""
         compute firewall-rules list --format="{0}"
-        """.format(flags.LIST_WITH_ALL_FIELDS_FORMAT_ALPHA))
+        """.format(flags.LIST_WITH_ALL_FIELDS_FORMAT_BETA))
+    self.mock_get_global_resources.assert_called_once_with(
+        service=self.compute.firewalls,
+        project='my-project',
+        http=self.mock_http(),
+        filter_expr=None,
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME NETWORK DIRECTION PRIORITY SRC_RANGES DEST_RANGES ALLOW DENY SRC_TAGS SRC_SVC_ACCT TARGET_TAGS TARGET_SVC_ACCT DISABLED
+            disabled-firewall default INGRESS 300 0.0.0.0/0 tcp:1000-2000 True
+            enabled-firewall default INGRESS 200 0.0.0.0/0 udp:1000-2000 False
+            """),
+        normalize_space=True)
+
+  def testFirewallsCompleter(self):
+    self.RunCompleter(
+        flags.FirewallsCompleter,
+        expected_command=[
+            'compute',
+            'firewall-rules',
+            'list',
+            '--uri',
+            '--quiet',
+            '--format=disable',
+        ],
+        expected_completions=[
+            'disabled-firewall',
+            'enabled-firewall',
+        ],
+        cli=self.cli,
+    )
+
+
+class AlphaFirewallRulesListTest(BetaFirewallRulesListTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'alpha')
+
+  def testTableOutput(self):
+    self.Run("""
+        compute firewall-rules list
+        """)
+
+    self.mock_get_global_resources.assert_called_once_with(
+        service=self.compute.firewalls,
+        project='my-project',
+        http=self.mock_http(),
+        filter_expr=None,
+        batch_url=self.batch_url,
+        errors=[])
+    self.AssertErrContains(flags.LIST_NOTICE)
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+            NAME NETWORK DIRECTION PRIORITY ALLOW DENY DISABLED
+            disabled-firewall default INGRESS 300 tcp:1000-2000 True
+            enabled-firewall default INGRESS 200 udp:1000-2000 False
+            """),
+        normalize_space=True)
+
+  def testTableOutputWithAllFields(self):
+    self.Run("""
+        compute firewall-rules list --format="{0}"
+        """.format(flags.LIST_WITH_ALL_FIELDS_FORMAT_BETA))
     self.mock_get_global_resources.assert_called_once_with(
         service=self.compute.firewalls,
         project='my-project',

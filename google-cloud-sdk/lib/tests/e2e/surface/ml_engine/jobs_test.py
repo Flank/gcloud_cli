@@ -40,9 +40,9 @@ class MlJobsTests(e2e_base.WithServiceAuth):
       yield
     finally:
       storage_client = storage_api.StorageClient()
-      for object_name in storage_client.ListBucket(self.BUCKET_REF):
-        if object_name.startswith(job_id + '/'):
-          storage_client.DeleteObject(self.BUCKET_REF, object_name)
+      for obj in storage_client.ListBucket(self.BUCKET_REF):
+        if obj.name.startswith(job_id + '/'):
+          storage_client.DeleteObject(self.BUCKET_REF, obj.name)
 
   def testJobsSubmitTraining(self):
     job_id = e2e_utils.GetResourceNameGenerator(prefix='ml_job',

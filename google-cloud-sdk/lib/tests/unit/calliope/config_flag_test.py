@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of --configuration handling in nested command invocations."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import cli as calliope

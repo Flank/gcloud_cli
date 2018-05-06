@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'dataflow jobs show' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from tests.lib import sdk_test_base
@@ -47,7 +49,7 @@ class ShowUnitTest(
         view=self.view_all)
 
     job = self.Run('beta dataflow jobs show ' + JOB_1_ID)
-    self.assertEquals(JOB_1_ID, job.id)
+    self.assertEqual(JOB_1_ID, job.id)
     self.assertFalse(hasattr(job, 'environment'))
     self.assertFalse(hasattr(job, 'steps'))
 
@@ -61,7 +63,7 @@ class ShowUnitTest(
 
     job = self.Run('beta dataflow jobs show --region=%s %s' % (my_region,
                                                                JOB_1_ID))
-    self.assertEquals(JOB_1_ID, job.id)
+    self.assertEqual(JOB_1_ID, job.id)
     self.assertFalse(hasattr(job, 'environment'))
     self.assertFalse(hasattr(job, 'steps'))
 
@@ -71,16 +73,16 @@ class ShowUnitTest(
         view=self.view_all)
 
     job = self.Run('beta dataflow jobs show %s --environment' % JOB_1_ID)
-    self.assertEquals(JOB_1_ID, job.id)
-    self.assertEquals(self.fake_environment, job.environment)
+    self.assertEqual(JOB_1_ID, job.id)
+    self.assertEqual(self.fake_environment, job.environment)
     self.assertFalse(hasattr(job, 'steps'))
 
   def testShowSteps(self):
     self.MockGetJob(self.word_count_job, view=self.view_all)
     job = self.Run('beta dataflow jobs show --steps ' + JOB_1_ID)
-    self.assertEquals(JOB_1_ID, job.id)
+    self.assertEqual(JOB_1_ID, job.id)
     self.assertFalse(hasattr(job, 'environment'))
-    self.assertEquals(7, len(job.steps))
+    self.assertEqual(7, len(job.steps))
 
   def testShowMissingJobId(self):
     with self.AssertRaisesArgumentErrorMatches(

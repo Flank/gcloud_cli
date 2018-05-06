@@ -84,7 +84,7 @@ class EquivalenceTest(test_base.BaseTest):
     return self.parser.parse_args(cmd_line + ['--project', 'atlantic'])
 
   def _AssertArgs(self, expected, actual):
-    self.assertEquals(
+    self.assertEqual(
         set(expected + ['project']),
         set([attr for attr in dir(actual) if not attr.startswith('_')]))
 
@@ -108,13 +108,13 @@ class EquivalenceTest(test_base.BaseTest):
 
     args = self._ParseArgs([resource_arg], ['fish'])
     resource_ref = resource_arg.ResolveAsResource(args, self.registry)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/global/'
         'backendServices/fish', resource_ref.SelfLink())
 
     prompter_ref = self.MakeCommand().CreateGlobalReference(
         args.name, resource_type='backendServices')
-    self.assertEquals(resource_ref, prompter_ref)
+    self.assertEqual(resource_ref, prompter_ref)
 
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
@@ -129,7 +129,7 @@ class EquivalenceTest(test_base.BaseTest):
          '--forwarding-rule-region', 'north-sea-1'])
     resource_ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.REGION)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic/'
         'regions/north-sea-1/forwardingRules/fish', resource_ref.SelfLink())
 
@@ -138,7 +138,7 @@ class EquivalenceTest(test_base.BaseTest):
         args.forwarding_rule,
         region_arg=args.forwarding_rule_region,
         resource_type='forwardingRules')
-    self.assertEquals(resource_ref, prompter_ref)
+    self.assertEqual(resource_ref, prompter_ref)
 
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
@@ -152,7 +152,7 @@ class EquivalenceTest(test_base.BaseTest):
         ['--operation', 'viking', '--operation-zone', 'skagerrak'])
     resource_ref = resource_arg.ResolveAsResource(
         args, self.registry, default_scope=compute_scope.ScopeEnum.ZONE)
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/atlantic'
         '/zones/skagerrak/operations/viking',
         resource_ref.SelfLink())
@@ -162,7 +162,7 @@ class EquivalenceTest(test_base.BaseTest):
         args.operation,
         zone_arg=args.operation_zone,
         resource_type='zoneOperations')
-    self.assertEquals(resource_ref, prompter_ref)
+    self.assertEqual(resource_ref, prompter_ref)
 
     self.AssertOutputEquals('')
     self.AssertErrEquals('')
@@ -191,7 +191,7 @@ class EquivalenceTest(test_base.BaseTest):
         '[viking, norse, inuit] (Y/n)?  \n'.format(zone))
     self.ClearErr()
     for operation_name, resource_ref in zip(operation_names, resource_refs):
-      self.assertEquals(
+      self.assertEqual(
           'https://www.googleapis.com/compute/v1/projects/atlantic'
           '/zones/{0}/operations/{1}'.format(zone, operation_name),
           resource_ref.SelfLink())
@@ -203,7 +203,7 @@ class EquivalenceTest(test_base.BaseTest):
         zone_arg=args.operation_zone,
         resource_type='zoneOperations')
     for prompter_ref, resource_ref in zip(prompter_refs, resource_refs):
-      self.assertEquals(resource_ref, prompter_ref)
+      self.assertEqual(resource_ref, prompter_ref)
 
     self.AssertOutputEquals('')
     self.AssertErrEquals(

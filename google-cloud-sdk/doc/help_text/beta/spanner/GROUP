@@ -27,6 +27,9 @@ GROUPS
      operations
         (BETA) Manage Cloud Spanner operations.
 
+     rows
+        (BETA) Manage the rows in Cloud Spanner databases.
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

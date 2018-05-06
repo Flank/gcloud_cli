@@ -34,12 +34,12 @@ class InstanceFlagsTest(test_case.TestCase):
     self.messages = core_apis.GetMessagesModule('compute', 'v1')
 
   def testMigrationOptionsMatchApi(self):
-    self.assertEquals(sorted(flags.MIGRATION_OPTIONS.keys()), sorted(
+    self.assertEqual(sorted(flags.MIGRATION_OPTIONS.keys()), sorted(
         self.messages.Scheduling.OnHostMaintenanceValueValuesEnum
         .to_dict().keys()))
 
   def testLocalSSdInterfacesMatchApi(self):
-    self.assertEquals(flags.LOCAL_SSD_INTERFACES, sorted(
+    self.assertEqual(flags.LOCAL_SSD_INTERFACES, sorted(
         self.messages.AttachedDisk.InterfaceValueValuesEnum.to_dict().keys()))
 
   def testWarnForSourceInstanceTemplateLimitationsNoTrigger(self):

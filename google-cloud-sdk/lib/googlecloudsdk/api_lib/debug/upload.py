@@ -13,6 +13,8 @@
 # limitations under the License.
 """Support for uploading files to Cloud Source Repositories."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from datetime import datetime
 import os
 import uuid
@@ -20,6 +22,7 @@ from apitools.base.py import exceptions
 from googlecloudsdk.api_lib.source import git
 from googlecloudsdk.api_lib.source.repos import sourcerepo
 from googlecloudsdk.command_lib.util import gcloudignore
+from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import properties
 
 # The repo where uploads are stored.
@@ -52,6 +55,14 @@ def _GetUuid():
   return uuid.uuid4()
 
 
+class Error(core_exceptions.Error):
+  """Exceptions for this module."""
+
+
+class RepoNotFoundError(Error):
+  """Exception to be thrown when a repo cannot be found."""
+
+
 class UploadManager(object):
   """Provides methods for uploading files to Cloud Source Repositories."""
 
@@ -82,8 +93,10 @@ class UploadManager(object):
         'files_skipped': The number of files skipped.
         'size_written': The total number of bytes in all files uploaded.
     """
-    if not sourcerepo.Source().GetRepo(sourcerepo.ParseRepo(UPLOAD_REPO_NAME)):
-      raise exceptions.Error(
+    try:
+      sourcerepo.Source().GetRepo(sourcerepo.ParseRepo(UPLOAD_REPO_NAME))
+    except exceptions.HttpNotFoundError:
+      raise RepoNotFoundError(
           REPO_NOT_FOUND_ERROR.format(UPLOAD_REPO_NAME, self._project_id))
 
     file_chooser = gcloudignore.GetFileChooserForDir(

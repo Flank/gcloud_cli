@@ -21,6 +21,7 @@ from googlecloudsdk.command_lib.tasks import parsers
 from googlecloudsdk.core import log
 
 
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class UpdatePull(base.UpdateCommand):
   """Update a pull queue.
 
@@ -28,8 +29,10 @@ class UpdatePull(base.UpdateCommand):
   that are mutable. Attempting to use this command on a different type of queue
   will result in an error.
 
-  For more information about the different queue target types, see:
-  https://cloud.google.com/cloud-tasks/docs/queue-types
+  If you have early access to Cloud Tasks, refer to the following guide for
+  more information about the different queue target types:
+  https://cloud.google.com/cloud-tasks/docs/queue-types.
+  For access, sign up here: https://goo.gl/Ya0AZd
   """
 
   @staticmethod

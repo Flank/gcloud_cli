@@ -185,28 +185,28 @@ def PrintSubmitFollowUp(job_id, print_follow_up_message=True):
     log.status.Print(_FOLLOW_UP_MESSAGE.format(job_id=job_id))
 
 
-def GetStreamLogs(async_, stream_logs):
+def GetStreamLogs(asyncronous, stream_logs):
   """Return, based on the command line arguments, whether we should stream logs.
 
   Both arguments cannot be set (they're mutually exclusive flags) and the
   default is False.
 
   Args:
-    async_: bool, the value of the --async flag.
+    asyncronous: bool, the value of the --async flag.
     stream_logs: bool, the value of the --stream-logs flag.
 
   Returns:
     bool, whether to stream the logs
 
   Raises:
-    ValueError: if both async_ and stream_logs are True.
+    ValueError: if both asyncronous and stream_logs are True.
   """
-  if async_ and stream_logs:
+  if asyncronous and stream_logs:
     # Doesn't have to be a nice error; they're mutually exclusive so we should
     # never get here.
     raise ValueError('--async and --stream-logs cannot both be set.')
 
-  if async_:
+  if asyncronous:
     # TODO(b/36195821): Use the flag deprecation machinery when it supports the
     # store_true action
     log.warning('The --async flag is deprecated, as the default behavior is to '
@@ -222,7 +222,8 @@ def ParseCreateLabels(jobs_client, args):
 def SubmitTraining(jobs_client, job, job_dir=None, staging_bucket=None,
                    packages=None, package_path=None, scale_tier=None,
                    config=None, module_name=None, runtime_version=None,
-                   stream_logs=None, user_args=None, labels=None):
+                   python_version=None, stream_logs=None, user_args=None,
+                   labels=None):
   """Submit a training job."""
   region = properties.VALUES.compute.region.Get(required=True)
   staging_location = jobs_prep.GetStagingLocation(
@@ -251,6 +252,7 @@ def SubmitTraining(jobs_client, job, job_dir=None, staging_bucket=None,
       scale_tier=scale_tier,
       user_args=user_args,
       runtime_version=runtime_version,
+      python_version=python_version,
       labels=labels
   )
 

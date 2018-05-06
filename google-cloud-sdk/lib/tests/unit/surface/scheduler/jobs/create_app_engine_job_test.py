@@ -25,19 +25,21 @@ class JobsCreateTest(base.SchedulerTestBase):
 
   def _MakeJob(self):
     method = self.messages.AppEngineHttpTarget.HttpMethodValueValuesEnum.POST
+    name = 'projects/{}/locations/us-central1/jobs/my-job'.format(
+        self.Project())
     return self.messages.Job(
-        name=None,
+        name=name,
         schedule=self.messages.Schedule(
             schedule='every tuesday',
-            timezone='Etc/UTC'),
+            timeZone='Etc/UTC'),
         appEngineHttpTarget=self.messages.AppEngineHttpTarget(
             httpMethod=method,
             relativeUrl='/',
-            payload='my-payload',
+            body='my-payload',
         ),
         retryConfig=self.messages.RetryConfig(
-            maxBackoffSeconds='3600s',
-            minBackoffSeconds='0.1s',
+            maxBackoffDuration='3600s',
+            minBackoffDuration='5s',
             maxDoublings=16,
             retryCount=0
         )
@@ -54,7 +56,7 @@ class JobsCreateTest(base.SchedulerTestBase):
     self.track = track
 
     with self.AssertRaisesArgumentErrorMatches(
-        'argument --schedule: Must be specified.'):
+        'argument JOB --schedule: Must be specified.'):
       self.Run('scheduler jobs create-app-engine-job')
 
   def testCreate(self, track):
@@ -64,9 +66,9 @@ class JobsCreateTest(base.SchedulerTestBase):
     self._ExpectCreate(location_name, job)
     self._ExpectGetApp()
 
-    self.Run('scheduler jobs create-app-engine-job '
+    self.Run('scheduler jobs create-app-engine-job my-job '
              '    --schedule "every tuesday" '
-             '    --payload my-payload')
+             '    --message-body my-payload')
 
   def testCreate_PayloadMutuallyExclusive(self, track):
     self.track = track
@@ -74,25 +76,27 @@ class JobsCreateTest(base.SchedulerTestBase):
     payload_file = self.Touch(self.temp_path, 'payload_file', 'my-payload-2')
 
     with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(('scheduler jobs create-app-engine-job '
+      self.Run(('scheduler jobs create-app-engine-job my-job '
                 '    --schedule "every tuesday" '
-                '    --payload my-payload '
-                '    --payload-from-file {}').format(payload_file))
+                '    --message-body my-payload '
+                '    --message-body-from-file {}').format(payload_file))
     self.AssertErrContains(
-        'At most one of --payload | --payload-from-file may be specified')
+        'At most one of --message-body | --message-body-from-file '
+        'may be specified')
 
   def testCreate_AllArguments(self, track):
     self.track = track
     payload_file = self.Touch(self.temp_path, 'payload_file', 'my-payload-2')
     job = self._MakeJob()
     location_name = 'projects/{}/locations/us-central1'.format(self.Project())
+    job.description = 'my super cool job'
     job.retryConfig.retryCount = 5
-    job.retryConfig.jobAgeLimit = '7200s'
-    job.retryConfig.minBackoffSeconds = '0.2s'
-    job.retryConfig.maxBackoffSeconds = '10s'
+    job.retryConfig.maxRetryDuration = '7200s'
+    job.retryConfig.minBackoffDuration = '0.2s'
+    job.retryConfig.maxBackoffDuration = '10s'
     job.retryConfig.maxDoublings = 2
     job.appEngineHttpTarget.relativeUrl = '/foo/bar'
-    job.appEngineHttpTarget.payload = 'my-payload-2'
+    job.appEngineHttpTarget.body = 'my-payload-2'
     headers_value = self.messages.AppEngineHttpTarget.HeadersValue(
         additionalProperties=[
             self.messages.AppEngineHttpTarget.HeadersValue.AdditionalProperty(
@@ -111,8 +115,9 @@ class JobsCreateTest(base.SchedulerTestBase):
     self._ExpectCreate(location_name, job)
     self._ExpectGetApp()
 
-    self.Run(('scheduler jobs create-app-engine-job '
+    self.Run(('scheduler jobs create-app-engine-job my-job '
               '    --schedule "every tuesday" '
+              '    --description "my super cool job" '
               '    --max-attempts 5 '
               '    --max-retry-duration 2h '
               '    --min-backoff 0.2s '
@@ -122,7 +127,7 @@ class JobsCreateTest(base.SchedulerTestBase):
               '    --http-method gEt '
               '    --header "Header1: Value1,comma" '
               '    --header "Header2:  Value2" '
-              '    --payload-from-file {} '
+              '    --message-body-from-file {} '
               '    --version version '
               '    --service service ').format(payload_file))
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Command for updating target HTTPS proxies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import target_proxies_utils
 from googlecloudsdk.calliope import base
@@ -37,12 +39,14 @@ class UpdateGA(base.SilentCommand):
   for routing the requests. The URL map's job is to map URLs to
   backend services which handle the actual requests. The target
   HTTPS proxy also points to at most 10 SSL certificates used for
-  server-side authentication.
+  server-side authentication. The target HTTPS proxy can be associated with
+  at most one SSL policy.
   """
 
   SSL_CERTIFICATES_ARG = None
   TARGET_HTTPS_PROXY_ARG = None
   URL_MAP_ARG = None
+  SSL_POLICY_ARG = None
 
   @classmethod
   def Args(cls, parser):
@@ -57,6 +61,14 @@ class UpdateGA(base.SilentCommand):
         required=False, proxy_type='HTTPS')
     cls.URL_MAP_ARG.AddArgument(parser)
 
+    group = parser.add_mutually_exclusive_group()
+    cls.SSL_POLICY_ARG = (
+        ssl_policies_flags.GetSslPolicyArgumentForOtherResource(
+            'HTTPS', required=False))
+    cls.SSL_POLICY_ARG.AddArgument(group)
+    ssl_policies_flags.GetClearSslPolicyArgumentForOtherResource(
+        'HTTPS', required=False).AddToParser(group)
+
   @property
   def service(self):
     return self.compute.targetHttpsProxies
@@ -69,11 +81,7 @@ class UpdateGA(base.SilentCommand):
   def resource_type(self):
     return 'targetHttpProxies'
 
-  def _SendRequests(self,
-                    args,
-                    quic_override=None,
-                    ssl_policy=None,
-                    clear_ssl_policy=False):
+  def _SendRequests(self, args, quic_override=None):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
 
@@ -115,6 +123,11 @@ class UpdateGA(base.SilentCommand):
                    client.messages.TargetHttpsProxiesSetQuicOverrideRequest(
                        quicOverride=quic_override)))))
 
+    ssl_policy = client.messages.SslPolicyReference(
+        sslPolicy=self.SSL_POLICY_ARG.ResolveAsResource(args, holder.resources)
+        .SelfLink()) if args.IsSpecified('ssl_policy') else None
+    clear_ssl_policy = args.IsSpecified('clear_ssl_policy')
+
     if ssl_policy or clear_ssl_policy:
       requests.append(
           (client.apitools_client.targetHttpsProxies, 'SetSslPolicy',
@@ -127,17 +140,19 @@ class UpdateGA(base.SilentCommand):
 
   def _CheckMissingArgument(self, args):
     if not (args.IsSpecified('ssl_certificates') or
-            args.IsSpecified('url_map')):
+            args.IsSpecified('url_map') or
+            args.IsSpecified('ssl_policy') or
+            args.IsSpecified('clear_ssl_policy')):
       raise exceptions.ToolException(
-          'You must specify at least one of [--ssl-certificates] or '
-          '[--url-map].')
+          'You must specify at least one of [--ssl-certificates], '
+          '[--url-map], [--ssl-policy] or [--clear-ssl-policy].')
 
   def Run(self, args):
     self._CheckMissingArgument(args)
     return self._SendRequests(args)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class UpdateBeta(UpdateGA):
   """Update a target HTTPS proxy.
 
@@ -153,64 +168,9 @@ class UpdateBeta(UpdateGA):
   at most one SSL policy.
   """
 
-  SSL_POLICY_ARG = None
-
   @classmethod
   def Args(cls, parser):
     super(UpdateBeta, cls).Args(parser)
-    group = parser.add_mutually_exclusive_group()
-    cls.SSL_POLICY_ARG = (
-        ssl_policies_flags.GetSslPolicyArgumentForOtherResource(
-            'HTTPS', required=False))
-    cls.SSL_POLICY_ARG.AddArgument(group)
-    ssl_policies_flags.GetClearSslPolicyArgumentForOtherResource(
-        'HTTPS', required=False).AddToParser(group)
-
-  def _CheckMissingArgument(self, args):
-    if not sum(
-        args.IsSpecified(arg) for arg in
-        ['ssl_certificates', 'url_map', 'ssl_policy', 'clear_ssl_policy']):
-      raise exceptions.ToolException(
-          'You must specify at least one of [--ssl-certificates], '
-          '[--url-map], [--ssl-policy] or [--clear-ssl-policy].')
-
-  def Run(self, args):
-    self._CheckMissingArgument(args)
-
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    messages = holder.client.messages
-
-    ssl_policy = messages.SslPolicyReference(
-        sslPolicy=self.SSL_POLICY_ARG.ResolveAsResource(args, holder.resources)
-        .SelfLink()) if args.IsSpecified('ssl_policy') else None
-    return self._SendRequests(
-        args,
-        quic_override=None,
-        ssl_policy=ssl_policy,
-        clear_ssl_policy=args.IsSpecified('clear_ssl_policy'))
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class UpdateAlpha(UpdateBeta):
-  """Update a target HTTPS proxy.
-
-  *{command}* is used to change the SSL certificate and/or URL map of
-  existing target HTTPS proxies. A target HTTPS proxy is referenced
-  by one or more forwarding rules which
-  define which packets the proxy is responsible for routing. The
-  target HTTPS proxy in turn points to a URL map that defines the rules
-  for routing the requests. The URL map's job is to map URLs to
-  backend services which handle the actual requests. The target
-  HTTPS proxy also points to at most 10 SSL certificates used for
-  server-side authentication. The target HTTPS proxy can be associated with
-  at most one SSL policy.
-  """
-
-  SSL_POLICY_ARG = None
-
-  @classmethod
-  def Args(cls, parser):
-    super(UpdateAlpha, cls).Args(parser)
     target_proxies_utils.AddQuicOverrideUpdateArgs(parser)
 
   def _CheckMissingArgument(self, args):
@@ -233,11 +193,4 @@ class UpdateAlpha(UpdateBeta):
                      QuicOverrideValueValuesEnum(args.quic_override)
                     ) if args.IsSpecified('quic_override') else None
 
-    ssl_policy = messages.SslPolicyReference(
-        sslPolicy=self.SSL_POLICY_ARG.ResolveAsResource(args, holder.resources)
-        .SelfLink()) if args.IsSpecified('ssl_policy') else None
-    return self._SendRequests(
-        args,
-        quic_override=quic_override,
-        ssl_policy=ssl_policy,
-        clear_ssl_policy=args.IsSpecified('clear_ssl_policy'))
+    return self._SendRequests(args, quic_override=quic_override)

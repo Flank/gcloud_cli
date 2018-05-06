@@ -40,11 +40,13 @@ Pythonicness of the Transform*() methods:
       Exceptions for arguments explicitly under the caller's control are OK.
 """
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import constants
 from googlecloudsdk.api_lib.compute import instance_utils
 from googlecloudsdk.api_lib.compute import path_simplifier
 from googlecloudsdk.core.resource import resource_transform
+import six
 
 
 def TransformFirewallRule(r, undefined=''):
@@ -139,7 +141,7 @@ def TransformMachineType(r, undefined=''):
   Returns:
     The formatted name for a machine type.
   """
-  if not isinstance(r, basestring):
+  if not isinstance(r, six.string_types):
     return undefined
   custom_cpu, custom_ram = instance_utils.GetCpuRamFromCustomName(r)
   if not custom_cpu or not custom_ram:
@@ -187,7 +189,7 @@ def TransformOperationHttpStatus(r, undefined=''):
   """
   if resource_transform.GetKeyValue(r, 'status', None) == 'DONE':
     return (resource_transform.GetKeyValue(r, 'httpErrorStatusCode', None) or
-            httplib.OK)
+            200)  # httplib.OK
   return undefined
 
 

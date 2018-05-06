@@ -32,8 +32,8 @@ class DescribeAppTest(api_test_util.ApiTestBase):
     """Test `gcloud app describe` raises informative error if no project found.
     """
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app describe')
 
   def testDescribe(self):
@@ -62,8 +62,8 @@ class DescribeAppTest(api_test_util.ApiTestBase):
                          '`gcloud app create` to initialize an App Engine '
                          'application within the project.'
                          .format(self.Project()))
-    with self.assertRaisesRegexp(app_exceptions.MissingApplicationError,
-                                 missing_app_regex):
+    with self.assertRaisesRegex(app_exceptions.MissingApplicationError,
+                                missing_app_regex):
       self.Run('app describe')
 
 

@@ -18,11 +18,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute import backend_buckets_test_base
 
 
-class BackendBucketDeleteSignedUrlKeyTest(
+class BackendBucketDeleteSignedUrlKeyTestBeta(
     backend_buckets_test_base.BackendBucketsTestBase):
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
+    self._SetUp(calliope_base.ReleaseTrack.BETA)
 
   def testWithKeyNameArg(self):
     """Tests deleting a key is successful."""
@@ -51,6 +51,13 @@ class BackendBucketDeleteSignedUrlKeyTest(
         'argument --key-name: Must be specified.'):
       self.RunBackendBuckets('delete-signed-url-key ' +
                              backend_bucket_ref.Name())
+
+
+class BackendBucketDeleteSignedUrlKeyTestAlpha(
+    BackendBucketDeleteSignedUrlKeyTestBeta):
+
+  def SetUp(self):
+    self._SetUp(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

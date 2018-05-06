@@ -1,0 +1,104 @@
+
+.TH "GCLOUD_ALPHA_REDIS_INSTANCES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha redis instances describe \- show metadata for a Memorystore Redis instance
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha redis instances describe\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Show metadata for a Memorystore Redis instance.
+
+Displays all metadata associated with a Redis instance given a valid instance
+name.
+
+This command can fail for the following reasons:
+.RS 2m
+.IP "\(bu" 2m
+The instance specified does not exist.
+.IP "\(bu" 2m
+The active account does not have permission to access the given instance.
+.RE
+.sp
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+INSTANCE \- Arguments and flags that specify the Memorystore Redis instance you
+want to describe. The arguments in this group can be used to specify the
+attributes of this resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: Set the
+property [core/project] or provide the flag [\-\-project] on the command line.
+This must be specified.
+
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+The ID of the instance or a fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The name of the Redis region of the instance. Overrides the default redis/region
+property value for this command invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBredis/v1alpha1\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/memorystore/docs/redis/
+
+
+
+.SH "EXAMPLES"
+
+The following command prints metadata for an instance with the name
+\f5my\-redis\-instance\fR in your default region:
+
+.RS 2m
+$ gcloud alpha redis instances describe my\-redis\-instance
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. This variant is also available:
+
+.RS 2m
+$ gcloud beta redis instances describe
+.RE
+

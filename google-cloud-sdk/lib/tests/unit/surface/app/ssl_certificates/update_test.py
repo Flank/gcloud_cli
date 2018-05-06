@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for gcloud app ssl-certificates."""
 
+from __future__ import absolute_import
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import parameterized

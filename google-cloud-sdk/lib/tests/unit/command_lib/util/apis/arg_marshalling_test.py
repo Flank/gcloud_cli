@@ -14,6 +14,8 @@
 
 """Tests for the arg_marshalling module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import itertools
 
 from apitools.base.py.testing import mock
@@ -103,14 +105,20 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
         method, [], MakeResource())
     (_, args) = CheckArgs(gen.GenerateArgs())
     self.assertEqual(['instance'], sorted(args.keys()))
-    self.assertEqual(args['instance'].kwargs['help'], 'gh')
+    self.assertEqual(
+        args['instance'].kwargs['help'],
+        'The ID of the instance or a fully qualified identifier for the '
+        'instance.')
 
     # Make sure positional override works.
     gen = arg_marshalling.DeclarativeArgumentGenerator(
         method, [], MakeResource(is_positional=False))
     (parser, args) = CheckArgs(gen.GenerateArgs())
     self.assertEqual(['--instance'], sorted(args.keys()))
-    self.assertEqual(args['--instance'].kwargs['help'], 'gh')
+    self.assertEqual(
+        args['--instance'].kwargs['help'],
+        'The ID of the instance or a fully qualified identifier for the '
+        'instance.')
 
     namespace = parser.parse_args(['--instance=i'])
     properties.VALUES.core.project.Set('p')
@@ -138,7 +146,10 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
         method, [], MakeResource())
     (parser, args) = CheckArgs(gen.GenerateArgs())
     self.assertEqual(['instance'], sorted(args.keys()))
-    self.assertEqual(args['instance'].kwargs['help'], 'gh')
+    self.assertEqual(
+        args['instance'].kwargs['help'],
+        'The ID of the instance or a fully qualified identifier for the '
+        'instance.')
 
     namespace = parser.parse_args(['i'])
     properties.VALUES.core.project.Set('p')
@@ -160,7 +171,10 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
     (parser, args) = CheckArgs(gen.GenerateArgs())
     self.assertEqual(['--location'], sorted(args.keys()))
     self.assertEqual(args['--location'].name, '--location')
-    self.assertEqual(args['--location'].kwargs['help'], 'gh')
+    self.assertEqual(
+        args['--location'].kwargs['help'],
+        'The ID of the location or a fully qualified identifier for the '
+        'location.')
     self.assertEqual(args['--location'].kwargs['required'], True)
 
     namespace = parser.parse_args(['--location=l'])
@@ -256,7 +270,10 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
         method, [], MakeResource(collection='foo.instances'))
     (parser, args) = CheckArgs(gen.GenerateArgs())
     self.assertEqual(['instance'], sorted(args.keys()))
-    self.assertEqual(args['instance'].kwargs['help'], 'gh')
+    self.assertEqual(
+        args['instance'].kwargs['help'],
+        'The ID of the instance or a fully qualified identifier for the '
+        'instance.')
 
     namespace = parser.parse_args(['i'])
     properties.VALUES.core.project.Set('p')

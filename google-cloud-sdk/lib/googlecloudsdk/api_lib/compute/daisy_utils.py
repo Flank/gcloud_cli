@@ -13,6 +13,8 @@
 # limitations under the License.
 """Utilities for running Daisy builds on Google Container Builder."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
@@ -88,7 +90,7 @@ def CheckIamPermissions(project_id):
     operation = services_api.EnableServiceApiCall(project.projectId,
                                                   cloudbuild_service_name)
     # Wait for the operation to finish.
-    services_util.ProcessOperationResult(operation, async=False)
+    services_util.ProcessOperationResult(operation, is_async=False)
 
   # Now that we're sure the service account exists, actually check permissions.
   service_account = 'serviceAccount:{0}@cloudbuild.gserviceaccount.com'.format(
@@ -177,7 +179,8 @@ def GetAndCreateDaisyBucket(bucket_name=None, storage_client=None):
   return safe_bucket_name
 
 
-def RunDaisyBuild(args, workflow, variables, daisy_bucket=None, tags=None):
+def RunDaisyBuild(args, workflow, variables, daisy_bucket=None, tags=None,
+                  user_zone=None):
   """Run a build with Daisy on Google Cloud Builder.
 
   Args:
@@ -188,6 +191,8 @@ def RunDaisyBuild(args, workflow, variables, daisy_bucket=None, tags=None):
     daisy_bucket: A string containing the name of the GCS bucket that daisy
       should use.
     tags: A list of strings for adding tags to the Argo build.
+    user_zone: The GCP zone to tell Daisy to do work in. If unspecified,
+      defaults to wherever the Argo runner happens to be.
 
   Returns:
     A build object that either streams the output or is displayed as a
@@ -211,6 +216,8 @@ def RunDaisyBuild(args, workflow, variables, daisy_bucket=None, tags=None):
                 '-variables={0}'.format(variables),
                 workflow,
                ]
+  if user_zone is not None:
+    daisy_args = ['-zone={0}'.format(user_zone)] + daisy_args
 
   build_tags = ['gce-daisy']
   if tags:

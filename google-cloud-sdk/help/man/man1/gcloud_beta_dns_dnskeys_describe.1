@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta dns dnskeys describe \- get a DnsKey
+gcloud beta dns dnskeys describe \- show details about a DNS key resource
 
 
 
@@ -17,7 +17,10 @@ gcloud beta dns dnskeys describe \- get a DnsKey
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR This command displays the details of a single DnsKey.
+\fB(BETA)\fR \fB(DEPRECATED)\fR The \f5gcloud beta dnskeys\fR commands are
+deprecated; please use the \f5gcloud beta dnskeys\fR commands instead.
+
+This command displays the details of a single DNS key resource.
 
 
 
@@ -37,7 +40,7 @@ The DNS key identifier.
 .RS 2m
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
-The name of the managed\-zone the DnsKey belongs to
+The name of the managed\-zone the DNSKEY record belongs to
 
 
 .RE
@@ -54,10 +57,19 @@ help\fR for details.
 
 .SH "EXAMPLES"
 
-To get a DnsKey from a managed\-zone, run:
+To show details about a DNS key resource with ID 3 in a managed zone
+\f5my_zone\fR, run:
 
 .RS 2m
-$ gcloud beta dns dnskeys describe my_zone \-\-key_id my_key
+$ gcloud beta dns dnskeys describe \-\-zone my_zone 3
+.RE
+
+To get the DS record corresponding for the DNSKEY record from the previous
+example, run (the DNSKEY record must be for a key\-signing key):
+
+.RS 2m
+$ gcloud beta dns dnskeys describe \-\-zone my_zone 3 \e
+    \-\-format 'value(ds_record())'
 .RE
 
 

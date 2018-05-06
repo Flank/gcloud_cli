@@ -21,12 +21,14 @@ from __future__ import unicode_literals
 import datetime
 import functools
 import inspect
+import io
 import numbers
 import os
 import socket
 import sys
 import tempfile
 import traceback
+import types
 
 import googlecloudsdk
 from googlecloudsdk.core import config
@@ -72,7 +74,7 @@ def Retry(f=None, why=None, **kwargs):
       return Retry(f, why=why, **kwargs)
     return Decorator
 
-  if f and not (hasattr(f, '__call__') and hasattr(f, 'func_name')):
+  if not isinstance(f, types.FunctionType):
     raise Exception('Retry decorator only works with functions. '
                     'Using it with classes makes the class silently skip.')
 
@@ -447,7 +449,9 @@ class WithLogCapture(WithOutputCapture):
     log_files = os.listdir(sub_dir)
     if len(log_files) != 1:
       raise ValueError('Found more than one log file')
-    return open(os.path.join(sub_dir, log_files[0])).read()
+    with io.open(os.path.join(sub_dir, log_files[0]), mode='rt',
+                 encoding=log.LOG_FILE_ENCODING) as f:
+      return f.read()
 
   def AssertLogContains(self, expected, name=LOG, normalize_space=False,
                         actual_filter=None, success=True):

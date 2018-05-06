@@ -1,0 +1,81 @@
+NAME
+    gcloud compute images import - import a Google Compute Engine image
+
+SYNOPSIS
+    gcloud compute images import IMAGE_NAME (--data-disk | --os=OS)
+        (--source-file=SOURCE_FILE | --source-image=SOURCE_IMAGE) [--async]
+        [--log-location=LOG_LOCATION] [--timeout=TIMEOUT; default="2h"]
+        [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute images import imports Virtual Disk images, such as VMWare
+    VMDK files and VHD files, into Google Compute Engine.
+
+    Importing images involves 3 steps:
+      o Upload the virtual disk file to Google Cloud Storage.
+      o Import the image to Google Compute Engine.
+      o Translate the image to make a bootable image.
+    This command will perform all three of these steps as necessary, depending
+    on the input arguments specified by the user.
+
+    This command uses the --os flag to choose the appropriate translation. You
+    can omit the translation step using the --data-disk flag.
+
+POSITIONAL ARGUMENTS
+     IMAGE_NAME
+        The name of the disk image to create.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --data-disk
+          Specifies that the disk has no bootable OS installed on it. Imports
+          the disk without making it bootable or installing Google tools on it.
+
+       --os=OS
+          Specifies the OS of the image being imported. OS must be one of:
+          centos-6, centos-7, debian-8, debian-9, rhel-6, rhel-6-byol, rhel-7,
+          rhel-7-byol, ubuntu-1404, ubuntu-1604, windows-2008r2,
+          windows-2012r2, windows-2016.
+
+     Exactly one of these must be specified:
+
+       --source-file=SOURCE_FILE
+          A local file, or the Google Cloud Storage URI of the virtual disk
+          file to import. For example: gs://my-bucket/my-image.vmdk or
+          ./my-local-image.vmdk
+
+       --source-image=SOURCE_IMAGE
+          An existing Compute Engine image from which to import.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --log-location=LOG_LOCATION
+        Directory in Google Cloud Storage to hold build logs. If not set,
+        gs://<project num>.cloudbuild-logs.googleusercontent.com/ will be
+        created and used.
+
+     --timeout=TIMEOUT; default="2h"
+        Maximum time a build can last before it is failed as "TIMEOUT". For
+        example, specifying 2h will fail the process after 2 hours. See $
+        gcloud topic datetimes for information on duration formats.
+
+     --zone=ZONE
+        The zone of the image to import. The zone in which to do the work of
+        importing the image. Overrides the default compute/zone property value
+        for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute images import
+        $ gcloud beta compute images import
+

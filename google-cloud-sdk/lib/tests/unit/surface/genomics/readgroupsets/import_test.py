@@ -32,7 +32,7 @@ class ImportTest(base.GenomicsUnitTest):
                 'gs://mybucket/reads1.bam', 'gs://mybucket/reads2*.bam'
             ]),
         response=operation)
-    self.assertEquals(operation, self.RunGenomics(
+    self.assertEqual(operation, self.RunGenomics(
         ['readgroupsets', 'import', '--dataset-id', '1000', '--source-uris',
          'gs://mybucket/reads1.bam,gs://mybucket/reads2*.bam']))
     self.AssertOutputContains(operation.name)
@@ -48,7 +48,7 @@ class ImportTest(base.GenomicsUnitTest):
              MERGE_ALL),
             sourceUris=['gs://mybucket/????.bam']),
         response=operation)
-    self.assertEquals(operation, self.RunGenomics(
+    self.assertEqual(operation, self.RunGenomics(
         ['readgroupsets', 'import', '--dataset-id', '1000', '--source-uris',
          'gs://mybucket/????.bam', '--partition-strategy', 'MERGE_ALL']))
     self.AssertOutputContains(operation.name)
@@ -65,7 +65,7 @@ class ImportTest(base.GenomicsUnitTest):
             referenceSetId='123',
             sourceUris=['gs://mybucket/*.bam']),
         response=operation)
-    self.assertEquals(operation, self.RunGenomics(
+    self.assertEqual(operation, self.RunGenomics(
         ['readgroupsets', 'import', '--dataset-id', '1000', '--source-uris',
          'gs://mybucket/*.bam', '--reference-set-id', '123',
          '--partition-strategy', 'PER_FILE_PER_SAMPLE']))
@@ -94,8 +94,8 @@ class ImportTest(base.GenomicsUnitTest):
             datasetId='1000',
             sourceUris=['gs://mybucket/reads.bam']),
         exception=self.MakeHttpError(404, 'Dataset not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Dataset not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Dataset not found: 1000'):
       self.RunGenomics(['readgroupsets', 'import',
                         '--dataset-id', '1000',
                         '--source-uris', 'gs://mybucket/reads.bam'])
@@ -114,9 +114,9 @@ class ImportTest(base.GenomicsUnitTest):
             sourceUris=['gs://mybucket/variants.vcf'],),
         exception=self.MakeHttpError(
             400, '"sourceUris": element 0: unsupported file type'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 '"--source-uris": element 0: unsupported file'
-                                 ' type'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                '"--source-uris": element 0: unsupported file'
+                                ' type'):
       self.RunGenomics(['readgroupsets', 'import',
                         '--dataset-id', '1000',
                         '--source-uris', 'gs://mybucket/variants.vcf'])

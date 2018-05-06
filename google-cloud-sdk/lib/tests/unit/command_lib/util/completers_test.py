@@ -14,6 +14,9 @@
 
 """Tests for the command_lib.util.completers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis_util
 from googlecloudsdk.command_lib.util import completers
 from tests.lib import completer_test_base

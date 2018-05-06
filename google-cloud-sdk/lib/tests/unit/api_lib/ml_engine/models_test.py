@@ -45,7 +45,7 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
             parent='projects/{}'.format(self.Project()),
             model=model),
         model)
-    self.assertEquals(model, self.models_client.Create('myModel', None))
+    self.assertEqual(model, self.models_client.Create('myModel', None))
 
   def testCreateEnableLogging(self):
     model = self.short_msgs.Model(
@@ -55,7 +55,7 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
             parent='projects/{}'.format(self.Project()),
             model=model),
         model)
-    self.assertEquals(model, self.models_client.Create('myModel', None, True))
+    self.assertEqual(model, self.models_client.Create('myModel', None, True))
 
   def testCreateDescription(self):
     model = self.short_msgs.Model(
@@ -65,8 +65,8 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
             parent='projects/{}'.format(self.Project()),
             model=model),
         model)
-    self.assertEquals(model, self.models_client.Create('myModel', None,
-                                                       description='My Model'))
+    self.assertEqual(model, self.models_client.Create('myModel', None,
+                                                      description='My Model'))
 
   def testCreateWithSingleRegion(self):
     model = self.short_msgs.Model(
@@ -76,8 +76,8 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
             parent='projects/{}'.format(self.Project()),
             model=model),
         model)
-    self.assertEquals(model,
-                      self.models_client.Create('myModel', ['us-central1']))
+    self.assertEqual(model,
+                     self.models_client.Create('myModel', ['us-central1']))
 
   def testCreateWithMultipleRegion(self):
     model = self.short_msgs.Model(
@@ -89,9 +89,9 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
             parent='projects/{}'.format(self.Project()),
             model=model),
         model)
-    self.assertEquals(model,
-                      self.models_client.Create('myModel',
-                                                ['us-central1', 'us-east1']))
+    self.assertEqual(model,
+                     self.models_client.Create('myModel',
+                                               ['us-central1', 'us-east1']))
 
   def testDelete(self):
     op = self.msgs.GoogleLongrunningOperation(name='opId')
@@ -99,7 +99,7 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
         request=self.msgs.MlProjectsModelsDeleteRequest(
             name='projects/{}/models/myModel'.format(self.Project())),
         response=op)
-    self.assertEquals(op, self.models_client.Delete('myModel'))
+    self.assertEqual(op, self.models_client.Delete('myModel'))
 
   def testGet(self):
     model = self.short_msgs.Model(name='myModel')
@@ -107,7 +107,7 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
         self.msgs.MlProjectsModelsGetRequest(
             name='projects/{}/models/myModel'.format(self.Project())),
         model)
-    self.assertEquals(model, self.models_client.Get('myModel'))
+    self.assertEqual(model, self.models_client.Get('myModel'))
 
   def testList(self):
     response_items = [
@@ -122,8 +122,8 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
             pageSize=100),
         response=self.short_msgs.ListModelsResponse(
             models=response_items))
-    self.assertEquals(response_items,
-                      list(self.models_client.List(project_ref)))
+    self.assertEqual(response_items,
+                     list(self.models_client.List(project_ref)))
 
   def testGetIamPolicy(self):
     policy = self.msgs.GoogleIamV1Policy()
@@ -170,7 +170,7 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
                                update_mask=['labels']), model)
 
     label_update = labels_util.UpdateResult(True, labels_field)
-    self.assertEquals(model, self.models_client.Patch(model_ref, label_update))
+    self.assertEqual(model, self.models_client.Patch(model_ref, label_update))
 
   def testPatchDescription(self):
     updated_description = 'My New Description'
@@ -183,9 +183,9 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
                                update_mask=['description']), model)
 
     no_label_update = labels_util.UpdateResult(False, None)
-    self.assertEquals(model, self.models_client.Patch(model_ref,
-                                                      no_label_update,
-                                                      updated_description))
+    self.assertEqual(model, self.models_client.Patch(model_ref,
+                                                     no_label_update,
+                                                     updated_description))
 
   def testPatchAll(self):
     labels = {'foo': 'bar', 'fizz': 'buzz'}
@@ -202,7 +202,7 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
                                update_mask=['labels', 'description']), model)
 
     label_update = labels_util.UpdateResult(True, labels_field)
-    self.assertEquals(model, self.models_client.Patch(
+    self.assertEqual(model, self.models_client.Patch(
         model_ref, label_update, description=updated_description))
 
   def testPatchNoUpdate(self):

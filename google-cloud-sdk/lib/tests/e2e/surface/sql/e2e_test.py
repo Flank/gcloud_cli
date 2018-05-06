@@ -70,13 +70,13 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
     subprocess_args = exec_ordered_argumnents[0]
     (actual_mysql_path, actual_host_flag, actual_ip_address, actual_user_flag,
      actual_username, actual_pass_flag) = subprocess_args
-    self.assertEquals(mocked_mysql_path, actual_mysql_path)
-    self.assertEquals('-h', actual_host_flag)
+    self.assertEqual(mocked_mysql_path, actual_mysql_path)
+    self.assertEqual('-h', actual_host_flag)
     # Basic check that it's an IPv6 address. IPv4 uses '.' instead of ':'.
     self.assertIn(':', actual_ip_address)
-    self.assertEquals('-u', actual_user_flag)
-    self.assertEquals('root', actual_username)
-    self.assertEquals('-p', actual_pass_flag)
+    self.assertEqual('-u', actual_user_flag)
+    self.assertEqual('root', actual_username)
+    self.assertEqual('-p', actual_pass_flag)
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def DoTestOperations(self):
@@ -134,13 +134,13 @@ class PsqlE2ETest(base.PsqlIntegrationTestBase):
     subprocess_args = exec_ordered_argumnents[0]
     (actual_psql_path, actual_host_flag, actual_ip_address, actual_user_flag,
      actual_username, actual_pass_flag) = subprocess_args
-    self.assertEquals(mocked_psql_path, actual_psql_path)
-    self.assertEquals('-h', actual_host_flag)
+    self.assertEqual(mocked_psql_path, actual_psql_path)
+    self.assertEqual('-h', actual_host_flag)
     # Basic check that it's an IPv4 address. IPv4 uses '.' instead of ':'.
     self.assertIn('.', actual_ip_address)
-    self.assertEquals('-U', actual_user_flag)
-    self.assertEquals('root', actual_username)
-    self.assertEquals('-W', actual_pass_flag)
+    self.assertEqual('-U', actual_user_flag)
+    self.assertEqual('root', actual_username)
+    self.assertEqual('-W', actual_pass_flag)
 
 
 if __name__ == '__main__':

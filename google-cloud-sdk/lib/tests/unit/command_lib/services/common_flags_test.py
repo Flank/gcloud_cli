@@ -14,9 +14,12 @@
 
 """Unit tests for services common_flags module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.services import common_flags
 from tests.lib import completer_test_base
 from tests.lib.surface.services import unit_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class CompletionTest(unit_test_base.SV1UnitTestBase,

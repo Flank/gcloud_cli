@@ -24,7 +24,7 @@ class GenomicsV2alpha1(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new genomics handle."""
     url = url or self.BASE_URL
     super(GenomicsV2alpha1, self).__init__(
@@ -33,7 +33,8 @@ class GenomicsV2alpha1(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.pipelines = self.PipelinesService(self)
     self.projects_operations = self.ProjectsOperationsService(self)
     self.projects = self.ProjectsService(self)
@@ -50,14 +51,16 @@ class GenomicsV2alpha1(base_api.BaseApiClient):
           }
 
     def Run(self, request, global_params=None):
-      """Runs a pipeline.
+      r"""Runs a pipeline.
 
-**Note:** In order to use this method, the Genomics Service Agent must have
-access to your project.  This is done automatically when the Genomics API
-is first enabled, but if you delete this permission, or if you have
-already enabled the Genomics API prior to the launch of the v2alpha1 API,
-you must disable and re-enable the API to grant the Genomics Service Agent
-the required permissions.
+**Note:** In order to use this method, the Genomics Service Agent
+must have access to your project.  This is done automatically when the
+Genomics API is first enabled, but if you delete this permission, or if
+you have already enabled the Genomics API prior to the launch of the
+v2alpha1 API, you must disable and re-enable the API to grant the Genomics
+Service Agent the required permissions.
+
+[1]: /genomics/gsa
 
       Args:
         request: (RunPipelineRequest) input message
@@ -93,7 +96,7 @@ the required permissions.
           }
 
     def Cancel(self, request, global_params=None):
-      """Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation.
+      r"""Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation.
 
       Args:
         request: (GenomicsProjectsOperationsCancelRequest) input message
@@ -120,7 +123,7 @@ the required permissions.
     )
 
     def Get(self, request, global_params=None):
-      """Gets the latest state of a long-running operation.  Clients can use this.
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
 method to poll the operation result at intervals as recommended by the API
 service.
 
@@ -149,7 +152,7 @@ service.
     )
 
     def List(self, request, global_params=None):
-      """Lists operations that match the specified filter in the request.
+      r"""Lists operations that match the specified filter in the request.
 
       Args:
         request: (GenomicsProjectsOperationsListRequest) input message
@@ -196,7 +199,7 @@ service.
           }
 
     def CheckIn(self, request, global_params=None):
-      """The worker uses this method to retrieve the assigned operation and.
+      r"""The worker uses this method to retrieve the assigned operation and.
 provide periodic status updates.
 
       Args:

@@ -15,6 +15,8 @@
 
 """A command in a unicode supported group."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
@@ -23,8 +25,8 @@ class Certainly(base.Command):
 
   @staticmethod
   def Args(parser):
-    parser.add_argument(u'--søɨŧɇnłɏ', dest='certainly', default=u'уєѕ',
-                        help=u'This will søɨŧɇnłɏ work.')
+    parser.add_argument('--søɨŧɇnłɏ', dest='certainly', default='уєѕ',
+                        help='This will søɨŧɇnłɏ work.')
 
   def Run(self, args):
     return [args.certainly]

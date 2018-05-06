@@ -13,6 +13,9 @@
 # limitations under the License.
 """gcloud ml speech operations wait unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
@@ -28,7 +31,7 @@ class WaitTest(speech_base.MlSpeechTestBase):
   """Class to test `gcloud ml speech operations wait`."""
 
   def testWait(self, track):
-    self.track = track
+    self.SetUpForTrack(track)
     self._ExpectPollOperationRequests('12345', attempts=1,
                                       results=['Hello world.'])
     result = self.Run('ml speech operations wait 12345')
@@ -39,7 +42,7 @@ class WaitTest(speech_base.MlSpeechTestBase):
     self.assertEqual(expected, resource_projector.MakeSerializable(result))
 
   def testWait_PollsOperation(self, track):
-    self.track = track
+    self.SetUpForTrack(track)
     self._ExpectPollOperationRequests('12345', attempts=3,
                                       results=['Hello world.'])
     result = self.Run('ml speech operations wait 12345')
@@ -50,7 +53,7 @@ class WaitTest(speech_base.MlSpeechTestBase):
     self.assertEqual(expected, resource_projector.MakeSerializable(result))
 
   def testWait_Error(self, track):
-    self.track = track
+    self.SetUpForTrack(track)
     error_json = {'code': 400, 'message': 'Error message.'}
     self._ExpectPollOperationRequests('12345', attempts=3,
                                       error_json=error_json)

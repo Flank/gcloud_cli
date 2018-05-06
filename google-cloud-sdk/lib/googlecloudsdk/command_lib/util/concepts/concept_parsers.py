@@ -23,11 +23,16 @@ of all resources needed for the command, and they should be added all at once
 during calliope's Args method.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.calliope.concepts import util
 from googlecloudsdk.command_lib.util.concepts import completers
+
+import six
+from six.moves import filter  # pylint: disable=redefined-builtin
 
 
 class PresentationSpec(object):
@@ -166,6 +171,8 @@ class ResourcePresentationSpec(PresentationSpec):
     name = self.name.upper()
     if not util.IsPositional(name):
       name = name[len(util.PREFIX):].replace('-', ' ')
+    else:
+      name = name.replace('_', ' ')
     return '{}'.format(name)
 
   @property
@@ -194,7 +201,7 @@ class ResourcePresentationSpec(PresentationSpec):
     if not self.required:
       return False
     for attribute in self.concept_spec.attributes:
-      if not attribute.fallthroughs:
+      if self._GetAttributeArg(attribute) and not attribute.fallthroughs:
         return True
     return False
 
@@ -256,13 +263,8 @@ class ResourcePresentationSpec(PresentationSpec):
     # a more robust solution will be needed, e.g. a GetFallthroughsForAttribute
     # method.
     required = is_anchor and not attribute.fallthroughs
-    # If this is the only argument in the group, the help text should be the
-    # "group" help.
-    if len(filter(bool, self.attribute_to_args_map.values())) == 1:
-      help_text = self.group_help
-    else:
-      # Expand the help text.
-      help_text = attribute.help_text.format(resource=self.resource_spec.name)
+    # Expand the help text.
+    help_text = attribute.help_text.format(resource=self.resource_spec.name)
     plural = attribute == self.resource_spec.anchor and self.plural
     if attribute.completer:
       completer = attribute.completer
@@ -293,9 +295,10 @@ class ResourcePresentationSpec(PresentationSpec):
         kwargs_dict.update({'type': arg_parsers.ArgList()})
     return kwargs_dict
 
-  def _GetAttributeArg(self, attribute, is_anchor=False):
+  def _GetAttributeArg(self, attribute):
     """Creates argument for a specific attribute."""
     name = self.attribute_to_args_map.get(attribute.name, None)
+    is_anchor = attribute == self.resource_spec.anchor
     # Return None for any false value.
     if not name:
       return None
@@ -306,31 +309,35 @@ class ResourcePresentationSpec(PresentationSpec):
   def GetAttributeArgs(self):
     """Generate args to add to the argument group."""
     args = []
-    for attribute in self.resource_spec.attributes[:-1]:
+    for attribute in self.resource_spec.attributes:
       arg = self._GetAttributeArg(attribute)
       if arg:
         args.append(arg)
-    # If the group is optional, the anchor arg is "modal": it is required only
-    # if another argument in the group is specified.
-    arg = self._GetAttributeArg(
-        self.concept_spec.anchor, is_anchor=True)
-    if arg:
-      args.append(arg)
 
     return args
 
   def GetGroupHelp(self):
     """Build group help for the argument group."""
-    description = ['{} - {} The arguments in this group can be used to specify '
-                   'the attributes of this resource.'.format(self.title,
-                                                             self.group_help)]
+    if len(list(filter(bool, self.attribute_to_args_map.values()))) == 1:
+      generic_help = 'This represents a Cloud resource.'
+    else:
+      generic_help = ('The arguments in this group can be used to specify the '
+                      'attributes of this resource.')
+    description = ['{} - {} {}'.format(self.title,
+                                       self.group_help,
+                                       generic_help)]
     if self._skip_flags:
       description.append('(NOTE) Some attributes are not given arguments in '
                          'this group but can be set in other ways.')
       for attr_name in self._skip_flags:
+        hints = self.GetInfo().GetHints(attr_name)
+        if not hints:
+          # This may be an error, but existence of fallthroughs should not be
+          # enforced here.
+          continue
         hint = 'To set the [{}] attribute: {}.'.format(
             attr_name,
-            '; '.join(self.GetInfo().GetHints(attr_name)))
+            '; '.join(hints))
         description.append(hint)
     return ' '.join(description)
 
@@ -476,7 +483,7 @@ class ConceptParser(object):
                                                       presentation_spec.name))
 
     # Also check for duplicate attribute names.
-    for a, arg_name in presentation_spec.attribute_to_args_map.iteritems():
+    for a, arg_name in six.iteritems(presentation_spec.attribute_to_args_map):
       del a  # Unused.
       name = util.NormalizeFormat(arg_name)
       if name in self._all_args:
@@ -493,7 +500,7 @@ class ConceptParser(object):
       parser: the parser for a Calliope command.
     """
     parser.add_concepts(self._runtime_handler)
-    for spec_name, spec in self._specs.iteritems():
+    for spec_name, spec in six.iteritems(self._specs):
       self._runtime_handler.AddConcept(
           util.NormalizeFormat(spec_name), spec.GetInfo(),
           required=spec.required)
@@ -502,7 +509,7 @@ class ConceptParser(object):
   def GetExampleArgString(self):
     """Returns a command line example arg string for the concept."""
     examples = []
-    for _, spec in self._specs.iteritems():
+    for _, spec in six.iteritems(self._specs):
       args = spec.GetExampleArgList()
       if args:
         examples.extend(args)

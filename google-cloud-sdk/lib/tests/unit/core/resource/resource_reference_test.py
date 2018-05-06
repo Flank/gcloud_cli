@@ -62,7 +62,7 @@ class ResourceReferenceTest(test_case.TestCase):
 
   def testGetReferencedKeyNamesFilterFormatPrinter(self):
     printer = resource_printer.Printer('table(abc.xyz:label=ABC, def, pdq)')
-    with self.assertRaisesRegexp(ValueError, ''):
+    with self.assertRaisesRegex(ValueError, ''):
       resource_reference.GetReferencedKeyNames(
           filter_string='ABC:xyz OR pdq<123 OR rst:no]',
           format_string='table(abc.xyz:label=ABC, def, pdq)',

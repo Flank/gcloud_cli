@@ -130,12 +130,12 @@ class LogDataTest(test_case.Base):
                      traceback=None):
     relative_path = relative_path or self._RELATIVE_PATH
 
-    self.assertEquals(log_data.filename, filename)
-    self.assertEquals(log_data.relative_path, relative_path)
-    self.assertEquals(log_data.date, date)
-    self.assertEquals(log_data.command, command)
-    self.assertEquals(log_data.contents, contents)
-    self.assertEquals(log_data.traceback, traceback)
+    self.assertEqual(log_data.filename, filename)
+    self.assertEqual(log_data.relative_path, relative_path)
+    self.assertEqual(log_data.date, date)
+    self.assertEqual(log_data.command, command)
+    self.assertEqual(log_data.contents, contents)
+    self.assertEqual(log_data.traceback, traceback)
 
   def testFromFile_NoCrash(self):
     log_path = self._WriteLogFile()
@@ -143,8 +143,8 @@ class LogDataTest(test_case.Base):
     log_data = info_holder.LogData.FromFile(log_path)
 
     self._AssertLogData(log_data, filename=log_path, date=self._DATE)
-    self.assertEquals(str(log_data),
-                      '[{}]: [gcloud meta debug]'.format(self._RELATIVE_PATH))
+    self.assertEqual(str(log_data),
+                     '[{}]: [gcloud meta debug]'.format(self._RELATIVE_PATH))
 
   def testFromFile_HyphenCommand(self):
     modified_log_contents = LOG_NO_CRASH.replace('meta', 'm-e-t-a')
@@ -155,7 +155,7 @@ class LogDataTest(test_case.Base):
     self._AssertLogData(
         log_data, filename=log_path, date=self._DATE,
         command='gcloud m-e-t-a debug', contents=modified_log_contents)
-    self.assertEquals(
+    self.assertEqual(
         str(log_data),
         '[{}]: [gcloud m-e-t-a debug]'.format(self._RELATIVE_PATH))
 
@@ -235,7 +235,7 @@ class LogDataTest(test_case.Base):
     self._AssertLogData(log_data, filename=log_path, date=self._DATE,
                         command='gcloud version', contents=LOG_CRASH,
                         traceback=TRACEBACK_LOG)
-    self.assertEquals(
+    self.assertEqual(
         str(log_data),
         '[{}]: [gcloud version] (crash detected)'.format(self._RELATIVE_PATH))
 
@@ -246,8 +246,8 @@ class LogDataTest(test_case.Base):
 
     self._AssertLogData(log_data, filename=log_path, date=self._DATE,
                         command=None, contents='')
-    self.assertEquals(str(log_data),
-                      '[{}]: [None]'.format(self._RELATIVE_PATH))
+    self.assertEqual(str(log_data),
+                     '[{}]: [None]'.format(self._RELATIVE_PATH))
 
 
 class AnonymizerTest(sdk_test_base.SdkBase):

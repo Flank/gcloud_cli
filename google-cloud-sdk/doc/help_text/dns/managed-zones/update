@@ -1,0 +1,97 @@
+NAME
+    gcloud dns managed-zones update - update an existing Cloud DNS managed-zone
+
+SYNOPSIS
+    gcloud dns managed-zones update ZONE
+        [--denial-of-existence=DENIAL_OF_EXISTENCE] [--description=DESCRIPTION]
+        [--dnssec-state=DNSSEC_STATE] [--ksk-algorithm=KSK_ALGORITHM]
+        [--ksk-key-length=KSK_KEY_LENGTH] [--update-labels=[KEY=VALUE,...]]
+        [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
+        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Update an existing Cloud DNS managed-zone.
+
+POSITIONAL ARGUMENTS
+     ZONE - The name of the managed-zone to be updated. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       ZONE
+          The ID of the zone or a fully qualified identifier for the zone.
+
+FLAGS
+     --denial-of-existence=DENIAL_OF_EXISTENCE
+        Requires DNSSEC enabled. DENIAL_OF_EXISTENCE must be one of: nsec,
+        nsec3.
+
+     --description=DESCRIPTION
+        Short description for the managed-zone.
+
+     --dnssec-state=DNSSEC_STATE
+        The DNSSEC state for this managed zone. DNSSEC_STATE must be one of:
+
+         off
+            Disable DNSSEC for the managed zone.
+         on
+            Enable DNSSEC for the managed zone.
+         transfer
+            Enable DNSSEC and allow transferring a signed zone in or out.
+
+     --ksk-algorithm=KSK_ALGORITHM
+        String mnemonic specifying the DNSSEC algorithm of the key-signing key.
+        Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,
+        RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384
+
+     --ksk-key-length=KSK_KEY_LENGTH
+        Length of the key-signing key in bits. Requires DNSSEC enabled.
+
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+     --zsk-algorithm=ZSK_ALGORITHM
+        String mnemonic specifying the DNSSEC algorithm of the zone-signing
+        key. Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,
+        RSASHA512, ECDSAP256SHA256, ECDSAP384SHA384
+
+     --zsk-key-length=ZSK_KEY_LENGTH
+        Length of the zone-signing key in bits. Requires DNSSEC enabled.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud dns managed-zones update --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud dns managed-zones update --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    To change the description of a managed-zone, run:
+
+        $ gcloud dns managed-zones update my_zone \
+            --description="Hello, world!"
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta dns managed-zones update
+

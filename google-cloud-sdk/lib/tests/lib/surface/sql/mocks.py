@@ -50,6 +50,9 @@ class MockEndpoints(object):
   def GetRequestInstance(self, name=data.DEFAULT_INSTANCE_NAME):
     return data.GetRequestInstance(self.Project(), name)
 
+  def GetExternalMasterRequestInstance(self, name=data.DEFAULT_INSTANCE_NAME):
+    return data.GetExternalMasterRequestInstance(self.Project(), name)
+
   def GetPatchRequestInstance(self, name=data.DEFAULT_INSTANCE_NAME):
     return data.GetPatchRequestInstance(self.Project(), name)
 
@@ -61,6 +64,9 @@ class MockEndpoints(object):
 
   def GetPostgresInstance(self, name=data.DEFAULT_INSTANCE_NAME):
     return data.GetPostgresInstance(self.Project(), name)
+
+  def GetExternalMasterInstance(self, name=data.DEFAULT_INSTANCE_NAME):
+    return data.GetExternalMasterInstance(self.Project(), name)
 
   def GetInstanceGetRequest(self, instance):
     return data.GetInstanceGetRequest(self.Project(), instance)
@@ -96,15 +102,16 @@ class MockEndpoints(object):
 
   # Instance expect helpers.
 
-  def ExpectInstanceGet(self, instance, diff=None):
+  def ExpectInstanceGet(self, instance, diff=None, no_response=False):
     self.instance = helpers.UpdateMessage(instance, diff)
+    response = None if no_response else self.instance
     self.mocked_client.instances.Get.Expect(
-        self.GetInstanceGetRequest(self.instance), self.instance)
+        self.GetInstanceGetRequest(self.instance), response)
 
-  def ExpectInstanceInsert(self, instance, diff=None):
+  def ExpectInstanceInsert(self, instance, diff=None, no_response=False):
     self.instance = helpers.UpdateMessage(instance, diff)
-    self.mocked_client.instances.Insert.Expect(self.instance,
-                                               self.GetPendingCreateOperation())
+    response = None if no_response else self.GetPendingCreateOperation()
+    self.mocked_client.instances.Insert.Expect(self.instance, response)
 
   def ExpectInstancePatch(self, instance, diff=None):
     self.instance = helpers.UpdateMessage(instance, diff)

@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Test of the 'operations' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.container import util
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
@@ -70,6 +72,17 @@ class OperationsTestGA(base.TestBaseV1,
     self.ExpectListOperation(zone=self.ZONE, response=resp)
     self.Run(self.operations_command_base + ' --zone={0} list'.format(
         self.ZONE))
+    self.AssertOutputContains('CREATE_CLUSTER')
+
+  def testListOneRegion(self):
+    kwargs = {'zone': self.REGION}
+    operations = [
+        self._MakeOperation(**kwargs),
+    ]
+    resp = self.msgs.ListOperationsResponse(operations=operations)
+    self.ExpectListOperation(zone=self.REGION, response=resp)
+    self.Run(self.operations_command_base + ' --region={0} list'.format(
+        self.REGION))
     self.AssertOutputContains('CREATE_CLUSTER')
 
   def testListGlobal(self):
@@ -197,16 +210,6 @@ class OperationsTestAlphaV1Alpha1API(
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(False)
 
-  def testListOneRegion(self):
-    kwargs = {'zone': self.REGION}
-    operations = [
-        self._MakeOperation(**kwargs),
-    ]
-    resp = self.msgs.ListOperationsResponse(operations=operations)
-    self.ExpectListOperation(zone=self.REGION, response=resp)
-    self.Run(self.operations_command_base + ' --region={0} list'.format(
-        self.REGION))
-    self.AssertOutputContains('CREATE_CLUSTER')
 
 if __name__ == '__main__':
   test_case.main()

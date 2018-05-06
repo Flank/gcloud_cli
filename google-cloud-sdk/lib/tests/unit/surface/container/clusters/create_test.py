@@ -14,6 +14,8 @@
 
 """Tests for 'clusters create' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 import os
 
@@ -28,6 +30,7 @@ from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.container import base
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
@@ -109,6 +112,10 @@ class CreateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testCreateDefaults(self):
     self.WriteInput('y')
     self._TestCreateDefaults(self.ZONE)
+
+  def testCreateDefaultsRegional(self):
+    self.WriteInput('y\ny')
+    self._TestCreateDefaults(self.REGION)
 
   def testCreateDefaultsJsonOutput(self):
     self.ExpectCreateCalls()
@@ -359,7 +366,8 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
   def testServiceAccountCloudPlatformScopes(self):
     cluster_kwargs = {
         'serviceAccount': 'my-sa',
-        'oauthScopes': ['https://www.googleapis.com/auth/cloud-platform'],
+        'oauthScopes': ['https://www.googleapis.com/auth/cloud-platform',
+                        'https://www.googleapis.com/auth/userinfo.email'],
     }
     expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
         cluster_kwargs)
@@ -718,15 +726,6 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
 
 class CreateTestGAOnly(CreateTestGA):
   """gcloud GA track only using container v1 API (not beta/alpha)."""
-
-  def testCreateAddonsFlagsMutualExclusive(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --addons: At most one of --addons | --disable-addons '
-        'may be specified.'):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' create {0} --addons=HttpLoadBalancing,KubernetesDashboard'
-               ' --disable-addons=HttpLoadBalancing,KubernetesDashboard'
-               .format(self.CLUSTER_NAME))
 
   @parameterized.parameters(
       ('--service-account=my-sa --enable-cloud-endpoints',
@@ -1103,10 +1102,6 @@ class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
                ' create {0} --maintenance-window=24:93'.format(
                    self.CLUSTER_NAME))
     self.AssertErrContains('argument --maintenance-window')
-
-  def testCreateDefaultsRegional(self):
-    self.WriteInput('y\ny')
-    self._TestCreateDefaults(self.REGION)
 
   @parameterized.parameters(
       '--enable-cloud-endpoints',

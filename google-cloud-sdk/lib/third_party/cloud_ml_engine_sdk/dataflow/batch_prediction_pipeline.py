@@ -1,4 +1,4 @@
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,10 +22,6 @@ import batch_prediction
 from google.cloud.ml.dataflow.io.multifiles_source import ReadFromMultiFilesText
 from google.cloud.ml.dataflow.io.multifiles_source import ReadFromMultiFilesTFRecord
 from google.cloud.ml.dataflow.io.multifiles_source import ReadFromMultiFilesTFRecordGZip
-
-FILE_LIST_SEPARATOR = ","
-OUTPUT_RESULTS_FILES_BASENAME_ = "prediction.results"
-OUTPUT_ERRORS_FILES_BASENAME_ = "prediction.errors_stats"
 
 
 def keys_to_csv(keys):

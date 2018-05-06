@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha category-manager taxonomies update - update the description of
+        a taxonomy
+
+SYNOPSIS
+    gcloud alpha category-manager taxonomies update TAXONOMY
+        --description=DESCRIPTION [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Update the description of a taxonomy.
+
+POSITIONAL ARGUMENTS
+     TAXONOMY - A taxonomy reference. This represents a Cloud resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       TAXONOMY
+          The ID of the taxonomy or a fully qualified identifier for the
+          taxonomy.
+
+REQUIRED FLAGS
+     --description=DESCRIPTION
+        A human-readable description of the taxonomy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

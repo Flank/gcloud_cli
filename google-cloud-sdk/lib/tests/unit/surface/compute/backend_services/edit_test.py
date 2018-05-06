@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the backend-services edit subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from tests.lib import test_case
@@ -205,7 +207,7 @@ class BackendServicesEditTest(test_base.BaseEditTest):
         """)
 
     self.AssertErrContains('[healthChecks] must be referenced using URIs.')
-    # Note we only check the begining and end of the full uri because
+    # Note we only check the beginning and end of the full uri because
     # different api versions (v1 vs v2 beta1) lead to different locations
     # of line breakes in the middle of the rror message.
     self.AssertErrContains('Invalid [healthChecks] reference: [{uri}'.format(

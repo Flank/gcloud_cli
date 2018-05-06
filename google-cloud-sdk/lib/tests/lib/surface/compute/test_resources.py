@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +17,6 @@ import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 
-clouduseraccounts_beta_messages = core_apis.GetMessagesModule(
-    'clouduseraccounts', 'beta')
 alpha_messages = core_apis.GetMessagesModule('compute', 'alpha')
 beta_messages = core_apis.GetMessagesModule('compute', 'beta')
 messages = core_apis.GetMessagesModule('compute', 'v1')
@@ -870,38 +869,6 @@ BETA_GLOBAL_OPERATIONS = [
                   'my-project/global/operations/operation-1'),
         targetLink=('https://www.googleapis.com/compute/beta/projects/'
                     'my-project/resource/resource-1')),
-]
-
-ACCOUNT_OPERATIONS = [
-    clouduseraccounts_beta_messages.Operation(
-        name='operation-1',
-        status=clouduseraccounts_beta_messages.Operation
-        .StatusValueValuesEnum.DONE,
-        operationType='insert',
-        insertTime='2014-09-04T09:55:33.679-07:00',
-        selfLink=('https://www.googleapis.com/clouduseraccounts/beta/projects/'
-                  'my-project/global/operations/operation-1'),
-        targetLink=('https://www.googleapis.com/clouduseraccounts/beta/'
-                    'projects/my-project/global/users/test-1')),
-]
-
-GROUPS = [
-    clouduseraccounts_beta_messages.Group(
-        creationTimestamp='2015-03-10T13:05:29.819-07:00',
-        id=long(5296074615390662758),
-        kind='clouduseraccounts#group',
-        members=[
-            ('https://www.googleapis.com/clouduseraccounts/beta/projects/'
-             'my-project/global/users/u1'),
-        ],
-        name='group1',
-    ),
-    clouduseraccounts_beta_messages.Group(
-        creationTimestamp='2015-03-10T13:05:29.819-07:00',
-        id=long(5296074615390662758),
-        kind='clouduseraccounts#group',
-        name='group2',
-    ),
 ]
 
 
@@ -1867,6 +1834,218 @@ NETWORK_PEERINGS_V1 = [
 ]
 
 
+def MakeNodeGroups(msgs, api):
+  """Creates a set of Node Group messages for the given API version.
+
+  Args:
+    msgs: The compute messages API handle.
+    api: The API version for which to create the instances.
+
+  Returns:
+    A list of message objects representing sole tenancy note groups.
+  """
+  prefix = _COMPUTE_PATH + '/' + api
+  return [
+      msgs.NodeGroup(
+          creationTimestamp='2018-01-23T10:00:00.0Z',
+          description='description1',
+          kind='compute#nodeGroup',
+          name='group-1',
+          nodeTemplate=(prefix + '/projects/my-project/'
+                        'regions/region-1/nodeTemplates/template-1'),
+          nodes=[
+              msgs.NodeGroupNode(
+                  index=1,
+                  instances=[
+                      prefix + '/projects/my-project/zones/zone-1/'
+                      'instances/instance-1',
+                      prefix + '/projects/my-project/zones/zone-1/'
+                      'instances/instance-2'],
+                  nodeType='iAPX-286'),
+              msgs.NodeGroupNode(
+                  index=2,
+                  instances=[
+                      prefix + '/projects/my-project/zones/zone-1/'
+                      'instances/instance-3'],
+                  nodeType='iAPX-286')],
+          selfLink=(prefix + '/projects/my-project/'
+                    'zones/zone-1/nodeGroups/group-1'),
+          zone='zone-1'),
+      msgs.NodeGroup(
+          creationTimestamp='2018-02-21T10:00:00.0Z',
+          description='description2',
+          kind='compute#nodeGroup',
+          name='group-2',
+          nodeTemplate=(prefix + '/projects/my-project/'
+                        'regions/region-1/nodeTemplates/template-2'),
+          nodes=[
+              msgs.NodeGroupNode(
+                  index=1,
+                  instances=[
+                      prefix + '/projects/my-project/zones/zone-1/'
+                      'instances/instance-4',
+                      prefix + '/projects/my-project/zones/zone-1/'
+                      'instances/instance-5'],
+                  nodeType='n1-node-96-624')],
+          selfLink=(prefix + '/projects/my-project/'
+                    'zones/zone-1/nodeGroups/group-2'),
+          zone='zone-1'),
+  ]
+
+
+NODE_GROUPS_ALPHA = MakeNodeGroups(alpha_messages, 'alpha')
+NODE_GROUPS = NODE_GROUPS_ALPHA
+
+
+def MakeNodeTemplates(msgs, api):
+  """Creates a set of Node Template messages for the given API version.
+
+  Args:
+    msgs: The compute messages API handle.
+    api: The API version for which to create the instances.
+
+  Returns:
+    A list of message objects representing sole tenancy note templates.
+  """
+  prefix = _COMPUTE_PATH + '/' + api
+  node_affinity_value = msgs.NodeTemplate.NodeAffinityLabelsValue
+  return [
+      msgs.NodeTemplate(
+          creationTimestamp='2017-12-12T10:00:00.0Z',
+          description='a cool template',
+          kind='compute#nodeTemplate',
+          name='template-1',
+          nodeAffinityLabels=node_affinity_value(
+              additionalProperties=[
+                  node_affinity_value.AdditionalProperty(
+                      key='environment', value='prod'),
+                  node_affinity_value.AdditionalProperty(
+                      key='nodeGrouping', value='frontend')]),
+          nodeType='iAPX-286',
+          region=(prefix + '/projects/my-project/regions/region-1'),
+          selfLink=(prefix + '/projects/my-project/'
+                    'regions/region-1/nodeTemplates/template-1'),
+          status=msgs.NodeTemplate.StatusValueValuesEnum.READY,
+          statusMessage='Template is ready.'),
+      msgs.NodeTemplate(
+          creationTimestamp='2018-01-15T10:00:00.0Z',
+          description='a cold template',
+          kind='compute#nodeTemplate',
+          name='template-2',
+          nodeAffinityLabels=node_affinity_value(
+              additionalProperties=[
+                  node_affinity_value.AdditionalProperty(
+                      key='environment', value='prod'),
+                  node_affinity_value.AdditionalProperty(
+                      key='nodeGrouping', value='backend')]),
+          nodeType='n1-node-96-624',
+          region=(prefix + '/projects/my-project/regions/region-1'),
+          selfLink=(prefix + '/projects/my-project/'
+                    'regions/region-1/nodeTemplates/template-2'),
+          status=msgs.NodeTemplate.StatusValueValuesEnum.CREATING,
+          statusMessage='Template is being created.'),
+  ]
+
+
+NODE_TEMPLATES_ALPHA = MakeNodeTemplates(alpha_messages, 'alpha')
+NODE_TEMPLATES = NODE_TEMPLATES_ALPHA
+
+
+def MakeNodeTypes(msgs, api):
+  """Creates a set of Host Type messages for the given API version.
+
+  Args:
+    msgs: The compute messages API handle.
+    api: The API version for which to create the instances.
+
+  Returns:
+    A list of message objects representing sole tenancy host types.
+  """
+  prefix = _COMPUTE_PATH + '/' + api
+  return [
+      msgs.NodeType(
+          cpuPlatform='80286',
+          creationTimestamp='1982-02-01T10:00:00.0Z',
+          deprecated=msgs.DeprecationStatus(
+              state=msgs.DeprecationStatus.StateValueValuesEnum.OBSOLETE),
+          description='oldie but goodie',
+          guestCpus=1,
+          id=159265359,
+          kind='compute#nodeType',
+          localSsdGb=0,
+          memoryMb=256,
+          name='iAPX-286',
+          selfLink=(prefix + '/projects/my-project/'
+                    'zones/zone-1/nodeTypes/iAPX-286'),
+          zone='zone-1'),
+      msgs.NodeType(
+          cpuPlatform='skylake',
+          creationTimestamp='2014-12-12T10:00:00.0Z',
+          description='',
+          guestCpus=96,
+          id=159265360,
+          kind='compute#nodeType',
+          localSsdGb=46,
+          memoryMb=416000,
+          name='n1-node-96-624',
+          selfLink=(prefix + '/projects/my-project/'
+                    'zones/zone-1/nodeTypes/n1-node-96-624'),
+          zone='zone-1'),
+  ]
+
+
+NODE_TYPES_ALPHA = MakeNodeTypes(alpha_messages, 'alpha')
+NODE_TYPES = NODE_TYPES_ALPHA
+
+
+def MakeNetworkEndpointGroups(msgs, api):
+  """Creates a set of NEG messages for the given API version.
+
+  Args:
+    msgs: The compute messages API handle.
+    api: The API version for which to create the instances.
+
+  Returns:
+    A list of message objects representing network endpoint groups.
+  """
+  prefix = _COMPUTE_PATH + '/' + api
+  neg_type_enum = msgs.NetworkEndpointGroup.NetworkEndpointTypeValueValuesEnum
+  type_enum = msgs.NetworkEndpointGroup.TypeValueValuesEnum
+  return [
+      msgs.NetworkEndpointGroup(
+          description='My NEG 1',
+          kind='compute#networkEndpointGroup',
+          loadBalancer=msgs.NetworkEndpointGroupLbNetworkEndpointGroup(
+              network=('https://www.googleapis.com/compute/v1/projects/'
+                       'my-project/global/networks/network-1'),
+              zone='zone-1'),
+          name='my-neg1',
+          networkEndpointType=neg_type_enum.GCE_VM_IP_PORT,
+          selfLink=(prefix + '/projects/my-project/zones/zone-1/'
+                    'networkEndpointGroups/my-neg1'),
+          size=5,
+          type=type_enum.LOAD_BALANCING),
+      msgs.NetworkEndpointGroup(
+          description='My NEG Too',
+          kind='compute#networkEndpointGroup',
+          loadBalancer=msgs.NetworkEndpointGroupLbNetworkEndpointGroup(
+              network=('https://www.googleapis.com/compute/v1/projects/'
+                       'my-project/global/networks/network-2'),
+              zone='zone-2'),
+          name='my-neg2',
+          networkEndpointType=neg_type_enum.GCE_VM_IP_PORT,
+          selfLink=(prefix + '/projects/my-project/zones/zone-2/'
+                    'networkEndpointGroups/my-neg2'),
+          size=2,
+          type=type_enum.LOAD_BALANCING),
+  ]
+
+
+NETWORK_ENDPOINT_GROUPS_ALPHA = MakeNetworkEndpointGroups(alpha_messages,
+                                                          'alpha')
+NETWORK_ENDPOINT_GROUPS = NETWORK_ENDPOINT_GROUPS_ALPHA
+
+
 def MakeOsloginClient(version, use_extended_profile=False):
   """Return a dummy oslogin API client."""
   oslogin_messages = core_apis.GetMessagesModule('oslogin', version)
@@ -2302,7 +2481,7 @@ SSL_CERTIFICATES = [
     ),
     messages.SslCertificate(
         name='ssl-cert-2',
-        certificate=(textwrap.dedent("""
+        certificate=(textwrap.dedent("""\
             -----BEGIN CERTIFICATE-----
             MIICZzCCAdACCQChX1chr91razANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
             UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
@@ -2329,7 +2508,7 @@ ALPHA_SSL_CERTIFICATES = [
         type=alpha_messages.SslCertificate.TypeValueValuesEnum.SELF_MANAGED,
         name='ssl-cert-1',
         selfManaged=alpha_messages.SslCertificateSelfManagedSslCertificate(
-            certificate=(textwrap.dedent("""
+            certificate=(textwrap.dedent("""\
                 -----BEGIN CERTIFICATE-----
                 MIICZzCCAdACCQDjYQHCnQOiTDANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJV
                 UzETMBEGA1UECAwKV2FzaGluZ3RvbjEQMA4GA1UEBwwHU2VhdHRsZTEPMA0GA1UE
@@ -2354,7 +2533,11 @@ ALPHA_SSL_CERTIFICATES = [
         type=alpha_messages.SslCertificate.TypeValueValuesEnum.
         MANAGED,
         managed=alpha_messages.SslCertificateManagedSslCertificate(
-            domains=['test1.certsbridge.com', 'test2.certsbridge.com'],
+            domains=[
+                'test1.certsbridge.com',
+                # Punycode for Ṳᾔḯ¢◎ⅾℯ.certsbridge.com
+                'xn--8a342mzfam5b18csni3w.certsbridge.com',
+            ],
             status=alpha_messages.SslCertificateManagedSslCertificate.
             StatusValueValuesEnum.ACTIVE,
             domainStatus=alpha_messages.
@@ -2370,7 +2553,7 @@ ALPHA_SSL_CERTIFICATES = [
                     ),
                     alpha_messages.SslCertificateManagedSslCertificate.
                     DomainStatusValue.AdditionalProperty(
-                        key='test2.certsbridge.com',
+                        key='xn--8a342mzfam5b18csni3w.certsbridge.com',
                         value=alpha_messages.
                         SslCertificateManagedSslCertificate.DomainStatusValue.
                         AdditionalProperty.ValueValueValuesEnum.
@@ -2724,64 +2907,6 @@ def MakeUrlMaps(msgs, api):
 URL_MAPS_ALPHA = MakeUrlMaps(messages, 'alpha')
 URL_MAPS_BETA = MakeUrlMaps(messages, 'beta')
 URL_MAPS = MakeUrlMaps(messages, 'v1')
-
-USERS = [
-    clouduseraccounts_beta_messages.User(
-        creationTimestamp='2011-11-11T17:54:10.636-07:00',
-        description='the first user',
-        id=long(4964235628101519471),
-        kind='clouduseraccounts#user',
-        name='user1',
-        owner='user1@google.com',
-        publicKeys=[clouduseraccounts_beta_messages.PublicKey(
-            creationTimestamp='2015-03-06T11:12:46.854-08:00',
-            description='',
-            expirationTimestamp='1969-12-31T16:00:00.000-08:00',
-            fingerprint='b3ca816958b574f7f12c3c43f6e9065d',
-            key=('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIf6GtJU+tRBkM4Gc7ueu'
-                 'Z5WLMidMvh4hiytF9bSixQVWgrm520G2VbzHgof/o/3jqdtUCwJcokORTyP'
-                 's/cdNWuzieM7XThHgLxAyBwoh7D5wPSvi83KqjG+TkI9StSNo4VpXvvYBXH'
-                 'm3TXw87EtmewiTwaRv9luIlnBAua98tA87U5jZF6386Vd/SkdXzLX6CKgfc'
-                 'ofjsFcIaui7VcLt8CzBGiaF7ZUwxDroB2Hxl03mjnAzdVlOGdWa3HyxmXON'
-                 'ClTj83Do2X+o+bNe0sx7TogkAKJYvB3bveiqgCLsG4VUltX+3FfQ4miBezo'
-                 'Cne68ZpCWPmt9m8+Q3QdEGvNx1 user1@google.com'),
-        )],
-        selfLink=(
-            'https://www.googleapis.com/clouduseraccounts/beta/projects/'
-            'my-project/global/users/user1')
-    ),
-
-    clouduseraccounts_beta_messages.User(
-        creationTimestamp='2015-11-11T17:54:10.636-07:00',
-        description='the second user',
-        id=long(4964235628101519479),
-        kind='clouduseraccounts#user',
-        name='user2',
-        owner='user2@google.com',
-        publicKeys=[clouduseraccounts_beta_messages.PublicKey(
-            creationTimestamp='2015-03-06T11:12:46.854-08:00',
-            description='',
-            expirationTimestamp='1969-12-31T16:00:00.000-08:00',
-            fingerprint='b3ca816958b574f7f12c3c43f6e9065d',
-            key=('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDIf6GtJU+tRBkM4Gc7ueu'
-                 'Z5WLMidMvh4hiytF9bSixQVWgrm520G2VbzHgof/o/3jqdtUCwJcokORTyP'
-                 's/cdNWuzieM7XThHgLxAyBwoh7D5wPSvi83KqjG+TkI9StSNo4VpXvvYBXH'
-                 'm3TXw87EtmewiTwaRv9luIlnBAua98tA87U5jZF6386Vd/SkdXzLX6CKgfc'
-                 'ofjsFcIaui7VcLt8CzBGiaF7ZUwxDroB2Hxl03mjnAzdVlOGdWa3HyxmXON'
-                 'ClTj83Do2X+o+bNe0sx7TogkAKJYvB3bveiqgCLsG4VUltX+3FfQ4miBezo'
-                 'Cne68ZpCWPmt9m8+Q3QdEGvNx1 user2@google.com'),
-        )],
-    ),
-
-    clouduseraccounts_beta_messages.User(
-        creationTimestamp='2015-11-11T17:54:10.636-07:00',
-        description='the third user',
-        id=long(4964235628101519485),
-        kind='clouduseraccounts#user',
-        name='user3',
-        owner='user3@google.com',
-    ),
-]
 
 
 def MakeVpnTunnels(msgs, api):

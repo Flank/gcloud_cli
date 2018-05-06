@@ -13,21 +13,29 @@
 # limitations under the License.
 """Tests that exercise IAM-related 'gcloud kms keys *' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
-class CryptokeysIamTest(base.KmsMockTest):
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
+class CryptokeysGetIamTest(base.KmsMockTest):
 
   def SetUp(self):
     self.key_name = self.project_name.Descendant('global/my_kr/my_key')
 
-  def testGet(self):
+  def testGet(self, track):
+    self.track = track
     self.kms.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
         self.messages.
         CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
             resource=self.key_name.RelativeName()),
-        self.messages.Policy(etag='foo'))
+        self.messages.Policy(etag=b'foo'))
 
     self.Run('kms keys get-iam-policy '
              '--location={0} --keyring={1} {2}'.format(
@@ -35,12 +43,13 @@ class CryptokeysIamTest(base.KmsMockTest):
                  self.key_name.crypto_key_id))
     self.AssertOutputContains('etag: Zm9v')  # "foo" in b64
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
+    self.track = track
     self.kms.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
         self.messages.
         CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
             resource=self.key_name.RelativeName()),
-        self.messages.Policy(etag='foo'))
+        self.messages.Policy(etag=b'foo'))
 
     self.Run("""
         kms keys get-iam-policy
@@ -52,9 +61,15 @@ class CryptokeysIamTest(base.KmsMockTest):
 
     self.AssertOutputEquals('Zm9v\n')
 
+
+class CryptokeysIamTest(base.KmsMockTest):
+
+  def SetUp(self):
+    self.key_name = self.project_name.Descendant('global/my_kr/my_key')
+
   def testSetBindings(self):
     policy = self.messages.Policy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
@@ -88,7 +103,7 @@ etag: Zm9v
 
   def testSetBindingsAndAuditConfig(self):
     policy = self.messages.Policy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ],
@@ -140,10 +155,10 @@ etag: Zm9v
         self.messages.
         CloudkmsProjectsLocationsKeyRingsCryptoKeysGetIamPolicyRequest(
             resource=self.key_name.RelativeName()),
-        self.messages.Policy(etag='foo'))
+        self.messages.Policy(etag=b'foo'))
 
     policy = self.messages.Policy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
@@ -167,11 +182,11 @@ etag: Zm9v
 
   def testRemoveBinding(self):
     policy_before = self.messages.Policy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
-    policy_after = self.messages.Policy(etag='foo', bindings=[])
+    policy_after = self.messages.Policy(etag=b'foo', bindings=[])
 
     self.kms.projects_locations_keyRings_cryptoKeys.GetIamPolicy.Expect(
         self.messages.

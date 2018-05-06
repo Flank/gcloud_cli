@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'source clone' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import stat
 import subprocess
@@ -112,13 +114,13 @@ class CloneTest(cli_test_base.CliTestBase):
     with files.ChDir(target_dir):
       proc = subprocess.Popen(['git', 'status'])
       proc.communicate()
-      self.assertEquals(0, proc.returncode)
+      self.assertEqual(0, proc.returncode)
 
       properties.VALUES.core.account.Set('some-other-nonexistant account')
       # Make sure git can now authenticate on its own.
       proc = subprocess.Popen(['git', 'pull'])
       proc.communicate()
-      self.assertEquals(0, proc.returncode)
+      self.assertEqual(0, proc.returncode)
 
   def testClone_RefreshToken(self):
     with e2e_base.RefreshTokenAuth() as auth:

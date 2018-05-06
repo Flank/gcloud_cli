@@ -14,8 +14,8 @@
 
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
 from tests.lib.surface.firebase.test import e2e_base
+from tests.lib.surface.firebase.test.android import commands
 
 
 class GameLoopRunTest(e2e_base.TestIntegrationTestBase):

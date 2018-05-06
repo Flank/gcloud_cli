@@ -16,6 +16,7 @@ from apitools.base.py import encoding
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute.tpus import base
@@ -38,6 +39,12 @@ class CreateTest(base.TpuUnitTestBase):
   def SetUp(self):
     self.zone = 'us-central1-c'
     properties.VALUES.compute.zone.Set(self.zone)
+    self.create_op_ref = resources.REGISTRY.Parse(
+        'create',
+        params={
+            'projectsId': self.Project(),
+            'locationsId': self.zone},
+        collection='tpu.projects.locations.operations')
     self.StartPatch('time.sleep')
 
   def testCreateWithDefaults(self, track):
@@ -45,8 +52,10 @@ class CreateTest(base.TpuUnitTestBase):
     properties.VALUES.core.user_output_enabled.Set(True)
     node = self.messages.Node(cidrBlock='10.20.10.0/29',
                               acceleratorType='tpu-v2',
+                              network='my-tf-network',
                               tensorflowVersion='1.6')
-    create_response = self.GetOperationResponse('create')
+    create_response = self.GetOperationResponse(
+        self.create_op_ref.RelativeName())
     create_response.response = self._GetNodeResponseValue(node)
     create_request = self.messages.TpuProjectsLocationsNodesCreateRequest(
         node=node, nodeId='mytpu', parent=self.GetParent())
@@ -64,7 +73,7 @@ class CreateTest(base.TpuUnitTestBase):
     self.WriteInput('Y\n')
     self.assertEqual(
         self.Run('compute tpus create mytpu --range 10.20.10.0/29 '
-                 '--version 1.6'),
+                 '--network my-tf-network --version 1.6'),
         op_done_response.response
     )
 
@@ -78,7 +87,8 @@ class CreateTest(base.TpuUnitTestBase):
         acceleratorType='tpu-v2',
     )
 
-    create_response = self.GetOperationResponse('create')
+    create_response = self.GetOperationResponse(
+        self.create_op_ref.RelativeName())
     create_response.response = self._GetNodeResponseValue(node)
     create_request = self.messages.TpuProjectsLocationsNodesCreateRequest(
         node=node, nodeId='mytpu', parent=self.GetParent())
@@ -113,7 +123,8 @@ class CreateTest(base.TpuUnitTestBase):
         acceleratorType='v2-8',
     )
 
-    create_response = self.GetOperationResponse('create')
+    create_response = self.GetOperationResponse(
+        self.create_op_ref.RelativeName())
     create_response.response = self._GetNodeResponseValue(node)
     create_request = self.messages.TpuProjectsLocationsNodesCreateRequest(
         node=node, nodeId='mytpu', parent=self.GetParent())
@@ -143,8 +154,10 @@ class CreateTest(base.TpuUnitTestBase):
     properties.VALUES.core.user_output_enabled.Set(True)
     node = self.messages.Node(cidrBlock='10.20.10.0/29',
                               acceleratorType='tpu-v2',
+                              network='my-tf-network',
                               tensorflowVersion='1.6')
-    create_response = self.GetOperationResponse('create')
+    create_response = self.GetOperationResponse(
+        self.create_op_ref.RelativeName())
     create_response.response = self._GetNodeResponseValue(node)
     create_request = self.messages.TpuProjectsLocationsNodesCreateRequest(
         node=node, nodeId='mytpu', parent=self.GetParent())
@@ -160,16 +173,19 @@ class CreateTest(base.TpuUnitTestBase):
     )
 
     self.WriteInput('Y\n')
-    self.Run('compute tpus create mytpu --range 10.20.10.0/29 --version 1.6')
-    self.AssertErrContains('Waiting for [create] to finish')
-    self.AssertErrContains('Created [mytpu].')
+    self.Run('compute tpus create mytpu --range 10.20.10.0/29 --version 1.6 '
+             '--network my-tf-network')
+    self.AssertErrMatches(r'Waiting for operation \[.*create\] to complete')
+    self.AssertErrContains('Created tpu [mytpu].')
 
   def testCreateFailed(self, track):
     self._SetTrack(track)
     node = self.messages.Node(cidrBlock='10.20.10.0/29',
                               acceleratorType='tpu-v2',
+                              network='my-tf-network',
                               tensorflowVersion='1.6')
-    create_response = self.GetOperationResponse('create')
+    create_response = self.GetOperationResponse(
+        self.create_op_ref.RelativeName())
     create_response.response = self._GetNodeResponseValue(node)
     create_request = self.messages.TpuProjectsLocationsNodesCreateRequest(
         node=node, nodeId='mytpu', parent=self.GetParent())
@@ -186,8 +202,9 @@ class CreateTest(base.TpuUnitTestBase):
     )
 
     self.WriteInput('Y\n')
-    with self.assertRaisesRegexp(waiter.OperationError, r'Create Failed.'):
-      self.Run('compute tpus create mytpu --range 10.20.10.0/29 --version 1.6')
+    with self.assertRaisesRegex(waiter.OperationError, r'Create Failed.'):
+      self.Run('compute tpus create mytpu --range 10.20.10.0/29 --version 1.6'
+               ' --network my-tf-network')
 
 
 if __name__ == '__main__':

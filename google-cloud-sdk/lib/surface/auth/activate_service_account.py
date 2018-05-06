@@ -14,6 +14,9 @@
 
 """A simple auth command to bootstrap authentication with oauth2."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import getpass
 import json
 
@@ -24,6 +27,7 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.credentials import store as c_store
+from googlecloudsdk.core.util import encoding
 
 
 class ActivateServiceAccount(base.SilentCommand):
@@ -131,7 +135,7 @@ def _IsJsonFile(filename):
   """Check and validate if given filename is proper json file."""
   content = console_io.ReadFromFileOrStdin(filename, binary=True)
   try:
-    return json.loads(content), True
+    return json.loads(encoding.Decode(content)), True
   except ValueError as e:
     if filename.endswith('.json'):
       raise auth_service_account.BadCredentialFileException(

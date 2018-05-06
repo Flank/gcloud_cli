@@ -26,11 +26,13 @@ class JobsCreateTest(base.SchedulerTestBase):
 
   def _MakeJob(self):
     pubsub_message_type = self.messages.PubsubTarget.PubsubMessageValue
+    name = 'projects/{}/locations/us-central1/jobs/my-job'.format(
+        self.Project())
     return self.messages.Job(
-        name=None,
+        name=name,
         schedule=self.messages.Schedule(
             schedule='every tuesday',
-            timezone='Etc/UTC'),
+            timeZone='Etc/UTC'),
         pubsubTarget=self.messages.PubsubTarget(
             topicName='projects/other-project/topics/my-topic',
             pubsubMessage=pubsub_message_type(
@@ -57,8 +59,7 @@ class JobsCreateTest(base.SchedulerTestBase):
   def testCreate_MissingArguments(self, track):
     self.track = track
 
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --message-body --schedule --topic: Must be specified.'):
+    with self.AssertRaisesArgumentErrorMatches('must be specified'):
       self.Run('scheduler jobs create-pubsub-job')
 
   def testCreate(self, track):
@@ -68,10 +69,23 @@ class JobsCreateTest(base.SchedulerTestBase):
     self._ExpectCreate(location_name, job)
     self._ExpectGetApp()
 
-    self.Run('scheduler jobs create-pubsub-job '
+    self.Run('scheduler jobs create-pubsub-job my-job '
              '    --topic projects/other-project/topics/my-topic '
              '    --schedule "every tuesday" '
              '    --message-body asdf')
+
+  def testCreateFromFile(self, track):
+    self.track = track
+    payload_file = self.Touch(self.temp_path, 'payload_file', 'asdf')
+    job = self._MakeJob()
+    location_name = 'projects/{}/locations/us-central1'.format(self.Project())
+    self._ExpectCreate(location_name, job)
+    self._ExpectGetApp()
+
+    self.Run('scheduler jobs create-pubsub-job my-job '
+             '    --topic projects/other-project/topics/my-topic '
+             '    --schedule "every tuesday" '
+             '    --message-body-from-file {}'.format(payload_file))
 
   def testCreate_TopicUrl(self, track):
     self.track = track
@@ -82,7 +96,7 @@ class JobsCreateTest(base.SchedulerTestBase):
 
     topic_url = ('https://pubsub.googleapis.com/v1/projects/other-project'
                  '/topics/my-topic')
-    self.Run(('scheduler jobs create-pubsub-job '
+    self.Run(('scheduler jobs create-pubsub-job my-job '
               '    --topic {} '
               '    --schedule "every tuesday" '
               '    --message-body asdf').format(topic_url))
@@ -96,7 +110,7 @@ class JobsCreateTest(base.SchedulerTestBase):
     self._ExpectCreate(location_name, job)
     self._ExpectGetApp()
 
-    self.Run('scheduler jobs create-pubsub-job '
+    self.Run('scheduler jobs create-pubsub-job my-job '
              '    --topic my-topic '
              '    --schedule "every tuesday" '
              '    --message-body asdf')
@@ -104,7 +118,8 @@ class JobsCreateTest(base.SchedulerTestBase):
   def testCreate_AllArguments(self, track):
     self.track = track
     job = self._MakeJob()
-    job.schedule.timezone = 'America/New_York'
+    job.description = 'my super cool job'
+    job.schedule.timeZone = 'America/New_York'
     job.pubsubTarget.pubsubMessage.additionalProperties.append(
         job.pubsubTarget.pubsubMessage.AdditionalProperty(
             key='attributes',
@@ -126,12 +141,13 @@ class JobsCreateTest(base.SchedulerTestBase):
     self._ExpectCreate(location_name, job)
     self._ExpectGetApp()
 
-    self.Run('scheduler jobs create-pubsub-job '
+    self.Run('scheduler jobs create-pubsub-job my-job '
+             '    --description "my super cool job" '
              '    --topic projects/other-project/topics/my-topic '
              '    --schedule "every tuesday" '
              '    --message-body asdf '
              '    --attributes key1=value1,key2=value2 '
-             '    --timezone America/New_York')
+             '    --time-zone America/New_York')
 
 
 if __name__ == '__main__':

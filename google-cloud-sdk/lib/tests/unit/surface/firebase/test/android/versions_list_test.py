@@ -18,55 +18,36 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_attr
 from tests.lib import test_case
-from tests.lib.surface.firebase.test import commands
-from tests.lib.surface.firebase.test import unit_base
+from tests.lib.surface.firebase.test import test_utils
+from tests.lib.surface.firebase.test.android import commands
+from tests.lib.surface.firebase.test.android import fake_catalogs
+from tests.lib.surface.firebase.test.android import unit_base
 
 
 TESTING_V1_MESSAGES = apis.GetMessagesModule('testing', 'v1')
 
-_ANDROID_VERSION_2 = TESTING_V1_MESSAGES.AndroidVersion(
-    id='e',
-    apiLevel=2,
-    versionString='2.7.x',
-    codeName='Icee',
-    distribution=TESTING_V1_MESSAGES.Distribution(marketShare=0.0271828),
-    releaseDate=TESTING_V1_MESSAGES.Date(year=2012, month=2, day=7),
-    tags=['id'])
 
-_ANDROID_VERSION_3 = TESTING_V1_MESSAGES.AndroidVersion(
-    id='pi',
-    apiLevel=3,
-    versionString='3.1.x',
-    codeName='Pie',
-    distribution=TESTING_V1_MESSAGES.Distribution(marketShare=0.0314159),
-    releaseDate=TESTING_V1_MESSAGES.Date(year=2013, month=3, day=14),
-    tags=['dog'])
-
-_NO_VERSIONS_CATALOG = TESTING_V1_MESSAGES.AndroidDeviceCatalog(versions=[])
-
-_TWO_VERSIONS_CATALOG = TESTING_V1_MESSAGES.AndroidDeviceCatalog(
-    versions=[_ANDROID_VERSION_2, _ANDROID_VERSION_3])
-
-
-class TestVersionsListTest(unit_base.TestMockClientTest):
+class TestVersionsListTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
 
   def testVersionsList_NoVersionsFound(self):
-    self.ExpectCatalogGet(_NO_VERSIONS_CATALOG)
+    self.ExpectCatalogGet(fake_catalogs.EmptyAndroidCatalog())
     self.Run(commands.ANDROID_VERSIONS_LIST)
     self.AssertErrContains('Listed 0 items.')
 
   def testVersionsList_TwoVersionsFound(self):
-    self.ExpectCatalogGet(_TWO_VERSIONS_CATALOG)
+    self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
     self.Run(commands.ANDROID_VERSIONS_LIST)
-    self.AssertOutputContains("""\
-        | e | 2.7.x | Icee | 2 | 2012-02-07 | id |
-        | pi | 3.1.x | Pie | 3 | 2013-03-14 | dog |""", normalize_space=True)
+    self.AssertOutputContains(
+        """\
+        | C | 1.5 | Cupcake | 3 | 2009-04-27 | unsupported,deprecated |
+        | F | 2.2.x | Froyo | 8 | 2010-05-10 | default |""",
+        normalize_space=True)
 
   def testVersionsList_ApiThrowsHttpError(self):
-    err = unit_base.MakeHttpError('Error9', 'Environment catalog failure.')
+    err = test_utils.MakeHttpError('Error9', 'Environment catalog failure.')
     self.ExpectCatalogGetError(err)
 
     with self.assertRaises(exceptions.HttpException):

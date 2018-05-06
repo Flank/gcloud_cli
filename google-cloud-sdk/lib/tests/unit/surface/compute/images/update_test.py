@@ -22,7 +22,7 @@ class UpdateLabelsTestBeta(images_labels_test_base.ImagesLabelsTestBase):
 
   def testUpdateMissingNameOrLabels(self):
     image_ref = self._GetImageRef('image-1')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         calliope_exceptions.RequiredArgumentException,
         'At least one of --update-labels, '
         '--remove-labels, or --clear-labels must be specified.'):

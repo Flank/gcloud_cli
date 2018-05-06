@@ -15,6 +15,8 @@
 
 """Unit tests for api_lib.util.waiter module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import signal
 
@@ -120,7 +122,7 @@ class WaiterTest(waiter_test_base.Base):
     self.AssertErrContains('Making Cheese')
 
   def testTimeout_WaitLimit(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         waiter.TimeoutError,
         r'Operation operation-X has not finished in 1800 seconds. '
         r'The operations may still be underway remotely and may still succeed; '
@@ -134,9 +136,9 @@ class WaiterTest(waiter_test_base.Base):
     self.AssertErrContains('Making Cheese')
 
   def testTimeout_MaxRetries(self):
-    with self.assertRaisesRegexp(waiter.TimeoutError,
-                                 r'Operation operation-X has not finished in 4 '
-                                 r'seconds after max 2 retrials'):
+    with self.assertRaisesRegex(waiter.TimeoutError,
+                                r'Operation operation-X has not finished in 4 '
+                                r'seconds after max 2 retrials'):
       waiter.WaitFor(poller=OperationPoller(1000),
                      operation_ref='operation-X',
                      message='Making Cheese',
@@ -147,8 +149,8 @@ class WaiterTest(waiter_test_base.Base):
     self.AssertErrContains('Making Cheese')
 
   def testCtrlC(self):
-    with self.assertRaisesRegexp(console_io.OperationCancelledError,
-                                 r'Aborting wait for operation operation-X.'):
+    with self.assertRaisesRegex(console_io.OperationCancelledError,
+                                r'Aborting wait for operation operation-X.'):
       waiter.WaitFor(poller=OperationPoller(1000, ctrl_c_on=3),
                      operation_ref='operation-X',
                      message='Making Cheese')
@@ -206,8 +208,8 @@ class CloudOperationTest(waiter_test_base.CloudOperationsBase):
 
       poller = waiter.CloudOperationPoller(result_service, operation_service)
 
-      with self.assertRaisesRegexp(waiter.OperationError,
-                                   r'Something happened'):
+      with self.assertRaisesRegex(waiter.OperationError,
+                                  r'Something happened'):
         waiter.WaitFor(poller=poller,
                        operation_ref=operation_ref,
                        message='Making it')
@@ -260,8 +262,8 @@ class CloudOperationNoResourcesTest(waiter_test_base.CloudOperationsBase):
           operation_service,
           get_name_func=lambda x: x.operationsId)
 
-      with self.assertRaisesRegexp(waiter.OperationError,
-                                   r'Something happened'):
+      with self.assertRaisesRegex(waiter.OperationError,
+                                  r'Something happened'):
         waiter.WaitFor(poller=poller,
                        operation_ref=operation_ref,
                        message='Making it')

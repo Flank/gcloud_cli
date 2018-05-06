@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Unit tests for the actions module."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.calliope import actions as calliope_actions
@@ -45,14 +47,14 @@ class PreActionHookTest(sdk_test_base.WithLogCapture):
     error_str = ('action should be either a subclass of argparse.Action or a '
                  'string representing one of the default argparse Action Types')
 
-    with self.assertRaisesRegexp(TypeError, error_str):
+    with self.assertRaisesRegex(TypeError, error_str):
       self.parser.add_argument(
           'test-arg',
           action=calliope_actions._PreActionHook(object, lambda _: False),
           help='Test help')
 
   def testInvalidActionString(self):
-    with self.assertRaisesRegexp(ValueError, 'unknown action "foo"'):
+    with self.assertRaisesRegex(ValueError, 'unknown action "foo"'):
       self.parser.add_argument(
           'test_arg',
           action=calliope_actions._PreActionHook('foo', lambda _: False),
@@ -60,7 +62,7 @@ class PreActionHookTest(sdk_test_base.WithLogCapture):
 
   def testInvalidFunction(self):
     error_str = r'func should be a callable of the form func\(value\)'
-    with self.assertRaisesRegexp(TypeError, error_str):
+    with self.assertRaisesRegex(TypeError, error_str):
       self.parser.add_argument(
           '--testarg',
           action=calliope_actions._PreActionHook(self.custom_action,
@@ -83,8 +85,8 @@ class PreActionHookTest(sdk_test_base.WithLogCapture):
                                                self.func_test),
         help='Test help')
     self.parser.parse_args(['--testarg', 'foo'])
-    self.assertEquals(self.action_call_stack[0], 'Calling Wrapper on foo')
-    self.assertEquals(self.action_call_stack[1], 'customTestAction')
+    self.assertEqual(self.action_call_stack[0], 'Calling Wrapper on foo')
+    self.assertEqual(self.action_call_stack[1], 'customTestAction')
 
   def testAdditionalHelp(self):
     arg = self.parser.add_argument(
@@ -147,8 +149,8 @@ class DeprecationActionTest(sdk_test_base.WithLogCapture):
         help='Test help')
     self.parser.parse_args(['--testarg', 'foo'])
     self.AssertLogContains('Custom Test Warning.')
-    self.assertEquals(self.action_call_stack[0], 'customTestAction')
-    self.assertEquals(len(self.action_call_stack), 1)
+    self.assertEqual(self.action_call_stack[0], 'customTestAction')
+    self.assertEqual(len(self.action_call_stack), 1)
 
   def testRemoveCustomAction(self):
     error_str = 'Custom Test Error.'
@@ -176,8 +178,8 @@ class DeprecationActionTest(sdk_test_base.WithLogCapture):
 
     self.parser.parse_args(['--testarg', 'foo'])
     self.AssertLogContains('Custom Test Warning.')
-    self.assertEquals(self.action_call_stack[0], 'Calling Validation on foo')
-    self.assertEquals(self.action_call_stack[1], 'customTestAction')
+    self.assertEqual(self.action_call_stack[0], 'Calling Validation on foo')
+    self.assertEqual(self.action_call_stack[1], 'customTestAction')
 
   def testRemoveCustomValidation(self):
     error_str = 'Custom Test Error.'
@@ -265,8 +267,8 @@ class DeprecationActionDefaultActionTests(sdk_test_base.WithLogCapture):
     self.AssertLogNotContains('Flag testconst is deprecated.')
 
   def testInvalidPositionalName(self):
-    with self.assertRaisesRegexp(parser_errors.ArgumentException,
-                                 "Positional arguments cannot contain a '-'."):
+    with self.assertRaisesRegex(parser_errors.ArgumentException,
+                                "Positional arguments cannot contain a '-'."):
       self.parser.add_argument(
           'default-test',
           help='Invalid positional name test.')
@@ -279,7 +281,7 @@ class DeprecationActionDefaultActionTests(sdk_test_base.WithLogCapture):
         const=75,
         help='Test Const help')
     namespace = self.parser.parse_args(['--testconst'])
-    self.assertEquals(namespace.testconst, 75)
+    self.assertEqual(namespace.testconst, 75)
     self.AssertLogContains('Flag testconst is deprecated.')
 
   def testDeprecateStoreTrueAction(self):
@@ -310,9 +312,9 @@ class DeprecationActionDefaultActionTests(sdk_test_base.WithLogCapture):
         help='Test Append help')
     namespace = self.parser.parse_args(
         ['--testappend', 'Foo', '--testappend', 'Foo1'])
-    self.assertEquals(namespace.testappend, ['Foo', 'Foo1'])
+    self.assertEqual(namespace.testappend, ['Foo', 'Foo1'])
     self.AssertLogContains('Flag testappend is deprecated.')
-    self.assertEquals(len(self.action_calls), 1)
+    self.assertEqual(len(self.action_calls), 1)
 
   def testDeprecateAppendConstAction(self):
     self.parser.add_argument(
@@ -324,9 +326,9 @@ class DeprecationActionDefaultActionTests(sdk_test_base.WithLogCapture):
         const='Bar',
         help='Test Append Const help')
     namespace = self.parser.parse_args(['--testappendcnst', '--testappendcnst'])
-    self.assertEquals(namespace.testappendcnst, ['Bar', 'Bar'])
+    self.assertEqual(namespace.testappendcnst, ['Bar', 'Bar'])
     self.AssertLogContains('Flag testappendcnst is deprecated.')
-    self.assertEquals(len(self.action_calls), 1)
+    self.assertEqual(len(self.action_calls), 1)
 
   def testDeprecateCountAction(self):
     self.parser.add_argument(
@@ -335,5 +337,5 @@ class DeprecationActionDefaultActionTests(sdk_test_base.WithLogCapture):
             'testcount', action='count'),
         help='Test Count help')
     namespace = self.parser.parse_args(['--testcount'])
-    self.assertEquals(namespace.testcount, 1)
+    self.assertEqual(namespace.testcount, 1)
     self.AssertLogContains('Flag testcount is deprecated.')

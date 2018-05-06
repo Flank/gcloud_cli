@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """ml products catalogs import tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from tests.lib import test_case
 from tests.lib.surface.ml.products import base
 
@@ -28,11 +33,13 @@ class ImportTest(base.MlProductsTestBase):
     imported_images_response = self.test_resources.GetImportOperationResponse()
     import_response.response = imported_images_response
 
-    import_config = self.messages.ImportCatalogsInputConfig(
-        gcsSource=self.messages.ImportCatalogsGcsSource(
-            csvFileUri='gs://fake-bucket/catalog.csv'))
+    import_config = (
+        self.messages.GoogleCloudVisionV1alpha1ImportCatalogsInputConfig(
+            gcsSource=self.client.import_catalog_src(
+                csvFileUri='gs://fake-bucket/catalog.csv')))
     self.mock_client.productSearch_catalogs.Import.Expect(
-        self.messages.ImportCatalogsRequest(inputConfig=import_config),
+        self.messages.GoogleCloudVisionV1alpha1ImportCatalogsRequest(
+            inputConfig=import_config),
         import_response)
     op_result = self.test_resources.ExpectLongRunningOpResult(
         'operations/import', poll_count=3,
@@ -43,7 +50,8 @@ class ImportTest(base.MlProductsTestBase):
 
     self.assertEqual(op_result.response, self.import_success)
     self.AssertOutputContains('type.googleapis.com/google.cloud.alpha_vision.'
-                              'v1alpha1.ImportCatalogsResponse')
+                              'v1alpha1.'
+                              'GoogleCloudVisionV1alpha1ImportCatalogsResponse')
 
 
 if __name__ == '__main__':

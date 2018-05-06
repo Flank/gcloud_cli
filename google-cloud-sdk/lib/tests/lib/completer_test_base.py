@@ -193,9 +193,9 @@ class CompleterBase(core_completer_test_base.CoreCompleterBase):
         cache=cache, handler_info=handler_info)
     completions = completer.Complete(prefix, self.parameter_info)
     actual_commands = self.parsed_args.MockGetCommands()
-    self.assertEquals(expected_command, actual_commands)
+    self.assertEqual(expected_command, actual_commands)
     if expected_completions or completions != ['']:
-      self.assertItemsEqual(expected_completions or [], completions)
+      six.assertCountEqual(self, expected_completions or [], completions)
 
 
 class FlagCompleterBase(CompleterBase):

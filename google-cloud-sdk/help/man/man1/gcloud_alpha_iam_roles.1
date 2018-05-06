@@ -1,0 +1,82 @@
+
+.TH "GCLOUD_ALPHA_IAM_ROLES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha iam roles \- create and manipulate roles
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha iam roles\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create and manipulate roles.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcopy\fR
+\fB(ALPHA)\fR Create a role from an existing role.
+
+.TP 2m
+\fBcreate\fR
+\fB(ALPHA)\fR Create a custom role for a project or an organization.
+
+.TP 2m
+\fBdelete\fR
+\fB(ALPHA)\fR Delete a custom role from an organization or a project.
+
+.TP 2m
+\fBdescribe\fR
+\fB(ALPHA)\fR Show metadata for a role.
+
+.TP 2m
+\fBlist\fR
+\fB(ALPHA)\fR List the roles defined at a parent organization or a project.
+
+.TP 2m
+\fBundelete\fR
+\fB(ALPHA)\fR Undelete a custom role from an organization or a project.
+
+.TP 2m
+\fBupdate\fR
+\fB(ALPHA)\fR Update an IAM custom role.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud iam roles
+$ gcloud beta iam roles
+.RE
+

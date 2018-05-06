@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for gcloud app services."""
+from __future__ import absolute_import
 import textwrap
 
 from apitools.base.py import encoding
@@ -28,8 +29,8 @@ class OperationsListTest(operations_base.OperationsTestBase):
 
   def testList_NoProject(self):
     self.UnsetProject()
-    with self.assertRaisesRegexp(properties.RequiredPropertyError,
-                                 'is not currently set.'):
+    with self.assertRaisesRegex(properties.RequiredPropertyError,
+                                'is not currently set.'):
       self.Run('app operations list')
 
   def testListOne(self):
@@ -95,11 +96,11 @@ class OperationsListTest(operations_base.OperationsTestBase):
         self.MakeListOperationsResponse([o1, o2, o3, o4]))
     operations = list(self.Run('app operations list --format=disable'))
 
-    self.assertEquals(len(operations), 4)
-    self.assertEquals(operations[0], o1_template)
-    self.assertEquals(operations[1], o2_template)
-    self.assertEquals(operations[2], o3_template)
-    self.assertEquals(operations[3], o4_template)
+    self.assertEqual(len(operations), 4)
+    self.assertEqual(operations[0], o1_template)
+    self.assertEqual(operations[1], o2_template)
+    self.assertEqual(operations[2], o3_template)
+    self.assertEqual(operations[3], o4_template)
 
   def testListOnlyPending(self):
     """Tests list for a variety of operations."""
@@ -121,5 +122,5 @@ class OperationsListTest(operations_base.OperationsTestBase):
     operations = list(
         self.Run('app operations list --pending --format=disable'))
 
-    self.assertEquals(len(operations), 1)
-    self.assertEquals(operations[0], o3_template)
+    self.assertEqual(len(operations), 1)
+    self.assertEqual(operations[0], o3_template)

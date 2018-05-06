@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha genomics variants list --reference-name=REFERENCE_NAME
-        [--call-set-ids=CALL_SET_IDS,[CALL_SET_IDS,...]] [--end=END]
+        [--call-set-ids=CALL_SET_IDS,[...]] [--end=END]
         [--limit-calls=LIMIT_CALLS] [--start=START]
         [--variant-set-id=VARIANT_SET_ID] [--filter=EXPRESSION] [--limit=LIMIT]
         [--page-size=PAGE_SIZE; default=512] [--sort-by=[FIELD,...]] [--uri]
@@ -18,7 +18,7 @@ REQUIRED FLAGS
         Only return variants in this reference sequence.
 
 FLAGS
-     --call-set-ids=CALL_SET_IDS,[CALL_SET_IDS,...]
+     --call-set-ids=CALL_SET_IDS,[...]
         Restrict the list to variants which have calls from the listed call
         sets. If omitted, a --variant-set-id must be specified.
 

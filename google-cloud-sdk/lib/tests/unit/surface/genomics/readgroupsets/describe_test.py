@@ -48,8 +48,8 @@ class DescribeTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsReadgroupsetsGetRequest(readGroupSetId=
                                                               rgset.id),
         response=rgset)
-    self.assertEquals(rgset,
-                      self.RunGenomics(['readgroupsets', 'describe', rgset.id]))
+    self.assertEqual(rgset,
+                     self.RunGenomics(['readgroupsets', 'describe', rgset.id]))
     self.AssertOutputContains(rgset.name)
 
   def testDescribeNotExists(self):
@@ -57,8 +57,8 @@ class DescribeTest(base.GenomicsUnitTest):
         request=self.messages.GenomicsReadgroupsetsGetRequest(readGroupSetId=
                                                               '1000',),
         exception=self.MakeHttpError(404, 'Read group set not found: 1000'))
-    with self.assertRaisesRegexp(exceptions.HttpException,
-                                 'Read group set not found: 1000'):
+    with self.assertRaisesRegex(exceptions.HttpException,
+                                'Read group set not found: 1000'):
       self.RunGenomics(['readgroupsets', 'describe', '1000'])
 
 if __name__ == '__main__':

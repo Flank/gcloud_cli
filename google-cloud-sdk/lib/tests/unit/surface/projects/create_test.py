@@ -299,7 +299,7 @@ Create in progress for [https://cloudresourcemanager.googleapis.com"""
     regexp = (r'Project creation failed. The project ID you specified is '
               'already in use by another project. Please try an alternative '
               'ID.')
-    with self.assertRaisesRegexp(exceptions.HttpException, regexp):
+    with self.assertRaisesRegex(exceptions.HttpException, regexp):
       self.RunProjects('create', test_project.projectId)
     self.AssertOutputEquals('')
 
@@ -335,7 +335,7 @@ Create in progress for [https://cloudresourcemanager.googleapis.com"""
     self.StartPropertyPatch(config.Paths, 'sdk_root',
                             return_value=self.temp_path)
     prop = properties.FromString('core/project')
-    self.assertEquals(prop.Get(), None)
+    self.assertEqual(prop.Get(), None)
     test_project = util.GetTestActiveProjectWithSameNameAndId()
     self._expectCreationCall(test_project)
     self._expectServiceEnableCall(test_project.projectId)
@@ -344,19 +344,19 @@ Create in progress for [https://cloudresourcemanager.googleapis.com"""
   def testNoProjectChangeWithoutSetDefault(self):
     prop, project_id = self._prepareEmptyConfigAndExpectProjectCreation()
     self.RunProjects('create', project_id)
-    self.assertEquals(prop.Get(), None)
+    self.assertEqual(prop.Get(), None)
     self.AssertOutputEquals('')
 
   def testProjectChangedWithSetDefault(self):
     prop, project_id = self._prepareEmptyConfigAndExpectProjectCreation()
     self.RunProjects('create', project_id, '--set-as-default')
-    self.assertEquals(prop.Get(), project_id)
+    self.assertEqual(prop.Get(), project_id)
     self.AssertOutputEquals('')
 
   def testProjectChangedWithNoSetDefault(self):
     prop, project_id = self._prepareEmptyConfigAndExpectProjectCreation()
     self.RunProjects('create', project_id, '--no-set-as-default')
-    self.assertEquals(prop.Get(), None)
+    self.assertEqual(prop.Get(), None)
     self.AssertOutputEquals('')
 
 

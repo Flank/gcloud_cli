@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Test of the 'pubsub snapshots create' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from tests.lib import test_case
@@ -46,9 +50,9 @@ class SnapshotsCreateTest(base.CloudPubsubTestBase):
         'pubsub snapshots create snap1 '
         '--subscription subs1'))
 
-    self.assertEquals(result[0]['snapshotId'], snap_ref.RelativeName())
-    self.assertEquals(result[0]['topic'], topic_ref.RelativeName())
-    self.assertEquals(result[0]['expireTime'], 'sometime')
+    self.assertEqual(result[0]['snapshotId'], snap_ref.RelativeName())
+    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
+    self.assertEqual(result[0]['expireTime'], 'sometime')
 
   def testSnapshotsCreateWithCrossProjectSubscription(self):
     snap_ref = util.ParseSnapshot('snap1', self.Project())
@@ -70,9 +74,9 @@ class SnapshotsCreateTest(base.CloudPubsubTestBase):
         'pubsub snapshots create snap1 --subscription subs1'
         ' --subscription-project other-project'))
 
-    self.assertEquals(result[0]['snapshotId'], snap_ref.RelativeName())
-    self.assertEquals(result[0]['topic'], topic_ref.RelativeName())
-    self.assertEquals(result[0]['expireTime'], 'sometime')
+    self.assertEqual(result[0]['snapshotId'], snap_ref.RelativeName())
+    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
+    self.assertEqual(result[0]['expireTime'], 'sometime')
 
   def testSnapshotsCreateWithFullUri(self):
     snap_ref = util.ParseSnapshot('snap1', self.Project())
@@ -94,9 +98,9 @@ class SnapshotsCreateTest(base.CloudPubsubTestBase):
         'pubsub snapshots create snap1 --subscription {}'.format(
             sub_ref.SelfLink())))
 
-    self.assertEquals(result[0]['snapshotId'], snap_ref.RelativeName())
-    self.assertEquals(result[0]['topic'], topic_ref.RelativeName())
-    self.assertEquals(result[0]['expireTime'], 'sometime')
+    self.assertEqual(result[0]['snapshotId'], snap_ref.RelativeName())
+    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
+    self.assertEqual(result[0]['expireTime'], 'sometime')
 
   def testSnapshotsCreateWithNonExistentSubscription(self):
     snap_ref = util.ParseSnapshot('snap1', self.Project())
@@ -150,9 +154,9 @@ class SnapshotsCreateTest(base.CloudPubsubTestBase):
         '--labels key1=value1,key2=value2 '
         '--subscription subs1'))
 
-    self.assertEquals(result[0]['snapshotId'], snap_ref.RelativeName())
-    self.assertEquals(result[0]['topic'], topic_ref.RelativeName())
-    self.assertEquals(result[0]['expireTime'], 'sometime')
+    self.assertEqual(result[0]['snapshotId'], snap_ref.RelativeName())
+    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
+    self.assertEqual(result[0]['expireTime'], 'sometime')
 
 if __name__ == '__main__':
   test_case.main()

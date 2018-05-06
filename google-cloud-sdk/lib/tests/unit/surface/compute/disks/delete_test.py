@@ -19,6 +19,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -128,13 +129,14 @@ class DisksDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
                        ['disk-1', 'disk-2', 'disk-3'])
 
 
-class RegionalDisksDeleteTest(test_base.BaseTest):
+@parameterized.parameters((base.ReleaseTrack.ALPHA, 'alpha'),
+                          (base.ReleaseTrack.BETA, 'beta'))
+class RegionalDisksDeleteTest(test_base.BaseTest, parameterized.TestCase):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = base.ReleaseTrack.ALPHA
+  def testDefaultOptionsWithSingleDisk(self, track, api_version):
+    self.SelectApi(api_version)
+    self.track = track
 
-  def testDefaultOptionsWithSingleDisk(self):
     self.Run("""
         compute disks delete disk-1 --region central2
         """)

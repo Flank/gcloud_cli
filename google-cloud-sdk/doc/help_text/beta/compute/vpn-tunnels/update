@@ -32,7 +32,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --region=REGION
-        The region of the VPN Tunnel to operate on. If not specified, you will
+        The region of the VPN Tunnel to operate on. If not specified, you may
         be prompted to select a region.
 
         To avoid prompting when this flag is omitted, you can set the

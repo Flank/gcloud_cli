@@ -83,10 +83,10 @@ class AlternateAPIHostTest(sdk_test_base.SdkBase):
     registry = resources.Registry()
     registry.RegisterApiByName('compute', 'beta')
     ref = registry.Parse(url)
-    self.assertEquals(url, ref.SelfLink())
-    self.assertEquals('compute.zones', ref.Collection())
-    self.assertEquals('compute', ref.GetCollectionInfo().api_name)
-    self.assertEquals('beta', ref.GetCollectionInfo().api_version)
+    self.assertEqual(url, ref.SelfLink())
+    self.assertEqual('compute.zones', ref.Collection())
+    self.assertEqual('compute', ref.GetCollectionInfo().api_name)
+    self.assertEqual('beta', ref.GetCollectionInfo().api_version)
 
   def testDifferentEndpoint_CanParseExistingApi(self):
     urls = [
@@ -96,7 +96,7 @@ class AlternateAPIHostTest(sdk_test_base.SdkBase):
     registry = resources.Registry()
     for url in urls:
       ref = registry.Parse(url)
-      self.assertEquals(url, ref.SelfLink())
+      self.assertEqual(url, ref.SelfLink())
 
   def testOverrideShouldHaveVersion2(self):
     properties.VALUES.api_endpoint_overrides.container.Set(
@@ -179,17 +179,17 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
   def testStorageGsUri(self):
     ref = self.registry.Parse(
         'gs://my_bucket/my_folder/my_file.txt')
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
-    self.assertEquals('my_bucket', ref.bucket)
-    self.assertEquals('my_folder/my_file.txt', ref.object)
-    self.assertEquals('my_folder/my_file.txt', ref.Name())
-    self.assertEquals('b/my_bucket/o/my_folder/my_file.txt', ref.RelativeName())
-    self.assertEquals(
+    self.assertEqual('my_bucket', ref.bucket)
+    self.assertEqual('my_folder/my_file.txt', ref.object)
+    self.assertEqual('my_folder/my_file.txt', ref.Name())
+    self.assertEqual('b/my_bucket/o/my_folder/my_file.txt', ref.RelativeName())
+    self.assertEqual(
         {'bucket': 'my_bucket', 'object': 'my_folder/my_file.txt'},
         ref.AsDict())
-    self.assertEquals(
+    self.assertEqual(
         ['my_bucket', 'my_folder/my_file.txt'],
         ref.AsList())
 
@@ -199,35 +199,35 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         bucket='my_bucket',
         object='my_folder/my_file.txt',
     )
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
-    self.assertEquals('my_bucket', ref.bucket)
-    self.assertEquals('my_folder/my_file.txt', ref.object)
-    self.assertEquals('my_folder/my_file.txt', ref.Name())
-    self.assertEquals('b/my_bucket/o/my_folder/my_file.txt', ref.RelativeName())
-    self.assertEquals(
+    self.assertEqual('my_bucket', ref.bucket)
+    self.assertEqual('my_folder/my_file.txt', ref.object)
+    self.assertEqual('my_folder/my_file.txt', ref.Name())
+    self.assertEqual('b/my_bucket/o/my_folder/my_file.txt', ref.RelativeName())
+    self.assertEqual(
         {'bucket': 'my_bucket', 'object': 'my_folder/my_file.txt'},
         ref.AsDict())
-    self.assertEquals(
+    self.assertEqual(
         ['my_bucket', 'my_folder/my_file.txt'],
         ref.AsList())
 
   def testMultilineName(self):
     ref = self.registry.Parse('First\nSecond', collection='storage.buckets')
-    self.assertEquals('First\nSecond', ref.Name())
+    self.assertEqual('First\nSecond', ref.Name())
 
   def testWithTabName(self):
     ref = self.registry.Parse('First\tSecond', collection='storage.buckets')
-    self.assertEquals('First\tSecond', ref.Name())
+    self.assertEqual('First\tSecond', ref.Name())
 
   def testWithSpaceInName(self):
     ref = self.registry.Parse('First Second', collection='storage.buckets')
-    self.assertEquals('First Second', ref.Name())
+    self.assertEqual('First Second', ref.Name())
 
   def testEmpty(self):
-    with self.assertRaisesRegexp(resources.InvalidResourceException,
-                                 r'could not parse resource \[\]'):
+    with self.assertRaisesRegex(resources.InvalidResourceException,
+                                r'could not parse resource \[\]'):
       self.registry.Parse('', collection='storage.buckets')
 
   def testImmutable(self):
@@ -244,92 +244,92 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     ref = self.registry.Parse(
         'gs://my_bucket/my_folder/my_file.txt',
         collection='storage.objects')
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
 
   def testStorageJustBucket(self):
     ref = self.registry.Parse('gs://my_bucket')
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
-    self.assertEquals('my_bucket', ref.bucket)
-    self.assertEquals('my_bucket', ref.Name())
-    self.assertEquals('b/my_bucket', ref.RelativeName())
-    self.assertEquals({'bucket': 'my_bucket'}, ref.AsDict())
-    self.assertEquals(['my_bucket'], ref.AsList())
+    self.assertEqual('my_bucket', ref.bucket)
+    self.assertEqual('my_bucket', ref.Name())
+    self.assertEqual('b/my_bucket', ref.RelativeName())
+    self.assertEqual({'bucket': 'my_bucket'}, ref.AsDict())
+    self.assertEqual(['my_bucket'], ref.AsList())
 
   def testStorageUri(self):
     ref = self.registry.Parse(
         'https://www.googleapis.com/storage/v1'
         '/b/my_bucket/o/my_folder/my_file.txt')
-    self.assertEquals('storage.objects', ref.Collection())
-    self.assertEquals(
+    self.assertEqual('storage.objects', ref.Collection())
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
 
   def testStorageAlternativeUri_Fails(self):
     # Note that this url has no api version.
     url = 'https://storage.googleapis.com/my_bucket/my_folder/my_file.txt'
-    with self.assertRaisesRegexp(resources.InvalidResourceException,
-                                 r'could not parse resource \[{0}\]: '
-                                 r'unknown api version my_bucket'
-                                 .format(url)):
+    with self.assertRaisesRegex(resources.InvalidResourceException,
+                                r'could not parse resource \[{0}\]: '
+                                r'unknown api version my_bucket'
+                                .format(url)):
       self.registry.ParseURL(url)
 
   def testStorageAlternativeUri(self):
     ref = self.registry.Parse(
         'https://storage.googleapis.com'
         '/my_bucket/my_folder/my_file.txt')
-    self.assertEquals('storage.objects', ref.Collection())
-    self.assertEquals(
+    self.assertEqual('storage.objects', ref.Collection())
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/'
         'my_bucket/o/my_folder/my_file.txt', ref.SelfLink())
 
   def testStorageBucketUri(self):
     ref = self.registry.Parse(
         'https://www.googleapis.com/storage/v1/b/my_bucket')
-    self.assertEquals('storage.buckets', ref.Collection())
-    self.assertEquals(
+    self.assertEqual('storage.buckets', ref.Collection())
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
 
   def testStorageBucketPath(self):
     ref = self.registry.Parse('my_bucket', collection='storage.buckets')
-    self.assertEquals('storage.buckets', ref.Collection())
-    self.assertEquals(
+    self.assertEqual('storage.buckets', ref.Collection())
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
 
   def testStorageBucketPath_MockedClient(self):
     with api_mock.Client(core_apis.GetClientClass('storage', 'v1')) as client:
-      self.assertEquals('https://www.googleapis.com/storage/v1/', client.url)
+      self.assertEqual('https://www.googleapis.com/storage/v1/', client.url)
       self.registry.RegisterApiByName('storage', 'v1')
 
       ref = self.registry.Parse('my_bucket', collection='storage.buckets')
-      self.assertEquals('storage.buckets', ref.Collection())
-      self.assertEquals(
+      self.assertEqual('storage.buckets', ref.Collection())
+      self.assertEqual(
           'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
 
   def testStorageAlternativeBucketUri(self):
     ref = self.registry.Parse(
         'https://storage.googleapis.com/my_bucket')
-    self.assertEquals('storage.buckets', ref.Collection())
-    self.assertEquals(
+    self.assertEqual('storage.buckets', ref.Collection())
+    self.assertEqual(
         'https://www.googleapis.com/storage/v1/b/my_bucket', ref.SelfLink())
 
   def testStorageBadUri(self):
-    with self.assertRaisesRegexp(resources.InvalidResourceException,
-                                 r'could not parse resource \['
-                                 r'https://www.googleapis.com/storage/v1/'
-                                 r'bucket/my_bucket/o/my_folder/my_file.txt\]: '
-                                 r'Could not parse at \[bucket\]'):
+    with self.assertRaisesRegex(resources.InvalidResourceException,
+                                r'could not parse resource \['
+                                r'https://www.googleapis.com/storage/v1/'
+                                r'bucket/my_bucket/o/my_folder/my_file.txt\]: '
+                                r'Could not parse at \[bucket\]'):
       self.registry.Parse(
           'https://www.googleapis.com/storage/v1'
           '/bucket/my_bucket/o/my_folder/my_file.txt')
 
   def testStorageBadUriShort(self):
-    with self.assertRaisesRegexp(resources.InvalidResourceException,
-                                 r'could not parse resource \['
-                                 r'https://www.googleapis.com/storage/v1/'
-                                 r'foo\]: Could not parse at \[foo\]'):
+    with self.assertRaisesRegex(resources.InvalidResourceException,
+                                r'could not parse resource \['
+                                r'https://www.googleapis.com/storage/v1/'
+                                r'foo\]: Could not parse at \[foo\]'):
       self.registry.Parse(
           'https://www.googleapis.com/storage/v1'
           '/foo')
@@ -349,11 +349,11 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     self.assertEqual('projects/fake-project:fake/'
                      'zones/us-central1-a/instances/tc1',
                      resource.RelativeName())
-    self.assertEquals(
+    self.assertEqual(
         {'project': 'fake-project:fake',
          'zone': 'us-central1-a',
          'instance': 'tc1'}, resource.AsDict())
-    self.assertEquals(
+    self.assertEqual(
         ['fake-project:fake',
          'us-central1-a',
          'tc1'], resource.AsList())
@@ -432,7 +432,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         params=params))
 
   def testExtraParam(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError,
         r"Provided params \[u?'project', u?'region', u?'zone'\] is not subset "
         r"of the resource parameters \[u?'instance', u?'project', .?'zone'\]"):
@@ -446,7 +446,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
           collection='compute.instances')
 
   def testMisspelledParam(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError,
         r"Provided params \[u?'projectsId', u?'zone'\] is not subset of the "
         r"resource parameters \[u?'instance', u?'project', u?'zone'\]"):
@@ -467,7 +467,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         self.registry.Parse(ResourcePathingTest.TC1_URL_BETA, {}))
 
     # The URL has typos that make it not point to a valid resource.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.InvalidResourceException,
         r'could not parse resource \[{}\]: Could not parse at \[project\]'
         .format(ResourcePathingTest.BAD_URL)):
@@ -475,21 +475,21 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
 
     # The URL is the prefix of a valid resource, but does not indicate
     # a resource on its own.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.InvalidResourceException,
         r'could not parse resource \[{}\]: Url too short.'
         .format(ResourcePathingTest.SHORT_URL)):
       self.registry.Parse(ResourcePathingTest.SHORT_URL, {})
 
     # The provided URL is for an instance, but the constraint says disks.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.WrongResourceCollectionException,
         urllib.parse.unquote(ResourcePathingTest.TC1_URL)):
       self.registry.Parse(ResourcePathingTest.TC1_URL, {},
                           collection='compute.disks')
 
     # Only https:// is allowed for URLs.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.InvalidResourceException,
         r'could not parse resource \[http://something\]: unknown API host'):
       self.registry.Parse('http://something', {})
@@ -498,7 +498,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     # Confirm this collection gives us global resource.
     ref = self.registry.Parse('bs1', params={'project': self.Project()},
                               collection='compute.backendServices')
-    self.assertEquals(
+    self.assertEqual(
         'https://www.googleapis.com/compute/v1/projects/fake-project:fake/'
         'global/backendServices/bs1', ref.SelfLink())
 
@@ -508,7 +508,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
             'regions/us-central1/backendServices/bs1')
     ref = self.registry.Parse(name, collection='compute.backendServices',
                               enforce_collection=False)
-    self.assertEquals(urllib.parse.unquote(name), ref.SelfLink())
+    self.assertEqual(urllib.parse.unquote(name), ref.SelfLink())
 
     # Confirm that without enforce_collection set to False we get the error.
     with self.assertRaises(resources.WrongResourceCollectionException):
@@ -537,17 +537,17 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     registry._RegisterCollection(operations_collection)
     registry._RegisterCollection(clusters_collection)
     ref = registry.Parse('{0}projects/p/regions/r/clusters/c'.format(base_url))
-    self.assertEquals('p', ref.projectId)
-    self.assertEquals('r', ref.region)
-    self.assertEquals('c', ref.clusterName)
+    self.assertEqual('p', ref.projectId)
+    self.assertEqual('r', ref.region)
+    self.assertEqual('c', ref.clusterName)
     ref = registry.Parse('{0}projects/p/regions/r/operations/o'
                          .format(base_url))
-    self.assertEquals('p', ref.projectsId)
-    self.assertEquals('r', ref.regionsId)
-    self.assertEquals('o', ref.operationsId)
+    self.assertEqual('p', ref.projectsId)
+    self.assertEqual('r', ref.regionsId)
+    self.assertEqual('o', ref.operationsId)
 
   def testWrongCollectionMessage(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.WrongResourceCollectionException,
         r'wrong collection: expected \[compute.disks\], got '
         r'\[compute.instances\], for path \[https://www.googleapis.com'
@@ -577,6 +577,28 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     with self.assertRaises(resources.AmbiguousResourcePath):
       registry._RegisterCollection(clusters_collection)
 
+  def testAmbiguousResourcePathsNoUriParsing(self):
+    api_name, api_version = 'bigtableclusteradmin', 'v1'
+    registry = resources.Registry()
+    registry.registered_apis[api_name] = [api_version]
+    base_url = 'https://{0}.googleapis.com/{1}/'.format(api_name, api_version)
+    operations_collection = resource_util.CollectionInfo(
+        api_name, api_version, base_url, 'https://cloud.google.com/docs',
+        name='operations',
+        path='{+name}',
+        flat_paths=[],
+        params=['name'])
+    clusters_collection = resource_util.CollectionInfo(
+        api_name, api_version, base_url, 'https://cloud.google.com/docs',
+        name='projects.zones.clusters',
+        path='{+name}',
+        flat_paths=[],
+        params=['name'],
+        enable_uri_parsing=False)
+    registry._RegisterCollection(operations_collection)
+    # No exception here.
+    registry._RegisterCollection(clusters_collection)
+
   def testCustomResourcePaths(self):
     api_name, api_version = 'bigtableclusteradmin', 'v1'
     registry = resources.Registry()
@@ -602,12 +624,12 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
                     'operations/opid-123')
     ref = registry.Parse('opid-123',
                          collection='bigtableclusteradmin.operations')
-    self.assertEquals(expected_url, ref.SelfLink())
+    self.assertEqual(expected_url, ref.SelfLink())
     ref_from_url = registry.Parse(expected_url)
-    self.assertEquals(expected_url, ref_from_url.SelfLink())
-    self.assertEquals('operations/opid-123', ref.RelativeName())
-    self.assertEquals({'operationId': 'opid-123'}, ref.AsDict())
-    self.assertEquals(['opid-123'], ref.AsList())
+    self.assertEqual(expected_url, ref_from_url.SelfLink())
+    self.assertEqual('operations/opid-123', ref.RelativeName())
+    self.assertEqual({'operationId': 'opid-123'}, ref.AsDict())
+    self.assertEqual(['opid-123'], ref.AsList())
 
     expected_url = ('https://bigtableclusteradmin.googleapis.com/v1/'
                     'projects/fishing/zones/hudson/clusters/cluster-42')
@@ -615,16 +637,16 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         'cluster-42',
         params={'projectId': 'fishing', 'zoneId': 'hudson'},
         collection='bigtableclusteradmin.projects.zones.clusters')
-    self.assertEquals(expected_url, ref.SelfLink())
-    self.assertEquals('projects/fishing/zones/hudson/clusters/cluster-42',
-                      ref.RelativeName())
-    self.assertEquals(
+    self.assertEqual(expected_url, ref.SelfLink())
+    self.assertEqual('projects/fishing/zones/hudson/clusters/cluster-42',
+                     ref.RelativeName())
+    self.assertEqual(
         {'projectId': 'fishing', 'zoneId': 'hudson', 'clusterId': 'cluster-42'},
         ref.AsDict())
-    self.assertEquals(
+    self.assertEqual(
         ['fishing', 'hudson', 'cluster-42'], ref.AsList())
     ref_from_url = registry.Parse(expected_url)
-    self.assertEquals(expected_url, ref_from_url.SelfLink())
+    self.assertEqual(expected_url, ref_from_url.SelfLink())
 
   def testMultiplePathExpansions(self):
     api_name, api_version = 'dataproc', 'v1'
@@ -644,12 +666,12 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
 
     ref = registry.Parse('{0}projects/p/operations/o'.format(base_url),
                          collection='dataproc.projects.operations.full')
-    self.assertEquals('p', ref.projectId)
-    self.assertEquals('o', ref.operation)
+    self.assertEqual('p', ref.projectId)
+    self.assertEqual('o', ref.operation)
 
     ref = registry.Parse('operations-o',
                          collection='dataproc.projects.operations.atomic')
-    self.assertEquals('operations-o', ref.name)
+    self.assertEqual('operations-o', ref.name)
 
   def testUnknownCollection(self):
     # The collection is nonsense.
@@ -772,16 +794,16 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     url = ('https://www.googleapis.com/sql/v1beta3/projects/p/instances/i')
 
     ref = self.registry.Parse(url)
-    self.assertEquals(url, ref.SelfLink())
+    self.assertEqual(url, ref.SelfLink())
 
     cloned_registry = self.registry.Clone()
     cloned_registry.RegisterApiByName('sql', 'v1beta4')
     ref = cloned_registry.Parse(url)
-    self.assertEquals(url, ref.SelfLink())
+    self.assertEqual(url, ref.SelfLink())
 
     url4 = ('https://www.googleapis.com/sql/v1beta4/projects/p/instances/i')
     ref = cloned_registry.Parse(url4)
-    self.assertEquals(url4, ref.SelfLink())
+    self.assertEqual(url4, ref.SelfLink())
 
   def testAPIMethodOrder(self):
     base_url = 'https://www.googleapis.com/sql/v1beta3/'
@@ -894,11 +916,12 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
 
   def testParentImplicit(self):
     # Atomic name style.
-    ref = self.registry.Parse('projects/p/zones/z/clusters/c',
-                              collection='container.projects.zones.clusters')
+    ref = self.registry.Parse(
+        'projects/p/locations/l/clusters/c',
+        collection='container.projects.locations.clusters')
     parent = ref.Parent()
-    self.assertEqual('projects/p/zones/z', parent.RelativeName())
-    self.assertEqual('container.projects.zones', parent.Collection())
+    self.assertEqual('projects/p/locations/l', parent.RelativeName())
+    self.assertEqual('container.projects.locations', parent.Collection())
 
     # Legacy style.
     ref = self.registry.Parse('projects/p/zones/z/instances/i',
@@ -917,7 +940,7 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
         params=['parentJunkId', 'junkId'])
     self.registry._RegisterCollection(junk_collection)
     ref = self.registry.Parse('parentJunk/p/junk/j', collection='compute.junk')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.ParentCollectionResolutionException,
         r'Could not resolve the parent collection of collection '
         r'\[compute.junk\]. No collections found with parameters '
@@ -932,13 +955,13 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
     self.assertEqual('projects/p/zones/z', parent.RelativeName())
     self.assertEqual('compute.zones', parent.Collection())
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.ParentCollectionMismatchException,
         r'The parent collection \[compute.regions\] of collection '
         r'\[compute.instances\] does have have the expected parameters. '
         r'Expected \[project, zone\], found \[project, region\].'):
       ref.Parent('compute.regions')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.UnknownCollectionException,
         r'unknown collection for \[compute.foo\]'):
       ref.Parent('compute.foo')
@@ -966,57 +989,75 @@ class RelativePathTests(sdk_test_base.SdkBase):
     ref = self.registry.ParseRelativeName(
         'projects/p/operations/o',
         collection='dataproc.projects.operations.atomic')
-    self.assertEquals('projects/p/operations/o', ref.name)
-    self.assertEquals({'name': 'projects/p/operations/o'}, ref.AsDict())
-    self.assertEquals(['projects/p/operations/o'], ref.AsList())
+    self.assertEqual('projects/p/operations/o', ref.name)
+    self.assertEqual({'name': 'projects/p/operations/o'}, ref.AsDict())
+    self.assertEqual(['projects/p/operations/o'], ref.AsList())
 
     # Also able to use generic parse.
     ref = self.registry.Parse(
         'projects/p/operations/o',
         collection='dataproc.projects.operations.atomic')
-    self.assertEquals('projects/p/operations/o', ref.name)
+    self.assertEqual('projects/p/operations/o', ref.name)
+
+  def testAtomicNameInvalidApiVersion(self):
+    with self.assertRaisesRegex(
+        apis_util.UnknownVersionError,
+        r'The \[dataproc] API does not have version \[v0] in the APIs map'):
+      self.registry.ParseRelativeName(
+          'projects/p/operations/o',
+          collection='dataproc.projects.operations.atomic',
+          api_version='v0')
+
+    # Also able to use generic parse.
+    with self.assertRaisesRegex(
+        apis_util.UnknownVersionError,
+        r'The \[dataproc] API does not have version \[v0] in the APIs map'):
+      self.registry.Parse(
+          'projects/p/operations/o',
+          collection='dataproc.projects.operations.atomic',
+          api_version='v0')
 
   def testFullName(self):
     ref = self.registry.ParseRelativeName(
         'projects/p/operations/o',
         collection='dataproc.projects.operations.full')
-    self.assertEquals('p', ref.projectId)
-    self.assertEquals('o', ref.operation)
-    self.assertEquals({'operation': 'o', 'projectId': 'p'}, ref.AsDict())
-    self.assertEquals(['p', 'o'], ref.AsList())
+    self.assertEqual('p', ref.projectId)
+    self.assertEqual('o', ref.operation)
+    self.assertEqual({'operation': 'o', 'projectId': 'p'}, ref.AsDict())
+    self.assertEqual(['p', 'o'], ref.AsList())
 
     # Also able to use generic parse.
     parsed_ref = self.registry.Parse(
         'projects/p/operations/o',
         collection='dataproc.projects.operations.full')
-    self.assertEquals(ref, parsed_ref)
+    self.assertEqual(ref, parsed_ref)
 
   def testFullName_WithSlash(self):
     ref = self.registry.ParseRelativeName(
         'projects/p/operations/o/fish',
         collection='dataproc.projects.operations.full')
-    self.assertEquals('p', ref.projectId)
-    self.assertEquals('o/fish', ref.operation)
-    self.assertEquals({'operation': 'o/fish', 'projectId': 'p'}, ref.AsDict())
-    self.assertEquals(['p', 'o/fish'], ref.AsList())
+    self.assertEqual('p', ref.projectId)
+    self.assertEqual('o/fish', ref.operation)
+    self.assertEqual({'operation': 'o/fish', 'projectId': 'p'}, ref.AsDict())
+    self.assertEqual(['p', 'o/fish'], ref.AsList())
 
     # Also able to use generic parse.
     parsed_ref = self.registry.Parse(
         'projects/p/operations/o/fish',
         collection='dataproc.projects.operations.full')
-    self.assertEquals(ref, parsed_ref)
+    self.assertEqual(ref, parsed_ref)
 
   def testFullName_UrEscape(self):
     ref = self.registry.ParseRelativeName(
         'projects/p/operations/o%2Ffish',
         collection='dataproc.projects.operations.full',
         url_unescape=True)
-    self.assertEquals('p', ref.projectId)
-    self.assertEquals('o/fish', ref.operation)
-    self.assertEquals('projects/p/operations/o%2Ffish',
-                      ref.RelativeName(url_escape=True))
-    self.assertEquals({'operation': 'o/fish', 'projectId': 'p'}, ref.AsDict())
-    self.assertEquals(['p', 'o/fish'], ref.AsList())
+    self.assertEqual('p', ref.projectId)
+    self.assertEqual('o/fish', ref.operation)
+    self.assertEqual('projects/p/operations/o%2Ffish',
+                     ref.RelativeName(url_escape=True))
+    self.assertEqual({'operation': 'o/fish', 'projectId': 'p'}, ref.AsDict())
+    self.assertEqual(['p', 'o/fish'], ref.AsList())
 
 
 class GRIParseTests(subtests.Base):
@@ -1186,12 +1227,12 @@ class GRIRegistryParseTests(subtests.Base):
         (ref.versionsId, ref.servicesId, ref.appsId, ref.Collection()))
 
   def testBadParse(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.UnknownCollectionException,
         r'unknown collection for \[i:z:p\]'):
       self.registry.Parse('i:z:p', params={}, collection=None)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.GRIPathMismatchException,
         r'It must match the format: \['
         r'instance:zone:project::compute.instances\]'):
@@ -1199,7 +1240,7 @@ class GRIRegistryParseTests(subtests.Base):
       self.registry.Parse('i:z:p:junk::compute.instances', params={},
                           collection=None)
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resources.GRIPathMismatchException,
         r'It must match the format: \[instance:zone:project\]'):
       # Check that we only show the contextual GRI because we didn't provide

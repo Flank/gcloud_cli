@@ -14,6 +14,9 @@
 
 """Tests for googlecloudsdk.core.credentials.store."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 import contextlib
 import datetime
 import json
@@ -69,10 +72,10 @@ class StoreTests(sdk_test_base.WithLogCapture):
     store.Store(self.fake_cred)
     loaded = store.Load()
     self.assertEqual(loaded.scopes, set(config.CLOUDSDK_SCOPES))
-    self.assertEquals('fake-token', loaded.refresh_token)
+    self.assertEqual('fake-token', loaded.refresh_token)
     self.refresh_mock.assert_called_once()
 
-    self.assertEquals('fake-token', store.LoadIfEnabled().refresh_token)
+    self.assertEqual('fake-token', store.LoadIfEnabled().refresh_token)
     properties.VALUES.auth.disable_credentials.Set(True)
     self.assertIsNone(store.LoadIfEnabled())
     properties.VALUES.auth.disable_credentials.Set(False)
@@ -84,7 +87,7 @@ class StoreTests(sdk_test_base.WithLogCapture):
 
     with open(paths.LegacyCredentialsAdcPath(self.fake_account)) as f:
       adc_file = json.load(f)
-    self.assertEquals(json.loads("""
+    self.assertEqual(json.loads("""
        {
          "client_id": "client_id",
          "client_secret": "client_secret",
@@ -114,12 +117,12 @@ gs_oauth2_refresh_token = fake-token
         'access-token', 'client_id', 'client_secret',
         'fake-token', None, 'token_uri', 'user_agent'), account='account1')
     store.Store(oauth2client_gce.AppAssertionCredentials(), account='from_gce')
-    self.assertEquals(['account1'], store.AvailableAccounts())
+    self.assertEqual(['account1'], store.AvailableAccounts())
 
   def testNoRefreshOnLoadIfPrevented(self):
     store.Store(self.fake_cred)
     loaded = store.Load(prevent_refresh=True)
-    self.assertEquals('fake-token', loaded.refresh_token)
+    self.assertEqual('fake-token', loaded.refresh_token)
     self.refresh_mock.assert_not_called()
 
   def testRefreshOnLoadIfStale(self):
@@ -127,7 +130,7 @@ gs_oauth2_refresh_token = fake-token
         datetime.datetime.utcnow() - datetime.timedelta(1))
     store.Store(self.fake_cred)
     loaded = store.Load()
-    self.assertEquals('fake-token', loaded.refresh_token)
+    self.assertEqual('fake-token', loaded.refresh_token)
     self.refresh_mock.assert_called_once()
 
   def testNoRefreshOnLoadIfFresh(self):
@@ -135,7 +138,7 @@ gs_oauth2_refresh_token = fake-token
         datetime.datetime.utcnow() + datetime.timedelta(1))
     store.Store(self.fake_cred)
     loaded = store.Load()
-    self.assertEquals('fake-token', loaded.refresh_token)
+    self.assertEqual('fake-token', loaded.refresh_token)
     self.refresh_mock.assert_not_called()
 
   def testAvailableAccounts(self):
@@ -149,39 +152,39 @@ gs_oauth2_refresh_token = fake-token
     store.Store(client.OAuth2Credentials(
         'access-token2', 'client_id2', 'client_secret2',
         'fake-token2', None, 'token_uri2', 'user_agent2'), account='account2')
-    self.assertEquals(['account1', 'account2'], store.AvailableAccounts())
+    self.assertEqual(['account1', 'account2'], store.AvailableAccounts())
 
   def testStoreAndLoadFileOverride(self):
     store.Store(self.fake_cred)
     properties.VALUES.auth.credential_file_override.Set(self.adc_file)
     loaded = store.Load()
-    self.assertEquals('file-token', loaded.refresh_token)
+    self.assertEqual('file-token', loaded.refresh_token)
     self.assertIsNone(loaded.access_token)
     loaded.access_token = 'access-token-2'
     loaded.store.put(loaded)
     # Make sure access-token was cached.
     reloaded = store.Load()
-    self.assertEquals('access-token-2', reloaded.access_token)
+    self.assertEqual('access-token-2', reloaded.access_token)
 
     properties.VALUES.auth.credential_file_override.Set(self.json_file)
     loaded = store.Load()
     self.assertTrue(
         isinstance(loaded, service_account.ServiceAccountCredentials))
-    self.assertEquals('bar.apps.googleusercontent.com', loaded.client_id)
+    self.assertEqual('bar.apps.googleusercontent.com', loaded.client_id)
     self.assertEqual(loaded._scopes, ' '.join(config.CLOUDSDK_SCOPES))
     self.assertNotEquals('token_uri', loaded.token_uri)
 
     properties.VALUES.auth.token_host.Set('token_uri')
     loaded = store.Load()
-    self.assertEquals('token_uri', loaded.token_uri)
+    self.assertEqual('token_uri', loaded.token_uri)
 
     properties.VALUES.auth.credential_file_override.Set(None)
     loaded = store.Load()
-    self.assertEquals('fake-token', loaded.refresh_token)
+    self.assertEqual('fake-token', loaded.refresh_token)
 
   def testError(self):
     properties.VALUES.auth.credential_file_override.Set('non-existing-file')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         store.InvalidCredentialFileException,
         r'Failed to load credential file: \[non-existing-file\]'):
       store.Load()
@@ -259,17 +262,17 @@ gs_oauth2_refresh_token = fake-token
 
   def testRefreshError(self):
     self.refresh_mock.side_effect = client.AccessTokenRefreshError
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         store.TokenRefreshError,
         'There was a problem refreshing your current auth tokens'):
       store.Refresh(self.fake_cred)
 
 
 @test_case.Filters.RunOnlyOnLinux
-@test_case.Filters.SkipInDebPackage('Socket conflict in docker container in '
-                                    'test environment', 'b/37959415')
-@test_case.Filters.SkipInRpmPackage('Socket conflict in docker container in '
-                                    'test environment', 'b/37959415')
+@test_case.Filters.SkipInDebPackage(
+    'Socket conflict in docker container in test environment', 'b/37959415')
+@test_case.Filters.SkipInRpmPackage(
+    'Socket conflict in docker container in test environment', 'b/37959415')
 class DevshellTests(sdk_test_base.SdkBase):
 
   def _UnregisterDevshellProvider(self, provider):
@@ -306,7 +309,7 @@ class DevshellTests(sdk_test_base.SdkBase):
       self.assertIsNone(properties.VALUES.core.project.Get())
       with self._DevshellProxy():
         self.assertEqual('fooproj', properties.VALUES.core.project.Get())
-        with self.assertRaisesRegexp(store.RevokeError, 'Cannot revoke'):
+        with self.assertRaisesRegex(store.RevokeError, 'Cannot revoke'):
           store.Revoke('joe@example.com')
 
         # Need to do this check while the dev shell proxy is still active.

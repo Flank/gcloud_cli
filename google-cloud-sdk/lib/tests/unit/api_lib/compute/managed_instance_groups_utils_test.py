@@ -14,6 +14,8 @@
 
 """Unit tests for the intance_utils module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -67,7 +69,7 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
                                                             holder.client,
                                                             holder.resources))
 
-    self.assertEquals(migs[0]['autoscaler'], autoscaler)
+    self.assertEqual(migs[0]['autoscaler'], autoscaler)
 
   def testAddAutoscalersToMigs_MismatchedRegionProjects(self):
     holder = base_classes.ComputeApiHolder(base.ReleaseTrack.GA)
@@ -90,10 +92,10 @@ class ManagesInstanceGroupUtilsTest(cli_test_base.CliTestBase,
                                                             holder.client,
                                                             holder.resources))
 
-    self.assertEquals(migs[0]['autoscaler'], autoscaler)
+    self.assertEqual(migs[0]['autoscaler'], autoscaler)
 
   def testAllowedUtilizationTargetTypesMatchApi(self):
-    self.assertEquals(
+    self.assertEqual(
         managed_instance_groups_utils._ALLOWED_UTILIZATION_TARGET_TYPES,
         sorted(self.messages.AutoscalingPolicyCustomMetricUtilization
                .UtilizationTargetTypeValueValuesEnum.to_dict().keys()))

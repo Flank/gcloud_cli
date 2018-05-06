@@ -354,7 +354,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-connections.*cannot be set with RATE balancing mode'):
       self.Run("""
@@ -372,7 +372,7 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
         [],
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
         '.*--max-rate.*cannot be set with CONNECTION balancing mode'):
       self.Run("""

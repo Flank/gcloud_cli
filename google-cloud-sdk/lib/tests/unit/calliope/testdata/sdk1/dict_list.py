@@ -13,8 +13,12 @@
 # limitations under the License.
 """This is a command for testing."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
+import six
 
 
 class DictList(base.Command):  # pylint:disable=missing-docstring
@@ -75,33 +79,34 @@ class DictList(base.Command):  # pylint:disable=missing-docstring
         type=arg_parsers.ArgList(choices=['a', 'b', 'c']),
         help='Auxilio aliis.')
 
-  def repr_dict_ordered(self, d):
-    """Return a dictionary string in key-sorted order."""
-    if not d:
-      return '{}'
-
-    values = []
-    for k in sorted(d.iterkeys()):
-      value = d[k]
-      if isinstance(value, list):
-        values.append("'{0}': {1}".format(k, value))
-      else:
-        values.append("'{0}': '{1}'".format(k, value))
-
-    return '{' + ', '.join(values) + '}'
+  def repr_all(self, obj):
+    """Basically just a helper to make repr work the same on python 2 and 3."""
+    if not obj:
+      return ''
+    if isinstance(obj, six.string_types):
+      return "'{}'".format(obj)
+    elif isinstance(obj, list):
+      return '[{}]'.format(', '.join([self.repr_all(v) for v in obj]))
+    elif isinstance(obj, dict):
+      values = []
+      for k, v in sorted(six.iteritems(obj)):
+        values.append("'{0}': {1}".format(k, self.repr_all(v)))
+      return '{' + ', '.join(values) + '}'
+    else:
+      return six.text_type(obj)
 
   def Run(self, args):
-    print 'list:', repr(args.list)
-    print 'repeated-list:', repr(args.repeated_list)
-    print 'repeated-list-update:', repr(args.repeated_list_update)
-    print 'repeated-list-update-with-append:', repr(
-        args.repeated_list_update_with_append)
-    print 'dict:', repr(args.dict)
-    print 'repeated-dict:', repr(args.repeated_dict)
-    print 'repeated-dict-update:', self.repr_dict_ordered(
-        args.repeated_dict_update)
-    print 'repeated-dict-update-with-append:', self.repr_dict_ordered(
-        args.repeated_dict_update_with_append)
-    print 'store-once:', self.repr_dict_ordered(args.store_once)
-    print 'int-list:', repr(args.int_list)
-    print 'choice-list:', repr(args.choice_list)
+    print('list:', self.repr_all(args.list))
+    print('repeated-list:', self.repr_all(args.repeated_list))
+    print('repeated-list-update:', self.repr_all(args.repeated_list_update))
+    print('repeated-list-update-with-append:', self.repr_all(
+        args.repeated_list_update_with_append))
+    print('dict:', self.repr_all(args.dict))
+    print('repeated-dict:', self.repr_all(args.repeated_dict))
+    print('repeated-dict-update:', self.repr_all(
+        args.repeated_dict_update) or '{}')
+    print('repeated-dict-update-with-append:', self.repr_all(
+        args.repeated_dict_update_with_append) or '{}')
+    print('store-once:', self.repr_all(args.store_once) or '{}')
+    print('int-list:', self.repr_all(args.int_list))
+    print('choice-list:', self.repr_all(args.choice_list))

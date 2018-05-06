@@ -201,7 +201,7 @@ class SetIamPolicy(unit_test_base.BaseTest):
 
   def testSetIamPolicyInvalidName(self):
     _, in_file = self._CreatePolicyAndFile(include_etag=True)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         r'Not a valid service account identifier. It should be either a '
         r'numeric string representing the unique_id or an email of the form: '

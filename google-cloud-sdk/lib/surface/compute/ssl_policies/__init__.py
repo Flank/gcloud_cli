@@ -13,9 +13,10 @@
 # limitations under the License.
 """Commands for creating, reading, and manipulating SSL policies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class SslPolicies(base.Group):
   """List, create, delete and update Google Compute Engine SSL policies."""

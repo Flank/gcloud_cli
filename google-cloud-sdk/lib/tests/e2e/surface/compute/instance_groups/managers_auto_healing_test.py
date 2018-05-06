@@ -168,7 +168,7 @@ class InstanceGroupsAutoHealingTest(e2e_test_base.BaseTest):
     mig_description = self.Run('compute instance-groups managed describe {0} '
                                '{1} --no-user-output-enabled'.format(
                                    igm_name, self.GetScopeFlag()))
-    self.assertEquals(
+    self.assertEqual(
         mig_description['autoHealingPolicies'][0]['healthCheck'],
         'https://www.googleapis.com/compute/{}/'
         'projects/{}/global/healthChecks/{}'.format(

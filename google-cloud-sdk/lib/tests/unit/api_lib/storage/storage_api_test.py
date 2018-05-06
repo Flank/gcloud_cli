@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.storage.storage_api."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import io
 import os
 import re
@@ -50,7 +52,7 @@ class GetObjectTest(sdk_test_base.SdkBase):
             bucket='mybucket', object='myobject'),
         self.storage_msgs.Object(name='myobject'))
 
-    self.assertEquals(
+    self.assertEqual(
         self.storage_client.GetObject(self._OBJECT),
         self.storage_msgs.Object(name='myobject'))
 
@@ -96,7 +98,7 @@ class CopyFileTest(sdk_test_base.SdkBase):
         exception=exception
     )
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.BadFileException,
         r'Could not copy \[{}\] to \[{}\]. Please retry: Invalid request API '
         r'reason: Invalid request.'.format(
@@ -215,7 +217,7 @@ class ReadObjectTest(sdk_test_base.SdkBase):
         response)
     self.assertEqual(
         self.storage_client.ReadObject(self._OBJECT).read(),
-        '')
+        b'')
 
   def testApiError(self):
     exception = http_error.MakeHttpError()
@@ -247,16 +249,18 @@ class ListBucketTest(cloud_storage_util.WithGCSCalls):
   def testListBucket(self):
     self.ExpectList([('a', 'content'), ('b', 'content'), ('c', 'content2')])
 
-    self.assertEquals(
-        self.storage_client.ListBucket(self.bucket),
+    names = set(o.name for o in self.storage_client.ListBucket(self.bucket))
+    self.assertEqual(
+        names,
         set([self._SHA1_SUMS['content'], self._SHA1_SUMS['content2']]))
 
   def testListBucketMultiplePages(self):
     self.ExpectListMulti([
         [('a', 'content'), ('b', 'content')],
         [('c', 'content2'), ('d', 'content3')]])
-    self.assertEquals(
-        self.storage_client.ListBucket(self.bucket),
+    names = set(o.name for o in self.storage_client.ListBucket(self.bucket))
+    self.assertEqual(
+        names,
         set([self._SHA1_SUMS['content'], self._SHA1_SUMS['content2'],
              self._SHA1_SUMS['content3']]))
 

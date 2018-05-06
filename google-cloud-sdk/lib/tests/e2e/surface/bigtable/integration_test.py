@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for bigtable command group."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.core.util import platforms
@@ -41,7 +43,7 @@ class BigtableIntegrationTest(sdk_test_base.BundledBase,
       result = (self.ExecuteLegacyScript('cbt.exe', args)
                 if platforms.OperatingSystem.IsWindows() else
                 self.ExecuteScript('cbt', args))
-      self.assertEquals(0, result.return_code)
+      self.assertEqual(0, result.return_code)
       if expected is not None:
         self.assertIn(expected, result.stdout)
       return result
@@ -51,17 +53,17 @@ class BigtableIntegrationTest(sdk_test_base.BundledBase,
 
   def SetUp(self):
     id_gen = e2e_utils.GetResourceNameGenerator(prefix='btinstanc')
-    self.instance = id_gen.next()
-    self.cluster = id_gen.next()
-    self.table = id_gen.next()
-    self.family = id_gen.next()
-    self.row = id_gen.next()
-    self.column = id_gen.next()
-    self.value = id_gen.next()
+    self.instance = next(id_gen)
+    self.cluster = next(id_gen)
+    self.table = next(id_gen)
+    self.family = next(id_gen)
+    self.row = next(id_gen)
+    self.column = next(id_gen)
+    self.value = next(id_gen)
 
     # Create an instance.
     self.RunB('instances create {0} --cluster {1} --cluster-num-nodes 3 '
-              '--cluster-zone us-central1-b --description {0}'.format(
+              '--cluster-zone us-central1-b --display-name {0}'.format(
                   self.instance, self.cluster))
 
   def TearDown(self):
@@ -80,7 +82,7 @@ class BigtableIntegrationTest(sdk_test_base.BundledBase,
     self.AssertOutputContains(self.instance)
 
     # Update the instance description.
-    self.RunB('instances update {0} --description '
+    self.RunB('instances update {0} --display-name '
               '"My New Description"'.format(self.instance))
 
     # Describe the instance and verify the new description.

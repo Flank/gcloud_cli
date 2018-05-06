@@ -14,6 +14,8 @@
 
 """Tests for DM base commands command_lib."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from apitools.base.py import exceptions as apitools_exceptions
@@ -31,10 +33,8 @@ from tests.lib.surface.deployment_manager import unit_test_base
 OPERATION_NAME = 'op-123'
 
 
-def LogResource(request, async):
-  log.CreatedResource(request.deployment,
-                      kind='deployment',
-                      async=async)
+def LogResource(request, is_async):
+  log.CreatedResource(request.deployment, kind='deployment', is_async=is_async)
 
 
 def CallDmApiSuccess(request):  # pylint: disable=unused-argument
@@ -71,12 +71,12 @@ class DmWriteTest(unit_test_base.DmV2UnitTestBase):
                                  LogResource)
     self.AssertErrContains('Create in progress for deployment [foo].')
     self.AssertOutputContains('Operation [op-123] running')
-    self.assertEquals(CallDmApiSuccess('foo'), operation)
+    self.assertEqual(CallDmApiSuccess('foo'), operation)
 
   def testCallFailed(self):
     # HttpError => HttpException happens later in the CLI.
-    with self.assertRaisesRegexp(apitools_exceptions.HttpError,
-                                 'unsuccessful'):
+    with self.assertRaisesRegex(apitools_exceptions.HttpError,
+                                'unsuccessful'):
       dm_write.Execute(self.client, self.messages, self.resources, self.request,
                        False, CallDmApiError, LogResource)
     self.AssertErrNotContains('Created endpoint [foo].')
@@ -84,8 +84,8 @@ class DmWriteTest(unit_test_base.DmV2UnitTestBase):
   def testOperationFailed(self):
     self.WithOperationPolling(operation_type='op',
                               error=self.OperationErrorFor('fail'))
-    with self.assertRaisesRegexp(exceptions.OperationError,
-                                 re.compile(r'.*fail.*')):
+    with self.assertRaisesRegex(exceptions.OperationError,
+                                re.compile(r'.*fail.*')):
       dm_write.Execute(self.client, self.messages, self.resources, self.request,
                        False, CallDmApiSuccess, LogResource)
     self.AssertErrContains('Waiting for [op-123]')
@@ -96,7 +96,7 @@ class DmWriteTest(unit_test_base.DmV2UnitTestBase):
     self.WithOperationPolling(operation_type='op',
                               poll_attempts=3,
                               require_final_poll=False)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.compile(r'.*'+OPERATION_NAME+'.*exceeded timeout.*')):
       dm_write.WaitForOperation(self.client, self.messages, OPERATION_NAME,

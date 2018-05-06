@@ -11,7 +11,7 @@ gcloud compute disks snapshot \- create snapshots of Google Compute Engine persi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute disks snapshot\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[\fISNAPSHOT_NAME\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute disks snapshot\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -66,7 +66,7 @@ snapshot process. Currently only supported on Windows instances using the Volume
 Shadow Copy Service (VSS).
 
 .TP 2m
-\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[\fISNAPSHOT_NAME\fR,...]
+\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]
 Names to assign to the snapshots. Without this option, the name of each snapshot
 will be a random, 16\-character hexadecimal number that starts with a letter.
 The values of this option run parallel to the disks specified. For example,
@@ -83,7 +83,7 @@ so on.
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 The zone of the disks to operate on. If not specified and the
-\f5\fIcompute/zone\fR\fR property isn't set, you will be prompted to select a
+\f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
 zone.
 
 To avoid prompting when this flag is omitted, you can set the

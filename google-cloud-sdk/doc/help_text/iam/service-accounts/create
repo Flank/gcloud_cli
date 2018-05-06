@@ -35,7 +35,8 @@ EXAMPLES
     resulting from this call as the IAM_ACCOUNT argument.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha iam service-accounts create
         $ gcloud beta iam service-accounts create
 

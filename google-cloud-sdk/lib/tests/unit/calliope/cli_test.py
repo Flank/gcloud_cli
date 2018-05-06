@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import ssl
 
@@ -26,6 +27,7 @@ from tests.lib import test_case
 import mock
 
 from oauth2client import client
+import six.moves.http_client
 
 
 class AlternateCommandTests(sdk_test_base.SdkBase):
@@ -95,7 +97,7 @@ class CliTests(sdk_test_base.SdkBase):
     c = self.MakeCli()
     c._HandleAllErrors(
         exceptions.Error('exception text'), 'group.command', 'LOCAL')
-    log_error.assert_called_with(u'(group.command) exception text')
+    log_error.assert_called_with('(group.command) exception text')
 
   @mock.patch('googlecloudsdk.core.log.error')
   def testHandleKnownErrorSsl(self, log_error):
@@ -106,7 +108,7 @@ class CliTests(sdk_test_base.SdkBase):
   @mock.patch('googlecloudsdk.core.log.error')
   def testHandleKnownErrorResponseNotReady(self, log_error):
     self.DoKnownExceptionHandlingCheck(
-        log_error, httplib.ResponseNotReady,
+        log_error, six.moves.http_client.ResponseNotReady,
         'This may be due to network connectivity issues.')
 
   @mock.patch('googlecloudsdk.core.log.error')
@@ -134,8 +136,8 @@ class CliTests(sdk_test_base.SdkBase):
   @mock.patch('googlecloudsdk.core.log.error')
   def testHandleKnownErrorUnicode(self, log_error):
     c = self.MakeCli()
-    c._HandleAllErrors(exceptions.Error(u'\xff'), 'path', 'GLOBAL')
-    log_error.assert_called_with(u'(path) \\xff')
+    c._HandleAllErrors(exceptions.Error('\xff'), 'path', 'GLOBAL')
+    log_error.assert_called_with('(path) \\xff')
 
 
 if __name__ == '__main__':

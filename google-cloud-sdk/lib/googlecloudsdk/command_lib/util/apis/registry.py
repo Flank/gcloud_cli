@@ -14,6 +14,8 @@
 
 """Utilities for the gcloud meta apis surface."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.protorpclite import messages
 from apitools.base.py import  exceptions as apitools_exc
 from apitools.base.py import list_pager
@@ -25,6 +27,7 @@ from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.third_party.apis import apis_map
+import six
 
 NAME_SEPARATOR = '.'
 
@@ -110,6 +113,7 @@ class APICollection(object):
     self.detailed_params = collection_info.GetParams('')
     self.path = collection_info.path
     self.params = collection_info.params
+    self.enable_uri_parsing = collection_info.enable_uri_parsing
 
 
 class APIMethod(object):
@@ -143,6 +147,8 @@ class APIMethod(object):
     self.response_type = method_config.response_type_name
 
     self._request_collection = self._RequestCollection()
+    # Keep track of method query parameters
+    self.query_params = method_config.query_params
 
   @property
   def resource_argument_collection(self):
@@ -200,6 +206,23 @@ class APIMethod(object):
       response_type = arg_utils.GetFieldFromMessage(
           response_type, item_field).type
     return response_type
+
+  def GetMessageByName(self, name):
+    """Gets a arbitrary apitools message class by name.
+
+    This method can be used to get arbitrary apitools messages from the
+    underlying service. Examples:
+
+    policy_type = method.GetMessageByName('Policy')
+    status_type = method.GetMessageByName('Status')
+
+    Args:
+      name: str, the name of the message to return.
+    Returns:
+      The apitools Message object.
+    """
+    msgs = self._service.client.MESSAGES_MODULE
+    return getattr(msgs, name, None)
 
   def IsList(self):
     """Determines whether this is a List method."""
@@ -410,7 +433,7 @@ def _ValidateAndGetDefaultVersion(api_name, api_version):
       raise UnknownAPIVersionError(api_name, api_version)
     return api_version
 
-  for version, api_def in api_vers.iteritems():
+  for version, api_def in six.iteritems(api_vers):
     if api_def.default_version:
       return version
   raise NoDefaultVersionError(api_name)
@@ -440,8 +463,8 @@ def GetAllAPIs():
     [API], A list of API definitions.
   """
   all_apis = []
-  for api_name, versions in apis_map.MAP.iteritems():
-    for api_version, _ in versions.iteritems():
+  for api_name, versions in six.iteritems(apis_map.MAP):
+    for api_version, _ in six.iteritems(versions):
       all_apis.append(GetAPI(api_name, api_version))
   return all_apis
 
@@ -467,7 +490,7 @@ def GetAPICollections(api_name=None, api_version=None):
     all_apis = {x.name: x.version for x in GetAllAPIs() if x.is_default}
 
   collections = []
-  for n, v in all_apis.iteritems():
+  for n, v in six.iteritems(all_apis):
     # pylint:disable=protected-access
     collections.extend(
         [APICollection(c) for c in apis_internal._GetApiCollections(n, v)])

@@ -50,7 +50,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
             parent='projects/{}/models/myModel'.format(self.Project()),
             version=version),
         response=op)
-    self.assertEquals(op, self.versions.Create(self.model_ref, version=version))
+    self.assertEqual(op, self.versions.Create(self.model_ref, version=version))
 
   def testDelete(self):
     op = self.msgs.GoogleLongrunningOperation(name='opId')
@@ -59,7 +59,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
     self.client.projects_models_versions.Delete.Expect(
         request=self.msgs.MlProjectsModelsVersionsDeleteRequest(name=name),
         response=op)
-    self.assertEquals(op, self.versions.Delete(self.version_ref))
+    self.assertEqual(op, self.versions.Delete(self.version_ref))
 
   def testGet(self):
     version = self.short_msgs.Version(name='versionName')
@@ -68,7 +68,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
     self.client.projects_models_versions.Get.Expect(
         request=self.msgs.MlProjectsModelsVersionsGetRequest(name=name),
         response=version)
-    self.assertEquals(version, self.versions.Get(self.version_ref))
+    self.assertEqual(version, self.versions.Get(self.version_ref))
 
   def testList(self):
     response_items = [
@@ -81,7 +81,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
             pageSize=100),
         response=self.short_msgs.ListVersionsResponse(
             versions=response_items))
-    self.assertEquals(response_items, list(self.versions.List(self.model_ref)))
+    self.assertEqual(response_items, list(self.versions.List(self.model_ref)))
 
   def testPatch(self):
     labels = {'foo': 'bar', 'fizz': 'buzz'}
@@ -99,9 +99,9 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
         version)
 
     label_update = labels_util.UpdateResult(True, labels_field)
-    self.assertEquals(version, self.versions.Patch(self.version_ref,
-                                                   label_update,
-                                                   updated_description))
+    self.assertEqual(version, self.versions.Patch(self.version_ref,
+                                                  label_update,
+                                                  updated_description))
 
   def testPatchNoUpdate(self):
     no_label_update = labels_util.UpdateResult(False, None)
@@ -115,15 +115,15 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
     self.client.projects_models_versions.SetDefault.Expect(
         request=self.versions._MakeSetDefaultRequest(name=name),
         response=version)
-    self.assertEquals(version, self.versions.SetDefault(self.version_ref))
+    self.assertEqual(version, self.versions.SetDefault(self.version_ref))
 
   def testBuildVersion(self):
-    self.assertEquals(
+    self.assertEqual(
         self.versions.BuildVersion('myVersion'),
         self.short_msgs.Version(name='myVersion'))
 
   def testBuildVersion_FullySpecified(self):
-    self.assertEquals(
+    self.assertEqual(
         self.versions.BuildVersion('myVersion',
                                    deployment_uri='gs://foo/bar',
                                    runtime_version='0.12'),
@@ -139,9 +139,10 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
         manualScaling:
           nodes: 10
         framework: SCIKIT_LEARN
+        pythonVersion: '2.7'
     """
     framework = self.short_msgs.Version.FrameworkValueValuesEnum.SCIKIT_LEARN
-    self.assertEquals(
+    self.assertEqual(
         self.versions.BuildVersion(
             'myVersion',
             path=self.Touch(self.temp_path, 'version.yaml', test_yaml)),
@@ -151,7 +152,8 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
             description='spam',
             runtimeVersion='1.0',
             manualScaling=self.short_msgs.ManualScaling(nodes=10),
-            framework=framework))
+            framework=framework,
+            pythonVersion='2.7'))
 
   def testBuildVersion_YamlOverridden(self):
     test_yaml = """
@@ -161,13 +163,15 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
         manualScaling:
           nodes: 10
         framework: SCIKIT_LEARN
+        pythonVersion: '2.7'
     """
-    self.assertEquals(
+    self.assertEqual(
         self.versions.BuildVersion(
             'myVersion',
             path=self.Touch(self.temp_path, 'version.yaml', test_yaml),
             deployment_uri='gs://foo/bar',
             runtime_version='0.12',
+            python_version='3.6',
             framework=self.short_msgs.Version.FrameworkValueValuesEnum.XGBOOST),
         self.short_msgs.Version(
             name='myVersion',
@@ -175,6 +179,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
             runtimeVersion='0.12',
             description='spam',
             manualScaling=self.short_msgs.ManualScaling(nodes=10),
+            pythonVersion='3.6',
             framework=self.short_msgs.Version.FrameworkValueValuesEnum.XGBOOST))
 
   def testBuildVersion_YamlBadConfigFields(self):
@@ -184,13 +189,13 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
         manualScaling:
           nodes: 10
     """
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         versions_api.InvalidVersionConfigFile,
         r'Invalid field \[name\] '
         r'in configuration file \[.*version\.yaml\]\. '
         r'Allowed fields: '
         r'\[autoScaling, deploymentUri, description, framework, labels, '
-        r'machineType, manualScaling, runtimeVersion\]'):
+        r'machineType, manualScaling, pythonVersion, runtimeVersion\]'):
       self.versions.BuildVersion(
           'myVersion',
           path=self.Touch(self.temp_path, 'version.yaml', test_yaml))
@@ -203,20 +208,20 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
           nodes: 10
         toaster: true
     """
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         versions_api.InvalidVersionConfigFile,
         r'Invalid fields \[name, toaster\] '
         r'in configuration file \[.*version\.yaml\]\. '
         r'Allowed fields: '
         r'\[autoScaling, deploymentUri, description, framework, labels, '
-        r'machineType, manualScaling, runtimeVersion\]'):
+        r'machineType, manualScaling, pythonVersion, runtimeVersion\]'):
       self.versions.BuildVersion(
           'myVersion',
           path=self.Touch(self.temp_path, 'version.yaml', test_yaml))
 
   def testBuildVersion_MissingFile(self):
     """Tests a missing YAML config file."""
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         versions_api.InvalidVersionConfigFile,
         r'Could not read Version configuration file \[.*\.yaml\]'):
       self.versions.BuildVersion(
@@ -225,7 +230,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
 
   def testBuildVersion_BadYaml(self):
     """Tests invalid YAML in the config file."""
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         versions_api.InvalidVersionConfigFile,
         r'Could not read Version configuration file \[.*\.yaml\]'):
       self.versions.BuildVersion(

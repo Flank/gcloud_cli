@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute target-https-proxies create NAME
-        --ssl-certificates=SSL_CERTIFICATE,[SSL_CERTIFICATE,...]
-        --url-map=URL_MAP [--description=DESCRIPTION]
+        --ssl-certificates=SSL_CERTIFICATE,[...] --url-map=URL_MAP
+        [--description=DESCRIPTION]
         [--quic-override=QUIC_OVERRIDE; default="NONE"]
         [--ssl-policy=SSL_POLICY] [GCLOUD_WIDE_FLAG ...]
 
@@ -24,7 +24,7 @@ POSITIONAL ARGUMENTS
         The name of the target HTTPS proxy to create.
 
 REQUIRED FLAGS
-     --ssl-certificates=SSL_CERTIFICATE,[SSL_CERTIFICATE,...]
+     --ssl-certificates=SSL_CERTIFICATE,[...]
         References to at most 10 SSL certificate resources that are used for
         server-side authentication. The first SSL certificate in this list is
         considered the primary SSL certificate associated with the load

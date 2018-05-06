@@ -4,14 +4,14 @@ NAME
 
 SYNOPSIS
     gcloud container clusters update NAME
-        (--complete-ip-rotation | --enable-autoscaling
-          | --enable-legacy-authorization | --enable-master-authorized-networks
-          | --enable-network-policy | --generate-password
-          | --logging-service=LOGGING_SERVICE
+        (--complete-credential-rotation | --complete-ip-rotation
+          | --enable-autoscaling | --enable-legacy-authorization
+          | --enable-master-authorized-networks | --enable-network-policy
+          | --generate-password | --logging-service=LOGGING_SERVICE
           | --maintenance-window=MAINTENANCE_WINDOW
           | --monitoring-service=MONITORING_SERVICE
           | --node-locations=ZONE,[ZONE,...] | --remove-labels=[KEY,...]
-          | --set-password | --start-ip-rotation
+          | --set-password | --start-credential-rotation | --start-ip-rotation
           | --update-addons=[ADDON=ENABLED|DISABLED,...]
           | --update-labels=[KEY=VALUE,...]
           | --password=PASSWORD --enable-basic-auth
@@ -29,6 +29,16 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      Exactly one of these must be specified:
+
+       --complete-credential-rotation
+          Complete the IP and credential rotation for this cluster. For
+          example:
+
+              $ gcloud container clusters update example-cluster \
+                  --complete-credential-rotation
+
+          This causes the cluster to stop serving its old IP, return to a
+          single IP, and invalidate old credentials.
 
        --complete-ip-rotation
           Complete the IP rotation for this cluster. For example:
@@ -54,11 +64,18 @@ REQUIRED FLAGS
           option --no-enable-legacy-authorization.
 
        --enable-master-authorized-networks
-          Allow only Authorized Networks (specified by the
-          --master-authorized-networks flag) and Google Compute Engine Public
-          IPs to connect to Kubernetes master through HTTPS. By default public
-          internet (0.0.0.0/0) is allowed to connect to Kubernetes master
-          through HTTPS.
+          Allow only specified set of CIDR blocks (specified by the
+          --master-authorized-networks flag) to connect to Kubernetes master
+          through HTTPS. Besides these blocks, the following have access as
+          well:
+
+              1) The private network the cluster connects to if
+              `--private-cluster` is specified.
+              2) Google Compute Engine Public IPs if `--private-cluster` is not
+              specified.
+
+          When disabled, public internet (0.0.0.0/0) is allowed to connect to
+          Kubernetes master through HTTPS.
 
        --enable-network-policy
           Enable network policy enforcement for this cluster. If you are
@@ -94,9 +111,11 @@ REQUIRED FLAGS
        --node-locations=ZONE,[ZONE,...]
           The set of zones in which the specified node footprint should be
           replicated. All zones must be in the same region as the cluster's
-          primary zone, specified by the --zone flag. --node-locations must
-          contain the primary zone. If node-locations is not specified, all
-          nodes will be in the primary zone.
+          master(s), specified by the --zone or --region flag. Additionally,
+          for zonal clusters, --node-locations must contain the cluster's
+          primary zone. If not specified, all nodes will be in the cluster's
+          primary zone (for zonal clusters) or spread across three randomly
+          chosen zones within the cluster's region (for regional clusters).
 
           Note that NUM_NODES nodes will be created in each zone, such that if
           you specify --num-nodes=4 and choose two locations, 8 nodes will be
@@ -121,6 +140,16 @@ REQUIRED FLAGS
           Set the basic auth password to the specified value, keeping the
           existing username.
 
+       --start-credential-rotation
+          Start the rotation of IP and credentials for this cluster. For
+          example:
+
+              $ gcloud container clusters update example-cluster \
+                  --start-credential-rotation
+
+          This causes the cluster to serve on two IPs, and will initiate a node
+          upgrade to point to the new IP.
+
        --start-ip-rotation
           Start the rotation of this cluster to a new IP. For example:
 
@@ -134,7 +163,7 @@ REQUIRED FLAGS
           Cluster addons to enable or disable. Options are
           HorizontalPodAutoscaling=ENABLED|DISABLED
           HttpLoadBalancing=ENABLED|DISABLED
-          KubernetesDashboard=ENABLED|DISABLED
+          KubernetesDashboard=ENABLED|DISABLED NetworkPolicy=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
           Labels to apply to the Google Cloud resources in use by the
@@ -170,7 +199,7 @@ OPTIONAL FLAGS
         Don't wait for the operation to complete.
 
      --master-authorized-networks=NETWORK,[NETWORK,...]
-        The list of external networks (up to 10) that are allowed to connect to
+        The list of CIDR blocks (up to 20) that are allowed to connect to
         Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
         1.2.3.4/30). Can not be specified unless
         --enable-master-authorized-networks is also specified.

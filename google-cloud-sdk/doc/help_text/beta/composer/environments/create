@@ -1,0 +1,111 @@
+NAME
+    gcloud beta composer environments create - creates and initializes a Cloud
+        Composer environment
+
+SYNOPSIS
+    gcloud beta composer environments create
+        (ENVIRONMENT : --location=LOCATION) [--airflow-configs=[KEY=VALUE,...]]
+        [--async] [--disk-size=DISK_SIZE; default="100GB"]
+        [--env-variables=[NAME=VALUE,...]] [--labels=[KEY=VALUE,...]]
+        [--machine-type=MACHINE_TYPE] [--node-count=NODE_COUNT]
+        [--oauth-scopes=[SCOPE,...]] [--service-account=SERVICE_ACCOUNT]
+        [--tags=[TAG,...]] [--zone=ZONE]
+        [--network=NETWORK : --subnetwork=SUBNETWORK] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) If run asynchronously with --async, exits after printing an
+    operation that can be used to poll the status of the creation operation
+    via:
+
+        gcloud composer operations describe
+
+POSITIONAL ARGUMENTS
+     ENVIRONMENT - The environment to create. The arguments in this group can
+     be used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
+
+       ENVIRONMENT
+          The ID of the environment or a fully qualified identifier for the
+          environment. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --location=LOCATION
+          The Cloud location for the environment.
+
+FLAGS
+     --airflow-configs=[KEY=VALUE,...]
+        A list of Airflow software configuration override KEY=VALUE pairs to
+        set. For information on how to structure KEYs and VALUEs, run $ gcloud
+        help composer environments update.
+
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --disk-size=DISK_SIZE; default="100GB"
+        The disk size for each VM node in the environment. The minimum size is
+        10GB, and the maximum is 64TB. Specified value must be an integer
+        multiple of gigabytes. Cannot be updated after the environment has been
+        created. If units are not provided, defaults to GB.
+
+     --env-variables=[NAME=VALUE,...]
+        A comma-delimited list of environment variable NAME=VALUE pairs to
+        provide to the Airflow scheduler, worker, and webserver processes. NAME
+        may contain upper and lowercase letters, digits, and underscores, but
+        they may not begin with a digit. To include commas as part of a VALUE,
+        see gcloud topics escaping for information about overriding the
+        delimiter.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+     --machine-type=MACHINE_TYPE
+        The Compute Engine machine type
+        (https://cloud.google.com/compute/docs/machine-types) to use for nodes.
+        For example --machine-type=n1-standard-1.
+
+     --node-count=NODE_COUNT
+        The number of nodes to create to run the environment.
+
+     --oauth-scopes=[SCOPE,...]
+        The set of Google API scopes to be made available on all of the node
+        VMs. Defaults to ['https://www.googleapis.com/auth/cloud-platform'].
+        Cannot be updated.
+
+     --service-account=SERVICE_ACCOUNT
+        The Google Cloud Platform service account to be used by the node VMs.
+        If a service account is not specified, the "default" Compute Engine
+        service account for the project is used. Cannot be updated.
+
+     --tags=[TAG,...]
+        The set of instance tags applied to all node VMs. Tags are used to
+        identify valid sources or targets for network firewalls. Each tag
+        within the list must comply with RFC 1035. Cannot be updated.
+
+     --zone=ZONE
+        The Compute Engine zone in which the environment will be created. For
+        example --zone=us-central1-a.
+
+     Virtual Private Cloud networking
+
+       --network=NETWORK
+          The Compute Engine Network to which the environment will be
+          connected. If a 'Custom Subnet Network' is provided, --subnetwork
+          must be specified as well. This flag must be specified if any of the
+          other arguments in this group are specified.
+
+       --subnetwork=SUBNETWORK
+          The Compute Engine subnetwork
+          (https://cloud.google.com/compute/docs/subnetworks) to which the
+          environment will be connected.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

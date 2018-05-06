@@ -81,7 +81,8 @@ EXAMPLES
             --labels env=prod,team=kms
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys create
         $ gcloud beta kms keys create
 

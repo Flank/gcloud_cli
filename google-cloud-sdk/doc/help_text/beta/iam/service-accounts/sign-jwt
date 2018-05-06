@@ -37,5 +37,8 @@ SEE ALSO:
     https://cloud.google.com/appengine/docs/java/appidentity/.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha iam service-accounts sign-jwt
 

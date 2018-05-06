@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha services vpc-peerings - VPC Peerings to various services
+
+SYNOPSIS
+    gcloud alpha services vpc-peerings GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) VPC Peerings to various services.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+GROUPS
+    GROUP is one of the following:
+
+     operations
+        (ALPHA) Manage VPC Peering operations.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     connect
+        (ALPHA) Connect to a service via VPC peering for a project network.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

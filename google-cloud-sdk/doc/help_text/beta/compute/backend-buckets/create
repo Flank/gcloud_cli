@@ -4,12 +4,14 @@ NAME
 SYNOPSIS
     gcloud beta compute backend-buckets create BACKEND_BUCKET_NAME
         --gcs-bucket-name=GCS_BUCKET_NAME [--description=DESCRIPTION]
-        [--enable-cdn] [GCLOUD_WIDE_FLAG ...]
+        [--enable-cdn] [--signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute backend-buckets create is used to create backend
-    buckets. Backend buckets define Google Cloud Storage buckets that can serve
-    content. URL maps define which requests are sent to which backend buckets.
+    buckets. Backend buckets define a Google Cloud Storage bucket that can
+    serve content. URL maps define which requests are sent to which backend
+    buckets.
 
 POSITIONAL ARGUMENTS
      BACKEND_BUCKET_NAME
@@ -28,6 +30,21 @@ OPTIONAL FLAGS
         Enable Cloud CDN for the backend bucket. Cloud CDN can cache HTTP
         responses from a backend bucket at the edge of the network, close to
         users.
+
+     --signed-url-cache-max-age=SIGNED_URL_CACHE_MAX_AGE
+        The amount of time up to which the response to a signed URL request
+        will be cached in the CDN. After this time period, the Signed URL will
+        be revalidated before being served. Cloud CDN will internally act as
+        though all responses from this backend had a Cache-Control: public,
+        max-age=[TTL] header, regardless of any existing Cache-Control header.
+        The actual headers served in responses will not be altered. If
+        unspecified, the default value is 3600s.
+
+        For example, specifying 12h will cause the responses to signed URL
+        requests to be cached in the CDN up to 12 hours. See $ gcloud topic
+        datetimes for information on duration formats.
+
+        This flag only affects signed URL requests.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

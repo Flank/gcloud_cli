@@ -54,16 +54,16 @@ class LintTest(cli_test_base.CliTestBase):
     issues = self._BuildIssueMap(
         linter.Run(self.LoadGroupTree('testdata/lint/sdk2')))
 
-    self.assertEquals(1, len(issues))
+    self.assertEqual(1, len(issues))
     self.assertIn('NameCheck', issues)
-    self.assertEquals(4, len(issues['NameCheck']))
+    self.assertEqual(4, len(issues['NameCheck']))
 
   def testLinterFailsFlagUnderscoreCheckViaArgs(self):
     issues = self._BuildIssueMap(lint.Lint._SetupAndRun(
         self.LoadGroupTree('testdata/lint/sdk2'), ['NameCheck']))
-    self.assertEquals(1, len(issues))
+    self.assertEqual(1, len(issues))
     self.assertIn('NameCheck', issues)
-    self.assertEquals(
+    self.assertEqual(
         set(['[gcloud.internal.xyzzy]: flag [--input_param] has underscores',
              '[gcloud]: flag [--sdk_root_override] has underscores',
              '[gcloud]: flag [-i] has no long form',
@@ -85,7 +85,7 @@ BadLists: [gcloud]: flag [--user-output-enabled] has nargs='?'
     actual = '\n'.join(sorted(msgs)) + '\n'
     self.maxDiff = None
     self.assertMultiLineEqual(expected, actual)
-    self.assertEquals(4, len(issues))
+    self.assertEqual(4, len(issues))
 
   def testLinterWhitelistedCommands(self):
     mock = self.StartObjectPatch(lint, '_GetWhitelistedCommandVocabulary')
@@ -95,7 +95,7 @@ BadLists: [gcloud]: flag [--user-output-enabled] has nargs='?'
                              'subgroup-command-2'])
     issues = lint.Lint._SetupAndRun(
         self.LoadGroupTree('testdata/lint/sdk2'), ['WhitelistedNameCheck'])
-    self.assertEquals(
+    self.assertEqual(
         set(['[gcloud.internal.xyzzy]: command name [xyzzy] '
              'is not whitelisted']),
         set(issue.msg for issue in issues))

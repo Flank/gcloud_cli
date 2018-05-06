@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha pubsub topics get-iam-policy - get the IAM policy for a Cloud
-        Pub/Sub Topic
+    gcloud alpha pubsub topics get-iam-policy - get the IAM policy for a topic
 
 SYNOPSIS
     gcloud alpha pubsub topics get-iam-policy TOPIC [--filter=EXPRESSION]
@@ -8,11 +7,21 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Get the IAM policy for a Cloud Pub/Sub Topic.
+    (ALPHA) gcloud alpha pubsub topics get-iam-policy displays the IAM policy
+    associated with a topic. If formatted as JSON, the output can be edited and
+    used as a policy file for set-iam-policy. The output includes an "etag"
+    field identifying the version emitted and allowing detection of concurrent
+    policy updates; see $ {parent} set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     TOPIC
-        Name of the topic to get the IAM policy of.
+     TOPIC - The topic for which to display the IAM policy. This represents a
+     Cloud resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute: Set
+     the property [core/project] or provide the flag [--project] on the command
+     line. This must be specified.
+
+       TOPIC
+          The ID of the topic or a fully qualified identifier for the topic.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -44,6 +53,10 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the pubsub/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/pubsub/docs
 
 EXAMPLES
     To print the IAM policy for a given topic, run:

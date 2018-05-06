@@ -13,14 +13,15 @@
 # limitations under the License.
 """Test of the 'list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import grpc_util
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
-
 import mock
-
+from six.moves import range  # pylint: disable=redefined-builtin
 from google.bigtable.admin.v2 import bigtable_table_admin_pb2
 from google.bigtable.admin.v2 import bigtable_table_admin_pb2_grpc
 from google.bigtable.admin.v2 import table_pb2

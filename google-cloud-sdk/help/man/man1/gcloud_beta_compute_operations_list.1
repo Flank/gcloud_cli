@@ -11,7 +11,7 @@ gcloud beta compute operations list \- list Google Compute Engine operations
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute operations list\fR [\fINAME\fR\ ...] [\fB\-\-accounts\fR] [\fB\-\-global\fR] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-zones\fR=[\fIZONE\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute operations list\fR [\fINAME\fR\ ...] [\fB\-\-global\fR] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-zones\fR=[\fIZONE\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -20,9 +20,9 @@ gcloud beta compute operations list \- list Google Compute Engine operations
 \fB(BETA)\fR \fBgcloud beta compute operations list\fR displays all Google
 Compute Engine operations in a project.
 
-By default, all global, regional, zonal and Compute Accounts operations are
-listed. The results can be narrowed by providing combinations of the \-\-zones,
-\-\-regions, \-\-global and \-\-accounts flags.
+By default, all global, regional, and zonal operations are listed. The results
+can be narrowed by providing combinations of the \-\-zones, \-\-regions, and
+\-\-global flags.
 
 Note: \fBgcloud beta compute operations list\fR displays operations fewer than
 14 days old, up to a maximum of 5000.
@@ -46,10 +46,6 @@ Argument NAME is deprecated. Use \-\-filter="name=( 'NAME' ... )" instead.
 .SH "FLAGS"
 
 .RS 2m
-.TP 2m
-\fB\-\-accounts\fR
-If provided, all accounts resources are shown.
-
 .TP 2m
 \fB\-\-global\fR
 If provided, all global resources are shown.
@@ -163,12 +159,6 @@ operations in the us\-central1\-a zone, run:
 .RS 2m
 $ gcloud beta compute operations list \-\-zones us\-central1\-a \e
    \-\-regions us\-central1,europe\-west1
-.RE
-
-To list all Compute Accounts operations, run:
-
-.RS 2m
-$ gcloud beta compute operations list \-\-accounts
 .RE
 
 

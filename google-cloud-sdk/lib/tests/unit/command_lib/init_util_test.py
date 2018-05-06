@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for googlecloudsdk.command_lib.init_util."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_util
 from googlecloudsdk.api_lib.util import apis
@@ -35,12 +37,12 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
   def testPickProject_Preselected(self):
     """Should accept preselected value, since it's in the list."""
-    self.assertEquals(init_util.PickProject('foo'), 'foo')
+    self.assertEqual(init_util.PickProject('foo'), 'foo')
 
   def testPickProject_PreselectedButNotAvailable(self):
     """Should return None, since preselected value is not in the list."""
     self.WriteInput('n')
-    self.assertEquals(init_util.PickProject('qux'), None)
+    self.assertEqual(init_util.PickProject('qux'), None)
     self.AssertErrEquals(
         '[qux] is not one of your projects [bar,baz,foo].\n\n'
         'Would you like to create it? (Y/n)?\n', normalize_space=True)
@@ -50,7 +52,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.list_projects_mock.side_effect = RuntimeError('blah')
     self.WriteInput('qux')
 
-    self.assertEquals(init_util.PickProject(), 'qux')
+    self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrEquals(
         'WARNING: Listing available projects failed: blah\n'
         'Enter project id you would like to use:',
@@ -60,7 +62,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     """Should pick the corresponding project."""
     self.WriteInput('2')
 
-    self.assertEquals(init_util.PickProject(), 'baz')
+    self.assertEqual(init_util.PickProject(), 'baz')
     # Output is sorted lexicographically
     self.AssertErrEquals("""\
         Pick cloud project to use:
@@ -75,7 +77,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     """Should accept free-form input, since it's in the list."""
     self.WriteInput('bar')
 
-    self.assertEquals(init_util.PickProject(), 'bar')
+    self.assertEqual(init_util.PickProject(), 'bar')
     self.AssertErrEquals("""\
         Pick cloud project to use:
          [1] bar
@@ -89,7 +91,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     """Should return None and show another prompt."""
     self.WriteInput('5')
 
-    self.assertEquals(init_util.PickProject(), None)
+    self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals("""\
         Pick cloud project to use:
          [1] bar
@@ -104,7 +106,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     """Should return None and show another prompt."""
     self.WriteInput('qux')
 
-    self.assertEquals(init_util.PickProject(), None)
+    self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals("""\
         Pick cloud project to use:
          [1] bar
@@ -117,7 +119,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
 
   def testPickProject_NoInput(self):
     """Should pick the corresponding project."""
-    self.assertEquals(init_util.PickProject(), None)
+    self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals("""\
         Pick cloud project to use:
          [1] bar
@@ -132,7 +134,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
     self.WriteInput('4\nnew-project')
 
-    self.assertEquals(init_util.PickProject(), 'new-project')
+    self.assertEqual(init_util.PickProject(), 'new-project')
     self.AssertErrEquals(
         """\
         Pick cloud project to use:
@@ -155,7 +157,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
     self.WriteInput('4')
 
-    self.assertEquals(init_util.PickProject(), None)
+    self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
         """\
         Pick cloud project to use:
@@ -177,7 +179,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
         projects_api, 'Create', side_effect=RuntimeError('blah'))
     self.WriteInput('4\nnew-project')
 
-    self.assertEquals(init_util.PickProject(), None)
+    self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
         """\
         Pick cloud project to use:
@@ -206,7 +208,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.list_projects_mock.return_value = iter(projects)
     self.WriteInput('1')
 
-    self.assertEquals(init_util.PickProject(), 'spam')
+    self.assertEqual(init_util.PickProject(), 'spam')
     self.AssertErrEquals(
         'Pick cloud project to use:\n'
         ' [1] spam\n'
@@ -219,7 +221,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     """Should return None because an empty project ID was given."""
     self.list_projects_mock.return_value = iter([])
 
-    self.assertEquals(init_util.PickProject(), None)
+    self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
         'This account has no projects.\n\n'
         'Would you like to create one? (Y/n)?\n'
@@ -232,7 +234,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.WriteInput('n')
     self.list_projects_mock.return_value = iter([])
 
-    self.assertEquals(init_util.PickProject(), None)
+    self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
         'This account has no projects.\n\n'
         'Would you like to create one? (Y/n)?\n',
@@ -243,7 +245,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.WriteInput('y\nqux')
     self.list_projects_mock.return_value = iter([])
 
-    self.assertEquals(init_util.PickProject(), 'qux')
+    self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrEquals(
         'This account has no projects.\n\n'
         'Would you like to create one? (Y/n)?\n'
@@ -260,7 +262,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     self.list_projects_mock.side_effect = RuntimeError('blah')
     self.WriteInput('qux')
 
-    self.assertEquals(init_util.PickProject(), 'qux')
+    self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrEquals(
         'WARNING: Listing available projects failed: blah\n'
         'Enter project id you would like to use:',
@@ -270,7 +272,7 @@ class PickProjectTests(sdk_test_base.WithLogCapture, test_case.WithInput):
     """Should return None."""
     self.list_projects_mock.side_effect = RuntimeError('blah')
 
-    self.assertEquals(init_util.PickProject(), None)
+    self.assertEqual(init_util.PickProject(), None)
     self.AssertErrEquals(
         'WARNING: Listing available projects failed: blah\n'
         'Enter project id you would like to use:',
@@ -303,7 +305,7 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
     get_projects_mock = self.StartObjectPatch(projects_api, 'Get')
     self.StartObjectPatch(projects_util, 'IsActive', return_value=True)
 
-    self.assertEquals(init_util.PickProject('qux'), 'qux')
+    self.assertEqual(init_util.PickProject('qux'), 'qux')
     get_projects_mock.assert_called_once_with(
         resources.REGISTRY.Create('cloudresourcemanager.projects',
                                   projectId='qux'))
@@ -313,7 +315,7 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
     self.StartObjectPatch(projects_util, 'IsActive', side_effect=[False, True])
 
     self.WriteInput('1\nxuq\nqux')
-    self.assertEquals(init_util.PickProject(), 'qux')
+    self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrContains(
         """\
         This account has a lot of projects! Listing them all can take a while.
@@ -336,7 +338,7 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
     create_projects_mock = self.StartObjectPatch(projects_api, 'Create')
 
     self.WriteInput('2\nqux')
-    self.assertEquals(init_util.PickProject(), 'qux')
+    self.assertEqual(init_util.PickProject(), 'qux')
     self.AssertErrContains(
         """\
         This account has a lot of projects! Listing them all can take a while.
@@ -351,7 +353,7 @@ class PickProjectTestsLimitExceeded(sdk_test_base.WithLogCapture,
 
   def testPickProject_ListProjects(self):
     self.WriteInput('3\n1')
-    self.assertEquals(init_util.PickProject(), 'bar')
+    self.assertEqual(init_util.PickProject(), 'bar')
     self.AssertErrContains(
         """\
         This account has a lot of projects! Listing them all can take a while.

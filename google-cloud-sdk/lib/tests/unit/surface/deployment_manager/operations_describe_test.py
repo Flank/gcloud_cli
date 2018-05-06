@@ -14,6 +14,8 @@
 
 """Unit tests for operations describe command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.deployment_manager import unit_test_base

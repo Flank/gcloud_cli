@@ -31,7 +31,7 @@ COMMANDS
         (ALPHA) Describes a service given a service name.
 
      get-iam-policy
-        (ALPHA) Describes the IAM policy for a service.
+        (ALPHA) Get the IAM policy for a service.
 
      list
         (ALPHA) List services for a project.

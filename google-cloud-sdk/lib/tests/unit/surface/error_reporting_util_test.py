@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for error reporting util."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import ntpath
 import os
 import posixpath

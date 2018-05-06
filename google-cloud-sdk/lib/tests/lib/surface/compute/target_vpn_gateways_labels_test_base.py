@@ -13,6 +13,8 @@
 # limitations under the License.
 """Common component for target VPN gateways labels testing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
 
@@ -173,6 +175,7 @@ class TargetVpnGatewaysLabelsTestBase(sdk_test_base.WithFakeAuth,
     request.region = target_vpn_gateway_ref.region
     request.regionSetLabelsRequest = scoped_set_labels_request(
         labelFingerprint=fingerprint,
-        labels=labels_value,)
+        labels=labels_value,
+    )
 
     service.SetLabels.Expect(request=request, response=target_vpn_gateway)

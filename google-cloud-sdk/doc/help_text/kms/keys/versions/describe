@@ -35,7 +35,8 @@ EXAMPLES
             --keyring fellowship --location us-east1
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys versions describe
         $ gcloud beta kms keys versions describe
 

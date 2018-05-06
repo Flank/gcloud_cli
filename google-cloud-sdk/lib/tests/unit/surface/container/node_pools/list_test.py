@@ -14,6 +14,8 @@
 
 """Tests for 'node-pools list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import test_case
@@ -52,6 +54,9 @@ class ListTestGA(base.TestBaseV1,
 
   def testListNodePools(self):
     self._TestListNodePools(self.ZONE)
+
+  def testListRegionalNodePools(self):
+    self._TestListNodePools(self.REGION)
 
   def testListEmptyNodePools(self):
     self.ExpectListNodePools(response=self._MakeListNodePoolsResponse([]))
@@ -103,9 +108,6 @@ class ListTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, ListTestAlphaV1API,
 
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(False)
-
-  def testListRegionalNodePools(self):
-    self._TestListNodePools(self.REGION)
 
 
 if __name__ == '__main__':

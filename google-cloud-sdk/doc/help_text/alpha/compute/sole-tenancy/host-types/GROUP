@@ -6,7 +6,10 @@ SYNOPSIS
     gcloud alpha compute sole-tenancy host-types COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read Google Compute Engine sole-tenancy host types.
+    (ALPHA) (DEPRECATED) Read Google Compute Engine sole-tenancy host types.
+
+    This command group is deprecated. Please use gcloud alpha compute
+    sole-tenancy node-types instead.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -17,10 +20,11 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (ALPHA) Display detailed information about a sole-tenancy host type.
+        (ALPHA) (DEPRECATED) Display detailed information about a sole-tenancy
+        host type.
 
      list
-        (ALPHA) List Google Compute Engine hostTypes.
+        (ALPHA) (DEPRECATED) List Google Compute Engine hostTypes.
 
 NOTES
     This command is an internal implementation detail and may change or

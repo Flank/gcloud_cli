@@ -14,6 +14,8 @@
 
 """Tests for the yaml command schema."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import itertools
 
 from googlecloudsdk.api_lib.util import resource as resource_util
@@ -95,7 +97,7 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual({'field1': 'value1'}, zone_attr.completion_request_params)
 
   def testRemovedFlagsValidation(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         r'Removed flag \[asdf\] for resource arg \[zone\] references an '
         r'attribute that does not exist. Valid attributes are '
@@ -115,13 +117,13 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
 
   @parameterized.parameters(True, False)
   def testGenerateAttributesValidation(self, is_atomic):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resource_arg_schema.InvalidResourceArgumentLists,
         r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
         r' Found \[\]'):
       resource_arg_schema._GenerateAttributes(['projectsId', 'instancesId'], [])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resource_arg_schema.InvalidResourceArgumentLists,
         r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
         r' Found \[junk\]'):
@@ -129,7 +131,7 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
           ['projectsId', 'instancesId'],
           [{'parameter_name': 'junk', 'attribute_name': 'junk', 'help': 'h'}])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         resource_arg_schema.InvalidResourceArgumentLists,
         r'Invalid resource arguments: Expected \[\[projectsId\], instancesId\],'
         r' Found \[instancesId, extraId\]'):
@@ -218,7 +220,7 @@ class CollectionValidationTests(base.Base, parameterized.TestCase):
         {'name': 'instance', 'collection': 'asdf', 'attributes': []},
         group_help='group_help')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         r'Collection names do not match for resource argument specification '
         r'\[instance\]. Expected \[foo.projects.instances\], found \[asdf\]'):
@@ -229,7 +231,7 @@ class CollectionValidationTests(base.Base, parameterized.TestCase):
          'collection': 'foo.projects.instances', 'attributes': []},
         group_help='group_help')
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         util.InvalidSchemaError,
         r'API versions do not match for resource argument specification '
         r'\[instance\]. Expected \[v1\], found \[foo\]'):

@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """beta ml vision tests."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import textwrap
 
@@ -23,15 +27,11 @@ from tests.lib import test_case
 from tests.lib.surface.ml.vision import base as vision_base
 
 
-@parameterized.named_parameters(
-    ('Alpha', base.ReleaseTrack.ALPHA),
-    ('Beta', base.ReleaseTrack.BETA),
-    ('GA', base.ReleaseTrack.GA))
-class DetectFacesTest(vision_base.MlVisionTestBase):
+class DetectFacesBase(vision_base.MlVisionTestBase):
 
   def _ExpectDetectFacesRequest(self, image_path, success=False,
                                 error_message=None, max_results=None,
-                                contents=None):
+                                contents=None, model=None):
     """Build expected detect-faces requests and responses.
 
     Args:
@@ -42,9 +42,11 @@ class DetectFacesTest(vision_base.MlVisionTestBase):
           any).
       contents: the content of the Image message to be expected (if any).
           Alternative to image_path.
+      model: str, the model version to use for the feature.
     """
     feature = self.messages.Feature(
-        type=self.messages.Feature.TypeValueValuesEnum.FACE_DETECTION)
+        type=self.messages.Feature.TypeValueValuesEnum.FACE_DETECTION,
+        model=model)
     if max_results:
       feature.maxResults = max_results
     image = self.messages.Image()
@@ -144,11 +146,18 @@ class DetectFacesTest(vision_base.MlVisionTestBase):
     self.client.images.Annotate.Expect(request,
                                        response=response)
 
-  def testDetectFaces_Success(self, track):
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA, 'builtin/stable'),
+    ('Beta', base.ReleaseTrack.BETA, 'builtin/stable'),
+    ('GA', base.ReleaseTrack.GA, None))
+class DetectFacesCommonTest(DetectFacesBase):
+
+  def testDetectFaces_Success(self, track, model):
     """Test `gcloud ml vision detect-faces` runs & outputs correctly."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
-    self._ExpectDetectFacesRequest(path_to_image, success=True)
+    self._ExpectDetectFacesRequest(path_to_image, success=True, model=model)
     self.Run('ml vision detect-faces {path}'.format(path=path_to_image))
     self.AssertOutputEquals(textwrap.dedent("""\
         {
@@ -231,32 +240,48 @@ class DetectFacesTest(vision_base.MlVisionTestBase):
         }
     """))
 
-  def testDetectFaces_LocalPath(self, track):
+  def testDetectFaces_LocalPath(self, track, model):
     """Test `gcloud ml vision detect-faces with a local image path."""
     self.track = track
     tempdir = self.CreateTempDir()
     path_to_image = self.Touch(tempdir, name='imagefile', contents='image')
-    self._ExpectDetectFacesRequest(None, success=True, contents=bytes('image'))
+    self._ExpectDetectFacesRequest(None, success=True, contents=b'image',
+                                   model=model)
     self.Run('ml vision detect-faces {path}'.format(path=path_to_image))
 
-  def testDetectFaces_MaxResults(self, track):
+  def testDetectFaces_MaxResults(self, track, model):
     """Test `gcloud ml vision detect-faces with --max-results specified."""
     self.track = track
     path_to_image = 'https://example.com/fake-image'
     self._ExpectDetectFacesRequest(path_to_image, success=True,
-                                   max_results=4)
+                                   max_results=4, model=model)
     self.Run('ml vision detect-faces {path} '
              '--max-results 4'.format(path=path_to_image))
 
-  def testDetectFaces_Error(self, track):
+  def testDetectFaces_Error(self, track, model):
     """Test `gcloud ml vision detect-faces with an error."""
     self.track = track
     path_to_image = 'gs://fake-bucket/fake-file'
     self._ExpectDetectFacesRequest(path_to_image,
-                                   error_message='Not found.')
+                                   error_message='Not found.', model=model)
     with self.AssertRaisesExceptionMatches(exceptions.Error,
                                            'Code: [400] Message: [Not found.]'):
       self.Run('ml vision detect-faces {path}'.format(path=path_to_image))
+
+
+@parameterized.named_parameters(
+    ('Alpha', base.ReleaseTrack.ALPHA),
+    ('Beta', base.ReleaseTrack.BETA))
+class DetectFacesAlphaBetaTest(DetectFacesBase):
+
+  def testDetectFaces_ModelVersion(self, track):
+    self.track = track
+    tempdir = self.CreateTempDir()
+    path_to_image = self.Touch(tempdir, name='imagefile', contents='image')
+    self._ExpectDetectFacesRequest(None, success=True, contents=b'image',
+                                   model='builtin/latest')
+    self.Run('ml vision detect-faces {path} '
+             '--model-version builtin/latest'.format(path=path_to_image))
 
 
 if __name__ == '__main__':

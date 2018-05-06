@@ -39,8 +39,8 @@ class CreateTestBase(object):
         collection='ml.projects.models')
     self.versions = versions_api.VersionsClient()
 
-  def _ExpectOperationPolling(self, async=False):
-    if not async:
+  def _ExpectOperationPolling(self, is_async=False):
+    if not is_async:
       self.client.projects_operations.Get.Expect(
           request=self.msgs.MlProjectsOperationsGetRequest(
               name='projects/{}/operations/opId'.format(self.Project())),
@@ -50,7 +50,8 @@ class CreateTestBase(object):
   def _ExpectCreate(self, runtime_version=None,
                     deployment_uri='gs://path/to/file',
                     description=None, manual_scaling=None, auto_scaling=None,
-                    labels=None, machine_type=None, framework=None):
+                    labels=None, machine_type=None, framework=None,
+                    python_version=None):
     if framework:
       framework = self.short_msgs.Version.FrameworkValueValuesEnum(framework)
     op = self.msgs.GoogleLongrunningOperation(name='opId')
@@ -66,7 +67,8 @@ class CreateTestBase(object):
                 autoScaling=auto_scaling,
                 labels=labels,
                 machineType=machine_type,
-                framework=framework
+                framework=framework,
+                pythonVersion=python_version
             )),
         response=op)
 
@@ -108,7 +110,7 @@ class CreateTestBase(object):
 
   def testCreateAsync(self):
     self._ExpectCreate()
-    self._ExpectOperationPolling(async=True)
+    self._ExpectOperationPolling(is_async=True)
     self.Run('ml-engine versions create versionId --model modelId '
              '--origin gs://path/to/file --async')
     self.AssertErrNotContains(
@@ -184,9 +186,9 @@ class CreateTestBase(object):
 
   def testCreate_LocalPathNoStagingBucket(self):
     """Tests an error from an invalid combination of flags."""
-    with self.assertRaisesRegexp(exceptions.Error,
-                                 r'If --origin is provided as a local path, '
-                                 r'--staging-bucket must be given as well\.'):
+    with self.assertRaisesRegex(exceptions.Error,
+                                r'If --origin is provided as a local path, '
+                                r'--staging-bucket must be given as well\.'):
       self.Run('ml-engine versions create versionId --model modelId '
                '--origin ' + self.temp_path)
 
@@ -248,6 +250,29 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
              '--config {}'.format(yaml_path))
     self.AssertErrContains('Creating version (this might take a few minutes)')
 
+  def testythonVersionFlag(self):
+    self._ExpectCreate(python_version='2.7')
+    self._ExpectOperationPolling()
+    self.Run('ml-engine versions create versionId --model modelId '
+             '--origin gs://path/to/file --python-version 2.7')
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  def testythonVersionFromConfig(self):
+    yaml_contents = """\
+        description: dummy description
+        deploymentUri: gs://foo/bar
+        runtimeVersion: '1.0'
+        pythonVersion: '3.4'
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
+                       description='dummy description',
+                       python_version='3.4')
+    self._ExpectOperationPolling()
+    self.Run('ml-engine versions create versionId --model modelId '
+             '--config {}'.format(yaml_path))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
 
 class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
 
@@ -273,6 +298,29 @@ class CreateAlphaTest(CreateTestBase, base.MlGaPlatformTestBase):
     self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
                        description='dummy description',
                        machine_type='mls1-highcpu-4')
+    self._ExpectOperationPolling()
+    self.Run('ml-engine versions create versionId --model modelId '
+             '--config {}'.format(yaml_path))
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  def testythonVersionFlag(self):
+    self._ExpectCreate(python_version='2.7')
+    self._ExpectOperationPolling()
+    self.Run('ml-engine versions create versionId --model modelId '
+             '--origin gs://path/to/file --python-version 2.7')
+    self.AssertErrContains('Creating version (this might take a few minutes)')
+
+  def testythonVersionFromConfig(self):
+    yaml_contents = """\
+        description: dummy description
+        deploymentUri: gs://foo/bar
+        runtimeVersion: '1.0'
+        pythonVersion: '3.4'
+    """
+    yaml_path = self.Touch(self.temp_path, 'version.yaml', yaml_contents)
+    self._ExpectCreate(runtime_version='1.0', deployment_uri='gs://foo/bar',
+                       description='dummy description',
+                       python_version='3.4')
     self._ExpectOperationPolling()
     self.Run('ml-engine versions create versionId --model modelId '
              '--config {}'.format(yaml_path))

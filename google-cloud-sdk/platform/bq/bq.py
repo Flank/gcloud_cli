@@ -43,6 +43,7 @@ if 'google' in sys.modules:
     import imp
     imp.reload(google)
 
+from google_reauth.reauth_creds import Oauth2WithReauthCredentials
 
 import googleapiclient
 import httplib2
@@ -112,6 +113,7 @@ else:
 _GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive'
 _BIGQUERY_SCOPE = 'https://www.googleapis.com/auth/bigquery'
 _CLOUD_PLATFORM_SCOPE = 'https://www.googleapis.com/auth/cloud-platform'
+_REAUTH_SCOPE = 'https://www.googleapis.com/auth/accounts.reauth'
 
 
 _CLIENT_INFO = {
@@ -345,7 +347,7 @@ def _GetApplicationDefaultCredentialFromFile(filename):
 
   client_scope = _GetClientScopeFromFlags()
   if credentials['type'] == oauth2client_4_0.client.AUTHORIZED_USER:
-    return oauth2client_4_0.client.OAuth2Credentials(
+    return Oauth2WithReauthCredentials(
         access_token=None,
         client_id=credentials['client_id'],
         client_secret=credentials['client_secret'],
@@ -372,6 +374,7 @@ def _GetClientScopeFromFlags():
   client_scope = [_BIGQUERY_SCOPE, _CLOUD_PLATFORM_SCOPE]
   if FLAGS.enable_gdrive is None or FLAGS.enable_gdrive:
     client_scope.append(_GDRIVE_SCOPE)
+  client_scope.append(_REAUTH_SCOPE)
   return client_scope
 
 
@@ -442,17 +445,24 @@ def _GetCredentialsFromFlags():
     # Note that oauth2client.file ensures the file is created with
     # the correct permissions.
     credentials = credentials_getter(storage)
-    credentials.set_store(storage)
 
+
+  # Save credentials to storage now to reuse and also avoid a warning message.
+  if not os.path.exists(credential_file):
+    storage.put(credentials)
 
   if verify_storage:
     # Verify credentials storage is ok now.
     try:
-      storage.locked_put(credentials)
-      storage.locked_get()
+      storage.get()
     except BaseException as e:  # pylint: disable=broad-except
       _RaiseCredentialsCorrupt(e)
 
+  if type(credentials) == oauth2client_4_0.client.OAuth2Credentials:  # pylint: disable=unidiomatic-typecheck
+    credentials = Oauth2WithReauthCredentials.from_OAuth2Credentials(
+        credentials)
+
+  credentials.set_store(storage)
   return credentials
 
 
@@ -1248,6 +1258,13 @@ class _Load(BigqueryCmd):
         'Whether to require partition filter for queries over this table. '
         'Only apply to partitioned table.',
         flag_values=fv)
+    flags.DEFINE_string(
+        'clustering_fields',
+        None,
+        'Comma separated field names. Can only be specified with time based '
+        'partitioning. Data will be first partitioned and subsequently "'
+        'clustered on these fields.',
+        flag_values=fv)
     self._ProcessCommandRc(fv)
 
   def RunWithArgs(self, destination_table, source, schema=None):
@@ -1328,6 +1345,9 @@ class _Load(BigqueryCmd):
         self.require_partition_filter)
     if time_partitioning is not None:
       opts['time_partitioning'] = time_partitioning
+    clustering = _ParseClustering(self.clustering_fields)
+    if clustering:
+      opts['clustering'] = clustering
     if self.destination_kms_key is not None:
       opts['destination_encryption_configuration'] = {
           'kmsKeyName': self.destination_kms_key
@@ -1636,6 +1656,13 @@ class _Query(BigqueryCmd):
         'Only apply to partitioned table.',
         flag_values=fv)
     flags.DEFINE_string(
+        'clustering_fields',
+        None,
+        'Comma separated field names. Can only be specified with time based '
+        'partitioning. Data will be first partitioned and subsequently "'
+        'clustered on these fields.',
+        flag_values=fv)
+    flags.DEFINE_string(
         'destination_kms_key', None,
         'Cloud KMS key for encryption of the destination table data.',
         flag_values=fv)
@@ -1699,6 +1726,9 @@ class _Query(BigqueryCmd):
         self.require_partition_filter)
     if time_partitioning is not None:
       kwds['time_partitioning'] = time_partitioning
+    clustering = _ParseClustering(self.clustering_fields)
+    if clustering:
+      kwds['clustering'] = clustering
     if self.destination_schema and not self.destination_table:
       raise app.UsageError(
           'destination_schema can only be used with destination_table.')
@@ -2648,8 +2678,8 @@ class _Make(BigqueryCmd):
         flag_values=fv)
     flags.DEFINE_string(
         'data_location', None,
-        'Location of the data. Either US or EU. Requires that the project '
-        'has data location enabled',
+        'Geographic location of the data. See details at '
+        'https://cloud.google.com/bigquery/docs/dataset-locations.',
         flag_values=fv)
     flags.DEFINE_integer(
         'expiration', None,
@@ -2720,6 +2750,13 @@ class _Make(BigqueryCmd):
         None,
         'Whether to require partition filter for queries over this table. '
         'Only apply to partitioned table.',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'clustering_fields',
+        None,
+        'Comma separated field names. Can only be specified with time based '
+        'partitioning. Data will be first partitioned and subsequently "'
+        'clustered on these fields.',
         flag_values=fv)
     self._ProcessCommandRc(fv)
 
@@ -2879,6 +2916,7 @@ class _Make(BigqueryCmd):
           self.time_partitioning_field,
           None,
           self.require_partition_filter)
+      clustering = _ParseClustering(self.clustering_fields)
       client.CreateTable(
           reference,
           ignore_existing=True,
@@ -2891,6 +2929,7 @@ class _Make(BigqueryCmd):
           external_data_config=external_data_config,
           labels=labels,
           time_partitioning=time_partitioning,
+          clustering=clustering,
           destination_kms_key=(self.destination_kms_key))
       print "%s '%s' successfully created." % (object_name, reference,)
 
@@ -3501,8 +3540,10 @@ class _Cancel(BigqueryCmd):
       job_id: Job ID to cancel.
     """
     client = Client.Get()
-    job = client.CancelJob(job_id=job_id,
-                           location=FLAGS.location)
+    job_reference_dict = dict(client.GetJobReference(job_id, FLAGS.location))
+    job = client.CancelJob(
+        job_id=job_reference_dict['jobId'],
+        location=job_reference_dict['location'])
     _PrintObjectInfo(job, JobReference.Create(**job['jobReference']),
                      custom_format='show')
     status = job['status']

@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud beta ml vision detect-faces IMAGE_PATH [--max-results=MAX_RESULTS]
+        [--model-version=MODEL_VERSION; default="builtin/stable"]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -19,6 +20,10 @@ POSITIONAL ARGUMENTS
 FLAGS
      --max-results=MAX_RESULTS
         The maximum number of results to be provided.
+
+     --model-version=MODEL_VERSION; default="builtin/stable"
+        The model version to use for the feature. Supported values include
+        "builtin/stable" and "builtin/latest".
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

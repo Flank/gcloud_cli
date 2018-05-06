@@ -18,8 +18,14 @@ COMMANDS
      describe
         (BETA) Show metadata for a billing account.
 
+     get-iam-policy
+        (BETA) Get the IAM policy for a Cloud Billing account.
+
      list
         (BETA) List all active billing accounts.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for a Cloud Billing account.
 
 NOTES
     This command is currently in BETA and may change without notice. This

@@ -145,6 +145,27 @@ class DisksResizeTestBeta(test_base.BaseTest):
   def testWithNo(self):
     TestWithNo(self)
 
+  def testRegionalDisks(self):
+    self.make_requests.side_effect = iter([
+        []
+    ])
+    msg = self.messages
+    properties.VALUES.core.disable_prompts.Set(True)
+
+    self.Run('compute disks resize disk1 --region us-central1 --size=6000GB')
+
+    self.CheckRequests(
+        ([(self.compute_beta.regionDisks,
+           'Resize',
+           msg.ComputeRegionDisksResizeRequest(
+               disk='disk1',
+               regionDisksResizeRequest=msg.RegionDisksResizeRequest(
+                   sizeGb=6000
+               ),
+               project='my-project',
+               region='us-central1'))
+         ]))
+
 
 class DisksResizeTestGA(test_base.BaseTest):
 

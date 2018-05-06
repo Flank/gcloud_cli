@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for XPN API utilities."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from apitools.base.py import exceptions as apitools_exceptions
@@ -74,7 +76,7 @@ class XpnApiTest(test_base.BaseTest):
   def testEnableHost_Errors(self):
     self.make_requests.side_effect = _MakeRequestsError
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.escape('Could not enable [myproject] as XPN host')):
       self.xpn_client.EnableHost('myproject')
@@ -99,7 +101,7 @@ class XpnApiTest(test_base.BaseTest):
   def testDisableHost_Errors(self):
     self.make_requests.side_effect = _MakeRequestsError
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.escape('Could not disable [myproject] as XPN host')):
       self.xpn_client.DisableHost('myproject')
@@ -125,7 +127,7 @@ class XpnApiTest(test_base.BaseTest):
   def testGetHostProject_Errors(self):
     self.make_requests.side_effect = _MakeRequestsError
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.escape('Could not get XPN host for project [myproject]')):
       self.xpn_client.GetHostProject('myproject')
@@ -170,7 +172,7 @@ class XpnApiTest(test_base.BaseTest):
     self.mock_client.projects.GetXpnResources.Expect(
         expected_request, exception=apitools_exceptions.Error(404, 'Not Found'))
 
-    with self.assertRaisesRegexp(apitools_exceptions.Error, 'Not Found'):
+    with self.assertRaisesRegex(apitools_exceptions.Error, 'Not Found'):
       list(self.xpn_client.ListEnabledResources('myproject'))
 
   def testListOrganizationsHostProjects_OrganizationIdSpecified(self):
@@ -212,7 +214,7 @@ class XpnApiTest(test_base.BaseTest):
     self.mock_client.projects.ListXpnHosts.Expect(
         expected_request, exception=apitools_exceptions.Error(404, 'Not Found'))
 
-    with self.assertRaisesRegexp(apitools_exceptions.Error, 'Not Found'):
+    with self.assertRaisesRegex(apitools_exceptions.Error, 'Not Found'):
       list(
           self.xpn_client.ListOrganizationHostProjects(
               project='myproject', organization_id='12345'))
@@ -236,7 +238,7 @@ class XpnApiTest(test_base.BaseTest):
   def testEnableXpnAssociatedProject_Errors(self):
     self.make_requests.side_effect = _MakeRequestsError
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.escape('Could not enable resource [myproject] as an associated '
                   'resource for project [xpn-host]')):
@@ -272,7 +274,7 @@ class XpnApiTest(test_base.BaseTest):
   def testDisableXpnAssociatedProject_Errors(self):
     self.make_requests.side_effect = _MakeRequestsError
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.Error,
         re.escape('Could not disable resource [myproject] as an associated '
                   'resource for project [xpn-host]')):

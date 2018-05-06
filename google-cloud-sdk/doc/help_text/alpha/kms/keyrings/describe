@@ -1,0 +1,39 @@
+NAME
+    gcloud alpha kms keyrings describe - get metadata for a keyring
+
+SYNOPSIS
+    gcloud alpha kms keyrings describe KEYRING [--location=LOCATION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Returns metadata for the given keyring.
+
+POSITIONAL ARGUMENTS
+     KEYRING
+        Name of the keyring to describe.
+
+FLAGS
+     --location=LOCATION
+        The location of the requested resource.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command returns the metadata for the keyring towers in the
+    location us-east1:
+
+        $ gcloud alpha kms keyrings describe towers --location us-east1
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keyrings describe
+        $ gcloud beta kms keyrings describe
+

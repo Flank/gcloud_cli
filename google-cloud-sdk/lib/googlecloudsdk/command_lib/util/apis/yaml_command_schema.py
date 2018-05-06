@@ -15,6 +15,8 @@
 """Data objects to support the yaml command schema."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from enum import Enum
 
 from googlecloudsdk.calliope import base
@@ -39,10 +41,12 @@ class CommandData(object):
     self.request = Request(self.command_type, data['request'])
     self.response = Response(data.get('response', {}))
     async_data = data.get('async')
+    iam_data = data.get('iam')
     if self.command_type == CommandType.WAIT and not async_data:
       raise util.InvalidSchemaError(
           'Wait commands must include an async section.')
     self.async = Async(async_data) if async_data else None
+    self.iam = IamData(iam_data) if iam_data else None
     self.arguments = Arguments(data['arguments'])
     self.input = Input(self.command_type, data.get('input', {}))
     self.output = Output(data.get('output', {}))
@@ -62,6 +66,7 @@ class CommandType(Enum):
   WAIT = 'get'
   # IAM support currently implemented as subcommands
   GET_IAM_POLICY = 'getIamPolicy'
+  SET_IAM_POLICY = 'setIamPolicy'
   # Generic commands are those that don't extend a specific calliope command
   # base class.
   GENERIC = None
@@ -96,6 +101,7 @@ class Request(object):
         util.Hook.FromPath(p) for p in data.get('modify_request_hooks', [])]
     self.create_request_hook = util.Hook.FromData(data, 'create_request_hook')
     self.issue_request_hook = util.Hook.FromData(data, 'issue_request_hook')
+    self.use_relative_name = data.get('use_relative_name', True)
 
 
 class Response(object):
@@ -104,6 +110,8 @@ class Response(object):
     self.id_field = data.get('id_field')
     self.result_attribute = data.get('result_attribute')
     self.error = ResponseError(data['error']) if 'error' in data else None
+    self.modify_response_hooks = [
+        util.Hook.FromPath(p) for p in data.get('modify_response_hooks', [])]
 
 
 class ResponseError(object):
@@ -133,6 +141,13 @@ class Async(object):
     self.result_attribute = data.get('result_attribute')
     self.state = AsyncStateField(data.get('state', {}))
     self.error = AsyncErrorField(data.get('error', {}))
+
+
+class IamData(object):
+
+  def __init__(self, data):
+    self.message_type_overrides = data.get('message_type_overrides', {})
+    self.set_iam_policy_request_path = data.get('set_iam_policy_request_path')
 
 
 class AsyncStateField(object):
@@ -238,7 +253,7 @@ class Argument(object):
         is_positional=is_positional,
         type=util.ParseType(data.get('type')),
         choices=[util.Choice(d) for d in choices] if choices else None,
-        default=data.get('default'),
+        default=data.get('default', arg_utils.UNSPECIFIED),
         fallback=util.Hook.FromData(data, 'fallback'),
         processor=util.Hook.FromData(data, 'processor'),
         required=data.get('required', False),
@@ -250,9 +265,9 @@ class Argument(object):
   # pylint:disable=redefined-builtin, type param needs to match the schema.
   def __init__(self, api_field=None, arg_name=None, help_text=None,
                metavar=None, completer=None, is_positional=None, type=None,
-               choices=None, default=None, fallback=None, processor=None,
-               required=False, hidden=False, action=None, repeated=None,
-               generate=True):
+               choices=None, default=arg_utils.UNSPECIFIED, fallback=None,
+               processor=None, required=False, hidden=False, action=None,
+               repeated=None, generate=True):
     self.api_field = api_field
     self.arg_name = arg_name
     self.help_text = help_text

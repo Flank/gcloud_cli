@@ -24,7 +24,7 @@ class CloudshellV1alpha1(base_api.BaseApiClient):
                get_credentials=True, http=None, model=None,
                log_request=False, log_response=False,
                credentials_args=None, default_global_params=None,
-               additional_http_headers=None):
+               additional_http_headers=None, response_encoding=None):
     """Create a new cloudshell handle."""
     url = url or self.BASE_URL
     super(CloudshellV1alpha1, self).__init__(
@@ -33,7 +33,8 @@ class CloudshellV1alpha1(base_api.BaseApiClient):
         log_request=log_request, log_response=log_response,
         credentials_args=credentials_args,
         default_global_params=default_global_params,
-        additional_http_headers=additional_http_headers)
+        additional_http_headers=additional_http_headers,
+        response_encoding=response_encoding)
     self.users_environments_publicKeys = self.UsersEnvironmentsPublicKeysService(self)
     self.users_environments = self.UsersEnvironmentsService(self)
     self.users = self.UsersService(self)
@@ -49,7 +50,7 @@ class CloudshellV1alpha1(base_api.BaseApiClient):
           }
 
     def Create(self, request, global_params=None):
-      """Adds a public SSH key to an environment, allowing clients with the.
+      r"""Adds a public SSH key to an environment, allowing clients with the.
 corresponding private key to connect to that environment via SSH. If a key
 with the same format and content already exists, this will return the
 existing key.
@@ -79,7 +80,7 @@ existing key.
     )
 
     def Delete(self, request, global_params=None):
-      """Removes a public SSH key from an environment. Clients will no longer be.
+      r"""Removes a public SSH key from an environment. Clients will no longer be.
 able to connect to the environment using the corresponding private key.
 
       Args:
@@ -117,7 +118,7 @@ able to connect to the environment using the corresponding private key.
           }
 
     def Get(self, request, global_params=None):
-      """Gets an environment. Returns NOT_FOUND if the environment does not exist.
+      r"""Gets an environment. Returns NOT_FOUND if the environment does not exist.
 
       Args:
         request: (CloudshellUsersEnvironmentsGetRequest) input message
@@ -144,7 +145,7 @@ able to connect to the environment using the corresponding private key.
     )
 
     def Patch(self, request, global_params=None):
-      """Updates an existing environment.
+      r"""Updates an existing environment.
 
       Args:
         request: (CloudshellUsersEnvironmentsPatchRequest) input message
@@ -171,7 +172,7 @@ able to connect to the environment using the corresponding private key.
     )
 
     def Start(self, request, global_params=None):
-      """Starts an existing environment, allowing clients to connect to it. The.
+      r"""Starts an existing environment, allowing clients to connect to it. The.
 returned operation will contain an instance of StartEnvironmentMetadata in
 its metadata field. Users can wait for the environment to start by polling
 this operation via GetOperation. Once the environment has finished starting

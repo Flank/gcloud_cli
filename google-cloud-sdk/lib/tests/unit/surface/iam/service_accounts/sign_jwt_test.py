@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure deserialization of server responses work properly."""
-from googlecloudsdk.api_lib.iam import exceptions
+
+from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
 
@@ -42,7 +44,7 @@ class SignJwtTest(unit_test_base.BaseTest):
                                                       test_key))
 
   def testMissingInputFile(self):
-    with self.assertRaises(exceptions.FileReadException):
+    with self.assertRaises(files.Error):
       self.Run('beta iam service-accounts sign-jwt '
                '--iam-account=test@test-project.iam.gserviceaccount.com '
                '/file-does-not-exist /tmp/key')

@@ -136,6 +136,15 @@ AVAILABLE PROPERTIES
          disable_update_check
             If True, the Cloud SDK will not automatically check for updates.
 
+     composer
+         location
+            Specifies the Composer location to use. Each Composer
+            locationconstitutes an independent resource namespace constrained
+            to deploying environments into Compute Engine regions inside the
+            location. This location parameter corresponds to the
+            /locations/<location> segment of the Composer resource URIs being
+            referenced.
+
      compute
          region
             The default region to use when working with regional Compute Engine
@@ -182,20 +191,22 @@ AVAILABLE PROPERTIES
             API server.
 
          use_v1_api
-            If true, all gcloud Kubernetes Engine commands (regardless of
-            release track) will use the v1 API; otherwise, gcloud beta track
-            commands will use v1beta1 API and gcloud alpha track commands will
-            use v1alpha1 API. By default, it is set to true. The Kubernetes
-            Engine v1alpha1 API is whitelist-only at this time. Note:
-            use_v1_api is an alias of use_v1_api_client.
+            This property is DEPRECATED. If true, all gcloud Kubernetes Engine
+            commands (regardless of release track) will use the v1 API;
+            otherwise, gcloud beta track commands will use v1beta1 API and
+            gcloud alpha track commands will use v1alpha1 API. By default, it
+            is set to false. The Kubernetes Engine v1alpha1 API is
+            whitelist-only at this time. Note: use_v1_api is an alias of
+            use_v1_api_client.
 
          use_v1_api_client
-            If true, all gcloud Kubernetes Engine commands (regardless of
-            release track) will use the v1 API; otherwise, gcloud beta track
-            commands will use v1beta1 API and gcloud alpha track commands will
-            use v1alpha1 API. By default, it is set to true. The Kubernetes
-            Engine v1alpha1 API is whitelist-only at this time. Note:
-            use_v1_api_client is an alias of use_v1_api.
+            This property is DEPRECATED. If true, all gcloud Kubernetes Engine
+            commands (regardless of release track) will use the v1 API;
+            otherwise, gcloud beta track commands will use v1beta1 API and
+            gcloud alpha track commands will use v1alpha1 API. By default, it
+            is set to false. The Kubernetes Engine v1alpha1 API is
+            whitelist-only at this time. Note: use_v1_api_client is an alias of
+            use_v1_api.
 
      dataproc
          region

@@ -14,6 +14,8 @@
 
 """Unit tests for deployments update command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.deployment_manager import dm_api_util
 from googlecloudsdk.api_lib.deployment_manager import exceptions
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
@@ -22,6 +24,8 @@ from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.deployment_manager import unit_test_base
+import six
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 DEPLOYMENT_NAME = 'deployment-name'
@@ -29,9 +33,9 @@ DESCRIPTION = 'deployment-description'
 UPDATE_DESCRIPTION = 'update-description'
 MANIFEST_NAME = 'manifest-name'
 MANIFEST_URL = 'google.com/' + MANIFEST_NAME
-FINGERPRINT = '123456'
+FINGERPRINT = b'123456'
 FINGERPRINT_ENCODED = 'MTIzNDU2'
-NEW_FINGERPRINT = '654321'
+NEW_FINGERPRINT = b'654321'
 NEW_FINGERPRINT_ENCODED = 'NjU0MzIx'
 INVALID_FINGERPRINT_ERROR = 'fingerprint cannot be decoded.'
 
@@ -65,7 +69,7 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
     for i in range(4):
       self.AssertOutputContains('resource-{}'.format(i))
     if self.track is base.ReleaseTrack.ALPHA:
-      for i in xrange(4):
+      for i in range(4):
         self.AssertOutputContains('action_name-' + str(i))
       self.AssertOutputContains('RUNTIME_POLICIES')
       self.AssertOutputContains('UPDATE_ON_CHANGE')
@@ -370,10 +374,10 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
     self.AssertBasicOutputs()
     self.AssertOutputContains('IN_PREVIEW')
     self.AssertOutputContains('INTENT')
-    for i in xrange(4):
+    for i in range(4):
       self.AssertOutputContains('resource-' + str(i))
     if self.track is base.ReleaseTrack.ALPHA:
-      for i in xrange(4):
+      for i in range(4):
         self.AssertOutputContains('action_name-' + str(i))
       self.AssertOutputContains('DELETE/NOT_RUN')
       self.AssertOutputContains('CREATE_OR_ACQUIRE/TO_RUN')
@@ -414,9 +418,49 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
 
       self.fail('Expected gcloud error for update operation with error.')
     except exceptions.Error as e:
-      self.assertTrue(error_string in e.message)
-      self.assertTrue(OPERATION_NAME in e.message)
+      self.assertTrue(error_string in str(e))
+      self.assertTrue(OPERATION_NAME in str(e))
     self.AssertErrContains(NEW_FINGERPRINT_ENCODED)
+
+  def testDeploymentsUpdate_WithWarning(self):
+    deployment = self.buildDeploymentObjectFromSimpleYaml()
+
+    self.expectBasicDeploymentGet()
+    self.expectUpdate(deployment=deployment)
+    self.expectBasicDeploymentGet(fingerprint=NEW_FINGERPRINT)
+    self.expectOperationGetPollAndTerminate(normal_termination=False)
+
+    # WaitForOperation throws an error after doing one final poll and seeing
+    # errors set in the operation.
+    self.mocked_client.operations.Get.Expect(
+        request=self.messages.DeploymentmanagerOperationsGetRequest(
+            project=self.Project(),
+            operation=OPERATION_NAME,
+        ),
+        response=self.messages.Operation(
+            name=OPERATION_NAME,
+            operationType='update',
+            status='DONE',
+            warnings=[
+                self.messages.Operation.WarningsValueListEntry(
+                    message='warning')
+            ]))
+    self.expectResourceListWithResources()
+    self.expectDeploymentGetWithManifestUrlResponse()
+    self.expectManifestGetRequestWithLayoutResponse()
+    self.Run('deployment-manager deployments update ' + DEPLOYMENT_NAME +
+             ' --config "' + self.getSimpleYamlConfigFilePath() + '"')
+    self.AssertErrContains(NEW_FINGERPRINT_ENCODED)
+    self.AssertErrContains(OPERATION_NAME)
+    self.AssertErrContains('WARNING: Update operation operation-12345-67890 '
+                           'completed with warnings:')
+    self.AssertErrContains('message: warning')
+    self.AssertOutputNotContains('PENDING')
+    self.AssertOutputContains('OUTPUT')
+    self.AssertOutputContains('the-only-output')
+    self.AssertOutputContains('successful-output')
+    for i in range(4):
+      self.AssertOutputContains('resource-{}'.format(i))
 
   def setupManifestTest(self, initial_yaml, updated_yaml):
     self.mocked_client.manifests.Get.Expect(
@@ -454,7 +498,7 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
     self.expectManifestGetRequestWithLayoutResponse()
 
   def testDeploymentsUpdate_MissingFingerprint(self):
-    deployment = self.buildDeploymentObjectFromSimpleYaml(fingerprint='')
+    deployment = self.buildDeploymentObjectFromSimpleYaml(fingerprint=b'')
     self.expectBasicDeploymentGet(fingerprint=None)
     self.expectUpdate(deployment=deployment)
     self.expectBasicDeploymentGet(fingerprint=NEW_FINGERPRINT)
@@ -496,8 +540,8 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
                + '" --fingerprint invalid')
       self.fail('Expected invalid fingerprint error')
     except calliope_exceptions.InvalidArgumentException as e:
-      self.assertTrue('Invalid value for [--fingerprint]' in e.message)
-      self.assertTrue(INVALID_FINGERPRINT_ERROR in e.message)
+      self.assertTrue('Invalid value for [--fingerprint]' in str(e))
+      self.assertTrue(INVALID_FINGERPRINT_ERROR in str(e))
 
   def testDeploymentsUpdate_ErrorGettingFingerprint(self):
     error_string = 'messed up'
@@ -775,7 +819,7 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
     label_entry = []
     if labels:
       label_entry = [self.messages.DeploymentLabelEntry(key=k, value=v)
-                     for k, v in sorted(labels.iteritems())]
+                     for k, v in sorted(six.iteritems(labels))]
     return label_entry
 
   def buildUpdateLabelEntry(self, labels=None):
@@ -789,7 +833,7 @@ class DeploymentsUpdateTest(unit_test_base.DmV2UnitTestBase):
     label_entry = []
     if labels:
       label_entry = [self.messages.DeploymentUpdateLabelEntry(key=k, value=v)
-                     for k, v in sorted(labels.iteritems())]
+                     for k, v in sorted(six.iteritems(labels))]
     return label_entry
 
 
@@ -878,7 +922,7 @@ resources:
                % (DEPLOYMENT_NAME, MANIFEST_NAME))
       self.fail('Expected HttpException when deployments get failed.')
     except exceptions.Error as e:
-      self.assertTrue('single resource' in e.message)
+      self.assertTrue('single resource' in str(e))
     self.AssertErrNotContains(NEW_FINGERPRINT_ENCODED)
 
   def testDeploymentsUpdate_ManifestIdWithProperties(self):
@@ -1009,7 +1053,7 @@ resources:
                + ' --config "' + self.getSimpleYamlConfigFilePath()
                + '" --credential ' + credential_input)
     except calliope_exceptions.InvalidArgumentException as e:
-      self.assertTrue(error_string in unicode(e))
+      self.assertTrue(error_string in str(e))
 
   def testDeploymentsUpdate_WithCredential_projectDefault(self):
     credential_input = 'PROJECT_DEFAULT'

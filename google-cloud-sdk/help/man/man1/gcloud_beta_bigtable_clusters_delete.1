@@ -1,0 +1,63 @@
+
+.TH "GCLOUD_BETA_BIGTABLE_CLUSTERS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta bigtable clusters delete \- delete a bigtable cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta bigtable clusters delete\fR (\fICLUSTER\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Delete a bigtable cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+CLUSTER \- The cluster to delete. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: Set the property [core/project] or provide the flag [\-\-project] on
+the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fICLUSTER\fR
+The ID of the cluster or a fully qualified identifier for the cluster. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+The Cloud Bigtable instance for the cluster.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice.
+

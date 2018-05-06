@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'describe' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
@@ -36,23 +38,24 @@ class DescribeCommandTest(base.BigtableV2TestBase,
             serveNodes=6,
             defaultStorageType=(
                 self.msgs.Cluster.DefaultStorageTypeValueValuesEnum.SSD)))
-    self.RunBT(cmd)
+    self.Run(cmd)
     self.AssertOutputContains('thecluster')
     self.AssertOutputContains('6')
     self.AssertOutputContains('SSD')
 
   def testDescribe(self):
-    self._RunSuccessTest('clusters describe thecluster --instance=theinstance')
+    self._RunSuccessTest(
+        'bigtable clusters describe thecluster --instance=theinstance')
 
   def testDescribeByUri(self):
-    cmd = ('clusters describe https://bigtableadmin.googleapis.com/v2/'
+    cmd = ('bigtable clusters describe https://bigtableadmin.googleapis.com/v2/'
            'projects/{0}/instances/theinstance/clusters/thecluster'.format(
                self.Project()))
     self._RunSuccessTest(cmd)
 
   def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.msg):
-      self.RunBT('clusters describe thecluster --instance=theinstance')
+      self.Run('bigtable clusters describe thecluster --instance=theinstance')
 
 
 if __name__ == '__main__':

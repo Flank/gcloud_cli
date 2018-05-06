@@ -52,7 +52,8 @@ class DisksSnapshotTestBase(sdk_test_base.WithFakeAuth,
   def _GetCreateSnapshotRequest(self, disk_ref, snapshot_ref, description=None,
                                 guest_flush=False,
                                 raw_encryption_key=None,
-                                rsa_encryption_key=None,):
+                                rsa_encryption_key=None,
+                                storage_location=None):
     if disk_ref.Collection() == 'compute.regionDisks':
       service = self.api_mock.adapter.apitools_client.regionDisks
       request_type = (
@@ -63,7 +64,10 @@ class DisksSnapshotTestBase(sdk_test_base.WithFakeAuth,
           self.api_mock.messages.ComputeDisksCreateSnapshotRequest)
     snapshot = self.api_mock.messages.Snapshot(name=snapshot_ref.Name())
     payload = request_type(snapshot=snapshot, **disk_ref.AsDict())
-    payload.guestFlush = guest_flush
+    try:
+      payload.guestFlush = guest_flush
+    except AttributeError:
+      pass
     if description is not None:
       payload.snapshot.description = description
     if raw_encryption_key:
@@ -74,6 +78,8 @@ class DisksSnapshotTestBase(sdk_test_base.WithFakeAuth,
       payload.snapshot.sourceDiskEncryptionKey = (
           self.api_mock.messages.CustomerEncryptionKey(
               rsaEncryptedKey=rsa_encryption_key))
+    if storage_location is not None:
+      payload.snapshot.storageLocations = [storage_location]
 
     return service, 'CreateSnapshot', payload
 
@@ -205,7 +211,7 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
          Exception('booboo'))
     ])
 
-    with self.assertRaisesRegexp(core_exceptions.MultiError, 'booboo'):
+    with self.assertRaisesRegex(core_exceptions.MultiError, 'booboo'):
       self.Run('compute disks snapshot {disk} --async'
                .format(disk=disk_ref.SelfLink()))
 
@@ -227,7 +233,7 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
                  'message': 'booboo.'}]))
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.MultiError,
         'booboo.'):
       self.Run('compute disks snapshot {disk}'
@@ -256,7 +262,7 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
 
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.MultiError,
         'http error, operation error.'):
       self.Run('compute disks snapshot {disk1} {disk2}'
@@ -287,7 +293,7 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
         )
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         core_exceptions.MultiError,
         'booboo.'):
       self.Run('compute disks snapshot {disk}'
@@ -535,7 +541,7 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
     key_store.AddKey(disk_ref.SelfLink(), key_type='rsa-encrypted')
     key_store.WriteToFile(csek_key_file)
 
-    with self.assertRaisesRegexp(csek_utils.BadKeyTypeException, re.escape(
+    with self.assertRaisesRegex(csek_utils.BadKeyTypeException, re.escape(
         'Invalid key type [rsa-encrypted]: this feature is only allowed in the '
         'alpha and beta versions of this command.')):
       self.Run('compute disks snapshot {disk} --zone {zone} '
@@ -595,6 +601,25 @@ class DisksSnapshotBetaTest(DisksSnapshotTestBase):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
+
+  def testRegional(self):
+    disk_ref = self._GetDiskRef('disk-1', region='central2')
+    snapshot_ref = self._GetSnapshotRef('random-name-0')
+    operation_ref = self._GetOperationRef('operation-1', region='central2')
+
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref),
+         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
+    ])
+
+    self.Run('compute disks snapshot {disk} --region {region} --async'
+             .format(disk=disk_ref.Name(), region=disk_ref.region))
+
+    self.AssertOutputEquals('')
+    self.AssertErrEquals(
+        'Disk snapshot in progress for [{}].\n'
+        'Use [gcloud compute operations describe URI] command to check '
+        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
 
   def testSnapshotCsekKeyFileRsaWrappedKey(self):
     disk_ref = self._GetDiskRef('disk-1')
@@ -695,6 +720,28 @@ class DisksSnapshotTestAlpha(DisksSnapshotTestBase):
         'Creating snapshot(s) random-name-0',
         max_wait_ms=None
     )
+
+  def testStorageLocation(self):
+    disk_ref = self._GetDiskRef('disk-1')
+    snapshot_ref = self._GetSnapshotRef('random-name-0')
+    storage_location = 'us-west1'
+    operation_ref = self._GetOperationRef('operation-1')
+
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref,
+                                        storage_location='us-west1'),
+         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
+    ])
+
+    self.Run('compute disks snapshot {disk}  --zone central2-a '
+             '--storage-location {storage_location} --async'
+             .format(disk=disk_ref.Name(), storage_location=storage_location))
+
+    self.AssertOutputEquals('')
+    self.AssertErrEquals(
+        'Disk snapshot in progress for [{}].\n'
+        'Use [gcloud compute operations describe URI] command to check '
+        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
 
 
 if __name__ == '__main__':

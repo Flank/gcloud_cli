@@ -197,7 +197,7 @@ class SetServiceAccountTest(test_base.BaseTest):
         []
     ])
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         exceptions.ToolException,
         r'Can not set scopes when there is no service acoount\.'):
       self.Run("""

@@ -38,7 +38,7 @@ class SubnetworksTest(e2e_test_base.BaseTest):
                          scope=e2e_test_base.GLOBAL)
 
   def testSubnetworks(self):
-    self.Run('compute networks create {0} --mode custom'
+    self.Run('compute networks create {0} --subnet-mode custom'
              .format(self.network_name))
     self.AssertNewOutputContains(self.network_name)
     self.Run('compute networks subnets create {0} --network {1} '
@@ -61,7 +61,7 @@ class SubnetworksTest(e2e_test_base.BaseTest):
     Retry(lambda: self.Run(cmd))
 
   def testSubnetworksPrivateIpGoogleAccess(self):
-    self.Run('compute networks create {0} --mode custom'
+    self.Run('compute networks create {0} --subnet-mode custom'
              .format(self.network_name))
     self.AssertNewOutputContains(self.network_name)
 
@@ -112,19 +112,6 @@ class SubnetworksTest(e2e_test_base.BaseTest):
     cmd = 'compute networks delete {0}'.format(self.network_name)
     Retry(lambda: self.Run(cmd))
 
-
-class SubnetworksBetaTest(e2e_test_base.BaseTest):
-
-  def _SetUpForReleaseTrack(self, track):
-    self.track = track
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='subnets-test-network').next()
-    self.subnetwork_name = e2e_utils.GetResourceNameGenerator(
-        prefix='subnets-test-subnet').next()
-
-  def SetUp(self):
-    self._SetUpForReleaseTrack(calliope_base.ReleaseTrack.BETA)
-
   def testSubnetworksAddRemoveSecondaryRange(self):
     self.Run('compute networks create {0} --subnet-mode custom'
              .format(self.network_name))
@@ -164,12 +151,6 @@ class SubnetworksBetaTest(e2e_test_base.BaseTest):
 
     cmd = 'compute networks delete {0}'.format(self.network_name)
     Retry(lambda: self.Run(cmd))
-
-
-class SubnetworksAlphaTest(SubnetworksBetaTest):
-
-  def SetUp(self):
-    self._SetUpForReleaseTrack(calliope_base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

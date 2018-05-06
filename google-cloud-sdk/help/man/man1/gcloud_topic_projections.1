@@ -29,6 +29,10 @@ resource\-keys. For details run $ gcloud topic resource\-keys.
 To list a subset of resource keys in a resource, use projections. Resource
 projections are described in detail below.
 
+To work through an interactive tutorial about using the filter and format flags
+instead, see:
+https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud\-shell\-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
+
 
 
 .SH "Projections"
@@ -682,10 +686,10 @@ For example:
 
 .RS 2m
 .TP 2m
-\f5"https://abc/foo/projects/bar/xyz".scope("projects")\fR
+\f5"http://abc/foo/projects/bar/xyz".scope("projects")\fR
 Returns "bar/xyz".
 .TP 2m
-\f5"https://xyz/foo/regions/abc".scope()\fR
+\f5"http://xyz/foo/regions/abc".scope()\fR
 Returns "abc".
 
 

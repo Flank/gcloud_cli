@@ -22,6 +22,7 @@ from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import cli_test_base
 from tests.lib import completer_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -66,12 +67,13 @@ class DiskTypesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
             """), normalize_space=True)
 
 
-class AlphaDiskTypesListTest(sdk_test_base.WithFakeAuth,
-                             cli_test_base.CliTestBase,
-                             completer_test_base.CompleterBase):
+class AlphaBetaDiskTypesListTest(sdk_test_base.WithFakeAuth,
+                                 cli_test_base.CliTestBase,
+                                 completer_test_base.CompleterBase,
+                                 parameterized.TestCase):
 
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def _SetUpForTrack(self, track):
+    self.track = track
     self.mock_client = apitools_mock.Client(
         core_apis.GetClientClass('compute', self._ApiVersion()),
         real_client=core_apis.GetClientInstance(
@@ -101,7 +103,10 @@ class AlphaDiskTypesListTest(sdk_test_base.WithFakeAuth,
         ),
     )
 
-  def testAggregatedList(self):
+  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                            calliope_base.ReleaseTrack.BETA)
+  def testAggregatedList(self, track):
+    self._SetUpForTrack(track)
     expected_request = self.messages.ComputeDiskTypesAggregatedListRequest(
         filter=None,
         maxResults=500,
@@ -129,7 +134,10 @@ class AlphaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd                            10GB-1TB
             """), normalize_space=True)
 
-  def testZonalList(self):
+  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                            calliope_base.ReleaseTrack.BETA)
+  def testZonalList(self, track):
+    self._SetUpForTrack(track)
     expected_request = self.messages.ComputeDiskTypesAggregatedListRequest(
         filter='(zone eq arctic-north1-a|antactic-south2-b)',
         maxResults=500,
@@ -158,7 +166,10 @@ class AlphaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd      antactic-south2-b zone  10GB-1TB
             """), normalize_space=True)
 
-  def testRegionalList(self):
+  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                            calliope_base.ReleaseTrack.BETA)
+  def testRegionalList(self, track):
+    self._SetUpForTrack(track)
     expected_request = self.messages.ComputeDiskTypesAggregatedListRequest(
         filter='(region eq arctic-north1|antactic-south2)',
         maxResults=500,
@@ -187,7 +198,10 @@ class AlphaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd                     10GB-1TB
             """), normalize_space=True)
 
-  def testNamesFilter(self):
+  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                            calliope_base.ReleaseTrack.BETA)
+  def testNamesFilter(self, track):
+    self._SetUpForTrack(track)
     expected_request = self.messages.ComputeDiskTypesAggregatedListRequest(
         filter='(name eq pd-standard|pd-ssd)',
         maxResults=500,
@@ -216,7 +230,10 @@ class AlphaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd                     10GB-1TB
             """), normalize_space=True)
 
-  def testRegexFilter(self):
+  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                            calliope_base.ReleaseTrack.BETA)
+  def testRegexFilter(self, track):
+    self._SetUpForTrack(track)
     expected_request = self.messages.ComputeDiskTypesAggregatedListRequest(
         filter='(name eq pd-.*)',
         maxResults=500,
@@ -245,7 +262,10 @@ class AlphaDiskTypesListTest(sdk_test_base.WithFakeAuth,
             pd-ssd                     10GB-1TB
             """), normalize_space=True)
 
-  def testMultiFilter(self):
+  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                            calliope_base.ReleaseTrack.BETA)
+  def testMultiFilter(self, track):
+    self._SetUpForTrack(track)
     expected_request = self.messages.ComputeDiskTypesAggregatedListRequest(
         filter='(name eq pd-.*)(zone eq oceanina-central3-d)',
         maxResults=500,
@@ -260,6 +280,7 @@ class AlphaDiskTypesListTest(sdk_test_base.WithFakeAuth,
     self.AssertOutputEquals('')
 
   def testDiskTypesCompleter(self):
+    self._SetUpForTrack(calliope_base.ReleaseTrack.ALPHA)
     expected_request = self.messages.ComputeDiskTypesAggregatedListRequest(
         filter=None,
         maxResults=500,

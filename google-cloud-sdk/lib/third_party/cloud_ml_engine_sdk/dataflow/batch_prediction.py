@@ -1,4 +1,4 @@
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ from apache_beam.utils.windowed_value import WindowedValue
 
 from google.cloud.ml import prediction as mlprediction
 from google.cloud.ml.dataflow import _aggregators as aggregators
-from google.cloud.ml.dataflow import _cloud_logging_client as cloud_logging_client
+
+
 from google.cloud.ml.dataflow import _error_filter as error_filter
 from tensorflow.python.saved_model import tag_constants
 
@@ -152,20 +153,6 @@ class PredictionDoFn(beam.DoFn):
                  checkpoint files to restore the session.
     """
     self._target = target
-
-    # TODO(user): Remove the "if" section when the direct use of
-    # PredictionDoFn() is retired from ml_transform.
-    if isinstance(user_project_id, basestring):
-      user_project_id = StaticValueProvider(str, user_project_id)
-    if isinstance(user_job_id, basestring):
-      user_job_id = StaticValueProvider(str, user_job_id)
-    if isinstance(tags, basestring):
-      tags = StaticValueProvider(str, tags)
-    if isinstance(signature_name, basestring):
-      signature_name = StaticValueProvider(str, signature_name)
-    if isinstance(framework, basestring):
-      framework = StaticValueProvider(str, framework)
-
     self._user_project_id = user_project_id
     self._user_job_id = user_job_id
     self._tags = tags
@@ -174,7 +161,8 @@ class PredictionDoFn(beam.DoFn):
     self._config = config
     self._aggregator_dict = aggregator_dict
     self._model_state = None
-    self._cloud_logger = None
+
+
     self._tag_list = []
     self._framework = framework
     # Metrics.
@@ -186,21 +174,11 @@ class PredictionDoFn(beam.DoFn):
   def start_bundle(self):
     user_project_id = self._user_project_id.get()
     user_job_id = self._user_job_id.get()
-    if user_project_id and user_job_id:
-      self._cloud_logger = cloud_logging_client.MLCloudLoggingClient.create(
-          user_project_id, user_job_id, LOG_NAME, "jsonPayload")
+
+
     self._tag_list = self._tags.get().split(",")
     self._signature_name = self._signature_name.get()
 
-  def _create_snippet(self, input_data):
-    """Truncate the input data to create a snippet."""
-    try:
-      input_snippet = "\n".join(str(x) for x in input_data)
-      return unicode(input_snippet[:LOG_SIZE_LIMIT], errors="replace")
-    except Exception:  # pylint: disable=broad-except
-      logging.warning("Failed to create snippet from input: [%s].",
-                      traceback.format_exc())
-      return "Input snippet is unavailable."
 
   def process(self, element, model_dir):
     try:
@@ -260,11 +238,8 @@ class PredictionDoFn(beam.DoFn):
       logging.error("Got a known exception: [%s]\n%s", str(e),
                     traceback.format_exc())
       clean_error_detail = error_filter.filter_tensorflow_error(e.error_detail)
-      if self._cloud_logger:
-        # TODO(user): consider to write a sink to buffer the logging events. It
-        # also eliminates the restarting/duplicated running issue.
-        self._cloud_logger.write_error_message(clean_error_detail,
-                                               self._create_snippet(element))
+
+
       # Track in the counter.
       if self._aggregator_dict:
         counter_name = aggregators.AggregatorName.ML_FAILED_PREDICTIONS
@@ -282,9 +257,8 @@ class PredictionDoFn(beam.DoFn):
 
     except Exception as e:  # pylint: disable=broad-except
       logging.error("Got an unknown exception: [%s].", traceback.format_exc())
-      if self._cloud_logger:
-        self._cloud_logger.write_error_message(
-            str(e), self._create_snippet(element))
+
+
       # Track in the counter.
       if self._aggregator_dict:
         counter_name = aggregators.AggregatorName.ML_FAILED_PREDICTIONS
@@ -352,45 +326,47 @@ class BatchPredict(beam.PTransform):
       raise TypeError("%s: batch_size must be of type int"
                       " or ValueProvider; got %r instead"
                       % (self.__class__.__name__, batch_size))
-    if isinstance(batch_size, int):
-      batch_size = StaticValueProvider(int, batch_size)
-    if framework == mlprediction.TENSORFLOW_FRAMEWORK_NAME:
-      if not isinstance(tags, (basestring, ValueProvider)):
-        raise TypeError("%s: tags must be of type string"
-                        " or ValueProvider; got %r instead" %
-                        (self.__class__.__name__, tags))
-      if isinstance(tags, basestring):
-        tags = StaticValueProvider(str, tags)
-
-      if not isinstance(signature_name, (basestring, ValueProvider)):
-        raise TypeError("%s: signature_name must be of type string"
-                        " or ValueProvider; got %r instead"
-                        % (self.__class__.__name__, signature_name))
-      if isinstance(signature_name, basestring):
-        signature_name = StaticValueProvider(str, signature_name)
-
     self._batch_size = batch_size
-    self._framework = framework
-    self._aggregator_dict = aggregator_dict
-    self._tags = tags
-    self._signature_name = signature_name
+    if isinstance(batch_size, int):
+      self._batch_size = StaticValueProvider(int, batch_size)
 
+    self._framework = framework
+    if isinstance(framework, basestring):
+      self._framework = StaticValueProvider(str, framework)
+
+    # Tags
+    self._tags = tags
+    if isinstance(tags, basestring):
+      self._tags = StaticValueProvider(str, tags)
+    # Signature name
+    if not isinstance(signature_name, (basestring, ValueProvider)):
+      raise TypeError("%s: signature_name must be of type string"
+                      " or ValueProvider; got %r instead"
+                      % (self.__class__.__name__, signature_name))
+    self._signature_name = signature_name
+    if isinstance(signature_name, basestring):
+      self._signature_name = StaticValueProvider(str, signature_name)
+
+    # user_project_id
     if not isinstance(user_project_id, (basestring, ValueProvider)):
       raise TypeError("%s: user_project_id must be of type string"
                       " or ValueProvider; got %r instead"
                       % (self.__class__.__name__, user_project_id))
-    if isinstance(user_project_id, basestring):
-      user_project_id = StaticValueProvider(str, user_project_id)
     self._user_project_id = user_project_id
+    if isinstance(user_project_id, basestring):
+      self._user_project_id = StaticValueProvider(str, user_project_id)
 
+    # user_job_id
     if not isinstance(user_job_id, (basestring, ValueProvider)):
       raise TypeError("%s: user_job_id must be of type string"
                       " or ValueProvider; got %r instead"
                       % (self.__class__.__name__, user_job_id))
-    if isinstance(user_job_id, basestring):
-      user_job_id = StaticValueProvider(str, user_job_id)
     self._user_job_id = user_job_id
+    if isinstance(user_job_id, basestring):
+      self._user_job_id = StaticValueProvider(str, user_job_id)
 
+    # None-value-provider variable.
+    self._aggregator_dict = aggregator_dict
     self._target = target
     self._config = config
     self._model_dir = model_dir

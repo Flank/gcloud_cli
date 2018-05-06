@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Cloud Pub/Sub subscriptions set-iam-policy command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.pubsub import subscriptions
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.iam import iam_util
@@ -20,7 +25,7 @@ from googlecloudsdk.command_lib.pubsub import resource_args
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
 class SetIamPolicy(base.Command):
   """Set the IAM policy for a Cloud Pub/Sub Subscription."""
 
@@ -43,6 +48,6 @@ class SetIamPolicy(base.Command):
         subscription_ref,
         policy=policy)
     log.status.Print(
-        'Set IAM policy for Subscription [{}].'.format(
+        'Updated IAM policy for subscription [{}].'.format(
             subscription_ref.Name()))
     return response

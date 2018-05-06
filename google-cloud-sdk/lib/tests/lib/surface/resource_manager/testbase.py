@@ -20,6 +20,7 @@ from googlecloudsdk.api_lib.resource_manager import liens
 from googlecloudsdk.api_lib.resource_manager import operations
 from googlecloudsdk.api_lib.resource_manager import org_policies
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
@@ -93,6 +94,9 @@ class FoldersUnitTestBase(CrmUnitTestBase):
       displayName=u'Test Folder For Testing',
       lifecycleState=ACTIVE)
 
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
   def _GetTestIamPolicy(self, clear_fields=None):
     """Creates a test IAM policy.
 
@@ -131,7 +135,7 @@ class FoldersUnitTestBase(CrmUnitTestBase):
     return policy
 
   def RunFolders(self, *command):
-    return self.Run(['alpha', 'resource-manager', 'folders'] + list(command))
+    return self.Run(['resource-manager', 'folders'] + list(command))
 
 
 class OperationsUnitTestBase(CrmUnitTestBase):
@@ -140,8 +144,11 @@ class OperationsUnitTestBase(CrmUnitTestBase):
   TEST_OPERATION = operations.OperationsMessages().Operation(
       name=u'operations/fc.58219052', done=False)
 
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
   def RunOperations(self, *command):
-    return self.Run(['alpha', 'resource-manager', 'operations'] + list(command))
+    return self.Run(['resource-manager', 'operations'] + list(command))
 
 
 class LiensUnitTestBase(CrmUnitTestBase):

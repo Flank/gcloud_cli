@@ -14,8 +14,11 @@
 
 """Unit tests for the transforms module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import transforms
 from tests.lib import test_case
+import six
 
 
 class ComputeTransformTest(test_case.Base):
@@ -334,7 +337,7 @@ class ComputeTransformTest(test_case.Base):
         'zonal': 'names/my-name',
     }
 
-    for object_type, path in paths.iteritems():
+    for object_type, path in six.iteritems(paths):
       suffix = transforms.TransformTypeSuffix(path)
       self.assertEqual(expected_suffix[object_type], suffix)
 

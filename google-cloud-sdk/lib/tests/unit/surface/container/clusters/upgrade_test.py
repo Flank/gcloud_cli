@@ -14,10 +14,14 @@
 
 """Tests for 'clusters upgrade' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.command_lib.container import container_command_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
+from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.container import base
 
@@ -29,7 +33,7 @@ class UpgradeTestGA(base.TestBaseV1,
 
   def SetUp(self):
     self.api_mismatch = False
-    self.locations = [self.ZONE]
+    self.locations = [self.ZONE, self.REGION]
 
   def _TestUpgrade(self, update, flags, cluster_kwargs=None):
     for location in self.locations:
@@ -40,7 +44,7 @@ class UpgradeTestGA(base.TestBaseV1,
     properties.VALUES.core.disable_prompts.Set(False)
     cluster_kwargs = cluster_kwargs or {}
     self.WriteInput('y\ny')
-    name = u'tobeupgraded'
+    name = 'tobeupgraded'
     cluster = self._RunningCluster(name=name, **cluster_kwargs)
     cluster.currentNodeVersion = '1.1.2'
     cluster.currentMasterVersion = '1.1.3'
@@ -71,7 +75,7 @@ class UpgradeTestGA(base.TestBaseV1,
     properties.VALUES.core.disable_prompts.Set(False)
     cluster_kwargs = cluster_kwargs or {}
     self.WriteInput('y')
-    name = u'tobeupgraded'
+    name = 'tobeupgraded'
     cluster = self._RunningCluster(name=name, **cluster_kwargs)
     cluster.currentNodeVersion = '1.1.2'
     cluster.currentMasterVersion = '1.1.3'
@@ -108,8 +112,8 @@ class UpgradeTestGA(base.TestBaseV1,
   def testBadUpgrade(self):
     properties.VALUES.core.disable_prompts.Set(False)
     self.WriteInput('y')
-    name = u'tobeupgraded'
-    message = u'Bad upgrade, no cookie'
+    name = 'tobeupgraded'
+    message = 'Bad upgrade, no cookie'
     update = self.msgs.ClusterUpdate(desiredNodeVersion='-')
     self.ExpectGetCluster(self._RunningCluster(name=name))
     self.ExpectUpgradeCluster(
@@ -189,7 +193,7 @@ class UpgradeTestGA(base.TestBaseV1,
   def testUpgradeNodesWithNonExistentNodePool(self):
     properties.VALUES.core.disable_prompts.Set(False)
     self.WriteInput('y')
-    name = u'tobeupgraded'
+    name = 'tobeupgraded'
     cluster_kwargs = {
         'nodePools': [{'name': 'default-pool', 'version': '1.1.2'},
                       {'name': 'NodePoolName', 'version': '1.1.4'}]}
@@ -209,7 +213,6 @@ class UpgradeTestBetaV1API(base.BetaTestBase, UpgradeTestGA):
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(True)
     self.api_mismatch = True
-    self.locations = [self.ZONE, self.REGION]
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -231,13 +234,45 @@ class UpgradeTestAlphaV1API(base.AlphaTestBase, UpgradeTestBetaV1API):
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
-class UpgradeTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, UpgradeTestAlphaV1API,
-                                  UpgradeTestBetaV1Beta1API):
+class UpgradeTestAlphaV1Alpha1API(
+    parameterized.TestCase, base.TestBaseV1Alpha1, UpgradeTestAlphaV1API,
+    UpgradeTestBetaV1Beta1API):
   """gcloud Alpha track using container v1alpha1 API."""
 
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(False)
     self.api_mismatch = False
+
+  @parameterized.parameters(
+      0, -1, 21
+  )
+  def testUpgradeNodesWithConcurrentNodeCountError(self, concurrent_node_count):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(self.clusters_command_base.format(self.ZONE) +
+               ' upgrade {0} --concurrent-node-count={1}'.format(
+                   self.CLUSTER_NAME,
+                   concurrent_node_count))
+    self.AssertErrContains('argument --concurrent-node-count:')
+
+  def testUpgradeNodesWithConcurrentNodeCountTwoNodes(self):
+    self._TestUpgrade(
+        update=self.msgs.ClusterUpdate(desiredNodeVersion='-',
+                                       concurrentNodeCount=2),
+        flags='--concurrent-node-count=2')
+    self.AssertErrContains(' nodes will be upgraded at a time.')
+
+  def testUpgradeNodesWithNodePoolWithConcurrentNodeCountFourNodes(self):
+    self._TestUpgrade(
+        update=self.msgs.ClusterUpdate(desiredNodeVersion='1.2.3',
+                                       desiredNodePoolId='NodePoolName',
+                                       concurrentNodeCount=4),
+        flags=('--node-pool=NodePoolName --cluster-version=1.2.3 '
+               '--concurrent-node-count=4'),
+        cluster_kwargs={
+            'nodePools': [{'name': 'default-pool', 'version': '1.1.2'},
+                          {'name': 'NodePoolName', 'version': '1.1.4'}]
+        })
+    self.AssertErrContains(' nodes will be upgraded at a time.')
 
 
 if __name__ == '__main__':

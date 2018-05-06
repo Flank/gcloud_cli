@@ -11,7 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """A library containing flags used by Cloud Pub/Sub commands."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.pubsub import subscriptions
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
@@ -40,7 +45,11 @@ def AddAckIdFlag(parser, action, add_deprecated=False):
             show_message=lambda _: False,  # See ParseAckIdsArgs for reason.
             warn=DEPRECATION_FORMAT_STR.format('ACK_ID', '--ack-ids')))
   parser.add_argument(
-      '--ack-ids', metavar='ACK_ID', type=arg_parsers.ArgList(), help=help_text)
+      '--ack-ids',
+      metavar='ACK_ID',
+      required=not add_deprecated,
+      type=arg_parsers.ArgList(),
+      help=help_text)
 
 
 def ParseAckIdsArgs(args):

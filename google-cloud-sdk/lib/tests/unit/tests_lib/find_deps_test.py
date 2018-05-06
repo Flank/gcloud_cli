@@ -50,24 +50,24 @@ class FindDepsTest(sdk_test_base.SdkBase):
 
   def testGraph(self):
     outgoing = self._graph.graph.describe_node('foo')[2]
-    self.assertEquals(
+    self.assertEqual(
         ['bar', 'baz', 'submodule', 'submodule.b'],
         sorted(
             [self._graph.graph.edge_by_id(e)[1] for e in outgoing]))
 
     _, data, _, incoming = self._graph.graph.describe_node('unknown_module')
     self.assertIsInstance(data, modulegraph.BadModule)
-    self.assertEquals(
+    self.assertEqual(
         ['bar'],
         sorted(
             [self._graph.graph.edge_by_id(e)[0] for e in incoming]))
 
     outgoing, incoming = self._graph.graph.describe_node('submodule')[2:]
-    self.assertEquals(
+    self.assertEqual(
         ['submodule.c'],
         sorted(
             [self._graph.graph.edge_by_id(e)[1] for e in outgoing]))
-    self.assertEquals(
+    self.assertEqual(
         ['foo', 'submodule.a', 'submodule.b', 'submodule.c'],
         sorted(
             [self._graph.graph.edge_by_id(e)[0] for e in incoming]))
@@ -76,13 +76,13 @@ class FindDepsTest(sdk_test_base.SdkBase):
     self.StartObjectPatch(os.path, 'join', return_value='')
 
     modules_to_run = find_deps.RunBfs(self._graph, ['bar'])
-    self.assertEquals(modules_to_run, ['bar', 'foo'])
+    self.assertEqual(modules_to_run, ['bar', 'foo'])
 
     modules_to_run = find_deps.RunBfs(self._graph, ['baz'])
-    self.assertEquals(modules_to_run, ['baz', 'foo'])
+    self.assertEqual(modules_to_run, ['baz', 'foo'])
 
     modules_to_run = find_deps.RunBfs(self._graph, ['foo'])
-    self.assertEquals(modules_to_run, ['foo'])
+    self.assertEqual(modules_to_run, ['foo'])
 
 
 if __name__ == '__main__':

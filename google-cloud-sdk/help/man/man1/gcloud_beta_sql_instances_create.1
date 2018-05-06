@@ -11,7 +11,7 @@ gcloud beta sql instances create \- creates a new Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR;\ default="MYSQL_5_6"] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR;\ default="PER_USE"] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR;\ default="MYSQL_5_6"] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR;\ default="PER_USE"] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-master\-dump\-file\-path\fR=\fIMASTER_DUMP_FILE_PATH\fR\ \fB\-\-master\-username\fR=\fIMASTER_USERNAME\fR\ :\ [\fB\-\-master\-ca\-certificate\-path\fR=\fIMASTER_CA_CERTIFICATE_PATH\fR\ :\ \fB\-\-client\-certificate\-path\fR=\fICLIENT_CERTIFICATE_PATH\fR\ \fB\-\-client\-key\-path\fR=\fICLIENT_KEY_PATH\fR]\ \fB\-\-master\-password\fR=\fIMASTER_PASSWORD\fR\ |\ \fB\-\-prompt\-for\-master\-password\fR] [\fB\-\-source\-ip\-address\fR=\fISOURCE_IP_ADDRESS\fR\ :\ \fB\-\-source\-port\fR=\fISOURCE_PORT\fR;\ default=3306] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -65,16 +65,16 @@ Specified in CIDR notation, also known as 'slash' notation (e.g.
 
 .TP 2m
 \fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR
-Specifies level of availability. Only applies to PSQL instances.
+Specifies level of availability. Only applies to PostgreSQL instances.
 \fIAVAILABILITY_TYPE\fR must be one of:
 
 .RS 2m
 .TP 2m
-\fBREGIONAL\fR
+\fBregional\fR
 Provides high availability and is recommended for production instances; instance
 automatically fails over to another zone within your selected region.
 .TP 2m
-\fBZONAL\fR
+\fBzonal\fR
 Provides no failover capability. This is the default.
 
 .RE
@@ -227,7 +227,90 @@ only shared\-core machine types (e.g., db\-f1\-micro) apply. The default tier is
 db\-n1\-standard\-1. A complete list of tiers is available here:
 https://cloud.google.com/sql/pricing
 
+.TP 2m
 
+Options for creating an internal replica of an external data source.
+
+.RS 2m
+.TP 2m
+\fB\-\-master\-dump\-file\-path\fR=\fIMASTER_DUMP_FILE_PATH\fR
+Path to the MySQL dump file in Google Cloud Storage from which the seed import
+is made. The URI is in the form gs://bucketName/fileName. Compressed gzip files
+(.gz) are also supported. This flag must be specified if any of the other
+arguments in this group are specified.
+
+.TP 2m
+\fB\-\-master\-username\fR=\fIMASTER_USERNAME\fR
+Name of the replication user on the external data source. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+
+Client and server credentials.
+
+.RS 2m
+.TP 2m
+\fB\-\-master\-ca\-certificate\-path\fR=\fIMASTER_CA_CERTIFICATE_PATH\fR
+Path to a file containing the X.509v3 (RFC5280) PEM encoded certificate of the
+CA that signed the external data source's certificate. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+
+Client credentials.
+
+.RS 2m
+.TP 2m
+\fB\-\-client\-certificate\-path\fR=\fICLIENT_CERTIFICATE_PATH\fR
+Path to a file containing the X.509v3 (RFC5280) PEM encoded certificate that
+will be used by the replica to authenticate against the external data source.
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-client\-key\-path\fR=\fICLIENT_KEY_PATH\fR
+Path to a file containing the unencrypted PKCS#1 or PKCS#8 PEM encoded private
+key associated with the clientCertificate. This flag must be specified if any of
+the other arguments in this group are specified.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Password group. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-master\-password\fR=\fIMASTER_PASSWORD\fR
+Password of the replication user on the external data source.
+
+.TP 2m
+\fB\-\-prompt\-for\-master\-password\fR
+Prompt for the password of the replication user on the external data source. The
+password is all typed characters up to but not including the RETURN or ENTER
+key.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Options for creating a wrapper for an external data source.
+
+.RS 2m
+.TP 2m
+\fB\-\-source\-ip\-address\fR=\fISOURCE_IP_ADDRESS\fR
+Public IP address used to connect to and replicate from the external data
+source. This flag must be specified if any of the other arguments in this group
+are specified.
+
+.TP 2m
+\fB\-\-source\-port\fR=\fISOURCE_PORT\fR; default=3306
+Port number used to connect to and replicate from the external data source.
+
+
+.RE
 .RE
 .sp
 

@@ -40,7 +40,8 @@ EXAMPLES
             --keyring fellowship --key frodo
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha kms keys versions restore
         $ gcloud beta kms keys versions restore
 

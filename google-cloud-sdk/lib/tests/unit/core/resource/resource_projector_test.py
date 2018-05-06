@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 import collections
 import datetime
 import io
@@ -569,6 +570,7 @@ class ResourceProjectionTest(test_case.Base):
         'trade_type': 'BUY',
         }
     self.CheckProjection('', expected, resource=resource)
+    self.CheckProjection('', 'BUY', resource=TradeType.BUY)
 
   def testSerializableCopy(self):
     resource = {'x': bytearray(b'original')}
@@ -990,6 +992,8 @@ class ResourceProjectionTest(test_case.Base):
             'year': 9999
         }
     }
+    if six.PY3:
+      expected['MAX']['fold'] = 0
     self.CheckProjection('(MAX)', expected, resource=resource)
 
   def testProjectDateTimeStart(self):
@@ -1008,6 +1012,8 @@ class ResourceProjectionTest(test_case.Base):
             'year': 2015
         }
     }
+    if six.PY3:
+      expected['start']['fold'] = 0
     self.CheckProjection('(start)', expected, resource=resource)
 
   def testProjectList(self):

@@ -1,0 +1,97 @@
+
+.TH "GCLOUD_ALPHA_IAM_ROLES_COPY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha iam roles copy \- create a role from an existing role
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha iam roles copy\fR [\fB\-\-dest\-organization\fR=\fIDEST_ORGANIZATION\fR] [\fB\-\-dest\-project\fR=\fIDEST_PROJECT\fR] [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-source\-organization\fR=\fISOURCE_ORGANIZATION\fR] [\fB\-\-source\-project\fR=\fISOURCE_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command creates a role from an existing role.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-dest\-organization\fR=\fIDEST_ORGANIZATION\fR
+The organization of the destination role.
+
+.TP 2m
+\fB\-\-dest\-project\fR=\fIDEST_PROJECT\fR
+The project of the destination role.
+
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+The destination role id for the new custom role. For example: viewer.
+
+.TP 2m
+\fB\-\-source\fR=\fISOURCE\fR
+The source role name or id.For curated roles, for example: roles/viewer.For
+custom roles, for example: viewer.
+
+.TP 2m
+\fB\-\-source\-organization\fR=\fISOURCE_ORGANIZATION\fR
+The organization of the source role if it is an custom role.
+
+.TP 2m
+\fB\-\-source\-project\fR=\fISOURCE_PROJECT\fR
+The project of the source role if it is an custom role.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a copy of an existing role into an organization with ORGANIZATION_ID.
+
+.RS 2m
+$gcloud alpha iam roles copy \-\-source "roles/viewer" \-\-destination CustomViewer
+ \-\-dest\-organization ORGANIZATION_ID
+.RE
+
+To create a copy of an existing role into a project with PROJECT_ID.
+
+.RS 2m
+$gcloud alpha iam roles copy \-\-source "roles/spanner.databaseAdmin"
+ \-\-destination CustomSpannerDbAdmin \-\-dest\-project PROJECT_ID
+.RE
+
+To modify the newly created role see the roles update command.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud iam roles copy
+$ gcloud beta iam roles copy
+.RE
+

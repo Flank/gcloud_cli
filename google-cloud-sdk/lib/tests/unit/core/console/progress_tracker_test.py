@@ -14,9 +14,11 @@
 
 """Tests of the progress_tracker module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 import os
 import signal
-import StringIO
 import time
 
 from googlecloudsdk.core import exceptions as core_exceptions
@@ -27,6 +29,8 @@ from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.console import progress_tracker
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
@@ -355,8 +359,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     # support sending POSIX signals on Windows. The Windows shell catches
     # CTRL-C and converts it into a SIGINT (which is why the code works).
     # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
-    with self.assertRaisesRegexp(console_io.OperationCancelledError,
-                                 'Aborted by user.'):
+    with self.assertRaisesRegex(console_io.OperationCancelledError,
+                                'Aborted by user.'):
       with progress_tracker.ProgressTracker('tracker', autotick=False) as t:
         t.Tick()
         os.kill(os.getpid(), signal.SIGINT)
@@ -371,8 +375,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     # support sending POSIX signals on Windows. The Windows shell catches
     # CTRL-C and converts it into a SIGINT (which is why the code works).
     # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
-    with self.assertRaisesRegexp(console_io.OperationCancelledError,
-                                 'blah'):
+    with self.assertRaisesRegex(console_io.OperationCancelledError,
+                                'blah'):
       with progress_tracker.ProgressTracker('tracker', aborted_message='blah',
                                             autotick=False) as t:
         t.Tick()
@@ -390,15 +394,14 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     # support sending POSIX signals on Windows. The Windows shell catches
     # CTRL-C and converts it into a SIGINT (which is why the code works).
     # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
-    with self.assertRaisesRegexp(console_io.OperationCancelledError,
-                                 'blah'):
+    with self.assertRaisesRegex(console_io.OperationCancelledError, 'blah'):
       with progress_tracker.ProgressTracker('tracker', aborted_message='blah',
                                             autotick=False) as t:
         t.Tick()
         os.kill(os.getpid(), signal.SIGINT)
         t.Tick()
     self.AssertOutputEquals('')
-    self.AssertErrEquals(
+    self.AssertErrContains(
         '<START PROGRESS TRACKER>tracker\n'
         '<END PROGRESS TRACKER>INTERRUPTED\n')
 
@@ -449,50 +452,50 @@ class CompletionProgressTrackerTest(sdk_test_base.SdkBase):
     for style in (properties.VALUES.core.InteractiveUXStyles.OFF.name,
                   properties.VALUES.core.InteractiveUXStyles.TESTING.name):
       properties.VALUES.core.interactive_ux_style.Set(style)
-      ofile = StringIO.StringIO()
+      ofile = io.StringIO()
       with progress_tracker.CompletionProgressTracker('tracker', autotick=True):
         pass
       actual = ofile.getvalue()
       ofile.close()
-      self.assertEquals('', actual)
+      self.assertEqual('', actual)
 
   def testSpinnerToStream(self):
-    ofile = StringIO.StringIO()
+    ofile = io.StringIO()
     with progress_tracker.CompletionProgressTracker(ofile, autotick=True) as t:
-      for _ in xrange(0, 5):
+      for _ in range(0, 5):
         t._Spin()
     actual = ofile.getvalue()
     ofile.close()
     self.assertFalse(t._TimedOut())
-    self.assertEquals('/\b-\b\\\b|\b/\b \b', actual)
+    self.assertEqual('/\b-\b\\\b|\b/\b \b', actual)
 
   def testNoTimeout(self):
     # return_value=0 exercises the background code.
     self.StartObjectPatch(os, 'fork', return_value=0)
-    ofile = StringIO.StringIO()
+    ofile = io.StringIO()
     with progress_tracker.CompletionProgressTracker(
         ofile, autotick=True, timeout=0.4, tick_delay=0.1,
         background_ttl=0.1) as t:
       # Spin a bit but not enough to time out.
-      for _ in xrange(0, 3):
+      for _ in range(0, 3):
         t._Spin()  # Bypass signal.setitimer() in unit tests.
     actual = ofile.getvalue()
     ofile.close()
-    self.assertEquals('/\b-\b\\\b \b', actual)
+    self.assertEqual('/\b-\b\\\b \b', actual)
 
   def testTimedOut(self):
     # return_value=0 exercises the background code.
     self.StartObjectPatch(os, 'fork', return_value=0)
-    ofile = StringIO.StringIO()
+    ofile = io.StringIO()
     with progress_tracker.CompletionProgressTracker(
         ofile, autotick=True, timeout=0.4, tick_delay=0.1,
         background_ttl=0.1) as t:
       # Spin enough to time out.
-      for _ in xrange(0, 6):
+      for _ in range(0, 6):
         t._Spin()  # Bypass signal.setitimer() in unit tests.
     actual = ofile.getvalue()
     ofile.close()
-    self.assertEquals('/\b-\b\\\b|\b/\b?\b', actual)
+    self.assertEqual('/\b-\b\\\b|\b/\b?\b', actual)
 
 
 @test_case.Filters.SkipOnWindows('Enable completion on Windows', 'b/24905560')
@@ -544,15 +547,15 @@ class CompletionProgressTrackerFdTest(sdk_test_base.SdkBase):
   def testSpinnerToFile(self):
     with self.OpenCompletionFile('w'):
       with progress_tracker.CompletionProgressTracker(autotick=True) as t:
-        for _ in xrange(0, 5):
+        for _ in range(0, 5):
           t._Spin()
         with self.OpenCompletionFile('r') as r:
           preliminary = r.read()
     self.assertFalse(t._TimedOut())
-    self.assertEquals('/\b-\b\\\b|\b/\b', preliminary)
+    self.assertEqual('/\b-\b\\\b|\b/\b', preliminary)
     with self.OpenCompletionFile('r') as r:
       final = r.read()
-    self.assertEquals('/\b-\b\\\b|\b/\b \b', final)
+    self.assertEqual('/\b-\b\\\b|\b/\b \b', final)
 
   def testGetStream(self):
     expected = 'This is the completion progress tracker stream.\n'
@@ -561,7 +564,7 @@ class CompletionProgressTrackerFdTest(sdk_test_base.SdkBase):
         s.write(expected)
     with self.OpenCompletionFile('r') as f:
       actual = f.read()
-    self.assertEquals(expected, actual)
+    self.assertEqual(expected, actual)
 
 
 if __name__ == '__main__':
