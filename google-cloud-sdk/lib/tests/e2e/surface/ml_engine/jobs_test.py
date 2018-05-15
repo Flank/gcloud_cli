@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """e2e tests for ml-engine jobs command group."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.api_lib.storage import storage_api
@@ -45,8 +47,8 @@ class MlJobsTests(e2e_base.WithServiceAuth):
           storage_client.DeleteObject(self.BUCKET_REF, obj.name)
 
   def testJobsSubmitTraining(self):
-    job_id = e2e_utils.GetResourceNameGenerator(prefix='ml_job',
-                                                delimiter='_').next()
+    job_id = next(e2e_utils.GetResourceNameGenerator(prefix='ml_job',
+                                                     delimiter='_'))
     package = self.Resource('tests', 'e2e', 'surface', 'ml_engine', 'testdata',
                             'trainer-0.0.0.tar.gz')
 
@@ -79,8 +81,8 @@ class MlJobsTests(e2e_base.WithServiceAuth):
         --origin ${CLOUDSDK_TEST_DIR}/e2e/surface/ml_engine/testdata/model \
         --staging-bucket gs://${PROJECT}-ml
     """
-    job_id = e2e_utils.GetResourceNameGenerator(prefix='ml_job',
-                                                delimiter='_').next()
+    job_id = next(e2e_utils.GetResourceNameGenerator(prefix='ml_job',
+                                                     delimiter='_'))
     with self._SubmitJob(
         'prediction', job_id,
         ('  --model={model_id} '

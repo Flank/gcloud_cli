@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instance-groups managed set-named-ports subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import instance_groups_utils
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -25,7 +27,7 @@ class InstanceGroupsSetNamedPortsZonalTest(test_base.BaseTest):
   def SetUp(self):
     self.SelectApi(API_VERSION)
     self.make_requests.side_effect = iter([
-        iter([self.messages.InstanceGroup(name='group-1', fingerprint='123')]),
+        iter([self.messages.InstanceGroup(name='group-1', fingerprint=b'123')]),
         []
     ])
 
@@ -49,7 +51,7 @@ class InstanceGroupsSetNamedPortsZonalTest(test_base.BaseTest):
               instanceGroup='group-1',
               instanceGroupsSetNamedPortsRequest=(
                   self.messages.InstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[
                           self.messages.NamedPort(name='serv-1', port=1111)])),
               project='my-project',
@@ -76,7 +78,7 @@ class InstanceGroupsSetNamedPortsZonalTest(test_base.BaseTest):
               instanceGroup='group-1',
               instanceGroupsSetNamedPortsRequest=(
                   self.messages.InstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[
                           self.messages.NamedPort(name='serv-1', port=1111),
                           self.messages.NamedPort(name='serv-2', port=2222),
@@ -105,7 +107,7 @@ class InstanceGroupsSetNamedPortsZonalTest(test_base.BaseTest):
               instanceGroup='group-1',
               instanceGroupsSetNamedPortsRequest=(
                   self.messages.InstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[])),
               project='my-project',
               zone='central2-a'))],
@@ -132,7 +134,7 @@ class InstanceGroupsSetNamedPortsZonalTest(test_base.BaseTest):
               instanceGroup='group-1',
               instanceGroupsSetNamedPortsRequest=(
                   self.messages.InstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[
                           self.messages.NamedPort(name='serv-1', port=1111)])),
               project='my-project',
@@ -152,7 +154,7 @@ class InstanceGroupsSetNamedPortsZonalTest(test_base.BaseTest):
             self.messages.Zone(name='central1-b'),
             self.messages.Zone(name='central2-a'),
         ],
-        iter([self.messages.InstanceGroup(name='group-1', fingerprint='123')]),
+        iter([self.messages.InstanceGroup(name='group-1', fingerprint=b'123')]),
         []
     ])
     self.WriteInput('5\n')
@@ -176,7 +178,7 @@ class InstanceGroupsSetNamedPortsZonalTest(test_base.BaseTest):
               instanceGroup='group-1',
               instanceGroupsSetNamedPortsRequest=(
                   self.messages.InstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[
                           self.messages.NamedPort(name='serv-1', port=1111)])),
               project='my-project',
@@ -189,7 +191,7 @@ class InstanceGroupsSetNamedPortsRegionalTest(test_base.BaseTest):
   def SetUp(self):
     self.SelectApi(API_VERSION)
     self.make_requests.side_effect = iter([
-        iter([self.messages.InstanceGroup(name='group-1', fingerprint='123')]),
+        iter([self.messages.InstanceGroup(name='group-1', fingerprint=b'123')]),
         iter([]),
     ])
 
@@ -213,7 +215,7 @@ class InstanceGroupsSetNamedPortsRegionalTest(test_base.BaseTest):
               instanceGroup='group-1',
               regionInstanceGroupsSetNamedPortsRequest=(
                   self.messages.RegionInstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[
                           self.messages.NamedPort(name='serv-1', port=1111)])),
               project='my-project',
@@ -240,7 +242,7 @@ class InstanceGroupsSetNamedPortsRegionalTest(test_base.BaseTest):
               instanceGroup='group-1',
               regionInstanceGroupsSetNamedPortsRequest=(
                   self.messages.RegionInstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[
                           self.messages.NamedPort(name='serv-1', port=1111),
                           self.messages.NamedPort(name='serv-2', port=2222),
@@ -269,7 +271,7 @@ class InstanceGroupsSetNamedPortsRegionalTest(test_base.BaseTest):
               instanceGroup='group-1',
               regionInstanceGroupsSetNamedPortsRequest=(
                   self.messages.RegionInstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[])),
               project='my-project',
               region='central2'))],
@@ -296,7 +298,7 @@ class InstanceGroupsSetNamedPortsRegionalTest(test_base.BaseTest):
               instanceGroup='group-1',
               regionInstanceGroupsSetNamedPortsRequest=(
                   self.messages.RegionInstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[
                           self.messages.NamedPort(name='serv-1', port=1111)])),
               project='my-project',
@@ -316,7 +318,7 @@ class InstanceGroupsSetNamedPortsRegionalTest(test_base.BaseTest):
             self.messages.Zone(name='central1-b'),
             self.messages.Zone(name='central2-a'),
         ]),
-        iter([self.messages.InstanceGroup(name='group-1', fingerprint='123')]),
+        iter([self.messages.InstanceGroup(name='group-1', fingerprint=b'123')]),
         iter([]),
     ])
     self.WriteInput('2\n')
@@ -340,7 +342,7 @@ class InstanceGroupsSetNamedPortsRegionalTest(test_base.BaseTest):
               instanceGroup='group-1',
               regionInstanceGroupsSetNamedPortsRequest=(
                   self.messages.RegionInstanceGroupsSetNamedPortsRequest(
-                      fingerprint='123',
+                      fingerprint=b'123',
                       namedPorts=[
                           self.messages.NamedPort(name='serv-1', port=1111)])),
               project='my-project',

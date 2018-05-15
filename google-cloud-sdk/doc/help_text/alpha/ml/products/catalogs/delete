@@ -9,8 +9,8 @@ DESCRIPTION
     (ALPHA) This command deletes a Cloud Product Search Catalog.
 
 POSITIONAL ARGUMENTS
-     CATALOG - The catalog to delete. This represents a Cloud resource. This
-     must be specified.
+     Catalog resource - The catalog to delete. This represents a Cloud
+     resource. This must be specified.
 
        CATALOG
           The ID of the catalog or a fully qualified identifier for the

@@ -34,6 +34,9 @@ COMMANDS
      add-metadata
         (ALPHA) Add or update instance metadata.
 
+     add-resource-policies
+        (ALPHA) Add resource policies to Google Compute Engine VM instances.
+
      add-tags
         (ALPHA) Add tags to Google Compute Engine virtual machine instances.
 
@@ -76,6 +79,9 @@ COMMANDS
 
      remove-metadata
         (ALPHA) Remove instance metadata.
+
+     remove-resource-policies
+        (ALPHA) Remove resource policies to Google Compute Engine VM instances.
 
      remove-tags
         (ALPHA) Remove tags from Google Compute Engine virtual machine

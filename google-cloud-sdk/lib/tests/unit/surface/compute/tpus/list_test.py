@@ -13,12 +13,15 @@
 # limitations under the License.
 """tpus list tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute.tpus import base
+from six.moves import range
 
 
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
@@ -31,8 +34,8 @@ class ListTest(base.TpuUnitTestBase):
             '/projects/{0}/locations/{1}/nodes/tpu-{2}'.format(
                 self.Project(), self.zone, i),
             ip_address='10.142.0.1',
-            accelerator_type='zones/us-central1-c/acceleratorTypes/tpu-v2')
-        for i in xrange(1, num+1)
+            accelerator_type='zones/us-central1-c/acceleratorTypes/v2-8')
+        for i in range(1, num+1)
     ]
     return self.messages.ListNodesResponse(nodes=test_nodes)
 
@@ -76,9 +79,9 @@ class ListTest(base.TpuUnitTestBase):
     self.Run('compute tpus list')
     self.AssertOutputEquals("""\
 NAME ZONE ACCELERATOR_TYPE NETWORK_ENDPOINTS NETWORK RANGE STATUS
-tpu-1 us-central1-c tpu-v2 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
-tpu-2 us-central1-c tpu-v2 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
-tpu-3 us-central1-c tpu-v2 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
+tpu-1 us-central1-c v2-8 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
+tpu-2 us-central1-c v2-8 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
+tpu-3 us-central1-c v2-8 10.142.0.1:2222,10.142.0.2:2222 data-test 10.142.0.0/29 READY
 """, normalize_space=True)
 
   def testListWithPaging(self, track):

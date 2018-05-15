@@ -10,11 +10,11 @@ DESCRIPTION
     (ALPHA) List device registries.
 
 REQUIRED FLAGS
-     REGION - The location you want to list the registries for. This represents
-     a Cloud resource. (NOTE) Some attributes are not given arguments in this
-     group but can be set in other ways. To set the [project] attribute: Set
-     the property [core/project] or provide the flag [--project] on the command
-     line. This must be specified.
+     Region resource - The location you want to list the registries for. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
 
        --region=REGION
           The ID of the region or a fully qualified identifier for the region.

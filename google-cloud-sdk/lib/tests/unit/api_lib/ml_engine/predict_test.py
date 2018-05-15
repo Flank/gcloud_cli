@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the ML Predict library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 
 from googlecloudsdk.api_lib.ml_engine import predict
@@ -160,7 +162,7 @@ class PredictTestBase(object):
   def testPredictNonUtf8Instances(self):
     with self.assertRaisesRegex(core_exceptions.Error,
                                 'Instances cannot be JSON encoded'):
-      predict.Predict(self.version_ref, ['\x89PNG'])
+      predict.Predict(self.version_ref, [b'\x89PNG'])
 
 
 class PredictGaTest(PredictTestBase, base.MlGaPlatformTestBase):

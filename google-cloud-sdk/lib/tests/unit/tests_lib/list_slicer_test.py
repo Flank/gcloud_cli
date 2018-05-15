@@ -14,14 +14,19 @@
 """Unit ests for tests.lib.api_lib.util.list_slicer."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from tests.lib import test_case
 from tests.lib.api_lib.util import list_slicer
+
+from six.moves import range
 
 
 class ListSlicerTest(test_case.TestCase):
 
   def testPageSizeEqualsListLength(self):
-    list_ = range(100)
+    list_ = list(range(100))
     page_size = 100
     expected_slices_list = [slice(0, None, None)]
     expect_token_pairs_list = [(None, None)]
@@ -30,7 +35,7 @@ class ListSlicerTest(test_case.TestCase):
                      (list(actual_slices), list(actual_token_pairs)))
 
   def testPageSizeSmallerThanListLength(self):
-    list_ = range(100)
+    list_ = list(range(100))
     page_size = 80
     expected_slices_list = [slice(0, 80, None), slice(80, None, None)]
     expect_token_pairs_list = [(None, 'TOKEN80'), ('TOKEN80', None)]
@@ -39,7 +44,7 @@ class ListSlicerTest(test_case.TestCase):
                      (list(actual_slices), list(actual_token_pairs)))
 
   def testPageSizeMuchSmallerThanListLength(self):
-    list_ = range(100)
+    list_ = list(range(100))
     page_size = 6
     expected_slices_list = [slice(0, 6, None), slice(6, 12, None),
                             slice(12, 18, None), slice(18, 24, None),
@@ -73,10 +78,10 @@ class ListSlicerTest(test_case.TestCase):
                      (list(actual_slices), list(actual_token_pairs)))
 
   def testPageSizeZero(self):
-    list_ = range(100)
+    list_ = list(range(100))
     page_size = 0
     with self.assertRaisesRegex(
-        ValueError, r'xrange\(\) arg 3 must not be zero'):
+        ValueError, r'range\(\) arg 3 must not be zero'):
       list_slicer.SliceList(list_, page_size)
 
 

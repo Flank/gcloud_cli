@@ -17,15 +17,30 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import contextlib
+
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import cli_test_base
+from tests.lib import e2e_base
 from tests.lib import e2e_utils
+from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.surface import redis_test_base
 
 
-class E2eTest(redis_test_base.E2eTestBase):
+TEST_REGION = 'us-central1'
+# The default network in the cloud-sdk-integration-testing project is LEGACY
+# and will not work with the Redis API.
+TEST_NETWORK = 'do-not-delete-redis-test'
 
-  def testInstanceCreate(self):
-    region_id = redis_test_base.TEST_REGION
+
+class E2eTest(e2e_base.WithServiceAuth, cli_test_base.CliTestBase,
+              parameterized.TestCase):
+
+  @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
+                             calliope_base.ReleaseTrack.BETA])
+  def testInstanceCreate(self, track):
+    self.track = track
+    region_id = TEST_REGION
     instance_id = next(e2e_utils.GetResourceNameGenerator('redis-instance'))
     expected_instance_name = (
         'projects/{project}/locations/{regionId}/instances/{instanceId}'
@@ -34,6 +49,18 @@ class E2eTest(redis_test_base.E2eTestBase):
 
     with self.CreateInstance(instance_id, region_id) as actual_instance:
       self.assertEqual(actual_instance.name, expected_instance_name)
+
+  @contextlib.contextmanager
+  def CreateInstance(self, instance_id, region):
+    try:
+      yield self.Run(
+          'redis instances create --region {region} {instance_id}'
+          ' --network {network}'
+          .format(region=region, instance_id=instance_id,
+                  network=TEST_NETWORK))
+    finally:
+      self.Run('redis instances delete --region {region} {instance_id} --quiet'
+               .format(region=region, instance_id=instance_id))
 
 
 if __name__ == '__main__':

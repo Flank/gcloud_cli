@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """e2e tests for ml local predict command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import subprocess
 
 from googlecloudsdk.core.util import files
@@ -85,7 +87,7 @@ class PredictTest(base.MlGaPlatformTestBase):
 8 1 \[1\.916230[e0-9-]+, 0\.980750[e0-9-]+, 0\.001764[e0-9-]+, 0\.006697[e0-9-]+, 0\.000128[e0-9-]+, 0\.003971[e0-9-]+, 0\.000656[e0-9-]+, 0\.000788[e0-9-]+, 0\.004152[e0-9-]+, 0\.001070[e0-9-]+\]
 9 4 \[0\.000282[e0-9-]+, 1\.802669[e0-9-]+, 0\.000287[e0-9-]+, 6\.428515[e0-9-]+, 0\.964252[e0-9-]+, 0\.005196[e0-9-]+, 0\.015701[e0-9-]+, 0\.000438[e0-9-]+, 0\.004905[e0-9-]+, 0\.008852[e0-9-]+\]
 """, normalize_space=True)
-    self.assertEqual(results.keys(), ['predictions'])
+    self.assertEqual(list(results.keys()), ['predictions'])
     predictions = results['predictions']
     self.assertEqual(len(predictions), 10)
     expected_keys = set(['prediction', 'key', 'scores'])

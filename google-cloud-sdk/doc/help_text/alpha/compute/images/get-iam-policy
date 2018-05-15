@@ -3,7 +3,7 @@ NAME
         Google Compute Engine image
 
 SYNOPSIS
-    gcloud alpha compute images get-iam-policy IMAGE_NAME [--filter=EXPRESSION]
+    gcloud alpha compute images get-iam-policy IMAGE [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -16,13 +16,13 @@ DESCRIPTION
     set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     IMAGE NAME - The image for which to display the IAM policy. This
+     Image resource - The image for which to display the IAM policy. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
      attribute: Set the property [core/project] or provide the flag [--project]
      on the command line. This must be specified.
 
-       IMAGE_NAME
+       IMAGE
           The ID of the image or a fully qualified identifier for the image.
 
 LIST COMMAND FLAGS

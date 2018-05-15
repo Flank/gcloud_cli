@@ -101,7 +101,7 @@ class CreateTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
     self.SetUpInstancesForTrack()
     instance_to_create = self.MakeDefaultInstance()
     self._ExpectCreate(instance_to_create, self.instance_id,
-                       self.instance_relative_name, async=True)
+                       self.instance_relative_name, is_async=True)
 
     self.Run('redis instances create {} --region {} --async'
              .format(self.instance_id, self.region_id))
@@ -112,7 +112,7 @@ class CreateTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
                            format(self.wait_operation_id))
 
   def _ExpectCreate(self, instance_to_create, instance_to_create_id,
-                    instance_to_create_name, async=False):
+                    instance_to_create_name, is_async=False):
     operation = self.messages.Operation(name=self.wait_operation_relative_name)
     self.instances_service.Create.Expect(
         request=self.messages.RedisProjectsLocationsInstancesCreateRequest(
@@ -120,7 +120,7 @@ class CreateTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
             parent=self.region_relative_name),
         response=operation)
 
-    if async:
+    if is_async:
       return
 
     operation.done = True  # Simulate immediate success.

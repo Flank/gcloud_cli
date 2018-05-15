@@ -16,8 +16,8 @@ DESCRIPTION
     for additional details.
 
 POSITIONAL ARGUMENTS
-     ORGANIZATION - The organization for which to display the IAM policy. This
-     represents a Cloud resource. This must be specified.
+     Organization resource - The organization for which to display the IAM
+     policy. This represents a Cloud resource. This must be specified.
 
        ORGANIZATION
           The ID of the organization or a fully qualified identifier for the

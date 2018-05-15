@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base class for all tpu_nodes tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding as apitools_encoding
 from apitools.base.py.testing import mock
 
@@ -21,6 +23,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+from six.moves import range
 
 
 class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
@@ -53,7 +56,7 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                  network='data-test',
                  version=None,
                  port='2222',
-                 accelerator_type='tpu-v2'
+                 accelerator_type='v2-8'
                 ):
     return self.messages.Node(
         name=name,
@@ -91,7 +94,7 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         name=('projects/{project}/locations/{zone}/tensorflowVersions/{version}'
               .format(project=self.Project(), zone=self.zone, version=version)))
 
-  def GetTestAccType(self, acc_type='tpu-v2'):
+  def GetTestAccType(self, acc_type='v2-8'):
     return self.messages.AcceleratorType(
         type=acc_type,
         name=('projects/{project}/locations/{zone}/acceleratorTypes/{acc_type}'
@@ -128,7 +131,7 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             'projectsId': self.Project(),
             'locationsId': self.zone},
         collection='tpu.projects.locations.operations')
-    for _ in xrange(poll_count):
+    for _ in range(poll_count):
       op_polling_response = self.GetOperationResponse(op_name, is_done=False)
       self.mock_client.projects_locations_operations.Get.Expect(
           self.messages.TpuProjectsLocationsOperationsGetRequest(

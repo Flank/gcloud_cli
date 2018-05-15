@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for folders list."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.resource_manager import exceptions
 from googlecloudsdk.api_lib.resource_manager import folders
 from googlecloudsdk.calliope import exceptions as calliope_exceptions

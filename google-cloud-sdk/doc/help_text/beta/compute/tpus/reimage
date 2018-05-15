@@ -9,11 +9,11 @@ DESCRIPTION
     (BETA) Reimages the OS on a Cloud TPU.
 
 POSITIONAL ARGUMENTS
-     TPU ID - The Cloud TPU to reimage. The arguments in this group can be used
-     to specify the attributes of this resource. (NOTE) Some attributes are not
-     given arguments in this group but can be set in other ways. To set the
-     [project] attribute: Set the property [core/project] or provide the flag
-     [--project] on the command line. This must be specified.
+     Tpu resource - The Cloud TPU to reimage. The arguments in this group can
+     be used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
 
        TPU_ID
           The ID of the tpu or a fully qualified identifier for the tpu. This

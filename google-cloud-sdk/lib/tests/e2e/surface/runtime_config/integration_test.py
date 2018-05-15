@@ -13,6 +13,9 @@
 # limitations under the License.
 """Integration tests for the 'runtime-config' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import base64
 from googlecloudsdk.core.util import retry
 from tests.lib import test_case
 from tests.lib.surface.runtime_config import base
@@ -112,7 +115,7 @@ class VariableTest(base.RuntimeConfigIntegrationTest):
       self._WaitForValue(
           RunVariables,
           name='a/var1',
-          value=self.FIRST_VAL.encode('base64').strip())
+          value=base64.b64encode(self.FIRST_VAL.encode()).strip())
       RunVariables('describe a/var1')
       self.AssertOutputMatches("""\
 atomicName: projects/{0}/configs/{1}/variables/a/var1
@@ -170,7 +173,7 @@ updateTime: [^\n]+
       self._WaitForValue(
           RunVariables,
           name='a/var2',
-          value=self.SECOND_VAL.encode('base64').strip())
+          value=base64.b64encode(self.SECOND_VAL.encode()).strip())
       RunVariables('describe a/var2')
       self.AssertOutputMatches("""\
 atomicName: projects/{0}/configs/{1}/variables/a/var2

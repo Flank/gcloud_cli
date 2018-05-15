@@ -261,7 +261,6 @@ class HealthChecksListAlphaTest(test_base.BaseTest):
         textwrap.dedent("""\
             NAME                PROTOCOL
             health-check-http2  HTTP2
-            health-check-udp    UDP
             """),
         normalize_space=True)
 
@@ -301,42 +300,6 @@ class HealthChecksListAlphaTest(test_base.BaseTest):
             health-check-http2  HTTP2
             """),
         normalize_space=True)
-
-  def testTableOutputUdp(self):
-    self.Run("""
-        compute health-checks list --protocol udp
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL PORT REQUEST RESPONSE
-            health-check-udp    UDP      443  req     ack
-            """),
-        normalize_space=True)
-
-  def testTableOutputListByNameUDP(self):
-    # List a specific health check by name.
-    self.Run("""
-        compute health-checks list health-check-udp
-        """)
-    self.mock_get_global_resources.assert_called_once_with(
-        service=self.compute.healthChecks,
-        project='my-project',
-        http=self.mock_http(),
-        filter_expr=None,
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME                PROTOCOL
-            health-check-udp    UDP
-            """), normalize_space=True)
 
 if __name__ == '__main__':
   test_case.main()

@@ -14,6 +14,8 @@
 
 """Unit tests for ml-engine completers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.ml_engine import flags
 from tests.lib import completer_test_base
 from tests.lib.surface.iam import unit_test_base

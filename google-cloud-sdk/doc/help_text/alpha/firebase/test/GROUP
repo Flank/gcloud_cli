@@ -20,6 +20,9 @@ GROUPS
      android
         (ALPHA) Command group for Android application testing.
 
+     ios
+        (ALPHA) Command group for iOS application testing.
+
      network-profiles
         (ALPHA) Explore network profiles available for testing.
 

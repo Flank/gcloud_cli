@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud ml-engine locations list`."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib.surface.ml_engine import base
 
@@ -58,10 +60,9 @@ class LocationsListTest(base.MlAlphaPlatformTestBase):
     properties.VALUES.core.user_output_enabled.Set(True)
     self._ExpectList()
     self.Run('ml-engine locations list')
-    self.AssertOutputEquals(
-        """\
-        NAME TYPE AVAILABLE_ACCELERATORS
-        loc1  [u'TRAINING']  [u'NVIDIA_TESLA_K80', u'NVIDIA_TESLA_P100']
-        loc2 [u'TRAINING', u'BATCH_PREDICTION'] [u'NVIDIA_TESLA_K80'],None
-        """,
+    self.AssertOutputMatches(
+        # pylint: disable=line-too-long
+        r"""NAME TYPE AVAILABLE_ACCELERATORS
+        loc1  \[u?'TRAINING'\]  \[u?'NVIDIA_TESLA_K80', u?'NVIDIA_TESLA_P100'\]
+        loc2 \[u?'TRAINING', u?'BATCH_PREDICTION'\] \[u?'NVIDIA_TESLA_K80'\],None""",
         normalize_space=True)

@@ -45,10 +45,13 @@ class RemoveIamPolicyBindingTest(sdk_test_base.WithFakeAuth,
         messages.ComputeImagesGetIamPolicyRequest(
             resource='my-resource', project='fake-project'),
         response=test_resources.AlphaIamPolicyWithOneBinding())
+    policy = test_resources.EmptyAlphaIamPolicy()
     self.mock_client.images.SetIamPolicy.Expect(
         messages.ComputeImagesSetIamPolicyRequest(
             resource='my-resource', project='fake-project',
-            policy=test_resources.EmptyAlphaIamPolicy()),
+            globalSetPolicyRequest=messages.GlobalSetPolicyRequest(
+                bindings=policy.bindings,
+                etag=policy.etag)),
         response=test_resources.EmptyAlphaIamPolicy())
 
     self.Run("""

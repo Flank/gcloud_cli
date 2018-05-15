@@ -23,7 +23,7 @@ from tests.lib.surface.firebase.test.android import fake_catalogs
 from tests.lib.surface.firebase.test.android import unit_base
 
 
-class TestModelsListTest(unit_base.AndroidMockClientTest):
+class TestAndroidModelsListTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
@@ -31,12 +31,12 @@ class TestModelsListTest(unit_base.AndroidMockClientTest):
   def TearDown(self):
     console_attr.ResetConsoleAttr()
 
-  def testModelsList_NoModelsFound(self):
+  def testAndroidModelsList_NoModelsFound(self):
     self.ExpectCatalogGet(fake_catalogs.EmptyAndroidCatalog())
     self.Run(commands.ANDROID_MODELS_LIST)
     self.AssertErrContains('Listed 0 items.')
 
-  def testModelsList_ModelsFound(self):
+  def testAndroidModelsList_ModelsFound(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
     self.Run(commands.ANDROID_MODELS_LIST)
     self.AssertOutputContains(
@@ -46,7 +46,7 @@ class TestModelsListTest(unit_base.AndroidMockClientTest):
         | youreit, default |""",
         normalize_space=True)
 
-  def testModelsList_DeprecationWarningShown(self):
+  def testAndroidModelsList_DeprecationWarningShown(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
     self.Run(commands.ANDROID_MODELS_LIST)
     self.AssertOutputContains(
@@ -56,7 +56,7 @@ class TestModelsListTest(unit_base.AndroidMockClientTest):
         normalize_space=True)
     self.AssertErrContains('Some devices are deprecated. Learn more')
 
-  def testModelsList_ApiThrowsHttpError(self):
+  def testAndroidModelsList_ApiThrowsHttpError(self):
     err = test_utils.MakeHttpError('ErrorXYZ', 'Environment catalog failure.')
     self.ExpectCatalogGetError(err)
 

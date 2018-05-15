@@ -17,7 +17,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.container import binauthz_util as binauthz_api_util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
@@ -63,101 +62,6 @@ def _ReRunUntilResultPredicate(
       should_retry_if=ShouldRetryIf,
       sleep_ms=sleep_ms,
   )
-
-
-class BinauthzLegacyTest(
-    e2e_base.WithServiceAuth,
-    sdk_test_base.WithTempCWD,
-    cli_test_base.CliTestBase,
-    binauthz_test_base.BinauthzUnitTestBase,
-):
-
-  def SetUp(self):
-    # We don't get our track from the base binauthz test because `CliTestBase`
-    # clobbers it in its SetUp.
-    self.track = base.ReleaseTrack.ALPHA
-    # CliTestBase sets this to True in its SetUp, but we only need to consume
-    # the result of calling self.Run in their structured format.
-    properties.VALUES.core.user_output_enabled.Set(False)
-    self.containeranalysis_client = apis.GetClientInstance(
-        'containeranalysis',
-        binauthz_api_util.DEFAULT_CONTAINERANALYSIS_API_VERSION)
-    self.client = binauthz_api_util.ContainerAnalysisClient(
-        client=self.containeranalysis_client,
-        messages=self.containeranalysis_messages)
-    self.artifact_url = self.GenerateArtifactUrl()
-    self.project_ref = resources.REGISTRY.Parse(
-        self.Project(), collection='cloudresourcemanager.projects')
-    self.provider_ref = resources.REGISTRY.Parse(
-        self.project_ref.Name(), collection='containeranalysis.providers')
-
-  def GetOccurrence(self, occurrence_name):
-    return self.containeranalysis_client.projects_occurrences.Get(
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesGetRequest(name=occurrence_name))
-
-  def GetNote(self, note_name):
-    return self.containeranalysis_client.projects_notes.Get(
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsNotesGetRequest(name=note_name))
-
-  def CleanUpAttestation(self, occurrence, note):
-    self.containeranalysis_client.projects_occurrences.Delete(
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesDeleteRequest(name=occurrence.name))
-    self.containeranalysis_client.providers_notes.Delete(
-        self.containeranalysis_messages.
-        ContaineranalysisProvidersNotesDeleteRequest(name=note.name))
-
-  def CreateAttestation(self, public_key, signature):
-    public_key_path = self.Touch(directory=self.cwd_path, contents=public_key)
-    signature_path = self.Touch(directory=self.cwd_path, contents=signature)
-    occurrence, note = self.RunBinauthz([
-        'attestations',
-        'create',
-        '--artifact-url',
-        self.artifact_url,
-        '--public-key-file',
-        public_key_path,
-        '--signature-file',
-        signature_path,
-    ])
-    self.addCleanup(self.CleanUpAttestation, occurrence=occurrence, note=note)
-    return occurrence, note
-
-  def testAttestationsCreate(self):
-    public_key = 'bogus_pk_contents'
-    signature = 'bogus_sig_contents'
-    result_occurrence, result_note = self.CreateAttestation(
-        public_key=public_key, signature=signature)
-    occurrence = self.GetOccurrence(result_occurrence.name)
-    note = self.GetNote(result_note.name)
-    self.assertEqual(note.buildType.signature.publicKey, public_key)
-    self.assertEqual(note.buildType.signature.signature, signature)
-    self.assertEqual(occurrence.noteName, note.name)
-
-  @test_case.Filters.DoNotRunIf(
-      condition=True,
-      reason='This test is present only as a convenient way to demonstrate a '
-      'perf issue with our e2e testing and Drydock queries.  Should not be run '
-      'as part of periodic or presubmit tests. Only run by hand to test the '
-      'perf issue documented in issue b/63458988.')
-  def testListRuntime(self):
-    occurrences_iter = list_pager.YieldFromList(
-        self.containeranalysis_client.projects_occurrences,
-        request=self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesListRequest(
-            parent=self.project_ref.RelativeName(),
-            filter='kind="BUILD_DETAILS"'),
-        field='occurrences',
-        batch_size=100,
-        batch_size_attribute='pageSize')
-
-    # Since this iterator is streaming results and we're only interested
-    # in the count, we can count up the elements without buffering the
-    # entire result in memory.  Note that this consumes the iterator.
-    # pylint: disable=unused-variable
-    occurrence_count = sum(1 for _ in occurrences_iter)
 
 
 class BinauthzTest(

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """e2e tests for ml-engine models command group."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.core.util import retry
@@ -33,7 +35,7 @@ class MlPlatformModelsIntegrationTest(e2e_base.WithServiceAuth):
 
   @contextlib.contextmanager
   def _CreateModel(self):
-    model_id = self.id_gen.next()
+    model_id = next(self.id_gen)
     created = False
     try:
       self.Run('ml-engine models create {}'.format(model_id))
@@ -46,7 +48,7 @@ class MlPlatformModelsIntegrationTest(e2e_base.WithServiceAuth):
 
   @contextlib.contextmanager
   def _CreateVersion(self, model_id, other_args=''):
-    version_id = self.id_gen.next()
+    version_id = next(self.id_gen)
     created = False
     try:
       self.Run('ml-engine versions create --model {} {} {}'.format(

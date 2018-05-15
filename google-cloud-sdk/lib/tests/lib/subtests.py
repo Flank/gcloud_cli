@@ -189,22 +189,22 @@ class Base(test_case.Base):
 
     argv = ["'" + six.text_type(a) + "'" for a in args]
     for name, value in sorted(six.iteritems(kwargs)):
-      argv.append('{name}={value}'.format(name=name, value=repr(value)))
+      argv.append("{name}='{value}'".format(name=name, value=value))
     args = ', '.join(argv)
 
     if (expected_exception_type == exception_type or
         isinstance(exception_type, type(expected_exception_type))):
       if not exception_type and not matches(expected, actual):
-        self.failures.append('[{args}] result [{actual}] does not match'
-                             ' [{expected}] at line {line}.'.format(
-                                 args=args, actual=repr(actual),
-                                 expected=repr(expected), line=line))
+        self.failures.append("[{args}] result ['{actual}'] does not match"
+                             " ['{expected}'] at line {line}.".format(
+                                 args=args, actual=actual,
+                                 expected=expected, line=line))
       elif (expected_exception_message and
             not matches(expected_exception_message, exception_message)):
-        self.failures.append('Exception message [{actual}] does not match '
-                             '[{expected}] at line {line}.'.format(
-                                 actual=repr(exception_message),
-                                 expected=repr(expected_exception_message),
+        self.failures.append("Exception message ['{actual}'] does not match "
+                             "['{expected}'] at line {line}.".format(
+                                 actual=exception_message,
+                                 expected=expected_exception_message,
                                  line=line))
     elif exception_type:
       self.failures.append(

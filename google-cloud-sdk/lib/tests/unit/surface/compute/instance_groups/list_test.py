@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base
@@ -67,8 +69,7 @@ class InstanceGroupsListTestBase(test_base.BaseTest):
 
     self.SelectApi(api_version)
     make_requests_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.request_helper.MakeRequests',
-        autospec=True)
+        'googlecloudsdk.api_lib.compute.request_helper.MakeRequests')
     self.addCleanup(make_requests_patcher.stop)
     self.make_requests = make_requests_patcher.start()
     self.make_requests.side_effect = _MockMakeRequests

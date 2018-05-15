@@ -24,7 +24,7 @@ from tests.lib.surface.firebase.test.android import fake_catalogs
 from tests.lib.surface.firebase.test.android import unit_base
 
 
-class TestVersionsDescribeTest(unit_base.AndroidMockClientTest):
+class TestAndroidVersionsDescribeTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
@@ -32,7 +32,7 @@ class TestVersionsDescribeTest(unit_base.AndroidMockClientTest):
   def TearDown(self):
     console_attr.ResetConsoleAttr()
 
-  def testVersionsDescribe_VersionNotFound(self):
+  def testAndroidVersionsDescribe_VersionNotFound(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
 
     with self.assertRaises(exceptions.VersionNotFoundError):
@@ -40,7 +40,7 @@ class TestVersionsDescribeTest(unit_base.AndroidMockClientTest):
 
     self.AssertErrContains("'bad-version' is not a valid OS version")
 
-  def testVersionsDescribe_VersionFound(self):
+  def testAndroidVersionsDescribe_VersionFound(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
     self.Run(commands.ANDROID_VERSIONS_DESCRIBE + 'C')
 
@@ -52,7 +52,7 @@ class TestVersionsDescribeTest(unit_base.AndroidMockClientTest):
     self.AssertOutputContains("versionString: '1.5'")
     self.AssertOutputContains('tags:\n- unsupported\n- deprecated')
 
-  def testVersionsDescribe_ApiThrowsHttpError(self):
+  def testAndroidVersionsDescribe_ApiThrowsHttpError(self):
     err = test_utils.MakeHttpError('Error9', 'Environment catalog failure.')
     self.ExpectCatalogGetError(err)
 

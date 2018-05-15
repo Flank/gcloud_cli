@@ -81,6 +81,9 @@ COMMANDS
      update
         (ALPHA) Update Google Compute Engine managed instance groups.
 
+     update-autoscaling
+        (ALPHA) Update autoscaling parameters of a managed instance group.
+
      wait-until-stable
         (ALPHA) Waits until state of managed instance group is stable.
 

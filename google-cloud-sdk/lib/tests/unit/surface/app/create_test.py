@@ -14,6 +14,8 @@
 
 """Tests for gcloud app create."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from googlecloudsdk.command_lib.app import create_util
 from googlecloudsdk.core import properties

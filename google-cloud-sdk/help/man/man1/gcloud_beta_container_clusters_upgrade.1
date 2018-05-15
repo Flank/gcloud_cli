@@ -23,6 +23,10 @@ This command upgrades the Kubernetes version of the \fBnodes\fR or \fBmaster\fR
 of a cluster. Note that the Kubernetes version of the cluster's \fBmaster\fR is
 also periodically upgraded automatically as new releases are available.
 
+If desired cluster version is omitted, \fBnode\fR upgrades default to the
+current \fBmaster\fR version and \fBmaster\fR upgrades default to the latest
+supported version.
+
 \fBBy running this command, all of the cluster's nodes will be deleted and\fR
 \fBrecreated one at a time.\fR While persistent Kubernetes resources, such as
 pods backed by replication controllers, will be rescheduled onto new nodes, a

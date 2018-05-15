@@ -14,6 +14,8 @@
 
 """Tests for the beta backend-services describe subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core.resource import resource_projector

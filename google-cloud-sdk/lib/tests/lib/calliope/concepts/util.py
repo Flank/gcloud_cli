@@ -43,11 +43,12 @@ def MakeAttributeConfigs(with_completers=False):
           completer=MockBookCompleter if with_completers else None)}
 
 
-def GetBookResource(with_completers=False, auto_completers=False):
+def GetBookResource(with_completers=False, auto_completers=False,
+                    resource_name='book'):
   """Makes the test book resource."""
   return concepts.ResourceSpec(
       'example.projects.shelves.books',
-      'book',
+      resource_name,
       disable_auto_completers=not auto_completers,
       **MakeAttributeConfigs(with_completers=with_completers))
 

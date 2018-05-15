@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for Kontainers-on-GCE."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.compute import e2e_instances_test_base
@@ -29,7 +31,7 @@ class InstancesWithContainerTest(e2e_instances_test_base.InstancesTestBase,
                                  sdk_test_base.WithCommandCapture):
 
   def SetUp(self):
-    self.prefix = 'create-with-container'
+    self.prefix = b'create-with-container'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
     # Containers for created resources.

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for projects move."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_util
@@ -35,9 +37,9 @@ def MakeTestResources():
   def MakeTestProject(parent=None):
     return messages.Project(
         lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-        projectId=u'feisty-catcher-644',
+        projectId='feisty-catcher-644',
         projectNumber=925276746377,
-        name=u'My Project 5',
+        name='My Project 5',
         parent=parent)
 
   org_resource_id = messages.ResourceId(id='57935028', type='organization')

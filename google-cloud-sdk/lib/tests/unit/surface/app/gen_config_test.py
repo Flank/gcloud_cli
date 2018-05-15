@@ -15,6 +15,8 @@
 # limitations under the License.
 """Small test to verify that the gen-config command works as advertised."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import textwrap
 
@@ -294,7 +296,7 @@ class GenConfigTest(cli_test_base.CliTestBase, util.WithAppData,
     """Check that the right error is thrown when app.yaml is read only."""
     self._WriteNodeFiles()
     self.WriteFile('app.yaml', APP_YAML_NODEJS)
-    os.chmod('app.yaml', 0444)
+    os.chmod('app.yaml', 0o444)
     with mock.patch.object(console_io, 'CanPrompt', lambda: True):
       with mock.patch.object(console_io, 'PromptContinue',
                              lambda **kwargs: True):
@@ -303,7 +305,7 @@ class GenConfigTest(cli_test_base.CliTestBase, util.WithAppData,
     self.AssertErrContains('Could not alter app.yaml due to an internal error')
     self.AssertErrContains('Please update app.yaml manually.')
     self.AssertFileExistsWithContents(APP_YAML_NODEJS, 'app.yaml')
-    os.chmod('app.yaml', 0666)
+    os.chmod('app.yaml', 0o666)
 
 
 if __name__ == '__main__':

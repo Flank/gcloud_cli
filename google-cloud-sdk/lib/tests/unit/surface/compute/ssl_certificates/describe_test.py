@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the SSL certificates describe subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from tests.lib import test_case
@@ -136,7 +138,7 @@ class SslCertificatesDescribeAlphaTest(test_base.BaseTest,
     )
     self.assertMultiLineEqual(
         self.GetOutput(),
-        textwrap.dedent(u"""\
+        textwrap.dedent("""\
                 creationTimestamp: '2017-12-17T10:00:00.000-07:00'
                 description: Managed certificate.
                 managed:

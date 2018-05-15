@@ -32,7 +32,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        The name of the instance to update.
+        Name of the instance to update.
 
 FLAGS
      --[no-]deletion-protection

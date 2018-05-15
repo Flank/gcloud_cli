@@ -15,6 +15,8 @@
 """Package containing unit tests for the wrapper_util module.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import itertools
 import os
 from googlecloudsdk.api_lib.app import wrapper_util
@@ -203,7 +205,8 @@ class _ParseBooleanTest(test_case.TestCase):
     self.assertFalse(wrapper_util._ParseBoolean('0'))
 
   def testBad(self):
-    self.assertRaisesRegex(ValueError, "known booleans are 'true', 'yes'",
+    self.assertRaisesRegex(ValueError,
+                           "known booleans are [u]?'true', [u]?'yes'",
                            wrapper_util._ParseBoolean, 'bad')
 
 

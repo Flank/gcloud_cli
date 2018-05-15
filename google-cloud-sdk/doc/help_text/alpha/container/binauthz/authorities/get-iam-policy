@@ -12,7 +12,7 @@ DESCRIPTION
     IAM policy set.
 
 POSITIONAL ARGUMENTS
-     AUTHORITY - The authority whose IAM policy will be fetched. This
+     Authority resource - The authority whose IAM policy will be fetched. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
      attribute: Set the property [core/project] or provide the flag [--project]

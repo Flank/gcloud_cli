@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the interconnect attachment partner update subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from tests.lib.surface.compute import test_base
 
@@ -72,7 +74,7 @@ class InterconnectAttachmentsProviderUpdateAlphaTest(test_base.BaseTest):
         [
             messages.InterconnectAttachment(
                 name='my-attachment',
-                labelFingerprint='abcd',
+                labelFingerprint=b'abcd',
                 labels=old_labels),
         ],
         [
@@ -105,7 +107,7 @@ class InterconnectAttachmentsProviderUpdateAlphaTest(test_base.BaseTest):
                   name='my-attachment',
                   description='this is my attachment',
                   labels=labels,
-                  labelFingerprint='abcd',
+                  labelFingerprint=b'abcd',
                   adminEnabled=False)))],
     )
 
@@ -120,7 +122,7 @@ class InterconnectAttachmentsProviderUpdateAlphaTest(test_base.BaseTest):
         [
             messages.InterconnectAttachment(
                 name='my-attachment',
-                labelFingerprint='abcd',
+                labelFingerprint=b'abcd',
                 labels=old_labels),
         ],
         [
@@ -153,7 +155,7 @@ class InterconnectAttachmentsProviderUpdateAlphaTest(test_base.BaseTest):
                   name='my-attachment',
                   description='this is my attachment',
                   labels=labels,
-                  labelFingerprint='abcd',
+                  labelFingerprint=b'abcd',
                   adminEnabled=False)))],
     )
 

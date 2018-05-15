@@ -16,12 +16,19 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 import argparse
 
 from googlecloudsdk.calliope import parser_errors
 from tests.lib import cli_test_base
+from tests.lib import parameterized
+from tests.lib import parameterized_line_no
 from tests.lib.calliope import util as calliope_test_util
+
 import mock
+
+
+T = parameterized_line_no.LineNo
 
 
 class SpecifiedArgsTest(cli_test_base.CliTestBase):
@@ -180,6 +187,191 @@ class SpecifiedArgsTest(cli_test_base.CliTestBase):
     with self.AssertRaisesArgumentErrorMatches(
         'argument HOST: Must be specified.'):
       self.parser.parse_args(['--project', 'proj', '--', 'echo', 'hey'])
+
+
+class SpecifiedGroupsTest(cli_test_base.CliTestBase, parameterized.TestCase):
+
+  def SetUp(self):
+    self.parser = calliope_test_util.ArgumentParser()
+
+  @parameterized.parameters(
+      T(
+          [],
+          None,
+      ),
+      T(
+          ['--inner-1'],
+          'argument --outer-1 --outer-2: Must be specified.',
+      ),
+      T(
+          ['--inner-2'],
+          'argument --outer-1 --outer-2: Must be specified.',
+      ),
+      T(
+          ['--inner-1', '--inner-2'],
+          'argument --inner-1: At most one of (--inner-1 | --inner-2) '
+          'may be specified.',
+      ),
+      T(
+          ['--outer-1'],
+          'argument --outer-2 (--inner-1 | --inner-2): Must be specified.',
+      ),
+      T(
+          ['--outer-1', '--inner-1'],
+          'argument --outer-2: Must be specified.',
+      ),
+      T(
+          ['--outer-1', '--inner-2'],
+          'argument --outer-2: Must be specified.',
+      ),
+      T(
+          ['--outer-1', '--inner-1', '--inner-2'],
+          'argument --inner-1: At most one of (--inner-1 | --inner-2) '
+          'may be specified.',
+      ),
+      T(
+          ['--outer-2'],
+          'argument --outer-1 (--inner-1 | --inner-2): Must be specified.',
+      ),
+      T(
+          ['--outer-2', '--inner-1'],
+          'argument --outer-1: Must be specified.',
+      ),
+      T(
+          ['--outer-2', '--inner-2'],
+          'argument --outer-1: Must be specified.',
+      ),
+      T(
+          ['--outer-2', '--inner-1', '--inner-2'],
+          'argument --inner-1: At most one of (--inner-1 | --inner-2) '
+          'may be specified.',
+      ),
+      T(
+          ['--outer-1', '--outer-2'],
+          'argument (--inner-1 | --inner-2): Must be specified.',
+      ),
+      T(
+          ['--outer-1', '--outer-2', '--inner-1'],
+          None,
+      ),
+      T(
+          ['--outer-1', '--outer-2', '--inner-2'],
+          None,
+      ),
+      T(
+          ['--outer-1', '--outer-2', '--inner-1', '--inner-2'],
+          'argument --inner-1: At most one of (--inner-1 | --inner-2) '
+          'may be specified.',
+      ),
+  )
+  def testRequiredInOptionalGroup(self, line, args, error):
+    outer_group = self.parser.add_group(
+        required=False, mutex=False, help='Outer.')
+    outer_group.add_argument(
+        '--outer-1', action='store_true', required=True, help='Outer 1.')
+    outer_group.add_argument(
+        '--outer-2', action='store_true', required=True, help='Outer 1.')
+    inner_group = outer_group.add_group(
+        required=True, mutex=True, help='Inner.')
+    inner_group.add_argument(
+        '--inner-1', action='store_true', required=False, help='Inner 1.')
+    inner_group.add_argument(
+        '--inner-2', action='store_true', required=False, help='Inner 1.')
+
+    if error:
+      with self.AssertRaisesArgumentErrorMatches(error):
+        self.parser.parse_args(args)
+    else:
+      self.parser.parse_args(args)
+
+  @parameterized.parameters(
+      T(
+          [],
+          'Exactly one of (--inner-1 | --inner-2) must be specified.',
+      ),
+      T(
+          ['--inner-1'],
+          'argument --outer-1 --outer-2: Must be specified.',
+      ),
+      T(
+          ['--inner-2'],
+          'argument --outer-1 --outer-2: Must be specified.',
+      ),
+      T(
+          ['--inner-1', '--inner-2'],
+          'Exactly one of (--inner-1 | --inner-2) must be specified.',
+      ),
+      T(
+          ['--outer-1'],
+          'Exactly one of (--inner-1 | --inner-2) must be specified.',
+      ),
+      T(
+          ['--outer-1', '--inner-1'],
+          'argument --outer-2: Must be specified.',
+      ),
+      T(
+          ['--outer-1', '--inner-2'],
+          'argument --outer-2: Must be specified.',
+      ),
+      T(
+          ['--outer-1', '--inner-1', '--inner-2'],
+          'Exactly one of (--inner-1 | --inner-2) must be specified.',
+      ),
+      T(
+          ['--outer-2'],
+          'Exactly one of (--inner-1 | --inner-2) must be specified.',
+      ),
+      T(
+          ['--outer-2', '--inner-1'],
+          'argument --outer-1: Must be specified.',
+      ),
+      T(
+          ['--outer-2', '--inner-2'],
+          'argument --outer-1: Must be specified.',
+      ),
+      T(
+          ['--outer-2', '--inner-1', '--inner-2'],
+          'argument --inner-1: Exactly one of (--inner-1 | --inner-2) '
+          'must be specified.',
+      ),
+      T(
+          ['--outer-1', '--outer-2'],
+          'Exactly one of (--inner-1 | --inner-2) must be specified.',
+      ),
+      T(
+          ['--outer-1', '--outer-2', '--inner-1'],
+          None,
+      ),
+      T(
+          ['--outer-1', '--outer-2', '--inner-2'],
+          None,
+      ),
+      T(
+          ['--outer-1', '--outer-2', '--inner-1', '--inner-2'],
+          'argument --inner-1: Exactly one of (--inner-1 | --inner-2) '
+          'must be specified.',
+      ),
+  )
+  def testRequiredInRequiredGroup(self, line, args, error):
+    # required=True is the only change from testRequiredInOptionalGroup.
+    outer_group = self.parser.add_group(
+        required=True, mutex=False, help='Outer.')
+    outer_group.add_argument(
+        '--outer-1', action='store_true', required=True, help='Outer 1.')
+    outer_group.add_argument(
+        '--outer-2', action='store_true', required=True, help='Outer 2.')
+    inner_group = outer_group.add_group(
+        required=True, mutex=True, help='Inner.')
+    inner_group.add_argument(
+        '--inner-1', action='store_true', required=False, help='Inner 1.')
+    inner_group.add_argument(
+        '--inner-2', action='store_true', required=False, help='Inner 2.')
+
+    if error:
+      with self.AssertRaisesArgumentErrorMatches(error):
+        self.parser.parse_args(args)
+    else:
+      self.parser.parse_args(args)
 
 
 if __name__ == '__main__':

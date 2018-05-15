@@ -10,8 +10,8 @@ DESCRIPTION
     encoded in JSON or YAML that contains the IAM policy.
 
 POSITIONAL ARGUMENTS
-     PROJECT ID - The project to set the IAM policy for. This represents a
-     Cloud resource. This must be specified.
+     Project resource - The project to set the IAM policy for. This represents
+     a Cloud resource. This must be specified.
 
        PROJECT_ID
           The ID of the project or a fully qualified identifier for the

@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for gcloud init command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.core import resources
@@ -21,6 +24,7 @@ from googlecloudsdk.core.util import platforms
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+import six
 
 
 class InitTest(sdk_test_base.BundledBase,
@@ -45,7 +49,7 @@ class InitTest(sdk_test_base.BundledBase,
 
   def AssertProperties(self, props):
     config_setting = self.Run(['config', 'list'])
-    for prop, value in props.iteritems():
+    for prop, value in six.iteritems(props):
       path = prop.split('/')
       cfg = config_setting
       for part in path:

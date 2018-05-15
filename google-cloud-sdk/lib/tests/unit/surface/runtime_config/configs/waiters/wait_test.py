@@ -13,11 +13,14 @@
 # limitations under the License.
 """Tests for surface.runtime_config.configs.waiters.wait."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.runtime_config import exceptions as rtc_exceptions
 from googlecloudsdk.api_lib.runtime_config import util
 from googlecloudsdk.calliope import exceptions as sdk_exceptions
 from tests.lib import test_case
 from tests.lib.surface.runtime_config import base
+from six.moves import range
 
 
 class WaitersWaitTest(base.RuntimeConfigTestBase):
@@ -75,7 +78,7 @@ class WaitersWaitTest(base.RuntimeConfigTestBase):
     )
 
     # Set time to return +5 seconds each time it is called.
-    self.time_mock.side_effect = range(0, 100, 5)
+    self.time_mock.side_effect = list(range(0, 100, 5))
 
     self.waiter_client.Get.Expect(request, not_done_result)
 

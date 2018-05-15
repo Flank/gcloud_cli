@@ -25,7 +25,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the HTTP2 health check to create.
+        Name of the HTTP2 health check to create.
 
 FLAGS
      --check-interval=CHECK_INTERVAL; default="5s"

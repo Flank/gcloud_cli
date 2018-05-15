@@ -14,11 +14,16 @@
 
 """Test assertions for the sdk_test_base test assertions. We must dig deeper."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.core import config
 import googlecloudsdk.core.util.files as file_utils
 from tests.lib import sdk_test_base
+
+import six
 
 
 class TestRetryDecorator(sdk_test_base.WithOutputCapture):
@@ -50,7 +55,7 @@ class TestRetryDecorator(sdk_test_base.WithOutputCapture):
 
   def testRetryDefaultThrowValueError(self):
     with self.assertRaisesRegex(ValueError, '\'a\', 3'):
-      self.RetryDefaultThrowValueError('a')
+      self.RetryDefaultThrowValueError(b'a' if six.PY2 else 'a')
 
     self.AssertErrContains('WARNING: Test failure, but will be retried.')
     self.AssertErrContains('ValueError: (\'a\', 1)')

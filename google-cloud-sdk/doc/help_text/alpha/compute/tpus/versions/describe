@@ -14,16 +14,16 @@ DESCRIPTION
         $ gcloud alpha compute tpus versions list
 
 POSITIONAL ARGUMENTS
-     VERSION - The Tensorflow version you want to describe. The arguments in
-     this group can be used to specify the attributes of this resource. (NOTE)
-     Some attributes are not given arguments in this group but can be set in
-     other ways. To set the [project] attribute: Set the property
+     Tensorflow version resource - The Tensorflow version you want to describe.
+     The arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This
      must be specified.
 
        VERSION
-          The ID of the tensorflowversion or a fully qualified identifier for
-          the tensorflowversion. This positional must be specified if any of
+          The ID of the tensorflow_version or a fully qualified identifier for
+          the tensorflow_version. This positional must be specified if any of
           the other arguments in this group are specified.
 
        --zone=ZONE

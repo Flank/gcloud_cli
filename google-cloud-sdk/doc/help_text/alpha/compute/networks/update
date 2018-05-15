@@ -13,7 +13,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the network to operate on.
+        Name of the network to operate on.
 
 FLAGS
      At most one of these may be specified:

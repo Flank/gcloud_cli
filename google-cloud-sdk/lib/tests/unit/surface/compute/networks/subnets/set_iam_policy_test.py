@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the networks subnets set-iam-policy subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py import encoding
@@ -54,10 +56,12 @@ class SetIamPolicyTest(test_base.BaseTest):
               resource='resource',
               project='my-project',
               region='region-1',
-              policy=policy))],
+              regionSetPolicyRequest=messages.RegionSetPolicyRequest(
+                  bindings=policy.bindings,
+                  etag=policy.etag)))],
     )
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        self.GetOutput(),
         textwrap.dedent("""\
             bindings:
             - members:

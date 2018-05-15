@@ -14,6 +14,8 @@
 
 """Tests for the remove-interface subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from tests.lib import test_case

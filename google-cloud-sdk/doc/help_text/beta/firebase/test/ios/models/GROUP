@@ -1,0 +1,40 @@
+NAME
+    gcloud beta firebase test ios models - explore iOS models available in the
+        Test Environment catalog
+
+SYNOPSIS
+    gcloud beta firebase test ios models COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Explore iOS models available in the Test Environment catalog.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (BETA) Describe an iOS model.
+
+     list
+        (BETA) List all iOS models available for testing.
+
+EXAMPLES
+    To list all iOS models available for running tests, along with their model
+    names and supported iOS versions, run:
+
+        $ gcloud beta firebase test ios models list
+
+    To view information about a single iOS model, run:
+
+        $ gcloud beta firebase test ios models describe MODEL_ID
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha firebase test ios models
+

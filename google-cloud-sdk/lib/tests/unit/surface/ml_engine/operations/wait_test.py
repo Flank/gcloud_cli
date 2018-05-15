@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ml-engine operations cancel tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
+from six.moves import range
 
 
 class WaitTestBase(object):

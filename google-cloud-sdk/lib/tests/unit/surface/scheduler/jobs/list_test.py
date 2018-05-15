@@ -42,7 +42,7 @@ class JobsListTest(base.SchedulerTestBase):
                                           timeZone='utc'),
           pubsubTarget=pubsub_target,
           appEngineHttpTarget=app_engine_http_target,
-          jobState=self.messages.Job.JobStateValueValuesEnum.ENABLED,
+          state=self.messages.Job.StateValueValuesEnum.ENABLED,
           userUpdateTime='2017-01-01T00:00:00Z'
       )
       jobs.append(job)

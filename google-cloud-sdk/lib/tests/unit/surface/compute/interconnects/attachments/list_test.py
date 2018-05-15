@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the interconnect attachments list subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py.testing import mock
@@ -81,6 +83,8 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         self.apis_messages.InterconnectAttachment(
             name='my-attachment1',
             description='description',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            DEDICATED,
             interconnect='my-interconnect',
             router='my-router',
             region='us-central1',
@@ -88,7 +92,8 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         self.apis_messages.InterconnectAttachment(
             name='my-attachment2',
             description='description',
-            interconnect='my-interconnect',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            PARTNER,
             router='my-router',
             region='us-central1',
             selfLink=self.attachment_ref2.SelfLink())
@@ -96,8 +101,9 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         self.apis_messages.InterconnectAttachment(
             name='my-attachment3',
             description='description',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            PARTNER_PROVIDER,
             interconnect='my-interconnect',
-            router='my-router3',
             region='us-east1',
             selfLink=self.attachment_ref3.SelfLink())
     ])]
@@ -114,10 +120,10 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
           """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-          NAME           REGION      INTERCONNECT    ROUTER
-          my-attachment1 us-central1 my-interconnect my-router
-          my-attachment2 us-central1 my-interconnect my-router
-          my-attachment3 us-east1    my-interconnect my-router3
+          NAME           REGION      TYPE             INTERCONNECT    ROUTER
+          my-attachment1 us-central1 DEDICATED        my-interconnect my-router
+          my-attachment2 us-central1 PARTNER                          my-router
+          my-attachment3 us-east1    PARTNER_PROVIDER my-interconnect
           """),
         normalize_space=True)
     self.AssertErrEquals('')
@@ -178,6 +184,8 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         self.apis_messages.InterconnectAttachment(
             name='my-attachment1',
             description='description',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            DEDICATED,
             interconnect='my-interconnect',
             router='my-router',
             region='us-central1',
@@ -185,7 +193,8 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         self.apis_messages.InterconnectAttachment(
             name='my-attachment2',
             description='description',
-            interconnect='my-interconnect',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            PARTNER,
             router='my-router',
             region='us-central1',
             selfLink=self.attachment_ref2.SelfLink())
@@ -193,7 +202,7 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
     self.client.interconnectAttachments.AggregatedList.Expect(
         self.messages.ComputeInterconnectAttachmentsAggregatedListRequest(
             pageToken=None,
-            filter=u'region eq ".*\\bus\\-central1\\b.*"',
+            filter='region eq ".*\\bus\\-central1\\b.*"',
             project=self.Project(),
         ),
         response=self._GetInterconnectAttachmentAggregatedListResponse(
@@ -204,9 +213,9 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
           """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-          NAME           REGION      INTERCONNECT    ROUTER
-          my-attachment1 us-central1 my-interconnect my-router
-          my-attachment2 us-central1 my-interconnect my-router
+          NAME           REGION      TYPE             INTERCONNECT    ROUTER
+          my-attachment1 us-central1 DEDICATED        my-interconnect my-router
+          my-attachment2 us-central1 PARTNER                          my-router
           """),
         normalize_space=True)
     self.AssertErrEquals('')
@@ -216,6 +225,8 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         self.apis_messages.InterconnectAttachment(
             name='my-attachment1',
             description='description',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            DEDICATED,
             interconnect='my-interconnect',
             router='my-router',
             region='us-central1',
@@ -223,7 +234,8 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         self.apis_messages.InterconnectAttachment(
             name='my-attachment2',
             description='description',
-            interconnect='my-interconnect',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            PARTNER,
             router='my-router',
             region='us-central1',
             selfLink=self.attachment_ref2.SelfLink())
@@ -231,8 +243,9 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         self.apis_messages.InterconnectAttachment(
             name='my-attachment3',
             description='description',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            PARTNER_PROVIDER,
             interconnect='my-interconnect',
-            router='my-router3',
             region='us-east1',
             selfLink=self.attachment_ref3.SelfLink())
     ])]
@@ -243,28 +256,32 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
         ),
         response=self._GetInterconnectAttachmentAggregatedListResponse(
             scoped_interconnect_attachments=scoped_interconnect_attachments,
-            next_page_token=u'1396059067464'))
+            next_page_token='1396059067464'))
 
-    scoped_interconnect_attachments_2 = [('regions/asian-east1', [
+    scoped_interconnect_attachments_2 = [('regions/asia-east1', [
         self.apis_messages.InterconnectAttachment(
             name='my-attachment5',
             description='description',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            DEDICATED,
             interconnect='my-interconnect',
             router='my-router5',
-            region='asian-east1',
+            region='asia-east1',
             selfLink=self.attachment_ref1.SelfLink()),
         self.apis_messages.InterconnectAttachment(
             name='my-attachment6',
             description='description',
+            type=self.apis_messages.InterconnectAttachment.TypeValueValuesEnum.
+            DEDICATED,
             interconnect='my-interconnect',
             router='my-router6',
-            region='asian-east1',
+            region='asia-east1',
             selfLink=self.attachment_ref2.SelfLink())
     ])]
 
     self.client.interconnectAttachments.AggregatedList.Expect(
         self.messages.ComputeInterconnectAttachmentsAggregatedListRequest(
-            pageToken=u'1396059067464',
+            pageToken='1396059067464',
             project=self.Project(),
         ),
         response=self._GetInterconnectAttachmentAggregatedListResponse(
@@ -276,81 +293,15 @@ class InterconnectAttachmentsListTest(sdk_test_base.WithFakeAuth,
           """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-          NAME           REGION      INTERCONNECT    ROUTER
-          my-attachment1 us-central1 my-interconnect my-router
-          my-attachment2 us-central1 my-interconnect my-router
-          my-attachment3 us-east1    my-interconnect my-router3
-          my-attachment5 asian-east1 my-interconnect my-router5
-          my-attachment6 asian-east1 my-interconnect my-router6
+          NAME           REGION      TYPE             INTERCONNECT    ROUTER
+          my-attachment1 us-central1 DEDICATED        my-interconnect my-router
+          my-attachment2 us-central1 PARTNER                          my-router
+          my-attachment3 us-east1    PARTNER_PROVIDER my-interconnect
+          my-attachment5 asia-east1  DEDICATED        my-interconnect my-router5
+          my-attachment6 asia-east1  DEDICATED        my-interconnect my-router6
           """),
         normalize_space=True)
     self.AssertErrEquals('')
-
-
-class InterconnectAttachmentsListBetaTest(InterconnectAttachmentsListTest):
-
-  def Project(self):
-    return 'my-project'
-
-  def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.messages = self.client.MESSAGES_MODULE
-    self.api_version = 'beta'
-    self.apis_messages = core_apis.GetMessagesModule('compute',
-                                                     self.api_version)
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', self.api_version)
-    self.attachment_ref1 = self.resources.Create(
-        'compute.interconnectAttachments',
-        interconnectAttachment='my-attachment1',
-        project=self.Project(),
-        region='us-central1')
-    self.attachment_ref2 = self.resources.Create(
-        'compute.interconnectAttachments',
-        interconnectAttachment='my-attachment2',
-        project=self.Project(),
-        region='us-central1')
-    self.attachment_ref3 = self.resources.Create(
-        'compute.interconnectAttachments',
-        interconnectAttachment='my-attachment3',
-        project=self.Project(),
-        region='us-east1')
-
-
-class InterconnectAttachmentsListAlphaTest(InterconnectAttachmentsListTest):
-
-  def Project(self):
-    return 'my-project'
-
-  def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-    self.messages = self.client.MESSAGES_MODULE
-    self.api_version = 'alpha'
-    self.apis_messages = core_apis.GetMessagesModule('compute',
-                                                     self.api_version)
-    self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', self.api_version)
-    self.attachment_ref1 = self.resources.Create(
-        'compute.interconnectAttachments',
-        interconnectAttachment='my-attachment1',
-        project=self.Project(),
-        region='us-central1')
-    self.attachment_ref2 = self.resources.Create(
-        'compute.interconnectAttachments',
-        interconnectAttachment='my-attachment2',
-        project=self.Project(),
-        region='us-central1')
-    self.attachment_ref3 = self.resources.Create(
-        'compute.interconnectAttachments',
-        interconnectAttachment='my-attachment3',
-        project=self.Project(),
-        region='us-east1')
 
 
 if __name__ == '__main__':

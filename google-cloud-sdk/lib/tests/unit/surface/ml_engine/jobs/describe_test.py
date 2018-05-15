@@ -13,9 +13,12 @@
 # limitations under the License.
 """ml-engine jobs describe tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
+from six.moves import range
 
 
 class DescribeTestBase(object):

@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
     gcloud alpha genomics pipelines run [--command-line=COMMAND_LINE]
         [--cpus=CPUS] [--disk-size=DISK_SIZE]
-        [--docker-image=DOCKER_IMAGE; default="google/cloud-sdk"]
+        [--docker-image=DOCKER_IMAGE; default="google/cloud-sdk:alpine"]
         [--inputs=[NAME=VALUE,...]] [--inputs-from-file=[NAME=FILE,...]]
         [--logging=LOGGING] [--memory=MEMORY] [--outputs=[NAME=VALUE,...]]
         [--preemptible] [--labels=[KEY=VALUE,...]]
@@ -31,7 +31,7 @@ COMMONLY USED FLAGS
         disk name and size. For example: --disk-size "name:size,name2:size2".
         Overrides any values specified in the pipeline-file.
 
-     --docker-image=DOCKER_IMAGE; default="google/cloud-sdk"
+     --docker-image=DOCKER_IMAGE; default="google/cloud-sdk:alpine"
         v2alpha1 only. A docker image to run. Requires --command-line to be
         specified and cannot be used with --pipeline-file.
 

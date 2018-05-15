@@ -103,7 +103,7 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
     self.assertEqual(r.getcode(), 200)
 
   def testDeployNodejs(self):
-    test_app = self._Resource('app_engine_nodejs_data', 'app.yaml')
+    test_app = self._Resource('app_engine_nodejs_flex_data', 'app.yaml')
     self.deployApp(test_app)
 
   def testDeployRuby(self):

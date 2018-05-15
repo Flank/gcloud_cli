@@ -14,6 +14,8 @@
 # limitations under the License.
 """ml-engine models remove-iam-policy-binding tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.ml_engine import models_util
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
@@ -34,7 +36,7 @@ class RemoveIamPolicyBindingUnitTest(base.MlGaPlatformTestBase):
                 role='roles/editor'
             )
         ],
-        etag='abcd'
+        etag=b'abcd'
     )
     self.remove_iam_policy_binding = self.StartObjectPatch(
         models_util, 'RemoveIamPolicyBinding', return_value=self.policy)
@@ -93,13 +95,13 @@ class RemoveIamPolicyBindingIntegrationTest(base.MlGaPlatformTestBase):
             self.msgs.GoogleIamV1Binding(
                 members=['user:email1@gmail.com', 'user:user2@gmail.com'],
                 role='roles/owner')],
-        etag='abcd')
+        etag=b'abcd')
     new_policy = self.msgs.GoogleIamV1Policy(
         bindings=[
             self.msgs.GoogleIamV1Binding(
                 members=['user:email1@gmail.com'],
                 role='roles/owner')],
-        etag='abcd')
+        etag=b'abcd')
     self.client.projects_models.GetIamPolicy.Expect(
         request=self.msgs.MlProjectsModelsGetIamPolicyRequest(
             resource='projects/{}/models/myModel'.format(self.Project())),

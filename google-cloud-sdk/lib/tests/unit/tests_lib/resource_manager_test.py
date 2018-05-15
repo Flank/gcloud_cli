@@ -14,6 +14,9 @@
 
 """Test resource_managers test lib."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import re
 import unittest
 

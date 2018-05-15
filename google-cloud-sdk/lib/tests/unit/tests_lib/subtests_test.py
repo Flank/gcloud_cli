@@ -15,6 +15,9 @@
 
 """Test assertions for the subtests module. We must dig deeper."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import re
 
 from unittest import case
@@ -165,14 +168,14 @@ class SubTestsTest(SubTestsExampleRunner):
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   ['exception'] should not raise ValueError [[exception] means raise an exception] at line {}.
   ['value'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely not the exception message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely not the exception message'] at line {}.
 
 {}/{} subtests failed:
   ['value'] result ['VALUE'] does not match ['error'] at line {}.
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   ['exception'] should not raise ValueError [[exception] means raise an exception] at line {}.
   ['value'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely not the exception message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely not the exception message'] at line {}.
 """.format(*example.GetFailureCountsAndLines())
     actual = '\n'.join(self.actual)
     if expected != actual:
@@ -242,14 +245,14 @@ class SubTestsWithMultipleArgsTest(SubTestsExampleRunner):
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   ['e', 'xception'] should not raise ValueError [[exception] means raise an exception] at line {}.
   ['v', 'alue'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely not the exception message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely not the exception message'] at line {}.
 
 {}/{} subtests failed:
   ['v', 'alue'] result ['VALUE'] does not match ['error'] at line {}.
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   ['e', 'xception'] should not raise ValueError [[exception] means raise an exception] at line {}.
   ['v', 'alue'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely not the exception message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely not the exception message'] at line {}.
 """.format(*example.GetFailureCountsAndLines())
     actual = '\n'.join(self.actual)
     if expected != actual:
@@ -319,14 +322,14 @@ class SubTestsWithMultipleKwargsTest(SubTestsExampleRunner):
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   [arg1='e', arg2='xception'] should not raise ValueError [[exception] means raise an exception] at line {}.
   [arg1='v', arg2='alue'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely not the exception message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely not the exception message'] at line {}.
 
 {}/{} subtests failed:
   [arg1='value', arg2=''] result ['VALUE'] does not match ['error'] at line {}.
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   [arg1='e', arg2='xception'] should not raise ValueError [[exception] means raise an exception] at line {}.
   [arg1='v', arg2='alue'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely not the exception message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely not the exception message'] at line {}.
 """.format(*example.GetFailureCountsAndLines())
     actual = '\n'.join(self.actual)
     if expected != actual:
@@ -397,14 +400,14 @@ class SubTestsWithMultipleArgsKwargsTest(SubTestsExampleRunner):
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   ['e', 'x', arg3='c', arg4='eption'] should not raise ValueError [[exception] means raise an exception] at line {}.
   ['v', 'a', arg3='l', arg4='ue'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely not the exception message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely not the exception message'] at line {}.
 
 {}/{} subtests failed:
   ['v', 'a', arg3='lue', arg4=''] result ['VALUE'] does not match ['error'] at line {}.
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   ['e', 'x', arg3='c', arg4='eption'] should not raise ValueError [[exception] means raise an exception] at line {}.
   ['v', 'a', arg3='l', arg4='ue'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely not the exception message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely not the exception message'] at line {}.
 """.format(*example.GetFailureCountsAndLines())
     actual = '\n'.join(self.actual)
     if expected != actual:
@@ -481,14 +484,14 @@ class SubTestsWithMatchesTest(SubTestsExampleRunner):
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   ['exception'] should not raise ValueError [[exception] means raise an exception] at line {}.
   ['value'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely\\\\ not\\\\ the\\\\ exception\\\\ message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely\\\\ not\\\\ the\\\\ exception\\\\ message'] at line {}.
 
 {}/{} subtests failed:
   ['value'] result ['VALUE'] does not match ['e.*r'] at line {}.
   [FOLLOW_ON_FAIL] extra mismatch at line {}.
   ['exception'] should not raise ValueError [[exception] means raise an exception] at line {}.
   ['value'] should raise an exception at line {}.
-  Exception message [u'[exception] means raise an exception'] does not match [u'definitely\\\\ not\\\\ the\\\\ exception\\\\ message'] at line {}.
+  Exception message ['[exception] means raise an exception'] does not match ['definitely\\\\ not\\\\ the\\\\ exception\\\\ message'] at line {}.
 """.format(*example.GetFailureCountsAndLines())
     actual = '\n'.join(self.actual)
     if expected != actual:

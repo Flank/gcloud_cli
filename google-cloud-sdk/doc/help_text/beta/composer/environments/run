@@ -14,8 +14,8 @@ DESCRIPTION
     code.
 
 POSITIONAL ARGUMENTS
-     ENVIRONMENT - The environment in which to run an Airflow command.. The
-     arguments in this group can be used to specify the attributes of this
+     Environment resource - The environment in which to run an Airflow command.
+     The arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This
@@ -27,7 +27,7 @@ POSITIONAL ARGUMENTS
           arguments in this group are specified.
 
        --location=LOCATION
-          The Cloud location for the environment.
+          Compute Engine zone in which to create the environment.
 
      SUBCOMMAND
         The Airflow CLI subcommand to run. (see

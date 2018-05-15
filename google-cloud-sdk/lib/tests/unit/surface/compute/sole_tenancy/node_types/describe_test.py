@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-types describe subcommand."""
-import textwrap
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
@@ -41,23 +42,21 @@ class NodeTypesDescribeTest(test_base.BaseTest):
               project='my-project',
               zone='zone-1'))],
     )
-    self.assertMultiLineEqual(
-        self.stdout.getvalue(),
-        textwrap.dedent("""\
-            cpuPlatform: '80286'
-            creationTimestamp: '1982-02-01T10:00:00.0Z'
-            deprecated:
-              state: OBSOLETE
-            description: oldie but goodie
-            guestCpus: 1
-            id: '159265359'
-            kind: compute#nodeType
-            localSsdGb: 0
-            memoryMb: 256
-            name: iAPX-286
-            selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/nodeTypes/iAPX-286
-            zone: zone-1
-            """))
+    self.AssertOutputEquals("""\
+    cpuPlatform: '80286'
+    creationTimestamp: '1982-02-01T10:00:00.0Z'
+    deprecated:
+      state: OBSOLETE
+    description: oldie but goodie
+    guestCpus: 1
+    id: '159265359'
+    kind: compute#nodeType
+    localSsdGb: 0
+    memoryMb: 256
+    name: iAPX-286
+    selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/nodeTypes/iAPX-286
+    zone: zone-1
+    """, normalize_space=True)
 
 
 if __name__ == '__main__':

@@ -13,6 +13,8 @@
 # limitations under the License.
 """tpus accelerator-types describe tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -39,11 +41,11 @@ class DescribeTest(base.TpuUnitTestBase):
     self.mock_client.projects_locations_acceleratorTypes.Get.Expect(
         self.messages.TpuProjectsLocationsAcceleratorTypesGetRequest(
             name='{}/acceleratorTypes/{}'.format(
-                location_ref.RelativeName(), 'tpu-v2')),
+                location_ref.RelativeName(), 'v2-8')),
         acc_type)
 
     self.assertEqual(acc_type,
-                     self.Run('compute tpus accelerator-types describe tpu-v2'))
+                     self.Run('compute tpus accelerator-types describe v2-8'))
 
 
 if __name__ == '__main__':

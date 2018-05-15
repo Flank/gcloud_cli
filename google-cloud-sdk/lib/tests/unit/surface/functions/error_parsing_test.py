@@ -14,6 +14,8 @@
 
 """Tests for functions error_parsing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.functions import util
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -26,24 +28,24 @@ class ErrorParsingTest(sdk_test_base.SdkBase):
     error = testutil.CreateTestHttpError(10, 'reason', 'invalid json')
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[invalid json]')
+        'ResponseError: status=[10], code=[reason], message=[invalid json]',
+        result)
 
   def testErrorInvalidJsonWithError(self):
     # Test that 'error' word doesn't break our functions.
     error = testutil.CreateTestHttpError(10, 'reason', 'json error')
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[json error]')
+        'ResponseError: status=[10], code=[reason], message=[json error]',
+        result)
 
   def testErrorWithoutError(self):
     content = '{}'
     error = testutil.CreateTestHttpError(10, 'reason', content)
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[]')
+        'ResponseError: status=[10], code=[reason], message=[]',
+        result)
 
   def testErrorWithStringError(self):
     content = '{"error": "message"}'
@@ -58,24 +60,24 @@ class ErrorParsingTest(sdk_test_base.SdkBase):
     error = testutil.CreateTestHttpError(10, 'reason', content)
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[message]')
+        'ResponseError: status=[10], code=[reason], message=[message]',
+        result)
 
   def testErrorWithStringDetails(self):
     content = '{"error": {"details": "field"}}'
     error = testutil.CreateTestHttpError(10, 'reason', content)
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[]')
+        'ResponseError: status=[10], code=[reason], message=[]',
+        result)
 
   def testErrorWithDetailsWithoutInnerDictionary(self):
     content = '{"error": {"details": {"field": "value"}}}'
     error = testutil.CreateTestHttpError(10, 'reason', content)
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[]')
+        'ResponseError: status=[10], code=[reason], message=[]',
+        result)
 
   def testErrorWithStringViolations(self):
     content = """{"error": {"details":
@@ -83,8 +85,8 @@ class ErrorParsingTest(sdk_test_base.SdkBase):
     error = testutil.CreateTestHttpError(10, 'reason', content)
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[]')
+        'ResponseError: status=[10], code=[reason], message=[]',
+        result)
 
   def testErrorWithViolationsWithoutList(self):
     content = """{"error": {"details":
@@ -92,8 +94,8 @@ class ErrorParsingTest(sdk_test_base.SdkBase):
     error = testutil.CreateTestHttpError(10, 'reason', content)
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[]')
+        'ResponseError: status=[10], code=[reason], message=[]',
+        result)
 
   def testErrorWithViolationsWithoutDescription(self):
     content = """{"error": {"details":
@@ -101,8 +103,8 @@ class ErrorParsingTest(sdk_test_base.SdkBase):
     error = testutil.CreateTestHttpError(10, 'reason', content)
     result = util.GetHttpErrorMessage(error)
     self.assertEqual(
-        result,
-        'ResponseError: status=[10], code=[reason], message=[]')
+        'ResponseError: status=[10], code=[reason], message=[]',
+        result)
 
   def testErrorSuccessful(self):
     content = """{"error": {"details":

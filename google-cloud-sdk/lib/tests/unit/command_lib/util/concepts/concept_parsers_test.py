@@ -672,59 +672,52 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
                      help_text)
 
   @parameterized.named_parameters(
-      ('Flag', '--a-book'),
-      ('Positional', 'A_BOOK'))
-  def testTitle(self, name):
-    """Tests that the presentation spec generates group help correctly."""
+      ('lowercase', 'book', 'Book'),
+      ('uppercase', 'BOOK', 'BOOK'),
+      ('multiword', 'project_book', 'Project book'))
+  def testTitle(self, resource_name, expected_title):
+    """Tests that the presentation spec generates the title correctly."""
+    resource_spec = concepts_util.GetBookResource(resource_name=resource_name)
     presentation_spec = concept_parsers.ResourcePresentationSpec(
-        name,
-        self.resource_spec,
+        '--a-book',
+        resource_spec,
         'The book to act upon.',
         flag_name_overrides={'project': '--book-project'})
-    self.assertEqual('A BOOK', presentation_spec.title)
+    self.assertEqual(expected_title, presentation_spec.title)
 
-  @parameterized.named_parameters(
-      ('Flag', '--a-book'),
-      ('Positional', 'A_BOOK'))
-  def testGroupHelp(self, name):
+  def testGroupHelp(self):
     """Tests that the presentation spec generates group help correctly."""
     presentation_spec = concept_parsers.ResourcePresentationSpec(
-        name,
+        '--a-book',
         self.resource_spec,
         'The book to act upon.',
         flag_name_overrides={'project': '--book-project'})
-    expected = ('A BOOK - The book to act upon. The arguments in this group '
-                'can be used to specify the attributes of this resource.')
+    expected = ('Book resource - The book to act upon. The arguments in this '
+                'group can be used to specify the attributes of this resource.')
     self.assertEqual(expected, presentation_spec.GetGroupHelp())
 
-  @parameterized.named_parameters(
-      ('Flag', '--a-book'),
-      ('Positional', 'A_BOOK'))
-  def testGroupHelpSkippedFlags(self, name):
+  def testGroupHelpSkippedFlags(self):
     """Tests presentation spec group help when flags are skipped."""
     presentation_spec = concept_parsers.ResourcePresentationSpec(
-        name,
+        '--a-book',
         self.resource_spec,
         'The book to act upon.')
-    expected = ('A BOOK - The book to act upon. The arguments in this group '
-                'can be used to specify the attributes of this resource. '
+    expected = ('Book resource - The book to act upon. The arguments in this '
+                'group can be used to specify the attributes of this resource. '
                 '(NOTE) Some attributes are not given arguments in this group '
                 'but can be set in other ways. To set the [project] attribute: '
                 'Set the property [core/project] or provide the flag '
                 '[--project] on the command line.')
     self.assertEqual(expected, presentation_spec.GetGroupHelp())
 
-  @parameterized.named_parameters(
-      ('Flag', '--a-book'),
-      ('Positional', 'A_BOOK'))
-  def testGroupHelpSingleArg(self, name):
+  def testGroupHelpSingleArg(self):
     """Tests presentation spec group help when flags are skipped."""
     presentation_spec = concept_parsers.ResourcePresentationSpec(
-        name,
+        '--a-book',
         self.resource_spec,
         'The book to act upon.',
         flag_name_overrides={'project': '', 'shelf': ''})
-    expected = ('A BOOK - The book to act upon. This represents a Cloud '
+    expected = ('Book resource - The book to act upon. This represents a Cloud '
                 'resource. (NOTE) Some attributes are not given arguments in '
                 'this group but can be set in other ways. To set the [project] '
                 'attribute: Set the property [core/project] or provide the '

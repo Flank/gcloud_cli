@@ -14,6 +14,8 @@
 
 """Tests for projects set-iam-policy."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from apitools.base.py.testing import mock

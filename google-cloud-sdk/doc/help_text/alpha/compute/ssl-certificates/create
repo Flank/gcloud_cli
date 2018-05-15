@@ -22,7 +22,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the SSL certificate to create.
+        Name of the SSL certificate to create.
 
 REQUIRED FLAGS
      Flags for managed or self-managed certificate. Exactly one of these must

@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the addresses list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.addresses import flags
 from googlecloudsdk.core.resource import resource_projector
@@ -25,14 +26,12 @@ from tests.lib.surface.compute import test_resources
 
 import mock
 
-messages = core_apis.GetMessagesModule('compute', 'v1')
-
 
 class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
   def SetUp(self):
     list_json_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
+        'googlecloudsdk.api_lib.compute.request_helper.ListJson')
     self.addCleanup(list_json_patcher.stop)
     self.list_json = list_json_patcher.start()
 
@@ -163,9 +162,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     ]
     self.Run(command)
     self.list_json.assert_called_once_with(
-        requests=[(self.compute_v1.globalAddresses,
-                   'List',
-                   messages.ComputeGlobalAddressesListRequest(
+        requests=[(self.compute.globalAddresses, 'List',
+                   self.messages.ComputeGlobalAddressesListRequest(
                        project='my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
@@ -180,9 +178,8 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     self.Run(command)
 
     self.list_json.assert_called_once_with(
-        requests=[(self.compute_v1.addresses,
-                   'AggregatedList',
-                   messages.ComputeAddressesAggregatedListRequest(
+        requests=[(self.compute.addresses, 'AggregatedList',
+                   self.messages.ComputeAddressesAggregatedListRequest(
                        project='my-project'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
@@ -196,11 +193,9 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     ]
     self.Run(command)
     self.list_json.assert_called_once_with(
-        requests=[(self.compute_v1.addresses,
-                   'List',
-                   messages.ComputeAddressesListRequest(
-                       project='my-project',
-                       region='region-1'))],
+        requests=[(self.compute.addresses, 'List',
+                   self.messages.ComputeAddressesListRequest(
+                       project='my-project', region='region-1'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])
@@ -213,16 +208,12 @@ class AddressesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     ]
     self.Run(command)
     self.list_json.assert_called_once_with(
-        requests=[(self.compute_v1.addresses,
-                   'List',
-                   messages.ComputeAddressesListRequest(
-                       project='my-project',
-                       region='region-1')),
-                  (self.compute_v1.addresses,
-                   'List',
-                   messages.ComputeAddressesListRequest(
-                       project='my-project',
-                       region='region-2'))],
+        requests=[(self.compute.addresses, 'List',
+                   self.messages.ComputeAddressesListRequest(
+                       project='my-project', region='region-1')),
+                  (self.compute.addresses, 'List',
+                   self.messages.ComputeAddressesListRequest(
+                       project='my-project', region='region-2'))],
         http=self.mock_http(),
         batch_url=self.batch_url,
         errors=[])

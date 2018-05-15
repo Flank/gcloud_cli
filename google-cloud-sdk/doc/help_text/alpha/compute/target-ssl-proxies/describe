@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the target SSL proxy to describe.
+        Name of the target SSL proxy to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

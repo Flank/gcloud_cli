@@ -34,7 +34,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the instance group to operate on.
+        Name of the instance group to operate on.
 
 FLAGS
      --regexp=REGEXP, -r REGEXP

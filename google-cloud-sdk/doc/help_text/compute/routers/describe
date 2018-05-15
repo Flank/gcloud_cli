@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the router to describe.
+        Name of the router to describe.
 
 FLAGS
      --region=REGION

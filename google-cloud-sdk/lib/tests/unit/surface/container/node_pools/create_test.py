@@ -630,6 +630,9 @@ class CreateTestGAOnly(CreateTestGA):
 class CreateTestBetaV1API(base.BetaTestBase, CreateTestGA):
   """gcloud Beta track using container v1 API."""
 
+  def SetUp(self):
+    properties.VALUES.container.use_v1_api.Set(True)
+
   def testCreateMinCpuPlatform(self):
     self.assertIsNone(
         c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,

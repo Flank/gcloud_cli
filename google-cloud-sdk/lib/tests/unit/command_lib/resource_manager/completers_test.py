@@ -14,6 +14,8 @@
 
 """Tests for the IAM completers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.resource_manager import completers
 from tests.lib import completer_test_base
 from tests.lib import completer_test_data
@@ -42,13 +44,13 @@ class OrganizationCompleterTest(testbase.OrganizationsUnitTestBase,
   messages = testbase.OrganizationsUnitTestBase.messages
 
   TEST_ORG_1 = messages.Organization(
-      name=u'organizations/298357488294',
-      displayName=u'Test Organization For Testing',
-      owner=messages.OrganizationOwner(directoryCustomerId=u'C0123n456'))
+      name='organizations/298357488294',
+      displayName='Test Organization For Testing',
+      owner=messages.OrganizationOwner(directoryCustomerId='C0123n456'))
   TEST_ORG_2 = messages.Organization(
-      name=u'organizations/309468599305',
-      displayName=u'A Secondary Organization',
-      owner=messages.OrganizationOwner(directoryCustomerId=u'C9876n543'))
+      name='organizations/309468599305',
+      displayName='A Secondary Organization',
+      owner=messages.OrganizationOwner(directoryCustomerId='C9876n543'))
 
   def testOrganizationCompleter(self):
     self.mock_client.organizations.Search.Expect(

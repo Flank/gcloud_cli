@@ -16,8 +16,8 @@ DESCRIPTION
     services set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     SERVICE - The service for which to display the IAM policy. This represents
-     a Cloud resource. This must be specified.
+     Service resource - The service for which to display the IAM policy. This
+     represents a Cloud resource. This must be specified.
 
        SERVICE
           The ID of the service or a fully qualified identifier for the

@@ -14,6 +14,11 @@
 
 """Unit tests for endpoints add-iam-policy-binding command."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+import base64
+
 from googlecloudsdk.api_lib.endpoints import services_util
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -29,8 +34,8 @@ class EndpointsAddIamPolicyBindingTest(unit_test_base.EV1UnitTestBase):
 
   def PreSetUp(self):
     self.access_policy_msg = self.services_messages.Policy
-    self.etag = 'test_etag'
-    self.encoded_etag = self.etag.encode('base64').strip()
+    self.etag = b'test_etag'
+    self.encoded_etag = base64.b64encode(self.etag).strip()
     self.consumer_role = 'roles/servicemanagement.serviceConsumer'
 
   def testAddUserToService(self):

@@ -185,7 +185,7 @@ class SdkBase(test_case.Base):
     elif hasattr(self, 'dirs_size_limit_class'):
       size_limit = getattr(self, '_dirs_size_limit_class')
     else:
-      size_limit = 1<<20  # 1MB default
+      size_limit = 2<<20  # 2MB default
     self.assertLess(size, size_limit)
 
     # Remove the root directory and its contents

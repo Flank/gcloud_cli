@@ -14,6 +14,9 @@
 
 """Unit tests for endpoints operations wait command."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.endpoints import exceptions
 from tests.lib import test_case
 from tests.lib.surface.endpoints import unit_test_base

@@ -14,6 +14,8 @@
 """Tests for surface.runtime_config.configs.describe.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.runtime_config import util
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case

@@ -371,6 +371,14 @@ List the URIs for all compute instances:
 $ gcloud compute instances list \-\-format='value(uri())'
 .RE
 
+List all compute instances with their creation timestamps displayed according to
+the local timezone:
+
+.RS 2m
+$ gcloud compute instances list \e
+    \-\-format="table(name,creationTimestamp.date(tz=LOCAL))"
+.RE
+
 List the project authenticated user email address:
 
 .RS 2m

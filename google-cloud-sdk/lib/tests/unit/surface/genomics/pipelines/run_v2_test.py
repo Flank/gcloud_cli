@@ -99,7 +99,7 @@ PIPELINE_CLI_OBJECT = messages.RunPipelineRequest(
     pipeline=messages.Pipeline(
         actions=[
             messages.Action(
-                imageUri='google/cloud-sdk',
+                imageUri='google/cloud-sdk:alpine',
                 commands=['/bin/sh', '-c',
                           'gsutil -q cp gs://bucket/in ${in}'],
                 mounts=[messages.Mount(
@@ -107,19 +107,20 @@ PIPELINE_CLI_OBJECT = messages.RunPipelineRequest(
                     path='/gcloud-shared')]),
             messages.Action(
                 imageUri='bash',
-                commands=['/bin/sh', '-c', 'cp ${in} ${out}'],
+                commands=['-c', 'cp ${in} ${out}'],
+                entrypoint='bash',
                 mounts=[messages.Mount(
                     disk='gcloud-shared',
                     path='/gcloud-shared')]),
             messages.Action(
-                imageUri='google/cloud-sdk',
+                imageUri='google/cloud-sdk:alpine',
                 commands=['/bin/sh', '-c',
                           'gsutil -q cp ${out} gs://bucket/out'],
                 mounts=[messages.Mount(
                     disk='gcloud-shared',
                     path='/gcloud-shared')]),
             messages.Action(
-                imageUri='google/cloud-sdk',
+                imageUri='google/cloud-sdk:alpine',
                 commands=[
                     '/bin/sh', '-c',
                     'gsutil -q cp /google/logs/output gs://bucket/'],
@@ -265,6 +266,17 @@ class RunTest(base.GenomicsUnitTest):
     self._runFileTest(request, PIPELINE_MINIMAL_JSON, [
         '--service-account-email', 'test@google.com',
         '--service-account-scopes', 'https://www.googleapis.com/auth/compute'])
+
+  def testPipelinesRun_Logging(self):
+    request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
+    request.pipeline.actions.append(messages.Action(
+        imageUri='google/cloud-sdk:alpine',
+        commands=[
+            '/bin/sh', '-c',
+            'gsutil -q cp /google/logs/output gs://bucket/'],
+        flags=[messages.Action.FlagsValueListEntryValuesEnum.ALWAYS_RUN]))
+    self._runFileTest(request, PIPELINE_MINIMAL_JSON,
+                      ['--logging', 'gs://bucket/'])
 
   def testPipelinesRun_Inputs(self):
     self._runFileTest(PIPELINE_INPUT_OBJECT, PIPELINE_MINIMAL_JSON,

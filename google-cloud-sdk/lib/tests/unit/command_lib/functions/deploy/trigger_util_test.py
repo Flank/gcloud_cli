@@ -14,6 +14,8 @@
 
 """Test of the functions surface deploy.trigger_util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.functions import triggers
 from googlecloudsdk.command_lib.functions.deploy import trigger_util
 from googlecloudsdk.core import exceptions
@@ -64,7 +66,7 @@ class TriggerUtilTest(sdk_test_base.SdkBase):
 
   def testCheckArgsInternalErrorFalseNegative(self):
     # get some content
-    args = self._ProviderEventGenerator().next()
+    args = next(self._ProviderEventGenerator())
     # mock
     copy = triggers.INPUT_TRIGGER_PROVIDER_REGISTRY.providers
     try:

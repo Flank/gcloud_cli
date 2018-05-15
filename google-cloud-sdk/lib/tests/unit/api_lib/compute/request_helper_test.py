@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Unit tests for the request_helper module."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from googlecloudsdk.api_lib.compute import request_helper
 from googlecloudsdk.api_lib.compute import waiters
@@ -1102,7 +1104,8 @@ class ListJsonTests(test_case.TestCase):
         errors=errors)
 
     self.assertEqual(
-        sorted(list(res)), resource_projector.MakeSerializable(items))
+        set(instance['name'] for instance in res),
+        set(instance.name for instance in items))
     self.assertFalse(errors)
     self.batch_helper.assert_called_once_with(
         requests=[(self.compute_v1.instances,

@@ -11,7 +11,7 @@ gcloud beta compute tpus start \- start a Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute tpus start\fR (\fITPU_ID\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute tpus start\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,15 +26,15 @@ gcloud beta compute tpus start \- start a Cloud TPU
 .RS 2m
 .TP 2m
 
-TPU ID \- The Cloud TPU to start. The arguments in this group can be used to
-specify the attributes of this resource. (NOTE) Some attributes are not given
+Tpu resource \- The Cloud TPU to start. The arguments in this group can be used
+to specify the attributes of this resource. (NOTE) Some attributes are not given
 arguments in this group but can be set in other ways. To set the [project]
 attribute: Set the property [core/project] or provide the flag [\-\-project] on
 the command line. This must be specified.
 
 .RS 2m
 .TP 2m
-\fITPU_ID\fR
+\fITPU\fR
 The ID of the tpu or a fully qualified identifier for the tpu. This positional
 must be specified if any of the other arguments in this group are specified.
 

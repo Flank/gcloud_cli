@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for command_lib.app.build."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.app import build
 from tests.lib import sdk_test_base
 from tests.lib.api_lib.util import build_base

@@ -6,6 +6,8 @@ type-instr:
 type-robo:
   type: robo
 
+type-xctest:
+  type: xctest
 
 # Invalid test type args
 

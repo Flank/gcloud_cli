@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the interconnects describe subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis

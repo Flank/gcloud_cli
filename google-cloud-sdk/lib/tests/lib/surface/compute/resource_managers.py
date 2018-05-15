@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Utils for creating and cleaning up resources."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import traceback
 
 from googlecloudsdk.core import exceptions
@@ -103,7 +105,7 @@ class SoleTenancyHost(object):
     return self._zone
 
   def __enter__(self):
-    self._name = self._name_generator.next()
+    self._name = next(self._name_generator)
     self._run("""\
         compute sole-tenancy hosts create {}
         --host-type {}
@@ -119,13 +121,10 @@ class SoleTenancyHost(object):
     except:  # pylint: disable=bare-except
       if not prev_exc_type:
         raise
-      message = (
-          u'Got exception {0}'
-          u'while another exception was active {1} [{2}]'
-          .format(
-              encoding.Decode(traceback.format_exc()),
-              prev_exc_type,
-              encoding.Decode(prev_exc_val)))
+      message = ('Got exception {0}'
+                 'while another exception was active {1} [{2}]'.format(
+                     encoding.Decode(traceback.format_exc()), prev_exc_type,
+                     encoding.Decode(prev_exc_val)))
       exceptions.reraise(prev_exc_type(message), tb=prev_exc_trace)
     # always return False so any exceptions will be re-raised
     return False

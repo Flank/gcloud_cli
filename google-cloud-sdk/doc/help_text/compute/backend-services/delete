@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME [BACKEND_SERVICE_NAME ...]
-        The names of the backend services to delete.
+        Names of the backend services to delete.
 
 FLAGS
      At most one of these may be specified:

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Unit tests for the lister module."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.api_lib.compute import lister
@@ -22,6 +24,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import utils
 import mock
+import six
 
 
 COMPUTE_V1_MESSAGES = apis.GetMessagesModule('compute', 'v1')
@@ -68,7 +71,7 @@ class MockDisplayInfo(object):
 class MockArgs(object):
 
   def __init__(self, **kwargs):
-    for name, value in kwargs.iteritems():
+    for name, value in six.iteritems(kwargs):
       setattr(self, name, value)
 
   def __contains__(self, item):
@@ -952,9 +955,10 @@ class RegionalListerTests(cli_test_base.CliTestBase):
 
   def testRepr(self):
     regional_lister = lister.RegionalLister('client', 'service')
-
-    self.assertEqual(
-        repr(regional_lister), "RegionalLister('client', 'service')")
+    # Python 2: u"RegionalLister(u'client', u'service')"
+    # Python 3: "RegionalLister('client', 'service')"
+    expected = 'RegionalLister({}, {})'.format(repr('client'), repr('service'))
+    self.assertEqual(repr(regional_lister), expected)
 
   def testEq(self):
     client = object()
@@ -1063,8 +1067,10 @@ class GlobalListerTests(cli_test_base.CliTestBase):
 
   def testRepr(self):
     global_lister = lister.GlobalLister('client', 'service')
-
-    self.assertEqual(repr(global_lister), "GlobalLister('client', 'service')")
+    # Python 2: u"GlobalLister(u'client', u'service')"
+    # Python 3: "GlobalLister('client', 'service')"
+    expected = 'GlobalLister({}, {})'.format(repr('client'), repr('service'))
+    self.assertEqual(repr(global_lister), expected)
 
   def testEq(self):
     client = object()
@@ -1132,11 +1138,14 @@ class MultiScopeListerTests(cli_test_base.CliTestBase):
     multi_scope_lister = lister.MultiScopeLister(
         'client', 'zonal_service', 'regional_service', 'global_service',
         'aggregation_service')
-
-    self.assertEqual(
-        repr(multi_scope_lister),
-        "MultiScopeLister('client', 'zonal_service', 'regional_service', "
-        "'global_service', 'aggregation_service')")
+    # Python 2: u"MultiScopeLister(u'client', u'zonal_service',
+    #   u'regional_service', u'global_service', u'aggregation_service')"
+    # Python 3: "MultiScopeLister('client', 'zonal_service','regional_service',
+    #  'global_service', 'aggregation_service')"
+    expected = 'MultiScopeLister({}, {}, {}, {}, {})'.format(
+        repr('client'), repr('zonal_service'), repr('regional_service'),
+        repr('global_service'), repr('aggregation_service'))
+    self.assertEqual(repr(multi_scope_lister), expected)
 
   def testEq(self):
     client = object()
@@ -1287,10 +1296,11 @@ class ZonalParallelListerTests(test_base.BaseTest):
 
   def testRepr(self):
     zonal_lister = lister.ZonalParallelLister('client', 'service', 'resources')
-
-    self.assertEqual(
-        repr(zonal_lister),
-        "ZonalParallelLister('client', 'service', 'resources')")
+    # Python 2: u"ZonalParallelLister(u'client', u'service', u'resources')"
+    # Python 3: "ZonalParallelLister('client', 'service', 'resources')"
+    expected = 'ZonalParallelLister({}, {}, {})'.format(
+        repr('client'), repr('service'), repr('resources'))
+    self.assertEqual(repr(zonal_lister), expected)
 
   def testEq(self):
     client = object()

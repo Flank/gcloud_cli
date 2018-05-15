@@ -3,20 +3,19 @@ NAME
         location
 
 SYNOPSIS
-    gcloud alpha ml-engine locations describe LOCATION_ID
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha ml-engine locations describe LOCATION [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Display CMLE capabilities in a location.
 
 POSITIONAL ARGUMENTS
-     LOCATION ID - The location you want to show details for. This represents a
-     Cloud resource. (NOTE) Some attributes are not given arguments in this
-     group but can be set in other ways. To set the [project] attribute: Set
-     the property [core/project] or provide the flag [--project] on the command
-     line. This must be specified.
+     Location resource - The location you want to show details for. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
 
-       LOCATION_ID
+       LOCATION
           The ID of the location or a fully qualified identifier for the
           location.
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Common component for forwarding rules update testing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.compute import test_base
 

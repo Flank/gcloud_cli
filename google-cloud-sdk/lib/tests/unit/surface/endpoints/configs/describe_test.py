@@ -14,6 +14,9 @@
 
 """Unit tests for endpoints configs describe command."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import parser_errors
 from tests.lib import test_case
 from tests.lib.surface.endpoints import unit_test_base

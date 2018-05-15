@@ -94,23 +94,6 @@ class SetIamPolicy(base.CloudIotBase):
     self.assertEqual(result, policy)
     self.AssertLogContains('Updated IAM policy for registry [my-registry].')
 
-  def testSetIamPolicyWithServiceAccount(self, track):
-    self.track = track
-    policy, in_file = self._CreatePolicyAndFile()
-
-    self.client.projects_locations_registries.SetIamPolicy.Expect(
-        request=
-        self.messages.CloudiotProjectsLocationsRegistriesSetIamPolicyRequest(
-            resource='projects/{}/locations/us-central1/registries/{}'.format(
-                self.Project(), 'my-registry'),
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=policy)),
-        response=policy)
-
-    self.Run('iot registries set-iam-policy my-registry --region us-central1 '
-             '{0} --account test@test-project.iam.gserviceaccount.com'
-             .format(in_file))
-
   def testSetIamPolicyYaml(self, track):
     self.track = track
     policy = self.messages.Policy(

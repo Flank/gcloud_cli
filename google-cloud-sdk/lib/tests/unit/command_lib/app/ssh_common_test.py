@@ -14,7 +14,7 @@
 
 from __future__ import absolute_import
 from googlecloudsdk.api_lib.app import appengine_api_client
-from googlecloudsdk.api_lib.app import util
+from googlecloudsdk.api_lib.app import env
 from googlecloudsdk.command_lib.app import exceptions as command_exceptions
 from googlecloudsdk.command_lib.app import ssh_common
 from googlecloudsdk.command_lib.util.ssh import ssh
@@ -44,16 +44,16 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
         ssh.Remote('127.0.0.1', user='me'), self.options)
 
   def _ExpectGetVersionCall(self, service, version, exception=None,
-                            environment=util.Environment.FLEX):
+                            environment=env.FLEX):
     name = self._FormatVersion(service, version)
     response = self.messages.Version(name=name,
                                      createTime='2016-01-01T12:00:00.000Z',
                                      createdBy='user@gmail.com',
                                      id='version1',
                                      runtime='intercal')
-    if environment is util.Environment.FLEX:
+    if environment is env.FLEX:
       response.env = 'flexible'
-    elif environment is util.Environment.MANAGED_VMS:
+    elif environment is env.MANAGED_VMS:
       response.vm = True
     self.mocked_client.apps_services_versions.Get.Expect(
         request=self.messages.AppengineAppsServicesVersionsGetRequest(
@@ -121,7 +121,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
   def testPopulateKeyManagedVMs(self):
     """Fail while trying Managed VMs instance."""
     self._ExpectGetVersionCall('default', 'v1',
-                               environment=util.Environment.MANAGED_VMS)
+                               environment=env.MANAGED_VMS)
     with self.AssertRaisesExceptionMatches(
         command_exceptions.InvalidInstanceTypeError,
         'Managed VMs instances do not support this operation'):
@@ -131,7 +131,7 @@ class KeyPopulateTest(instances_base.InstancesTestBase):
   def testPopulateKeyStandard(self):
     """Fail while trying standard instance."""
     self._ExpectGetVersionCall('default', 'v1',
-                               environment=util.Environment.STANDARD)
+                               environment=env.STANDARD)
     with self.AssertRaisesExceptionMatches(
         command_exceptions.InvalidInstanceTypeError,
         'Standard instances do not support this operation'):

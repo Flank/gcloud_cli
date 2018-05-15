@@ -1,0 +1,89 @@
+name: my scenario
+commands:
+- command: iot registries create my-registry --region us-central1
+  events:
+  - request:
+      uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries?alt=json
+      method: POST
+      body:
+        json:
+          httpConfig:
+            httpEnabledState: HTTP_ENABLED
+          id: my-registry
+          mqttConfig:
+            mqttEnabledState: MQTT_ENABLED
+      response_id: 1
+  - stderr: |
+      Created registry [my-registry].
+  - exit_code: 0
+
+- command: iot registries describe my-registry --region us-central1
+  events:
+  - request:
+      uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/my-registry?alt=json
+      method: GET
+      body:
+        json:
+      response_id: 2
+  - stdout: "name: projects/fake-project/locations/us-central1/registries/my-registry\n"
+  - exit_code: 0
+
+- command: iot registries list --region us-central1
+  events:
+  - request:
+      uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries?alt=json
+      method: GET
+      body:
+        json:
+      response_id: 3
+  - stdout: |
+      ID             LOCATION     MQTT_ENABLED
+      my-registry-1  us-central1
+      my-registry-2  us-central1
+      my-registry-3  us-central1
+      my-registry-4  us-central1
+      my-registry-5  us-central1
+  - exit_code: 0
+
+- command: iot registries delete my-registry --region us-central1
+  events:
+  - stderr: "You are about to delete registry [my-registry]\n\nDo you want to continue\
+      \ (Y/n)?  "
+  - stdin:
+    - y
+  - stderr: "\n"
+  - request:
+      uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/my-registry?alt=json
+      method: DELETE
+      body:
+        json:
+      response_id: 4
+  - stderr: |
+      Deleted registry [my-registry].
+  - exit_code: 0
+
+
+responses:
+  1:
+    headers:
+      status: '200'
+    body:
+  2:
+    headers:
+      status: '200'
+    body:
+      name: projects/fake-project/locations/us-central1/registries/my-registry
+  3:
+    headers:
+      status: '200'
+    body:
+      deviceRegistries:
+      - name: projects/fake-project/locations/us-central1/registries/my-registry-1
+      - name: projects/fake-project/locations/us-central1/registries/my-registry-2
+      - name: projects/fake-project/locations/us-central1/registries/my-registry-3
+      - name: projects/fake-project/locations/us-central1/registries/my-registry-4
+      - name: projects/fake-project/locations/us-central1/registries/my-registry-5
+  4:
+    headers:
+      status: '200'
+    body:

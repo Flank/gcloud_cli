@@ -14,6 +14,8 @@
 
 """Base class for all Functions commands tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions
 import httplib2
 
@@ -23,4 +25,6 @@ def CreateTestHttpError(status, reason, body=None, url=None):
     body = ''
   response = httplib2.Response({
       'status': status, 'reason': reason})
+  response.status = status
+  response.reason = reason
   return exceptions.HttpError(response, body, url)

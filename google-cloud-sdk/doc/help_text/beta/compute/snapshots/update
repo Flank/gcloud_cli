@@ -27,7 +27,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      SNAPSHOT_NAME
-        The name of the snapshot to update.
+        Name of the snapshot to update.
 
 FLAGS
      --update-labels=[KEY=VALUE,...]

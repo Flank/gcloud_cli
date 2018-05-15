@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for surface.runtime_config.configs.variables.describe."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.runtime_config import base
@@ -28,7 +30,7 @@ class VariablesGetValueTest(base.RuntimeConfigTestBase):
     wanted_result = self.messages.Variable(
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1\nvalue2',
+        value=b'value1\nvalue2',
     )
 
     self.variable_client.Get.Expect(request, wanted_result)
@@ -66,7 +68,7 @@ class VariablesGetValueTest(base.RuntimeConfigTestBase):
     wanted_result = self.messages.Variable(
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1\nvalue2',
+        value=b'value1\nvalue2',
     )
 
     self.variable_client.Get.Expect(request, wanted_result)

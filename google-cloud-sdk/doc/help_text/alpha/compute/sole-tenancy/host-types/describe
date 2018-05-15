@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the host type to describe.
+        Name of the host type to describe.
 
 FLAGS
      --zone=ZONE

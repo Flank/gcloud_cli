@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import itertools
 
-from apitools.base.py.testing import mock
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.util.apis import arg_marshalling
 from googlecloudsdk.command_lib.util.apis import registry
@@ -31,6 +30,7 @@ from tests.lib.calliope import util as calliope_util
 from tests.lib.command_lib.util.apis import base
 
 import mock
+import six
 
 
 def CheckArgs(args):
@@ -58,7 +58,7 @@ def CheckArgs(args):
 
 
 def MakeResource(collection='foo.projects.instances', attributes=None,
-                 is_positional=True, removed_flags=None):
+                 is_positional=True, removed_flags=None, arg_name=None):
   attributes = attributes if attributes is not None else ['instance']
   return resource_arg_schema.YAMLResourceArgument(
       {'name': attributes[-1] if attributes else 'UNKNOWN',
@@ -73,6 +73,7 @@ def MakeResource(collection='foo.projects.instances', attributes=None,
       'gh',
       is_positional=is_positional,
       removed_flags=removed_flags,
+      arg_name=arg_name
   )
 
 
@@ -109,6 +110,38 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
         args['instance'].kwargs['help'],
         'The ID of the instance or a fully qualified identifier for the '
         'instance.')
+
+    # Make sure positional override works.
+    gen = arg_marshalling.DeclarativeArgumentGenerator(
+        method, [], MakeResource(is_positional=False))
+    parser, args = CheckArgs(gen.GenerateArgs())
+    six.assertCountEqual(self, ('--instance',), args)
+    self.assertEqual(
+        args['--instance'].kwargs['help'],
+        'The ID of the instance or a fully qualified identifier for the '
+        'instance.')
+
+    namespace = parser.parse_args(['--instance=i'])
+    properties.VALUES.core.project.Set('p')
+    req = gen.CreateRequest(namespace)
+    if is_atomic:
+      self.assertEqual('projects/p/instances/i', req.name)
+    else:
+      self.assertEqual('p', req.projectsId)
+      self.assertEqual('i', req.instancesId)
+
+  @parameterized.parameters(True, False)
+  def testGenerateGetWithArgNameOverride(self, is_atomic):
+    self.MockGetListCreateMethods(('foo.projects.instances', is_atomic))
+    method = registry.GetMethod('foo.projects.instances', 'get')
+    gen = arg_marshalling.DeclarativeArgumentGenerator(
+        method, [], MakeResource(arg_name='new_instance'))
+    (_, args) = CheckArgs(gen.GenerateArgs())
+    six.assertCountEqual(self, ('new_instance',), args)
+    self.assertEqual(
+        args['new_instance'].kwargs['help'],
+        'The ID of the new_instance or a fully qualified identifier for the '
+        'new_instance.')
 
     # Make sure positional override works.
     gen = arg_marshalling.DeclarativeArgumentGenerator(

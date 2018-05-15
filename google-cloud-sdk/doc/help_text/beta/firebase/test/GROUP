@@ -20,6 +20,9 @@ GROUPS
      android
         (BETA) Command group for Android application testing.
 
+     ios
+        (BETA) Command group for iOS application testing.
+
      network-profiles
         (BETA) Explore network profiles available for testing.
 

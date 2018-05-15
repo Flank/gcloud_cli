@@ -41,7 +41,7 @@ class AddIamPolicyBindingTest(test_base.BaseTest, test_case.WithOutputCapture):
         compute instances add-iam-policy-binding resource --zone zone-1
         --member user:testuser@google.com --role owner
         """)
-
+    policy = test_resources.AlphaIamPolicyWithOneBinding()
     self.CheckRequests(
         [(self.compute.instances,
           'GetIamPolicy',
@@ -55,7 +55,9 @@ class AddIamPolicyBindingTest(test_base.BaseTest, test_case.WithOutputCapture):
               resource='resource',
               project='my-project',
               zone='zone-1',
-              policy=test_resources.AlphaIamPolicyWithOneBinding())),
+              zoneSetPolicyRequest=messages.ZoneSetPolicyRequest(
+                  bindings=policy.bindings,
+                  etag=policy.etag))),
         ]
     )
 

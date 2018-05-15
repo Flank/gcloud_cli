@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy hosts describe subcommand."""
-import textwrap
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
@@ -42,20 +43,18 @@ class HostsDescribeTest(test_base.BaseTest):
               project='my-project',
               zone='zone-1'))],
     )
-    self.assertMultiLineEqual(
-        self.stdout.getvalue(),
-        textwrap.dedent("""\
-            description: Host 1
-            hostType: n1-host-64-208
-            instances:
-            - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-1
-            - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-2
-            name: host-1
-            selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/hosts/host-1
-            status: READY
-            statusMessage: Host has room.
-            zone: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1
-            """))
+    self.AssertOutputEquals("""\
+    description: Host 1
+    hostType: n1-host-64-208
+    instances:
+    - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-1
+    - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-2
+    name: host-1
+    selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/hosts/host-1
+    status: READY
+    statusMessage: Host has room.
+    zone: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1
+    """, normalize_space=True)
 
 
 if __name__ == '__main__':

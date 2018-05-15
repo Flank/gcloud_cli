@@ -11,7 +11,7 @@ gcloud alpha compute tpus create \- create a new Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute tpus create\fR (\fITPU_ID\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="tpu\-v2"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,15 +26,15 @@ gcloud alpha compute tpus create \- create a new Cloud TPU
 .RS 2m
 .TP 2m
 
-TPU ID \- The Cloud TPU you want to create. The arguments in this group can be
-used to specify the attributes of this resource. (NOTE) Some attributes are not
-given arguments in this group but can be set in other ways. To set the [project]
-attribute: Set the property [core/project] or provide the flag [\-\-project] on
-the command line. This must be specified.
+Tpu resource \- The Cloud TPU you want to create. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: Set the property [core/project] or provide the flag
+[\-\-project] on the command line. This must be specified.
 
 .RS 2m
 .TP 2m
-\fITPU_ID\fR
+\fITPU\fR
 The ID of the tpu or a fully qualified identifier for the tpu. This positional
 must be specified if any of the other arguments in this group are specified.
 
@@ -79,9 +79,9 @@ TensorFlow versions please see https://www.tensorflow.org/versions/.
 
 .RS 2m
 .TP 2m
-\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR; default="tpu\-v2"
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR; default="v2\-8"
 TPU accelerator type for the TPU. If not specified, this defaults to
-\f5tpu\-v2\fR.
+\f5v2\-8\fR.
 
 For a list of available accelerator types run:
 
@@ -134,7 +134,7 @@ for all required and optional parameters:
 $ gcloud alpha compute tpus create my\-tpu \e
     \-\-zone us\-central1\-a \e
     \-\-range '10.240.0.0/29' \e
-    \-\-accelerator\-type 'tpu\-v2' \e
+    \-\-accelerator\-type 'v2\-8' \e
     \-\-network my\-tf\-network \e
     \-\-description 'My TF Node' \e
     \-\-version '1.1'

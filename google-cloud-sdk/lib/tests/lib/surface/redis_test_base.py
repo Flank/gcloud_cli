@@ -16,23 +16,13 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import contextlib
-
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib import redis
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
-from tests.lib import e2e_base
 from tests.lib import sdk_test_base
-
-
-TEST_REGION = 'us-central1'
-# The default network in the cloud-sdk-integration-testing project is LEGACY
-# and will not work with the Redis API.
-E2E_TEST_NETWORK = 'do-not-delete-redis-test'
 
 
 class UnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
@@ -121,21 +111,3 @@ class OperationsUnitTestBase(UnitTestBase):
         params={'locationsId': self.region_id, 'projectsId': self.Project()},
         api_version=self.api_version)
     self.operation_relative_name = self.operation_ref.RelativeName()
-
-
-class E2eTestBase(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  @contextlib.contextmanager
-  def CreateInstance(self, instance_id, region):
-    try:
-      yield self.Run(
-          'redis instances create --region {region} {instance_id}'
-          ' --network {network}'
-          .format(region=region, instance_id=instance_id,
-                  network=E2E_TEST_NETWORK))
-    finally:
-      self.Run('redis instances delete --region {region} {instance_id} --quiet'
-               .format(region=region, instance_id=instance_id))

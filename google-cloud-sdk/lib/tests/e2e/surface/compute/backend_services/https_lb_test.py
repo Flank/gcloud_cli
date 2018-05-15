@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for creating/deleting firewalls."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import subprocess
 import time
@@ -53,8 +55,9 @@ class HttpsLoadBalancingTestBase(e2e_test_base.BaseTest):
   SIGNED_URL_KEY2 = 'SCfA_VWzIi3hzOziLJozkQ=='
 
   def UniqueName(self, name):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='compute-https-lb-test-' + name).next()
+    return next(
+        e2e_utils.GetResourceNameGenerator(prefix='compute-https-lb-test-' +
+                                           name))
 
   def SetUp(self):
     self.backend_bucket_names_used = []

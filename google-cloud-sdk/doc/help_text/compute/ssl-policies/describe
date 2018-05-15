@@ -17,7 +17,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the SSL policy to describe.
+        Name of the SSL policy to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

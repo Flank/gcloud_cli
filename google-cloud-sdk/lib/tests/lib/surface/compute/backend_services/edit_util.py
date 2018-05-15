@@ -14,6 +14,8 @@
 
 """Tests constanst for testing the backend-services edit subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 
@@ -95,4 +97,3 @@ YAML_FILE_CONTENTS_ORIGINAL = textwrap.dedent("""\
     """)
 YAML_FILE_CONTENTS = (YAML_FILE_CONTENTS_HEADER + YAML_FILE_CONTENTS_WORKSPACE +
                       YAML_FILE_CONTENTS_EXAMPLE + YAML_FILE_CONTENTS_ORIGINAL)
-

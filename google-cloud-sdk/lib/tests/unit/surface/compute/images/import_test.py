@@ -39,6 +39,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     self.daisy_builder = 'gcr.io/compute-image-tools/daisy:release'
     self.daisy_import_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               '-variables=image_name={0},source_disk_file={1}'
               .format(self.image_name, self.copied_source),
               self.import_workflow,],
@@ -46,6 +47,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     )
     self.daisy_import_translate_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               ('-variables=image_name={0},'
                'source_disk_file={1},'
                'translate_workflow={2}').format(
@@ -149,6 +151,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     translate_workflow = 'ubuntu/translate_ubuntu_1604.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               ('-variables=image_name={0},'
                'translate_workflow={1},'
                'source_image=global/images/{2}').format(
@@ -175,6 +178,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     translate_workflow = 'ubuntu/translate_ubuntu_1604_custom.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               ('-variables=image_name={0},'
                'translate_workflow={1},'
                'source_image=global/images/{2}').format(
@@ -212,7 +216,15 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
                            'v1/projects/my-project/builds/1234]')
 
   def testTimeoutFlag(self):
-    self.PrepareDaisyMocks(self.daisy_import_step, timeout='60s')
+    daisy_import_step = self.cloudbuild_v1_messages.BuildStep(
+        args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=60s',
+              '-variables=image_name={0},source_disk_file={1}'
+              .format(self.image_name, self.copied_source),
+              self.import_workflow,],
+        name=self.daisy_builder,
+    )
+    self.PrepareDaisyMocks(daisy_import_step, timeout='60s')
     self.AddStorageRewriteMock()
 
     self.Run("""
@@ -394,6 +406,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
                      '1234-5678-1234-567812345678-source-image.ova')
     daisy_import_translate_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               ('-variables=image_name={0},'
                'source_disk_file={1},'
                'translate_workflow={2}').format(
@@ -464,6 +477,7 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
     import_and_translate_step_with_zone = self.cloudbuild_v1_messages.BuildStep(  # pylint: disable=line-too-long
         args=['-zone=us-west1-c',
               '-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               ('-variables=image_name={0},'
                'source_disk_file={1},'
                'translate_workflow={2}').format(

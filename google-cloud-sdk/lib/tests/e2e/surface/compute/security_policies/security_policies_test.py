@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for security policies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 import os
 
@@ -25,8 +27,8 @@ from tests.lib.surface.compute import e2e_test_base
 
 
 def _UniqueName(name):
-  return e2e_utils.GetResourceNameGenerator(
-      prefix='compute-security-policy-test-' + name).next()
+  return next(e2e_utils.GetResourceNameGenerator(
+      prefix='compute-security-policy-test-' + name))
 
 
 class SecurityPoliciesTestAlpha(e2e_test_base.BaseTest):

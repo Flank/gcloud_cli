@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the network-endpoint-groups delete subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base

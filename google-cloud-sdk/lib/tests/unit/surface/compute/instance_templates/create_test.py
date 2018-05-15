@@ -14,6 +14,8 @@
 
 """Tests for the instance-templates create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import random
 import textwrap
 
@@ -4327,10 +4329,10 @@ class InstanceTemplatesCreateWithNodeAffinity(test_base.BaseTest,
     """
     node_affinity_file = self.Touch(
         self.temp_path, 'affinity_config.json', contents=contents)
-    with self.AssertRaisesExceptionMatches(
+    with self.AssertRaisesExceptionRegexp(
         sole_tenancy_util.NodeAffinityFileParseError,
-        "Expected type <type 'unicode'> for field values, found 3 "
-        "(type <type 'int'>)"):
+        r"Expected type <(class|type) '(str|unicode)'> for field values, found "
+        r"3 \(type <(class|type) 'int'>\)"):
       self.Run("""
           compute instance-templates create template-1
             --node-affinity-file {}

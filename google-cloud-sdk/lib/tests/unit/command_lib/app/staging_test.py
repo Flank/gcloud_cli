@@ -16,8 +16,8 @@ import os
 import re
 import tempfile
 
-from googlecloudsdk.api_lib.app import util
-from googlecloudsdk.command_lib.app import runtime_registry
+from googlecloudsdk.api_lib.app import env
+from googlecloudsdk.api_lib.app import runtime_registry
 from googlecloudsdk.command_lib.app import staging
 from googlecloudsdk.command_lib.util import java
 from googlecloudsdk.core import config
@@ -46,16 +46,16 @@ class StagerRegistryTest(sdk_test_base.WithLogCapture):
 
   # Use fake command strings in order to easier compare for equality
   _DEFAULT_REGISTRY = {
-      runtime_registry.RegistryEntry('intercal', {util.Environment.FLEX}):
+      runtime_registry.RegistryEntry('intercal', {env.FLEX}):
           'fake-intercal-command',
-      runtime_registry.RegistryEntry('x86-asm', {util.Environment.STANDARD}):
+      runtime_registry.RegistryEntry('x86-asm', {env.STANDARD}):
           'fake-x86-asm-command',
   }
 
   _REGISTRY_BETA = {
-      runtime_registry.RegistryEntry('intercal', {util.Environment.FLEX}):
+      runtime_registry.RegistryEntry('intercal', {env.FLEX}):
           'fake-intercal-beta-command',
-      runtime_registry.RegistryEntry('chicken', {util.Environment.STANDARD}):
+      runtime_registry.RegistryEntry('chicken', {env.STANDARD}):
           'fake-chicken-beta-command',
   }
 
@@ -72,9 +72,9 @@ class StagerRegistryTest(sdk_test_base.WithLogCapture):
     """Ensures the default registry works is what it was originally set to."""
     self._MockDefaultRegistries()
     expected = {
-        ('intercal', util.Environment.FLEX): 'fake-intercal-command',
-        ('x86-asm', util.Environment.STANDARD): 'fake-x86-asm-command',
-        ('chicken', util.Environment.STANDARD): staging.NoopCommand(),
+        ('intercal', env.FLEX): 'fake-intercal-command',
+        ('x86-asm', env.STANDARD): 'fake-x86-asm-command',
+        ('chicken', env.STANDARD): staging.NoopCommand(),
     }
     registry = staging.GetRegistry()
     for key, value in expected.items():
@@ -84,9 +84,9 @@ class StagerRegistryTest(sdk_test_base.WithLogCapture):
     """Ensures entries in beta- overrides entries in default-registry."""
     self._MockDefaultRegistries()
     expected = {
-        ('intercal', util.Environment.FLEX): 'fake-intercal-beta-command',
-        ('x86-asm', util.Environment.STANDARD): 'fake-x86-asm-command',
-        ('chicken', util.Environment.STANDARD): 'fake-chicken-beta-command',
+        ('intercal', env.FLEX): 'fake-intercal-beta-command',
+        ('x86-asm', env.STANDARD): 'fake-x86-asm-command',
+        ('chicken', env.STANDARD): 'fake-chicken-beta-command',
     }
     registry = staging.GetBetaRegistry()
     for key, value in expected.items():
@@ -97,10 +97,10 @@ class StagerRegistryTest(sdk_test_base.WithLogCapture):
     registry = staging.GetRegistry()
 
     def Good(runtime):
-      command = registry.Get(runtime, util.Environment.FLEX)
+      command = registry.Get(runtime, env.FLEX)
       self.assertFalse(isinstance(command, staging.NoopCommand))
     def Bad(runtime):
-      command = registry.Get(runtime, util.Environment.FLEX)
+      command = registry.Get(runtime, env.FLEX)
       self.assertTrue(isinstance(command, staging.NoopCommand))
 
     Good('go')
@@ -129,12 +129,12 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
   """Tests the staging code by mocking executables."""
 
   _REGISTRY = runtime_registry.Registry({
-      runtime_registry.RegistryEntry('intercal', {util.Environment.FLEX}):
+      runtime_registry.RegistryEntry('intercal', {env.FLEX}):
           staging._BundledCommand('intercal-flex', 'intercal-flex.exe'),
-      runtime_registry.RegistryEntry('x86-asm', {util.Environment.STANDARD}):
+      runtime_registry.RegistryEntry('x86-asm', {env.STANDARD}):
           staging._BundledCommand('x86-asm-standard', 'x86-asm-standard.exe',
                                   'app-engine-x86-asm'),
-      runtime_registry.RegistryEntry('german', {util.Environment.STANDARD}):
+      runtime_registry.RegistryEntry('german', {env.STANDARD}):
           staging._BundledCommand('german-standard', 'german-standard.exe',
                                   mapper=_GermanMapper),
   }, default=staging.NoopCommand())
@@ -165,14 +165,14 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
   def testStage_StagingDir(self):
     """Ensures that the staging dir is created properly."""
     app_dir = self.stager.Stage('app.yaml', 'dir', 'intercal',
-                                util.Environment.FLEX)
+                                env.FLEX)
     self.assertEqual(app_dir, 'tmp_dir')
     self.mkdtemp_mock.assert_called_once_with(dir='/staging-area')
 
   def testStage_MismatchedRuntime(self):
     self.assertIsNone(
         self.stager.Stage('app.yaml', 'dir', 'intercal',
-                          util.Environment.STANDARD))
+                          env.STANDARD))
     self.AssertOutputEquals('')
     self.AssertLogNotContains('err')  # Log will have debug messages
     self.exec_mock.assert_not_called()
@@ -181,7 +181,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
   def testStage_MismatchedEnvironment(self):
     self.assertIsNone(
         self.stager.Stage('app.yaml', 'dir', 'intercal',
-                          util.Environment.STANDARD))
+                          env.STANDARD))
     self.AssertOutputEquals('')
     self.AssertLogNotContains('err')  # Log will have debug messages
     self.exec_mock.assert_not_called()
@@ -191,7 +191,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
     self.sdk_root_mock.return_value = None
     with self.assertRaises(staging.NoSdkRootError):
       self.stager.Stage('app.yaml', 'dir', 'intercal',
-                        util.Environment.FLEX)
+                        env.FLEX)
     self.exec_mock.assert_not_called()
 
   def testStage_StagingCommandFailed(self):
@@ -205,7 +205,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
     with self.assertRaisesRegex(staging.StagingCommandFailedError,
                                 expected_pattern):
       self.stager.Stage('app.yaml', 'dir', 'intercal',
-                        util.Environment.FLEX)
+                        env.FLEX)
     self.exec_mock.assert_called_once_with(
         args, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
 
@@ -213,7 +213,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
     args = [os.path.join('sdk_root_dir', 'intercal-flex'), 'app.yaml',
             'dir', 'tmp_dir']
     self.stager.Stage('app.yaml', 'dir', 'intercal',
-                      util.Environment.FLEX)
+                      env.FLEX)
     self.exec_mock.assert_called_once_with(
         args, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
     command = ' '.join(args)
@@ -228,7 +228,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
     args = [os.path.join('sdk_root_dir', 'intercal-flex.exe'),
             'app.yaml', 'dir', 'tmp_dir']
     self.stager.Stage('app.yaml', 'dir', 'intercal',
-                      util.Environment.FLEX)
+                      env.FLEX)
     self.exec_mock.assert_called_once_with(
         args, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
     command = ' '.join(args)
@@ -243,7 +243,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
     args = [os.path.join('sdk_root_dir', 'x86-asm-standard'),
             'app.yaml', 'dir', 'tmp_dir']
     self.stager.Stage('app.yaml', 'dir', 'x86-asm',
-                      util.Environment.STANDARD)
+                      env.STANDARD)
     self.exec_mock.assert_called_once_with(
         args, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
     command = ' '.join(args)
@@ -259,7 +259,7 @@ class StagerMockExecTest(sdk_test_base.WithLogCapture):
     args = [os.path.join('sdk_root_dir', 'german-standard'), '-dir', 'tmp_dir',
             '-yaml', 'app.yaml', 'dir']
     self.stager.Stage('app.yaml', 'dir', 'german',
-                      util.Environment.STANDARD)
+                      env.STANDARD)
     self.exec_mock.assert_called_once_with(
         args, no_exit=True, out_func=mock.ANY, err_func=mock.ANY)
     command = ' '.join(args)
@@ -273,9 +273,9 @@ class StagerRealExecutableTest(sdk_test_base.WithLogCapture):
   """Tests the staging code using real executables."""
 
   _REGISTRY = runtime_registry.Registry({
-      runtime_registry.RegistryEntry('success', {util.Environment.FLEX}):
+      runtime_registry.RegistryEntry('success', {env.FLEX}):
           staging._BundledCommand('success.sh', 'success.cmd'),
-      runtime_registry.RegistryEntry('failure', {util.Environment.FLEX}):
+      runtime_registry.RegistryEntry('failure', {env.FLEX}):
           staging._BundledCommand('failure.sh', 'failure.cmd')
   }, default=staging.NoopCommand())
 
@@ -307,7 +307,7 @@ class StagerRealExecutableTest(sdk_test_base.WithLogCapture):
 
   def testStage_Success(self):
     app_dir = self.stager.Stage('app.yaml', '.', 'success',
-                                util.Environment.FLEX)
+                                env.FLEX)
     self.AssertFileExistsWithContents(
         'app.yaml contents\n', os.path.join(app_dir, 'app.yaml'))
     self.AssertLogMatches(self._SUCCESS_OUTPUT_PATTERN)
@@ -316,7 +316,7 @@ class StagerRealExecutableTest(sdk_test_base.WithLogCapture):
     with self.assertRaisesRegex(staging.StagingCommandFailedError,
                                 self._FAILURE_PATTERN):
       self.stager.Stage('app.yaml', '.', 'failure',
-                        util.Environment.FLEX)
+                        env.FLEX)
 
 
 class MapperTests(test_case.Base):

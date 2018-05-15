@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module for instance integration test base classes."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 import os.path
 
@@ -25,8 +27,8 @@ class InstancesTestBase(e2e_test_base.BaseTest):
   def SetUp(self):
     self.instance_names_used = []
     # No hash on login name, since we really only care about the timestamp
-    self.logname = e2e_utils.GetResourceNameGenerator(
-        prefix='bundledtest', hash_len=0).next()
+    self.logname = next(
+        e2e_utils.GetResourceNameGenerator(prefix='bundledtest', hash_len=0))
     self.home_dir = self.CreateTempDir(name=os.path.join('home', self.logname))
     self.ssh_dir = self.CreateTempDir(name=os.path.join(self.home_dir, '.ssh'))
     self.private_key_file = os.path.join(self.ssh_dir, 'google_compute_engine')
@@ -42,8 +44,8 @@ class InstancesTestBase(e2e_test_base.BaseTest):
   def GetInstanceName(self):
     # Make sure a new name is used if the test is retried, and make sure all
     # used names get cleaned up
-    name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test').next()
+    name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='gcloud-compute-test'))
     self.instance_name = name
     self.instance_names_used.append(name)
     return name

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the backend services add-backend subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
@@ -38,7 +40,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
     self.make_requests.side_effect = iter([
         [messages.BackendService(
             name='my-backend-service',
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             port=80,
             timeoutSec=120)],
         [],
@@ -56,7 +58,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
     self.make_requests.side_effect = iter([
         [messages.BackendService(
             name='my-backend-service',
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             port=80,
             timeoutSec=120)],
         [],
@@ -82,7 +84,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=('https://www.googleapis.com/compute/'
@@ -100,7 +102,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ])
@@ -126,7 +128,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           balancingMode=self._connection,
@@ -145,7 +147,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ])
@@ -171,7 +173,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           balancingMode=self._connection,
@@ -196,7 +198,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
                            'us-central1-a/instanceGroups/my-group')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
     ])
 
@@ -219,7 +221,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
     ])
 
@@ -240,7 +242,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
     ])
 
@@ -261,7 +263,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
     ])
 
@@ -283,7 +285,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
     ])
 
@@ -304,7 +306,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ])
@@ -331,7 +333,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           balancingMode=self._utilization,
@@ -351,7 +353,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ])
@@ -377,7 +379,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           balancingMode=self._utilization,
@@ -396,7 +398,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest):
         [messages.BackendService(
             name='my-backend-service',
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
     ])
 
@@ -424,7 +426,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
     self.make_requests.side_effect = iter([
         [messages.BackendService(
             name='my-backend-service',
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             port=80,
             backends=[
                 messages.Backend(
@@ -455,7 +457,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +
@@ -475,7 +477,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
     self.make_requests.side_effect = iter([
         [messages.BackendService(
             name='my-backend-service',
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             backends=[
                 messages.Backend(
                     group=(self.compute_uri +
@@ -507,7 +509,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +
@@ -528,7 +530,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
     self.make_requests.side_effect = iter([
         [messages.BackendService(
             name='my-backend-service',
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             port=80,
             timeoutSec=120)],
         [],
@@ -553,7 +555,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +
@@ -571,7 +573,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
     self.make_requests.side_effect = iter([
         [messages.BackendService(
             name='my-backend-service',
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             port=80,
             timeoutSec=120)],
         [
@@ -608,7 +610,7 @@ class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +

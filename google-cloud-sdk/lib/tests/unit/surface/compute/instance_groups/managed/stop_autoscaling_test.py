@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instance-groups managed stop-autoscaling subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base

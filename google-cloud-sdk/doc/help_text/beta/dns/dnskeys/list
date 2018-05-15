@@ -6,8 +6,8 @@ SYNOPSIS
         [--limit=LIMIT] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) (DEPRECATED) The gcloud beta dnskeys commands are deprecated; please
-    use the gcloud beta dnskeys commands instead.
+    (BETA) (DEPRECATED) The gcloud beta dns dnskeys commands are deprecated;
+    please use the gcloud beta dns dns-keys commands instead.
 
     List DNS key resources in a managed zone.
 

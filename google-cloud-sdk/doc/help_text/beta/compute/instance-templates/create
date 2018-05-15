@@ -44,7 +44,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the instance template to create.
+        Name of the instance template to create.
 
 FLAGS
      --accelerator=[type=TYPE,[count=COUNT],...]

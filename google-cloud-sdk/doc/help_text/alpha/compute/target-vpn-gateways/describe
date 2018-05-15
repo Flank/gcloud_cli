@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the Target VPN Gateway to describe.
+        Name of the Target VPN Gateway to describe.
 
 FLAGS
      --region=REGION

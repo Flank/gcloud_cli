@@ -33,8 +33,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to update per instance config
-        for.
+        Name of the managed instance group to update per instance config for.
 
 REQUIRED FLAGS
      --instance=INSTANCE

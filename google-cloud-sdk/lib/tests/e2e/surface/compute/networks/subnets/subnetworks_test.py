@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for manipulating subnetworks."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -25,10 +27,10 @@ class SubnetworksTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='subnets-test-network').next()
-    self.subnetwork_name = e2e_utils.GetResourceNameGenerator(
-        prefix='subnets-test-subnet').next()
+    self.network_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='subnets-test-network'))
+    self.subnetwork_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='subnets-test-subnet'))
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')

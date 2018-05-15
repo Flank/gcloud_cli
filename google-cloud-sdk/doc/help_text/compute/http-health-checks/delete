@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the HTTP health checks to delete.
+        Names of the HTTP health checks to delete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

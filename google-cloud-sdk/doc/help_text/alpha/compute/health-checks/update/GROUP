@@ -31,9 +31,6 @@ COMMANDS
      tcp
         (ALPHA) Update a TCP health check.
 
-     udp
-        (ALPHA) Update a UDP health check.
-
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,
     users of ALPHA commands and flags need to apply for access, agree to

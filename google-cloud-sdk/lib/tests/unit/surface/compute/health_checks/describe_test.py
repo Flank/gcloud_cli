@@ -164,33 +164,6 @@ class HealthChecksDescribeTest(test_base.BaseTest,
             type: SSL
             """))
 
-  def testSimpleCaseUdp(self):
-    self.make_requests.side_effect = iter([
-        [test_resources.HEALTH_CHECKS_ALPHA[1]],
-    ])
-
-    self.Run("""
-        compute health-checks describe my-health-check
-        """)
-
-    self.CheckRequests(
-        [(self.compute.healthChecks,
-          'Get',
-          self.messages.ComputeHealthChecksGetRequest(
-              healthCheck='my-health-check',
-              project='my-project'))],
-    )
-    self.assertMultiLineEqual(self.GetOutput(), textwrap.dedent("""\
-            name: health-check-udp
-            selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/global/healthChecks/health-check-udp
-            type: UDP
-            udpHealthCheck:
-              port: 443
-              portName: happy-udp-port
-              request: req
-              response: ack
-            """))
-
   def testDescribeCompletion(self):
     self.StartPatch(
         'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',

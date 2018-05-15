@@ -13,12 +13,15 @@
 # limitations under the License.
 """tpus versions list tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute.tpus import base
+from six.moves import range
 
 
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
@@ -28,7 +31,7 @@ class ListTest(base.TpuUnitTestBase):
   def _GetListResponse(self, num=3):
     test_versions = [
         self.GetTestTFVersion(version='1.{}'.format(i))
-        for i in xrange(1, num+1)
+        for i in range(1, num+1)
     ]
     return self.messages.ListTensorFlowVersionsResponse(
         tensorflowVersions=test_versions)

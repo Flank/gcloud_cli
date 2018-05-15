@@ -54,7 +54,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]
-        The names of the instances to create.
+        Names of the instances to create.
 
 FLAGS
      --accelerator=[type=TYPE,[count=COUNT],...]

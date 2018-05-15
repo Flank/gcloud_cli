@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for gcloud preview app gen-repo-info-file."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 import os
 

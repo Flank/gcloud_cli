@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for manipulating networks."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from tests.lib import e2e_utils
@@ -24,8 +26,8 @@ from tests.lib.surface.compute import e2e_test_base
 class NetworksTest(parameterized.TestCase, e2e_test_base.BaseTest):
 
   def SetUp(self):
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='networks-test-network').next()
+    self.network_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='networks-test-network'))
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')

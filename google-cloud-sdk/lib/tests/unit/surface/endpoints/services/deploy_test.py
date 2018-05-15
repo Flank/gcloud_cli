@@ -13,8 +13,10 @@
 # limitations under the License.
 
 """Unit tests for endpoints services deploy command."""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 import os
-import urllib2
 
 from apitools.base.py.extra_types import JsonObject
 from apitools.base.py.extra_types import JsonValue
@@ -24,9 +26,17 @@ from googlecloudsdk.api_lib.endpoints import exceptions
 from googlecloudsdk.api_lib.endpoints import services_util
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.core.util import http_encoding
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.endpoints import unit_test_base
+
+import six
+from six.moves import range
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
+
 
 ENDPOINTS_SERVICE = 'endpoints.googleapis.com'
 SERVICE_NAME = 'service-name.googleapis.com'
@@ -38,27 +48,27 @@ CONFIG_TEMPLATE = """
      "name": "%s"
 }
 """
-TEST_CONFIG = CONFIG_TEMPLATE % (TITLE, SERVICE_NAME)
-TEST_SWAGGER = """
+TEST_CONFIG = http_encoding.Encode(CONFIG_TEMPLATE % (TITLE, SERVICE_NAME))
+TEST_SWAGGER = http_encoding.Encode("""
 {
    "swagger": "2.0",
    "host": "%s",
    "title": "%s"
 }
-""" % (SERVICE_NAME, TITLE)
-TEST_SWAGGER_YAML = """
+""" % (SERVICE_NAME, TITLE))
+TEST_SWAGGER_YAML = http_encoding.Encode("""
 ---
   title: "%s"
   host: "%s"
   swagger: "2.0"
-""" % (TITLE, SERVICE_NAME)
-TEST_SERVICE_CONFIG_YAML = """
+""" % (TITLE, SERVICE_NAME))
+TEST_SERVICE_CONFIG_YAML = http_encoding.Encode("""
 ---
   type: google.api.Service
   name: "%s"
   title: "%s"
-""" % (SERVICE_NAME, TITLE)
-TEST_SERVICE_CONFIG_2_YAML = """
+""" % (SERVICE_NAME, TITLE))
+TEST_SERVICE_CONFIG_2_YAML = http_encoding.Encode("""
 ---
   type: google.api.Service
   name: foobar
@@ -66,18 +76,18 @@ TEST_SERVICE_CONFIG_2_YAML = """
     rules:
     - selector: endpoints.examples.bookstore.Bookstore.ListShelves
       get: /v1/shelves
-"""
-TEST_RAW_PROTO = """
+""")
+TEST_RAW_PROTO = http_encoding.Encode("""
 syntax = "proto3";
 service Bookstore {
   rpc GetShelf(GetShelfRequest) returns (Shelf) {}
 }
-"""
-TEST_SERVICE_CONFIG_NO_TYPE_YAML = """
+""")
+TEST_SERVICE_CONFIG_NO_TYPE_YAML = http_encoding.Encode("""
 ---
   name: "%s"
   title: "%s"
-""" % (SERVICE_NAME, TITLE)
+""" % (SERVICE_NAME, TITLE))
 
 ENABLED = True
 DISABLED = False
@@ -155,8 +165,8 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
         'To manage your API, go to: '
         'https://console.cloud.google.com/endpoints/api/'
         '{service}/overview?project={project}'.format(
-            service=urllib2.quote(service),
-            project=urllib2.quote(project)))
+            service=six.moves.urllib.parse.quote(service),
+            project=six.moves.urllib.parse.quote(project)))
 
   def _MockServiceGetCall(self, service_name):
     self.mocked_client.services.Get.Expect(
@@ -174,7 +184,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
             percentages=(traffic.PercentagesValue(
                 additionalProperties=[
                     (traffic.PercentagesValue.AdditionalProperty(
-                        key=u'service-config-version-1',
+                        key='service-config-version-1',
                         value=100.0))]))))
     # These class names are reminding me uncomfortably of Java.
     rcr = self.services_messages.ServicemanagementServicesRolloutsCreateRequest
@@ -281,12 +291,12 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                     configSource=self.services_messages.ConfigSource(
                         files=[
                             self.services_messages.ConfigFile(
-                                fileContents=str(TEST_SWAGGER_YAML),
+                                fileContents=six.binary_type(TEST_SWAGGER_YAML),
                                 filePath=os.path.basename(
                                     self._swagger_yaml_file_path),
                                 fileType=FILE_TYPES.OPEN_API_YAML),
                             self.services_messages.ConfigFile(
-                                fileContents=str(TEST_SWAGGER_YAML),
+                                fileContents=six.binary_type(TEST_SWAGGER_YAML),
                                 filePath=os.path.basename(
                                     self._swagger_yaml_file_path),
                                 fileType=FILE_TYPES.OPEN_API_YAML)
@@ -342,7 +352,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     self._AssertManagementUrlDisplayed()
 
   def testDeployMultipleProtoYamlFilesAtOnce(self):
-    proto_binary = '`1234568908@#%*@(#*$ !!! binary-foo!!! %!@#!%@!#$!@#$'
+    proto_binary = b'`1234568908@#%*@(#*$ !!! binary-foo!!! %!@#!%@!#$!@#$'
     yaml_file = self.Touch(self.temp_path, name='bookstore.yaml',
                            contents=TEST_SERVICE_CONFIG_YAML)
     yaml_file_2 = self.Touch(self.temp_path, name='bookstore_config.yaml',
@@ -378,15 +388,17 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                     configSource=self.services_messages.ConfigSource(
                         files=[
                             self.services_messages.ConfigFile(
-                                fileContents=str(proto_binary),
+                                fileContents=six.binary_type(proto_binary),
                                 filePath=os.path.basename(proto_file),
                                 fileType=FILE_TYPES.FILE_DESCRIPTOR_SET_PROTO),
                             self.services_messages.ConfigFile(
-                                fileContents=str(TEST_SERVICE_CONFIG_YAML),
+                                fileContents=six.binary_type(
+                                    TEST_SERVICE_CONFIG_YAML),
                                 filePath=os.path.basename(yaml_file),
                                 fileType=FILE_TYPES.SERVICE_CONFIG_YAML),
                             self.services_messages.ConfigFile(
-                                fileContents=str(TEST_SERVICE_CONFIG_2_YAML),
+                                fileContents=six.binary_type(
+                                    TEST_SERVICE_CONFIG_2_YAML),
                                 filePath=os.path.basename(yaml_file_2),
                                 fileType=FILE_TYPES.SERVICE_CONFIG_YAML)
                         ]),
@@ -474,11 +486,12 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                     configSource=self.services_messages.ConfigSource(
                         files=[
                             self.services_messages.ConfigFile(
-                                fileContents=str(TEST_SERVICE_CONFIG_YAML),
+                                fileContents=six.binary_type(
+                                    TEST_SERVICE_CONFIG_YAML),
                                 filePath=os.path.basename(yaml_file),
                                 fileType=FILE_TYPES.SERVICE_CONFIG_YAML),
                             self.services_messages.ConfigFile(
-                                fileContents=str(TEST_RAW_PROTO),
+                                fileContents=six.binary_type(TEST_RAW_PROTO),
                                 filePath=os.path.basename(raw_proto_file),
                                 fileType=FILE_TYPES.PROTO_FILE)
                         ]),
@@ -831,7 +844,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                 self.services_messages.SubmitConfigSourceRequest(
                     configSource=self.services_messages.ConfigSource(
                         files=[self.services_messages.ConfigFile(
-                            fileContents=str(TEST_SWAGGER_YAML),
+                            fileContents=six.binary_type(TEST_SWAGGER_YAML),
                             filePath=os.path.basename(
                                 self._swagger_yaml_file_path),
                             fileType=FILE_TYPES.OPEN_API_YAML)]),
@@ -900,7 +913,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                 self.services_messages.SubmitConfigSourceRequest(
                     configSource=self.services_messages.ConfigSource(
                         files=[self.services_messages.ConfigFile(
-                            fileContents=str(TEST_SWAGGER),
+                            fileContents=six.binary_type(TEST_SWAGGER),
                             filePath=os.path.basename(
                                 self._swagger_file_path),
                             fileType=FILE_TYPES.OPEN_API_YAML)]),
@@ -1026,7 +1039,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                 self.services_messages.SubmitConfigSourceRequest(
                     configSource=self.services_messages.ConfigSource(
                         files=[self.services_messages.ConfigFile(
-                            fileContents=str(TEST_SWAGGER),
+                            fileContents=six.binary_type(TEST_SWAGGER),
                             filePath=os.path.basename(
                                 self._swagger_file_path),
                             fileType=FILE_TYPES.OPEN_API_YAML)]),
@@ -1092,7 +1105,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                 self.services_messages.SubmitConfigSourceRequest(
                     configSource=self.services_messages.ConfigSource(
                         files=[self.services_messages.ConfigFile(
-                            fileContents=str(TEST_SWAGGER_YAML),
+                            fileContents=six.binary_type(TEST_SWAGGER_YAML),
                             filePath=os.path.basename(
                                 self._swagger_yaml_file_path),
                             fileType=FILE_TYPES.OPEN_API_YAML)]),
@@ -1131,7 +1144,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
 
   def testServicesDeployRaisesExceptionOnDiagnosticErrors(self):
     # Test with one diagnostic ERROR as well as several
-    for num_errors in xrange(1, 3):
+    for num_errors in range(1, 3):
       self._WaitForEnabledCheck(DISABLED, ENDPOINTS_SERVICE)
       # The Endpoints service is auto-enabled
       self.mocked_client.services.Enable.Expect(
@@ -1159,7 +1172,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
                   self.services_messages.SubmitConfigSourceRequest(
                       configSource=self.services_messages.ConfigSource(
                           files=[self.services_messages.ConfigFile(
-                              fileContents=str(TEST_SWAGGER_YAML),
+                              fileContents=six.binary_type(TEST_SWAGGER_YAML),
                               filePath=os.path.basename(
                                   self._swagger_yaml_file_path),
                               fileType=FILE_TYPES.OPEN_API_YAML)]),
@@ -1177,10 +1190,10 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
           ] + [
               {
                   'kind': 'ERROR',
-                  'location': 'foo' + str(n),
-                  'message': 'diagnostic error message bar' + str(n)
+                  'location': 'foo{n}'.format(n=n),
+                  'message': 'diagnostic error message bar{n}'.format(n=n)
               }
-              for n in xrange(2, 2 + num_errors)
+              for n in range(2, 2 + num_errors)
           ]
       }
       self.MockOperationWait(self.operation_name, submit_response)
@@ -1193,7 +1206,7 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
         self.Run('{0} {1}'.format(
             self.base_cmd, self._swagger_yaml_file_path))
       self.AssertErrContains('WARNING: foo: diagnostic warning message bar')
-      for n in xrange(2, 2 + num_errors):
+      for n in range(2, 2 + num_errors):
         self.AssertErrContains(
             'ERROR: foo{n}: diagnostic error message bar{n}'.format(n=n))
 
@@ -1310,7 +1323,7 @@ class EndpointsBetaDeployTest(EndpointsDeployTest):
     self._deployServiceConfigWithAdvisorResult(push_advisor_result)
 
     # Verify that the warning log messages appear
-    for n in xrange(3):
+    for n in range(3):
       self.AssertLogContains('oldValue #{0}'.format(n+1))
       self.AssertLogContains('newValue #{0}'.format(n+1))
     self.AssertLogContains('Advice #1')

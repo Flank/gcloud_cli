@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine Jobs library."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.ml_engine import jobs
 from googlecloudsdk.core import resources
 from tests.lib import test_case
@@ -75,7 +77,7 @@ class JobsClientTest(base.MlGaPlatformTestBase):
     self.assertEqual(job, self.jobs_client.Create(project_ref, job))
 
   def testBuildTrainingJobWithYaml(self):
-    test_yaml = u"""
+    test_yaml = """
         jobId: job_name_to_override
         trainingInput:
           args:

@@ -4734,8 +4734,7 @@ class InstancesCreateDiskTest(InstancesCreateTestsMixin):
   """Test creation of VM instances with create disk(s)."""
 
   def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUp(self, 'v1')
 
   def testCreateDiskWithAllProperties(self):
     m = self.messages
@@ -4783,7 +4782,6 @@ class InstancesCreateDiskTest(InstancesCreateTestsMixin):
                 networkInterfaces=[m.NetworkInterface(
                     accessConfigs=[m.AccessConfig(
                         name='external-nat',
-                        networkTier=self._default_network_tier,
                         type=self._one_to_one_nat)],
                     network=self._default_network)],
                 serviceAccounts=[
@@ -4855,7 +4853,6 @@ class InstancesCreateDiskTest(InstancesCreateTestsMixin):
                           accessConfigs=[
                               m.AccessConfig(
                                   name='external-nat',
-                                  networkTier=self._default_network_tier,
                                   type=self._one_to_one_nat)
                           ],
                           network=self._default_network)
@@ -4918,7 +4915,6 @@ class InstancesCreateDiskTest(InstancesCreateTestsMixin):
                           accessConfigs=[
                               m.AccessConfig(
                                   name='external-nat',
-                                  networkTier=self._default_network_tier,
                                   type=self._one_to_one_nat)
                           ],
                           network=self._default_network)
@@ -4975,7 +4971,6 @@ class InstancesCreateDiskTest(InstancesCreateTestsMixin):
                 networkInterfaces=[msg.NetworkInterface(
                     accessConfigs=[msg.AccessConfig(
                         name='external-nat',
-                        networkTier=self._default_network_tier,
                         type=self._one_to_one_nat)],
                     network=_DefaultNetworkOf(self.api))],
                 serviceAccounts=[
@@ -5027,7 +5022,6 @@ class InstancesCreateDiskTest(InstancesCreateTestsMixin):
                 networkInterfaces=[msg.NetworkInterface(
                     accessConfigs=[msg.AccessConfig(
                         name='external-nat',
-                        networkTier=self._default_network_tier,
                         type=self._one_to_one_nat)],
                     network=_DefaultNetworkOf(self.api))],
                 serviceAccounts=[
@@ -7905,6 +7899,100 @@ class InstancesCreateTestAlpha(InstancesCreateTestsMixin,
     self.AssertErrContains(
         'WARNING: The --maintenance-policy flag is now deprecated. '
         'Please use `--on-host-maintenance` instead')
+
+  def testWithResourcePolicies(self):
+    m = self.messages
+
+    self.Run("""
+        compute instances create instance
+          --zone central2-a
+          --resource-policies pol1
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                disks=[
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                machineType=self._default_machine_type,
+                metadata=m.Metadata(),
+                name='instance',
+                networkInterfaces=[
+                    m.NetworkInterface(
+                        accessConfigs=[
+                            m.AccessConfig(
+                                name='external-nat', type=self._one_to_one_nat)
+                        ],
+                        network=self._default_network)
+                ],
+                resourcePolicies=[
+                    self.compute_uri + '/projects/{}/regions/central2/'
+                    'resourcePolicies/pol1'.format(self.Project())],
+                serviceAccounts=[
+                    m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                ],
+                scheduling=m.Scheduling(automaticRestart=True),),
+            project='my-project',
+            zone='central2-a',))],)
+
+  def testWithMultipleResourcePolicies(self):
+    m = self.messages
+
+    self.Run("""
+        compute instances create instance
+          --zone central2-a
+          --resource-policies pol1,pol2
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                disks=[
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                machineType=self._default_machine_type,
+                metadata=m.Metadata(),
+                name='instance',
+                networkInterfaces=[
+                    m.NetworkInterface(
+                        accessConfigs=[
+                            m.AccessConfig(
+                                name='external-nat', type=self._one_to_one_nat)
+                        ],
+                        network=self._default_network)
+                ],
+                resourcePolicies=[
+                    self.compute_uri + '/projects/{}/regions/central2/'
+                    'resourcePolicies/pol1'.format(self.Project()),
+                    self.compute_uri + '/projects/{}/regions/central2/'
+                    'resourcePolicies/pol2'.format(self.Project())],
+                serviceAccounts=[
+                    m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                ],
+                scheduling=m.Scheduling(automaticRestart=True),),
+            project='my-project',
+            zone='central2-a',))],)
 
 
 class InstancesCreateWithLabelsTest(test_base.BaseTest):

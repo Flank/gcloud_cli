@@ -14,6 +14,9 @@
 """Test utils for compute routers unit tests."""
 
 
+from __future__ import unicode_literals
+
+
 def CreateMinimalBgpPeerMessage(messages):
   """Create a BGP peer with only required fields.
 

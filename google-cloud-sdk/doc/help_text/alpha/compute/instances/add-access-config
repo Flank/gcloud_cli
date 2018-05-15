@@ -20,7 +20,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        The name of the instance to operate on.
+        Name of the instance to operate on.
 
 FLAGS
      --access-config-name=ACCESS_CONFIG_NAME; default="external-nat"

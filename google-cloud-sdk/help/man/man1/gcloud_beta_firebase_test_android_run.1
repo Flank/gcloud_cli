@@ -11,7 +11,7 @@ gcloud beta firebase test android run \- invoke a test in Firebase Test Lab for 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta firebase test android run\fR [\fIARGSPEC\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fITEST\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-additional\-apks\fR=\fIAPK\fR,[\fIAPK\fR,...]] [\fB\-\-app\-package\fR=\fIAPP_PACKAGE\fR] [\fB\-\-async\fR] [\fB\-\-no\-auto\-google\-login\fR] [\fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]] [\fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-profile\fR=\fIPROFILE_ID\fR] [\fB\-\-obb\-files\fR=\fIOBB_FILE\fR,[\fIOBB_FILE\fR]] [\fB\-\-other\-files\fR=\fIFILE\fR=\fIDEVICE_DIR\fR,[...]] [\fB\-\-no\-performance\-metrics\fR] [\fB\-\-no\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-labels\fR=\fILABEL\fR,[\fILABEL\fR,...]] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-package\fR=\fITEST_PACKAGE\fR] [\fB\-\-test\-runner\-class\fR=\fITEST_RUNNER_CLASS\fR] [\fB\-\-test\-targets\fR=\fITEST_TARGET\fR,[\fITEST_TARGET\fR,...]] [\fB\-\-use\-orchestrator\fR] [\fB\-\-app\-initial\-activity\fR=\fIAPP_INITIAL_ACTIVITY\fR] [\fB\-\-max\-depth\fR=\fIint\fR] [\fB\-\-max\-steps\fR=\fIint\fR] [\fB\-\-robo\-directives\fR=[\fITYPE\fR:\fIRESOURCE_NAME\fR=\fIINPUT\fR,...]] [\fB\-\-robo\-script\fR=\fIROBO_SCRIPT\fR] [\fB\-\-device\-ids\fR=\fIMODEL_ID\fR,[\fIMODEL_ID\fR,...],\ \fB\-d\fR\ \fIMODEL_ID\fR,[\fIMODEL_ID\fR,...]] [\fB\-\-locales\fR=\fILOCALE\fR,[\fILOCALE\fR,...],\ \fB\-l\fR\ \fILOCALE\fR,[\fILOCALE\fR,...]] [\fB\-\-orientations\fR=\fIORIENTATION\fR,[\fIORIENTATION\fR],\ \fB\-o\fR\ \fIORIENTATION\fR,[\fIORIENTATION\fR]] [\fB\-\-os\-version\-ids\fR=\fIOS_VERSION_ID\fR,[...],\ \fB\-v\fR\ \fIOS_VERSION_ID\fR,[...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta firebase test android run\fR [\fIARGSPEC\fR] [\fB\-\-app\fR=\fIAPP\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fITEST\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-additional\-apks\fR=\fIAPK\fR,[\fIAPK\fR,...]] [\fB\-\-app\-package\fR=\fIAPP_PACKAGE\fR] [\fB\-\-async\fR] [\fB\-\-auto\-google\-login\fR] [\fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]] [\fB\-\-environment\-variables\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-profile\fR=\fIPROFILE_ID\fR] [\fB\-\-obb\-files\fR=\fIOBB_FILE\fR,[\fIOBB_FILE\fR]] [\fB\-\-other\-files\fR=\fIFILE\fR=\fIDEVICE_DIR\fR,[...]] [\fB\-\-performance\-metrics\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-scenario\-labels\fR=\fILABEL\fR,[\fILABEL\fR,...]] [\fB\-\-scenario\-numbers\fR=\fIint\fR,[\fIint\fR,...]] [\fB\-\-test\-package\fR=\fITEST_PACKAGE\fR] [\fB\-\-test\-runner\-class\fR=\fITEST_RUNNER_CLASS\fR] [\fB\-\-test\-targets\fR=\fITEST_TARGET\fR,[\fITEST_TARGET\fR,...]] [\fB\-\-use\-orchestrator\fR] [\fB\-\-app\-initial\-activity\fR=\fIAPP_INITIAL_ACTIVITY\fR] [\fB\-\-max\-depth\fR=\fIint\fR] [\fB\-\-max\-steps\fR=\fIint\fR] [\fB\-\-robo\-directives\fR=[\fITYPE\fR:\fIRESOURCE_NAME\fR=\fIINPUT\fR,...]] [\fB\-\-robo\-script\fR=\fIROBO_SCRIPT\fR] [\fB\-\-device\-ids\fR=\fIMODEL_ID\fR,[\fIMODEL_ID\fR,...],\ \fB\-d\fR\ \fIMODEL_ID\fR,[\fIMODEL_ID\fR,...]] [\fB\-\-locales\fR=\fILOCALE\fR,[\fILOCALE\fR,...],\ \fB\-l\fR\ \fILOCALE\fR,[\fILOCALE\fR,...]] [\fB\-\-orientations\fR=\fIORIENTATION\fR,[\fIORIENTATION\fR],\ \fB\-o\fR\ \fIORIENTATION\fR,[\fIORIENTATION\fR]] [\fB\-\-os\-version\-ids\fR=\fIOS_VERSION_ID\fR,[...],\ \fB\-v\fR\ \fIOS_VERSION_ID\fR,[...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -73,13 +73,13 @@ A list of \f5\fIDIMENSION=VALUE\fR\fR pairs which specify a target device to
 test against. This flag may be repeated to specify multiple devices. The four
 device dimensions are: \fBmodel\fR, \fBversion\fR, \fBlocale\fR, and
 \fBorientation\fR. If any dimensions are omitted, they will use a default value.
-The default value can be found with the list command for each dimension, \f5$
-gcloud beta firebase test android <dimension> list\fR. \fB\-\-device\fR is now
-the preferred way to specify test devices and may not be used in conjunction
-with \fB\-\-devices\-ids\fR, \fB\-\-os\-version\-ids\fR, \fB\-\-locales\fR, or
-\fB\-\-orientations\fR. Omitting all of the preceding dimension\-related flags
-will run tests against a single device using defaults for all four device
-dimensions.
+The default value for each dimension can be found with the \f5\fIlist\fR\fR
+command for that dimension, such as \f5$ gcloud beta firebase test android
+models list\fR. \fB\-\-device\fR is now the preferred way to specify test
+devices and may not be used in conjunction with \fB\-\-devices\-ids\fR,
+\fB\-\-os\-version\-ids\fR, \fB\-\-locales\fR, or \fB\-\-orientations\fR.
+Omitting all of the preceding dimension\-related flags will run tests against a
+single device using defaults for all four device dimensions.
 
 Examples:
 
@@ -92,7 +92,8 @@ Examples:
 .TP 2m
 \fB\-\-test\fR=\fITEST\fR
 The path to the binary file containing instrumentation tests. The given path may
-be in the local filesystem or in Google Cloud Storage using gs:// notation.
+be in the local filesystem or in Google Cloud Storage using a URL beginning with
+\f5gs://\fR.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR
@@ -145,8 +146,8 @@ Invoke a test asynchronously without waiting for test results.
 .TP 2m
 \fB\-\-auto\-google\-login\fR
 Automatically log into the test device using a preconfigured Google account
-before beginning the test. Enabled by default, use
-\fB\-\-no\-auto\-google\-login\fR to disable.
+before beginning the test. Enabled by default, use \-\-no\-auto\-google\-login
+to disable.
 
 .TP 2m
 \fB\-\-directories\-to\-pull\fR=[\fIDIR_TO_PULL\fR,...]
@@ -206,13 +207,13 @@ files, see \-\-obb\-files and \-\-additional\-apks.
 .TP 2m
 \fB\-\-performance\-metrics\fR
 Monitor and record performance metrics: CPU, memory, network usage, and FPS
-(game\-loop only). Enabled by default, use \fB\-\-no\-performance\-metrics\fR to
+(game\-loop only). Enabled by default, use \-\-no\-performance\-metrics to
 disable.
 
 .TP 2m
 \fB\-\-record\-video\fR
 Enable video recording during the test. Enabled by default, use
-\fB\-\-no\-record\-video\fR to disable.
+\-\-no\-record\-video to disable.
 
 .TP 2m
 \fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR

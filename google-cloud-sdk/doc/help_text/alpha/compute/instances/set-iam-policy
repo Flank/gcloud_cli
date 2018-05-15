@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        The name of the instance to set the IAM policy of.
+        Name of the instance to set the IAM policy of.
 
      POLICY_FILE
         JSON or YAML file containing the IAM policy.

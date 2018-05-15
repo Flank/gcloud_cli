@@ -14,6 +14,7 @@
 """In-memory persistent cache implementation."""
 from __future__ import absolute_import
 from __future__ import division
+from __future__ import unicode_literals
 
 import fnmatch
 
@@ -22,6 +23,7 @@ from googlecloudsdk.core.cache import metadata_table
 from googlecloudsdk.core.cache import persistent_cache_base
 
 import six
+from six.moves import range
 
 
 class _Table(persistent_cache_base.Table):

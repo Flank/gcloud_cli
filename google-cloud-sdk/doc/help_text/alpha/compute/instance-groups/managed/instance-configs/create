@@ -34,8 +34,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to create per instance config
-        for.
+        Name of the managed instance group to create per instance config for.
 
 REQUIRED FLAGS
      --instance=INSTANCE

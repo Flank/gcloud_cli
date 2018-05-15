@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for surface.runtime_config.configs.variables.watch."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import ssl
 
 from apitools.base.py import exceptions as apitools_exceptions
@@ -46,7 +48,7 @@ class VariablesWatchTest(base.RuntimeConfigTestBase):
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
         state=self.messages.Variable.StateValueValuesEnum.UPDATED,
-        value='value1',
+        value=b'value1',
     )
 
     self.variable_client.Watch.Expect(request, wanted_result)
@@ -68,7 +70,7 @@ class VariablesWatchTest(base.RuntimeConfigTestBase):
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
         state=self.messages.Variable.StateValueValuesEnum.UPDATED,
-        value='value1',
+        value=b'value1',
     )
 
     self.variable_client.Watch.Expect(request, wanted_result)
@@ -89,7 +91,7 @@ class VariablesWatchTest(base.RuntimeConfigTestBase):
         name=var_name,
         updateTime='2017-04-16T00:00:00Z',
         state=self.messages.Variable.StateValueValuesEnum.UPDATED,
-        value='value1',
+        value=b'value1',
     )
 
     self.variable_client.Watch.Expect(request, wanted_result)
@@ -184,7 +186,7 @@ class VariablesWatchTest(base.RuntimeConfigTestBase):
         name=var_name,
         updateTime='2017-04-16T00:00:00Z',
         state=self.messages.Variable.StateValueValuesEnum.UPDATED,
-        value='value1',
+        value=b'value1',
     )
     self.variable_client.Watch.Expect(request, result)
 

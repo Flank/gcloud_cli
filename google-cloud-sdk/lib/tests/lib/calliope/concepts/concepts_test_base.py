@@ -27,6 +27,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.calliope import util as calliope_util
 from tests.lib.calliope.concepts import util
+import six
 
 
 class ConceptsTestBase(sdk_test_base.WithFakeAuth,
@@ -75,6 +76,17 @@ class ConceptsTestBase(sdk_test_base.WithFakeAuth,
         cli_generator=None,
         allow_positional=True)
     command.ai = self.parser
+
+  def _GetMockNamespace(self, **kwargs):
+
+    class MockNamespace(object):
+      """A mock class to store the values of parsed args."""
+
+      def __init__(self, **kwargs):
+        for k, v in six.iteritems(kwargs):
+          setattr(self, k, v)
+
+    return MockNamespace(**kwargs)
 
   def _MakeAttributeConfigs(self, with_completers=False):
     """Makes default attribute configs."""

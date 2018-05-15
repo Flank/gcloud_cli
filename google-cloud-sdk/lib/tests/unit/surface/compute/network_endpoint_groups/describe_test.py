@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the network-endpoint-groups describe subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base
@@ -43,7 +45,7 @@ class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
     )
     self.assertEqual(test_resources.NETWORK_ENDPOINT_GROUPS[0], result)
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        self.GetOutput(),
         textwrap.dedent("""\
            description: My NEG 1
            kind: compute#networkEndpointGroup

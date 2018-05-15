@@ -13,12 +13,15 @@
 # limitations under the License.
 """Tests of the 'deploy' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import zipfile
 
 from apitools.base.py import http_wrapper
 from googlecloudsdk.api_lib.functions import exceptions
 from googlecloudsdk.api_lib.storage import storage_util
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.command_lib.functions.deploy import trigger_util
 from googlecloudsdk.core import execution_utils
@@ -30,6 +33,7 @@ from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.functions import base
 from tests.lib.surface.functions import util as testutil
+from six.moves import range
 
 
 _TEST_FUNCTION_FILE = 'functions.js'
@@ -86,7 +90,7 @@ class DeployTestBase(base.FunctionsTestBase):
 
   def MockLongRunningOpResult(self, op_name, poll_count=2, is_error=False):
     """Get Expectation for a LRO."""
-    for _ in xrange(poll_count):
+    for _ in range(poll_count):
       in_progress_op = self._GenerateActiveOperation(op_name)
       self.mock_client.operations.Get.Expect(
           self.messages.CloudfunctionsOperationsGetRequest(name=op_name),
@@ -575,7 +579,6 @@ class CoreTest(DeployTestBase):
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
   def testLocalSourceFailsOnPathDoesNotExist(self):
-    self.StartObjectPatch(os.path, 'exists', return_value=False)
     self.MockGetExistingFunction(response=None)
     with self.assertRaisesRegex(
         exceptions.FunctionsError,
@@ -1408,6 +1411,59 @@ class UpdateTests(DeployTestBase):
       self.Run(
           'functions deploy my-test --remove-labels=deployment ')
 
+
+class DeployAlphaTests(DeployTestBase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testUpdateRuntime(self):
+    """Test update of runtime."""
+    function_name = self.GetFunctionResource(self.GetRegion(), 'my-test')
+    source_archive_url = 'gs://bucket'
+
+    original_function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        source_archive=source_archive_url)
+    updated_function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        source_archive=source_archive_url)
+    updated_function.runtime = 'python37'
+
+    self.ExpectFunctionPatch(
+        function_name=function_name,
+        original_function=original_function,
+        updated_function=updated_function,
+        update_mask='runtime'
+    )
+
+    self.Run('functions deploy my-test --runtime python37')
+
+  def testCreateRuntime(self):
+    self.MockGetExistingFunction(response=None)
+    location = self.GetLocationResource()
+    trigger = self.GetPubSubTrigger(self.Project(), 'topic')
+    function = self.GetFunctionMessage(
+        _DEFAULT_REGION,
+        _DEFAULT_FUNCTION_NAME,
+        event_trigger=trigger,
+        source_archive='gs://my-bucket/function.zip')
+    function.runtime = 'python37'
+    create_request = self.GetFunctionsCreateRequest(function, location)
+    operation = self._GenerateActiveOperation('operations/operation')
+    self.mock_client.projects_locations_functions.Create.Expect(
+        create_request, operation)
+
+    self.MockLongRunningOpResult('operations/operation')
+    self.MockGetExistingFunction(response=function)
+    result = self.Run(
+        'functions deploy my-test --trigger-topic topic '
+        '--region {} --source gs://my-bucket/function.zip '
+        '--runtime python37 --quiet'.format(_DEFAULT_REGION))
+    self.assertEqual(result, function)
+    self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
 if __name__ == '__main__':
   test_case.main()

@@ -37,7 +37,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the route to create.
+        Name of the route to create.
 
 REQUIRED FLAGS
      --destination-range=DESTINATION_RANGE

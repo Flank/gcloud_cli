@@ -19,7 +19,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the target SSL proxy to update.
+        Name of the target SSL proxy to update.
 
 FLAGS
      --backend-service=BACKEND_SERVICE

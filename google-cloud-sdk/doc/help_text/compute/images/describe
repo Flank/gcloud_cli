@@ -10,7 +10,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
-        The name of the disk image to describe.
+        Name of the disk image to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

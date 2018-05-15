@@ -19,8 +19,8 @@ from __future__ import division
 from __future__ import unicode_literals
 import imp
 import inspect
+import io
 import os
-import StringIO
 import sys
 
 from googlecloudsdk.core import yaml
@@ -113,7 +113,7 @@ class _LoadModuleMock(object):
           filtered_deps.append(deps[i])
       filtered_deps.append(deps[-1])
 
-    stream = StringIO.StringIO()
+    stream = io.StringIO()
     yaml_printer.YamlPrinter(stream).AddRecord(filtered_deps)
     deps = stream.getvalue()
 

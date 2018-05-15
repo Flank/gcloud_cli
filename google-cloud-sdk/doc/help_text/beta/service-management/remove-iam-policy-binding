@@ -1,0 +1,47 @@
+NAME
+    gcloud beta service-management remove-iam-policy-binding - removes an IAM
+        policy binding from a service's access policy
+
+SYNOPSIS
+    gcloud beta service-management remove-iam-policy-binding SERVICE
+        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) (REMOVED) Removes an IAM policy binding from a service's access
+    policy.
+
+    The service-management remove-iam-policy-binding command has been replaced
+    by endpoints services remove-iam-policy-binding.
+
+POSITIONAL ARGUMENTS
+     SERVICE
+        The name of the service from which the member is to be removed.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
+        domain:example.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

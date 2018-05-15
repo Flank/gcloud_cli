@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Operations library."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.ml_engine import operations
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.core import resources

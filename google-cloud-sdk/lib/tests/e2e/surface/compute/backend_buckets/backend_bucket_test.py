@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for backend buckets."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
 from googlecloudsdk.calliope import base as calliope_base
@@ -27,8 +29,8 @@ class BackendBucketsTestBase(e2e_test_base.BaseTest):
   GSUTIL_BUCKET_PREFIX = 'gs://'
 
   def UniqueName(self, name):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='compute-backend-test-' + name).next()
+    return next(e2e_utils.GetResourceNameGenerator(
+        prefix='compute-backend-test-' + name))
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)

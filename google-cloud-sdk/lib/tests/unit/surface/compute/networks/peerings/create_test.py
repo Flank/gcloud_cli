@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the network peering create command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case

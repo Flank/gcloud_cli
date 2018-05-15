@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the security policy to describe.
+        Name of the security policy to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

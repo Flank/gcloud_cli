@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the network peering list command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py.testing import mock

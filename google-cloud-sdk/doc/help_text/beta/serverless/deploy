@@ -1,0 +1,19 @@
+NAME
+    gcloud beta serverless deploy - deploy a serverless app
+
+SYNOPSIS
+    gcloud beta serverless deploy [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Deploy a serverless app.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

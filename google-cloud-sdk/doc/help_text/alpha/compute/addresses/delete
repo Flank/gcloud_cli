@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the addresses to delete.
+        Names of the addresses to delete.
 
 FLAGS
      At most one of these may be specified:

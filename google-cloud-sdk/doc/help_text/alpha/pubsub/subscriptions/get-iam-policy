@@ -16,11 +16,11 @@ DESCRIPTION
     details.
 
 POSITIONAL ARGUMENTS
-     SUBSCRIPTION - The subscription for which to display the IAM policy. This
-     represents a Cloud resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: Set the property [core/project] or provide the flag [--project]
-     on the command line. This must be specified.
+     Subscription resource - The subscription for which to display the IAM
+     policy. This represents a Cloud resource. (NOTE) Some attributes are not
+     given arguments in this group but can be set in other ways. To set the
+     [project] attribute: Set the property [core/project] or provide the flag
+     [--project] on the command line. This must be specified.
 
        SUBSCRIPTION
           The ID of the subscription or a fully qualified identifier for the

@@ -1,0 +1,98 @@
+NAME
+    gcloud alpha compute resource-policies create-backup-schedule - create a
+        Google Compute Engine Backup Schedule Resource Policy
+
+SYNOPSIS
+    gcloud alpha compute resource-policies create-backup-schedule NAME
+        --max-retention-days=MAX_RETENTION_DAYS
+        (--weekly-schedule-from-file=WEEKLY_CYCLE_FROM_FILE
+          | --start-time=START_TIME (--daily-schedule | --hourly-schedule=HOURS
+          | --weekly-schedule=WEEKLY_CYCLE)) [--description=DESCRIPTION]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute resource-policies create-backup-schedule
+    creates a Resource Policy which can be attached to disks and specifies a
+    schedule for taking disk snapshots and how long these snapshots should be
+    retained.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the resource policy to operate on.
+
+REQUIRED FLAGS
+     --max-retention-days=MAX_RETENTION_DAYS
+        Maximum number of days snapshot can be retained.
+
+     Cycle Frequency Group. Exactly one of these must be specified:
+
+       From file
+
+         --weekly-schedule-from-file=WEEKLY_CYCLE_FROM_FILE
+            A file which defines a weekly cadence with multiple days and start
+            times. The format is a JSON/YAML file containing a list of objects
+            with the following fields:
+
+            day: Day of the week with the same choices as --weekly-window.
+            startTime: Start time of the snapshot schedule with the same format
+            as --start-time.
+
+       From flags
+
+         --start-time=START_TIME
+            Start time for the disk snapshot schedule to start.. Valid choices
+            are 00:00, 04:00, 08:00,12:00, 16:00 and 20:00 UTC. See $ gcloud
+            topic datetimes for information on time formats. For example,
+            --start-time="03:00-05" (which gets converted to 08:00 UTC). This
+            flag must be specified if any of the other arguments in this group
+            are specified.
+
+         Exactly one of these must be specified:
+
+           --daily-schedule
+              Snapshot schedule occurs daily at START_TIME.
+
+           --hourly-schedule=HOURS
+              Snapshot schedule occurs every n hours starting at START_TIME.
+
+           --weekly-schedule=WEEKLY_CYCLE
+              Snapshot schedule occurs weekly on WEEKLY_WINDOW at START_TIME.
+              WEEKLY_CYCLE must be one of: monday, tuesday, wednesday,
+              thursday, friday, saturday, sunday.
+
+OPTIONAL FLAGS
+     --description=DESCRIPTION
+        An optional, textual description for the backend.
+
+     --region=REGION
+        The region of the resource policy to operate on. If not specified, you
+        may be prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

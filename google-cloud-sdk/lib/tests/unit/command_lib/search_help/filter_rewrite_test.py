@@ -14,6 +14,9 @@
 
 """Unit tests for the help search filter expression rewrite module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.search_help import filter_rewrite
 from tests.lib import subtests
 from tests.lib import test_case

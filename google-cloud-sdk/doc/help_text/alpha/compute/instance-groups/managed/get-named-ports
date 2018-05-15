@@ -20,7 +20,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the instance group to operate on.
+        Name of the instance group to operate on.
 
 FLAGS
      At most one of these may be specified:

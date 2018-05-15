@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Models library."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.ml_engine import models
@@ -138,8 +140,8 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
     self.assertIs(policy, self.models_client.GetIamPolicy(model_ref))
 
   def testSetIamPolicy(self):
-    request_policy = self.msgs.GoogleIamV1Policy(etag='abcd')
-    response_policy = self.msgs.GoogleIamV1Policy(etag='efgh')
+    request_policy = self.msgs.GoogleIamV1Policy(etag=b'abcd')
+    response_policy = self.msgs.GoogleIamV1Policy(etag=b'efgh')
     model_ref = resources.REGISTRY.Parse(
         'myModel', params={'projectsId': self.Project()},
         collection='ml.projects.models')

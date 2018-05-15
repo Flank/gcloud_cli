@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for surface.runtime_config.configs.waiters.delete."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.runtime_config import base

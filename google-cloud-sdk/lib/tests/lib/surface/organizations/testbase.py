@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base class for all organizations tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis
@@ -38,9 +40,9 @@ class OrganizationsUnitTestBase(cli_test_base.CliTestBase,
   HTTP_500_ERR = http_error.MakeHttpError(500, 'Uh oh', url=GOOD_ID_URL)
 
   TEST_ORGANIZATION = messages.Organization(
-      name=u'organizations/298357488294',
-      displayName=u'Test Organization For Testing',
-      owner=messages.OrganizationOwner(directoryCustomerId=u'C0123n456'))
+      name='organizations/298357488294',
+      displayName='Test Organization For Testing',
+      owner=messages.OrganizationOwner(directoryCustomerId='C0123n456'))
 
   def _GetTestIamPolicy(self, clear_fields=None):
     """Creates a test IAM policy.
@@ -61,17 +63,17 @@ class OrganizationsUnitTestBase(cli_test_base.CliTestBase,
                         logType=self.messages.AuditLogConfig
                         .LogTypeValueValuesEnum.ADMIN_READ)
                 ],
-                service=u'allServices')
+                service='allServices')
         ],
         bindings=[
             self.messages.Binding(
-                role=u'roles/resourcemanager.projectCreator',
-                members=[u'domain:foo.com']),
+                role='roles/resourcemanager.projectCreator',
+                members=['domain:foo.com']),
             self.messages.Binding(
-                role=u'roles/resourcemanager.organizationAdmin',
-                members=[u'user:admin@foo.com'])
+                role='roles/resourcemanager.organizationAdmin',
+                members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=b'someUniqueEtag',
         version=1)
 
     for field in clear_fields:

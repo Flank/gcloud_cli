@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine log utilities library."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 
 from googlecloudsdk.command_lib.ml_engine import log_utils
@@ -111,9 +113,9 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
                 'timestamp': '2017-01-20T17:28:19.002754Z'}
     log_generator = self._GetGenerator([log_entry])
     generator = log_utils.SplitMultiline(log_generator)
-    self.assertEqual(log_dict, generator.next())
+    self.assertEqual(log_dict, next(generator))
     with self.assertRaises(StopIteration):
-      generator.next()
+      next(generator)
 
   def testSplitMultilineWithTwoLines(self):
     log_entry = Log(textPayload='foo\nfoo2',
@@ -129,10 +131,10 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
                  'timestamp': '2017-01-20T17:28:19.002754Z'}
     log_generator = self._GetGenerator([log_entry])
     generator = log_utils.SplitMultiline(log_generator)
-    self.assertEqual(log_dict1, generator.next())
-    self.assertEqual(log_dict2, generator.next())
+    self.assertEqual(log_dict1, next(generator))
+    self.assertEqual(log_dict2, next(generator))
     with self.assertRaises(StopIteration):
-      generator.next()
+      next(generator)
 
   def testSplitMultilineWrapper(self):
     log_entry = Log(textPayload='foo\nfoo2',
@@ -144,9 +146,9 @@ class LogUtilsTest(base.MlGaPlatformTestBase):
                 'timestamp': '2017-01-20T17:28:19.002754Z',}
     log_generator = self._GetGenerator([log_entry])
     generator = log_utils.SplitMultiline(log_generator, allow_multiline=True)
-    self.assertEqual(log_dict, generator.next())
+    self.assertEqual(log_dict, next(generator))
     with self.assertRaises(StopIteration):
-      generator.next()
+      next(generator)
 
   def testFormatBasicLog(self):
     log_entry = Log(

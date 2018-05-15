@@ -14,6 +14,9 @@
 
 """Test for the gcloud init."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import re
 import sys
@@ -32,7 +35,10 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
+
 import mock
+import six
+from six.moves import zip
 
 
 def _GetWelcomeMessage():
@@ -323,7 +329,8 @@ def _GetReadyToUseMessage(account, project, zone=None, region=None):
 
 
 def Obj(d):
-  return type('obj', (object,), d)
+  name = b'obj' if six.PY2 else 'obj'
+  return type(name, (object,), d)
 
 
 def GetFakeCred(account):
@@ -470,7 +477,7 @@ class InitNoAuthTest(
                   .format(remaining_commands))
 
   def AssertProperties(self, props):
-    for prop, value in props.iteritems():
+    for prop, value in six.iteritems(props):
       path = prop.split('/')
       cfg = properties.VALUES.AllValues()
       for part in path:
@@ -622,7 +629,7 @@ class InitNoAuthTest(
       commands.append((['compute', 'zones', 'list'], zone_list))
       if zone_choice is not None:
         self.WriteInput(str(zone_choice))
-        if not isinstance(zone_choice, (int, str)):
+        if not isinstance(zone_choice, six.string_types + (int,)):
           raise ValueError(('zone_choice [{zone_choice}] should be an int or '
                             'str, was a [{choice_type}]').format(
                                 zone_choice=zone_choice,

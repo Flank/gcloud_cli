@@ -11,7 +11,7 @@ gcloud alpha genomics pipelines run \- defines and runs a pipeline
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha genomics pipelines run\fR [\fB\-\-command\-line\fR=\fICOMMAND_LINE\fR] [\fB\-\-cpus\fR=\fICPUS\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-docker\-image\fR=\fIDOCKER_IMAGE\fR;\ default="google/cloud\-sdk"] [\fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-inputs\-from\-file\fR=[\fINAME\fR=\fIFILE\fR,...]] [\fB\-\-logging\fR=\fILOGGING\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-outputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-preemptible\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR] [\fB\-\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR;\ default="default"] [\fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-zones\fR=[\fIZONE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha genomics pipelines run\fR [\fB\-\-command\-line\fR=\fICOMMAND_LINE\fR] [\fB\-\-cpus\fR=\fICPUS\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-docker\-image\fR=\fIDOCKER_IMAGE\fR;\ default="google/cloud\-sdk:alpine"] [\fB\-\-inputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-inputs\-from\-file\fR=[\fINAME\fR=\fIFILE\fR,...]] [\fB\-\-logging\fR=\fILOGGING\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-outputs\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-preemptible\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR] [\fB\-\-regions\fR=[\fIREGION\fR,...]] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR;\ default="default"] [\fB\-\-service\-account\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-zones\fR=[\fIZONE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -42,7 +42,7 @@ name and size. For example: \-\-disk\-size "name:size,name2:size2". Overrides
 any values specified in the pipeline\-file.
 
 .TP 2m
-\fB\-\-docker\-image\fR=\fIDOCKER_IMAGE\fR; default="google/cloud\-sdk"
+\fB\-\-docker\-image\fR=\fIDOCKER_IMAGE\fR; default="google/cloud\-sdk:alpine"
 v2alpha1 only. A docker image to run. Requires \-\-command\-line to be specified
 and cannot be used with \-\-pipeline\-file.
 

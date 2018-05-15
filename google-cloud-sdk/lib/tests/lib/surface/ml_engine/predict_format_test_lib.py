@@ -13,6 +13,7 @@
 # limitations under the License.
 """Test Data for all ml predict output formatting tests."""
 
+from __future__ import unicode_literals
 PREDICT_DICT_FORMAT_RESULT = (
     """\
       X Y

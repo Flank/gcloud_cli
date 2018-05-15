@@ -18,7 +18,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      [NAME ...]
-        The names of the addresses to create.
+        Names of the addresses to create.
 
 FLAGS
      --description=DESCRIPTION

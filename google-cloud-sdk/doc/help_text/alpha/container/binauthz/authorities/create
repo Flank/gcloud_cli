@@ -12,9 +12,9 @@ DESCRIPTION
     (ALPHA) Create an Attestation Authority.
 
 POSITIONAL ARGUMENTS
-     AUTHORITY - The authority to be created. This represents a Cloud resource.
-     (NOTE) Some attributes are not given arguments in this group but can be
-     set in other ways. To set the [project] attribute: Set the property
+     Authority resource - The authority to be created. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This
      must be specified.
 
@@ -23,8 +23,8 @@ POSITIONAL ARGUMENTS
           authority.
 
 REQUIRED FLAGS
-     AUTHORITY NOTE - The Container Analysis ATTESTATION_AUTHORITY Note to
-     which the created attestation authority will be bound.
+     Note resource - The Container Analysis ATTESTATION_AUTHORITY Note to which
+     the created attestation authority will be bound.
 
     For the attestation authority to be able to access and use the Note, the
     Note must exist and the active gcloud account (core/account) must have the

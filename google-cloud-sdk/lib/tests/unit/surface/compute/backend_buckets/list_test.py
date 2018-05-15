@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the backend-buckets list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.command_lib.compute.backend_buckets import flags
@@ -31,8 +33,7 @@ class BackendBucketsListGaTest(test_base.BaseTest,
     self._backend_buckets = test_resources.BACKEND_BUCKETS
 
     lister_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
+        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts')
     self.addCleanup(lister_patcher.stop)
     self.mock_get_global_resources = lister_patcher.start()
     self.mock_get_global_resources.return_value = (

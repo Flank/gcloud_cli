@@ -30,7 +30,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the Target VPN Gateway to operate on.
+        Name of the Target VPN Gateway to operate on.
 
 FLAGS
      --region=REGION

@@ -18,8 +18,8 @@ import os
 from googlecloudsdk.api_lib.app import build
 from googlecloudsdk.api_lib.app import deploy_app_command_util
 from googlecloudsdk.api_lib.app import deploy_command_util
+from googlecloudsdk.api_lib.app import env
 from googlecloudsdk.api_lib.app import runtime_builders
-from googlecloudsdk.api_lib.app import util
 from googlecloudsdk.api_lib.app import version_util
 from googlecloudsdk.api_lib.app import yaml_parsing
 from googlecloudsdk.calliope import base
@@ -154,7 +154,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     """If build image on client, and non-hermetic service, upload files."""
     mock_service_info = mock.MagicMock()
     mock_service_info.is_hermetic = False
-    mock_service_info.env = util.Environment.FLEX
+    mock_service_info.env = env.FLEX
     copy_files_mock = self.StartObjectPatch(
         deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
@@ -168,7 +168,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     """If build image on server, and non-hermetic service, upload files."""
     mock_service_info = mock.MagicMock()
     mock_service_info.is_hermetic = False
-    mock_service_info.env = util.Environment.FLEX
+    mock_service_info.env = env.FLEX
     copy_files_mock = self.StartObjectPatch(
         deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
@@ -182,7 +182,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     """Check the standard path, specifically file size limit."""
     mock_service_info = mock.MagicMock()
     mock_service_info.is_hermetic = False
-    mock_service_info.env = util.Environment.STANDARD
+    mock_service_info.env = env.STANDARD
     copy_files_mock = self.StartObjectPatch(
         deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(
@@ -206,10 +206,10 @@ class PrintPostDeployHintsTest(sdk_test_base.WithLogCapture):
     self.AssertLogNotContains('--project')
 
 
-def _MakeConfig(runtime, env='flex'):
+def _MakeConfig(runtime, environment='flex'):
   module = 'my-module'
   source_dir = 'my-module'
-  app_yaml = appinfo.AppInfoExternal(runtime=runtime, env=env)
+  app_yaml = appinfo.AppInfoExternal(runtime=runtime, env=environment)
   source_dir = os.path.join(source_dir, module)
   app_yaml_path = os.path.join(source_dir, 'app.yaml')
   yaml_info = yaml_parsing.ServiceYamlInfo(app_yaml_path, app_yaml)

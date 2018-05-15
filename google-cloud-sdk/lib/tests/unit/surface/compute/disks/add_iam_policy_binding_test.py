@@ -45,10 +45,13 @@ class AddIamPolicyBindingTest(sdk_test_base.WithFakeAuth,
         messages.ComputeDisksGetIamPolicyRequest(
             resource='my-resource', project='fake-project', zone='zone-1'),
         response=test_resources.EmptyAlphaIamPolicy())
+    policy = test_resources.AlphaIamPolicyWithOneBinding()
     self.mock_client.disks.SetIamPolicy.Expect(
         messages.ComputeDisksSetIamPolicyRequest(
             resource='my-resource', project='fake-project', zone='zone-1',
-            policy=test_resources.AlphaIamPolicyWithOneBinding()),
+            zoneSetPolicyRequest=messages.ZoneSetPolicyRequest(
+                bindings=policy.bindings,
+                etag=policy.etag)),
         response=test_resources.AlphaIamPolicyWithOneBinding())
 
     self.Run("""

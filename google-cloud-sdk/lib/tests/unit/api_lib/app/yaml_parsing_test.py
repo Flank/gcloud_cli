@@ -15,7 +15,7 @@
 
 import os
 
-from googlecloudsdk.api_lib.app import util as app_util
+from googlecloudsdk.api_lib.app import env as app_env
 from googlecloudsdk.api_lib.app import yaml_parsing
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
@@ -49,7 +49,15 @@ class YamlParsingTests(util.WithAppData, sdk_test_base.SdkBase):
     self.AssertModule(mod, 'default')
     # True only for Managed VMs
     self.assertFalse(mod.RequiresImage())
-    self.assertIs(mod.env, app_util.Environment.STANDARD)
+    self.assertIs(mod.env, app_env.STANDARD)
+    self.assertFalse(mod.is_ti_runtime)
+
+  def testDefaultTiModule(self):
+    f = self.WriteApp('app.yaml', runtime='nodejs8')
+    mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
+    self.AssertModule(mod, 'default')
+    self.assertIs(mod.env, app_env.STANDARD)
+    self.assertTrue(mod.is_ti_runtime)
 
   def testRuntimeField(self):
     good = [
@@ -94,7 +102,7 @@ class YamlParsingTests(util.WithAppData, sdk_test_base.SdkBase):
     f = self.WriteVmRuntime('app.yaml', 'python')
     mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
     self.AssertModule(mod, 'default',
-                      env=app_util.Environment.MANAGED_VMS)
+                      env=app_env.MANAGED_VMS)
     self.AssertErrContains('Deployments using `vm: true` have been deprecated.')
 
   def testPythonCompatWarning(self):
@@ -102,7 +110,7 @@ class YamlParsingTests(util.WithAppData, sdk_test_base.SdkBase):
     f = self.WriteApp('app.yaml', env='flex', runtime='python-compat')
     mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
     self.AssertModule(mod, 'default', is_hermetic=True,
-                      env=app_util.Environment.FLEX)
+                      env=app_env.FLEX)
     self.AssertErrContains('[runtime: python-compat] is deprecated.  '
                            'Please use [runtime: python] instead.')
 
@@ -112,7 +120,7 @@ class YamlParsingTests(util.WithAppData, sdk_test_base.SdkBase):
                       beta_settings='\n  enable_app_engine_apis: true')
     mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
     self.AssertModule(mod, 'default', is_hermetic=True,
-                      env=app_util.Environment.FLEX)
+                      env=app_env.FLEX)
     self.AssertErrContains('Please migrate to a new base image',
                            normalize_space=True)
 
@@ -180,7 +188,7 @@ libraries:
     f = self.WriteApp('app.yaml', runtime='python27', data=libdata)
     mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
     self.AssertModule(mod, 'default',
-                      env=app_util.Environment.STANDARD)
+                      env=app_env.STANDARD)
     self.AssertErrContains('outdated version [2.7] of the Python SSL library')
 
   def testPythonNoSSLWarning(self):
@@ -197,7 +205,7 @@ libraries:
     f = self.WriteApp('app.yaml', runtime='python27', data=libdata)
     mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
     self.AssertModule(mod, 'default',
-                      env=app_util.Environment.STANDARD)
+                      env=app_env.STANDARD)
     self.AssertErrNotContains('outdated version [2.7] of the Python SSL lib')
 
   def testFlexPy34Warning(self):
@@ -280,23 +288,23 @@ runtime_config:
 
     # Flexible service without explicit skip_files should have flex default
     self.AssertModule(hermetic_module_info, 'default', is_hermetic=True,
-                      env=app_util.Environment.FLEX,
+                      env=app_env.FLEX,
                       skip_files=flex_default)
     # Flexible parsing doesn't replace standard default if it was on purpose
     self.AssertModule(hermetic_with_skip_info, 'mod1', is_hermetic=True,
-                      env=app_util.Environment.FLEX,
+                      env=app_env.FLEX,
                       skip_files=standard_default)
     # Flexible users who use flex default in app.yaml get what they expect.
     self.AssertModule(hermetic_with_extra_skip_info, 'mod1b', is_hermetic=True,
-                      env=app_util.Environment.FLEX,
+                      env=app_env.FLEX,
                       skip_files=flex_default)
     # standard service without explicit skip_files should have standard default
     self.AssertModule(standard_module_info, 'mod2', is_hermetic=False,
-                      env=app_util.Environment.STANDARD,
+                      env=app_env.STANDARD,
                       skip_files=standard_default)
     # standard service should have different skip_files if one is entered.
     self.AssertModule(standard_with_skip_info, 'mod3', is_hermetic=False,
-                      env=app_util.Environment.STANDARD,
+                      env=app_env.STANDARD,
                       skip_files=(r'^(main.py)$'))
 
   def testCustomRuntimeNoEnv(self):
@@ -325,9 +333,9 @@ handlers:
     mod1 = yaml_parsing.ServiceYamlInfo.FromFile(hermetic_vm_module)
     mod2 = yaml_parsing.ServiceYamlInfo.FromFile(non_hermetic_vm_module)
     self.AssertModule(mod1, 'mymod1', is_hermetic=True,
-                      env=app_util.Environment.MANAGED_VMS)
+                      env=app_env.MANAGED_VMS)
     self.AssertModule(mod2, 'mymod2', is_hermetic=False,
-                      env=app_util.Environment.MANAGED_VMS)
+                      env=app_env.MANAGED_VMS)
 
   def testBadFile(self):
     file_path = self.WriteFile('junk.txt', '')
@@ -380,20 +388,20 @@ handlers:
   def testRequiresImage(self):
     f1 = self.WriteVmRuntime('app.yaml', 'python27')
     mod = yaml_parsing.ServiceYamlInfo.FromFile(f1)
-    self.AssertModule(mod, 'default', env=app_util.Environment.MANAGED_VMS)
+    self.AssertModule(mod, 'default', env=app_env.MANAGED_VMS)
     self.assertTrue(mod.RequiresImage())
 
   def testRequiresImageLocalAppYaml(self):
     self.WriteVmRuntime('app.yaml', 'dart')
     with files.ChDir(self.temp_path):
       mod = yaml_parsing.ServiceYamlInfo.FromFile('app.yaml')
-      self.AssertModule(mod, 'default', env=app_util.Environment.MANAGED_VMS)
+      self.AssertModule(mod, 'default', env=app_env.MANAGED_VMS)
       self.assertTrue(mod.RequiresImage())
 
   def testUpdateManagedVMConfig(self):
     f = self.WriteVmRuntime('app.yaml', runtime='python27')
     mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
-    self.AssertModule(mod, 'default', env=app_util.Environment.MANAGED_VMS)
+    self.AssertModule(mod, 'default', env=app_env.MANAGED_VMS)
     self.assertTrue(mod.RequiresImage())
     self.assertEqual(mod.parsed.vm_settings['module_yaml_path'], 'app.yaml')
 

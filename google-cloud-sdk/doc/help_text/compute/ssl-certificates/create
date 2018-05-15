@@ -17,7 +17,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the SSL certificate to create.
+        Name of the SSL certificate to create.
 
 REQUIRED FLAGS
      --certificate=LOCAL_FILE_PATH

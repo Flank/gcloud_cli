@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instances create-with-container subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.compute import containers_utils
@@ -917,6 +919,45 @@ class InstanceTemplatesCreateFromContainerWithNetworkTierBetaTest(
           --network-tier random-network-tier
           """)
 
+  def testWithLabels(self):
+    m = self.messages
+    expected_labels = m.InstanceProperties.LabelsValue(additionalProperties=[
+        m.InstanceProperties.LabelsValue.AdditionalProperty(
+            key='container-vm', value='cos-beta-63-8872-76-0'),
+        m.InstanceProperties.LabelsValue.AdditionalProperty(key='a', value='1'),
+        m.InstanceProperties.LabelsValue.AdditionalProperty(key='b', value='2')
+    ])
+
+    self.Run("""
+        compute instance-templates create-with-container it-1
+          --container-image=gcr.io/my-docker/test-image
+          --labels=a=1,b=2
+        """)
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=m.InstanceTemplate(
+                  name='it-1',
+                  properties=m.InstanceProperties(
+                      canIpForward=False,
+                      disks=[self.default_attached_disk],
+                      labels=expected_labels,
+                      machineType=self.default_machine_type,
+                      metadata=self.default_metadata,
+                      networkInterfaces=[self.default_network_interface],
+                      scheduling=m.Scheduling(automaticRestart=True),
+                      serviceAccounts=[self.default_service_account],
+                      tags=self.default_tags)),
+              project='my-project',
+          ))],
+    )
+    self.AssertOutputEquals(
+        textwrap.dedent("""\
+        NAME  MACHINE_TYPE   PREEMPTIBLE  CREATION_TIMESTAMP
+        it-1  n1-standard-1
+        """))
+
 
 class InstanceTemplatesCreateFromContainerWithNetworkTierAlphaTest(
     InstanceTemplatesCreateWithContainerTestBase):
@@ -1012,6 +1053,27 @@ class InstanceTemplatesCreateFromContainerWithNetworkTierAlphaTest(
           --container-image=gcr.io/my-docker/test-image
           --network-tier random-network-tier
           """)
+
+  def testWithLabels(self):
+    self.Run("""
+        compute instance-templates create-with-container it-1
+          --container-image=gcr.io/my-docker/test-image
+          --labels=c=3,d=4
+        """)
+    m = self.messages
+    expected_labels = m.InstanceProperties.LabelsValue(additionalProperties=[
+        m.InstanceProperties.LabelsValue.AdditionalProperty(
+            key='container-vm', value='cos-beta-63-8872-76-0'),
+        m.InstanceProperties.LabelsValue.AdditionalProperty(key='c', value='3'),
+        m.InstanceProperties.LabelsValue.AdditionalProperty(key='d', value='4')
+    ])
+    expected_request = self.CreateRequestWithNetworkTier(None)
+    expected_request.instanceTemplate.properties.labels = expected_labels
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates, 'Insert', expected_request)],
+    )
+
 
 if __name__ == '__main__':
   test_case.main()

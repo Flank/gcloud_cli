@@ -90,16 +90,24 @@ class MultiErrorTest(test_case.TestCase):
     err = parallel.MultiError([MyException(':('), MyException(':(')])
     self.assertEqual(str(err),
                      'One or more errors occurred:\n'
-                     ':(\n\n'
-                     ':(')
+                     'MyException: :(\n\n'
+                     'MyException: :(')
 
   def testMultiErrorUnicode(self):
     err = parallel.MultiError([
         MyException(_UNICODE_TEST_STRING), MyException(_UNICODE_TEST_STRING)])
     self.assertEqual(six.text_type(err),
                      'One or more errors occurred:\n'
-                     'いろはにほへとちりぬるを\n\n'
-                     'いろはにほへとちりぬるを')
+                     'MyException: いろはにほへとちりぬるを\n\n'
+                     'MyException: いろはにほへとちりぬるを')
+
+  def testMultiErrorEmpty(self):
+    err = parallel.MultiError([
+        MyException('Wrong shoe size'), RuntimeError()])
+    self.assertEqual(six.text_type(err),
+                     'One or more errors occurred:\n'
+                     'MyException: Wrong shoe size\n\n'
+                     'RuntimeError: ')
 
 
 class PoolTestBase(object):

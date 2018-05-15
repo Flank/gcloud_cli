@@ -21,6 +21,9 @@ COMMANDS
      add-iam-policy-binding
         (ALPHA) Add iam policy binding to a taxonomy store.
 
+     get-common
+        (ALPHA) Get common taxonomy store of Google-defined taxonomies.
+
      get-iam-policy
         (ALPHA) Get iam policy of a taxonomy store.
 

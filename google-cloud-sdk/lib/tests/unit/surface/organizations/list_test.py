@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for organizations list."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.organizations import testbase
 
@@ -22,13 +24,13 @@ class OrganizationsListTest(testbase.OrganizationsUnitTestBase):
   messages = testbase.OrganizationsUnitTestBase.messages
 
   TEST_ORG_1 = messages.Organization(
-      name=u'organizations/298357488294',
-      displayName=u'Test Organization For Testing',
-      owner=messages.OrganizationOwner(directoryCustomerId=u'C0123n456'))
+      name='organizations/298357488294',
+      displayName='Test Organization For Testing',
+      owner=messages.OrganizationOwner(directoryCustomerId='C0123n456'))
   TEST_ORG_2 = messages.Organization(
-      name=u'organizations/309468599305',
-      displayName=u'A Secondary Organization',
-      owner=messages.OrganizationOwner(directoryCustomerId=u'C9876n543'))
+      name='organizations/309468599305',
+      displayName='A Secondary Organization',
+      owner=messages.OrganizationOwner(directoryCustomerId='C9876n543'))
 
   def testNoFlagsEmptyList(self):
     self.mock_client.organizations.Search.Expect(

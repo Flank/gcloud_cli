@@ -187,10 +187,12 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
   def testInitialize(self):
     """Tests that a resource is initialized correctly using a deps object."""
     deps_object = deps.Deps(
-        {'book': [deps.ArgFallthrough('--book', 'example')],
-         'shelf': [deps.ArgFallthrough('--book-shelf', 'exampleshelf')],
-         'project': [
-             deps.ArgFallthrough('--book-project', 'exampleproject')]})
+        {'book': [deps.ArgFallthrough('--book')],
+         'shelf': [deps.ArgFallthrough('--book-shelf')],
+         'project': [deps.ArgFallthrough('--book-project')]},
+        parsed_args=self._GetMockNamespace(
+            book='example', book_shelf='exampleshelf',
+            book_project='exampleproject'))
     resource_spec = concepts.ResourceSpec(
         'example.projects.shelves.books',
         resource_name='book',
@@ -206,11 +208,14 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
     """Tests that a resource is initialized correctly with property fallthrough.
     """
     deps_object = deps.Deps(
-        {'book': [deps.ArgFallthrough('--book', 'example')],
-         'shelf': [deps.ArgFallthrough('--book-shelf', 'exampleshelf')],
+        {'book': [deps.ArgFallthrough('--book')],
+         'shelf': [deps.ArgFallthrough('--book-shelf')],
          'project': [
-             deps.ArgFallthrough('--book-project', None),
-             deps.PropertyFallthrough(properties.VALUES.core.project)]})
+             deps.ArgFallthrough('--book-project'),
+             deps.PropertyFallthrough(properties.VALUES.core.project)]},
+        parsed_args=self._GetMockNamespace(
+            book='example', book_shelf='exampleshelf',
+            book_project=None))
     resource_spec = concepts.ResourceSpec(
         'example.projects.shelves.books',
         resource_name='book',
@@ -227,13 +232,14 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
     """Tests Initialize when a fully specified name is given to the anchor.
     """
     deps_object = deps.Deps(
-        {'book': [
-            deps.ArgFallthrough(
-                '--book',
-                'projects/exampleproject/shelves/exampleshelf/books/example')],
-         'shelf': [deps.ArgFallthrough('--book-shelf', 'anothershelf')],
+        {'book': [deps.ArgFallthrough('--book')],
+         'shelf': [deps.ArgFallthrough('--book-shelf')],
          'project': [
-             deps.PropertyFallthrough(properties.VALUES.core.project)]})
+             deps.PropertyFallthrough(properties.VALUES.core.project)]},
+        parsed_args=self._GetMockNamespace(
+            book='projects/exampleproject/shelves/exampleshelf/books/example',
+            book_shelf='anothershelf',
+            book_project=None))
     resource_spec = concepts.ResourceSpec(
         'example.projects.shelves.books',
         resource_name='book',
@@ -254,7 +260,11 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
          'shelf': [deps.ArgFallthrough('--book-shelf', 'exampleshelf')],
          'project': [
              deps.ArgFallthrough('--book-project', None),
-             deps.PropertyFallthrough(properties.VALUES.core.project)]})
+             deps.PropertyFallthrough(properties.VALUES.core.project)]},
+        parsed_args=self._GetMockNamespace(
+            book='example',
+            book_shelf='exampleshelf',
+            book_project=None))
     resource_spec = concepts.ResourceSpec(
         'example.projects.shelves.books',
         resource_name='book',

@@ -10,7 +10,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      URL_MAP_NAME [URL_MAP_NAME ...]
-        The names of the URL maps to delete.
+        Names of the URL maps to delete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

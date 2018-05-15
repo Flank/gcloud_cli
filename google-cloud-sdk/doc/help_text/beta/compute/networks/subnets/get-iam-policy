@@ -13,7 +13,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the subnetwork to describe the IAM Policy of.
+        Name of the subnetwork to describe the IAM Policy of.
 
 FLAGS
      --region=REGION

@@ -14,10 +14,12 @@
 """Integration tests for simulating maintenance on instances."""
 
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
+@test_case.Filters.SkipOnWindows('Too flaky', 'b/79499707')
 class SimulateMaintenanceEventTest(e2e_instances_test_base.InstancesTestBase):
 
   def testSimulateMaintenanceEvent(self):

@@ -21,7 +21,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME
-        The name of the backend service to operate on.
+        Name of the backend service to operate on.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:
@@ -29,9 +29,9 @@ REQUIRED FLAGS
        Instance Group
 
          --instance-group=INSTANCE_GROUP
-            The name of the instance group to remove from the backend service.
-            This flag must be specified if any of the other arguments in this
-            group are specified.
+            Name of the instance group to remove from the backend service. This
+            flag must be specified if any of the other arguments in this group
+            are specified.
 
          At most one of these may be specified:
 
@@ -80,7 +80,7 @@ REQUIRED FLAGS
        Network Endpoint Group
 
          --network-endpoint-group=NETWORK_ENDPOINT_GROUP
-            The name of the network endpoint group to remove from the backend
+            Name of the network endpoint group to remove from the backend
             service. This flag must be specified if any of the other arguments
             in this group are specified.
 

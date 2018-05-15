@@ -15,8 +15,13 @@
 """Test session test base."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from tests.lib import sdk_test_base
 from tests.lib import session_test_base
+
+from six.moves import zip
 
 
 class TestSessionTest(sdk_test_base.SdkBase):

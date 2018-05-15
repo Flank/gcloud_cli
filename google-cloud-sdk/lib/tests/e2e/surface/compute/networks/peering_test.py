@@ -13,11 +13,15 @@
 # limitations under the License.
 """Integration tests for manipulating network peerings."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 
 
 class NetworkPeeringTest(e2e_test_base.BaseTest):
@@ -30,15 +34,15 @@ class NetworkPeeringTest(e2e_test_base.BaseTest):
     self.subnetwork_names = []
     self.peering_names = []
 
-    for _ in xrange(2):
+    for _ in range(2):
       # Prefix limited in size to avoid conflict in firewall names based on
       # first 43 characters of network names.
-      self.network_names.append(e2e_utils.GetResourceNameGenerator(
-          prefix='compute-peering-net').next())
-      self.subnetwork_names.append(e2e_utils.GetResourceNameGenerator(
-          prefix='compute-peering-sub').next())
-      self.peering_names.append(e2e_utils.GetResourceNameGenerator(
-          prefix='compute-peering-peer').next())
+      self.network_names.append(next(e2e_utils.GetResourceNameGenerator(
+          prefix='compute-peering-net')))
+      self.subnetwork_names.append(next(e2e_utils.GetResourceNameGenerator(
+          prefix='compute-peering-sub')))
+      self.peering_names.append(next(e2e_utils.GetResourceNameGenerator(
+          prefix='compute-peering-peer')))
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')

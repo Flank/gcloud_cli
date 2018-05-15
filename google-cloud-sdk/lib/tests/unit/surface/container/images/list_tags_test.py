@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for the container images list-tags commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from containerregistry.client.v2_2 import docker_http
 from containerregistry.client.v2_2 import docker_image
 from googlecloudsdk.api_lib.container.images import util
@@ -26,6 +29,7 @@ from tests.lib import test_case
 
 import httplib2
 import mock
+import six
 
 
 _IMAGE = 'gcr.io/foobar/baz'
@@ -277,7 +281,7 @@ sha1 tag1 2016-04-14T20:47:07
                        _MakeSha('sha2'): {'tag': ['tag2', 'tag3'],
                                           'timeCreatedMs': _TIME_CREATED_MS}}
     self.ListTags(show_occurrences=False)
-    for digest, data in self._manifests.iteritems():
+    for digest, data in six.iteritems(self._manifests):
       self.AssertOutputContains(_StripSha(digest))
       for tag in data['tag']:
         self.AssertOutputContains(tag)

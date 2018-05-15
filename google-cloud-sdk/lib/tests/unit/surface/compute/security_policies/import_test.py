@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the security policies import subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 import textwrap
 
@@ -153,9 +155,9 @@ class SecurityPoliciesImportTest(test_base.BaseTest):
     self.CheckRequests()
 
   def testInvalidJsonFile(self):
-    self._ImportInvalidFromFileHelper(
-        _JSON_INVALID_FILE_PATH, 'json',
-        'Error parsing JSON: No JSON object could be decoded')
+    # Python 2 and 3 produce different json parsing error messages.
+    self._ImportInvalidFromFileHelper(_JSON_INVALID_FILE_PATH, 'json',
+                                      'Error parsing JSON: .*')
 
   def testInvalidYamlFile(self):
     self._ImportInvalidFromFileHelper(

@@ -86,11 +86,11 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
     handler.parsed_args = parsed_args
     self.assertEqual(parsed_args, handler.ParsedArgs())
 
-  @parameterized.parameters(
-      ('--book',
+  @parameterized.named_parameters(
+      ('Flag', '--book',
        ['--book', 'examplebook', '--shelf', 'exampleshelf', '--book-project',
         'exampleproject']),
-      ('BOOK',
+      ('Positional', 'BOOK',
        ['examplebook', '--shelf', 'exampleshelf', '--book-project',
         'exampleproject']))
   def testParse(self, name, arg_list):
@@ -105,9 +105,11 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
         'projects/exampleproject/shelves/exampleshelf/books/examplebook',
         parsed.RelativeName())
 
-  @parameterized.parameters(
-      (['--book', 'examplename', '--shelf', 'exampleshelf'], '[project]'),
-      (['--book', 'examplename', '--book-project', 'exampleproject'],
+  @parameterized.named_parameters(
+      ('MissingProject',
+       ['--book', 'examplename', '--shelf', 'exampleshelf'], '[project]'),
+      ('MissingShelf',
+       ['--book', 'examplename', '--book-project', 'exampleproject'],
        '[shelf]'))
   def testParseError(self, arg_list, error_msg):
     """Tests that Parse method raises InitializationError when necessary."""
@@ -203,68 +205,38 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
             self.Project()),
         parsed.RelativeName())
 
-  @parameterized.named_parameters(
-      ('Flag', '--shelf', ['--shelf', 'exampleshelf'],
-       [deps_lib.ArgFallthrough('--shelf', 'exampleshelf')]),
-      ('None', '', [], []),
-      # Non-anchor args aren't usually positional, but could happen.
-      ('Positional', 'SHELF', ['exampleshelf'],
-       [deps_lib.ArgFallthrough('SHELF', 'exampleshelf')]))
-  def testBuildFullFallthroughsMap(self, flag_name, args_to_parse,
-                                   expected_shelf_fallthroughs):
+  def testBuildFullFallthroughsMapEmptyFallthroughs(self):
     """Tests fallthroughs map is properly built."""
     spec = concept_parsers.ResourcePresentationSpec(
         '--book',
         self.resource_spec,
         'a resource',
         flag_name_overrides={
-            'shelf': flag_name,
+            'shelf': '',
             'project': '--book-project'})
     resource_info = spec.GetInfo()
-    concept_parsers.ConceptParser([spec]).AddToParser(self.parser)
-    parsed_args = self.parser.parser.parse_args(
-        ['--book', 'examplebook'] + args_to_parse)
 
-    result = resource_info.BuildFullFallthroughsMap(parsed_args=parsed_args)
+    result = resource_info.BuildFullFallthroughsMap()
 
     expected = {
         'project': [
-            deps_lib.ArgFallthrough('--book-project', None),
+            deps_lib.ArgFallthrough('--book-project'),
             deps_lib.PropertyFallthrough(properties.VALUES.core.project)],
-        'shelf': expected_shelf_fallthroughs,
+        'shelf': [],
         'book': [
-            deps_lib.ArgFallthrough('--book', 'examplebook')]}
+            deps_lib.ArgFallthrough('--book')]}
     self.assertEqual(expected, result)
 
   @parameterized.named_parameters(
       ('Flag', '--book', False, True,
-       ['--book', 'examplebook', '--shelf', 'exampleshelf'],
-       [deps_lib.ArgFallthrough('--book', 'examplebook')]),
+       [deps_lib.ArgFallthrough('--book')]),
       ('Positional', 'BOOK', False, True,
-       ['examplebook', '--shelf', 'exampleshelf'],
-       [deps_lib.ArgFallthrough('BOOK', 'examplebook')]),
+       [deps_lib.ArgFallthrough('BOOK')]),
       ('FlagPlural', '--books', True, True,
-       ['--books', 'examplebook,anotherbook', '--shelf', 'exampleshelf'],
-       [deps_lib.ArgFallthrough('--books', ['examplebook', 'anotherbook'])]),
+       [deps_lib.ArgFallthrough('--books', plural=True)]),
       ('PositionalPlural', 'BOOKS', True, True,
-       ['examplebook', 'anotherbook', '--shelf', 'exampleshelf'],
-       [deps_lib.ArgFallthrough('BOOKS', ['examplebook', 'anotherbook'])]),
-      ('PositionalNonrequired', 'BOOKS', False, False,
-       ['examplebook', '--shelf', 'exampleshelf'],
-       [deps_lib.ArgFallthrough('BOOKS', 'examplebook')]),
-      ('PositionalNonrequiredPlural', 'BOOKS', True, False,
-       ['examplebook', '--shelf', 'exampleshelf'],
-       [deps_lib.ArgFallthrough('BOOKS', ['examplebook'])]),
-      ('FlagNonrequiredEmpty', '--book', False, False,
-       [], [deps_lib.ArgFallthrough('--book', None)]),
-      ('PositionalNonrequiredEmpty', 'BOOK', False, False,
-       [], [deps_lib.ArgFallthrough('BOOK', None)]),
-      ('FlagNonrequiredPluralEmpty', '--books', True, False,
-       [], [deps_lib.ArgFallthrough('--books', [])]),
-      ('PositionalNonrequiredPluralEmpty', 'BOOKS', True, False,
-       [], [deps_lib.ArgFallthrough('BOOKS', [])]))
+       [deps_lib.ArgFallthrough('BOOKS', plural=True)]))
   def testBuildFullFallthroughsMapAnchor(self, name, plural, required,
-                                         args_to_parse,
                                          expected_book_fallthroughs):
     """Tests fallthroughs map is properly built."""
     spec = concept_parsers.ResourcePresentationSpec(
@@ -277,11 +249,8 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
         prefixes=False,
         required=required)
     resource_info = spec.GetInfo()
-    concept_parsers.ConceptParser([spec]).AddToParser(self.parser)
-    parsed_args = self.parser.parser.parse_args(
-        args_to_parse)
 
-    result = resource_info.BuildFullFallthroughsMap(parsed_args=parsed_args)
+    result = resource_info.BuildFullFallthroughsMap()
 
     self.assertEqual(expected_book_fallthroughs, result['book'])
 
@@ -393,6 +362,25 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
     self.SetUpConceptParser(name, plural=plural, required=False)
     args = self.parser.parser.parse_args([])
     self.assertEqual(expected, getattr(args.CONCEPTS, dest).Parse())
+
+  @parameterized.named_parameters(
+      ('Used',
+       ['--book', 'examplebook', '--book-project', 'exampleproject',
+        '--other-flag', 'exampleshelf']),
+      ('NotUsed',
+       ['--book',
+        'projects/exampleproject/shelves/exampleshelf/books/examplebook']))
+  def testParseWithArbitraryArgFallthrough(self, args_to_parse):
+    fallthroughs_map = {'shelf': [deps_lib.ArgFallthrough('--other-flag')]}
+    self.SetUpConceptParserWithFallthroughs(
+        '--book',
+        fallthroughs_map)
+    self.parser.add_argument('--other-flag', help='h')
+    parsed_args = self.parser.parser.parse_args(args_to_parse)
+
+    self.assertEqual(
+        'projects/exampleproject/shelves/exampleshelf/books/examplebook',
+        parsed_args.CONCEPTS.book.Parse().RelativeName())
 
 
 if __name__ == '__main__':

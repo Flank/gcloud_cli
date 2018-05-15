@@ -31,8 +31,7 @@ COMMANDS
     COMMAND is one of the following:
 
      activate-service-account
-        Authorize gcloud to access Cloud Platform with a Google service
-        account.
+        Authorize access to Google Cloud Platform with a service account.
 
      configure-docker
         Registers gcloud as a Docker credential helper.

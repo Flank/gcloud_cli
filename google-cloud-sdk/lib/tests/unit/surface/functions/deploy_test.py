@@ -22,6 +22,8 @@ they get gradually replaced by tests in deploy_simplified_test.py:
   command changing behavior) and it doesn't look like too much trouble.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from argparse import ArgumentTypeError
 import functools
 import os

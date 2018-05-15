@@ -17,7 +17,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the VPN Tunnel to create.
+        Name of the VPN Tunnel to create.
 
 REQUIRED FLAGS
      --peer-address=PEER_ADDRESS

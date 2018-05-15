@@ -1,0 +1,47 @@
+NAME
+    gcloud alpha access-context-manager perimeters delete - delete a service
+        perimeter
+
+SYNOPSIS
+    gcloud alpha access-context-manager perimeters delete
+        (PERIMETER : --policy=POLICY) [--async] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Delete a service perimeter in a given access policy.
+
+POSITIONAL ARGUMENTS
+     Perimeter resource - The service perimeter you want to delete. The
+     arguments in this group can be used to specify the attributes of this
+     resource. This must be specified.
+
+       PERIMETER
+          The ID of the perimeter or a fully qualified identifier for the
+          perimeter. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --policy=POLICY
+          The ID of the access policy.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the accesscontextmanager/v1alpha API. The full
+    documentation for this API can be found at:
+    https://cloud.google.com/access-context-manager/docs/reference/rest/
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. Usually, users of ALPHA commands and flags need to apply
+    for access, agree to applicable terms, and have their projects whitelisted.
+    Contact Google or sign up on a product's page for ALPHA access. Product
+    pages can be found at https://cloud.google.com/products/.
+

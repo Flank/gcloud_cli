@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the interconnects list subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -122,7 +124,7 @@ class InterconnectsListGATest(sdk_test_base.WithFakeAuth,
   def testWithFilterFlag(self):
     self.client.interconnects.List.Expect(
         self.messages.ComputeInterconnectsListRequest(
-            filter=u'location eq ".*\\bmy\\-location\\b.*"',
+            filter='location eq ".*\\bmy\\-location\\b.*"',
             pageToken=None,
             project=self.Project(),
         ),
@@ -264,7 +266,7 @@ class InterconnectsListBetaTest(sdk_test_base.WithFakeAuth,
   def testWithFilterFlag(self):
     self.client.interconnects.List.Expect(
         self.messages.ComputeInterconnectsListRequest(
-            filter=u'location eq ".*\\bmy\\-location\\b.*"',
+            filter='location eq ".*\\bmy\\-location\\b.*"',
             pageToken=None,
             project=self.Project(),
         ),

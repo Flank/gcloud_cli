@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the security policies list subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py.testing import mock
@@ -24,6 +26,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_resources
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 class SecurityPoliciesListTest(sdk_test_base.WithFakeAuth,

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for manipulating interconnects."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 import time
 
@@ -27,14 +29,16 @@ class AlphaInterconnectsTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.interconnect_name = e2e_utils.GetResourceNameGenerator(
-        prefix='interconnects-test-interconnect').next()
-    self.attachment_name = e2e_utils.GetResourceNameGenerator(
-        prefix='interconnects-test-attachment').next()
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='interconnects-test-network').next()
-    self.router_name = e2e_utils.GetResourceNameGenerator(
-        prefix='interconnects-test-router').next()
+    self.interconnect_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='interconnects-test-interconnect'))
+    self.attachment_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='interconnects-test-attachment'))
+    self.network_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='interconnects-test-network'))
+    self.router_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='interconnects-test-router'))
     self.location = 'sjc-zone1-6'
 
   def GetRegion(self):
@@ -143,14 +147,16 @@ class BetaInterconnectsTest(AlphaInterconnectsTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
-    self.interconnect_name = e2e_utils.GetResourceNameGenerator(
-        prefix='interconnects-test-interconnect').next()
-    self.attachment_name = e2e_utils.GetResourceNameGenerator(
-        prefix='interconnects-test-attachment').next()
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='interconnects-test-network').next()
-    self.router_name = e2e_utils.GetResourceNameGenerator(
-        prefix='interconnects-test-router').next()
+    self.interconnect_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='interconnects-test-interconnect'))
+    self.attachment_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='interconnects-test-attachment'))
+    self.network_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='interconnects-test-network'))
+    self.router_name = next(
+        e2e_utils.GetResourceNameGenerator(prefix='interconnects-test-router'))
     self.location = 'sjc-zone1-6'
 
 

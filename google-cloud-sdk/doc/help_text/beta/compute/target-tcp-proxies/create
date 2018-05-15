@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the target TCP proxy to create.
+        Name of the target TCP proxy to create.
 
 REQUIRED FLAGS
      --backend-service=BACKEND_SERVICE

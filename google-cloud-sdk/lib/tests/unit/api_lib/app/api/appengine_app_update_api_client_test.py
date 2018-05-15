@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.app.api.appengine_app_update_api_client."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.app.api import appengine_app_update_api_client
 from googlecloudsdk.api_lib.util import apis

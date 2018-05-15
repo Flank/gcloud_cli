@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import sys
 import textwrap
@@ -49,23 +52,25 @@ class InfoTest(cli_test_base.CliTestBase,
 
   def testInfo_PythonLocation(self):
     self.Run('info')
-    self.AssertOutputContains(u'Python Location: [{}]'.format(sys.executable))
+    self.AssertOutputContains('Python Location: [{}]'.format(sys.executable))
 
   def testInfo_PythonLocationUnicode(self):
     self.SetEncoding('utf8')
-    unicode_path = u'/skrendu/į/Italiją'
+    unicode_path = '/skrendu/į/Italiją'
     self.StartObjectPatch(sys, 'executable', unicode_path)
     self.Run('info')
-    self.AssertOutputContains(u'Python Location: [{}]'.format(unicode_path))
+    self.AssertOutputContains('Python Location: [{}]'.format(unicode_path))
 
   def testInfo_NoPython(self):
     self.StartObjectPatch(sys, 'executable', None)
     self.Run('info')
-    self.AssertOutputContains(u'Python Location: [None]')
+    self.AssertOutputContains('Python Location: [None]')
 
   def testInfo_Yaml_PythonLocation(self):
+    path = '/usr/local/python'
+    self.StartObjectPatch(sys, 'executable', return_value=path)
     self.Run('info --format=yaml')
-    self.AssertOutputContains(u'python_location: {}'.format(sys.executable))
+    self.AssertOutputContains('python_location: {}'.format(sys.executable))
 
   def testInfo_Yaml_NoPython(self):
     self.StartObjectPatch(sys, 'executable', None)

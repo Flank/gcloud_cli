@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for the forwarding_rules flags module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.command_lib.compute.forwarding_rules import flags

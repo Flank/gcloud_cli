@@ -17,10 +17,7 @@ from tests.lib.surface.firebase.test import e2e_base
 from tests.lib.surface.firebase.test.android import commands
 
 
-class VersionsTests(e2e_base.TestIntegrationTestBase):
-
-  def SetUp(self):
-    pass
+class AndroidVersionsTests(e2e_base.TestIntegrationTestBase):
 
   def testAndroidVersionsList(self):
     self.Run(commands.ANDROID_VERSIONS_LIST)
@@ -29,6 +26,15 @@ class VersionsTests(e2e_base.TestIntegrationTestBase):
     self.AssertOutputMatches(r'19 .* 4.4.x .* KitKat')
     self.AssertOutputMatches(r'21 .* 5.0.x .* Lollipop')
     self.AssertOutputContains('default')
+
+  def testAndroidVersionsDescribe(self):
+    self.Run(commands.ANDROID_VERSIONS_DESCRIBE + '25')
+    self.AssertOutputContains('apiLevel: 25')
+    self.AssertOutputContains("id: '25'")
+    self.AssertOutputContains('codeName: Nougat')
+    self.AssertOutputContains('versionString: 7.1.x')
+    self.AssertOutputContains('releaseDate:')
+    self.AssertOutputContains('  year: 2016')
 
 
 if __name__ == '__main__':

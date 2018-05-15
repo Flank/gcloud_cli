@@ -36,7 +36,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME
-        The name of the backend service to create.
+        Name of the backend service to create.
 
 FLAGS
      --affinity-cookie-ttl=AFFINITY_COOKIE_TTL

@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the node templates to operate on.
+        Name of the node templates to operate on.
 
 FLAGS
      --region=REGION

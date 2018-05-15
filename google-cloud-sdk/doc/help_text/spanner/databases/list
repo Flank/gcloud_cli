@@ -11,8 +11,8 @@ DESCRIPTION
     List the Cloud Spanner databases contained within the given instance.
 
 FLAGS
-     INSTANCE - The Cloud Spanner instance in which to list databases. This
-     represents a Cloud resource. (NOTE) Some attributes are not given
+     Instance resource - The Cloud Spanner instance in which to list databases.
+     This represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
      attribute: Set the property [core/project] or provide the flag [--project]
      on the command line.

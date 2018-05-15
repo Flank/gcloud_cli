@@ -271,7 +271,7 @@ class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
   @parameterized.named_parameters(
       ('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testIncludeWordConfidence_Async(self, track):
-    """Test recognize-long-running command basic output with --async flag."""
+    """Test recognize-long-running command that requests word confidence."""
     self.SetUpForTrack(track)
     self._ExpectLongRunningRecognizeRequest(
         uri='gs://bucket/object',
@@ -295,6 +295,47 @@ class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
     self.assertEqual(expected, actual)
     self.assertEqual(json.loads(self.GetOutput()),
                      encoding.MessageToPyValue(expected))
+
+  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
+  def testSpeakerDiarizationRequest_Async(self, track):
+    """Test diarization flag values mapped in Recognize request."""
+    self.SetUpForTrack(track)
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        max_alternatives=1,
+        result='12345',
+        encoding=None,
+        enable_speaker_diarization=True,
+        speaker_count=7)
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --async '
+                      '    --diarization-speaker-count 7 '
+                      '    --enable-speaker-diarization')
+
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+    self.assertEqual(
+        json.loads(self.GetOutput()), encoding.MessageToPyValue(expected))
+
+  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
+  def testInvalidSpeakerDiarizationRequest_Async(self, track):
+    """Test invalid diarization flag values."""
+    self.SetUpForTrack(track)
+    with self.AssertRaisesArgumentErrorRegexp(
+        'enable-speaker-diarization must be specified.'):
+      self.Run('ml speech recognize-long-running gs://bucket/object '
+               '    --language-code en-US '
+               '    --diarization-speaker-count 8')
+
+    with self.AssertRaisesArgumentErrorRegexp(
+        "invalid int value: 'catsanddogs'"):
+      self.Run('ml speech recognize-long-running gs://bucket/object '
+               '    --language-code en-US '
+               '    --enable-speaker-diarization '
+               '    --diarization-speaker-count catsanddogs')
 
 
 if __name__ == '__main__':

@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups describe subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
+from googlecloudsdk.core.util import encoding
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -54,7 +57,7 @@ class InstanceGroupsDescribeTest(
         """)
 
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        encoding.Decode(self.stdout.getvalue()),
         textwrap.dedent("""\
             creationTimestamp: '2013-09-06T17:54:10.636-07:00'
             description: Test instance group
@@ -87,7 +90,7 @@ class InstanceGroupsDescribeTest(
         """)
 
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        encoding.Decode(self.stdout.getvalue()),
         textwrap.dedent("""\
             creationTimestamp: '2013-09-06T17:54:10.636-07:00'
             description: Test instance group

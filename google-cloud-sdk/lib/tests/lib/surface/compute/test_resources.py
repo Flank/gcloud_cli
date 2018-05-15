@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Resources that are shared by two or more tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -745,29 +747,29 @@ def MakeIamPolicy(msgs, etag, bindings=None):
 
 
 def EmptyAlphaIamPolicy():
-  return MakeIamPolicy(alpha_messages, 'test')
+  return MakeIamPolicy(alpha_messages, b'test')
 
 
 def AlphaIamPolicyWithOneBinding():
-  return MakeIamPolicy(alpha_messages, 'test',
+  return MakeIamPolicy(alpha_messages, b'test',
                        bindings=[alpha_messages.Binding(
                            role='owner',
                            members=['user:testuser@google.com'])])
 
 
 def AlphaIamPolicyWithOneBindingAndDifferentEtag():
-  return MakeIamPolicy(alpha_messages, 'etagTwo',
+  return MakeIamPolicy(alpha_messages, b'etagTwo',
                        bindings=[alpha_messages.Binding(
                            role='owner',
                            members=['user:testuser@google.com'])])
 
 
 def EmptyBetaIamPolicy():
-  return MakeIamPolicy(beta_messages, 'test')
+  return MakeIamPolicy(beta_messages, b'test')
 
 
 def BetaIamPolicyWithOneBindingAndDifferentEtag():
-  return MakeIamPolicy(beta_messages, 'etagTwo',
+  return MakeIamPolicy(beta_messages, b'etagTwo',
                        bindings=[beta_messages.Binding(
                            role='owner',
                            members=['user:testuser@google.com'])])
@@ -953,16 +955,6 @@ def MakeHealthCheckAlpha(msgs, api):
                   msgs.HTTP2HealthCheck.ProxyHeaderValueValuesEnum.NONE)),
           selfLink=(prefix + '/projects/'
                     'my-project/global/healthChecks/health-check-http2')),
-      msgs.HealthCheck(
-          name='health-check-udp',
-          type=msgs.HealthCheck.TypeValueValuesEnum.UDP,
-          udpHealthCheck=msgs.UDPHealthCheck(
-              port=443,
-              portName='happy-udp-port',
-              request='req',
-              response='ack'),
-          selfLink=(prefix + '/projects/'
-                    'my-project/global/healthChecks/health-check-udp'))
   ]
 
 HEALTH_CHECKS = MakeHealthChecks(messages, 'v1')
@@ -976,7 +968,6 @@ HTTP_HEALTH_CHECKS = [
         requestPath='/testpath',
         selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
                   'global/httpHealthChecks/health-check-1')),
-
     messages.HttpHealthCheck(
         name='health-check-2',
         port=80,
@@ -1231,7 +1222,7 @@ def MakeInstanceGroups(msgs, api, scope_type='zone', scope_name='zone-1'):
                     .format(prefix, scope_type + 's', scope_name)),
           creationTimestamp='2013-09-06T17:54:10.636-07:00',
           description='Test instance group',
-          fingerprint='123',
+          fingerprint=b'123',
           namedPorts=[msgs.NamedPort(name='serv-1', port=1111),
                       msgs.NamedPort(name='serv-2', port=2222),
                       msgs.NamedPort(name='serv-3', port=3333)],
@@ -1517,7 +1508,7 @@ def MakeInstanceGroupManagersWithActions(
             'projects/my-project/zones/zone-1'.format(api)),
       baseInstanceName='test-instance-name-1',
       description='Test description.',
-      fingerprint='1234',
+      fingerprint=b'1234',
       instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
                      'my-project/{1}/{2}/instanceGroups/group-1'
                      .format(api, scope_type + 's', scope_name)),
@@ -1576,7 +1567,7 @@ def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
           creationTimestamp='2013-09-06T17:54:10.636-07:00',
           baseInstanceName='test-instance-name-1',
           description='Test description.',
-          fingerprint='1234',
+          fingerprint=b'1234',
           instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-1'
                          .format(api, scope_type + 's', scope_name)),
@@ -1594,7 +1585,7 @@ def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
           creationTimestamp='2014-12-31T23:59:59.999-11:00',
           baseInstanceName='test-instance-name-2',
           description='Test description.',
-          fingerprint='12345',
+          fingerprint=b'12345',
           instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-2'
                          .format(api, scope_type + 's', scope_name)),
@@ -1612,7 +1603,7 @@ def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
           creationTimestamp='2012-01-01T00:00:00.001+11:00',
           baseInstanceName='test-instance-name-3',
           description='Test description.',
-          fingerprint='12346',
+          fingerprint=b'12346',
           instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
                          'my-project/zones/zone-1/instanceGroups/group-3'
                          .format(api)),
@@ -1645,7 +1636,7 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
           creationTimestamp='2013-09-06T17:54:10.636-07:00',
           baseInstanceName='test-instance-name-1',
           description='Test description.',
-          fingerprint='1234',
+          fingerprint=b'1234',
           instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-1'
                          .format(api, scope_type + 's', scope_name)),
@@ -1670,7 +1661,7 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
           creationTimestamp='2014-12-31T23:59:59.999-11:00',
           baseInstanceName='test-instance-name-2',
           description='Test description.',
-          fingerprint='12345',
+          fingerprint=b'12345',
           instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-2'
                          .format(api, scope_type + 's', scope_name)),
@@ -1698,7 +1689,7 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
           creationTimestamp='2012-01-01T00:00:00.001+11:00',
           baseInstanceName='test-instance-name-3',
           description='Test description.',
-          fingerprint='12346',
+          fingerprint=b'12346',
           instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
                          'my-project/zones/zone-1/instanceGroups/group-3'
                          .format(api)),
@@ -1716,7 +1707,7 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
           creationTimestamp='2014-12-31T23:59:59.999-11:00',
           baseInstanceName='test-instance-name-4',
           description='Test description.',
-          fingerprint='12347',
+          fingerprint=b'12347',
           instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
                          'my-project/{1}/{2}/instanceGroups/group-4'
                          .format(api, scope_type + 's', scope_name)),
@@ -2065,7 +2056,7 @@ def MakeOsloginClient(version, use_extended_profile=False):
               ssh_public_keys_value.AdditionalProperty(
                   key='qwertyuiop',
                   value=oslogin_messages.SshPublicKey(
-                      fingerprint='asdfasdf',
+                      fingerprint=b'asdfasdf',
                       key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCks0aWrx'))]),
   )
 
@@ -2099,7 +2090,7 @@ def MakeOsloginClient(version, use_extended_profile=False):
               ssh_public_keys_value.AdditionalProperty(
                   key='qwertyuiop',
                   value=oslogin_messages.SshPublicKey(
-                      fingerprint='asdfasdf',
+                      fingerprint=b'asdfasdf',
                       key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCks0aWrx'))]),
   )
 
@@ -2399,7 +2390,7 @@ def MakeSecurityPolicy(msgs, security_policy_ref):
       name=security_policy_ref.Name(),
       description='my description',
       id=123,
-      fingerprint='=g\313\0305\220\f\266',
+      fingerprint=b'=g\313\0305\220\f\266',
       rules=[
           msgs.SecurityPolicyRule(
               description='default rule',

@@ -14,8 +14,11 @@
 
 """Tests for the e2e_utils module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import io
 import re
-import StringIO
 import time
 
 from tests.lib import e2e_utils
@@ -27,7 +30,7 @@ import mock
 class E2eUtilsTest(test_case.WithOutputCapture):
 
   def testPrintAllThreadStacks(self):
-    output = StringIO.StringIO()
+    output = io.StringIO()
     e2e_utils.PrintAllThreadStacks(out=output)
     self.assertTrue(
         re.search(r'e2e_utils\.py", line \d+, in PrintAllThreadStacks',

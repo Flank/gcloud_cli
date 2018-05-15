@@ -22,6 +22,7 @@ SYNOPSIS
         [--create-disk=[PROPERTY=VALUE,...]] [--description=DESCRIPTION]
         [--disk=[auto-delete=AUTO-DELETE],
           [boot=BOOT],[device-name=DEVICE-NAME],[mode=MODE],[name=NAME]]
+        [--labels=[KEY=VALUE,...]]
         [--local-ssd=[device-name=DEVICE-NAME],
           [interface=INTERFACE],[size=SIZE]] [--machine-type=MACHINE_TYPE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
@@ -57,7 +58,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the instance template to create.
+        Name of the instance template to create.
 
 FLAGS
      --boot-disk-auto-delete
@@ -271,6 +272,9 @@ FLAGS
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
             is no.
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
 
      --local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE],[size=SIZE]
         Attaches a local SSD to the instances.

@@ -16,7 +16,7 @@ DESCRIPTION
     can use the --auto-ack flag on gcloud pubsub subscriptions pull.
 
 POSITIONAL ARGUMENTS
-     SUBSCRIPTION - Name of the subscription to ACK messages on. This
+     Subscription resource - Name of the subscription to ACK messages on. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
      attribute: Set the property [core/project] or provide the flag [--project]

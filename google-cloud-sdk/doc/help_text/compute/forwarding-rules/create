@@ -63,7 +63,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the forwarding rule to create.
+        Name of the forwarding rule to create.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:

@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_BUCKET_NAME
-        The name of the backend bucket to create.
+        Name of the backend bucket to create.
 
 REQUIRED FLAGS
      --gcs-bucket-name=GCS_BUCKET_NAME

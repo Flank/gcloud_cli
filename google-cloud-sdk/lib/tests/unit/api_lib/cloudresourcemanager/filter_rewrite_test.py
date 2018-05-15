@@ -14,6 +14,8 @@
 
 """Unit tests for the Cloud Resource Manager filter rewrite module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudresourcemanager import filter_rewrite
 from tests.lib import subtests
 from tests.lib import test_case

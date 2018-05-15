@@ -14,7 +14,10 @@
 
 """Testing resources for Projects."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_util
+import six
 
 
 def GetTestActiveProjectsList():
@@ -22,19 +25,19 @@ def GetTestActiveProjectsList():
   return [
       messages.Project(
           lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-          projectId=u'feisty-catcher-644',
+          projectId='feisty-catcher-644',
           projectNumber=925276746377,
-          name=u'My Project 5'),
+          name='My Project 5'),
       messages.Project(
           lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-          projectId=u'test-project-2',
+          projectId='test-project-2',
           projectNumber=123002,
-          name=u'test-project-2'),
+          name='test-project-2'),
       messages.Project(
           lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-          projectId=u'test-project-3',
+          projectId='test-project-3',
           projectNumber=123003,
-          name=u'Test Project 3')
+          name='Test Project 3')
   ]
 
 
@@ -42,50 +45,49 @@ def GetTestProjectWithLongNameAndMatchingId():
   messages = projects_util.GetMessages()
   return messages.Project(
       lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-      projectId=u'abcdefghijklmnopqrstuvwxyz',
+      projectId='abcdefghijklmnopqrstuvwxyz',
       projectNumber=925276746377,
-      name=u'AbcdefghijkLMNOpqrstuvwxyz ')  # needs to be at least 24 characters
+      name='AbcdefghijkLMNOpqrstuvwxyz ')  # needs to be at least 24 characters
 
 
 def GetTestActiveProject(prefix=False):
   messages = projects_util.GetMessages()
   return messages.Project(
       lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-      projectId=(
-          u'projects/feisty-catcher-644' if prefix else u'feisty-catcher-644'),
+      projectId=('projects/feisty-catcher-644'
+                 if prefix else 'feisty-catcher-644'),
       projectNumber=925276746377,
-      name=u'My Project 5')
+      name='My Project 5')
 
 
 def GetTestActiveProjectWithSameNameAndId():
   messages = projects_util.GetMessages()
   return messages.Project(
       lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-      projectId=u'test-project-2',
+      projectId='test-project-2',
       projectNumber=123002,
-      name=u'test-project-2')
+      name='test-project-2')
 
 
 def GetTestActiveProjectWithFolderParent():
   messages = projects_util.GetMessages()
   return messages.Project(
       lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-      projectId=u'test-project-2',
+      projectId='test-project-2',
       projectNumber=123002,
-      name=u'test-project-2',
-      parent=messages.ResourceId(
-          id='12345', type='folder'))
+      name='test-project-2',
+      parent=messages.ResourceId(id='12345', type='folder'))
 
 
 def GetTestActiveProjectWithOrganizationParent():
   messages = projects_util.GetMessages()
   return messages.Project(
       lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-      projectId=u'test-project-2',
+      projectId='test-project-2',
       projectNumber=123002,
-      name=u'test-project-2',
-      parent=messages.ResourceId(
-          id='2048', type='organization'),)
+      name='test-project-2',
+      parent=messages.ResourceId(id='2048', type='organization'),
+  )
 
 
 def GetTestActiveProjectWithLabels(labels):
@@ -97,9 +99,9 @@ def GetTestActiveProjectWithLabels(labels):
       ])
   return projects_util.GetMessages().Project(
       lifecycleState=messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-      projectId=u'test-project-2',
+      projectId='test-project-2',
       projectNumber=123002,
-      name=u'test-project-2',
+      name='test-project-2',
       labels=labels_message)
 
 
@@ -122,15 +124,15 @@ def GetTestIamPolicy(clear_fields=None):
                   messages.AuditLogConfig(logType=messages.AuditLogConfig.
                                           LogTypeValueValuesEnum.ADMIN_READ)
               ],
-              service=u'allServices')
+              service='allServices')
       ],
       bindings=[
           messages.Binding(
-              members=[u'serviceAccount:123hash@developer.gserviceaccount.com'],
-              role=u'roles/editor'),
+              members=['serviceAccount:123hash@developer.gserviceaccount.com'],
+              role='roles/editor'),
           messages.Binding(
-              members=[u'user:tester@gmail.com', u'user:slick@gmail.com'],
-              role=u'roles/owner')
+              members=['user:tester@gmail.com', 'user:slick@gmail.com'],
+              role='roles/owner')
       ],
       etag=b'<< Unique versioning etag bytefield >>',
       version=0)
@@ -143,4 +145,4 @@ def GetTestIamPolicy(clear_fields=None):
 
 def GetLabelsFlagValue(labels):
   return ','.join(
-      ['{0}={1}'.format(k, v) for k, v in sorted(labels.iteritems())])
+      ['{0}={1}'.format(k, v) for k, v in sorted(six.iteritems(labels))])

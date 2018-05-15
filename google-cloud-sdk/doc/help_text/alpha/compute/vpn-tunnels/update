@@ -28,7 +28,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the VPN Tunnel to operate on.
+        Name of the VPN Tunnel to operate on.
 
 FLAGS
      --region=REGION

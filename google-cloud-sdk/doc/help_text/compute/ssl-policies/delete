@@ -18,7 +18,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the SSL policies to delete.
+        Names of the SSL policies to delete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

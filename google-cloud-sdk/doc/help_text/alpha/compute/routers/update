@@ -17,7 +17,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the router to update.
+        Name of the router to update.
 
 FLAGS
      --advertisement-mode=MODE

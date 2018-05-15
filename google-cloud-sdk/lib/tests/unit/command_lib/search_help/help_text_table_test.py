@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for the table module."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import textwrap
@@ -33,10 +37,8 @@ class TableTests(calliope_test_base.CalliopeTestBase):
     self.table_dir_path = os.path.join(sdk_root_dir, 'data', 'cli')
     file_utils.MakeDir(self.table_dir_path)
 
-    self.paths_mock = self.StartObjectPatch(config, 'Paths')
-    self.paths_mock.return_value.sdk_root = sdk_root_dir
-    self.paths_mock.return_value.CLOUDSDK_STATE_DIR = '.install'
-
+    self.sdk_root_mock = self.StartPropertyPatch(
+        config.Paths, 'sdk_root', return_value=sdk_root_dir)
     self.table_file_path = os.path.join(self.table_dir_path, 'gcloud.json')
 
     # Load the mock CLI.
@@ -158,7 +160,7 @@ class TableTests(calliope_test_base.CalliopeTestBase):
     self.assertTrue('--help' in table_contents[lookup.FLAGS])
 
   def testNoSdkRootRaisesError(self):
-    self.paths_mock.return_value.sdk_root = None
+    self.sdk_root_mock.return_value = None
     with self.AssertRaisesExceptionMatches(
         cli_tree.SdkRootNotFoundError,
         'SDK root not found for this installation. '

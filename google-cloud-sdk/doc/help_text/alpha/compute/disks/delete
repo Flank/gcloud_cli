@@ -13,7 +13,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      DISK_NAME [DISK_NAME ...]
-        The names of the disks to delete.
+        Names of the disks to delete.
 
 FLAGS
      At most one of these may be specified:

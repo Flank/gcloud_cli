@@ -18,7 +18,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the hosts to delete.
+        Names of the hosts to delete.
 
 FLAGS
      --zone=ZONE

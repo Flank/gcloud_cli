@@ -105,6 +105,9 @@ GROUPS
      regions
         (ALPHA) List Google Compute Engine regions.
 
+     resource-policies
+        (ALPHA) Manage Google Compute Engine Resource Policies.
+
      rolling-updates
         (ALPHA) (DEPRECATED) Manage updates in a managed instance group.
 

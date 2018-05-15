@@ -21,12 +21,12 @@ REQUIRED FLAGS
         imported into the data/ subdirectory in the environment's Cloud Storage
         bucket. Cloud Storage paths must begin with 'gs://'.
 
-     ENVIRONMENT - The environment into whose Cloud Storage bucket to import
-     data.. The arguments in this group can be used to specify the attributes
-     of this resource. (NOTE) Some attributes are not given arguments in this
-     group but can be set in other ways. To set the [project] attribute: Set
-     the property [core/project] or provide the flag [--project] on the command
-     line. This must be specified.
+     Environment resource - The environment into whose Cloud Storage bucket to
+     import data.. The arguments in this group can be used to specify the
+     attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
 
        --environment=ENVIRONMENT
           The ID of the environment or a fully qualified identifier for the
@@ -34,7 +34,7 @@ REQUIRED FLAGS
           arguments in this group are specified.
 
        --location=LOCATION
-          The Cloud location for the environment.
+          Compute Engine zone in which to create the environment.
 
 OPTIONAL FLAGS
      --destination=DESTINATION

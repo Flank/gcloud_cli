@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the target pools to delete.
+        Names of the target pools to delete.
 
 FLAGS
      --region=REGION

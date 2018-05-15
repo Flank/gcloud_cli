@@ -13,7 +13,8 @@
 # limitations under the License.
 """Tests for the container images describecommands."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from containerregistry.client.v2_2 import docker_http
 from containerregistry.client.v2_2 import docker_image
@@ -24,8 +25,8 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import httplib2
-
 import mock
+import six.moves.http_client
 
 
 _IMAGE_STR = (
@@ -63,7 +64,7 @@ class DescribeTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   def testDescribe_NotFound(self, mock_get_digest_from_name):
     mock_get_digest_from_name.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.NOT_FOUND
+            'status': six.moves.http_client.NOT_FOUND
         }), '')
     test_image = 'gcr.io/foo/goodimage:latest'
     with self.assertRaises(util.UserRecoverableV2Error):
@@ -74,7 +75,7 @@ class DescribeTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   def testDescribe_Forbidden(self, mock_get_digest_from_name):
     mock_get_digest_from_name.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.FORBIDDEN
+            'status': six.moves.http_client.FORBIDDEN
         }), '')
     test_image = 'gcr.io/foo/goodimage:latest'
     with self.assertRaises(util.UserRecoverableV2Error):

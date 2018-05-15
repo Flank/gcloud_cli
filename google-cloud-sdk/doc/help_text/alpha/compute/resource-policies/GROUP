@@ -1,0 +1,42 @@
+NAME
+    gcloud alpha compute resource-policies - manage Google Compute Engine
+        Resource Policies
+
+SYNOPSIS
+    gcloud alpha compute resource-policies COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Currently Resource Policies are only available for instances.
+    Resource policies for instances let you define time windows in which live
+    migrations can take place.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create-backup-schedule
+        (ALPHA) Create a Google Compute Engine Backup Schedule Resource Policy.
+
+     create-vm-maintenance
+        (ALPHA) Create a Google Compute Engine VM Maintenance Resource Policy.
+
+     delete
+        (ALPHA) Deletes a Google Compute Engine resource policy.
+
+     describe
+        (ALPHA) Describes a Google Compute Engine resource policy.
+
+     list
+        (ALPHA) List Google Compute Engine resource policies.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

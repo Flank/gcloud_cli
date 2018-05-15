@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for network endpoint groups."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import base
@@ -33,8 +35,8 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
     self.zone = 'us-east2-a'
 
   def _GetResourceName(self):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-neg-test').next()
+    return next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-neg-test'))
 
   @contextlib.contextmanager
   def _CreateInstance(self):

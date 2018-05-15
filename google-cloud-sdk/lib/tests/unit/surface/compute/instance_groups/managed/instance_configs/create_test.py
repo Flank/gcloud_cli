@@ -14,6 +14,8 @@
 
 """Tests for the instance-configs create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions
 from apitools.base.py.testing import mock
 

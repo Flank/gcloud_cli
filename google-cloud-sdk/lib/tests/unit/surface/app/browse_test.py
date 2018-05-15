@@ -14,6 +14,8 @@
 
 """Tests for `gcloud app browse` commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.app import exceptions as app_exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.configurations import named_configs

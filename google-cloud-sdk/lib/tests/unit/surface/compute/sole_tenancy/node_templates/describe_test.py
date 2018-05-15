@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-templates describe subcommand."""
-import textwrap
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
@@ -42,22 +43,20 @@ class NodeTemplatesDescribeTest(test_base.BaseTest):
               region='region-1'))],
     )
     self.assertEqual(test_resources.NODE_TEMPLATES[1], result)
-    self.assertMultiLineEqual(
-        self.stdout.getvalue(),
-        textwrap.dedent("""\
-            creationTimestamp: '2018-01-15T10:00:00.0Z'
-            description: a cold template
-            kind: compute#nodeTemplate
-            name: template-2
-            nodeAffinityLabels:
-              environment: prod
-              nodeGrouping: backend
-            nodeType: n1-node-96-624
-            region: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1
-            selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/nodeTemplates/template-2
-            status: CREATING
-            statusMessage: Template is being created.
-            """))
+    self.AssertOutputEquals("""\
+    creationTimestamp: '2018-01-15T10:00:00.0Z'
+    description: a cold template
+    kind: compute#nodeTemplate
+    name: template-2
+    nodeAffinityLabels:
+      environment: prod
+      nodeGrouping: backend
+    nodeType: n1-node-96-624
+    region: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1
+    selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/nodeTemplates/template-2
+    status: CREATING
+    statusMessage: Template is being created.
+    """, normalize_space=True)
 
 
 if __name__ == '__main__':

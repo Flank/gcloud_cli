@@ -13,6 +13,9 @@
 # limitations under the License.
 
 """Integration tests for Service Manager V1."""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 import json
 import os
 import re
@@ -24,6 +27,7 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import yaml
 from tests.lib import e2e_base
 from tests.lib import test_case
+import six
 
 
 # This bucket is associated with the cloud-sdk-integration-testing-app project.
@@ -265,10 +269,10 @@ class EndpointsIntegrationTest(e2e_base.WithServiceAuth):
         new_list.append(self._normalizeServiceConfig(item))
       return sorted(new_list)
     elif isinstance(config_json, dict):
-      for k, v in config_json.iteritems():
+      for k, v in six.iteritems(config_json):
         if k == 'number' and isinstance(v, int):
           config_json[k] = 0
-        elif k == 'fileName' and isinstance(v, basestring):
+        elif k == 'fileName' and isinstance(v, six.string_types):
           config_json[k] = v.replace('json', '').replace('yaml', '')
         else:
           config_json[k] = self._normalizeServiceConfig(v)

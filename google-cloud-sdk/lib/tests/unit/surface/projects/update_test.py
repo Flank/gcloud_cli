@@ -14,6 +14,8 @@
 
 """Tests for projects update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.projects import base
 from tests.lib.surface.projects import util

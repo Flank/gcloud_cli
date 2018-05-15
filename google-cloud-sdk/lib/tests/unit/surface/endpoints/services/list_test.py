@@ -14,10 +14,14 @@
 
 """Unit tests for endpoints services list command."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 
 from tests.lib import test_case
 from tests.lib.surface.endpoints import unit_test_base
+from six.moves import range
 
 
 class EndpointsListTest(unit_test_base.EV1UnitTestBase):

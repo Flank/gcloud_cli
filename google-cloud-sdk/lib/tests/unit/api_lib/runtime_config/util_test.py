@@ -14,6 +14,8 @@
 
 """Tests for googlecloudsdk.api_lib.runtime_config.util."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 from apitools.base.protorpclite import messages
@@ -134,33 +136,33 @@ class UtilTest(sdk_test_base.SdkBase):
   def testFormatVariable(self):
     variable = MESSAGE_MODULE.Variable(
         name='projects/my-project/configs/my-config/variables/my/var',
-        value='asdf',
+        value=b'asdf',
         state=MESSAGE_MODULE.Variable.StateValueValuesEnum.UPDATED,
         updateTime='2016-04-29T00:00:00Z',
     )
     munged_variable = {
         'atomicName': 'projects/my-project/configs/my-config/variables/my/var',
         'name': 'my/var',
-        'value': 'asdf'.encode('base64').strip(),
+        'value': 'YXNkZg==',
         'state': 'UPDATED',
         'updateTime': '2016-04-29T00:00:00Z',
     }
-    self.assertEqual(util.FormatVariable(variable), munged_variable)
+    self.assertEqual(munged_variable, util.FormatVariable(variable))
 
   def testFormatVariableDecodeValue(self):
     variable = MESSAGE_MODULE.Variable(
         name='projects/my-project/configs/my-config/variables/my/var',
-        value='asdf',
+        value=b'asdf',
         state=MESSAGE_MODULE.Variable.StateValueValuesEnum.UPDATED,
         updateTime='2016-04-29T00:00:00Z',)
     munged_variable = {
         'atomicName': 'projects/my-project/configs/my-config/variables/my/var',
         'name': 'my/var',
-        'value': 'asdf',
+        'value': b'asdf',
         'state': 'UPDATED',
         'updateTime': '2016-04-29T00:00:00Z',
     }
-    self.assertEqual(util.FormatVariable(variable, True), munged_variable)
+    self.assertEqual(munged_variable, util.FormatVariable(variable, True))
 
   def testFormatVariableOutputText(self):
     variable = MESSAGE_MODULE.Variable(

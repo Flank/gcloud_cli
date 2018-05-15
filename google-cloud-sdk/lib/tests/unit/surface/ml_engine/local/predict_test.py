@@ -15,7 +15,8 @@
 
 Mocks subprocess; everything else is an integration test.
 """
-import cStringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import subprocess
 import textwrap
@@ -30,6 +31,7 @@ from tests.lib.surface.ml_engine import base
 from tests.lib.surface.ml_engine import predict_format_test_lib as format_test_data
 
 import mock
+import six
 
 
 class LocalPredictTestBase(object):
@@ -56,7 +58,7 @@ class LocalPredictTestBase(object):
 
   def _MockPopen(self, returncode=0, stdout='[]\n', stderr=''):
     popen_mock = mock.Mock(spec=subprocess.Popen)
-    popen_mock.stdin = cStringIO.StringIO()
+    popen_mock.stdin = test_case.FakeStd()
     popen_mock.communicate.return_value = (stdout, stderr)
     popen_mock.returncode = returncode
     return self.StartObjectPatch(
@@ -77,7 +79,12 @@ class LocalPredictTestBase(object):
     self.assertEqual(kwargs['stdin'], subprocess.PIPE)
     self.assertDictContainsSubset(expected_env, kwargs['env'])
 
-    self.assertEqual(popen_mock.return_value.stdin.getvalue(), instances)
+    stdin_value = popen_mock.return_value.stdin.getvalue()
+    if isinstance(stdin_value, six.binary_type):
+      # In Python 3, getvalue() returns bytes, while in Python 2, it returns
+      # text.
+      stdin_value = stdin_value.decode('utf-8')
+    self.assertEqual(stdin_value, instances)
 
   def testLocalPredict_NoSdkRoot(self):
     self.StartObjectPatch(config.Paths, 'sdk_root',

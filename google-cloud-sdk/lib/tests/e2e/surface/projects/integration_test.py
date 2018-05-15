@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 from tests.lib import test_case
@@ -25,12 +27,12 @@ class ProjectIntegrationTest(base.ProjectsTestBase, e2e_base.WithServiceAuth):
 
   def getIntegrationTestingProject(self):
     return self.messages.Project(
-        createTime=u'2014-09-30T14:51:18.935Z',
-        lifecycleState=
-        self.messages.Project.LifecycleStateValueValuesEnum.ACTIVE,
-        projectId=u'cloud-sdk-integration-testing',
+        createTime='2014-09-30T14:51:18.935Z',
+        lifecycleState=self.messages.Project.LifecycleStateValueValuesEnum.
+        ACTIVE,
+        projectId='cloud-sdk-integration-testing',
         projectNumber=462803083913,
-        name=u'Cloud SDK Integration Testing')
+        name='Cloud SDK Integration Testing')
 
   def compareProjects(self, expected, project):
     return (expected.projectId == project.projectId and

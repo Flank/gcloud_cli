@@ -26,6 +26,13 @@ GROUPS
      images
         (ALPHA) Use Cloud DLP Image capabilities.
 
+     job-triggers
+        (ALPHA) Cloud DLP commands for creating and managing Cloud DLP job
+        triggers.
+
+     jobs
+        (ALPHA) Manage asynchronous, long-running Cloud DLP jobs.
+
      text
         (ALPHA) Use Cloud DLP Text capabilities.
 

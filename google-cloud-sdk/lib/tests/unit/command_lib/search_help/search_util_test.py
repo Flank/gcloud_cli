@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Unit tests for help search utils."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 import textwrap
@@ -269,7 +273,7 @@ Choices description. _FRIENDS_ must be one of: *rachel*, *phoebe*, *monica*."""
     sdk_node = copy.deepcopy(self.sdk)
     sdk_node.update(
         {lookup.COMMANDS:
-         self.sdk.get(lookup.COMMANDS, {}).keys()})
+         list(self.sdk.get(lookup.COMMANDS, {}).keys())})
     self.assertEqual(expected_summary,
                      search_util.GetSummary(sdk_node, terms_to_locations))
     # Should still work if the commands dict wasn't changed for some reason.

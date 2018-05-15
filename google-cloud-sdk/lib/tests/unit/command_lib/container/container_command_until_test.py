@@ -109,7 +109,7 @@ class GetUseV1APIPropertyTest(
     parameterized.TestCase, cli_test_base.CliTestBase):
 
   @parameterized.parameters(
-      (None, None, True),
+      (None, None, False),
       (True, None, True),
       (False, None, False),
       (None, True, True),

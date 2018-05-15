@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the node types to operate on.
+        Name of the node types to operate on.
 
 FLAGS
      --zone=ZONE

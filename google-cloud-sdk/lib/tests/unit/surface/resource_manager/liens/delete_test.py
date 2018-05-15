@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.resource_manager import liens
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
 from tests.lib import test_case
@@ -24,8 +26,8 @@ class LiensDeleteTest(testbase.LiensUnitTestBase):
   def testDeleteLien(self):
     self.mock_liens.Delete.Expect(
         liens.LiensMessages().CloudresourcemanagerLiensDeleteRequest(
-            liensId=u'pt123-abc'),
-        u'pt123-abc')
+            liensId='pt123-abc'),
+        'pt123-abc')
     self.RunLiens('delete', 'pt123-abc')
     self.AssertErrContains('Deleted [liens/pt123-abc].')
 
@@ -39,7 +41,7 @@ class LiensDeleteTest(testbase.LiensUnitTestBase):
         liens.LiensMessages().CloudresourcemanagerLiensDeleteRequest(
             liensId='l1234'),
         exception=http_error.MakeDetailedHttpError(
-            url=u'https://cloudresourcemanager.googleapis.com/v1/liens/l1234',
+            url='https://cloudresourcemanager.googleapis.com/v1/liens/l1234',
             reason='INTERNAL',
             message=':/',
             details=[{

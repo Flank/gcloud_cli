@@ -17,10 +17,7 @@ from tests.lib.surface.firebase.test import e2e_base
 from tests.lib.surface.firebase.test.android import commands
 
 
-class LocalesTests(e2e_base.TestIntegrationTestBase):
-
-  def SetUp(self):
-    pass
+class AndroidLocalesTests(e2e_base.TestIntegrationTestBase):
 
   def testAndroidLocalesList(self):
     self.Run(commands.ANDROID_LOCALES_LIST)

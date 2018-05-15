@@ -14,6 +14,8 @@
 
 """Unit tests for the interactive command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import cli_tree
 from googlecloudsdk.command_lib.interactive import application
@@ -114,11 +116,11 @@ WARNING: No CLI tree generators for [bq, gsutil, kubectl].
 """)
     self.AssertOutputContains("""\
      bottom_bindings_line
-        Display the bottom key bindings line, if true. The default value is
+        If True, display the bottom key bindings line. The default value is
         true.
 
      bottom_status_line
-        Display the bottom status line, if true. The default value is false.
+        If True, display the bottom status line. The default value is false.
 
      completion_menu_lines
         Number of lines in the completion menu. The default value is 4.
@@ -127,36 +129,36 @@ WARNING: No CLI tree generators for [bq, gsutil, kubectl].
         Command context string. The default value is "".
 
      fixed_prompt_position
-        Display the prompt at the same position, if true. The default value is
+        If True, display the prompt at the same position. The default value is
         false.
 
      help_lines
         Maximum number of help snippet lines. The default value is 10.
 
      hidden
-        Expose hidden commands/flags, if true. The default value is false.
+        If True, expose hidden commands/flags. The default value is false.
 
      justify_bottom_lines
-        Left- and right-justify bottom toolbar lines, if true. The default
+        If True, left- and right-justify bottom toolbar lines. The default
         value is false.
 
      manpage_generator
-        Use the manpage CLI tree generator for unsupported commands, if true.
+        If True, use the manpage CLI tree generator for unsupported commands.
         The default value is true.
 
      multi_column_completion_menu
-        Display the completions as a multi-column menu, if true. The default
+        If True, display the completions as a multi-column menu. The default
         value is false.
 
      prompt
         Command prompt string. The default value is "$ ".
 
      show_help
-        Show help as command args are entered, if true. The default value is
-        true.
+        If True, show help as command args are being entered. The default value
+        is true.
 
      suggest
-        Add command line suggestions based on history, if true. The default
+        If True, add command line suggestions based on history. The default
         value is false.
 """)
 

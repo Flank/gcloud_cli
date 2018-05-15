@@ -46,7 +46,7 @@ class CompletionTest(base.DnsMockBetaTest, completer_test_base.CompleterBase):
         expected_command=[
             'beta',
             'dns',
-            'dnskeys',
+            'dns-keys',
             'list',
             '--format=value(keyTag)',
             '--quiet',

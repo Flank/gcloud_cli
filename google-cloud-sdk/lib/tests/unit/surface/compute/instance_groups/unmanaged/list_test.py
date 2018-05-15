@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups unmanaged list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.command_lib.compute import completers
@@ -44,7 +46,7 @@ class UnmanagedInstanceGroupsListTest(test_base.BaseTest,
                       'instanceGroups/group-1'.format(API_VERSION)),
             creationTimestamp='2013-09-06T17:54:10.636-07:00',
             description='Test regional instance group',
-            fingerprint='123',
+            fingerprint=b'123',
             namedPorts=[],
             size=0,
         ))

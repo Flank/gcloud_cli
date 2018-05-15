@@ -26,11 +26,12 @@ REQUIRED FLAGS
        --config-file=CONFIG_FILE
           Path to a local file containing the data for this configuration.
 
-     DEVICE - The device for the configuration to update. The arguments in this
-     group can be used to specify the attributes of this resource. (NOTE) Some
-     attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: Set the property [core/project] or
-     provide the flag [--project] on the command line. This must be specified.
+     Device resource - The device for the configuration to update. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
 
        --device=DEVICE
           The ID of the device or a fully qualified identifier for the device.

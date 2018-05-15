@@ -32,7 +32,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the forwarding rule to operate on.
+        Name of the forwarding rule to operate on.
 
 FLAGS
      --network-tier=NETWORK_TIER

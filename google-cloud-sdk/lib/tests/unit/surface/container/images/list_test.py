@@ -13,7 +13,9 @@
 # limitations under the License.
 """Tests for container images list commands."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from containerregistry.client.v2_2 import docker_http
 from containerregistry.client.v2_2 import docker_image
 from googlecloudsdk.api_lib.container.images import util
@@ -24,7 +26,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 import httplib2
 import mock
-
+import six.moves.http_client
 
 _REPOSITORY = 'gcr.io/foobar'
 
@@ -37,8 +39,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.registry_mock = mock.Mock()
     self.registry_mock.children.side_effect = lambda: self._children
 
-    ctx_manager = self.StartObjectPatch(
-        docker_image.FromRegistry, '__enter__')
+    ctx_manager = self.StartObjectPatch(docker_image.FromRegistry, '__enter__')
     ctx_manager.return_value = self.registry_mock
 
   def List(self, repository=None):
@@ -103,7 +104,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     # Simulate a 401 error the dockerless client.
     err = docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.UNAUTHORIZED
+            'status': six.moves.http_client.UNAUTHORIZED
         }), '')
     self.registry_mock.children.side_effect = err
 
@@ -115,7 +116,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     # Simulate a 403 error the dockerless client.
     err = docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.FORBIDDEN
+            'status': six.moves.http_client.FORBIDDEN
         }), '')
 
     self.registry_mock.children.side_effect = err
@@ -128,7 +129,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     # Simulate a 404 error the dockerless client.
     err = docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.NOT_FOUND
+            'status': six.moves.http_client.NOT_FOUND
         }), '')
 
     self.registry_mock.children.side_effect = err
@@ -146,6 +147,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     with self.assertRaises(util.TokenRefreshError):
       self.List()
     self.AssertErrContains(expected_message)
+
 
 if __name__ == '__main__':
   test_case.main()

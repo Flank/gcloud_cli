@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_BUCKET_NAME
-        The name of the backend bucket to update.
+        Name of the backend bucket to update.
 
 FLAGS
      --description=DESCRIPTION

@@ -14,7 +14,7 @@ DESCRIPTION
     policy updates; see $ {parent} set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     PROJECT ID - The project for which to display the IAM policy. This
+     Project resource - The project for which to display the IAM policy. This
      represents a Cloud resource. This must be specified.
 
        PROJECT_ID

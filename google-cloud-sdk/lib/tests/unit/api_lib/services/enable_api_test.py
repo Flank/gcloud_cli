@@ -19,9 +19,12 @@ from apitools.base.py import exceptions as apitools_exceptions
 
 from googlecloudsdk.api_lib.services import enable_api
 from googlecloudsdk.api_lib.services import exceptions
+from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
+
+import httplib2
 
 
 class EnableApiTest(unit_test_base.SV1UnitTestBase,
@@ -146,3 +149,16 @@ class EnableApiTest(unit_test_base.SV1UnitTestBase,
     with self.assertRaises(exceptions.OperationErrorException):
       enable_api.EnableServiceIfDisabled(self.Project(),
                                          'service3.googleapis.com')
+
+
+class ResourceQuotaTests(sdk_test_base.WithFakeAuth):
+
+  def testDoesntUseResourceQuota(self):
+    self.request_mock = self.StartObjectPatch(
+        httplib2.Http, 'request',
+        return_value=(httplib2.Response({'status': 200}), b''))
+    properties.VALUES.core.project.Set('myproject')
+    enable_api.IsServiceEnabled('myproj', 'service1.googleapis.com')
+    self.assertNotIn(b'X-Goog-User-Project',
+                     self.request_mock.call_args[0][3])
+

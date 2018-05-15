@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for projects delete."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import test_case
@@ -31,8 +33,9 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
         self.messages.Empty())
     self.WriteInput('y\n')
     result = self.RunProjectsBeta('delete', '--format=disable', test_project_id)
-    self.assertEqual([{u'projectId': u'feisty-catcher-644'}],
-                     resource_projector.MakeSerializable(list(result)))
+    self.assertEqual([{
+        'projectId': 'feisty-catcher-644'
+    }], resource_projector.MakeSerializable(list(result)))
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
     self.AssertErrContains('Do you want to continue (Y/n)?')
@@ -72,15 +75,16 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
         self.messages.Empty())
     self.WriteInput('y\n')
     result = self.RunProjectsBeta('delete', '--format=disable', test_project_id)
-    self.assertEqual([{u'projectId': u'feisty-catcher-644'}],
-                     resource_projector.MakeSerializable(list(result)))
+    self.assertEqual([{
+        'projectId': 'feisty-catcher-644'
+    }], resource_projector.MakeSerializable(list(result)))
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
     self.AssertErrContains('Do you want to continue (Y/n)?')
 
   def testDeleteFails400(self):
     exception = http_error.MakeDetailedHttpError(
-        url=u'https://cloudresourcemanager.googleapis.com/v1/projects/p123',
+        url='https://cloudresourcemanager.googleapis.com/v1/projects/p123',
         reason='FAILED_PRECONDITION',
         message='Precondition check failed.',
         details=[{

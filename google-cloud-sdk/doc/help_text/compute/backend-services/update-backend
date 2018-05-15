@@ -33,11 +33,11 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME
-        The name of the backend service to operate on.
+        Name of the backend service to operate on.
 
 REQUIRED FLAGS
      --instance-group=INSTANCE_GROUP
-        The name of the instance group to update the backend service.
+        Name of the instance group to update the backend service.
 
 OPTIONAL FLAGS
      --balancing-mode=BALANCING_MODE

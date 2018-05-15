@@ -13,8 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine local_train command_lib utils."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import atexit
-import cStringIO
+import io
 import os
 import shutil
 import subprocess
@@ -58,7 +60,7 @@ class LocalTrainTest(base.MlBetaPlatformTestBase):
     run_root = os.path.join(self.temp_path, 'run_dir')
     shutil.copytree(package_dir, run_root)
     module_name = 'test_package.test_task'
-    out = cStringIO.StringIO()
+    out = io.BytesIO()
     args = ['foo']
     cluster = {'distributed': ['address_1']}
     stdout, _ = local_train.MakeProcess(

@@ -24,7 +24,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the TCP health check to create.
+        Name of the TCP health check to create.
 
 FLAGS
      --check-interval=CHECK_INTERVAL; default="5s"

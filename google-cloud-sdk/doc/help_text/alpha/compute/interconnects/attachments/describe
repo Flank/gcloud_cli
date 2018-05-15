@@ -13,7 +13,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the interconnect attachment to describe.
+        Name of the interconnect attachment to describe.
 
 FLAGS
      --region=REGION

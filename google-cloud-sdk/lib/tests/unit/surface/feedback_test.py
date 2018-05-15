@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for [gcloud feedback] command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import datetime
 import ntpath
@@ -20,8 +24,6 @@ import posixpath
 import re
 import textwrap
 import unittest
-import urlparse
-
 
 from googlecloudsdk.command_lib import feedback_util
 from googlecloudsdk.command_lib import info_holder
@@ -30,7 +32,10 @@ from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
 from tests.lib import test_case
+
 import mock
+from six.moves import range
+import six.moves.urllib.parse as urlparse
 
 
 STACKOVERFLOW_URL = 'http://stackoverflow.com/questions/tagged/gcloud'
@@ -154,6 +159,8 @@ class FeedbackTestBase(cli_test_base.CliTestBase):
         name=self._TIMESTAMP_LOG_NAME_FORMAT.format(timestamp=timestamp))
 
   def SetUp(self):
+    self.StartPropertyPatch(
+        config.Paths, 'logs_dir', return_value=self.temp_path)
     self.StartPatch('datetime.datetime', _FakeDatetime)
     # Artisinally chosen value: This is 2 hours after the most recent log file
     # that we generate in the FeedbackTest. It lets us just check that we print

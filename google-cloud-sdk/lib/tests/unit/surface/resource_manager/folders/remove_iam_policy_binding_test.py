@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.api_lib.resource_manager import folders
+from googlecloudsdk.core.util import http_encoding
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
@@ -28,20 +31,20 @@ class FoldersRemoveIamPolicyBindingTest(testbase.FoldersUnitTestBase):
   START_POLICY = messages.Policy(
       bindings=[
           messages.Binding(
-              role=u'roles/resourcemanager.projectCreator',
-              members=[u'domain:foo.com']), messages.Binding(
-                  role=u'roles/resourcemanager.folderAdmin',
-                  members=[u'user:admin@foo.com'])
+              role='roles/resourcemanager.projectCreator',
+              members=['domain:foo.com']), messages.Binding(
+                  role='roles/resourcemanager.folderAdmin',
+                  members=['user:admin@foo.com'])
       ],
-      etag='someUniqueEtag',
+      etag=http_encoding.Encode('someUniqueEtag'),
       version=1)
   NEW_POLICY = messages.Policy(
       bindings=[
           messages.Binding(
-              role=u'roles/resourcemanager.projectCreator',
-              members=[u'domain:foo.com'])
+              role='roles/resourcemanager.projectCreator',
+              members=['domain:foo.com'])
       ],
-      etag='someUniqueEtag',
+      etag=http_encoding.Encode('someUniqueEtag'),
       version=1)
 
   def testRemoveIamPolicyBinding(self):

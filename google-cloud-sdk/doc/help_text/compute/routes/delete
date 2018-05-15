@@ -10,7 +10,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the routes to delete.
+        Names of the routes to delete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
-        The name of the disk image to operate on.
+        Name of the disk image to operate on.
 
 REQUIRED FLAGS
      --state=STATE

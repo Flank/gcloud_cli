@@ -243,13 +243,14 @@ $ gcloud projects list \e
     \-\-filter="createTime>=2018\-01\-15"
 .RE
 
-List projects that were created on and after a specific date and time, and sort
-from oldest to newest:
+List projects that were created on and after a specific date and time and sort
+from oldest to newest (with dates and times listed according to the local
+timezone):
 
 .RS 2m
 $ gcloud projects list \e
-    \-\-format="table(projectNumber,projectId,createTime)" \e
-    \-\-filter="createTime>=2018\-01\-15T12:00:00" \-\-sort\-by=createTime
+    \-\-format="table(projectNumber,projectId,createTime.date(tz=LOCAL\e
+))" \-\-filter="createTime>=2018\-01\-15T12:00:00" \-\-sort\-by=createTime
 .RE
 
 List projects that were created within the last two weeks, using ISO8601

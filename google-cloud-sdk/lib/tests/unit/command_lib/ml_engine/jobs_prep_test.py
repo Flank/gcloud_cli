@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine jobs_prep command_lib utils."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 import contextlib
 import os
@@ -318,6 +320,8 @@ class BuildPackagesUnitTest(base.MlBetaPlatformTestBase):
     self.output_path = os.path.join(self.temp_path, 'output')
     self.package_dir = os.path.join(self.package_root, 'test_package')
 
+    self.StartObjectPatch(sys, 'executable', 'fake/python')
+
   def testBuildPackages(self):
     self._RunExpectingPackages(['trainer-0.0.0.tar.gz'])
 
@@ -481,8 +485,8 @@ def _FakeUploadFiles(paths, bucket, gs_prefix=None):
   uploaded_files = []
   for _, remote_path in paths:
     uploaded_files.append(
-        '/'.join(filter(None, [bucket.ToBucketUrl(), gs_prefix, 'DEADBEEF',
-                               remote_path])))
+        '/'.join([f for f in [bucket.ToBucketUrl(), gs_prefix, 'DEADBEEF',
+                              remote_path] if f]))
   return uploaded_files
 
 

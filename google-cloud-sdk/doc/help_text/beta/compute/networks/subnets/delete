@@ -13,7 +13,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the subnetworks to delete.
+        Names of the subnetworks to delete.
 
 FLAGS
      --region=REGION

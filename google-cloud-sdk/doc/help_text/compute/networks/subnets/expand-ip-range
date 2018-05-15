@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the subnetwork to operate on.
+        Name of the subnetwork to operate on.
 
 REQUIRED FLAGS
      --prefix-length=PREFIX_LENGTH

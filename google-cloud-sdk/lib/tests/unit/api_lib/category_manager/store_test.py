@@ -75,6 +75,15 @@ class StoreTest(sdk_test_base.WithFakeAuth):
             'categorymanager.taxonomyStores', taxonomyStoresId='111'), policy)
     self.assertEqual(policy, response)
 
+  def testGetCommon(self):
+    expected_store_name = 'taxonomyStores/expected-store-name'
+    self.mock_client.taxonomyStores.GetCommon.Expect(
+        self.messages.CategorymanagerTaxonomyStoresGetCommonRequest(),
+        self.messages.TaxonomyStore(name=expected_store_name))
+    actual_store = store_api.GetCommonStore()
+    self.assertEqual(
+        actual_store, self.messages.TaxonomyStore(name=expected_store_name))
+
 
 if __name__ == '__main__':
   test_case.main()

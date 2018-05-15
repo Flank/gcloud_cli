@@ -10,17 +10,17 @@ DESCRIPTION
     (ALPHA) This command describes a Cloud Product Search ReferenceImage.
 
 POSITIONAL ARGUMENTS
-     REFERENCE IMAGE - The reference-image to describe. The arguments in this
-     group can be used to specify the attributes of this resource. This must be
-     specified.
+     Reference image resource - The reference-image to describe. The arguments
+     in this group can be used to specify the attributes of this resource. This
+     must be specified.
 
        REFERENCE_IMAGE
-          The ID of the referenceImage or a fully qualified identifier for the
-          referenceImage. This positional must be specified if any of the other
-          arguments in this group are specified.
+          The ID of the reference_image or a fully qualified identifier for the
+          reference_image. This positional must be specified if any of the
+          other arguments in this group are specified.
 
        --catalog=CATALOG
-          The catalog of the referenceImage.
+          The catalog of the reference_image.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

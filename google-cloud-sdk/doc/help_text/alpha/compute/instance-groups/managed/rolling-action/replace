@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to operate on.
+        Name of the managed instance group to operate on.
 
 FLAGS
      --max-surge=MAX_SURGE

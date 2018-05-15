@@ -10,8 +10,8 @@ DESCRIPTION
     (ALPHA) List access levels.
 
 FLAGS
-     POLICY - The access policy you want to list the access levels for. This
-     represents a Cloud resource.
+     Policy resource - The access policy you want to list the access levels
+     for. This represents a Cloud resource.
 
        --policy=POLICY
           The ID of the policy or a fully qualified identifier for the policy.

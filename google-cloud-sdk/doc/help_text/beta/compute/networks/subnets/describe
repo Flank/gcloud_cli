@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the subnetwork to describe.
+        Name of the subnetwork to describe.
 
 FLAGS
      --region=REGION

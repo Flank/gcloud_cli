@@ -15,8 +15,8 @@ REQUIRED FLAGS
      --table=TABLE
         The Cloud Spanner table name.
 
-     DATABASE - The Cloud Spanner database in which to update a row. The
-     arguments in this group can be used to specify the attributes of this
+     Database resource - The Cloud Spanner database in which to update a row.
+     The arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This

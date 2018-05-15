@@ -20,11 +20,11 @@ import re
 
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.core import properties
-from tests.lib import sdk_test_base
 from tests.lib import test_case
+from tests.lib.calliope.concepts import concepts_test_base
 
 
-class DepsTest(sdk_test_base.WithFakeAuth):
+class DepsTest(concepts_test_base.ConceptsTestBase):
   """Test for the calliope.concepts.deps module."""
 
   def Project(self):
@@ -36,34 +36,37 @@ class DepsTest(sdk_test_base.WithFakeAuth):
   def testGenericFallthrough(self):
     """Test functionality of a generic fallthrough."""
     fallthrough = deps.Fallthrough(lambda: 'FOO', 'this is the hint')
-    self.assertEqual('FOO', fallthrough.GetValue())
+    self.assertEqual('FOO', fallthrough.GetValue(self._GetMockNamespace()))
     self.assertEqual('this is the hint', fallthrough.hint)
 
   def testGenericFallthroughFails(self):
     """Test functionality of a generic fallthrough."""
     fallthrough = deps.Fallthrough(lambda: None, 'this is the hint')
     with self.assertRaises(deps.FallthroughNotFoundError):
-      fallthrough.GetValue()
+      fallthrough.GetValue(self._GetMockNamespace())
 
   def testPropertyFallthrough(self):
     """Test functionality of a property fallthrough."""
     fallthrough = deps.PropertyFallthrough(properties.VALUES.core.project)
-    self.assertEqual(self.Project(), fallthrough.GetValue())
+    self.assertEqual(self.Project(),
+                     fallthrough.GetValue(self._GetMockNamespace()))
 
   def testPropertyFallthroughFails(self):
     """Test property fallthrough when the property is unset."""
-    properties.VALUES.core.project.Set(None)
+    self.UnsetProject()
     fallthrough = deps.PropertyFallthrough(properties.VALUES.core.project)
     with self.assertRaises(deps.FallthroughNotFoundError):
-      fallthrough.GetValue()
+      fallthrough.GetValue(self._GetMockNamespace())
 
   def testDeps_ArgsGiven(self):
     """Test the deps object can initialize attributes using ArgFallthrough."""
     deps_object = deps.Deps(
-        {'name': [deps.ArgFallthrough('--myresource-name', 'example')],
-         'project': [deps.ArgFallthrough('--myresource-project',
-                                         'exampleproject'),
-                     deps.PropertyFallthrough(properties.VALUES.core.project)]})
+        {'name': [deps.ArgFallthrough('--myresource-name')],
+         'project': [deps.ArgFallthrough('--myresource-project'),
+                     deps.PropertyFallthrough(properties.VALUES.core.project)]},
+        parsed_args=self._GetMockNamespace(
+            myresource_name='example',
+            myresource_project='exampleproject'))
     self.assertEqual('example', deps_object.Get('name'))
     self.assertEqual('exampleproject', deps_object.Get('project'))
 
@@ -71,16 +74,18 @@ class DepsTest(sdk_test_base.WithFakeAuth):
     """Test the deps object can initialize attributes using PropertyFallthrough.
     """
     deps_object = deps.Deps(
-        {'project': [deps.ArgFallthrough('--myresource-project', None),
-                     deps.PropertyFallthrough(properties.VALUES.core.project)]})
+        {'project': [deps.ArgFallthrough('--myresource-project'),
+                     deps.PropertyFallthrough(properties.VALUES.core.project)]},
+        parsed_args=self._GetMockNamespace(myresource_project=None))
     self.assertEqual(self.Project(), deps_object.Get('project'))
 
   def testDeps_BothFail(self):
     """Test the deps object raises an error if an attribute can't be found."""
-    properties.VALUES.core.project.Set(None)
+    self.UnsetProject()
     deps_object = deps.Deps(
-        {'project': [deps.ArgFallthrough('--myresource-project', None),
-                     deps.PropertyFallthrough(properties.VALUES.core.project)]})
+        {'project': [deps.ArgFallthrough('--myresource-project'),
+                     deps.PropertyFallthrough(properties.VALUES.core.project)]},
+        parsed_args=self._GetMockNamespace(myresource_project=None))
     regex = re.escape(
         'Failed to find attribute [project]. The attribute can be set in the '
         'following ways: \n'
@@ -95,8 +100,9 @@ class DepsTest(sdk_test_base.WithFakeAuth):
     """
     properties.VALUES.compute.zone.Set('us-east1b')
     deps_object = deps.Deps(
-        {'zone': [deps.ArgFallthrough('--myresource-zone', None),
-                  deps.PropertyFallthrough(properties.VALUES.compute.zone)]})
+        {'zone': [deps.ArgFallthrough('--myresource-zone'),
+                  deps.PropertyFallthrough(properties.VALUES.compute.zone)]},
+        parsed_args=self._GetMockNamespace(myresource_zone=None))
     self.assertEqual('us-east1b', deps_object.Get('zone'))
 
   def testDeps_BothFail_AnotherProperty(self):
@@ -104,9 +110,10 @@ class DepsTest(sdk_test_base.WithFakeAuth):
     """
     properties.VALUES.compute.zone.Set(None)
     deps_object = deps.Deps(
-        {'zone': [deps.ArgFallthrough('--myresource-zone', None),
+        {'zone': [deps.ArgFallthrough('--myresource-zone'),
                   deps.PropertyFallthrough(properties.VALUES.compute.zone),
-                  deps.Fallthrough(lambda: None, 'Custom hint')]})
+                  deps.Fallthrough(lambda: None, 'Custom hint')]},
+        parsed_args=self._GetMockNamespace(myresource_zone=None))
     regex = re.escape(
         'Failed to find attribute [zone]. The attribute can be set in the '
         'following ways: \n'

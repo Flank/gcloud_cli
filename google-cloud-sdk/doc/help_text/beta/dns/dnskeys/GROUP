@@ -7,8 +7,8 @@ SYNOPSIS
 DESCRIPTION
     (BETA) (DEPRECATED) Manage Cloud DNS DNSKEY records.
 
-    The gcloud beta dnskeys commands are deprecated; please use the gcloud beta
-    dnskeys commands instead.
+    The gcloud beta dns dnskeys commands are deprecated; please use the gcloud
+    beta dns dns-keys commands instead.
 
     The commands in this group manage Cloud DNS DNS key resources. A DNS key
     resource represents a cryptographic signing key for use in DNSSEC; a DNSKEY

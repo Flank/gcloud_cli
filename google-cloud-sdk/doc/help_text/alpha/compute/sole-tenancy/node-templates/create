@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the node templates to operate on.
+        Name of the node templates to operate on.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:

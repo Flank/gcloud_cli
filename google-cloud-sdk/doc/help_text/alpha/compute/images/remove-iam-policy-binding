@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
-        The name of the disk image to remove the IAM policy binding from.
+        Name of the disk image to remove the IAM policy binding from.
 
 REQUIRED FLAGS
      --member=MEMBER

@@ -1,0 +1,30 @@
+NAME
+    gcloud beta service-management configs - view configurations for various
+        services
+
+SYNOPSIS
+    gcloud beta service-management configs COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) View configurations for various services.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (BETA) (REMOVED) Describes the configuration for a given version of a
+        service.
+
+     list
+        (BETA) (REMOVED) Lists the configurations for a given service.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

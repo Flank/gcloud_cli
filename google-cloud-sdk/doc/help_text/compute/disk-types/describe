@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      DISK_TYPE
-        The name of the disk type to describe.
+        Name of the disk type to describe.
 
 FLAGS
      --zone=ZONE

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for instance group managers."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
@@ -36,7 +38,7 @@ class InstanceTemplatesTestBase(e2e_test_base.BaseTest):
         res_type, name, creation_args)))
 
   def _CreateSubnetAlphaBeta(self, cidr_range):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     self._CreateResourceScheduleCleanUp(name, 'networks', e2e_test_base.GLOBAL,
                                         '--subnet-mode custom')
     self._CreateResourceScheduleCleanUp(
@@ -46,7 +48,7 @@ class InstanceTemplatesTestBase(e2e_test_base.BaseTest):
     return name
 
   def _CreateSubnetGA(self, cidr_range):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     self._CreateResourceScheduleCleanUp(name, 'networks', e2e_test_base.GLOBAL,
                                         '--subnet-mode custom')
     self._CreateResourceScheduleCleanUp(
@@ -80,7 +82,7 @@ class InstanceTemplatesTestBase(e2e_test_base.BaseTest):
     Returns:
       (string) the name of the newly created template.
     """
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     self._CreateResourceScheduleCleanUp(
         name, 'instance-templates', e2e_test_base.GLOBAL, creation_args)
     return name
@@ -98,7 +100,7 @@ class InstanceTemplatesAlphaTest(InstanceTemplatesTestBase):
   def testMultiNic(self):
     subnet_1 = self._CreateSubnetAlphaBeta('10.0.1.0/24')
     subnet_2 = self._CreateSubnetAlphaBeta('10.0.2.0/24')
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     # If the test passes the template will be deleted and the clean up will have
     # nothing to delete (but that's ok since CleanUpResource swallows all
     # exceptions.
@@ -122,12 +124,12 @@ class InstanceTemplatesAlphaTest(InstanceTemplatesTestBase):
         'Deleted [{0}].'.format(self._InstanceTemplateUrl(name)))
 
   def testMinCpuPlatform(self):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
 
-    result = self._CreateResourceScheduleCleanUp(
+    result = next(self._CreateResourceScheduleCleanUp(
         name, 'instance-templates', e2e_test_base.GLOBAL,
         '--min-cpu-platform "Intel Broadwell" '
-        '--format=disable').next()
+        '--format=disable'))
 
     self.assertEqual(result.properties.minCpuPlatform, 'Intel Broadwell')
 
@@ -144,7 +146,7 @@ class InstanceTemplatesBetaTest(InstanceTemplatesTestBase):
   def testMultiNic(self):
     subnet_1 = self._CreateSubnetAlphaBeta('10.0.1.0/24')
     subnet_2 = self._CreateSubnetAlphaBeta('10.0.2.0/24')
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     # If the test passes the template will be deleted and the clean up will have
     # nothing to delete (but that's ok since CleanUpResource swallows all
     # exceptions.
@@ -168,12 +170,12 @@ class InstanceTemplatesBetaTest(InstanceTemplatesTestBase):
         'Deleted [{0}].'.format(self._InstanceTemplateUrl(name)))
 
   def testMinCpuPlatform(self):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
 
-    result = self._CreateResourceScheduleCleanUp(
+    result = next(self._CreateResourceScheduleCleanUp(
         name, 'instance-templates', e2e_test_base.GLOBAL,
         '--min-cpu-platform "Intel Broadwell" '
-        '--format=disable').next()
+        '--format=disable'))
 
     self.assertEqual(result.properties.minCpuPlatform, 'Intel Broadwell')
 
@@ -186,7 +188,7 @@ class InstanceTemplatesBetaTest(InstanceTemplatesTestBase):
     self.AssertOutputContains('x: y')
 
   def testCreateWithContainer(self):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     self.Run('compute instance-templates create-with-container {} '
              '--container-image=gcr.io/google-containers/busybox'.format(name))
     try:
@@ -210,7 +212,7 @@ class InstanceTemplatesGATest(InstanceTemplatesTestBase):
   def testMultiNic(self):
     subnet_1 = self._CreateSubnetGA('10.0.1.0/24')
     subnet_2 = self._CreateSubnetGA('10.0.2.0/24')
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     # If the test passes the template will be deleted and the clean up will have
     # nothing to delete (but that's ok since CleanUpResource swallows all
     # exceptions.

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the security policies create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base
@@ -129,7 +131,7 @@ class SecurityPoliciesCreateTestAlpha(test_base.BaseTest,
     self.CheckSecurityPolicyRequest(
         name='my-policy',
         description=description,
-        fingerprint='=g\xcb\x185\x90\x0c\xb6',
+        fingerprint=b'=g\xcb\x185\x90\x0c\xb6',
         rules=[
             messages.SecurityPolicyRule(
                 description=rule_description,
@@ -144,8 +146,9 @@ class SecurityPoliciesCreateTestAlpha(test_base.BaseTest,
         ])
 
   @parameterized.named_parameters(
+      # Python 2 and 3 produce different json parsing error messages.
       ('InvalidJsonFile', _JSON_INVALID_FILE_PATH, 'json',
-       'Error parsing JSON: No JSON object could be decoded'),
+       'Error parsing JSON: .*'),
       ('InvalidYamlFile', _YAML_INVALID_FILE_PATH, 'yaml',
        'Failed to parse YAML: while parsing a block mapping\n.*\n.*\n.*'))
   def testCreateFromInvalidTemplate(self, file_path, file_format,

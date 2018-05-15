@@ -19,7 +19,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the interconnect to create.
+        Name of the interconnect to create.
 
 REQUIRED FLAGS
      --customer-name=CUSTOMER_NAME

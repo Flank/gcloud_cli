@@ -18,7 +18,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the instance group to create.
+        Name of the instance group to create.
 
 FLAGS
      --description=DESCRIPTION

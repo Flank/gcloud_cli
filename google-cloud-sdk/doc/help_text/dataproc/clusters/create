@@ -117,13 +117,13 @@ FLAGS
         for more information.
 
      --region=REGION
-        Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
-        constitutes an independent resource namespace constrained to deploying
-        instances into Google Compute Engine zones inside the region. The
-        default value of "global" is a special multi-region namespace which is
-        capable of deploying instances into all Google Compute Engine zones
-        globally, and is disjoint from other Cloud Dataproc regions. Overrides
-        the default dataproc/region property value for this command invocation.
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
 
      --scopes=SCOPE,[SCOPE,...]
         Specifies scopes for the node instances. The project's default service

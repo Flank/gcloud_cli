@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups managed set-autoscaling subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import random
 
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils

@@ -14,6 +14,8 @@
 
 """Tests of the 'deploy' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from apitools.base.py import http_wrapper
@@ -533,8 +535,6 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
   def testDeployFromLocalSource_failIfPathDoesNotExist(self):
-    self.StartObjectPatch(os.path, 'exists', return_value=False)
-
     self.ExpectGetFunction()
 
     with self.assertRaisesRegex(

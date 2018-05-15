@@ -11,8 +11,8 @@ DESCRIPTION
     (ALPHA) List all annotations for a given asset.
 
 POSITIONAL ARGUMENTS
-     ASSET - The asset reference. This represents a Cloud resource. This must
-     be specified.
+     Asset resource - The asset reference. This represents a Cloud resource.
+     This must be specified.
 
        ASSET
           The ID of the asset or a fully qualified identifier for the asset.

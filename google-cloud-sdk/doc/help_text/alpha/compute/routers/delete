@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the routers to delete.
+        Names of the routers to delete.
 
 FLAGS
      --region=REGION

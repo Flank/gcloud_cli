@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for wait messages for the compute instance groups managed commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.compute.instance_groups.managed import wait_info
 from tests.lib import test_case
 from tests.lib.surface.compute import test_resources

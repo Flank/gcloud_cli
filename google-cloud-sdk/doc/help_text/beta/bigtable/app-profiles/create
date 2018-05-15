@@ -12,11 +12,11 @@ DESCRIPTION
     (BETA) Create a new Bigtable app_profile.
 
 POSITIONAL ARGUMENTS
-     APP PROFILE - The app profile to create. The arguments in this group can
-     be used to specify the attributes of this resource. (NOTE) Some attributes
-     are not given arguments in this group but can be set in other ways. To set
-     the [project] attribute: Set the property [core/project] or provide the
-     flag [--project] on the command line. This must be specified.
+     App profile resource - The app profile to create. The arguments in this
+     group can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: Set the property [core/project] or
+     provide the flag [--project] on the command line. This must be specified.
 
        APP_PROFILE
           The ID of the app-profile or a fully qualified identifier for the

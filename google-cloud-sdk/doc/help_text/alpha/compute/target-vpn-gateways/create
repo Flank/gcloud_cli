@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the Target VPN Gateway to create.
+        Name of the Target VPN Gateway to create.
 
 REQUIRED FLAGS
      --network=NETWORK

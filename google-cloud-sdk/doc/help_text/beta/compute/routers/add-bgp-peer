@@ -17,7 +17,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the router to operate on.
+        Name of the router to operate on.
 
 REQUIRED FLAGS
      --interface=INTERFACE

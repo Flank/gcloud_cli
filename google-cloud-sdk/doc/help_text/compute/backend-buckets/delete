@@ -10,7 +10,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_BUCKET_NAME [BACKEND_BUCKET_NAME ...]
-        The names of the backend buckets to delete.
+        Names of the backend buckets to delete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -11,7 +11,7 @@ gcloud alpha monitoring policies update \- updates an alerting policy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha monitoring policies update\fR \fINAME\fR [\fB\-\-fields\fR=[\fIfield\fR,...]\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR\ \fB\-\-[no\-]enabled\fR\ \fB\-\-add\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-clear\-notification\-channels\fR\ |\ \fB\-\-remove\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-set\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ \fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR\ \fB\-\-documentation\fR=\fIDOCUMENTATION\fR\ |\ \fB\-\-documentation\-from\-file\fR=\fIDOCUMENTATION_FROM_FILE\fR\ \fB\-\-update\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-user\-labels\fR\ |\ \fB\-\-remove\-user\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-policy\fR=\fIPOLICY\fR\ |\ \fB\-\-policy\-from\-file\fR=\fIPOLICY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha monitoring policies update\fR \fIALERT_POLICY\fR [\fB\-\-fields\fR=[\fIfield\fR,...]\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR\ \fB\-\-[no\-]enabled\fR\ \fB\-\-add\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-clear\-notification\-channels\fR\ |\ \fB\-\-remove\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-set\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ \fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR\ \fB\-\-documentation\fR=\fIDOCUMENTATION\fR\ |\ \fB\-\-documentation\-from\-file\fR=\fIDOCUMENTATION_FROM_FILE\fR\ \fB\-\-update\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-user\-labels\fR\ |\ \fB\-\-remove\-user\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-policy\fR=\fIPOLICY\fR\ |\ \fB\-\-policy\-from\-file\fR=\fIPOLICY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -43,15 +43,15 @@ https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
 .RS 2m
 .TP 2m
 
-NAME \- Name of the Alert Policy to be updated. This represents a Cloud
-resource. (NOTE) Some attributes are not given arguments in this group but can
-be set in other ways. To set the [project] attribute: Set the property
+Alert Policy resource \- Name of the Alert Policy to be updated. This represents
+a Cloud resource. (NOTE) Some attributes are not given arguments in this group
+but can be set in other ways. To set the [project] attribute: Set the property
 [core/project] or provide the flag [\-\-project] on the command line. This must
 be specified.
 
 .RS 2m
 .TP 2m
-\fINAME\fR
+\fIALERT_POLICY\fR
 The ID of the Alert Policy or a fully qualified identifier for the Alert Policy.
 
 

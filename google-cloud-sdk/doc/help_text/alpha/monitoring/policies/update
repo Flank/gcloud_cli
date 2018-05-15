@@ -2,7 +2,7 @@ NAME
     gcloud alpha monitoring policies update - updates an alerting policy
 
 SYNOPSIS
-    gcloud alpha monitoring policies update NAME
+    gcloud alpha monitoring policies update ALERT_POLICY
         [--fields=[field,...] | --display-name=DISPLAY_NAME --[no-]enabled
           --add-notification-channels=[NOTIFICATION-CHANNELS,...]
           | --clear-notification-channels
@@ -34,13 +34,13 @@ DESCRIPTION
     https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies
 
 POSITIONAL ARGUMENTS
-     NAME - Name of the Alert Policy to be updated. This represents a Cloud
-     resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: Set the property
-     [core/project] or provide the flag [--project] on the command line. This
-     must be specified.
+     Alert Policy resource - Name of the Alert Policy to be updated. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
 
-       NAME
+       ALERT_POLICY
           The ID of the Alert Policy or a fully qualified identifier for the
           Alert Policy.
 

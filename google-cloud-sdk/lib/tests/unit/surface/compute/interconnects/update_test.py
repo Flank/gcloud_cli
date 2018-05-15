@@ -182,7 +182,7 @@ class InterconnectsUpdateTest(test_base.BaseTest, parameterized.TestCase):
             self.messages.Interconnect(
                 name='my-interconnect',
                 labels=old_labels,
-                labelFingerprint='abcd'
+                labelFingerprint=b'abcd'
             ),
         ],
         [
@@ -204,7 +204,7 @@ class InterconnectsUpdateTest(test_base.BaseTest, parameterized.TestCase):
           self.messages.ComputeInterconnectsPatchRequest(
               project='my-project', interconnect='my-interconnect',
               interconnectResource=self.messages.Interconnect(
-                  labelFingerprint='abcd',
+                  labelFingerprint=b'abcd',
                   labels=new_labels)))])
 
 

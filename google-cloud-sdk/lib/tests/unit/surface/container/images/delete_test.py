@@ -13,7 +13,8 @@
 # limitations under the License.
 """Tests for container images delete commands."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from containerregistry.client import docker_name
 from containerregistry.client.v2_2 import docker_http
@@ -27,6 +28,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 import httplib2
 import mock
+import six.moves.http_client
 
 _REPOSITORY = 'gcr.io/project/repository'
 _DIGEST_SUFFIX1 = 'sha256:' + 'a'*64
@@ -114,7 +116,7 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
     self.digest_from_name_mock.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.UNAUTHORIZED
+            'status': six.moves.http_client.UNAUTHORIZED
         }), '')
 
     with self.assertRaises(util.UserRecoverableV2Error):
@@ -125,7 +127,7 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
     self.digest_from_name_mock.side_effect = docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.NOT_FOUND
+            'status': six.moves.http_client.NOT_FOUND
         }), '')
 
     with self.assertRaises(util.UserRecoverableV2Error):

@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME
-        The name of the backend service to describe.
+        Name of the backend service to describe.
 
 FLAGS
      At most one of these may be specified:

@@ -15,6 +15,9 @@
 
 """Test assertions for the test_case test assertions. We must dig deeper."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import sys
 
@@ -212,24 +215,28 @@ add //mock/tmp/dir/base-2.suffix
 
   def testAssertOutputContainsUTF8WithAsciiEncodingMismatch(self):
     # Assertion failure messages should be immune to ascii encoding errors.
-    sys.stdout.buffer.write(u'Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
-    expected = u'stdout does not equal the expected value.*\\u1e72'
+    sys.stdout.buffer.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    expected = r'stdout does not equal the expected value.*\\u1e72'
     with self.assertRaisesRegex(AssertionError, expected):
       self.AssertOutputEquals('unicode')
 
+  @test_case.Filters.RunOnlyOnPy2(
+      'Encoding mismatches are not allowed to occur on Py3')
   def testAssertOutputContainsUTF8WithUTF8EncodingMismatch(self):
     # Assertion failure messages should be immune to ascii encoding errors.
     self.SetEncoding('utf8')
-    sys.stdout.write(u'Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    sys.stdout.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
     # No Regexp here because pytest has a str() that trips ascii codec error.
     with self.assertRaises(AssertionError):
-      self.AssertOutputEquals(u'unicode')
+      self.AssertOutputEquals('unicode')
 
+  @test_case.Filters.RunOnlyOnPy2(
+      'Encoding mismatches are not allowed to occur on Py3')
   def testAssertOutputContainsUTF8WithUTF8EncodingMatch(self):
     # Assertion failure messages should be immune to ascii encoding errors.
     self.SetEncoding('utf8')
-    sys.stdout.write(u'Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
-    self.AssertOutputEquals(u'Ṳᾔḯ¢◎ⅾℯ')
+    sys.stdout.write('Ṳᾔḯ¢◎ⅾℯ'.encode('utf8'))
+    self.AssertOutputEquals('Ṳᾔḯ¢◎ⅾℯ')
 
 
 class AssertIsGoldenTest(test_case.WithOutputCapture):

@@ -11,7 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Utility for repeated apitools Expect method calls."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+from six.moves import range
 
 
 def ExpectWithRetries(method, request, response,
@@ -35,7 +41,7 @@ def ExpectWithRetries(method, request, response,
   polling_request = polling_request or request
   final_response = final_response or response
 
-  for i in xrange(num_retries + 1):
+  for i in range(num_retries + 1):
     if i == 0:
       current_request = request
       current_method = method

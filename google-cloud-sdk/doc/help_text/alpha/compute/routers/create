@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the router to create.
+        Name of the router to create.
 
 REQUIRED FLAGS
      --asn=ASN

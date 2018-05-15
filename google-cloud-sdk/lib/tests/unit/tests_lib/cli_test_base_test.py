@@ -14,6 +14,10 @@
 
 """Test assertions for the cli_test_base test assertions. We must dig deeper."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import random
 import time
 
@@ -68,7 +72,7 @@ class CliTestBaseRunUntilTest(cli_test_base.CliTestBase):
   def testRunUntilSuccess(self):
     def Run(cmd):
       self._foo_counter = getattr(self, '_foo_counter', 0) + 1
-      print self._foo_counter
+      print(self._foo_counter)
       return cmd
 
     self.run_patch.side_effect = Run

@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to delete.
+        Name of the managed instance group to delete.
 
 REQUIRED FLAGS
      --instances=INSTANCE,[INSTANCE,...]

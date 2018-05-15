@@ -13,6 +13,8 @@
 # limitations under the License.
 """Module for instance-groups managed integration test base classes."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -73,7 +75,7 @@ class ManagedTestBase(e2e_test_base.BaseTest):
   def CreateInstanceTemplate(self,
                              machine_type='n1-standard-1',
                              additional_disks=None):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     command = 'compute instance-templates create {0} --machine-type {1}'.format(
         name, machine_type)
     for additional_disk in additional_disks or []:
@@ -87,7 +89,7 @@ class ManagedTestBase(e2e_test_base.BaseTest):
     return name
 
   def CreateTargetPool(self):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     self.Run('compute target-pools create {0} --region {1}'
              .format(name, e2e_test_base.REGION))
     self.target_pool_names.append(name)
@@ -98,7 +100,7 @@ class ManagedTestBase(e2e_test_base.BaseTest):
       self, instance_template_name, size=0, scope_flag=None):
     if scope_flag is None:
       scope_flag = self.GetScopeFlag()
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     if self.scope == e2e_test_base.ZONAL:
       self.instance_group_manager_names.append(name)
     elif self.scope == e2e_test_base.REGIONAL:

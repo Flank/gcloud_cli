@@ -30,7 +30,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME
-        The name of the backend service to update.
+        Name of the backend service to update.
 
 FLAGS
      --affinity-cookie-ttl=AFFINITY_COOKIE_TTL

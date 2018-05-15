@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for instance group managers."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib import test_case
@@ -62,7 +64,7 @@ class InstanceGroupsAutoscalingTest(e2e_test_base.BaseTest):
     return '--' + flag_name + ' ' + flag_value
 
   def CreateInstanceTemplate(self, machine_type='n1-standard-1'):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     self.Run('compute instance-templates create {0} --machine-type {1}'
              .format(name, machine_type))
     self.instance_template_names.append(name)
@@ -70,7 +72,7 @@ class InstanceGroupsAutoscalingTest(e2e_test_base.BaseTest):
     return name
 
   def CreateInstanceGroupManager(self, instance_template_name, size=0):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     if self.scope == e2e_test_base.ZONAL:
       self.instance_group_manager_names.append(name)
     elif self.scope == e2e_test_base.REGIONAL:

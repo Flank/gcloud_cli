@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the subnetwork to set the IAM Policy of.
+        Name of the subnetwork to set the IAM Policy of.
 
      POLICY_FILE
         Path to a local JSON or YAML formatted file containing a valid policy.

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for forwarding rules labels."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import base
@@ -26,10 +28,12 @@ class ForwardingRulesLabelsTest(e2e_test_base.BaseTest):
   def SetUp(self):
     self.track = base.ReleaseTrack.BETA
 
-    self.forwarding_rule_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-forwarding-rule').next()
-    self.target_pool_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-target-pool').next()
+    self.forwarding_rule_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-test-forwarding-rule'))
+    self.target_pool_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-test-target-pool'))
 
   def RunCompute(self, *cmd):
     return self.Run(('compute',) + cmd)
@@ -58,10 +62,9 @@ class ForwardingRulesLabelsTest(e2e_test_base.BaseTest):
       self.CleanUpResource('forwarding-rules', name, '--region', region)
 
   def testForwardingRules(self):
-    with contextlib.nested(
-        self._TargetPool(self.target_pool_name, self.region),
-        self._ForwardingRule(self.forwarding_rule_name, self.target_pool_name,
-                             self.region)):
+    with self._TargetPool(
+        self.target_pool_name, self.region), self._ForwardingRule(
+            self.forwarding_rule_name, self.target_pool_name, self.region):
       self._TestUpdateLabels()
 
   def _TestUpdateLabels(self):

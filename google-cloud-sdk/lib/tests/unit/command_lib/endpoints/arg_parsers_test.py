@@ -13,6 +13,9 @@
 # limitations under the License.
 """Unit tests for arg parsing utilities for service-management."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.endpoints import arg_parsers
 
 from tests.lib import test_case

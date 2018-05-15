@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instance-groups unmanaged list-instances subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from tests.lib import test_case

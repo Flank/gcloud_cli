@@ -16,7 +16,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the target instance to operate on.
+        Name of the target instance to operate on.
 
 REQUIRED FLAGS
      --instance=INSTANCE

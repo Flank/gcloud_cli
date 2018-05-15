@@ -14,6 +14,9 @@
 
 """Tests for the e2e_utils module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.core.util import files

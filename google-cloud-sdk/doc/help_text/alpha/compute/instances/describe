@@ -13,7 +13,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        The name of the instance to describe.
+        Name of the instance to describe.
 
 FLAGS
      --guest-attributes=[GUEST_ATTRIBUTE_KEY,...]

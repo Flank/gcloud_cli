@@ -19,9 +19,9 @@ gcloud alpha iot registries get\-iam\-policy \- get the IAM policy for a device 
 
 \fB(ALPHA)\fR This command gets the IAM policy for a device registry. If
 formatted as JSON, the output can be edited and used as a policy file for
-set\-iam\-policy. The output includes an "etag" field identifying the version
-emitted and allowing detection of concurrent policy updates; see $ gcloud iot
-registries set\-iam\-policy for additional details.
+\fBset\-iam\-policy\fR. The output includes an "etag" field identifying the
+version emitted and allowing detection of concurrent policy updates; see $
+gcloud iot registries set\-iam\-policy for additional details.
 
 
 
@@ -30,11 +30,12 @@ registries set\-iam\-policy for additional details.
 .RS 2m
 .TP 2m
 
-REGISTRY \- The device registry for which to display the IAM policy. The
-arguments in this group can be used to specify the attributes of this resource.
-(NOTE) Some attributes are not given arguments in this group but can be set in
-other ways. To set the [project] attribute: Set the property [core/project] or
-provide the flag [\-\-project] on the command line. This must be specified.
+Registry resource \- The device registry for which to display the IAM policy.
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: Set the property
+[core/project] or provide the flag [\-\-project] on the command line. This must
+be specified.
 
 .RS 2m
 .TP 2m

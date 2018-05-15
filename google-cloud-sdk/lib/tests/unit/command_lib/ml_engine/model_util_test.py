@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine jobs command_lib utils."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.ml_engine import models
 from googlecloudsdk.command_lib.ml_engine import models_util
 from googlecloudsdk.core import resources
@@ -74,7 +76,7 @@ class IamPolicyTest(base.MlBetaPlatformTestBase):
             self.msgs.GoogleIamV1Binding(
                 members=['user:email1@gmail.com'],
                 role='roles/owner')],
-        etag='\x07\x05#2\x10\xac6\xf6',
+        etag=b'\x07\x05#2\x10\xac6\xf6',
         version=1)
     set_iam_policy = self.StartObjectPatch(self.models_client, 'SetIamPolicy',
                                            return_value=policy, autospec=True)
@@ -89,7 +91,7 @@ class IamPolicyTest(base.MlBetaPlatformTestBase):
     self.AssertErrContains('Updated IAM policy for model [myModel].')
 
   def testGetIamPolicy(self):
-    policy = self.msgs.GoogleIamV1Policy(etag='abcd')
+    policy = self.msgs.GoogleIamV1Policy(etag=b'abcd')
     get_iam_policy = self.StartObjectPatch(self.models_client, 'GetIamPolicy',
                                            return_value=policy, autospec=True)
 
@@ -104,13 +106,13 @@ class IamPolicyTest(base.MlBetaPlatformTestBase):
             self.msgs.GoogleIamV1Binding(
                 members=['user:email1@gmail.com'],
                 role='roles/owner')],
-        etag='abcd')
+        etag=b'abcd')
     new_policy = self.msgs.GoogleIamV1Policy(
         bindings=[
             self.msgs.GoogleIamV1Binding(
                 members=['user:email1@gmail.com', 'user:user2@gmail.com'],
                 role='roles/owner')],
-        etag='abcd')
+        etag=b'abcd')
     get_iam_policy = self.StartObjectPatch(
         self.models_client, 'GetIamPolicy', return_value=original_policy,
         autospec=True)
@@ -129,13 +131,13 @@ class IamPolicyTest(base.MlBetaPlatformTestBase):
   def testAddIamPolicyBindingNewRole(self):
     original_policy = self.msgs.GoogleIamV1Policy(
         bindings=[],
-        etag='abcd')
+        etag=b'abcd')
     new_policy = self.msgs.GoogleIamV1Policy(
         bindings=[
             self.msgs.GoogleIamV1Binding(
                 members=['user:user2@gmail.com'],
                 role='roles/owner')],
-        etag='abcd')
+        etag=b'abcd')
     get_iam_policy = self.StartObjectPatch(
         self.models_client, 'GetIamPolicy', return_value=original_policy,
         autospec=True)
@@ -157,8 +159,8 @@ class IamPolicyTest(base.MlBetaPlatformTestBase):
             self.msgs.GoogleIamV1Binding(
                 members=['user:email1@gmail.com'],
                 role='roles/owner')],
-        etag='abcd')
-    new_policy = self.msgs.GoogleIamV1Policy(bindings=[], etag='abcd')
+        etag=b'abcd')
+    new_policy = self.msgs.GoogleIamV1Policy(bindings=[], etag=b'abcd')
     get_iam_policy = self.StartObjectPatch(
         self.models_client, 'GetIamPolicy', return_value=original_policy,
         autospec=True)

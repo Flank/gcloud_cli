@@ -13,6 +13,8 @@
 # limitations under the License.
 """Small test to verify that deploy behaves as expected."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import textwrap
 

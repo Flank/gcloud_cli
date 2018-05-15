@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for addresses update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
@@ -41,14 +43,14 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
                                                                'value4'))
 
     address = self._MakeAddressProto(
-        labels=address_labels, fingerprint='fingerprint-42')
+        labels=address_labels, fingerprint=b'fingerprint-42')
     updated_address = self._MakeAddressProto(labels=edited_labels)
 
     operation_ref = self._GetOperationRef('operation-1')
     operation = self._MakeOperationMessage(operation_ref, address_ref)
 
     self._ExpectGetRequest(address_ref, address)
-    self._ExpectLabelsSetRequest(address_ref, edited_labels, 'fingerprint-42',
+    self._ExpectLabelsSetRequest(address_ref, edited_labels, b'fingerprint-42',
                                  operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(address_ref, updated_address)
@@ -67,14 +69,14 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
     edited_labels = ()
 
     address = self._MakeAddressProto(
-        labels=address_labels, fingerprint='fingerprint-42')
+        labels=address_labels, fingerprint=b'fingerprint-42')
     updated_address = self._MakeAddressProto(labels=edited_labels)
 
     operation_ref = self._GetOperationRef('operation-1')
     operation = self._MakeOperationMessage(operation_ref, address_ref)
 
     self._ExpectGetRequest(address_ref, address)
-    self._ExpectLabelsSetRequest(address_ref, edited_labels, 'fingerprint-42',
+    self._ExpectLabelsSetRequest(address_ref, edited_labels, b'fingerprint-42',
                                  operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(address_ref, updated_address)
@@ -94,14 +96,14 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
                                                                'value4'))
 
     address = self._MakeAddressProto(
-        labels=address_labels, fingerprint='fingerprint-42')
+        labels=address_labels, fingerprint=b'fingerprint-42')
     updated_address = self._MakeAddressProto(labels=edited_labels)
 
     operation_ref = self._GetOperationRef('operation-1', 'us-central1')
     operation = self._MakeOperationMessage(operation_ref, address_ref)
 
     self._ExpectGetRequest(address_ref, address)
-    self._ExpectLabelsSetRequest(address_ref, edited_labels, 'fingerprint-42',
+    self._ExpectLabelsSetRequest(address_ref, edited_labels, b'fingerprint-42',
                                  operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(address_ref, updated_address)
@@ -117,13 +119,13 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
 
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
-    address = self._MakeAddressProto(labels=(), fingerprint='fingerprint-42')
+    address = self._MakeAddressProto(labels=(), fingerprint=b'fingerprint-42')
     updated_address = self._MakeAddressProto(labels=update_labels)
     operation_ref = self._GetOperationRef('operation-1', 'us-central1')
     operation = self._MakeOperationMessage(operation_ref, address_ref)
 
     self._ExpectGetRequest(address_ref, address)
-    self._ExpectLabelsSetRequest(address_ref, update_labels, 'fingerprint-42',
+    self._ExpectLabelsSetRequest(address_ref, update_labels, b'fingerprint-42',
                                  operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(address_ref, updated_address)
@@ -136,7 +138,7 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
 
   def testRemoveWithNoLabelsOnAddress(self):
     address_ref = self._GetAddressRef('address-1', region='us-central1')
-    address = self._MakeAddressProto(labels={}, fingerprint='fingerprint-42')
+    address = self._MakeAddressProto(labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(address_ref, address)
 
@@ -153,7 +155,7 @@ class UpdateLabelsTestBeta(addresses_labels_test_base.AddressesLabelsTestBase):
     update_labels = (('key1', 'value1'), ('key3', 'value3'), ('key4', 'value4'))
 
     address = self._MakeAddressProto(
-        labels=address_labels, fingerprint='fingerprint-42')
+        labels=address_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(address_ref, address)
 

@@ -51,17 +51,17 @@ _THREE_LOCALES_CATALOG = TESTING_MESSAGES.AndroidDeviceCatalog(
         locales=[_LOCALE_1, _LOCALE_2, _LOCALE_3]))
 
 
-class TestLocalesListTest(unit_base.AndroidMockClientTest):
+class TestAndroidLocalesListTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
 
-  def testLocalesList_NoLocalesFound(self):
+  def testAndroidLocalesList_NoLocalesFound(self):
     self.ExpectCatalogGet(_NO_LOCALES_CATALOG)
     self.Run(commands.ANDROID_LOCALES_LIST)
     self.AssertErrContains('Listed 0 items.')
 
-  def testLocalesList_TwoLocalesFound(self):
+  def testAndroidLocalesList_TwoLocalesFound(self):
     self.ExpectCatalogGet(_THREE_LOCALES_CATALOG)
     self.Run(commands.ANDROID_LOCALES_LIST)
     self.AssertOutputContains("""\
@@ -69,7 +69,7 @@ class TestLocalesListTest(unit_base.AndroidMockClientTest):
         | kl | Klingon | Empire | |
         | fe | Ferengi | Alliance | |""", normalize_space=True)
 
-  def testLocalesList_ApiThrowsHttpError(self):
+  def testAndroidLocalesList_ApiThrowsHttpError(self):
     err = test_utils.MakeHttpError('Failure 3', 'Environment catalog missing.')
     self.ExpectCatalogGetError(err)
 

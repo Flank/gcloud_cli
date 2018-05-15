@@ -1086,6 +1086,26 @@ class Filters(object):
     return Filters._CannedSkip(Filters._skipUnless, condition, reason, None)
 
   @staticmethod
+  def RunOnlyOnPy2(reason_or_function):
+    """A decorator for tests designed to only run on Python 2.
+
+    Note: The RunOnly... decorators are for tests that are meant to be run only
+      under the given condition. If the test should run outside the given
+      condition, but is skipped due to a bug, use the skip decorators instead.
+
+    Args:
+      reason_or_function: If called without an arguments list, this will be the
+        function to decorate; otherwise, this will be the reason given for the
+        skip.
+
+    Returns:
+      A decorator that will skip a test outside of Python 2.
+    """
+    return Filters._CannedSkip(
+        Filters._skipUnless, six.PY2, reason_or_function,
+        'This test requires features only available on Python 2.')
+
+  @staticmethod
   def SkipOnWindows(reason, issue):
     """A decorator that skips a method if on Windows.
 

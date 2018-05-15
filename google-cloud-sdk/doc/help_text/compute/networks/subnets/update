@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the subnetwork to update.
+        Name of the subnetwork to update.
 
 FLAGS
      --region=REGION

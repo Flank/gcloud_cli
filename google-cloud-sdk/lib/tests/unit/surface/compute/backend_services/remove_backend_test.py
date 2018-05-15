@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the backend services remove-backend subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -36,7 +38,7 @@ class RemoveBackendTest(test_base.BaseTest):
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
     ])
 
@@ -73,7 +75,7 @@ class RemoveBackendTest(test_base.BaseTest):
                     'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ]
@@ -101,7 +103,7 @@ class RemoveBackendTest(test_base.BaseTest):
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ]
@@ -125,7 +127,7 @@ class RemoveBackendTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +
@@ -152,7 +154,7 @@ class RemoveBackendTest(test_base.BaseTest):
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ]
@@ -177,7 +179,7 @@ class RemoveBackendTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +
@@ -206,7 +208,7 @@ class RemoveBackendTest(test_base.BaseTest):
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
 
         [
@@ -245,7 +247,7 @@ class RemoveBackendTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +
@@ -277,7 +279,7 @@ class RemoveBackendTest(test_base.BaseTest):
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ]
@@ -301,7 +303,7 @@ class RemoveBackendTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +
@@ -326,7 +328,7 @@ class RemoveBackendTest(test_base.BaseTest):
                            'us-central1-a/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
     ])
 
@@ -363,7 +365,7 @@ class RemoveBackendTest(test_base.BaseTest):
                            'us-central1/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ]
@@ -387,7 +389,7 @@ class RemoveBackendTest(test_base.BaseTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +
@@ -428,7 +430,7 @@ class RemoveBackendAlphaTest(RemoveBackendBetaTest):
                            'us-central1/instanceGroups/my-group-2')),
             ],
             port=80,
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             timeoutSec=120)],
         [],
     ]
@@ -453,7 +455,7 @@ class RemoveBackendAlphaTest(RemoveBackendBetaTest):
               backendServiceResource=messages.BackendService(
                   name='my-backend-service',
                   port=80,
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   backends=[
                       messages.Backend(
                           group=(self.compute_uri +

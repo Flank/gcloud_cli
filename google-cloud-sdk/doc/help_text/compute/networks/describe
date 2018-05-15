@@ -10,7 +10,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the network to describe.
+        Name of the network to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

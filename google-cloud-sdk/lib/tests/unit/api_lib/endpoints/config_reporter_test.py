@@ -14,14 +14,21 @@
 
 """Tests of the config_reporter module."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 import json
+import operator
 
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.endpoints import config_reporter
 
+from googlecloudsdk.core.util import http_encoding
+
 from tests.lib import test_case
 from tests.lib.surface.endpoints import unit_test_base
+
 
 SERVICE_NAME = 'service-name.googleapis.com'
 SERVICE_VERSION = 'service-config-version-1'
@@ -33,13 +40,13 @@ CONFIG_TEMPLATE = """
 }
 """
 TEST_CONFIG = CONFIG_TEMPLATE % (TITLE, SERVICE_NAME)
-TEST_SWAGGER = """
+TEST_SWAGGER = http_encoding.Encode("""
 {
    "swagger": "2.0",
    "host": "%s",
    "title": "%s"
 }
-""" % (SERVICE_NAME, TITLE)
+""" % (SERVICE_NAME, TITLE))
 TEST_SWAGGER_PATH = '/tmp/foo/bar/swagger.json'
 
 
@@ -65,7 +72,8 @@ class ConfigReporterValueTest(unit_test_base.EV1UnitTestBase):
       raise TypeError('Invalid config_value in normalizeConfigValue')
 
     config_value.additionalProperties = sorted(
-        config_value.additionalProperties)
+        config_value.additionalProperties,
+        key=operator.attrgetter('key', 'value'))
 
   def testUsingConfig(self):
     self.crv.SetConfig(json.loads(TEST_CONFIG))

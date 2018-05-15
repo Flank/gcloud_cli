@@ -76,28 +76,6 @@ class GetIamPolicyTest(base.CloudIotBase, test_case.WithOutputCapture):
 
     self.AssertOutputEquals('user:test-user@gmail.com\n')
 
-  def testGetIamPolicyUsingServiceAccount(self, track):
-    self.track = track
-    policy = self.messages.Policy(
-        version=1,
-        bindings=[
-            self.messages.Binding(
-                role='roles/owner', members=['user:test-user@gmail.com']),
-            self.messages.Binding(role='roles/viewer', members=['allUsers'])
-        ])
-
-    self.client.projects_locations_registries.GetIamPolicy.Expect(
-        request=
-        self.messages.CloudiotProjectsLocationsRegistriesGetIamPolicyRequest(
-            resource='projects/{}/locations/us-central1/registries/{}'.format(
-                self.Project(), 'my-registry')),
-        response=policy)
-
-    self.Run(
-        'iot registries get-iam-policy --format=disable '
-        'my-registry --region us-central1 '
-        '--account test2@test-project.iam.gserviceaccount.com')
-
   def testGetIamPolicy_RelativeName(self, track):
     self.track = track
     policy = self.messages.Policy(

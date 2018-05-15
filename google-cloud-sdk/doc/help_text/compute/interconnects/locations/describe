@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the interconnect location to describe.
+        Name of the interconnect location to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

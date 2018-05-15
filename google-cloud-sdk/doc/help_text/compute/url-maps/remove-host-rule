@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      URL_MAP_NAME
-        The name of the URL map to operate on.
+        Name of the URL map to operate on.
 
 REQUIRED FLAGS
      --host=HOST

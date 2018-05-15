@@ -35,7 +35,7 @@ class JobsDescribeTest(base.SchedulerTestBase):
         schedule=self.messages.Schedule(schedule='every tuesday',
                                         timeZone='utc'),
         pubsubTarget=pubsub_target,
-        jobState=self.messages.Job.JobStateValueValuesEnum.ENABLED,
+        state=self.messages.Job.StateValueValuesEnum.ENABLED,
         userUpdateTime='2017-01-01T00:00:00Z'
     )
 

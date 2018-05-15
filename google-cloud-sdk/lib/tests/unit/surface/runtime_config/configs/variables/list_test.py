@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for surface.runtime_config.configs.variables.list."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.runtime_config import util
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
@@ -119,12 +121,12 @@ class VariablesListTest(base.RuntimeConfigTestBase):
             name='projects/{0}/configs/foo/variables/var1'.format(
                 self.Project()),
             updateTime='2016-04-16T00:00:00Z',
-            value='This is var1.',),
+            value=b'This is var1.',),
         self.messages.Variable(
             name='projects/{0}/configs/foo/variables/var2/var3'.format(
                 self.Project()),
             updateTime='2016-04-16T01:00:00Z',
-            value='This is var2/var3',),
+            value=b'This is var2/var3',),
         self.messages.Variable(
             name='projects/{0}/configs/foo/variables/var4'.format(
                 self.Project()),
@@ -152,12 +154,12 @@ class VariablesListTest(base.RuntimeConfigTestBase):
             name='projects/{0}/configs/foo/variables/var1'.format(
                 self.Project()),
             updateTime='2016-04-16T00:00:00Z',
-            value='This is var1.',),
+            value=b'This is var1.',),
         self.messages.Variable(
             name='projects/{0}/configs/foo/variables/var2/var3'.format(
                 self.Project()),
             updateTime='2016-04-16T01:00:00Z',
-            value='This is var2/var3',),
+            value=b'This is var2/var3',),
         self.messages.Variable(
             name='projects/{0}/configs/foo/variables/var4'.format(
                 self.Project()),

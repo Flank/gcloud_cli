@@ -24,7 +24,7 @@ from tests.lib.surface.firebase.test.android import fake_catalogs
 from tests.lib.surface.firebase.test.android import unit_base
 
 
-class TestLocalesDescribeTest(unit_base.AndroidMockClientTest):
+class TestAndroidLocalesDescribeTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
@@ -32,7 +32,7 @@ class TestLocalesDescribeTest(unit_base.AndroidMockClientTest):
   def TearDown(self):
     console_attr.ResetConsoleAttr()
 
-  def testLocalesDescribe_LocaleNotFound(self):
+  def testAndroidLocalesDescribe_LocaleNotFound(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
 
     with self.assertRaises(exceptions.LocaleNotFoundError):
@@ -40,7 +40,7 @@ class TestLocalesDescribeTest(unit_base.AndroidMockClientTest):
 
     self.AssertErrContains("'bad-locale' is not a valid locale")
 
-  def testLocalesDescribe_LocaleFound(self):
+  def testAndroidLocalesDescribe_LocaleFound(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
     self.Run(commands.ANDROID_LOCALES_DESCRIBE + 'ro')
 
@@ -49,7 +49,7 @@ class TestLocalesDescribeTest(unit_base.AndroidMockClientTest):
     self.AssertOutputContains('region: Romulus')
     self.AssertOutputContains('tags:\n- cunning')
 
-  def testLocalesDescribe_ApiThrowsHttpError(self):
+  def testAndroidLocalesDescribe_ApiThrowsHttpError(self):
     err = test_utils.MakeHttpError('ErrorXYZ', 'Environment catalog failure.')
     self.ExpectCatalogGetError(err)
 

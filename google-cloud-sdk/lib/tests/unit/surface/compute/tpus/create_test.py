@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """tpus Create tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
@@ -51,7 +53,7 @@ class CreateTest(base.TpuUnitTestBase):
     self._SetTrack(track)
     properties.VALUES.core.user_output_enabled.Set(True)
     node = self.messages.Node(cidrBlock='10.20.10.0/29',
-                              acceleratorType='tpu-v2',
+                              acceleratorType='v2-8',
                               network='my-tf-network',
                               tensorflowVersion='1.6')
     create_response = self.GetOperationResponse(
@@ -84,7 +86,7 @@ class CreateTest(base.TpuUnitTestBase):
         description='My TF Node',
         network='my-tf-network',
         tensorflowVersion='1.6',
-        acceleratorType='tpu-v2',
+        acceleratorType='v2-8',
     )
 
     create_response = self.GetOperationResponse(
@@ -107,7 +109,7 @@ class CreateTest(base.TpuUnitTestBase):
     self.assertEqual(
         self.Run("""\
         compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29 \
-    --accelerator-type 'tpu-v2' --network my-tf-network  --version '1.6' \
+    --accelerator-type 'v2-8' --network my-tf-network  --version '1.6' \
     --description 'My TF Node'
         """),
         op_done_response.response
@@ -153,7 +155,7 @@ class CreateTest(base.TpuUnitTestBase):
     self._SetTrack(track)
     properties.VALUES.core.user_output_enabled.Set(True)
     node = self.messages.Node(cidrBlock='10.20.10.0/29',
-                              acceleratorType='tpu-v2',
+                              acceleratorType='v2-8',
                               network='my-tf-network',
                               tensorflowVersion='1.6')
     create_response = self.GetOperationResponse(
@@ -181,7 +183,7 @@ class CreateTest(base.TpuUnitTestBase):
   def testCreateFailed(self, track):
     self._SetTrack(track)
     node = self.messages.Node(cidrBlock='10.20.10.0/29',
-                              acceleratorType='tpu-v2',
+                              acceleratorType='v2-8',
                               network='my-tf-network',
                               tensorflowVersion='1.6')
     create_response = self.GetOperationResponse(

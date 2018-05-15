@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for gcloud compute routers update-bgp-peer."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -25,12 +27,12 @@ class RoutersUpdateBgpPeerTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='routers-update-bgp-peer-test-network').next()
-    self.router_name = e2e_utils.GetResourceNameGenerator(
-        prefix='routers-update-bgp-peer-test-router').next()
-    self.peer_name = e2e_utils.GetResourceNameGenerator(
-        prefix='routers-update-bgp-peer-test-bgp-peer').next()
+    self.network_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='routers-update-bgp-peer-test-network'))
+    self.router_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='routers-update-bgp-peer-test-router'))
+    self.peer_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='routers-update-bgp-peer-test-bgp-peer'))
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')

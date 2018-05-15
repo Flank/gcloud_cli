@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
-        The name of the disk image to add the IAM policy binding to.
+        Name of the disk image to add the IAM policy binding to.
 
 REQUIRED FLAGS
      --member=MEMBER

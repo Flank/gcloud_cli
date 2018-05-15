@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the Target VPN Gateways to delete.
+        Names of the Target VPN Gateways to delete.
 
 FLAGS
      --region=REGION

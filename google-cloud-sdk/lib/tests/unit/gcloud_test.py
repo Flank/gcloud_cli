@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for gcloud entry point."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import errno
 import signal
@@ -25,17 +29,20 @@ from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import store
 from tests.lib import sdk_test_base
+
 import mock
+import six
 
 
 class GcloudTest(sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
-    self.cli = self.StartObjectPatch(parser_extensions.ArgumentParser,
-                                     'parse_args')
+    self.cli = self.StartObjectPatch(
+        parser_extensions.ArgumentParser, 'parse_args')
     self.old_int_handler = signal.getsignal(signal.SIGINT)
-    self.report_error_mock = self.StartObjectPatch(crash_handling,
-                                                   'ReportError')
+    self.report_error_mock = self.StartObjectPatch(
+        crash_handling, 'ReportError')
+    properties.VALUES.core.allow_py3.Set(True)
 
   def TearDown(self):
     signal.signal(signal.SIGINT, self.old_int_handler)
@@ -122,16 +129,19 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
         gcloud.main()
       self.assertEqual(1, cm.exception.code)
       self.report_error_mock.assert_not_called()
+    error = (
+        'No module named gcloud_main' if six.PY2 else
+        "import of 'gcloud_main' halted; None in sys.modules")
     self.assertMultiLineEqual("""\
-ERROR: gcloud failed to load: No module named gcloud_main
+ERROR: gcloud failed to load: {0}
     gcloud_main = _import_gcloud_main()
-    import {0}
+    import {1}
 
 This usually indicates corruption in your gcloud installation or problems with \
 your Python interpreter.
 
 Please verify that the following is the path to a working Python 2.7 executable:
-    {1}
+    {2}
 
 If it is not, please set the CLOUDSDK_PYTHON environment variable to point to \
 a working Python 2.7 executable.
@@ -139,7 +149,7 @@ a working Python 2.7 executable.
 If you are still experiencing problems, please reinstall the Cloud SDK using \
 the instructions here:
     https://cloud.google.com/sdk/
-""".format(module_path, sys.executable), self.GetErr())
+""".format(error, module_path, sys.executable), self.GetErr())
     self.assertMultiLineEqual('', self.GetOutput())
 
   def testExceptionOtherErrorImportingGcloudMain(self):

@@ -29,7 +29,7 @@ from tests.lib.surface import redis_test_base
 class TestBase(redis_test_base.InstancesUnitTestBase):
 
   def ExpectUpdate(self, instance_to_update, expected_instance,
-                   expected_update_mask, async=False):
+                   expected_update_mask, is_async=False):
     self.instances_service.Get.Expect(
         request=self.messages.RedisProjectsLocationsInstancesGetRequest(
             name=instance_to_update.name),
@@ -42,7 +42,7 @@ class TestBase(redis_test_base.InstancesUnitTestBase):
             updateMask=expected_update_mask),
         response=operation)
 
-    if async:
+    if is_async:
       return
 
     operation.done = True  # Simulate immediate success.
@@ -117,7 +117,7 @@ class UpdateTest(TestBase, parameterized.TestCase):
   def testUpdate_Async(self, track):
     self.SetUpForTrack(track)
     self.SetUpInstancesForTrack()
-    self._SetUpExpectations(async=True)
+    self._SetUpExpectations(is_async=True)
 
     self.Run(
         'redis instances update {instance_id} --region {region_id} --async'
@@ -137,7 +137,7 @@ class UpdateTest(TestBase, parameterized.TestCase):
       self.Run('redis instances update {} --region {}'
                .format(self.instance_id, self.region_id))
 
-  def _SetUpExpectations(self, async=False):
+  def _SetUpExpectations(self, is_async=False):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
     update_options = (
@@ -158,7 +158,7 @@ class UpdateTest(TestBase, parameterized.TestCase):
     expected_instance.labels = self.Labels({'a': '3', 'b': '4', 'c': '5'})
 
     self.ExpectUpdate(instance_to_update, expected_instance,
-                      expected_update_mask, async=async)
+                      expected_update_mask, is_async=is_async)
 
     self.expected_instance = expected_instance
     self.update_options = update_options
@@ -231,7 +231,7 @@ class RemoveRedisConfigsTest(TestBase, parameterized.TestCase):
     self.assertEqual(actual_instance, self.expected_instance)
 
   def _SetUpExpectations(self, original_redis_configs, new_redis_configs,
-                         async=False):
+                         is_async=False):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
     instance_to_update.redisConfigs = self.RedisConfigs(new_redis_configs)
@@ -241,7 +241,7 @@ class RemoveRedisConfigsTest(TestBase, parameterized.TestCase):
     expected_instance.redisConfigs = self.RedisConfigs(new_redis_configs)
 
     self.ExpectUpdate(instance_to_update, expected_instance, 'redis_configs',
-                      async=async)
+                      is_async=is_async)
 
     self.expected_instance = expected_instance
 
@@ -347,7 +347,7 @@ class LabelsTest(TestBase, parameterized.TestCase):
 
     self.assertEqual(actual_instance, self.expected_instance)
 
-  def _SetUpExpectations(self, original_labels, new_labels, async=False):
+  def _SetUpExpectations(self, original_labels, new_labels, is_async=False):
     instance_to_update = self.messages.Instance(
         name=self.instance_relative_name)
     instance_to_update.labels = self.Labels(original_labels)
@@ -357,7 +357,7 @@ class LabelsTest(TestBase, parameterized.TestCase):
     expected_instance.labels = self.Labels(new_labels)
 
     self.ExpectUpdate(instance_to_update, expected_instance, 'labels',
-                      async=async)
+                      is_async=is_async)
 
     self.expected_instance = expected_instance
 

@@ -18,7 +18,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
-        The name of the disk image to set the IAM policy of.
+        Name of the disk image to set the IAM policy of.
 
      POLICY_FILE
         JSON or YAML file containing the IAM policy.

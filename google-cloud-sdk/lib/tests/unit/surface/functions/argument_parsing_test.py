@@ -14,6 +14,8 @@
 
 """Tests for functions argument parsing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.functions import util

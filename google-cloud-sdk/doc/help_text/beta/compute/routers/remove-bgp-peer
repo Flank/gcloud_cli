@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the router to update.
+        Name of the router to update.
 
 REQUIRED FLAGS
      --peer-name=PEER_NAME

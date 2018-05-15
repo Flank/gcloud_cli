@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the router utils library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.compute.routers import router_utils
 from tests.lib import cli_test_base

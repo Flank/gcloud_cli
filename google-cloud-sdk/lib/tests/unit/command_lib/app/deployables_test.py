@@ -17,7 +17,7 @@ from __future__ import absolute_import
 import os
 
 from googlecloudsdk.api_lib.app import deploy_command_util
-from googlecloudsdk.api_lib.app import util
+from googlecloudsdk.api_lib.app import env as app_env
 from googlecloudsdk.api_lib.app import yaml_parsing
 from googlecloudsdk.command_lib.app import deployables
 from googlecloudsdk.command_lib.app import exceptions
@@ -33,7 +33,7 @@ class AppInfoFake(object):
     self.file = filename
     self.module = service
     self.service = service
-    self.env = env or util.Environment.STANDARD
+    self.env = env or app_env.STANDARD
     self.runtime = runtime
     self.vm = False
 

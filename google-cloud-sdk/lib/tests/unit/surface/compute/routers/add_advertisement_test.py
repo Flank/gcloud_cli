@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the update command with add advertisements flags."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base

@@ -10,7 +10,7 @@ DESCRIPTION
     (ALPHA) List conditions for a basic access level.
 
 REQUIRED FLAGS
-     LEVEL - The access level you want to list the conditions for. The
+     Level resource - The access level you want to list the conditions for. The
      arguments in this group can be used to specify the attributes of this
      resource. This must be specified.
 

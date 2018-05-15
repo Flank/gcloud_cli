@@ -16,6 +16,7 @@
 from __future__ import absolute_import
 import re
 
+from googlecloudsdk.api_lib.app import env
 from googlecloudsdk.api_lib.app import util
 from googlecloudsdk.command_lib.app import source_files_util
 from googlecloudsdk.command_lib.util import gcloudignore
@@ -32,7 +33,7 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
     with mock.patch.object(gcloudignore, 'GetFileChooserForDir') as mock_method:
       source_files_util.GetSourceFileIterator(self.temp_path, re.compile(r'.'),
                                               False, 'nodejs8',
-                                              util.Environment.STANDARD)
+                                              env.STANDARD)
       mock_method.assert_called_once_with(
           self.temp_path,
           default_ignore_file=source_files_util._NODE_GCLOUDIGNORE,
@@ -47,7 +48,7 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
       with mock.patch.object(util, 'FileIterator') as util_mock:
         source_files_util.GetSourceFileIterator(
             self.temp_path, skip_files_regex, False, 'nodejs8',
-            util.Environment.FLEX)
+            env.FLEX)
         util_mock.assert_called_once_with(self.temp_path, skip_files_regex)
         gcloud_mock.assert_not_called()
 
@@ -56,7 +57,7 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
     with mock.patch.object(gcloudignore, 'GetFileChooserForDir') as mock_method:
       source_files_util.GetSourceFileIterator(self.temp_path, re.compile(r'.'),
                                               False, 'php72',
-                                              util.Environment.STANDARD)
+                                              env.STANDARD)
       mock_method.assert_called_once_with(
           self.temp_path,
           default_ignore_file=source_files_util._PHP_GCLOUDIGNORE,
@@ -71,7 +72,7 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
       with mock.patch.object(util, 'FileIterator') as util_mock:
         source_files_util.GetSourceFileIterator(
             self.temp_path, skip_files_regex, False, 'php55',
-            util.Environment.STANDARD)
+            env.STANDARD)
         util_mock.assert_called_once_with(self.temp_path, skip_files_regex)
         gcloud_mock.assert_not_called()
 
@@ -81,7 +82,7 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
     with self.assertRaises(source_files_util.SkipFilesError):
       source_files_util.GetSourceFileIterator(
           self.temp_path, re.compile(r'.'), True, 'nodejs8',
-          util.Environment.STANDARD)
+          env.STANDARD)
 
   def testSkipFilesAndGcloudignoreOldRuntimeRaisesError(self):
     """.gcloudignore and skip_files on Python2.7 Standard should error out."""
@@ -89,7 +90,7 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
     with self.assertRaises(source_files_util.SkipFilesError):
       source_files_util.GetSourceFileIterator(
           self.temp_path, re.compile(r'.'), True, 'python27',
-          util.Environment.STANDARD)
+          env.STANDARD)
 
   def testGcloudignoreAndNoSkipFilesDoesNotGenerateNewGcloudignore(self):
     """.gcloudignore and no skip_files python2.7 does not make .gcloudignore."""
@@ -98,5 +99,5 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
                            'GetFileChooserForDir') as gcloud_mock:
       source_files_util.GetSourceFileIterator(
           self.temp_path, re.compile(r'.'), False, 'python27',
-          util.Environment.STANDARD)
+          env.STANDARD)
       gcloud_mock.assert_called_once_with(self.temp_path)

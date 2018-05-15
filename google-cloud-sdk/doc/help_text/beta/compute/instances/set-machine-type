@@ -28,7 +28,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        The name of the instance to operate on.
+        Name of the instance to operate on.
 
 FLAGS
      --machine-type=MACHINE_TYPE

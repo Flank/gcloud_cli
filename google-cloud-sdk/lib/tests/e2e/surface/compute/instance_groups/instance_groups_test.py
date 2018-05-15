@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for instance groups."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
@@ -39,7 +41,7 @@ class InstanceGroupsTest(e2e_test_base.BaseTest):
                          'instance group')
 
   def CreateInstanceGroup(self):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     self.Run('compute instance-groups unmanaged create {0} --zone {1}'
              .format(name, self.zone))
     self.AssertNewOutputContains(name)
@@ -47,7 +49,7 @@ class InstanceGroupsTest(e2e_test_base.BaseTest):
     return name
 
   def CreateInstance(self):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     self.Run('compute instances create {0} --zone {1}'.format(name, self.zone))
     self.AssertNewOutputContains(name)
     self.instance_names.append(name)

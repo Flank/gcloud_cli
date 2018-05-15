@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for auto healing feature of instance group managers."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
@@ -67,7 +69,7 @@ class InstanceGroupsAutoHealingTest(e2e_test_base.BaseTest):
     return '--' + flag_name + ' ' + flag_value
 
   def CreateInstanceTemplate(self, machine_type='n1-standard-1'):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     self.Run('compute instance-templates create {0} --machine-type {1}'
              .format(name, machine_type))
     self.instance_template_names.append(name)
@@ -75,14 +77,14 @@ class InstanceGroupsAutoHealingTest(e2e_test_base.BaseTest):
     return name
 
   def CreateHealthCheck(self):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     self.Run('compute health-checks create tcp {0}'.format(name))
     self.health_check_names.append(name)
     self.AssertNewOutputContains(name)
     return name
 
   def CreateHttpHealthCheck(self):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     self.Run('compute http-health-checks create {0} '
              '--port {1} --request-path {2}'.format(name, 12345, '/healthz'))
     self.http_health_check_names.append(name)
@@ -90,7 +92,7 @@ class InstanceGroupsAutoHealingTest(e2e_test_base.BaseTest):
     return name
 
   def CreateHttpsHealthCheck(self):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     self.Run('compute https-health-checks create {0} '
              '--port {1} --request-path {2}'.format(name, 12345, '/healthz'))
     self.https_health_check_names.append(name)
@@ -98,7 +100,7 @@ class InstanceGroupsAutoHealingTest(e2e_test_base.BaseTest):
     return name
 
   def CreateInstanceGroupManager(self, instance_template_name, size=0):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     if self.scope == e2e_test_base.ZONAL:
       self.instance_group_manager_names.append(name)
     elif self.scope == e2e_test_base.REGIONAL:

@@ -285,7 +285,7 @@ handlers:
   def WriteApp(self, file_name, project=None, version=None, service=None,
                data=None, secure=None, runtime=None, env=None,
                beta_settings=None, module=None, api_version=None):
-    if not data:
+    if data is None:
       data = self.APP_DATA
     default_runtime = ('python' if env in ['2', 'flex', 'flexible']
                        else 'python27')

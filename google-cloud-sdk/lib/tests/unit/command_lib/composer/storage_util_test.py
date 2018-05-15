@@ -28,6 +28,7 @@ from tests.lib.surface.composer import base
 from tests.lib.surface.composer import kubectl_util
 import mock
 import six
+from six.moves import range
 
 
 class StorageUtilTest(base.StorageApiCallingUnitTest,

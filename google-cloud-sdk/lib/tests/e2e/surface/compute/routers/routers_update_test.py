@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for gcloud compute routers update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -25,10 +27,10 @@ class RoutersUpdateBetaTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='routers-update-test-network').next()
-    self.router_name = e2e_utils.GetResourceNameGenerator(
-        prefix='routers-update-test-router').next()
+    self.network_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='routers-update-test-network'))
+    self.router_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='routers-update-test-router'))
 
   def TearDown(self):
     logging.info('Starting TearDown (will delete resources if test fails).')

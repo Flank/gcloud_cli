@@ -10,11 +10,11 @@ DESCRIPTION
     (ALPHA) List Cloud TPUs
 
 FLAGS
-     ZONE - The compute/zone of the Cloud TPU. If not specified, will use
-     default compute/zone. This represents a Cloud resource. (NOTE) Some
-     attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: Set the property [core/project] or
-     provide the flag [--project] on the command line.
+     Location resource - The compute/zone of the Cloud TPU. If not specified,
+     will use default compute/zone. This represents a Cloud resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line.
 
        --zone=ZONE
           The ID of the location or a fully qualified identifier for the

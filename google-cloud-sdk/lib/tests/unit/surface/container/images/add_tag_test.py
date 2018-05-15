@@ -13,7 +13,9 @@
 # limitations under the License.
 """Tests for the container images add-tag command."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 
 from containerregistry.client import docker_name
 from containerregistry.client.v2 import docker_http as v2_docker_http
@@ -31,6 +33,7 @@ from tests.lib import test_case
 
 import httplib2
 import mock
+import six.moves.http_client
 
 _IMAGE = 'gcr.io/foobar/baz'
 _TAGS1 = ['tag1']
@@ -204,7 +207,7 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     # Simulate a 404 error the dockerless client.
     err = v2_docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.NOT_FOUND
+            'status': six.moves.http_client.NOT_FOUND
         }), '')
 
     self.push_mock.upload.side_effect = err
@@ -220,7 +223,7 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     # Simulate a 403 error the dockerless client.
     err = v2_docker_http.V2DiagnosticException(
         httplib2.Response({
-            'status': httplib.FORBIDDEN
+            'status': six.moves.http_client.FORBIDDEN
         }), '')
 
     self.push_mock.upload.side_effect = err

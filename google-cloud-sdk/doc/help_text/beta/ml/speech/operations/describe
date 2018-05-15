@@ -9,8 +9,8 @@ DESCRIPTION
     (BETA) Get information about a long-running speech recognition operation.
 
 POSITIONAL ARGUMENTS
-     OPERATION - The ID of the operation to describe. This represents a Cloud
-     resource. This must be specified.
+     Operation resource - The ID of the operation to describe. This represents
+     a Cloud resource. This must be specified.
 
        OPERATION
           The ID of the operation or a fully qualified identifier for the

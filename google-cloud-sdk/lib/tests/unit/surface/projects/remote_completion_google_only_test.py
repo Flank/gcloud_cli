@@ -14,6 +14,8 @@
 
 """Tests for projects list."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import test_case

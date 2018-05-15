@@ -10,8 +10,8 @@ DESCRIPTION
     (ALPHA) List access policies.
 
 REQUIRED FLAGS
-     ORGANIZATION - The parent organization of the policies you want to list.
-     This represents a Cloud resource. This must be specified.
+     Organization resource - The parent organization of the policies you want
+     to list. This represents a Cloud resource. This must be specified.
 
        --organization=ORGANIZATION
           The ID of the organization or a fully qualified identifier for the

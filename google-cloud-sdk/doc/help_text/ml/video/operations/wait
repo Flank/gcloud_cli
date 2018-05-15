@@ -3,7 +3,7 @@ NAME
         operation until it completes
 
 SYNOPSIS
-    gcloud ml video operations wait OPERATION_ID [GCLOUD_WIDE_FLAG ...]
+    gcloud ml video operations wait OPERATION [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Poll a long-running video analysis operation until it completes. When the
@@ -11,10 +11,10 @@ DESCRIPTION
     analysis.
 
 POSITIONAL ARGUMENTS
-     OPERATION ID - ID for the operation to poll until complete. This
+     Operation resource - ID for the operation to poll until complete. This
      represents a Cloud resource. This must be specified.
 
-       OPERATION_ID
+       OPERATION
           The ID of the operation or a fully qualified identifier for the
           operation.
 

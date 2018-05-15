@@ -25,13 +25,13 @@ from tests.lib.surface.firebase.test.android import unit_base
 
 
 class AndroidArgsTests(unit_base.AndroidMockClientTest):
-  """Unit tests for api_lib/test/android/arg_manager.py."""
+  """Unit tests for api_lib/firebase/test/android/arg_manager.py."""
 
   # Tests on arg rules data structures
 
   def testGetSetOfAllTestArgs_OnActualRules(self):
     all_args = arg_manager.AllArgsSet()
-    # arg_manager includes ga and beta args
+    # arg_manager tests include GA and beta args
     self.assertItemsEqual(set(unit_base.ALL_TEST_RUN_ARGS['beta']), all_args)
 
   def testArgNamesInRulesAreInternalNames(self):

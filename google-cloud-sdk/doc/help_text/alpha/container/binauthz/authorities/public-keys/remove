@@ -14,11 +14,11 @@ POSITIONAL ARGUMENTS
         The fingerprint of the public key to remove.
 
 REQUIRED FLAGS
-     AUTHORITY - The authority from which the public key should be removed.
-     This represents a Cloud resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: Set the property [core/project] or provide the flag [--project]
-     on the command line. This must be specified.
+     Authority resource - The authority from which the public key should be
+     removed. This represents a Cloud resource. (NOTE) Some attributes are not
+     given arguments in this group but can be set in other ways. To set the
+     [project] attribute: Set the property [core/project] or provide the flag
+     [--project] on the command line. This must be specified.
 
        --authority=AUTHORITY
           The ID of the authority or a fully qualified identifier for the

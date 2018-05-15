@@ -14,7 +14,7 @@ DESCRIPTION
         $ gcloud beta compute tpus accelerator-types list
 
 POSITIONAL ARGUMENTS
-     ACCELERATOR TYPE - The accelerator type you want to describe. The
+     Accelerator type resource - The accelerator type you want to describe. The
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: Set the property
@@ -22,8 +22,8 @@ POSITIONAL ARGUMENTS
      must be specified.
 
        ACCELERATOR_TYPE
-          The ID of the acceleratortype or a fully qualified identifier for the
-          acceleratortype. This positional must be specified if any of the
+          The ID of the accelerator_type or a fully qualified identifier for
+          the accelerator_type. This positional must be specified if any of the
           other arguments in this group are specified.
 
        --zone=ZONE

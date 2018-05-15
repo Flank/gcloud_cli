@@ -21,7 +21,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      DISK_NAME
-        The name of the disk to operate on.
+        Name of the disk to operate on.
 
 REQUIRED FLAGS
      --destination-zone=DESTINATION_ZONE

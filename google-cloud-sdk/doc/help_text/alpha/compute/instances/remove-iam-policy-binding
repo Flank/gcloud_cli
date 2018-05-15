@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        The name of the instance to remove the IAM policy binding from.
+        Name of the instance to remove the IAM policy binding from.
 
 REQUIRED FLAGS
      --member=MEMBER

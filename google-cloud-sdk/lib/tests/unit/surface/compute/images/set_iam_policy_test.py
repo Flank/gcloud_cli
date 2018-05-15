@@ -46,7 +46,9 @@ class SetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.mock_client.images.SetIamPolicy.Expect(
         messages.ComputeImagesSetIamPolicyRequest(
             resource='my-resource', project='fake-project',
-            policy=policy),
+            globalSetPolicyRequest=messages.GlobalSetPolicyRequest(
+                bindings=policy.bindings,
+                etag=policy.etag)),
         response=policy)
     policy_file = self.Touch(
         self.temp_path, 'iam.json',

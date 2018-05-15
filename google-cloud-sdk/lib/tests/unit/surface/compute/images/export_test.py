@@ -161,6 +161,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
     export_workflow = ('../workflows/export/image_export.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               '-variables=source_image=projects/my-project/global/images/{0},'
               'destination={1}'
               .format(self.image_name, self.destination_uri),
@@ -184,6 +185,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
     export_workflow = ('../workflows/export/image_export_ext.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               '-variables=source_image=projects/my-project/global/images/{0},'
               'destination={1},format=vmdk'
               .format(self.image_name, self.destination_uri),
@@ -207,6 +209,7 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
     export_workflow = ('../workflows/export/image_export.wf.json')
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
               '-variables=source_image=projects/debian-cloud/global/images/{0},'
               'destination={1}'
               .format(self.image_name, self.destination_uri),

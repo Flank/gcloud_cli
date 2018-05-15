@@ -15,12 +15,14 @@
 
 """Unit tests for the operations module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.functions import operations
 from tests.lib import test_case
 
 
 _ASCII_MESSAGE = "We're gettin' no place fast."
-_UNICODE_MESSAGE = u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"
+_UNICODE_MESSAGE = ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"
 
 
 class _MockHttpResponse(object):

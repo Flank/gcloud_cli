@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the security policy to create.
+        Name of the security policy to create.
 
 FLAGS
      --file-format=FILE_FORMAT

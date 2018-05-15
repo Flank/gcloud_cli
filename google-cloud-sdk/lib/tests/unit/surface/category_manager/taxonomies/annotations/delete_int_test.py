@@ -45,7 +45,7 @@ class AnnotationsDeleteIntTest(base.CategoryManagerUnitTestBase):
     args = '{} --taxonomy {}'.format(self.annotation_ref.annotationsId,
                                      self.annotation_ref.taxonomiesId)
     self.Run('category-manager taxonomies annotations delete ' + args)
-    self.AssertErrContains('Deleted projectAnnotation [{}].'.format(
+    self.AssertErrContains('Deleted project_annotation [{}].'.format(
         self.annotation_ref.annotationsId))
 
   def testDeleteAnnotationPromptingWithNo(self):

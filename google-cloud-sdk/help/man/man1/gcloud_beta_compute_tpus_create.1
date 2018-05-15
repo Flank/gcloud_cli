@@ -11,7 +11,7 @@ gcloud beta compute tpus create \- create a new Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute tpus create\fR \fITPU_ID\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="tpu\-v2"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute tpus create\fR \fITPU_ID\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -51,9 +51,9 @@ TensorFlow versions please see https://www.tensorflow.org/versions/.
 
 .RS 2m
 .TP 2m
-\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR; default="tpu\-v2"
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR; default="v2\-8"
 TPU accelerator type for the TPU. If not specified, this defaults to
-\f5tpu\-v2\fR.
+\f5v2\-8\fR.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -100,7 +100,7 @@ for all required and optional parameters:
 $ gcloud beta compute tpus create my\-tpu \e
     \-\-zone us\-central1\-a \e
     \-\-range '10.240.0.0/29' \e
-    \-\-accelerator\-type 'tpu\-v2' \e
+    \-\-accelerator\-type 'v2\-8' \e
     \-\-network my\-tf\-network \e
     \-\-description 'My TF Node' \e
     \-\-version '1.1'

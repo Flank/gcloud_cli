@@ -1,0 +1,234 @@
+
+.TH "GCLOUD_ALPHA_FIREBASE_TEST_IOS_RUN" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha firebase test ios run \- invoke a test in Firebase Test Lab for iOS and view test results
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha firebase test ios run\fR [\fIARGSPEC\fR] [\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]] [\fB\-\-test\fR=\fIXCTEST_ZIP\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-async\fR] [\fB\-\-record\-video\fR] [\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR] [\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR] [\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha firebase test ios run\fR invokes and monitors
+tests in Firebase Test Lab for iOS.
+
+The currently supported iOS test frameworks are XCTest and XCUITest. Other iOS
+testing frameworks which are built upon XCTest and XCUITest should also work.
+
+The XCTEST_ZIP test package is a zip file built using Apple's Xcode and
+supporting tools. For a detailed description of the process to create your
+XCTEST_ZIP file, see
+https://firebase.google.com/docs/test\-lab/ios/command\-line.
+
+All arguments for \fBgcloud alpha firebase test ios run\fR may be specified on
+the command line and/or within an argument file. Run \fB$ gcloud topic
+arg\-files\fR for more information about argument files.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+[\fIARGSPEC\fR]
+An ARG_FILE:ARG_GROUP_NAME pair, where ARG_FILE is the path to a file containing
+groups of test arguments in yaml format, and ARG_GROUP_NAME is the particular
+yaml object holding a group of arg:value pairs to use. Run \fB$ gcloud topic
+arg\-files\fR for more information and examples.
+
+
+.RE
+.sp
+
+.SH "COMMONLY USED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-device\fR=\fIDIMENSION\fR=\fIVALUE\fR,[...]
+A list of \f5\fIDIMENSION=VALUE\fR\fR pairs which specify a target device to
+test against. This flag may be repeated to specify multiple devices. The device
+dimensions are: \fBmodel\fR and \fBversion\fR. If any dimensions are omitted,
+they will use a default value. The default value for each dimension can be found
+with the \f5\fIlist\fR\fR command for that dimension, such as \f5$ gcloud alpha
+firebase test ios models list\fR. Omitting this flag entirely will run tests
+against a single device using defaults for every dimension.
+
+Examples:
+
+.RS 2m
+\-\-device model=iphone8plus
+\-\-device version=11.2
+\-\-device model=ipadmini4,version=11.2
+.RE
+
+.TP 2m
+\fB\-\-test\fR=\fIXCTEST_ZIP\fR
+The path to the test package (a zip file containing the iOS app and XCTest
+files). The given path may be in the local filesystem or in Google Cloud Storage
+using a URL beginning with \f5gs://\fR.
+
+.TP 2m
+\fB\-\-timeout\fR=\fITIMEOUT\fR
+The max time this test execution can run before it is cancelled (default: 15m).
+It does not include any time necessary to prepare and clean up the target
+device. The maximum possible testing time is 30m on physical devices and 60m on
+virtual devices. The \fITIMEOUT\fR units can be h, m, or s. If no unit is given,
+seconds are assumed. Examples:
+.RS 2m
+.IP "\(em" 2m
+\fB\-\-timeout 1h\fR is 1 hour
+.IP "\(em" 2m
+\fB\-\-timeout 5m\fR is 5 minutes
+.IP "\(em" 2m
+\fB\-\-timeout 200s\fR is 200 seconds
+.IP "\(em" 2m
+\fB\-\-timeout 100\fR is 100 seconds
+.RE
+.RE
+.sp
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Invoke a test asynchronously without waiting for test results.
+
+.TP 2m
+\fB\-\-record\-video\fR
+Enable video recording during the test. Enabled by default, use
+\-\-no\-record\-video to disable.
+
+.TP 2m
+\fB\-\-results\-bucket\fR=\fIRESULTS_BUCKET\fR
+The name of a Google Cloud Storage bucket where raw test results will be stored
+(default: "test\-lab\-<random\-UUID>"). Note that the bucket must be owned by a
+billing\-enabled project, and that using a non\-default bucket will result in
+billing charges for the storage used.
+
+.TP 2m
+\fB\-\-results\-dir\fR=\fIRESULTS_DIR\fR
+The name of a \fBunique\fR Google Cloud Storage object within the results bucket
+where raw test results will be stored (default: a timestamp with a random
+suffix). Caution: if specified, this argument \fBmust be unique\fR for each test
+matrix you create, otherwise results from multiple test matrices will be
+overwritten or intermingled.
+
+.TP 2m
+\fB\-\-results\-history\-name\fR=\fIRESULTS_HISTORY_NAME\fR
+The history name for your test results (an arbitrary string label; default: the
+bundle ID for the iOS application). All tests which use the same history name
+will have their results grouped together in the Firebase console in a
+time\-ordered test history list.
+
+
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates True then that item is listed. For more details and
+examples of filter expressions run $ gcloud topic filters. This flag interacts
+with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+The maximum number of resources to list. The default is \fBunlimited\fR. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+A comma\-separated list of resource field key names to sort by. The default
+order is ascending. Prefix a field with ``~'' for descending order on that
+field. This flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To invoke an xctest test lasting up to five minutes against the default device
+environment, run:
+
+.RS 2m
+$ gcloud alpha firebase test ios run \-\-test XCTEST_ZIP \-\-timeout 5m
+.RE
+
+To invoke an xctest test against an iPad 5 running iOS 11.2, run:
+
+.RS 2m
+$ gcloud alpha firebase test ios run \-\-test XCTEST_ZIP \e
+    \-\-device model=ipad5,version=11.2
+.RE
+
+To run your tests against multiple iOS devices simultaneously, specify the
+\fB\-\-device\fR flag more than once:
+
+.RS 2m
+$ gcloud alpha firebase test ios run \-\-test XCTEST_ZIP             \e
+      \-\-device model=iphone7               \e
+    \-\-device model=ipadmini4,version=11.2               \e
+    \-\-device model=iphonese
+.RE
+
+All test arguments for a given test may alternatively be stored in an argument
+group within a YAML\-formatted argument file. The \fIARG_FILE\fR may contain one
+or more named argument groups, and argument groups may be combined using the
+\f5include:\fR attribute (Run \fB$ gcloud topic arg\-files\fR for more
+information). The ARG_FILE can easily be shared with colleagues or placed under
+source control to ensure consistent test executions.
+
+To run a test using arguments loaded from an ARG_FILE named
+\fBexcelsior_app_args\fR, which contains an argument group named
+\fBios\-args:\fR, use the following syntax:
+
+.RS 2m
+$ gcloud alpha firebase test ios run \e
+    path/to/excelsior_app_args:ios\-args
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

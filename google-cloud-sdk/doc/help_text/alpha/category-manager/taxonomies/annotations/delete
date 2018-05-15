@@ -10,15 +10,16 @@ DESCRIPTION
     (ALPHA) Delete an annotation and all of its child annotations.
 
 POSITIONAL ARGUMENTS
-     ANNOTATION - The annotation you want to delete. The arguments in this
-     group can be used to specify the attributes of this resource. (NOTE) Some
-     attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: Set the property [core/project] or
-     provide the flag [--project] on the command line. This must be specified.
+     Project annotation resource - The annotation you want to delete. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
 
        ANNOTATION
-          The ID of the projectAnnotation or a fully qualified identifier for
-          the projectAnnotation. This positional must be specified if any of
+          The ID of the project_annotation or a fully qualified identifier for
+          the project_annotation. This positional must be specified if any of
           the other arguments in this group are specified.
 
        --taxonomy=TAXONOMY

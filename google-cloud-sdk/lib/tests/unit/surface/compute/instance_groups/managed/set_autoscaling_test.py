@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instance-groups managed set-autoscaling subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import random
 
 from googlecloudsdk.api_lib.compute import managed_instance_groups_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
@@ -153,7 +156,8 @@ class InstanceGroupManagersSetAutoscalingZonalTest(test_base.BaseTest):
         )
     ]
 
-    with self.AssertRaisesToolExceptionRegexp(
+    with self.assertRaisesRegexp(
+        console_io.OperationCancelledError,
         r'Setting autoscaling aborted by user.'):
       self.Run('compute instance-groups managed set-autoscaling '
                'gke-test-cluster-default-pool-9020bb-grp '

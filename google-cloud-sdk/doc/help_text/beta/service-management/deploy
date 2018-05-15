@@ -1,0 +1,46 @@
+NAME
+    gcloud beta service-management deploy - deploys a service configuration for
+        the given service name
+
+SYNOPSIS
+    gcloud beta service-management deploy SERVICE_CONFIG_FILE
+        [SERVICE_CONFIG_FILE ...] [--async] [--force, -f] [--validate-only]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) (REMOVED) Deploys a service configuration for the given service
+    name.
+
+    The service-management deploy command has been replaced by endpoints
+    services deploy.
+
+POSITIONAL ARGUMENTS
+     SERVICE_CONFIG_FILE [SERVICE_CONFIG_FILE ...]
+        The service configuration file (or files) containing the API
+        specification to upload. Proto Descriptors, Open API (Swagger)
+        specifications, and Google Service Configuration files in JSON and YAML
+        formats are acceptable.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --force, -f
+        Force the deployment even if any hazardous changes to the service
+        configuration are detected.
+
+     --validate-only
+        If included, the command will only validate the service
+        configuration(s). No configuration(s) will be persisted.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

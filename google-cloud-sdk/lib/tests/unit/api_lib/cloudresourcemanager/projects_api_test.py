@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for the projects api."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import exceptions
 from apitools.base.py.testing import mock
 

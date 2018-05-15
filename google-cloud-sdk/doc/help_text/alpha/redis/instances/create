@@ -18,12 +18,12 @@ DESCRIPTION
       o The active account does not have permission to create instances.
 
 POSITIONAL ARGUMENTS
-     INSTANCE - Arguments and flags that specify the Memorystore Redis instance
-     you want to create. The arguments in this group can be used to specify the
-     attributes of this resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: Set the property [core/project] or provide the flag [--project]
-     on the command line. This must be specified.
+     Instance resource - Arguments and flags that specify the Memorystore Redis
+     instance you want to create. The arguments in this group can be used to
+     specify the attributes of this resource. (NOTE) Some attributes are not
+     given arguments in this group but can be set in other ways. To set the
+     [project] attribute: Set the property [core/project] or provide the flag
+     [--project] on the command line. This must be specified.
 
        INSTANCE
           The ID of the instance or a fully qualified identifier for the
@@ -37,9 +37,9 @@ POSITIONAL ARGUMENTS
 FLAGS
      --alternative-zone=ALTERNATIVE_ZONE
         A secondary zone for the Redis instance to create. Only applicable to
-        STANDARD_HA tier which protects the instance against zonal failures by
-        provisioning it across two zones. If provided, it must be a different
-        zone from the one provided through --zone.
+        the standard tier. This protects the instance against zonal failures by
+        provisioning it across two zones. If provided, alternative zone must be
+        a different zone from the one provided through --zone.
 
      --async
         Display information about the operation in progress, without waiting

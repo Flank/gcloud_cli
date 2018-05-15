@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the ML Engine jobs command_lib utils."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import time
 
 from googlecloudsdk.api_lib.ml_engine import operations

@@ -18,7 +18,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to operate on.
+        Name of the managed instance group to operate on.
 
 REQUIRED FLAGS
      --version=[template=TEMPLATE,[name=NAME],...]

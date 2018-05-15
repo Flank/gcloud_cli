@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for api_lib.runtime_config.transforms."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.runtime_config import transforms
 from tests.lib import test_case
 

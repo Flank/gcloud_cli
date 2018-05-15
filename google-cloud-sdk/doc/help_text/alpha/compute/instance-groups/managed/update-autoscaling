@@ -1,0 +1,87 @@
+NAME
+    gcloud alpha compute instance-groups managed update-autoscaling - update
+        autoscaling parameters of a managed instance group
+
+SYNOPSIS
+    gcloud alpha compute instance-groups managed update-autoscaling NAME
+        [--mode=MODE] [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instance-groups managed update-autoscaling
+    updates autoscaling parameters of specified managed instance group.
+
+    Autoscalers can use one or more policies listed below. Information on using
+    multiple policies can be found here:
+    https://cloud.google.com/compute/docs/autoscaler/multiple-policies
+
+    In contrast to gcloud alpha compute instance-groups managed
+    set-autoscaling, this command only updates specified fields. For instance:
+
+        $ gcloud alpha compute instance-groups managed update-autoscaling \
+          --mode only-up
+
+    would change the mode field of the autoscaler policy, but leave the rest of
+    the settings intact.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the managed instance group to operate on.
+
+FLAGS
+     --mode=MODE
+        Set the mode of an autoscaler for a managed instance group.
+
+        You can turn off or restrict MIG activities without changing MIG
+        configuration and then having to restore it later. MIG configuration
+        persists while the activities are turned off or restricted, and the
+        activities pick it up when they are turned on again or when the
+        restrictions are lifted.
+
+        MODE must be one of:
+
+         off
+            to turn off autoscaling, while keeping the new configuration.
+         on
+            to permit autoscaling to scale up and down (default for new
+            autoscalers).
+         only-down
+            to permit autoscaling to scale only down and not up.
+         only-up
+            to permit autoscaling to scale only up and not down.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The region of the managed instance group to operate on. If not
+          specified, you may be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          The zone of the managed instance group to operate on. If not
+          specified, you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

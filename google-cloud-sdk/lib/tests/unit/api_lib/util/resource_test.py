@@ -58,6 +58,38 @@ class SplitUrlTest(test_case.Base):
     self.assertEqual((api_name, api_version, resource_path),
                      resource_util.SplitDefaultEndpointUrl(url))
 
+  def testGoogleApis_K8sStyle(self):
+    domain = 'googleapis.com'
+    api_name = 'serverless'
+    api_version = 'v1beta3'
+    resource_path = 'path/to/resource'
+    k8s_api = 'elephant.dev'
+    url = 'https://{api}.{domain}/apis/{k8s_api}/{version}/{resource}'.format(
+        domain=domain,
+        api=api_name,
+        k8s_api=k8s_api,
+        version=api_version,
+        resource=resource_path)
+    self.assertEqual((api_name, api_version, resource_path),
+                     resource_util.SplitDefaultEndpointUrl(url))
+
+  def testGoogleApis_K8sStyleMalformed(self):
+    # Look ma no crashes
+    domain = 'googleapis.com'
+    api_name = 'serverless'
+    url = 'https://{api}.{domain}/apis/blah blah blah'.format(
+        domain=domain,
+        api=api_name)
+    _, v, p = resource_util.SplitDefaultEndpointUrl(url)
+    self.assertEqual(v, None)
+    self.assertEqual(p, '')
+
+  def testGoogleApis_Malformed(self):
+    url = 'https://bliggity-blah'
+    _, v, p = resource_util.SplitDefaultEndpointUrl(url)
+    self.assertEqual(v, None)
+    self.assertEqual(p, '')
+
   def testGoogleApis_ApiNameFirst_NoResource(self):
     domain = 'googleapis.com'
     api_name = 'sql'

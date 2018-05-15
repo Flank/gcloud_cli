@@ -21,7 +21,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the firewall rule to update.
+        Name of the firewall rule to update.
 
 FLAGS
      --allow=[PROTOCOL[:PORT[-PORT]],...]

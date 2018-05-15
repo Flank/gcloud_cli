@@ -14,6 +14,8 @@
 
 """Tests for organiztaions add-iam-policy-binding."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from tests.lib import test_case
@@ -28,20 +30,20 @@ class OrganizationsAddIamPolicyBindingTest(testbase.OrganizationsUnitTestBase):
   NEW_USER = 'user:fox@google.com'
 
   START_POLICY = messages.Policy(bindings=[
-      messages.Binding(role=u'roles/resourcemanager.projectCreator',
-                       members=[u'domain:foo.com']), messages.Binding(
-                           role=u'roles/resourcemanager.organizationAdmin',
-                           members=[u'user:admin@foo.com'])
+      messages.Binding(role='roles/resourcemanager.projectCreator',
+                       members=['domain:foo.com']), messages.Binding(
+                           role='roles/resourcemanager.organizationAdmin',
+                           members=['user:admin@foo.com'])
   ],
-                                 etag='someUniqueEtag',
+                                 etag=b'someUniqueEtag',
                                  version=1)
   NEW_POLICY = messages.Policy(bindings=[
-      messages.Binding(role=u'roles/resourcemanager.projectCreator',
-                       members=[u'domain:foo.com', NEW_USER]), messages.Binding(
-                           role=u'roles/resourcemanager.organizationAdmin',
-                           members=[u'user:admin@foo.com'])
+      messages.Binding(role='roles/resourcemanager.projectCreator',
+                       members=['domain:foo.com', NEW_USER]), messages.Binding(
+                           role='roles/resourcemanager.organizationAdmin',
+                           members=['user:admin@foo.com'])
   ],
-                               etag='someUniqueEtag',
+                               etag=b'someUniqueEtag',
                                version=1)
 
   def testAddIamPolicyBinding(self):

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the ssh-keys update subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.oslogin import client as oslogin_client
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized

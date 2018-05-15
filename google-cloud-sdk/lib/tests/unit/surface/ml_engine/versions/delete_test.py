@@ -13,6 +13,8 @@
 # limitations under the License.
 """ml-engine versions delete tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.ml_engine import versions_api
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io

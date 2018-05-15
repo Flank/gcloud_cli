@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the forwarding-rules list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -57,7 +59,7 @@ def SetUp(test_obj, api_version):
     raise ValueError('Bad API version: [{0}]'.format(api_version))
 
   list_json_patcher = mock.patch(
-      'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
+      'googlecloudsdk.api_lib.compute.request_helper.ListJson')
   test_obj.addCleanup(list_json_patcher.stop)
   test_obj.list_json = list_json_patcher.start()
 
@@ -227,10 +229,10 @@ class ForwardingRulesListTest(test_base.BaseTest,
             ],
         ],
         expected_completions=[
-            u'forwarding-rule-1',
-            u'forwarding-rule-2',
-            u'global-forwarding-rule-1',
-            u'global-forwarding-rule-2',
+            'forwarding-rule-1',
+            'forwarding-rule-2',
+            'global-forwarding-rule-1',
+            'global-forwarding-rule-2',
         ],
         cli=self.cli,
     )
@@ -319,11 +321,11 @@ class ForwardingRulesListBetaTest(ForwardingRulesListTest):
             ],
         ],
         expected_completions=[
-            u'forwarding-rule-1',
-            u'forwarding-rule-2',
-            u'forwarding-rule-ilb',
-            u'global-forwarding-rule-1',
-            u'global-forwarding-rule-2',
+            'forwarding-rule-1',
+            'forwarding-rule-2',
+            'forwarding-rule-ilb',
+            'global-forwarding-rule-1',
+            'global-forwarding-rule-2',
         ],
         cli=self.cli,
     )

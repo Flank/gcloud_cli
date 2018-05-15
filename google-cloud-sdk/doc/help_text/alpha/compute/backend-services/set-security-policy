@@ -17,7 +17,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_SERVICE_NAME
-        The name of the backend service to operate on.
+        Name of the backend service to operate on.
 
 REQUIRED FLAGS
      --security-policy=SECURITY_POLICY

@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      SNAPSHOT_NAME [SNAPSHOT_NAME ...]
-        The names of the snapshots to delete.
+        Names of the snapshots to delete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Module for compute test utilities."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 
 from apitools.base.py import encoding
@@ -93,8 +95,8 @@ class BatchResponder(object):
     for r in requests:
       request_key = self._GetKeyForRequest(r)
       if request_key not in batch:
-        raise AssertionError('Unexpected request {}, expecting {}'
-                             .format(r, batch.keys()))
+        raise AssertionError('Unexpected request {}, expecting {}'.format(
+            r, list(batch.keys())))
       response = batch.pop(request_key)
       if isinstance(response, Exception):
         errors_to_collect.append(response)

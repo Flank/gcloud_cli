@@ -11,11 +11,11 @@ DESCRIPTION
     (BETA) Get the IAM policy for a Cloud Bigtable instance.
 
 POSITIONAL ARGUMENTS
-     INSTANCE - The instance to get the IAM policy for. This represents a Cloud
-     resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: Set the property
-     [core/project] or provide the flag [--project] on the command line. This
-     must be specified.
+     Instance resource - The instance to get the IAM policy for. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
 
        INSTANCE
           The ID of the instance or a fully qualified identifier for the
@@ -53,7 +53,5 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in BETA and may change
-    without notice.
+    This command is currently in BETA and may change without notice.
 

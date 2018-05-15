@@ -14,6 +14,8 @@
 
 """Unit tests for the compute.completers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.resource_manager import completers
 from tests.lib import completer_test_base
 

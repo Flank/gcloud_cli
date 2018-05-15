@@ -16,7 +16,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      URLMAP
-        The name of the URL map to operate on.
+        Name of the URL map to operate on.
 
 REQUIRED FLAGS
      --path=PATH

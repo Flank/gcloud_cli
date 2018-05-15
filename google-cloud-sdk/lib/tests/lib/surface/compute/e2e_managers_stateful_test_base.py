@@ -13,6 +13,8 @@
 # limitations under the License.
 """Module for instance-groups managed stateful integration test base classes."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -52,7 +54,7 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
                                          size=0,
                                          stateful_names=False,
                                          stateful_disks=None):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     if self.scope == e2e_test_base.ZONAL:
       self.instance_group_manager_names.append(name)
     elif self.scope == e2e_test_base.REGIONAL:
@@ -111,7 +113,7 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
     self.Run('compute instances describe {name}'.format(name=name))
 
   def CreateDisk(self, zone=None):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     # Update seek position
     self.GetNewErr()
     self.Run("""

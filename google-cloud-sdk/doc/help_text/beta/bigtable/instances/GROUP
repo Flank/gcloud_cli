@@ -15,6 +15,9 @@ GCLOUD WIDE FLAGS
 COMMANDS
     COMMAND is one of the following:
 
+     add-iam-policy-binding
+        (BETA) Add an IAM policy binding to a Cloud Bigtable instance.
+
      create
         (BETA) Create a new Bigtable instance.
 
@@ -24,8 +27,17 @@ COMMANDS
      describe
         (BETA) Describe an existing Bigtable instance.
 
+     get-iam-policy
+        (BETA) Get the IAM policy for a Cloud Bigtable instance.
+
      list
         (BETA) List existing Bigtable instances.
+
+     remove-iam-policy-binding
+        (BETA) Remove an IAM policy binding from a Cloud Spanner instance.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for a Cloud Bigtable instance.
 
      update
         (BETA) Modify an existing Bigtable instance.

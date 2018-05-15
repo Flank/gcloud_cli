@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the network-endpoint-groups list subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 from tests.lib import test_case

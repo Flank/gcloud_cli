@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for the backend_services flags module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.command_lib.compute.backend_services import flags

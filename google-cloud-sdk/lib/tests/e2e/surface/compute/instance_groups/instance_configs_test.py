@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for instance-configs (MIG subresources)."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -36,7 +38,7 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
     """.format(group_name=group_name, scope_flag=self.GetScopeFlag()))
 
   def _CreateInstanceUrl(self):
-    name = e2e_utils.GetResourceNameGenerator(prefix=self.prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
     return ('https://www.googleapis.com/compute/'
             '{0}/projects/{1}/zones/{2}/instances/{3}').format(
                 self.track.prefix, self.Project(), self.zone, name)

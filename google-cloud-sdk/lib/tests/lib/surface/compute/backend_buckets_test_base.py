@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base class for all backend buckets tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 
@@ -41,7 +43,7 @@ class BackendBucketsTestBase(sdk_test_base.WithFakeAuth,
     """Setup common test components.
 
     Args:
-      release_track: Release track the test is targetting.
+      release_track: Release track the test is targeting.
     """
     api_name = self._GetApiName(release_track)
 

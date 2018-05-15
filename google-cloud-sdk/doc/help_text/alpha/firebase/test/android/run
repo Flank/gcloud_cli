@@ -6,12 +6,12 @@ SYNOPSIS
     gcloud alpha firebase test android run [ARGSPEC] [--app=APP]
         [--device=DIMENSION=VALUE,[...]] [--test=TEST] [--timeout=TIMEOUT]
         [--type=TYPE] [--additional-apks=APK,[APK,...]]
-        [--app-package=APP_PACKAGE] [--async] [--no-auto-google-login]
+        [--app-package=APP_PACKAGE] [--async] [--auto-google-login]
         [--directories-to-pull=[DIR_TO_PULL,...]]
         [--environment-variables=[KEY=VALUE,...]]
         [--network-profile=PROFILE_ID] [--obb-files=OBB_FILE,[OBB_FILE]]
-        [--other-files=FILE=DEVICE_DIR,[...]] [--no-performance-metrics]
-        [--no-record-video] [--results-bucket=RESULTS_BUCKET]
+        [--other-files=FILE=DEVICE_DIR,[...]] [--performance-metrics]
+        [--record-video] [--results-bucket=RESULTS_BUCKET]
         [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME]
         [--scenario-labels=LABEL,[LABEL,...]]
@@ -68,13 +68,13 @@ COMMONLY USED FLAGS
         against. This flag may be repeated to specify multiple devices. The
         four device dimensions are: model, version, locale, and orientation. If
         any dimensions are omitted, they will use a default value. The default
-        value can be found with the list command for each dimension, $ gcloud
-        alpha firebase test android <dimension> list. --device is now the
-        preferred way to specify test devices and may not be used in
-        conjunction with --devices-ids, --os-version-ids, --locales, or
-        --orientations. Omitting all of the preceding dimension-related flags
-        will run tests against a single device using defaults for all four
-        device dimensions.
+        value for each dimension can be found with the list command for that
+        dimension, such as $ gcloud alpha firebase test android models list.
+        --device is now the preferred way to specify test devices and may not
+        be used in conjunction with --devices-ids, --os-version-ids, --locales,
+        or --orientations. Omitting all of the preceding dimension-related
+        flags will run tests against a single device using defaults for all
+        four device dimensions.
 
         Examples:
 
@@ -84,8 +84,8 @@ COMMONLY USED FLAGS
 
      --test=TEST
         The path to the binary file containing instrumentation tests. The given
-        path may be in the local filesystem or in Google Cloud Storage using
-        gs:// notation.
+        path may be in the local filesystem or in Google Cloud Storage using a
+        URL beginning with gs://.
 
      --timeout=TIMEOUT
         The max time this test execution can run before it is cancelled

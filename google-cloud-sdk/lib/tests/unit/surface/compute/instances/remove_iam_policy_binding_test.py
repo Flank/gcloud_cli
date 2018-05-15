@@ -43,6 +43,7 @@ class RemoveIamPolicyBindingTest(test_base.BaseTest,
         --member user:testuser@google.com --role owner
         """)
 
+    policy = test_resources.EmptyAlphaIamPolicy()
     self.CheckRequests(
         [(self.compute.instances,
           'GetIamPolicy',
@@ -56,7 +57,9 @@ class RemoveIamPolicyBindingTest(test_base.BaseTest,
               resource='resource',
               project='my-project',
               zone='zone-1',
-              policy=test_resources.EmptyAlphaIamPolicy())),
+              zoneSetPolicyRequest=messages.ZoneSetPolicyRequest(
+                  bindings=policy.bindings,
+                  etag=policy.etag))),
         ]
     )
 

@@ -30,7 +30,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --image=IMAGE
-        The name of the disk image to create.
+        Name of the disk image to create.
 
      --regexp=REGEXP, -r REGEXP
         (DEPRECATED) A regular expression to filter the names of the results

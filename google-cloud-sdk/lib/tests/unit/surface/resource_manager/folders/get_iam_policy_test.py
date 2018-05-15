@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.resource_manager import folders
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core.util import http_encoding
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
@@ -28,12 +31,12 @@ class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):
     test_policy = self.messages.Policy(
         bindings=[
             self.messages.Binding(
-                role=u'roles/resourcemanager.projectCreator',
-                members=[u'domain:foo.com']), self.messages.Binding(
-                    role=u'roles/resourcemanager.organizationAdmin',
-                    members=[u'user:admin@foo.com'])
+                role='roles/resourcemanager.projectCreator',
+                members=['domain:foo.com']), self.messages.Binding(
+                    role='roles/resourcemanager.organizationAdmin',
+                    members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=http_encoding.Encode('someUniqueEtag'),
         version=1)
     self.mock_folders.GetIamPolicy.Expect(self.ExpectedRequest(), test_policy)
     self.assertEqual(self.DoRequest(), test_policy)
@@ -43,12 +46,12 @@ class FoldersGetIamPolicyTest(testbase.FoldersUnitTestBase):
     test_policy = self.messages.Policy(
         bindings=[
             self.messages.Binding(
-                role=u'roles/resourcemanager.projectCreator',
-                members=[u'domain:foo.com']), self.messages.Binding(
-                    role=u'roles/resourcemanager.organizationAdmin',
-                    members=[u'user:admin@foo.com'])
+                role='roles/resourcemanager.projectCreator',
+                members=['domain:foo.com']), self.messages.Binding(
+                    role='roles/resourcemanager.organizationAdmin',
+                    members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=http_encoding.Encode('someUniqueEtag'),
         version=1)
     self.mock_folders.GetIamPolicy.Expect(self.ExpectedRequest(), test_policy)
     args = [

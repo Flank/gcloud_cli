@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAMES [NAMES ...]
-        The names of the managed instance groups to delete.
+        Names of the managed instance groups to delete.
 
 FLAGS
      At most one of these may be specified:

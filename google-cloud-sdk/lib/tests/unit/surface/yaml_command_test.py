@@ -20,8 +20,12 @@ to catch common errors. This test suite should cover anything about a command
 that can be statically analyzed.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import re
+import sys
 
 from apitools.base.protorpclite import messages as _messages
 from googlecloudsdk.calliope import command_loading
@@ -30,7 +34,6 @@ from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema
 from googlecloudsdk.command_lib.util.apis import yaml_command_translator
 
-from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import pkg_resources
@@ -39,6 +42,7 @@ from tests.lib import cli_test_base
 from tests.lib import parameterized
 
 import jsonschema
+import six
 
 
 class Validator(object):
@@ -159,7 +163,7 @@ class Validator(object):
       method_query_params = self.builder.method.query_params
       ref_params = (
           self.builder.method.resource_argument_collection.detailed_params)
-      for param, ref_param in params.iteritems():
+      for param, ref_param in six.iteritems(params):
         if param not in method_params + method_query_params:
           self.E('request.resource_method_params',
                  'Parameter [{}] does not exist on API method', param)
@@ -196,8 +200,8 @@ class Validator(object):
     if not error_field:
       return
 
-    for section, f in {'error.code': error.code,
-                       'error.message': error.message}.iteritems():
+    for section, f in six.iteritems({'error.code': error.code,
+                                     'error.message': error.message}):
       self._GetFieldFromMessage(error_field.type, f, section)
 
   def ValidateAsyncSection(self):
@@ -229,9 +233,9 @@ class Validator(object):
         'a',
         params={p: 'a' for p in poller_request_params},
         collection=asynchronous.collection)
-    ref_params = operation_ref.AsDict().keys()
+    ref_params = list(operation_ref.AsDict().keys())
     for param, ref_param in (
-        asynchronous.operation_get_method_params.iteritems()):
+        six.iteritems(asynchronous.operation_get_method_params)):
       if param not in method_params:
         self.E('async.operation_get_method_params',
                'Parameter [{}] does not exist on API method', param)
@@ -243,10 +247,10 @@ class Validator(object):
   def _CheckAsyncState(self, poller):
     asynchronous = self.builder.spec.async
     op_response = poller.method.GetEffectiveResponseType()
-    for section, f in {
+    for section, f in six.iteritems({
         'async.response_name_field': asynchronous.response_name_field,
         'async.state.field': asynchronous.state.field,
-        'async.error.field': asynchronous.error.field}.iteritems():
+        'async.error.field': asynchronous.error.field}):
       self._GetFieldFromMessage(op_response, f, section)
 
     # Check that success and error fields are mutually exclusive.
@@ -411,7 +415,7 @@ class YAMLCommandTests(cli_test_base.CliTestBase, parameterized.TestCase):
 
       if validator.errors:
         for e in validator.errors:
-          log.out.Print(e)
+          sys.__stderr__.write(e + '\n')
         self.fail('Validator failed.')
 
   def testEmptyArgumentGroupParams(self):

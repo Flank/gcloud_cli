@@ -26,7 +26,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
-        The name of the disk image to update.
+        Name of the disk image to update.
 
 FLAGS
      --update-labels=[KEY=VALUE,...]

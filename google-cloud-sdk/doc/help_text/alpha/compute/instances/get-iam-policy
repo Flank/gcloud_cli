@@ -3,7 +3,7 @@ NAME
         Google Compute Engine instance
 
 SYNOPSIS
-    gcloud alpha compute instances get-iam-policy (INSTANCE_NAME : --zone=ZONE)
+    gcloud alpha compute instances get-iam-policy (INSTANCE : --zone=ZONE)
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -16,14 +16,14 @@ DESCRIPTION
     set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     INSTANCE NAME - The instance for which to display the IAM policy. The
+     Instance resource - The instance for which to display the IAM policy. The
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This
      must be specified.
 
-       INSTANCE_NAME
+       INSTANCE
           The ID of the instance or a fully qualified identifier for the
           instance. This positional must be specified if any of the other
           arguments in this group are specified.

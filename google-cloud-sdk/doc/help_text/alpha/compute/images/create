@@ -31,7 +31,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      IMAGE_NAME
-        The name of the disk image to create.
+        Name of the disk image to create.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:

@@ -3,9 +3,9 @@ NAME
         Cloud Billing account
 
 SYNOPSIS
-    gcloud alpha billing accounts get-iam-policy ACCOUNT_ID
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha billing accounts get-iam-policy ACCOUNT [--filter=EXPRESSION]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha billing accounts get-iam-policy displays the IAM
@@ -16,12 +16,12 @@ DESCRIPTION
     set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     ACCOUNT ID - The Cloud Billing account for which to display the IAM
+     Account resource - The Cloud Billing account for which to display the IAM
      policy. This represents a Cloud resource. This must be specified.
 
-       ACCOUNT_ID
-          The ID of the account_id or a fully qualified identifier for the
-          account_id.
+       ACCOUNT
+          The ID of the account or a fully qualified identifier for the
+          account.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_BUCKET_NAME
-        The name of the backend bucket to describe.
+        Name of the backend bucket to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

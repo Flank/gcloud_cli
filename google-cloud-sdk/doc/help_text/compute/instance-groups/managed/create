@@ -23,7 +23,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to create.
+        Name of the managed instance group to create.
 
 REQUIRED FLAGS
      --size=SIZE

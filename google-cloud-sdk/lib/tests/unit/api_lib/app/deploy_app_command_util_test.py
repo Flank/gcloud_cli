@@ -84,13 +84,18 @@ class CopyFilesToCodeBucketTest(
     # Initialize some files
     _CreateFiles(self.temp_path)
 
+    default_app_info = appinfo.AppInfoExternal()
+    default_app_info.Set('runtime', 'python27')
     self.default_module = yaml_parsing.ServiceYamlInfo(
-        os.path.join(self.temp_path, 'app.yaml'), appinfo.AppInfoExternal())
+        os.path.join(self.temp_path, 'app.yaml'),
+        default_app_info)
     self.default_source_dir = os.path.dirname(self.default_module.file)
 
+    extra_app_info = appinfo.AppInfoExternal()
+    extra_app_info.Set('runtime', 'python27')
     self.extra_module = yaml_parsing.ServiceYamlInfo(
         os.path.join(self.temp_path, 'extra', 'app.yaml'),
-        appinfo.AppInfoExternal())
+        extra_app_info)
     self.extra_source_dir = os.path.dirname(self.extra_module.file)
 
     node_app_info = appinfo.AppInfoExternal()
@@ -112,6 +117,7 @@ class CopyFilesToCodeBucketTest(
         os.path.join(self.temp_path, 'app.yaml'), php_flex_app_info)
 
     skip_files_app_info = appinfo.AppInfoExternal()
+    skip_files_app_info.Set('runtime', 'python27')
     skip_files_app_info.Set('skip_files', '^(.*/)?#.*#$')
     self.skip_files_module = yaml_parsing.ServiceYamlInfo(
         os.path.join(self.temp_path, 'app.yaml'), skip_files_app_info)

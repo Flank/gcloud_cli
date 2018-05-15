@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the ssh-keys describe subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.oslogin import client as oslogin_client

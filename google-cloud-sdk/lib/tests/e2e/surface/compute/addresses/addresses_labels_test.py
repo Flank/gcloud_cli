@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for addresses labels."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import base
@@ -25,8 +27,9 @@ class AddressesLabelsTest(e2e_test_base.BaseTest):
 
   def SetUp(self):
     self.track = base.ReleaseTrack.BETA
-    self.address_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-address').next()
+    self.address_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-test-address'))
 
   def RunCompute(self, *cmd):
     return self.Run(('compute',) + cmd)

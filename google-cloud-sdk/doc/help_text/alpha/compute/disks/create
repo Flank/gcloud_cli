@@ -9,7 +9,8 @@ SYNOPSIS
         [--kms-keyring=KMS_KEYRING] [--kms-location=KMS_LOCATION]
         [--kms-project=KMS_PROJECT] [--labels=[KEY=VALUE,...]]
         [--licenses=[LICENSE,...]] [--replica-zones=ZONE,ZONE]
-        [--no-require-csek-key-create] [--size=SIZE] [--type=TYPE]
+        [--no-require-csek-key-create]
+        [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -36,7 +37,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      DISK_NAME [DISK_NAME ...]
-        The names of the disks to create.
+        Names of the disks to create.
 
 FLAGS
      --csek-key-file=FILE
@@ -159,6 +160,10 @@ FLAGS
         https://cloud.google.com/compute/docs/disks/customer-supplied-encryption
         for more details. Enabled by default, use --no-require-csek-key-create
         to disable.
+
+     --resource-policies=[RESOURCE_POLICY,...]
+        A list of resource policy names to be added to the instance. The
+        policies must exist in the same region as the instance.
 
      --size=SIZE
         Indicates the size of the disks. The value must be a whole number

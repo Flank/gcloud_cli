@@ -21,7 +21,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the instance groups to delete.
+        Names of the instance groups to delete.
 
 FLAGS
      --zone=ZONE

@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the target TCP proxy to update.
+        Name of the target TCP proxy to update.
 
 FLAGS
      --backend-service=BACKEND_SERVICE

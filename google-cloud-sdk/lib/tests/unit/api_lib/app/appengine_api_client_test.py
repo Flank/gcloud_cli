@@ -60,6 +60,9 @@ class AppEngineApiClientTestBase(sdk_test_base.WithFakeAuth):
     self.beta_client = appengine_api_client.AppengineApiClient(
         self.mocked_beta_client)
 
+    self.appyaml = appinfo.AppInfoExternal()
+    self.appyaml.Set('runtime', 'python27')
+
 
 class AppEngineApiClientTests(AppEngineApiClientTestBase):
   """Tests of the AppEngine API Client library."""
@@ -69,12 +72,12 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     fake_image = u'fake-image'
     fake_version = u'fake-version'
 
-    appyaml = appinfo.AppInfoExternal()
-    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', appyaml)
+    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
     self.mocked_client.apps_services_versions.Create.Expect(
         request=self.messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.messages.Version(
+                runtime=u'python27',
                 deployment=self.messages.Deployment(
                     container=self.messages.ContainerInfo(
                         image=fake_image
@@ -95,12 +98,12 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     fake_build = u'fake-build'
     fake_version = u'fake-version'
 
-    appyaml = appinfo.AppInfoExternal()
-    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', appyaml)
+    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
     self.mocked_beta_client.apps_services_versions.Create.Expect(
         request=self.beta_messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.beta_messages.Version(
+                runtime=u'python27',
                 deployment=self.beta_messages.Deployment(
                     build=self.beta_messages.BuildInfo(
                         cloudBuildId=fake_build)),
@@ -141,8 +144,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
                                             'cloudBuildTimeout':
                                             cloud_build_timeout,
                                         }})
-    appyaml = appinfo.AppInfoExternal()
-    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', appyaml)
+    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
     op_metadata_warning1 = encoding.MessageToPyValue(
         self.beta_messages.OperationMetadataV1Beta(
             warning=['oh-no!'],
@@ -167,6 +169,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.beta_messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.beta_messages.Version(
+                runtime='python27',
                 deployment=deployment_message,
                 id=fake_version,
             ),
@@ -214,10 +217,10 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
   def testCreateVersion(self):
     fake_build = app_build.BuildArtifact.MakeBuildIdArtifact('fake-build')
     fake_image = app_build.BuildArtifact.MakeImageArtifact('fake-image')
-    appyaml = appinfo.AppInfoExternal()
-    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', appyaml)
+    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
 
     image_version_expected = self.messages.Version(
+        runtime=u'python27',
         deployment=self.messages.Deployment(
             container=self.messages.ContainerInfo(image='fake-image')))
 
@@ -229,6 +232,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     # buildId deployments are only supported in the v1beta and v1alpha Admin API
     # versions currently, so use the v1beta client and messages.
     build_version_expected = self.beta_messages.Version(
+        runtime=u'python27',
         deployment=self.beta_messages.Deployment(
             build=self.beta_messages.BuildInfo(cloudBuildId='fake-build')))
 
@@ -249,8 +253,8 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     # This value is here to test that existing beta_settings value are not
     # over-written
     beta_settings['foo'] = 'bar'
-    appyaml = appinfo.AppInfoExternal(beta_settings=beta_settings)
-    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', appyaml)
+    self.appyaml.beta_settings = beta_settings
+    fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
 
     prop = self.messages.Version.BetaSettingsValue.AdditionalProperty
     beta_settings = self.messages.Version.BetaSettingsValue(
@@ -262,6 +266,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.messages.Version(
+                runtime=u'python27',
                 deployment=self.messages.Deployment(
                     container=self.messages.ContainerInfo(image=fake_image)),
                 id=fake_version,

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for creating/deleting sole tenant hosts."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base as calliope_base

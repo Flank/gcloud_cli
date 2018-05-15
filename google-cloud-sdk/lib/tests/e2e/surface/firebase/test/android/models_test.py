@@ -20,12 +20,9 @@ from tests.lib.surface.firebase.test.android import commands
 _PROJECT_ARG = ' --project cloud-sdk-integration-testing'
 
 
-class ModelsTests(e2e_base.TestIntegrationTestBase):
+class AndroidModelsTests(e2e_base.TestIntegrationTestBase):
 
-  def SetUp(self):
-    pass
-
-  def testModelsListWithValidProject(self):
+  def testAndroidModelsListWithValidProject(self):
     # Fetch the catalog with an explicit, known-good project specified to verify
     # that the IAM check for GetTestEnvironmentCatalog works correctly.
     self.Run(commands.ANDROID_MODELS_LIST + _PROJECT_ARG)
@@ -34,7 +31,7 @@ class ModelsTests(e2e_base.TestIntegrationTestBase):
     self.AssertOutputContains('default')
     self.AssertOutputContains('PHYSICAL')
 
-  def testModelsListWithNoProjectSpecified(self):
+  def testAndroidModelsListWithNoProjectSpecified(self):
     # Mock out properties so that core.project appears to not be set by user.
     # This verifies that the IAM check for GetTestEnvironmentCatalog is skipped
     # when no project is given, and the GA catalog is still available.
@@ -49,7 +46,7 @@ class ModelsTests(e2e_base.TestIntegrationTestBase):
     self.AssertOutputContains('default')
     self.AssertOutputContains('PHYSICAL')
 
-  def testModelsDescribePhysical(self):
+  def testAndroidModelsDescribePhysical(self):
     self.Run(commands.ANDROID_MODELS_DESCRIBE + 'hammerhead')
     self.AssertOutputContains('id: hammerhead')
     self.AssertOutputContains('name: Nexus 5')
@@ -57,7 +54,7 @@ class ModelsTests(e2e_base.TestIntegrationTestBase):
     self.AssertOutputContains('form: PHYSICAL')
     self.AssertOutputContains('screenY: 1920')
 
-  def testModelsDescribeVirtual(self):
+  def testAndroidModelsDescribeVirtual(self):
     self.Run(commands.ANDROID_MODELS_DESCRIBE + 'Nexus6P')
     self.AssertOutputContains('id: Nexus6P')
     self.AssertOutputContains('name: Nexus 6P')

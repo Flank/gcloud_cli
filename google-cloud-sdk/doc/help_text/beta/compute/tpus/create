@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud beta compute tpus create TPU_ID --range=RANGE --version=VERSION
-        [--accelerator-type=ACCELERATOR_TYPE; default="tpu-v2"]
+        [--accelerator-type=ACCELERATOR_TYPE; default="v2-8"]
         [--description=DESCRIPTION] [--network=NETWORK] [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -25,9 +25,9 @@ REQUIRED FLAGS
         TensorFlow versions please see https://www.tensorflow.org/versions/.
 
 OPTIONAL FLAGS
-     --accelerator-type=ACCELERATOR_TYPE; default="tpu-v2"
+     --accelerator-type=ACCELERATOR_TYPE; default="v2-8"
         TPU accelerator type for the TPU. If not specified, this defaults to
-        tpu-v2.
+        v2-8.
 
      --description=DESCRIPTION
         Specifies a text description of the TPU.
@@ -58,7 +58,7 @@ EXAMPLES
         $ gcloud beta compute tpus create my-tpu \
             --zone us-central1-a \
             --range '10.240.0.0/29' \
-            --accelerator-type 'tpu-v2' \
+            --accelerator-type 'v2-8' \
             --network my-tf-network \
             --description 'My TF Node' \
             --version '1.1'

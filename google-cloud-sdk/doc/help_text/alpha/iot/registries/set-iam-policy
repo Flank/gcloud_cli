@@ -17,8 +17,8 @@ DESCRIPTION
     will replace any existing policy for the device registry.
 
 POSITIONAL ARGUMENTS
-     REGISTRY - The device registry for which to set the IAM policy. The
-     arguments in this group can be used to specify the attributes of this
+     Registry resource - The device registry for which to set the IAM policy.
+     The arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This

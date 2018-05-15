@@ -13,7 +13,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the node group to operate on.
+        Name of the node group to operate on.
 
 FLAGS
      --node-template=NODE_TEMPLATE

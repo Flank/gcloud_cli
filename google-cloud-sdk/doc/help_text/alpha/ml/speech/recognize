@@ -8,7 +8,10 @@ SYNOPSIS
         [--filter-profanity] [--hints=[HINTS,...]] [--include-word-confidence]
         [--include-word-time-offsets]
         [--max-alternatives=MAX_ALTERNATIVES; default=1]
-        [--sample-rate=SAMPLE_RATE] [GCLOUD_WIDE_FLAG ...]
+        [--sample-rate=SAMPLE_RATE]
+        [--enable-speaker-diarization
+          : --diarization-speaker-count=DIARIZATION_SPEAKER_COUNT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Get a transcript of an audio file that is less than 60 seconds. You
@@ -68,6 +71,14 @@ OPTIONAL FLAGS
         The sample rate in Hertz. For best results, set the sampling rate of
         the audio source to 16000 Hz. If that's not possible, use the native
         sample rate of the audio source (instead of re-sampling).
+
+     --enable-speaker-diarization
+        Enable speaker detection for each recognized word in the top
+        alternative of the recognition result using an integer speaker_tag
+        provided in the WordInfo.
+
+     --diarization-speaker-count=DIARIZATION_SPEAKER_COUNT
+        Estimated number of speakers in the conversation being recognized.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

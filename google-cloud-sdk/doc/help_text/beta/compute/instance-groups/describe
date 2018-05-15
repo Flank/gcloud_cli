@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the instance group to describe.
+        Name of the instance group to describe.
 
 FLAGS
      At most one of these may be specified:

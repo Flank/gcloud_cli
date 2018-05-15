@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the address to describe.
+        Name of the address to describe.
 
 FLAGS
      At most one of these may be specified:

@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_ALPHA_DLP_JOBS_CANCEL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dlp jobs cancel \- start the asynchronous cancellation of a Cloud DLP job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dlp jobs cancel\fR \fIJOB\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Start the asynchronous cancellation of a Cloud DLP job. The server
+makes a best effort to cancel the job, but success is not guaranteed.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Job resource \- The Cloud DLP job to cancel. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: Set the property [core/project] or
+provide the flag [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+The ID of the job or a fully qualified identifier for the job.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdlp/v2\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/dlp/docs/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

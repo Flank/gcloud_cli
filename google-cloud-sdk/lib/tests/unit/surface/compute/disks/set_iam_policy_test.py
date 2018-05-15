@@ -46,8 +46,11 @@ class SetIamPolicyTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.mock_client.disks.SetIamPolicy.Expect(
         messages.ComputeDisksSetIamPolicyRequest(
             resource='my-resource', project='fake-project', zone='zone-1',
-            policy=policy),
+            zoneSetPolicyRequest=messages.ZoneSetPolicyRequest(
+                bindings=policy.bindings,
+                etag=policy.etag)),
         response=policy)
+
     policy_file = self.Touch(
         self.temp_path, 'iam.json',
         contents=encoding.MessageToJson(policy))

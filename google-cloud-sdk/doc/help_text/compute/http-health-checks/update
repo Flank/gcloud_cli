@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the HTTP health check to update.
+        Name of the HTTP health check to update.
 
 FLAGS
      --check-interval=CHECK_INTERVAL

@@ -11,11 +11,11 @@ DESCRIPTION
     and a file encoded in JSON or YAML that contains the IAM policy.
 
 POSITIONAL ARGUMENTS
-     INSTANCE - The Spanner instance to set the IAM policy for. This represents
-     a Cloud resource. (NOTE) Some attributes are not given arguments in this
-     group but can be set in other ways. To set the [project] attribute: Set
-     the property [core/project] or provide the flag [--project] on the command
-     line. This must be specified.
+     Instance resource - The Spanner instance to set the IAM policy for. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
 
        INSTANCE
           The ID of the instance or a fully qualified identifier for the

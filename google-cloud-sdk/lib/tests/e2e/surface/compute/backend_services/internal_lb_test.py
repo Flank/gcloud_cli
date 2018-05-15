@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for creating/deleting firewalls."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import exceptions
@@ -23,8 +25,9 @@ from tests.lib import test_case
 
 
 def _UniqueName(name):
-  return e2e_utils.GetResourceNameGenerator(
-      prefix='compute-internal-lb-test-' + name).next()
+  return next(
+      e2e_utils.GetResourceNameGenerator(prefix='compute-internal-lb-test-' +
+                                         name))
 
 
 class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
@@ -110,12 +113,11 @@ class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
     region = 'us-central1'
     zone = 'us-central1-f'
 
-    with contextlib.nested(
-        self._HealthCheck(health_check),
-        self._VmInstance(vm, zone),
-        self._InstanceGroup(instance_group, zone),
-        self._BackendService(backend_service, health_check, region)) as (
-            _, _, _, backend_services):
+    with self._HealthCheck(health_check), self._VmInstance(
+        vm,
+        zone), self._InstanceGroup(instance_group, zone), self._BackendService(
+            backend_service, health_check, region) as backend_services:
+
       # Check that created backend services matches intended one.
       self.assertEqual(1, len(backend_services))
       self.assertEqual(backend_service, backend_services[0].name)

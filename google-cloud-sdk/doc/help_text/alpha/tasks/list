@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha tasks list --queue=QUEUE [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [--page-size=PAGE_SIZE; default=25] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -26,12 +26,11 @@ LIST COMMAND FLAGS
         flag interacts with other flags that are applied in this order:
         --flatten, --sort-by, --filter, --limit.
 
-     --page-size=PAGE_SIZE
+     --page-size=PAGE_SIZE; default=25
         Some services group resource list output into pages. This flag
-        specifies the maximum number of resources per page. The default is
-        determined by the service if it supports paging, otherwise it is
-        unlimited (no paging). Paging may be applied before or after --filter
-        and --limit depending on the service.
+        specifies the maximum number of resources per page. The default is 25.
+        Paging may be applied before or after --filter and --limit depending on
+        the service.
 
      --sort-by=[FIELD,...]
         A comma-separated list of resource field key names to sort by. The

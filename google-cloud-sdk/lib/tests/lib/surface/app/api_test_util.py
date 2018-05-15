@@ -236,7 +236,8 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
 
   def GetCreateVersionCall(self, project, service, version_id,
                            beta_settings=None, deployment=None, handlers=None,
-                           api_version=None, **version_call_args):
+                           api_version=None, threadsafe=True,
+                           **version_call_args):
     """Helper function to create a create version call."""
     if handlers is None:
       handlers = self.DefaultHandlers()
@@ -245,7 +246,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         betaSettings=beta_settings,
         deployment=deployment,
         handlers=handlers,
-        threadsafe=True,
+        threadsafe=threadsafe,
         runtimeApiVersion=api_version,
         **version_call_args
     )

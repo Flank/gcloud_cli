@@ -98,7 +98,7 @@ FLAGS
         Display only assets that are annotatable. Enabled by default, use
         --no-show-only-annotatable to disable.
 
-     ANNOTATIONS - A comma separated list of annotation references. The
+     Annotation resource - A comma separated list of annotation references. The
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: Set the property

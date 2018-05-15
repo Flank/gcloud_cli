@@ -70,6 +70,34 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(zone_attr.help_text, concepts.ANCHOR_HELP)
     self.assertTrue(spec.disable_auto_completers)
 
+  def testResourceWithFlagNameOverride(self):
+    arg_schema = resource_arg_schema.YAMLResourceArgument.FromData(
+        {
+            'help_text': 'group help',
+            'spec': {'name': 'zone', 'collection': 'foo.projects.zones',
+                     'attributes': [
+                         {'parameter_name': 'projectsId',
+                          'attribute_name': 'project',
+                          'help': 'help1'},
+                         {'parameter_name': 'zonesId',
+                          'attribute_name': 'zone',
+                          'help': 'help2'}]},
+            'removed_flags': ['zone'],
+            'arg_name': 'alt-zone',
+            'is_positional': False})
+    self.assertEqual(arg_schema.group_help, 'group help')
+    self.assertEqual(arg_schema.removed_flags, ['zone'])
+    self.assertFalse(arg_schema.is_positional)
+
+    spec = arg_schema._GenerateResourceSpec(
+        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    project_attr, zone_attr = spec.attributes[0], spec.attributes[1]
+    self.assertEqual(project_attr.name, 'project')
+    self.assertEqual(project_attr.help_text, 'help1')
+    self.assertEqual(spec.name, 'alt-zone')
+    self.assertEqual(zone_attr.help_text, concepts.ANCHOR_HELP)
+    self.assertTrue(spec.disable_auto_completers)
+
   def testResourceWithCompleters(self):
     r = resource_arg_schema.YAMLResourceArgument.FromData(
         {

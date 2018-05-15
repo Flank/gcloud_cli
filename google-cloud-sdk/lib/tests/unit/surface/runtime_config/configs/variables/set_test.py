@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for surface.runtime_config.configs.variables.set."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.runtime_config import util
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
@@ -28,13 +30,13 @@ class VariablesSetTest(base.RuntimeConfigTestBase):
         parent=config_name,
         variable=self.messages.Variable(
             name=var_name,
-            value='value1',
+            value=b'value1',
         ),
     )
     wanted_result = self.messages.Variable(
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1',
+        value=b'value1',
     )
 
     self.variable_client.Create.Expect(request, wanted_result)
@@ -73,13 +75,13 @@ class VariablesSetTest(base.RuntimeConfigTestBase):
         parent=config_name,
         variable=self.messages.Variable(
             name=var_name,
-            value='value1',
+            value=b'value1',
         ),
     )
     wanted_result = self.messages.Variable(
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1',
+        value=b'value1',
     )
 
     self.variable_client.Create.Expect(request, wanted_result)
@@ -95,13 +97,13 @@ class VariablesSetTest(base.RuntimeConfigTestBase):
         parent=config_name,
         variable=self.messages.Variable(
             name=var_name,
-            value='line1\nline2\n',
+            value=b'line1\nline2\n',
         ),
     )
     wanted_result = self.messages.Variable(
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
-        value='line1\nline2\n',
+        value=b'line1\nline2\n',
     )
 
     self.variable_client.Create.Expect(request, wanted_result)
@@ -121,20 +123,20 @@ class VariablesSetTest(base.RuntimeConfigTestBase):
         parent=config_name,
         variable=self.messages.Variable(
             name=var_name,
-            value='value1',
+            value=b'value1',
         ),
     )
     cr_exception = base.MakeHttpError(409, 'ALREADY_EXISTS')
 
     upd_req = self.messages.Variable(
         name=var_name,
-        value='value1',
+        value=b'value1',
     )
     upd_result = self.messages.Variable(
         name=var_name,
         state=self.messages.Variable.StateValueValuesEnum.UPDATED,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1',
+        value=b'value1',
     )
 
     self.variable_client.Create.Expect(cr_req,
@@ -154,13 +156,13 @@ class VariablesSetTest(base.RuntimeConfigTestBase):
         parent=config_name,
         variable=self.messages.Variable(
             name=var_name,
-            value='value1',
+            value=b'value1',
         ),
     )
     wanted_result = self.messages.Variable(
         name=var_name,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1',
+        value=b'value1',
     )
 
     self.variable_client.Create.Expect(request, wanted_result)
@@ -180,7 +182,7 @@ class VariablesSetTest(base.RuntimeConfigTestBase):
         parent=config_name,
         variable=self.messages.Variable(
             name=var_name,
-            value='value1',
+            value=b'value1',
         ),
     )
     exception = base.MakeHttpError(409, 'ALREADY_EXISTS')
@@ -198,13 +200,13 @@ class VariablesSetTest(base.RuntimeConfigTestBase):
     var_name = 'projects/{0}/configs/foo/variables/var1'.format(self.Project())
     request = self.messages.Variable(
         name=var_name,
-        value='value1',
+        value=b'value1',
     )
     wanted_result = self.messages.Variable(
         name=var_name,
         state=self.messages.Variable.StateValueValuesEnum.UPDATED,
         updateTime='2016-04-16T00:00:00Z',
-        value='value1',
+        value=b'value1',
     )
 
     self.variable_client.Update.Expect(request, wanted_result)
@@ -221,7 +223,7 @@ class VariablesSetTest(base.RuntimeConfigTestBase):
     var_name = 'projects/{0}/configs/foo/variables/var1'.format(self.Project())
     request = self.messages.Variable(
         name=var_name,
-        value='value1',
+        value=b'value1',
     )
     exception = base.MakeHttpError(404, 'NOT_FOUND')
 

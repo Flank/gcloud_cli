@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for forwarding rules update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
@@ -45,7 +47,7 @@ class UpdateLabelsTestBeta(
                                                                'value4'))
 
     forwarding_rule = self._MakeForwardingRuleProto(
-        labels=forwarding_rule_labels, fingerprint='fingerprint-42')
+        labels=forwarding_rule_labels, fingerprint=b'fingerprint-42')
     updated_forwarding_rule = self._MakeForwardingRuleProto(
         labels=edited_labels)
 
@@ -54,7 +56,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
     self._ExpectLabelsSetRequest(forwarding_rule_ref, edited_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(forwarding_rule_ref, updated_forwarding_rule)
 
@@ -73,7 +75,7 @@ class UpdateLabelsTestBeta(
     edited_labels = ()
 
     forwarding_rule = self._MakeForwardingRuleProto(
-        labels=forwarding_rule_labels, fingerprint='fingerprint-42')
+        labels=forwarding_rule_labels, fingerprint=b'fingerprint-42')
     updated_forwarding_rule = self._MakeForwardingRuleProto(
         labels=edited_labels)
 
@@ -82,7 +84,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
     self._ExpectLabelsSetRequest(forwarding_rule_ref, edited_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(forwarding_rule_ref, updated_forwarding_rule)
 
@@ -102,7 +104,7 @@ class UpdateLabelsTestBeta(
                                                                'value4'))
 
     forwarding_rule = self._MakeForwardingRuleProto(
-        labels=forwarding_rule_labels, fingerprint='fingerprint-42')
+        labels=forwarding_rule_labels, fingerprint=b'fingerprint-42')
     updated_forwarding_rule = self._MakeForwardingRuleProto(
         labels=edited_labels)
 
@@ -111,7 +113,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
     self._ExpectLabelsSetRequest(forwarding_rule_ref, edited_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(forwarding_rule_ref, updated_forwarding_rule)
 
@@ -129,7 +131,7 @@ class UpdateLabelsTestBeta(
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     forwarding_rule = self._MakeForwardingRuleProto(
-        labels=(), fingerprint='fingerprint-42')
+        labels=(), fingerprint=b'fingerprint-42')
     updated_forwarding_rule = self._MakeForwardingRuleProto(
         labels=update_labels)
     operation_ref = self._GetOperationRef('operation-1', 'us-central1')
@@ -137,7 +139,7 @@ class UpdateLabelsTestBeta(
 
     self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
     self._ExpectLabelsSetRequest(forwarding_rule_ref, update_labels,
-                                 'fingerprint-42', operation)
+                                 b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(forwarding_rule_ref, updated_forwarding_rule)
 
@@ -151,7 +153,7 @@ class UpdateLabelsTestBeta(
     forwarding_rule_ref = self._GetForwardingRuleRef(
         'fr-1', region='us-central1')
     forwarding_rule = self._MakeForwardingRuleProto(
-        labels={}, fingerprint='fingerprint-42')
+        labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
 
@@ -169,7 +171,7 @@ class UpdateLabelsTestBeta(
     update_labels = (('key1', 'value1'), ('key3', 'value3'), ('key4', 'value4'))
 
     forwarding_rule = self._MakeForwardingRuleProto(
-        labels=forwarding_rule_labels, fingerprint='fingerprint-42')
+        labels=forwarding_rule_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(forwarding_rule_ref, forwarding_rule)
 
@@ -245,7 +247,8 @@ class ForwardingRuleUpdateWithNetworkTierAlphaTest(
 
   def testGlobalUpdateNetworkTierAndLabel(self):
     self._SetNextGetResult(
-        networkTier=self.select_network_tier, labelFingerprint='fingerprint-42')
+        networkTier=self.select_network_tier,
+        labelFingerprint=b'fingerprint-42')
 
     self.Run("""
         compute forwarding-rules update forwarding-rule-1
@@ -255,7 +258,7 @@ class ForwardingRuleUpdateWithNetworkTierAlphaTest(
         """)
     self._CheckPatchAndSetLabelsRequest(
         is_global=True,
-        label_fingerprint='fingerprint-42',
+        label_fingerprint=b'fingerprint-42',
         labels=(('key1', 'value1'),),
         networkTier=self.premium_network_tier)
 
@@ -294,7 +297,8 @@ class ForwardingRuleUpdateWithNetworkTierAlphaTest(
 
   def testRegionalUpdateNetworkTierAndLabel(self):
     self._SetNextGetResult(
-        networkTier=self.select_network_tier, labelFingerprint='fingerprint-42')
+        networkTier=self.select_network_tier,
+        labelFingerprint=b'fingerprint-42')
 
     self.Run("""
         compute forwarding-rules update forwarding-rule-1
@@ -304,7 +308,7 @@ class ForwardingRuleUpdateWithNetworkTierAlphaTest(
         """)
     self._CheckPatchAndSetLabelsRequest(
         is_global=False,
-        label_fingerprint='fingerprint-42',
+        label_fingerprint=b'fingerprint-42',
         labels=(('key1', 'value1'),),
         networkTier=self.premium_network_tier)
 

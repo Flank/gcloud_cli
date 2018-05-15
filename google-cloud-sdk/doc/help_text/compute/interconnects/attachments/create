@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the interconnect attachment to create.
+        Name of the interconnect attachment to create.
 
 REQUIRED FLAGS
      --interconnect=INTERCONNECT

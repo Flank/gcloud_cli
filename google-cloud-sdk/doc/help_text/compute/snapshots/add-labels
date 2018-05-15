@@ -26,7 +26,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      SNAPSHOT_NAME
-        The name of the snapshot to operate on.
+        Name of the snapshot to operate on.
 
 REQUIRED FLAGS
      --labels=[KEY=VALUE,...]

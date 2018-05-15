@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """tpus delete tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
@@ -20,6 +22,7 @@ from googlecloudsdk.core.console import console_io
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute.tpus import base
+from six.moves import range
 
 
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
@@ -107,7 +110,7 @@ class DeleteTest(base.TpuUnitTestBase):
     )
 
     # Operation Polling Interval
-    for _ in xrange(3):
+    for _ in range(3):
       op_polling_response = self.GetOperationResponse(
           op_name=self.delete_op_ref.RelativeName(), is_done=False)
       self.mock_client.projects_locations_operations.Get.Expect(
@@ -149,7 +152,7 @@ class DeleteTest(base.TpuUnitTestBase):
     )
 
     # Operation Polling Interval
-    for _ in xrange(3):
+    for _ in range(3):
       op_polling_response = self.GetOperationResponse(
           op_name=self.delete_op_ref.RelativeName(), is_done=False)
       self.mock_client.projects_locations_operations.Get.Expect(

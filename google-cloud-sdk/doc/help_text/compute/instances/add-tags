@@ -31,7 +31,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
-        The name of the instance to set tags on.
+        Name of the instance to set tags on.
 
 REQUIRED FLAGS
      --tags=TAG,[TAG,...]

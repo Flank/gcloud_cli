@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.api_lib.resource_manager import folders
+from googlecloudsdk.core.util import http_encoding
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
@@ -66,18 +69,18 @@ class FoldersAddIamPolicyBindingTest(testbase.FoldersUnitTestBase):
                            '--member={0}'.format(self.NEW_USER))
 
   def _MakePolicy(self, extra_member=None):
-    members = [u'domain:foo.com']
+    members = ['domain:foo.com']
     if extra_member:
       members.append(extra_member)
     return self.messages.Policy(
         bindings=[
             self.messages.Binding(
-                role=u'roles/resourcemanager.projectCreator', members=members),
+                role='roles/resourcemanager.projectCreator', members=members),
             self.messages.Binding(
-                role=u'roles/resourcemanager.folderAdmin',
-                members=[u'user:admin@foo.com'])
+                role='roles/resourcemanager.folderAdmin',
+                members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=http_encoding.Encode('someUniqueEtag'),
         version=1)
 
 

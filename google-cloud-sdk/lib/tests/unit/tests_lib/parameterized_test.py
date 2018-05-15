@@ -15,6 +15,9 @@
 """Tests for parameterized testing class."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import sys
 
 from tests.lib import parameterized

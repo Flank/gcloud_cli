@@ -10,9 +10,9 @@ DESCRIPTION
     (ALPHA) Update an existing Attestation Authority.
 
 POSITIONAL ARGUMENTS
-     AUTHORITY - The authority to update. This represents a Cloud resource.
-     (NOTE) Some attributes are not given arguments in this group but can be
-     set in other ways. To set the [project] attribute: Set the property
+     Authority resource - The authority to update. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This
      must be specified.
 

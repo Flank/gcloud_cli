@@ -13,6 +13,8 @@
 # limitations under the License.
 """ml-engine jobs cancel tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 

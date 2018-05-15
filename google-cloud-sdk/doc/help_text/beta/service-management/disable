@@ -1,0 +1,33 @@
+NAME
+    gcloud beta service-management disable - disables a service for consumption
+        for a project
+
+SYNOPSIS
+    gcloud beta service-management disable [SERVICE ...] [--async]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) (REMOVED) Disables a service for consumption for a project.
+
+    The service-management disable command has been replaced by services
+    disable.
+
+POSITIONAL ARGUMENTS
+     [SERVICE ...]
+        The name of the service(s) to disable.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

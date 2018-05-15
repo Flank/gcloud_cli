@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the interconnects to delete.
+        Names of the interconnects to delete.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

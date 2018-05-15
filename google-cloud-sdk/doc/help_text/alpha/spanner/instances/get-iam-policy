@@ -16,11 +16,11 @@ DESCRIPTION
     set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     INSTANCE - The Cloud Spanner instance for which to display the IAM policy.
-     This represents a Cloud resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: Set the property [core/project] or provide the flag [--project]
-     on the command line. This must be specified.
+     Instance resource - The Cloud Spanner instance for which to display the
+     IAM policy. This represents a Cloud resource. (NOTE) Some attributes are
+     not given arguments in this group but can be set in other ways. To set the
+     [project] attribute: Set the property [core/project] or provide the flag
+     [--project] on the command line. This must be specified.
 
        INSTANCE
           The ID of the instance or a fully qualified identifier for the

@@ -18,15 +18,15 @@ REQUIRED FLAGS
      --display-name=DISPLAY_NAME
         A human-readable name for the annotation.
 
-     TAXONOMY - The taxonomy ID of the parent taxonomy for this new annotation.
-     This represents a Cloud resource. (NOTE) Some attributes are not given
-     arguments in this group but can be set in other ways. To set the [project]
-     attribute: Set the property [core/project] or provide the flag [--project]
-     on the command line. This must be specified.
+     Project taxonomy resource - The taxonomy ID of the parent taxonomy for
+     this new annotation. This represents a Cloud resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: Set the property [core/project] or
+     provide the flag [--project] on the command line. This must be specified.
 
        --taxonomy=TAXONOMY
-          The ID of the projectTaxonomy or a fully qualified identifier for the
-          projectTaxonomy.
+          The ID of the project_taxonomy or a fully qualified identifier for
+          the project_taxonomy.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION

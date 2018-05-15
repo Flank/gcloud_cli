@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the disks describe subcommand."""
-import textwrap
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -29,8 +31,10 @@ def SetUpMockClient(api):
   return mock_client
 
 
-class RegionalDisksDescribeTest(sdk_test_base.WithFakeAuth,
-                                cli_test_base.CliTestBase):
+class RegionalDisksDescribeTest(
+    cli_test_base.CliTestBase,
+    sdk_test_base.WithFakeAuth,
+    sdk_test_base.WithOutputCapture):
 
   def SetUp(self):
     self.track = base.ReleaseTrack.GA
@@ -72,17 +76,14 @@ class RegionalDisksDescribeTest(sdk_test_base.WithFakeAuth,
         compute commitments describe erech --region region-1
         """)
 
-    self.assertMultiLineEqual(
-        self.stdout.getvalue(),
-        textwrap.dedent("""\
-            endTimestamp: '2038-01-19T01:00:00Z'
-            name: erech
-            plan: TWELVE_MONTH
-            region: https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1
-            resources:
-            - amount: '500'
-              type: VCPU
-            - amount: '12'
-              type: MEMORY
-            """))
-
+    self.AssertOutputEquals("""\
+endTimestamp: '2038-01-19T01:00:00Z'
+name: erech
+plan: TWELVE_MONTH
+region: https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1
+resources:
+- amount: '500'
+  type: VCPU
+- amount: '12'
+  type: MEMORY
+""")

@@ -28,6 +28,7 @@ from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import platforms
 from tests.lib import test_case
 
+import six
 from six.moves import StringIO
 
 
@@ -190,7 +191,8 @@ class WithCommandCapture(test_case.WithContentAssertions):
     self.orig_popen = subprocess.Popen  # Reference to original Popen for tests
     self.StartObjectPatch(subprocess, 'Popen', new=_PopenCapture)
     self._show_command_output = False
-    sys.exc_clear()
+    if six.PY2:
+      sys.exc_clear()
 
   def ShowCommandOutput(self):
     """Force that test's command I/O to be displayed."""

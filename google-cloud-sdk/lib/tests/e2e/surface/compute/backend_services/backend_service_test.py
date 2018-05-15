@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for backend services."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
@@ -24,8 +26,9 @@ from tests.lib.surface.compute import e2e_test_base
 class BackendServicesTest(e2e_test_base.BaseTest):
 
   def UniqueName(self, name):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='compute-backend-test-' + name).next()
+    return next(
+        e2e_utils.GetResourceNameGenerator(prefix='compute-backend-test-' +
+                                           name))
 
   def _SetUpReleaseTrack(self, track, api_version):
     self.track = track

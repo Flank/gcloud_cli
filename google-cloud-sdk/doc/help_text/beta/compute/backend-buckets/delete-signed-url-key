@@ -29,7 +29,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      BACKEND_BUCKET_NAME
-        The name of the backend bucket to delete CDN signed URL key from.
+        Name of the backend bucket to delete CDN signed URL key from.
 
 REQUIRED FLAGS
      --key-name=KEY_NAME

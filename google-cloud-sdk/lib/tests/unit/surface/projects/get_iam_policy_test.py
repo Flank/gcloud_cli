@@ -14,6 +14,8 @@
 
 """Tests for projects get-iam-policy."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base

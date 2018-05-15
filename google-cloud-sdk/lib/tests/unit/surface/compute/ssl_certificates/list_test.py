@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the SSL certificates list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.command_lib.compute.ssl_certificates import flags
@@ -30,8 +32,7 @@ class SslCertificatesListTest(test_base.BaseTest,
   def SetUp(self):
     self.SelectApi('v1')
     lister_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts',
-        autospec=True)
+        'googlecloudsdk.api_lib.compute.lister.GetGlobalResourcesDicts')
     self.addCleanup(lister_patcher.stop)
     self.mock_get_global_resources = lister_patcher.start()
     resources = test_resources.SSL_CERTIFICATES

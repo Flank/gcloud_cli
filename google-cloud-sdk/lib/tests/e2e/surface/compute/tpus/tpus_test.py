@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """e2e tests for compute tpus command group."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 import random
 
@@ -22,6 +24,7 @@ from googlecloudsdk.core.util import retry
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import test_case
+from six.moves import range
 
 NETWORK = 'tpus-test-do-not-delete'  # auto mode network
 _DELETE_MESSAGE = 'Deleted tpu [{tpu_name}].'
@@ -34,19 +37,20 @@ def _GetRandomCidr():
   components = [
       '10',
       '240',
-      str(random.choice(range(256))),
-      str(random.choice((range(0, 256, 8)))),
+      str(random.choice(list(range(256)))),
+      str(random.choice((list(range(0, 256, 8))))),
   ]
   return '.'.join(components) + '/29'
 
 
+@test_case.Filters.skip('Failing', 'b/79135451')
 class TpusTests(e2e_base.WithServiceAuth):
   """E2E tests for ml compute tpus command group."""
 
   def _GetTpuName(self):
     generator = e2e_utils.GetResourceNameGenerator(
         prefix='cloud-tpu-test', sequence_start=0, delimiter='-')
-    return generator.next()
+    return next(generator)
 
   @contextlib.contextmanager
   def _CreateTPU(self):
@@ -55,7 +59,7 @@ class TpusTests(e2e_base.WithServiceAuth):
     cidr = _GetRandomCidr()
     command = ("compute tpus create {name} --zone {zone} "
                "--network {network} "
-               "--range '{cidr}' --accelerator-type 'tpu-v2' "
+               "--range '{cidr}' --accelerator-type 'v2-8' "
                "--description 'Test TF Node {name}' "
                "--version '1.6'".format(zone=self.zone, name=tpu_id, cidr=cidr,
                                         network=NETWORK))

@@ -27,7 +27,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      DISK_NAME
-        The name of the disk to update.
+        Name of the disk to update.
 
 FLAGS
      --update-labels=[KEY=VALUE,...]

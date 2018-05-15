@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.resource_manager import liens
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
 from tests.lib import test_case
@@ -47,7 +49,7 @@ class LiensListTest(testbase.LiensUnitTestBase):
         liens.LiensMessages().CloudresourcemanagerLiensListRequest(
             parent='projects/t123'),
         exception=http_error.MakeDetailedHttpError(
-            url=u'https://cloudresourcemanager.googleapis.com/v1/liens',
+            url='https://cloudresourcemanager.googleapis.com/v1/liens',
             reason='INTERNAL',
             message=':/',
             details=[{

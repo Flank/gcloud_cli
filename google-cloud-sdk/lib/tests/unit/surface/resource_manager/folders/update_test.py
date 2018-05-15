@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for folders update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.api_lib.resource_manager import folders

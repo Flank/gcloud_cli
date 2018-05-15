@@ -26,7 +26,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to create.
+        Name of the managed instance group to create.
 
 REQUIRED FLAGS
      --size=SIZE
@@ -67,7 +67,7 @@ OPTIONAL FLAGS
      At most one of these may be specified:
 
        --health-check=HEALTH_CHECK
-          The name of the health check to operate on.
+          Name of the health check to operate on.
 
        --http-health-check=HTTP_HEALTH_CHECK
           Specifies the HTTP health check object used for autohealing instances

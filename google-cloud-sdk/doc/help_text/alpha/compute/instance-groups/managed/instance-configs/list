@@ -16,7 +16,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to list instance configs for.
+        Name of the managed instance group to list instance configs for.
 
 FLAGS
      At most one of these may be specified:

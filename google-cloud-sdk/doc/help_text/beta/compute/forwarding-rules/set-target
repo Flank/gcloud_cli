@@ -60,7 +60,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the forwarding rule to operate on.
+        Name of the forwarding rule to operate on.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:

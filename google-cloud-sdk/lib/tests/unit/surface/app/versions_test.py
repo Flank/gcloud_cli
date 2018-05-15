@@ -14,6 +14,8 @@
 
 """Tests for `gcloud app versions` commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.app import appengine_api_client
 from googlecloudsdk.api_lib.app import operations_util
 from googlecloudsdk.api_lib.app import service_util
@@ -24,6 +26,7 @@ from googlecloudsdk.core.util import times
 from tests.lib import test_case
 from tests.lib.surface.app import api_test_util
 import mock
+import six
 
 
 class VersionsApiTestBase(api_test_util.ApiTestBase):
@@ -94,8 +97,8 @@ class VersionsListTest(VersionsApiTestBase):
                              'v3': {'traffic_split': 1.0/3.0}},
                 'service2': {'v1': {'traffic_split': 1.0},
                              'v2': {'traffic_split': 0}}}
-    for service_info in services.itervalues():
-      for version_info in service_info.itervalues():
+    for service_info in six.itervalues(services):
+      for version_info in six.itervalues(service_info):
         version_info.update(kwargs)
     return services
 

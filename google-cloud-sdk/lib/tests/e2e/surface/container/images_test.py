@@ -11,8 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Integration tests for container clusters."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import os
 import shutil
@@ -55,8 +57,7 @@ class ImagesTest(e2e_base.WithServiceAuth):
     # Docker naming makes this way more confusing than it needs to be. This test
     # pushes images to locations formatted like:
     # gcr.io/$PROJECT/e2etest:images-test-$DATETIME.
-    image_tag = e2e_utils.GetResourceNameGenerator(
-        prefix='images-test').next()
+    image_tag = next(e2e_utils.GetResourceNameGenerator(prefix='images-test'))
     image_name = 'gcr.io/{0}/e2etest/{1}'.format(self.Project(), image_tag)
     image_name_with_tag = '{0}:{1}'.format(image_name, image_tag)
 
@@ -70,8 +71,7 @@ class ImagesTest(e2e_base.WithServiceAuth):
     # Docker naming makes this way more confusing than it needs to be. This test
     # pushes images to locations formatted like:
     # gcr.io/$PROJECT/e2etest/images-test-$DATETIME:latest.
-    image_name = e2e_utils.GetResourceNameGenerator(
-        prefix='images-test').next()
+    image_name = next(e2e_utils.GetResourceNameGenerator(prefix='images-test'))
     repository = 'gcr.io/{0}/e2etest'.format(self.Project())
     full_image_name = '{0}/{1}'.format(repository, image_name)
 

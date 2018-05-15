@@ -54,7 +54,9 @@ class SetIamPolicyTest(test_base.BaseTest, test_case.WithOutputCapture):
               resource='resource',
               project='my-project',
               zone='zone-1',
-              policy=policy))],
+              zoneSetPolicyRequest=messages.ZoneSetPolicyRequest(
+                  bindings=policy.bindings,
+                  etag=policy.etag)))],
     )
     self.assertMultiLineEqual(
         self.GetOutput(),

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Base class for all access context manager tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
@@ -20,6 +22,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+from six.moves import map
 
 
 class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
@@ -87,20 +90,23 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         title=title,
         updateTime=None)
 
-  def _MakeZone(self, id_='MY_ZONE', title='My Zone',
-                description='Very long description of my access zone',
-                restricted_services=('storage.googleapis.com',),
-                unrestricted_services=('compute.googleapis.com',),
-                access_levels=('MY_LEVEL', 'MY_LEVEL_2'),
-                resources=('projects/12345', 'projects/67890'),
-                type_=None,
-                policy='MY_POLICY'):
+  def _MakePerimeter(
+      self,
+      id_='MY_PERIMTER',
+      title='My Perimeter',
+      description='Very long description of my service perimeter',
+      restricted_services=('storage.googleapis.com',),
+      unrestricted_services=('compute.googleapis.com',),
+      access_levels=('MY_LEVEL', 'MY_LEVEL_2'),
+      resources=('projects/12345', 'projects/67890'),
+      type_=None,
+      policy='MY_POLICY'):
     if type_:
       type_ = self.messages.AccessZone.ZoneTypeValueValuesEnum(type_)
     return self.messages.AccessZone(
-        accessLevels=map(
+        accessLevels=list(map(
             'accessPolicies/MY_POLICY/accessLevels/{}'.format, access_levels
-        ),
+        )),
         description=description,
         name='accessPolicies/MY_POLICY/accessZones/' + id_,
         resources=resources,

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the interconnect attachment partner create subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base
@@ -71,6 +73,8 @@ class InterconnectAttachmentsPartnerCreateTest(test_base.BaseTest):
         EdgeAvailabilityDomainValueValuesEnum('AVAILABILITY_DOMAIN_2'),
         adminEnabled=True,
     )
+    self.AssertErrContains('Please use the pairing key to provision the '
+                           'attachment with your partner:')
 
   def testWithRouterRegionDifferentAsAttachment(self):
     with self.assertRaises(parser_errors.ArgumentException):

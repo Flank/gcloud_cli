@@ -37,6 +37,9 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
     self.Run('redis instances delete {} --region {}'
              .format(self.instance_id, self.region_id))
 
+    self.AssertErrContains('You are about to delete instance [{}] in [{}].'
+                           .format(self.instance_id, self.region_id))
+    self.AssertErrContains('Any associated data will be lost.')
     self.AssertErrContains('Delete request issued for: [{}]'
                            .format(self.instance_id))
     self.AssertErrContains('Deleted instance [{}].'.format(self.instance_id))
@@ -50,6 +53,9 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
     self.WriteInput('y')
     self.Run('redis instances delete {}'.format(self.instance_id))
 
+    self.AssertErrContains('You are about to delete instance [{}] in [{}].'
+                           .format(self.instance_id, self.region_id))
+    self.AssertErrContains('Any associated data will be lost.')
     self.AssertErrContains('Delete request issued for: [{}]'
                            .format(self.instance_id))
     self.AssertErrContains('Deleted instance [{}].'
@@ -63,6 +69,9 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
     self.WriteInput('y')
     self.Run('redis instances delete {}'.format(self.instance_relative_name))
 
+    self.AssertErrContains('You are about to delete instance [{}] in [{}].'
+                           .format(self.instance_id, self.region_id))
+    self.AssertErrContains('Any associated data will be lost.')
     self.AssertErrContains('Delete request issued for: [{}]'
                            .format(self.instance_id))
     self.AssertErrContains('Deleted instance [{}].'
@@ -71,12 +80,15 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
   def testDelete_Async(self, track):
     self.SetUpForTrack(track)
     self.SetUpInstancesForTrack()
-    self._ExpectDelete(async=True)
+    self._ExpectDelete(is_async=True)
 
     self.WriteInput('y')
     self.Run('redis instances delete {} --region {} --async'
              .format(self.instance_id, self.region_id))
 
+    self.AssertErrContains('You are about to delete instance [{}] in [{}].'
+                           .format(self.instance_id, self.region_id))
+    self.AssertErrContains('Any associated data will be lost.')
     self.AssertErrContains('Delete request issued for: [{}]'
                            .format(self.instance_id))
     self.AssertErrContains('Check operation [{}] for status.'
@@ -88,14 +100,14 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
     with self.assertRaises(concepts_handler.ParseError):
       self.Run('redis instances delete {}'.format(self.instance_id))
 
-  def _ExpectDelete(self, async=False):
+  def _ExpectDelete(self, is_async=False):
     operation = self.messages.Operation(name=self.wait_operation_relative_name)
     self.instances_service.Delete.Expect(
         request=self.messages.RedisProjectsLocationsInstancesDeleteRequest(
             name=self.instance_relative_name),
         response=operation)
 
-    if async:
+    if is_async:
       return
 
     operation.done = True  # Simulate immediate success.

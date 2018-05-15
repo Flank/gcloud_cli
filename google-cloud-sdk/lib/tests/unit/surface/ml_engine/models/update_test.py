@@ -13,6 +13,8 @@
 # limitations under the License.
 """ml-engine models update tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.ml_engine import models
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized

@@ -14,9 +14,9 @@ SYNOPSIS
         [--no-enable-cloud-logging] [--no-enable-cloud-monitoring]
         [--enable-ip-alias] [--enable-kubernetes-alpha]
         [--enable-legacy-authorization] [--enable-network-policy]
-        [--enable-pod-security-policy] [--image-type=IMAGE_TYPE]
-        [--no-issue-client-certificate] [--labels=[KEY=VALUE,...]]
-        [--local-ssd-count=LOCAL_SSD_COUNT]
+        [--enable-pod-security-policy] [--enable-stackdriver-kubernetes]
+        [--image-type=IMAGE_TYPE] [--no-issue-client-certificate]
+        [--labels=[KEY=VALUE,...]] [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--maintenance-window=MAINTENANCE_WINDOW]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL] [--min-cpu-platform=PLATFORM]
@@ -206,6 +206,9 @@ FLAGS
         create and update authorization controls through the PodSecurityPolicy
         API objects. For more information, see
         https://cloud.google.com/kubernetes-engine/docs/how-to/pod-security-policies.
+
+     --enable-stackdriver-kubernetes
+        Enable Stackdriver Kubernetes monitoring and logging.
 
      --image-type=IMAGE_TYPE
         The image type to use for the cluster. Defaults to server-specified.

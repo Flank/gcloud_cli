@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for command_lib.projects.util."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.command_lib.projects import util
@@ -35,7 +37,7 @@ class IdsFromNameTest(subtests.Base):
         ('A b/c.d_e\tf-g', r'a-b-c-d-e-f-g-\d{6}'),  # spaces
         ('a?b^c$d(e)', r'abcde-\d{6}'),  # weird ascii
         ('ab-123-c5d', r'ab-123-c5d-\d{6}'),  # digits
-        (u'a\U0001f489b', r'ab-\d{6}'),  # unicode
+        ('a\U0001f489b', r'ab-\d{6}'),  # unicode
         ('123abcdefghijklmnopqrstuvwxyz456',
          'abcdefghijklmnopqrstuvwxyz456'),  # leading digits
         ('abc_-  /def', r'abc-def-\d{6}'),  # consolidate spaces

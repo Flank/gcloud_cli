@@ -16,11 +16,11 @@ DESCRIPTION
     contain an etag value will replace any existing policy for the topic.
 
 POSITIONAL ARGUMENTS
-     TOPIC - The topic for which to set the IAM policy. This represents a Cloud
-     resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: Set the property
-     [core/project] or provide the flag [--project] on the command line. This
-     must be specified.
+     Topic resource - The topic for which to set the IAM policy. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
 
        TOPIC
           The ID of the topic or a fully qualified identifier for the topic.

@@ -10,7 +10,7 @@ SYNOPSIS
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the network endpoint group to operate on.
+        Name of the network endpoint group to operate on.
 
 FLAGS
      --zone=ZONE

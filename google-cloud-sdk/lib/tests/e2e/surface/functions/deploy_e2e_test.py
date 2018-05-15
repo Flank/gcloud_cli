@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """End to End tests for the 'functions deploy' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import base64
 import contextlib
 import os
@@ -23,6 +25,7 @@ from tests.lib import cli_test_base
 from tests.lib import e2e_base
 from tests.lib import e2e_utils
 from tests.lib import test_case
+import six
 
 
 FUNCTIONS_STAGING_BUCKET = 'e2e-functions-do-not-delete'
@@ -78,7 +81,7 @@ exports.{func_name} = function (event, callback) {{
 }};
 """
 
-PUBSUB_DATA = base64.b64encode('Pubsub!')  # 'UHVic3ViIQ=='
+PUBSUB_DATA = base64.b64encode(b'Pubsub!')  # 'UHVic3ViIQ=='
 
 
 STORAGE_JS_FILE = """\
@@ -118,7 +121,7 @@ class DeployE2ETestBase(e2e_base.WithServiceAuth,
   def _GenerateFunctionName(self):
     generator = e2e_utils.GetResourceNameGenerator(
         prefix=FUNCTION_NAME_PREFIX, sequence_start=0, delimiter='_')
-    return generator.next()
+    return next(generator)
 
   @contextlib.contextmanager
   def _DeployFunction(self, *args, **kwargs):
@@ -134,7 +137,7 @@ class DeployE2ETestBase(e2e_base.WithServiceAuth,
     for no_value_flag in args:
       command_args.append(no_value_flag.replace('_', '-'))
 
-    for flag, flag_value in  kwargs.iteritems():
+    for flag, flag_value in  six.iteritems(kwargs):
       command_args.append('--{}'.format(flag.replace('_', '-')))
       command_args.append(flag_value)
     command_args.append('--entry-point {}'.format(name))

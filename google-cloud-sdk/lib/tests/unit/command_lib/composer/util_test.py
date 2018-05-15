@@ -19,6 +19,7 @@ from googlecloudsdk.api_lib.container import api_adapter as gke_api_adapter
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.composer import util as command_util
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files
 from tests.lib.surface.composer import base
 from tests.lib.surface.composer import kubectl_util
 import mock
@@ -310,6 +311,35 @@ class UtilTest(base.KubectlShellingUnitTest):
       command_util.RunKubectlCommand(kubectl_args)
     fake_exec.Verify()
 
+  @mock.patch.object(files, 'FindExecutableOnPath')
+  @mock.patch('googlecloudsdk.core.config.Paths')
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testRunKubectlCommandSearchesEntirePath(
+      self, exec_mock, tmp_kubeconfig_mock, config_paths_mock,
+      find_executable_mock):
+    kubectl_args = ['exec', '-it', 'airflow-worker12345', 'bash']
+
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+    fake_exec.AddCallback(0, lambda *_, **__: 0)
+
+    config_paths_mock.sdk_bin_path = self.TEST_GCLOUD_PATH
+
+    # Find the executable only when searching entire path, not just SDK location
+    def _FakeFindExecutableOnFullPath(executable, path=None, **_):
+      if executable == 'kubectl':
+        if path is None:
+          return base.KubectlShellingUnitTest.TEST_KUBECTL_PATH
+      return None
+
+    find_executable_mock.side_effect = _FakeFindExecutableOnFullPath
+
+    # An error would be thrown if kubectl path was not found
+    command_util.RunKubectlCommand(kubectl_args)
+    fake_exec.Verify()
+
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   def testGetGkePod_Success(self, exec_mock, tmp_kubeconfig_mock):
@@ -406,8 +436,7 @@ class UtilTest(base.KubectlShellingUnitTest):
 
   def testSplitRequirementSpecifierPackageNameOnly(self):
     """Tests splitting requirements specifier with only package name."""
-    actual_entry = command_util.SplitRequirementSpecifier(
-        'package')
+    actual_entry = command_util.SplitRequirementSpecifier('package')
     self.assertEqual(('package', ''), actual_entry)
 
   def testSplitRequirementSpecifierExtras(self):
@@ -425,14 +454,12 @@ class UtilTest(base.KubectlShellingUnitTest):
 
   def testSplitRequirementSpecifierVersion(self):
     """Tests splitting requirements specifier with version."""
-    actual_entry = command_util.SplitRequirementSpecifier(
-        'package==1')
+    actual_entry = command_util.SplitRequirementSpecifier('package==1')
     self.assertEqual(('package', '==1'), actual_entry)
 
   def testSplitRequirementSpecifierVersionWithWhitespace(self):
     """Tests splitting requirements specifier with whitespace in version."""
-    actual_entry = command_util.SplitRequirementSpecifier(
-        'package== 1')
+    actual_entry = command_util.SplitRequirementSpecifier('package== 1')
     self.assertEqual(('package', '== 1'), actual_entry)
 
   def testSplitRequirementSpecifierExtrasAndVersion(self):

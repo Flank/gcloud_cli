@@ -14,6 +14,8 @@
 
 """Base for Runtime Config surface unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 import time
 
@@ -97,7 +99,7 @@ class RuntimeConfigIntegrationTest(
 
   @contextlib.contextmanager
   def _RuntimeConfig(self, prefix, description=''):
-    name = e2e_utils.GetResourceNameGenerator(prefix).next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix))
     try:
       self.RunRuntimeConfig(
           'create {0} --description={1}'.format(name, description))

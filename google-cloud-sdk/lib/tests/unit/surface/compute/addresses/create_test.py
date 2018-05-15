@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the addresses create subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import random
 import textwrap
 
@@ -21,6 +23,7 @@ from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+import mock
 
 messages = core_apis.GetMessagesModule('compute', 'v1')
 
@@ -102,7 +105,10 @@ class AddressesCreateTest(test_base.BaseTest):
               region='us-central2'))],
     )
 
-  def testOneAddressPromotionWithoutName(self):
+  @mock.patch(
+      'googlecloudsdk.api_lib.compute.name_generator.GenerateRandomName',
+      side_effect=['d41jrqx2db4p'])
+  def testOneAddressPromotionWithoutName(self, mock_method):
     self.Run("""
         compute addresses create
           --addresses 23.251.146.189
@@ -140,7 +146,10 @@ class AddressesCreateTest(test_base.BaseTest):
               region='us-central2'))],
     )
 
-  def testManyAddressPromotionsWithoutNames(self):
+  @mock.patch(
+      'googlecloudsdk.api_lib.compute.name_generator.GenerateRandomName',
+      side_effect=['d41jrqx2db4p', 'taqzi86bat7n', 'fpbhpriihqka'])
+  def testManyAddressPromotionsWithoutNames(self, mock_method):
     self.Run("""
         compute addresses create
           --addresses 23.251.146.189,162.222.181.198,162.222.179.207

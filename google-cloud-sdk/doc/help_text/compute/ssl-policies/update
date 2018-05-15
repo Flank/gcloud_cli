@@ -19,7 +19,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the SSL policy to patch.
+        Name of the SSL policy to patch.
 
 FLAGS
      --custom-features=[CUSTOM_FEATURES,...]

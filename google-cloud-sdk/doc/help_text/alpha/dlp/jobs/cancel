@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha dlp jobs cancel - start the asynchronous cancellation of a
+        Cloud DLP job
+
+SYNOPSIS
+    gcloud alpha dlp jobs cancel JOB [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Start the asynchronous cancellation of a Cloud DLP job. The server
+    makes a best effort to cancel the job, but success is not guaranteed.
+
+POSITIONAL ARGUMENTS
+     Job resource - The Cloud DLP job to cancel. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
+     [core/project] or provide the flag [--project] on the command line. This
+     must be specified.
+
+       JOB
+          The ID of the job or a fully qualified identifier for the job.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the dlp/v2 API. The full documentation for this API can
+    be found at: https://cloud.google.com/dlp/docs/
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

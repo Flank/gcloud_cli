@@ -15,19 +15,15 @@
 
 """Unit tests for the util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.functions import util
 from tests.lib import test_case
 
+import httplib2
 
 _ASCII_MESSAGE = "We're gettin' no place fast."
-_UNICODE_MESSAGE = u".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"
-
-
-class _MockHttpResponse(object):
-
-  def __init__(self, status='STATUS', reason=404):
-    self.status = status
-    self.reason = reason
+_UNICODE_MESSAGE = ".TꙅAꟻ ɘↄAlq oᴎ 'ᴎiTTɘg ɘᴙ'ɘW"
 
 
 class _MockHttpException(object):
@@ -38,7 +34,9 @@ class _MockHttpException(object):
     self.code = code
     self.content = content
     self.message = message
-    self.response = _MockHttpResponse(status=status, reason=code)
+    self.response = httplib2.Response({'status': status, 'response': code})
+    self.response.status = status
+    self.response.reason = code
 
 
 class FunctionsUtilTest(test_case.TestCase):

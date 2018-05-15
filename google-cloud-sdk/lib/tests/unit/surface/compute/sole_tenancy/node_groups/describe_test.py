@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the sole-tenancy node-groups describe subcommand."""
-import textwrap
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from tests.lib import test_case
@@ -41,27 +42,25 @@ class NodeGroupsDescribeTest(test_base.BaseTest):
               project='my-project',
               zone='zone-1'))],
     )
-    self.assertMultiLineEqual(
-        self.stdout.getvalue(),
-        textwrap.dedent("""\
-            creationTimestamp: '2018-01-23T10:00:00.0Z'
-            description: description1
-            kind: compute#nodeGroup
-            name: group-1
-            nodeTemplate: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/nodeTemplates/template-1
-            nodes:
-            - index: 1
-              instances:
-              - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-1
-              - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-2
-              nodeType: iAPX-286
-            - index: 2
-              instances:
-              - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-3
-              nodeType: iAPX-286
-            selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/nodeGroups/group-1
-            zone: zone-1
-            """))
+    self.AssertOutputEquals("""\
+    creationTimestamp: '2018-01-23T10:00:00.0Z'
+    description: description1
+    kind: compute#nodeGroup
+    name: group-1
+    nodeTemplate: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/nodeTemplates/template-1
+    nodes:
+    - index: 1
+      instances:
+      - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-1
+      - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-2
+      nodeType: iAPX-286
+    - index: 2
+      instances:
+      - https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/instances/instance-3
+      nodeType: iAPX-286
+    selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/nodeGroups/group-1
+    zone: zone-1
+    """, normalize_space=True)
 
 
 if __name__ == '__main__':

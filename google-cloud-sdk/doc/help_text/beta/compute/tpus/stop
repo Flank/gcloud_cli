@@ -2,20 +2,20 @@ NAME
     gcloud beta compute tpus stop - stop a Cloud TPU
 
 SYNOPSIS
-    gcloud beta compute tpus stop (TPU_ID : --zone=ZONE) [--async]
+    gcloud beta compute tpus stop (TPU : --zone=ZONE) [--async]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Stop a Cloud TPU.
 
 POSITIONAL ARGUMENTS
-     TPU ID - The Cloud TPU to stop. The arguments in this group can be used to
-     specify the attributes of this resource. (NOTE) Some attributes are not
-     given arguments in this group but can be set in other ways. To set the
-     [project] attribute: Set the property [core/project] or provide the flag
-     [--project] on the command line. This must be specified.
+     Tpu resource - The Cloud TPU to stop. The arguments in this group can be
+     used to specify the attributes of this resource. (NOTE) Some attributes
+     are not given arguments in this group but can be set in other ways. To set
+     the [project] attribute: Set the property [core/project] or provide the
+     flag [--project] on the command line. This must be specified.
 
-       TPU_ID
+       TPU
           The ID of the tpu or a fully qualified identifier for the tpu. This
           positional must be specified if any of the other arguments in this
           group are specified.

@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ml-engine jobs submit training tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 import contextlib
 import json
 import os
+import sys
 
 from googlecloudsdk.api_lib.storage import storage_api
 from googlecloudsdk.api_lib.storage import storage_util
@@ -681,6 +684,7 @@ if __name__ == '__main__':
     self.exec_mock = self.StartObjectPatch(
         execution_utils, 'Exec', autospec=True,
         side_effect=self._FakeRunSetupTools)
+    self.StartObjectPatch(sys, 'executable', 'fake/python')
 
     def FakeCopyToGcs(bucket_ref, local_path, target_path):
       del local_path  # Unused.

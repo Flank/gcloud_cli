@@ -42,7 +42,7 @@ class TaxonomiesDeleteIntTest(base.CategoryManagerUnitTestBase):
     self.WriteInput('Y\n')
     self.Run('category-manager taxonomies delete ' +
              self.project_taxonomy_ref.Name())
-    self.AssertErrContains('Deleted projectTaxonomy [{}].'.format(
+    self.AssertErrContains('Deleted project_taxonomy [{}].'.format(
         self.project_taxonomy_id))
 
   def testDeleteProjectTaxonomyPromptingWithNo(self):

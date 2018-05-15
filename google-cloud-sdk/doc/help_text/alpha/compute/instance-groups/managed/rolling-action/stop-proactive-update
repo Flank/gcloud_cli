@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the managed instance group to operate on.
+        Name of the managed instance group to operate on.
 
 FLAGS
      At most one of these may be specified:

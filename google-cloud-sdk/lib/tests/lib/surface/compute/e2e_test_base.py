@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Module for integration test base classes."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 import time
 
@@ -21,6 +23,8 @@ from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 from tests.lib import test_case
 import mock
+import six
+from six.moves import range  # pylint: disable=redefined-builtin
 
 
 ZONE = 'us-central1-f'
@@ -305,7 +309,7 @@ class BaseTest(e2e_base.WithServiceAuth):
     return False
 
   def DeleteResources(self, resource_names, delete_func, resource_type_name):
-    if isinstance(resource_names, basestring):
+    if isinstance(resource_names, six.string_types):
       resource_names = [resource_names]
     if not isinstance(resource_names, list):
       self.fail('resource_names {0!r} is not a string nor an iterable.'.format(

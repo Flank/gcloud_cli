@@ -45,15 +45,7 @@ EXAMPLES
         DIGEST="000000000000000000000000000000000000000000000000000000000000abcd"
         ARTIFACT_URL="gcr.io/example-project/example-image@sha256:${DIGEST}"
 
-    Export your keypair's public key:
-
-        gpg \
-            --armor \
-            --export "${ATTESTING_USER}" \
-            --output build_key1.pgp
-
-    Or if you're creating v2 kind=ATTESTATION_AUTHORITY attestations, export
-    your key's fingerprint (note this may differ based on version and
+    Export your key's fingerprint (note this may differ based on version and
     implementations of gpg):
 
         gpg \
@@ -83,13 +75,6 @@ EXAMPLES
           example_payload.txt
 
     Upload the attestation to Container Analysis:
-
-        gcloud alpha container binauthz attestations create \
-          --public-key-file=build_key1.pgp \
-          --signature-file=example_signature.pgp \
-          --artifact-url="${ARTIFACT_URL}"
-
-    Or if you're creating v2 kind=ATTESTATION_AUTHORITY attestations:
 
         gcloud alpha container binauthz attestations create \
           --pgp-key-fingerprint=${KEY_FINGERPRINT} \

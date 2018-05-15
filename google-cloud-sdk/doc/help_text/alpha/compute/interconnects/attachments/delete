@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the interconnect attachments to delete.
+        Names of the interconnect attachments to delete.
 
 FLAGS
      --region=REGION

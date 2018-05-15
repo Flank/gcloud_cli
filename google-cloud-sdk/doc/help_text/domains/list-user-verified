@@ -15,7 +15,7 @@ GCLOUD WIDE FLAGS
 EXAMPLES
     To list domains that have been verified by the current user, run:
 
-        $ gcloud domains list-user-verified list-user-verified
+        $ gcloud domains list-user-verified
 
     Use the gcloud domains verify command to verify additional domains.
 

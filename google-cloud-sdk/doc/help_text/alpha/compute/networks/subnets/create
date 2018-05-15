@@ -14,7 +14,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the subnetwork to create.
+        Name of the subnetwork to create.
 
 REQUIRED FLAGS
      --network=NETWORK

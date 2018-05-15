@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the backend-services list subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from googlecloudsdk.command_lib.compute.backend_services import flags
 from googlecloudsdk.core.resource import resource_projector

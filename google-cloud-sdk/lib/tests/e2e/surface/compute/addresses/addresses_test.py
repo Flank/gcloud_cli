@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for creating/deleting firewalls."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_instances_test_base
@@ -27,8 +29,9 @@ class AddressesTest(e2e_instances_test_base.InstancesTestBase):
   def GetAddressName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up
-    self.address_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-address').next()
+    self.address_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='gcloud-compute-test-address'))
     self.address_names_used.append(self.address_name)
 
   def TearDown(self):
@@ -125,8 +128,9 @@ class AddressesAlphaTest(e2e_test_base.BaseTest):
   def GetAddressName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up
-    self.address_name = e2e_utils.GetResourceNameGenerator(
-        prefix='alpha-gcloud-compute-test-address').next()
+    self.address_name = next(
+        e2e_utils.GetResourceNameGenerator(
+            prefix='alpha-gcloud-compute-test-address'))
     self.address_names_used.append(self.address_name)
 
   def TearDown(self):

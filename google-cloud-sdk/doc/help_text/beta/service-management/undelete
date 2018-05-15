@@ -1,0 +1,33 @@
+NAME
+    gcloud beta service-management undelete - undeletes a service given a
+        service name
+
+SYNOPSIS
+    gcloud beta service-management undelete SERVICE [--async]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) (REMOVED) Undeletes a service given a service name.
+
+    The service-management undelete command has been replaced by endpoints
+    services undelete.
+
+POSITIONAL ARGUMENTS
+     SERVICE
+        The name of the service to undelete.
+
+FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in BETA and may change
+    without notice.
+

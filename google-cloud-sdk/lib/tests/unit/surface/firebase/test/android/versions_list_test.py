@@ -14,7 +14,6 @@
 
 """Gcloud tests that exercise device catalog OS version listing."""
 
-from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_attr
 from tests.lib import test_case
@@ -24,20 +23,17 @@ from tests.lib.surface.firebase.test.android import fake_catalogs
 from tests.lib.surface.firebase.test.android import unit_base
 
 
-TESTING_V1_MESSAGES = apis.GetMessagesModule('testing', 'v1')
-
-
-class TestVersionsListTest(unit_base.AndroidMockClientTest):
+class TestAndroidVersionsListTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
 
-  def testVersionsList_NoVersionsFound(self):
+  def testAndroidVersionsList_NoVersionsFound(self):
     self.ExpectCatalogGet(fake_catalogs.EmptyAndroidCatalog())
     self.Run(commands.ANDROID_VERSIONS_LIST)
     self.AssertErrContains('Listed 0 items.')
 
-  def testVersionsList_TwoVersionsFound(self):
+  def testAndroidVersionsList_TwoVersionsFound(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
     self.Run(commands.ANDROID_VERSIONS_LIST)
     self.AssertOutputContains(
@@ -46,7 +42,7 @@ class TestVersionsListTest(unit_base.AndroidMockClientTest):
         | F | 2.2.x | Froyo | 8 | 2010-05-10 | default |""",
         normalize_space=True)
 
-  def testVersionsList_ApiThrowsHttpError(self):
+  def testAndroidVersionsList_ApiThrowsHttpError(self):
     err = test_utils.MakeHttpError('Error9', 'Environment catalog failure.')
     self.ExpectCatalogGetError(err)
 
@@ -54,7 +50,7 @@ class TestVersionsListTest(unit_base.AndroidMockClientTest):
       self.Run(commands.ANDROID_VERSIONS_LIST)
 
     self.AssertOutputEquals('')
-    self.AssertErrMatches(r'(gcloud.*.test.*versions\.list)')
+    self.AssertErrContains('(gcloud.firebase.test.android.versions.list)')
     self.AssertErrContains('Environment catalog failure.')
 
 

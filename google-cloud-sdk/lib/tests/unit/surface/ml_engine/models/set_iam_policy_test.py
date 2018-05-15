@@ -14,6 +14,8 @@
 # limitations under the License.
 """ml-engine models set-iam-policy tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.calliope import base as calliope_base

@@ -16,7 +16,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the interconnect to update.
+        Name of the interconnect to update.
 
 FLAGS
      --admin-enabled

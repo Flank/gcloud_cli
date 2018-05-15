@@ -1743,5 +1743,67 @@ class DisksCreateWithLicensesTest(test_base.BaseTest):
     )
 
 
+class DisksCreateTestWithResourcePoliciesAlpha(test_base.BaseTest):
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreate_ZonalWithResourcePolicy(self):
+    self.Run("""
+        compute disks create disk-with-backup --zone central2-a \
+            --resource-policies my-policy
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.compute.disks,
+          'Insert',
+          self.messages.ComputeDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='disk-with-backup',
+                  sizeGb=500,
+                  resourcePolicies=[
+                      'https://www.googleapis.com/compute/alpha/projects/'
+                      '{}/regions/central2/resourcePolicies/my-policy'
+                      .format(self.Project())]),
+              project='my-project',
+              zone='central2-a'))])
+
+  def testCreate_ZonalWithMultipleResourcePolicies(self):
+    self.Run("""
+        compute disks create disk-with-backup --zone central2-a \
+            --resource-policies pol1,pol2
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.compute.disks,
+          'Insert',
+          self.messages.ComputeDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='disk-with-backup',
+                  sizeGb=500,
+                  resourcePolicies=[
+                      'https://www.googleapis.com/compute/alpha/projects/'
+                      '{}/regions/central2/resourcePolicies/pol1'
+                      .format(self.Project()),
+                      'https://www.googleapis.com/compute/alpha/projects/'
+                      '{}/regions/central2/resourcePolicies/pol2'
+                      .format(self.Project())]),
+              project='my-project',
+              zone='central2-a'))])
+
+  def testCreate_RegionalWithResourcePolicy(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'Resource policies are not supported for regional disks.'):
+      self.Run("""
+          compute disks create disk-with-backup --region central2 \
+              --replica-zones central2-b,central2-c \
+              --resource-policies my-policy
+          """)
+
+
 if __name__ == '__main__':
   test_case.main()

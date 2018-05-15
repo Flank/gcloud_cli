@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for forwarding rules."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import resources
 from tests.lib import e2e_resource_managers

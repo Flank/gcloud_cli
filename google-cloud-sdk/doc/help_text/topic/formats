@@ -258,6 +258,12 @@ EXAMPLES
 
         $ gcloud compute instances list --format='value(uri())'
 
+    List all compute instances with their creation timestamps displayed
+    according to the local timezone:
+
+        $ gcloud compute instances list \
+            --format="table(name,creationTimestamp.date(tz=LOCAL))"
+
     List the project authenticated user email address:
 
         $ gcloud info --format='value(config.account)'

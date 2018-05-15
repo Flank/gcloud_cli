@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the interconnect create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base

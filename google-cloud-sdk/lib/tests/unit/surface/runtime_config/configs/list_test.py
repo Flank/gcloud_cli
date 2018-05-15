@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for surface.runtime_config.configs.list."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 from googlecloudsdk.api_lib.runtime_config import util
 from googlecloudsdk.calliope import exceptions

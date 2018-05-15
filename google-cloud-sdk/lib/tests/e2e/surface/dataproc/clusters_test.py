@@ -17,7 +17,6 @@
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
-from tests.lib import test_case
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import e2e_base
 
@@ -29,7 +28,6 @@ class ClustersIntegrationTest(e2e_base.DataprocIntegrationTestBase):
   clusters.
   """
 
-  @test_case.Filters.skip('Failing', 'b/78243266')
   def testAllClustersCommands(self):
     """Run all tests as one test case reuse a cluster when sharded."""
     self.CreateClusterWithRetries()

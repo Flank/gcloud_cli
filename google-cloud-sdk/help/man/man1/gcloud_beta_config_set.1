@@ -17,9 +17,20 @@ gcloud beta config set \- set a Cloud SDK property
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR By default, sets the property in your active configuration only.
-Use the \f5\-\-installation\fR flag to set the property across all
-configurations. See \f5gcloud topic configurations\fR for more information.
+\fB(BETA)\fR gcloud beta config set sets the specified property in your active
+configuration only. A property governs the behavior of a specific aspect of
+Cloud SDK such as the service account to use or the verbosity level of logs. To
+set the property across all configurations, use the \f5\-\-installation\fR flag.
+For more information regarding creating and using configurations, see \f5gcloud
+topic configurations\fR.
+
+To view a list of properties currently in use, run \f5gcloud config list\fR.
+
+To unset properties, use \f5gcloud config unset\fR.
+
+Note, Cloud SDK comes with a \f5default\fR configuration. To create multiple
+configurations, use \f5gcloud config configurations create\fR, and \f5gcloud
+config configurations activate\fR to switch between them.
 
 
 
@@ -28,12 +39,16 @@ configurations. See \f5gcloud topic configurations\fR for more information.
 .RS 2m
 .TP 2m
 \fISECTION\fR/\fIPROPERTY\fR
-The property to be set. Note that SECTION/ is optional while referring to
-properties in the core section.
+Property to be set. Note that SECTION/ is optional while referring to properties
+in the core section, i.e., using either \f5core/project\fR or \f5project\fR is a
+valid way of setting a project, while using section names is essential for
+setting specific properties like \f5compute/region\fR. Consult the Cloud SDK
+properties page for a comprehensive list of properties:
+https://cloud.google.com/sdk/docs/properties
 
 .TP 2m
 \fIVALUE\fR
-The value to be set.
+Value to be set.
 
 
 .RE
@@ -44,9 +59,9 @@ The value to be set.
 .RS 2m
 .TP 2m
 \fB\-\-installation\fR
-Typically properties are updated only in the currently active configuration, but
-when \f5\-\-installation\fR is given the property is updated for the entire
-gcloud installation.
+If set, the property is updated for the entire Cloud SDK installation.
+Otherwise, by default, the property is updated only in the currently active
+configuration.
 
 
 .RE
@@ -70,8 +85,8 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBaccount\fR
-The account gcloud should use for authentication. You can run \f5gcloud auth
-list\fR to see the accounts you currently have available.
+Account \f5gcloud\fR should use for authentication. Run \f5gcloud auth list\fR
+to see your currently available accounts.
 
 
 .TP 2m
@@ -82,7 +97,7 @@ Absolute path to a custom CA cert file.
 .TP 2m
 \fBdefault_regional_backend_service\fR
 If True, backend services in \f5gcloud compute backend\-services\fR will be
-regional by default. The \f5\-\-global\fR flag will be required for global
+regional by default. Setting the \f5\-\-global\fR flag is required for global
 backend services.
 
 
@@ -93,31 +108,33 @@ If True, color will not be used when printing messages in the terminal.
 
 .TP 2m
 \fBdisable_prompts\fR
-If True, the default answer will be assumed for all user prompts. For any
-prompts that require user input, an error will be raised. This is equivalent to
-either using the global \f5\-\-quiet\fR flag or setting the environment variable
-\f5CLOUDSDK_CORE_DISABLE_PROMPTS\fR to 1.
+If True, the default answer will be assumed for all user prompts. However, for
+any prompts that require user input, an error will be raised. This is equivalent
+to either using the global \f5\-\-quiet\fR flag or setting the environment
+variable \f5CLOUDSDK_CORE_DISABLE_PROMPTS\fR to 1. Setting this property is
+useful when scripting with \f5gcloud\fR.
 
 
 .TP 2m
 \fBdisable_usage_reporting\fR
-If True, anonymous statistics on SDK usage will not be collected. This is value
-is set based on your choices during installation, but can be changed at any
-time. For more information, see: https://cloud.google.com/sdk/usage\-statistics
+If True, anonymous statistics on SDK usage will not be collected. This value is
+set by default based on your choices during installation, but can be changed at
+any time. For more information, see:
+https://cloud.google.com/sdk/usage\-statistics
 
 
 .TP 2m
 \fBlog_http\fR
-If True, log HTTP requests and responses to the logs. You may need to adjust
-your \f5verbosity\fR setting if you want to see in the terminal, otherwise it is
-available in the log files.
+If True, log HTTP requests and responses to the logs. To see logs in the
+terminal, adjust \f5verbosity\fR settings. Otherwise, logs are available in
+their respective log files.
 
 
 .TP 2m
 \fBmax_log_days\fR
 Maximum number of days to retain log files before deleting. If set to 0, turns
-off log garbage collection and does not delete log files. If unset, defaults to
-30.
+off log garbage collection and does not delete log files. If unset, the default
+is 30 days.
 
 
 .TP 2m
@@ -127,36 +144,53 @@ If True, pass the configured Cloud SDK authentication to gsutil.
 
 .TP 2m
 \fBproject\fR
-The project id of the Cloud Platform project to operate on by default. This can
-be overridden by using the global \f5\-\-project\fR flag.
+Project ID of the Cloud Platform project to operate on by default. This can be
+overridden by using the global \f5\-\-project\fR flag.
 
 
 .TP 2m
 \fBshow_structured_logs\fR
-Controls when JSON structured log messages for the current verbosity and above
-will be written to standard error. The default is text format when disabled.
-Valid values are: \f5never\fR \- Log messages as text, \f5always\fR \- Always
-log messages as JSON, \f5log\fR \- Only log messages as JSON if stderr is a
-file, \f5terminal\fR \- Only log messages as JSON if stderr is a terminal. If
-unset default is \f5never\fR.
+Control when JSON\-structured log messages for the current verbosity level (and
+above) will be written to standard error. If this property is disabled, logs are
+formatted as \f5text\fR by default.
+
+Valid values are:
+.RS 2m
+.IP "\(bu" 2m
+\f5never\fR \- Log messages as text
+.IP "\(bu" 2m
+\f5always\fR \- Always log messages as JSON
+.IP "\(bu" 2m
+\f5log\fR \- Only log messages as JSON if stderr is a file
+.IP "\(bu" 2m
+\f5terminal\fR \- Only log messages as JSON if stderr is a terminal
+.RE
+.RE
+.RE
+.sp
+
+If unset, default is \f5never\fR.
 
 
+.RS 2m
 .TP 2m
 \fBtrace_token\fR
 Token used to route traces of service requests for investigation of issues. This
 token will be provided by Google support.
 
 
+.RS 2m
 .TP 2m
 \fBuser_output_enabled\fR
-If False, messages to the user and command output on both standard output and
-standard error will be suppressed.
+True, by default. If False, messages to the user and command output on both
+standard output and standard error will be suppressed.
 
 
 .TP 2m
 \fBverbosity\fR
-The default logging verbosity for gcloud commands. This is the equivalent of
-using the global \f5\-\-verbosity\fR flag.
+Default logging verbosity for \f5gcloud\fR commands. This is the equivalent of
+using the global \f5\-\-verbosity\fR flag. Supported verbosity levels:
+\f5debug\fR, \f5info\fR, \f5warning\fR, \f5error\fR, and \f5none\fR.
 
 
 .RE
@@ -167,15 +201,16 @@ using the global \f5\-\-verbosity\fR flag.
 .RS 2m
 .TP 2m
 \fBcloud_build_timeout\fR
-The timeout, in seconds, to wait for Docker builds to complete during
-deployments. All Docker builds now use the Container Builder API.
+Timeout, in seconds, to wait for Docker builds to complete during deployments.
+All Docker builds now use the Container Builder API.
 
 
 .TP 2m
 \fBpromote_by_default\fR
 If True, when deploying a new version of a service, that version will be
-promoted to receive all traffic for the service. The flag can be overridden via
-the \f5\-\-promote\-by\-default\fR or \f5\-\-no\-promote\-by\-default\fR flags.
+promoted to receive all traffic for the service. This property can be overridden
+via the \f5\-\-promote\-by\-default\fR or \f5\-\-no\-promote\-by\-default\fR
+flags.
 
 
 .TP 2m
@@ -187,8 +222,8 @@ version is stopped. If False, older versions must be stopped manually.
 .TP 2m
 \fBuse_runtime_builders\fR
 If set, opt in/out to a new code path for building applications using
-pre\-fabricated runtimes that can be updated independently of client tooling.
-(If not set, will use the default path for each runtime.)
+pre\-fabricated runtimes that can be updated independently of client tooling. If
+not set, the default path for each runtime is used.
 
 
 .RE
@@ -199,9 +234,9 @@ pre\-fabricated runtimes that can be updated independently of client tooling.
 .RS 2m
 .TP 2m
 \fBdisable_credentials\fR
-If true, gcloud will not attempt to load any credentials or authenticate any
-requests. This is useful if you are behind a proxy that adds authentication to
-your requests.
+If True, \f5gcloud\fR will not attempt to load any credentials or authenticate
+any requests. This is useful when behind a proxy that adds authentication to
+requests.
 
 
 .RE
@@ -212,13 +247,14 @@ your requests.
 .RS 2m
 .TP 2m
 \fBquota_project\fR
-This is the project that will be charged quota for the operations performed in
-gcloud. When unset, the default is CURRENT_PROJECT, which will charge quota
-against your currently set project for the operations you perform on it. Some
-existing APIs will continue to use a shared project for quota by default when
-this property is unset. If you need to operate on one project, but charge quota
-against a different project, you can use this property to specify the alternate
-project.
+Project that will be charged quota for the operations performed in \f5gcloud\fR.
+When unset, the default is [CURRENT_PROJECT]; this will charge quota against the
+currently set project for operations performed on it. Additionally, some
+existing APIs will continue to use a shared project for quota by default, when
+this property is unset.
+
+If you need to operate on one project, but need quota against a different
+project, you can use this property to specify the alternate project.
 
 
 .RE
@@ -229,14 +265,14 @@ project.
 .RS 2m
 .TP 2m
 \fBadditional_repositories\fR
-A comma separated list of additional repositories to check for components. This
+Comma separated list of additional repositories to check for components. This
 property is automatically managed by the \f5gcloud components repositories\fR
 commands.
 
 
 .TP 2m
 \fBdisable_update_check\fR
-If True, the Cloud SDK will not automatically check for updates.
+If True, Cloud SDK will not automatically check for updates.
 
 
 .RE
@@ -247,11 +283,10 @@ If True, the Cloud SDK will not automatically check for updates.
 .RS 2m
 .TP 2m
 \fBlocation\fR
-Specifies the Composer location to use. Each Composer locationconstitutes an
-independent resource namespace constrained to deploying environments into
-Compute Engine regions inside the location. This location parameter corresponds
-to the /locations/<location> segment of the Composer resource URIs being
-referenced.
+Composer location to use. Each Composer location constitutes an independent
+resource namespace constrained to deploying environments into Compute Engine
+regions inside this location. This parameter corresponds to the
+/locations/<location> segment of the Composer resource URIs being referenced.
 
 
 .RE
@@ -262,9 +297,9 @@ referenced.
 .RS 2m
 .TP 2m
 \fBregion\fR
-The default region to use when working with regional Compute Engine resources.
-When a \f5\-\-region\fR flag is required but not provided, the command will fall
-back to this value, if set. To see valid choices, run \f5gcloud compute regions
+Default region to use when working with regional Compute Engine resources. When
+a \f5\-\-region\fR flag is required but not provided, the command will fall back
+to this value, if set. To see valid choices, run \f5gcloud compute regions
 list\fR.
 
 
@@ -276,7 +311,7 @@ in the current project.
 
 .TP 2m
 \fBzone\fR
-The default zone to use when working with zonal Compute Engine resources. When a
+Default zone to use when working with zonal Compute Engine resources. When a
 \f5\-\-zone\fR flag is required but not provided, the command will fall back to
 this value, if set. To see valid choices, run \f5gcloud compute zones list\fR.
 
@@ -289,52 +324,58 @@ this value, if set. To see valid choices, run \f5gcloud compute zones list\fR.
 .RS 2m
 .TP 2m
 \fBbuild_timeout\fR
-The timeout, in seconds, to wait for container builds to complete.
+Timeout, in seconds, to wait for container builds to complete.
 
 
 .TP 2m
 \fBcluster\fR
-The name of the cluster to use by default when working with Kubernetes Engine.
+Name of the cluster to use by default when working with Kubernetes Engine.
 
 
 .TP 2m
 \fBnew_scopes_behavior\fR
-Use new scopes behavior: if true, do not add compute\-rw, storage\-ro,
-service\-control, or service\-management scopes. The former two (compute\-rw and
-storage\-ro) only applies to clusters at Kubernetes v1.9 and below; starting in
-v1.10, compute\-rw and storage\-ro are not added by default regardless. Any of
-these scopes may be added explicitly using \-\-scopes. If true,
-\-\-[no\-]enable\-cloud\-endpoints is not allowed. This will be the default
-behavior in a future release. This property is ignored in alpha and beta, which
-always use the new behavior. See \-\-scopes help for more info.
+If True, use new scopes behavior and do not add \f5compute\-rw\fR,
+\f5storage\-ro\fR, \f5service\-control\fR, or \f5service\-management\fR scopes.
+The former two (\f5compute\-rw\fR and \f5storage\-ro\fR) only apply to clusters
+at Kubernetes v1.9 and below; starting v1.10, \f5compute\-rw\fR and
+\f5storage\-ro\fR are not added by default. Any of these scopes may be added
+explicitly using \f5\-\-scopes\fR. Using new scopes behavior will be the default
+in a future release. Additionally, if this property is set to True, using
+\f5\-\-[no\-]enable\-cloud\-endpoints\fR is not allowed. This property is
+ignored in alpha and beta, since these tracks always use the new behavior. See
+\f5\-\-scopes\fR help for more info.
 
 
 .TP 2m
 \fBuse_application_default_credentials\fR
-Use application default credentials to authenticate to the cluster API server.
+If True, use application default credentials to authenticate to the cluster API
+server.
 
 
 .TP 2m
 \fBuse_client_certificate\fR
-Use the cluster's client certificate to authenticate to the cluster API server.
+If True, use the cluster's client certificate to authenticate to the cluster API
+server.
 
 
 .TP 2m
 \fBuse_v1_api\fR
-This property is DEPRECATED. If true, all gcloud Kubernetes Engine commands
-(regardless of release track) will use the v1 API; otherwise, gcloud beta track
-commands will use v1beta1 API and gcloud alpha track commands will use v1alpha1
-API. By default, it is set to false. The Kubernetes Engine v1alpha1 API is
-whitelist\-only at this time. Note: use_v1_api is an alias of use_v1_api_client.
+This property is DEPRECATED. If True, all \f5gcloud\fR Kubernetes Engine
+commands (regardless of release track) will use the v1 API; otherwise, \f5gcloud
+beta\fR track commands will use v1beta1 API and \f5gcloud alpha\fR track
+commands will use v1alpha1 API. By default, this property is set to false. The
+Kubernetes Engine v1alpha1 API is whitelist\-only at this time. Note: use_v1_api
+is an alias of use_v1_api_client.
 
 
 .TP 2m
 \fBuse_v1_api_client\fR
-This property is DEPRECATED. If true, all gcloud Kubernetes Engine commands
-(regardless of release track) will use the v1 API; otherwise, gcloud beta track
-commands will use v1beta1 API and gcloud alpha track commands will use v1alpha1
-API. By default, it is set to false. The Kubernetes Engine v1alpha1 API is
-whitelist\-only at this time. Note: use_v1_api_client is an alias of use_v1_api.
+This property is DEPRECATED. If True, all \f5gcloud\fR Kubernetes Engine
+commands (regardless of release track) will use the v1 API; otherwise, \f5gcloud
+beta\fR track commands will use v1beta1 API and \f5gcloud alpha\fR track
+commands will use v1alpha1 API. By default, this property is set to false. The
+Kubernetes Engine v1alpha1 API is whitelist\-only at this time. Note:
+use_v1_api_client is an alias of use_v1_api.
 
 
 .RE
@@ -345,12 +386,11 @@ whitelist\-only at this time. Note: use_v1_api_client is an alias of use_v1_api.
 .RS 2m
 .TP 2m
 \fBregion\fR
-Specifies the Cloud Dataproc region to use. Each Cloud Dataproc region
-constitutes an independent resource namespace constrained to deploying instances
-into Google Compute Engine zones inside the region. The default value of
-"global" is a special multi\-region namespace which is capable of deploying
-instances into all Google Compute Engine zones globally, and is disjoint from
-other Cloud Dataproc regions.
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
 
 
 .RE
@@ -361,9 +401,9 @@ other Cloud Dataproc regions.
 .RS 2m
 .TP 2m
 \fBregion\fR
-The default region to use when working with Google Compute functions resources.
-When a \f5\-\-region\fR flag is required but not provided, the command will fall
-back to this value, if set. To see valid choices, run \f5gcloud functions
+Default region to use when working with Cloud Functions resources. When a
+\f5\-\-region\fR flag is required but not provided, the command will fall back
+to this value, if set. To see valid choices, run \f5gcloud beta functions
 regions list\fR.
 
 
@@ -375,8 +415,9 @@ regions list\fR.
 .RS 2m
 .TP 2m
 \fBenabled\fR
-Whether to enable .gcloudignore files (see \f5$ gcloud topic gcloudignore\fR).
-If false, turn off the gcloudignore mechanism entirely and upload all files.
+If True, do not upload \f5.gcloudignore\fR files (see \f5$ gcloud topic
+gcloudignore\fR). If False, turn off the gcloudignore mechanism entirely and
+upload all files.
 
 
 .RE
@@ -387,12 +428,12 @@ If false, turn off the gcloudignore mechanism entirely and upload all files.
 .RS 2m
 .TP 2m
 \fBbottom_bindings_line\fR
-Display the bottom key bindings line, if true.
+If True, display the bottom key bindings line.
 
 
 .TP 2m
 \fBbottom_status_line\fR
-Display the bottom status line, if true.
+If True, display the bottom status line.
 
 
 .TP 2m
@@ -407,7 +448,7 @@ Command context string.
 
 .TP 2m
 \fBfixed_prompt_position\fR
-Display the prompt at the same position, if true.
+If True, display the prompt at the same position.
 
 
 .TP 2m
@@ -417,22 +458,22 @@ Maximum number of help snippet lines.
 
 .TP 2m
 \fBhidden\fR
-Expose hidden commands/flags, if true.
+If True, expose hidden commands/flags.
 
 
 .TP 2m
 \fBjustify_bottom_lines\fR
-Left\- and right\-justify bottom toolbar lines, if true.
+If True, left\- and right\-justify bottom toolbar lines.
 
 
 .TP 2m
 \fBmanpage_generator\fR
-Use the manpage CLI tree generator for unsupported commands, if true.
+If True, use the manpage CLI tree generator for unsupported commands.
 
 
 .TP 2m
 \fBmulti_column_completion_menu\fR
-Display the completions as a multi\-column menu, if true.
+If True, display the completions as a multi\-column menu.
 
 
 .TP 2m
@@ -442,12 +483,12 @@ Command prompt string.
 
 .TP 2m
 \fBshow_help\fR
-Show help as command args are entered, if true.
+If True, show help as command args are being entered.
 
 
 .TP 2m
 \fBsuggest\fR
-Add command line suggestions based on history, if true.
+If True, add command line suggestions based on history.
 
 
 .RE
@@ -458,16 +499,16 @@ Add command line suggestions based on history, if true.
 .RS 2m
 .TP 2m
 \fBlocal_python\fR
-The full path to the Python interpreter to use for Cloud ML Engine local
-predict/train jobs. If not specified, will default to using the Python
-interpreter found on system PATH.
+Full path to the Python interpreter to use for Cloud ML Engine local
+predict/train jobs. If not specified, the default path is the one to the Python
+interpreter found on system \f5PATH\fR.
 
 
 .TP 2m
 \fBpolling_interval\fR
-The interval (in seconds) at which to poll logs from your Cloud ML Engine jobs.
-Note that making it much faster than the default (60) will quickly use all of
-your quota.
+Interval (in seconds) at which to poll logs from your Cloud ML Engine jobs. Note
+that making it much faster than the default (60) will quickly use all of your
+quota.
 
 
 .RE
@@ -478,34 +519,47 @@ your quota.
 .RS 2m
 .TP 2m
 \fBaddress\fR
-The hostname or IP address of your proxy server.
+Hostname or IP address of proxy server.
 
 
 .TP 2m
 \fBpassword\fR
-If your proxy requires authentication, the password to use when connecting.
+Password to use when connecting, if the proxy requires authentication.
 
 
 .TP 2m
 \fBport\fR
-The port to use when connected to your proxy server.
+Port to use when connected to the proxy server.
 
 
 .TP 2m
 \fBrdns\fR
-If True (default), DNS queries will not be performed locally, and instead,
-handed to the proxy to resolve.
+If True, DNS queries will not be performed locally, and instead, handed to the
+proxy to resolve. This is default behavior.
 
 
 .TP 2m
 \fBtype\fR
-The type of proxy you are using. Supported proxy types are: [http,
-http_no_tunnel, socks4, socks5].
+Type of proxy being used. Supported proxy types are: [http, http_no_tunnel,
+socks4, socks5].
 
 
 .TP 2m
 \fBusername\fR
-If your proxy requires authentication, the username to use when connecting.
+Username to use when connecting, if the proxy requires authentication.
+
+
+.RE
+.sp
+.TP 2m
+\fIredis\fR
+
+.RS 2m
+.TP 2m
+\fBregion\fR
+The default region to use when working with Cloud Memorystore for Redis
+resources. When a \f5region\fR is required but not provided by a flag, the
+command will fall back to this value, if set.
 
 
 .RE
@@ -516,9 +570,9 @@ If your proxy requires authentication, the username to use when connecting.
 .RS 2m
 .TP 2m
 \fBinstance\fR
-The default instance to use when working with Cloud Spanner resources. When an
-\f5instance\fR is required but not provided by a flag, the command will fall
-back to this value, if set.
+Default instance to use when working with Cloud Spanner resources. When an
+instance is required but not provided by a flag, the command will fall back to
+this value, if set.
 
 
 .RE
@@ -527,13 +581,13 @@ back to this value, if set.
 
 .SH "EXAMPLES"
 
-To set the project property in the core section, run:
+To set the project \f5property\fR in the core section, run:
 
 .RS 2m
 $ gcloud beta config set project myProject
 .RE
 
-To set the zone property in the compute section, run:
+To set the \f5zone\fR property in the \f5compute\fR section, run:
 
 .RS 2m
 $ gcloud beta config set compute/zone asia\-east1\-b

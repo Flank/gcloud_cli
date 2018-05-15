@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base classes for all folders tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.resource_manager import folders
@@ -21,6 +23,7 @@ from googlecloudsdk.api_lib.resource_manager import operations
 from googlecloudsdk.api_lib.resource_manager import org_policies
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core.util import http_encoding
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
@@ -65,33 +68,33 @@ class FoldersUnitTestBase(CrmUnitTestBase):
   DELETED = messages.Folder.LifecycleStateValueValuesEnum.DELETE_REQUESTED
 
   TEST_FOLDER = messages.Folder(
-      name=u'folders/58219052',
-      parent=u'organizations/24521',
-      displayName=u'Test Folder For Testing',
+      name='folders/58219052',
+      parent='organizations/24521',
+      displayName='Test Folder For Testing',
       lifecycleState=ACTIVE)
 
   ANOTHER_TEST_FOLDER = messages.Folder(
-      name=u'folders/67045082',
-      parent=u'organizations/24521',
-      displayName=u'Another Test Folder For Testing',
+      name='folders/67045082',
+      parent='organizations/24521',
+      displayName='Another Test Folder For Testing',
       lifecycleState=ACTIVE)
 
   UPDATED_TEST_FOLDER = messages.Folder(
-      name=u'folders/58219052',
-      parent=u'organizations/24521',
-      displayName=u'Test Folder Updated To Be More Awesome',
+      name='folders/58219052',
+      parent='organizations/24521',
+      displayName='Test Folder Updated To Be More Awesome',
       lifecycleState=ACTIVE)
 
   DELETED_TEST_FOLDER = messages.Folder(
-      name=u'folders/58219052',
-      parent=u'organizations/24521',
-      displayName=u'Test Folder For Testing',
+      name='folders/58219052',
+      parent='organizations/24521',
+      displayName='Test Folder For Testing',
       lifecycleState=DELETED)
 
   TEST_FOLDER_WITH_FOLDER_PARENT = messages.Folder(
-      name=u'folders/58219052',
-      parent=u'folders/12345',
-      displayName=u'Test Folder For Testing',
+      name='folders/58219052',
+      parent='folders/12345',
+      displayName='Test Folder For Testing',
       lifecycleState=ACTIVE)
 
   def SetUp(self):
@@ -113,17 +116,17 @@ class FoldersUnitTestBase(CrmUnitTestBase):
                         logType=self.messages.AuditLogConfig.
                         LogTypeValueValuesEnum.ADMIN_READ,),
                 ],
-                service=u'allServices',)
+                service='allServices',)
         ],
         bindings=[
             self.messages.Binding(
-                role=u'roles/resourcemanager.projectCreator',
-                members=[u'domain:foo.com'],),
+                role='roles/resourcemanager.projectCreator',
+                members=['domain:foo.com'],),
             self.messages.Binding(
-                role=u'roles/resourcemanager.organizationAdmin',
-                members=[u'user:admin@foo.com'],),
+                role='roles/resourcemanager.organizationAdmin',
+                members=['user:admin@foo.com'],),
         ],
-        etag='someUniqueEtag',
+        etag=http_encoding.Encode('someUniqueEtag'),
         version=1,)
 
     if clear_fields is None:
@@ -142,7 +145,7 @@ class OperationsUnitTestBase(CrmUnitTestBase):
   """Base class for all Operations unit tests with fake auth and mocks."""
 
   TEST_OPERATION = operations.OperationsMessages().Operation(
-      name=u'operations/fc.58219052', done=False)
+      name='operations/fc.58219052', done=False)
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -156,10 +159,10 @@ class LiensUnitTestBase(CrmUnitTestBase):
 
   def SetUp(self):
     self.test_lien = liens.LiensMessages().Lien(
-        name=u'liens/p1234-abc',
-        origin=u'unittest.googlecloudsdk',
-        reason=u'player\' gotta play',
-        restrictions=[u'resourcemanager.projects.delete'])
+        name='liens/p1234-abc',
+        origin='unittest.googlecloudsdk',
+        reason='player\' gotta play',
+        restrictions=['resourcemanager.projects.delete'])
 
   def RunLiens(self, *command):
     return self.Run(['alpha', 'resource-manager', 'liens'] + list(command))

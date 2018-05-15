@@ -11,7 +11,7 @@ DESCRIPTION
     of policy role and member types.
 
 POSITIONAL ARGUMENTS
-     AUTHORITY - The authority whose IAM policy will be modified. This
+     Authority resource - The authority whose IAM policy will be modified. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
      attribute: Set the property [core/project] or provide the flag [--project]

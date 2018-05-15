@@ -21,7 +21,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the target HTTPS proxy to update.
+        Name of the target HTTPS proxy to update.
 
 FLAGS
      --quic-override=QUIC_OVERRIDE

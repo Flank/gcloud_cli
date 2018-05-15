@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute networks subnets get-iam-policy
-        (NAME : --region=REGION) [--filter=EXPRESSION] [--limit=LIMIT]
+        (SUBNETWORK : --region=REGION) [--filter=EXPRESSION] [--limit=LIMIT]
         [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -16,14 +16,14 @@ DESCRIPTION
     {parent} set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     NAME - The network for which to display the IAM policy. The arguments in
-     this group can be used to specify the attributes of this resource. (NOTE)
-     Some attributes are not given arguments in this group but can be set in
-     other ways. To set the [project] attribute: Set the property
+     Subnetwork resource - The network for which to display the IAM policy. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: Set the property
      [core/project] or provide the flag [--project] on the command line. This
      must be specified.
 
-       NAME
+       SUBNETWORK
           The ID of the subnetwork or a fully qualified identifier for the
           subnetwork. This positional must be specified if any of the other
           arguments in this group are specified.

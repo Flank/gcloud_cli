@@ -13,11 +13,14 @@
 # limitations under the License.
 """tpus locations list tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute.tpus import base
+from six.moves import range
 
 
 @parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
@@ -27,7 +30,7 @@ class ListTest(base.TpuUnitTestBase):
   def _GetListResponse(self, num=3):
     test_locations = [
         self.GetTestLocation(name='us-east-{}'.format(i))
-        for i in xrange(1, num+1)
+        for i in range(1, num+1)
     ]
     return self.messages.ListLocationsResponse(locations=test_locations)
 

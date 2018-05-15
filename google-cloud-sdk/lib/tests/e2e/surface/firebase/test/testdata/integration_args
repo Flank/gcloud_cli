@@ -38,3 +38,9 @@ bad-dimension:
     - version: 25
     - brand: Orange  # Invalid device dimension
     - locale: es
+
+ios-bad-dimension:
+  test: gs://gcloud-test-integration-test/ios-app.zip
+  device:
+    - model: iphone8
+    - brand: Orange  # Invalid device dimension

@@ -11,15 +11,15 @@ DESCRIPTION
     (ALPHA) List all the annotations of a taxonomy.
 
 REQUIRED FLAGS
-     TAXONOMY - A taxonomy resource reference. This represents a Cloud
-     resource. (NOTE) Some attributes are not given arguments in this group but
-     can be set in other ways. To set the [project] attribute: Set the property
-     [core/project] or provide the flag [--project] on the command line. This
-     must be specified.
+     Project taxonomy resource - A taxonomy resource reference. This represents
+     a Cloud resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute: Set
+     the property [core/project] or provide the flag [--project] on the command
+     line. This must be specified.
 
        --taxonomy=TAXONOMY
-          The ID of the projectTaxonomy or a fully qualified identifier for the
-          projectTaxonomy.
+          The ID of the project_taxonomy or a fully qualified identifier for
+          the project_taxonomy.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

@@ -10,11 +10,11 @@ DESCRIPTION
     (BETA) Get details about an asynchronous operation.
 
 POSITIONAL ARGUMENTS
-     OPERATION - The operation to describe. The arguments in this group can be
-     used to specify the attributes of this resource. (NOTE) Some attributes
-     are not given arguments in this group but can be set in other ways. To set
-     the [project] attribute: Set the property [core/project] or provide the
-     flag [--project] on the command line. This must be specified.
+     Operation resource - The operation to describe. The arguments in this
+     group can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: Set the property [core/project] or
+     provide the flag [--project] on the command line. This must be specified.
 
        OPERATION
           The ID of the operation or a fully qualified identifier for the
@@ -22,7 +22,7 @@ POSITIONAL ARGUMENTS
           arguments in this group are specified.
 
        --location=LOCATION
-          The Cloud location for the operation.
+          Compute Engine zone in which to create the operation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

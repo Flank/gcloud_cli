@@ -31,7 +31,7 @@ COMMANDS
     COMMAND is one of the following:
 
      activate-service-account
-        (BETA) Authorize gcloud to access Cloud Platform with a Google service
+        (BETA) Authorize access to Google Cloud Platform with a service
         account.
 
      configure-docker

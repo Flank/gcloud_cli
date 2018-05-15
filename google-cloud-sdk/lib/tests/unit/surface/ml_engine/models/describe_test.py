@@ -13,6 +13,8 @@
 # limitations under the License.
 """ml-engine models describe tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.ml_engine import models
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base

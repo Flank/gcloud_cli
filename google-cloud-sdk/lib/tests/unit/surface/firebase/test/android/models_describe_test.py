@@ -24,7 +24,7 @@ from tests.lib.surface.firebase.test.android import fake_catalogs
 from tests.lib.surface.firebase.test.android import unit_base
 
 
-class TestModelsDescribeTest(unit_base.AndroidMockClientTest):
+class TestAndroidModelsDescribeTest(unit_base.AndroidMockClientTest):
 
   def SetUp(self):
     console_attr.GetConsoleAttr(encoding='ascii')
@@ -32,7 +32,7 @@ class TestModelsDescribeTest(unit_base.AndroidMockClientTest):
   def TearDown(self):
     console_attr.ResetConsoleAttr()
 
-  def testModelsDescribe_ModelNotFound(self):
+  def testAndroidModelsDescribe_ModelNotFound(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
 
     with self.assertRaises(exceptions.ModelNotFoundError):
@@ -40,7 +40,7 @@ class TestModelsDescribeTest(unit_base.AndroidMockClientTest):
 
     self.AssertErrContains("'bad-model' is not a valid model")
 
-  def testModelsDescribe_ModelFound(self):
+  def testAndroidModelsDescribe_ModelFound(self):
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
     self.Run(commands.ANDROID_MODELS_DESCRIBE + 'Universe3')
 
@@ -49,7 +49,7 @@ class TestModelsDescribeTest(unit_base.AndroidMockClientTest):
     self.AssertOutputContains('id: Universe3')
     self.AssertOutputContains('name: Universe T3')
 
-  def testModelsDescribe_ApiThrowsHttpError(self):
+  def testAndroidModelsDescribe_ApiThrowsHttpError(self):
     err = test_utils.MakeHttpError('ErrorXYZ', 'Environment catalog failure.')
     self.ExpectCatalogGetError(err)
 

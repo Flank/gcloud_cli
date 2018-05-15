@@ -16,8 +16,8 @@ DESCRIPTION
     details.
 
 POSITIONAL ARGUMENTS
-     DATASET - The dataset for which to display the IAM policy. This represents
-     a Cloud resource. This must be specified.
+     Dataset resource - The dataset for which to display the IAM policy. This
+     represents a Cloud resource. This must be specified.
 
        DATASET
           The ID of the dataset or a fully qualified identifier for the

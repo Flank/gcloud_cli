@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      INSTANCE_NAMES [INSTANCE_NAMES ...]
-        The names of the instances to operate on.
+        Names of the instances to operate on.
 
 FLAGS
      --async

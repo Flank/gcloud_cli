@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests of the 'list' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -21,6 +23,7 @@ from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.functions import base
 from tests.lib.surface.functions import util as testutil
+from six.moves import range
 
 
 class FunctionsListTest(base.FunctionsTestBase):

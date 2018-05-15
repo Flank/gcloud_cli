@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the routers create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.calliope import base as calliope_base

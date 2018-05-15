@@ -15,9 +15,9 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --info-types=[INFOTYPE,...]
-        Which infoTypes to look for. The values must correspond to InfoType
-        values found in documentation. For more information about valid
-        infoTypes, see InfoTypes Reference
+        Which infoTypes to scan input for. The values must correspond to
+        infoType values found in documentation. For more information about
+        valid infoTypes, see infoTypes Reference
         (https://cloud.google.com/dlp/docs/infotypes-reference)
 
      Exactly one of these must be specified:

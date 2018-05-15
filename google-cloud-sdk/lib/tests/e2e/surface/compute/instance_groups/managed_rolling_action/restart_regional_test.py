@@ -14,6 +14,8 @@
 
 """Managed Instance Group Updater regional restart e2e test."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib.surface.compute import e2e_managers_updater_test_base
 from tests.lib.surface.compute import e2e_test_base
 

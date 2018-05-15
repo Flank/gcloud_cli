@@ -3,7 +3,7 @@ NAME
         Cloud Billing account
 
 SYNOPSIS
-    gcloud beta billing accounts set-iam-policy ACCOUNT_ID POLICY_FILE
+    gcloud beta billing accounts set-iam-policy ACCOUNT POLICY_FILE
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -12,12 +12,12 @@ DESCRIPTION
     describes the IAM policy.
 
 POSITIONAL ARGUMENTS
-     ACCOUNT ID - The Cloud Billing account for which to display the IAM
+     Account resource - The Cloud Billing account for which to display the IAM
      policy. This represents a Cloud resource. This must be specified.
 
-       ACCOUNT_ID
-          The ID of the account_id or a fully qualified identifier for the
-          account_id.
+       ACCOUNT
+          The ID of the account or a fully qualified identifier for the
+          account.
 
      POLICY_FILE
         Path to a local JSON or YAML formatted file containing a valid policy.

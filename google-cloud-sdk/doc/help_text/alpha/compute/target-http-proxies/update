@@ -16,7 +16,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the target HTTP proxy to update.
+        Name of the target HTTP proxy to update.
 
 REQUIRED FLAGS
      --url-map=URL_MAP

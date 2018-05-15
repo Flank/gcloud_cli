@@ -20,11 +20,11 @@ GROUPS
      levels
         (ALPHA) Manage Access Context Manager levels.
 
+     perimeters
+        (ALPHA) Manage Access Context Manager service perimeters.
+
      policies
         (ALPHA) Manage Access Context Manager policies.
-
-     zones
-        (ALPHA) Manage Access Context Manager zones.
 
 NOTES
     This command is an internal implementation detail and may change or

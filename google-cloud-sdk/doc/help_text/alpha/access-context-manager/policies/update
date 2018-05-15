@@ -10,7 +10,8 @@ DESCRIPTION
     (ALPHA) Update an existing access policy.
 
 POSITIONAL ARGUMENTS
-     POLICY - The access policy to update. This represents a Cloud resource.
+     Policy resource - The access policy to update. This represents a Cloud
+     resource.
 
        [POLICY]
           The ID of the policy or a fully qualified identifier for the policy.

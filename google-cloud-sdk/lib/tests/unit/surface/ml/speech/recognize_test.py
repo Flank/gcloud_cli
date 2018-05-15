@@ -163,7 +163,7 @@ class RecognizeSpecificTrackTest(speech_base.MlSpeechTestBase,
   @parameterized.named_parameters(
       ('Alpha', calliope_base.ReleaseTrack.ALPHA))
   def testIncludeWordConfidence(self, track):
-    """Test recognize command basic output with default flag values."""
+    """Test recognize command basic output with word confidence requested."""
     self.SetUpForTrack(track)
     self._ExpectRecognizeRequest(uri='gs://bucket/object', language='en-US',
                                  sample_rate=None, max_alternatives=1,
@@ -183,6 +183,49 @@ class RecognizeSpecificTrackTest(speech_base.MlSpeechTestBase,
     self.assertEqual(expected, actual)
     self.assertEqual(json.loads(self.GetOutput()),
                      encoding.MessageToPyValue(expected))
+
+  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
+  def testSpeakerDiarizationRequest(self, track):
+    """Test diarization flag values mapped in recognize request."""
+    self.SetUpForTrack(track)
+    transcript = 'what do you think you are doing dave'
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[transcript],
+        enable_speaker_diarization=True,
+        speaker_count=6)
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --enable-speaker-diarization'
+                      '    --diarization-speaker-count 6')
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
+  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
+  def testInvalidSpeakerDiarizationRequest(self, track):
+    """Test invalid diarization flag values."""
+    self.SetUpForTrack(track)
+    with self.AssertRaisesArgumentErrorRegexp(
+        'enable-speaker-diarization must be specified.'):
+      self.Run('ml speech recognize gs://bucket/object '
+               '    --language-code en-US '
+               '    --diarization-speaker-count 6')
+
+    with self.AssertRaisesArgumentErrorRegexp(
+        "invalid int value: 'hugsandkittens'"):
+      self.Run('ml speech recognize gs://bucket/object '
+               '    --language-code en-US '
+               '    --enable-speaker-diarization '
+               '    --diarization-speaker-count hugsandkittens')
 
 
 if __name__ == '__main__':

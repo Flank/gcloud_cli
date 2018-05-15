@@ -11,7 +11,7 @@ gcloud alpha ml speech recognize \- get transcripts of short (less\ than\ 60\ se
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml speech recognize\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-confidence\fR] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml speech recognize\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-confidence\fR] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fB\-\-enable\-speaker\-diarization\fR\ :\ \fB\-\-diarization\-speaker\-count\fR=\fIDIARIZATION_SPEAKER_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -97,6 +97,15 @@ return a maximum of one.
 The sample rate in Hertz. For best results, set the sampling rate of the audio
 source to 16000 Hz. If that's not possible, use the native sample rate of the
 audio source (instead of re\-sampling).
+
+.TP 2m
+\fR\-\-enable\-speaker\-diarization\fB
+Enable speaker detection for each recognized word in the top alternative of the
+recognition result using an integer speaker_tag provided in the WordInfo.
+
+.TP 2m
+\fR\-\-diarization\-speaker\-count\fB=\fIDIARIZATION_SPEAKER_COUNT\fR
+Estimated number of speakers in the conversation being recognized.
 
 
 \fR

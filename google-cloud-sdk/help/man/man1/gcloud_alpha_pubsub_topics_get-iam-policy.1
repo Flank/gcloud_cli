@@ -19,9 +19,10 @@ gcloud alpha pubsub topics get\-iam\-policy \- get the IAM policy for a topic
 
 \fB(ALPHA)\fR \fBgcloud alpha pubsub topics get\-iam\-policy\fR displays the IAM
 policy associated with a topic. If formatted as JSON, the output can be edited
-and used as a policy file for set\-iam\-policy. The output includes an "etag"
-field identifying the version emitted and allowing detection of concurrent
-policy updates; see $ {parent} set\-iam\-policy for additional details.
+and used as a policy file for \fBset\-iam\-policy\fR. The output includes an
+"etag" field identifying the version emitted and allowing detection of
+concurrent policy updates; see $ {parent} set\-iam\-policy for additional
+details.
 
 
 
@@ -30,9 +31,9 @@ policy updates; see $ {parent} set\-iam\-policy for additional details.
 .RS 2m
 .TP 2m
 
-TOPIC \- The topic for which to display the IAM policy. This represents a Cloud
-resource. (NOTE) Some attributes are not given arguments in this group but can
-be set in other ways. To set the [project] attribute: Set the property
+Topic resource \- The topic for which to display the IAM policy. This represents
+a Cloud resource. (NOTE) Some attributes are not given arguments in this group
+but can be set in other ways. To set the [project] attribute: Set the property
 [core/project] or provide the flag [\-\-project] on the command line. This must
 be specified.
 

@@ -10,7 +10,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      URL_MAP_NAME
-        The name of the URL map to describe.
+        Name of the URL map to describe.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

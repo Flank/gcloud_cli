@@ -16,12 +16,11 @@ DESCRIPTION
     details.
 
 POSITIONAL ARGUMENTS
-     FOLDER - The ID of the folder for which to display the IAM policy. This
-     represents a Cloud resource. This must be specified.
+     Folder resource - The ID of the folder for which to display the IAM
+     policy. This represents a Cloud resource. This must be specified.
 
        FOLDER
-          The ID of the folder-id or a fully qualified identifier for the
-          folder-id.
+          The ID of the folder or a fully qualified identifier for the folder.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

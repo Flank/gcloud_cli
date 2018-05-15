@@ -14,9 +14,13 @@
 
 """Unit tests for service_management common_flags module."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.endpoints import common_flags
 from tests.lib import completer_test_base
 from tests.lib.surface.endpoints import unit_test_base
+from six.moves import range
 
 
 class CompletionTest(unit_test_base.EV1UnitTestBase,

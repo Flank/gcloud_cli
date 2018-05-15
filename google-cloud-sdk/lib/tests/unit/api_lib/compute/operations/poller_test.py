@@ -15,6 +15,8 @@
 
 """Unit tests for api_lib.compute.operations.poller module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.compute import client_adapter
 from googlecloudsdk.api_lib.compute.operations import poller as compute_poller
@@ -26,6 +28,7 @@ from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 
 import mock
+from six.moves import range
 
 _GLOBAL_OPERATIONS_COLLECTION = 'compute.globalOperations'
 _REGION_OPERATIONS_COLLECTION = 'compute.regionOperations'
@@ -47,7 +50,7 @@ class PollerTest(waiter_test_base.Base):
     request_type = operation_service.GetRequestType('Get')
     response_type = operation_service.GetResponseType('Get')
     response = response_type()
-    for i in xrange(retries):
+    for i in range(retries):
       if error_msg:
         response.error = self.messages.Operation.ErrorValue(
             errors=[self.error_entry(code='BAD', message=error_msg)])
@@ -60,7 +63,7 @@ class PollerTest(waiter_test_base.Base):
           response=response)
 
     result = None
-    if result_service:
+    if not error_msg and result_service:
       result_request_type = result_service.GetRequestType('Get')
       result_response_type = result_service.GetResponseType('Get')
 

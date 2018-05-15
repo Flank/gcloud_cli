@@ -14,6 +14,8 @@
 
 """Tests for projects create."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.resource_manager import operations

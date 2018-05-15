@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for features of list subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core.resource import resource_projector

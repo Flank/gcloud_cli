@@ -13,6 +13,8 @@
 # limitations under the License.
 """Resources that are shared by two or more tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 
 beta_messages = core_apis.GetMessagesModule('compute', 'beta')

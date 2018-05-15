@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha dlp jobs - manage asynchronous, long-running Cloud DLP jobs
+
+SYNOPSIS
+    gcloud alpha dlp jobs COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage asynchronous, long-running Cloud DLP jobs.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        (ALPHA) Start the asynchronous cancellation of a Cloud DLP job.
+
+     delete
+        (ALPHA) Delete a Cloud DLP job.
+
+     describe
+        (ALPHA) Get the latest status of a Cloud DLP job.
+
+     list
+        (ALPHA) List Cloud DLP jobs.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

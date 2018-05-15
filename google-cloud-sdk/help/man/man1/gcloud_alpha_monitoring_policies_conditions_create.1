@@ -11,7 +11,7 @@ gcloud alpha monitoring policies conditions create \- create a condition in an a
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha monitoring policies conditions create\fR \fINAME\fR [\fB\-\-aggregation\fR=\fIAGGREGATION\fR\ \fB\-\-condition\-display\-name\fR=\fICONDITION_DISPLAY_NAME\fR\ \fB\-\-condition\-filter\fR=\fICONDITION_FILTER\fR\ \fB\-\-duration\fR=\fIDURATION\fR\ \fB\-\-if\fR=\fIIF_VALUE\fR\ \fB\-\-trigger\-count\fR=\fITRIGGER_COUNT\fR\ |\ \fB\-\-trigger\-percent\fR=\fITRIGGER_PERCENT\fR] [\fB\-\-condition\fR=\fICONDITION\fR\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha monitoring policies conditions create\fR \fIALERT_POLICY\fR [\fB\-\-aggregation\fR=\fIAGGREGATION\fR\ \fB\-\-condition\-display\-name\fR=\fICONDITION_DISPLAY_NAME\fR\ \fB\-\-condition\-filter\fR=\fICONDITION_FILTER\fR\ \fB\-\-duration\fR=\fIDURATION\fR\ \fB\-\-if\fR=\fIIF_VALUE\fR\ \fB\-\-trigger\-count\fR=\fITRIGGER_COUNT\fR\ |\ \fB\-\-trigger\-percent\fR=\fITRIGGER_PERCENT\fR] [\fB\-\-condition\fR=\fICONDITION\fR\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,15 +26,15 @@ gcloud alpha monitoring policies conditions create \- create a condition in an a
 .RS 2m
 .TP 2m
 
-NAME \- Name of the Alert Policy to add a condition to. This represents a Cloud
-resource. (NOTE) Some attributes are not given arguments in this group but can
-be set in other ways. To set the [project] attribute: Set the property
-[core/project] or provide the flag [\-\-project] on the command line. This must
-be specified.
+Alert Policy resource \- Name of the Alert Policy to add a condition to. This
+represents a Cloud resource. (NOTE) Some attributes are not given arguments in
+this group but can be set in other ways. To set the [project] attribute: Set the
+property [core/project] or provide the flag [\-\-project] on the command line.
+This must be specified.
 
 .RS 2m
 .TP 2m
-\fINAME\fR
+\fIALERT_POLICY\fR
 The ID of the Alert Policy or a fully qualified identifier for the Alert Policy.
 
 

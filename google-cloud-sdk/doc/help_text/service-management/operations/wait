@@ -1,0 +1,26 @@
+NAME
+    gcloud service-management operations wait - waits for an operation to
+        complete
+
+SYNOPSIS
+    gcloud service-management operations wait OPERATION [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (REMOVED) Waits for an operation to complete.
+
+    The service-management operations wait command has been replaced by
+    endpoints operations wait and services operations wait.
+
+POSITIONAL ARGUMENTS
+     OPERATION
+        The name of the operation on which to wait.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

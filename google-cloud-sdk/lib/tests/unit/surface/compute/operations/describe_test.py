@@ -14,6 +14,8 @@
 
 """Tests for the global-operations describe subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core import resources

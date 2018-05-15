@@ -16,28 +16,14 @@ DESCRIPTION
     for. If no artifact is specified, then this lists all URLs with associated
     occurrences.
 
-    To list attestations with kind=ATTESTATION_AUTHORITY (v2), the attestation
-    authority note ID must be passed with the flag --attestation-
-    authority-note-id. In this mode, only attestations bound to the provided
-    note will be listed. The returned attestation occurrences can be from any
-    project, so the global --project flag is not required (or used) in this
-    mode.
-
-    To list attestations with kind=BUILD_DETAILS (v1, soon to be deprecated),
-    the global --project flag must be provided (or implicitly provided from
-    configuration). In this mode, note that listed occurrences might include
-    more than just attestations, since it is listing any occurrence at all that
-    has the provided --artifact-url. All listed occurrences will be from the
-    provided project.
-
 FLAGS
      --artifact-url=ARTIFACT_URL
         Container URL. May be in the .gcr.io/repository/image format, or may
         optionally contain the http or https scheme
 
-     ATTESTATION AUTHORITY NOTE - The Container Analysis ATTESTATION_AUTHORITY
-     Note that will be queried for attestations. When this option is passed,
-     only occurrences with kind ATTESTATION_AUTHORITY will be returned. The
+     Note resource - The Container Analysis ATTESTATION_AUTHORITY Note that
+     will be queried for attestations. When this option is passed, only
+     occurrences with kind ATTESTATION_AUTHORITY will be returned. The
      occurrences might be from any project, not just the project where the note
      lives. Note that the caller must have the
      containeranalysis.notes.listOccurrences permission on the note being
@@ -87,30 +73,17 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 EXAMPLES
-    List all artifact URLs for which a v2 attestation exists and is bound to
-    the passed attestation authority note:
+    List all artifact URLs for which an attestation exists and is bound to the
+    passed attestation authority note:
 
         $ gcloud alpha container binauthz attestations list \
             --attestation-authority-note=providers/example-prj/notes/note-id
 
-    List the (pgp_key_fingerprint, signature) pairs for all v2 attestations for
+    List the (pgp_key_fingerprint, signature) pairs for all attestations for
     the passed artifact-url bound to the passed attestation authority note:
 
         $ gcloud alpha container binauthz attestations list \
             --attestation-authority-note=providers/exmple-prj/notes/note-id \
-            --artifact-url='gcr.io/example-project/example-image@sha256:abcd'
-
-    List all artifact URLs for which an v1 attestation exists in the passed
-    project:
-
-        $ gcloud alpha container binauthz attestations list \
-          --project=example-project
-
-    List the (public_key, signature) pairs for all v1 attestations in the
-    passed project:
-
-        $ gcloud alpha container binauthz attestations list \
-            --project=example-project \
             --artifact-url='gcr.io/example-project/example-image@sha256:abcd'
 
 NOTES

@@ -70,7 +70,8 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
       self, request_type, content=None, uri=None,
       enable_word_time_offsets=False, language='en-US', encoding=None,
       sample_rate=None, hints=None, max_alternatives=None,
-      filter_profanity=False, enable_word_confidence=None):
+      filter_profanity=False, enable_word_confidence=None,
+      enable_speaker_diarization=None, speaker_count=None):
     request = request_type(
         audio=self.messages.RecognitionAudio(content=content,
                                              uri=uri),
@@ -89,22 +90,29 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
     try:
       # Command default value
       request.config.enableWordConfidence = False
+      request.config.enableSpeakerDiarization = False
     except AttributeError:
       pass  # This is expected for some API versions
     if enable_word_confidence is not None:
       request.config.enableWordConfidence = enable_word_confidence
+    if enable_speaker_diarization is not None:
+      request.config.enableSpeakerDiarization = enable_speaker_diarization
+    if speaker_count is not None:
+      request.config.diarizationSpeakerCount = speaker_count
     return request
 
   def _ExpectRecognizeRequest(
       self, content=None, uri=None, enable_word_time_offsets=False,
       language='en-US', encoding=None, sample_rate=None, hints=None,
       max_alternatives=None, filter_profanity=False,
-      enable_word_confidence=None, results=None, error=None):
+      enable_word_confidence=None, results=None, error=None,
+      enable_speaker_diarization=None, speaker_count=None):
     """Expect request to client.speech.Recognize method."""
     request = self._MakeRecognizeRequest(
-        self.messages.RecognizeRequest,
-        content, uri, enable_word_time_offsets, language, encoding, sample_rate,
-        hints, max_alternatives, filter_profanity, enable_word_confidence)
+        self.messages.RecognizeRequest, content, uri, enable_word_time_offsets,
+        language, encoding, sample_rate, hints, max_alternatives,
+        filter_profanity, enable_word_confidence, enable_speaker_diarization,
+        speaker_count)
     if results:
       response = self.messages.RecognizeResponse(
           results=[
@@ -124,12 +132,14 @@ class MlSpeechTestBase(sdk_test_base.WithFakeAuth,
       self, content=None, uri=None, language='en-US',
       enable_word_time_offsets=False, encoding=None, sample_rate=None,
       hints=None, max_alternatives=None, filter_profanity=False,
-      enable_word_confidence=None, result=None, error=None):
+      enable_word_confidence=None, result=None, error=None,
+      enable_speaker_diarization=None, speaker_count=None):
     """Expect request to client.speech.Longrunningrecognize method."""
     request = self._MakeRecognizeRequest(
-        self.messages.LongRunningRecognizeRequest,
-        content, uri, enable_word_time_offsets, language, encoding, sample_rate,
-        hints, max_alternatives, filter_profanity, enable_word_confidence)
+        self.messages.LongRunningRecognizeRequest, content, uri,
+        enable_word_time_offsets, language, encoding, sample_rate, hints,
+        max_alternatives, filter_profanity, enable_word_confidence,
+        enable_speaker_diarization, speaker_count)
     response = self.messages.Operation(name=result) if result else None
     self.client.speech.Longrunningrecognize.Expect(
         request,

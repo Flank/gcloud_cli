@@ -3,7 +3,7 @@ NAME
         an alerting policy
 
 SYNOPSIS
-    gcloud alpha monitoring policies conditions create NAME
+    gcloud alpha monitoring policies conditions create ALERT_POLICY
         [--aggregation=AGGREGATION
           --condition-display-name=CONDITION_DISPLAY_NAME
           --condition-filter=CONDITION_FILTER
@@ -16,13 +16,13 @@ DESCRIPTION
     (ALPHA) Create a condition in an alerting policy.
 
 POSITIONAL ARGUMENTS
-     NAME - Name of the Alert Policy to add a condition to. This represents a
-     Cloud resource. (NOTE) Some attributes are not given arguments in this
-     group but can be set in other ways. To set the [project] attribute: Set
-     the property [core/project] or provide the flag [--project] on the command
-     line. This must be specified.
+     Alert Policy resource - Name of the Alert Policy to add a condition to.
+     This represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: Set the property [core/project] or provide the flag [--project]
+     on the command line. This must be specified.
 
-       NAME
+       ALERT_POLICY
           The ID of the Alert Policy or a fully qualified identifier for the
           Alert Policy.
 

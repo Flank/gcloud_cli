@@ -12,8 +12,9 @@ DESCRIPTION
     (ALPHA) Create a new access level in a given access policy.
 
 POSITIONAL ARGUMENTS
-     LEVEL - The access level to create. The arguments in this group can be
-     used to specify the attributes of this resource. This must be specified.
+     Level resource - The access level to create. The arguments in this group
+     can be used to specify the attributes of this resource. This must be
+     specified.
 
        LEVEL
           The ID of the level or a fully qualified identifier for the level.

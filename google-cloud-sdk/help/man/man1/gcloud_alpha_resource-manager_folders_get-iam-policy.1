@@ -19,10 +19,10 @@ gcloud alpha resource\-manager folders get\-iam\-policy \- get the IAM policy fo
 
 \fB(ALPHA)\fR \fBgcloud alpha resource\-manager folders get\-iam\-policy\fR
 displays the IAM policy associated with a folder. If formatted as JSON, the
-output can be edited and used as a policy file for set\-iam\-policy. The output
-includes an "etag" field identifying the version emitted and allowing detection
-of concurrent policy updates; see $ {parent} set\-iam\-policy for additional
-details.
+output can be edited and used as a policy file for \fBset\-iam\-policy\fR. The
+output includes an "etag" field identifying the version emitted and allowing
+detection of concurrent policy updates; see $ {parent} set\-iam\-policy for
+additional details.
 
 
 
@@ -31,13 +31,13 @@ details.
 .RS 2m
 .TP 2m
 
-FOLDER \- The ID of the folder for which to display the IAM policy. This
-represents a Cloud resource. This must be specified.
+Folder resource \- The ID of the folder for which to display the IAM policy.
+This represents a Cloud resource. This must be specified.
 
 .RS 2m
 .TP 2m
 \fIFOLDER\fR
-The ID of the folder\-id or a fully qualified identifier for the folder\-id.
+The ID of the folder or a fully qualified identifier for the folder.
 
 
 .RE

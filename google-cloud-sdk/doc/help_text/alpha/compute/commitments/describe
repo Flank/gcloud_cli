@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      COMMITMENT
-        The name of the commitment to describe.
+        Name of the commitment to describe.
 
 FLAGS
      --region=REGION

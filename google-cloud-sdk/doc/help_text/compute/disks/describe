@@ -11,7 +11,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      DISK_NAME
-        The name of the disk to describe.
+        Name of the disk to describe.
 
 FLAGS
      --zone=ZONE

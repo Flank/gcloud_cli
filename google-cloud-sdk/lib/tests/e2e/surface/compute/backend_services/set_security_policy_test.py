@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for setting security-policies."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -22,8 +24,9 @@ from tests.lib.surface.compute import e2e_test_base
 
 
 def _UniqueName(name):
-  return e2e_utils.GetResourceNameGenerator(
-      prefix='compute-set-security-policy-test-' + name).next()
+  return next(
+      e2e_utils.GetResourceNameGenerator(
+          prefix='compute-set-security-policy-test-' + name))
 
 
 class SetSecurityPolicyTestAlpha(e2e_test_base.BaseTest):
@@ -73,9 +76,8 @@ class SetSecurityPolicyTestAlpha(e2e_test_base.BaseTest):
     bs_name = _UniqueName('bs')
     sp_name = _UniqueName('sp')
 
-    with contextlib.nested(
-        self._HttpHealthCheck(hc_name),
-        self._BackendService(bs_name, hc_name), self._SecurityPolicy(sp_name)):
+    with self._HttpHealthCheck(hc_name), self._BackendService(
+        bs_name, hc_name), self._SecurityPolicy(sp_name):
 
       # Set security policy
       self.Run("""

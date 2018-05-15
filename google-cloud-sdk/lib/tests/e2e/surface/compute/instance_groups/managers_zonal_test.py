@@ -13,7 +13,8 @@
 # limitations under the License.
 """Integration tests for zonal instance group managers."""
 
-from tests.lib import test_case
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib.surface.compute import e2e_managers_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -27,7 +28,6 @@ class ManagedZonalTest(e2e_managers_test_base.ManagedTestBase):
   def testInstanceGroupManagerCreationZonal(self):
     self.RunInstanceGroupManagerCreationTest()
 
-  @test_case.Filters.skip('Failing', 'b/78025736')
   def testResizeZonal(self):
     self.RunResizeTest()
 

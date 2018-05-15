@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Unit tests for help search functionality."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import copy
 
@@ -139,7 +143,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     """Test PossiblyGetResult with a single term that does match."""
     searcher = search.Searcher({}, ['phoebe'])
     result = searcher.PossiblyGetResult(self.xyzzy)
-    expected_summary = (u'SUMMARY DESCRIPTION\n'
+    expected_summary = ('SUMMARY DESCRIPTION\n'
                         'Brief description of what Nothing Happens means.\n'
                         'FLAGS\n'
                         '--three-choices\n'
@@ -155,7 +159,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     """Test PossiblyGetResult with a single term that matches a positional."""
     searcher = search.Searcher({}, ['pdq'])
     result = searcher.PossiblyGetResult(self.xyzzy)
-    expected_summary = (u'SUMMARY DESCRIPTION\n'
+    expected_summary = ('SUMMARY DESCRIPTION\n'
                         'Brief description of what Nothing Happens means.\n'
                         'POSITIONALS\n'
                         'pdq\n'
@@ -170,7 +174,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     """Test PossiblyGetResult with a single term that matches a flag name."""
     searcher = search.Searcher({}, ['choices'])
     result = searcher.PossiblyGetResult(self.xyzzy)
-    expected_summary = (u'SUMMARY DESCRIPTION\n'
+    expected_summary = ('SUMMARY DESCRIPTION\n'
                         'Brief description of what Nothing Happens means.\n'
                         'FLAGS\n'
                         '--three-choices\n'
@@ -222,7 +226,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     """Test PossiblyGetResult correctly excerpts long descriptions."""
     searcher = search.Searcher({}, ['tarantula'])
     result = searcher.PossiblyGetResult(self.long_help)
-    expected_summary = (u'SUMMARY DESCRIPTION\n'
+    expected_summary = ('SUMMARY DESCRIPTION\n'
                         'A test command with a long help section.\n'
                         'DESCRIPTION\n'
                         '...or summarizing it as for gcloud search-help. If '
@@ -240,7 +244,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     """Test PossiblyGetResult correctly excerpts when multiple terms match."""
     searcher = search.Searcher({}, ['castle', 'mittens'])
     result = searcher.PossiblyGetResult(self.long_help)
-    expected_summary = (u'SUMMARY DESCRIPTION\n'
+    expected_summary = ('SUMMARY DESCRIPTION\n'
                         'A test command with a long help section.\n'
                         'DESCRIPTION\n'
                         '...with a very long help section, and some newlines '
@@ -261,7 +265,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
     """Test PossiblyGetResult works with a command group."""
     searcher = search.Searcher({}, ['xyzzy', 'second'])
     result = searcher.PossiblyGetResult(self.sdk)
-    expected_summary = (u'SUMMARY DESCRIPTION\n'
+    expected_summary = ('SUMMARY DESCRIPTION\n'
                         'gcloud sdk tests second level group.\n'
                         'COMMANDS\n'
                         'long-help, second-level-command-1, '
@@ -308,7 +312,7 @@ class SearchTests(search_help_test_base.SearchHelpTestBase):
 
   def testRunSearchMultipleTerms(self):
     """Overall test of search with three search terms."""
-    expected_summary = (u'SUMMARY DESCRIPTION\n'
+    expected_summary = ('SUMMARY DESCRIPTION\n'
                         'gcloud sdk tests second level group.\n'
                         'COMMANDS\n'
                         'long-help, second-level-command-1, '

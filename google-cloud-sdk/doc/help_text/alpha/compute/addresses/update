@@ -29,7 +29,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the address to operate on.
+        Name of the address to operate on.
 
 FLAGS
      --update-labels=[KEY=VALUE,...]

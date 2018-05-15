@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Integration test for the 'functions deploy' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.functions import exceptions
@@ -55,7 +57,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.function_path = self._PrepareFunctionFiles()
     generator = GetResourceNameGenerator(
         prefix='function-deploy', sequence_start=0)
-    self.function_name = generator.next()
+    self.function_name = next(generator)
     self.track = calliope_base.ReleaseTrack.BETA
     self.delete_function_on_tear_down = True
 

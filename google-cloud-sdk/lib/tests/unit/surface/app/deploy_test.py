@@ -14,6 +14,8 @@
 
 """Basic tests of the argument wiring between gcloud app and appcfg."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import multiprocessing.pool
 import os
 import tempfile
@@ -26,10 +28,11 @@ from googlecloudsdk.api_lib.app import build as app_build
 from googlecloudsdk.api_lib.app import cloud_build
 from googlecloudsdk.api_lib.app import deploy_app_command_util
 from googlecloudsdk.api_lib.app import deploy_command_util
+from googlecloudsdk.api_lib.app import env
 from googlecloudsdk.api_lib.app import exceptions
 from googlecloudsdk.api_lib.app import operations_util
 from googlecloudsdk.api_lib.app import runtime_builders
-from googlecloudsdk.api_lib.app import util
+from googlecloudsdk.api_lib.app import runtime_registry
 from googlecloudsdk.api_lib.app import version_util
 from googlecloudsdk.api_lib.cloudbuild import build
 from googlecloudsdk.api_lib.cloudbuild import cloudbuild_util
@@ -45,7 +48,6 @@ from googlecloudsdk.command_lib.app import create_util
 from googlecloudsdk.command_lib.app import deploy_util
 from googlecloudsdk.command_lib.app import exceptions as app_exceptions
 from googlecloudsdk.command_lib.app import output_helpers
-from googlecloudsdk.command_lib.app import runtime_registry
 from googlecloudsdk.command_lib.app import staging
 from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
@@ -381,7 +383,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     # Expect all requests associated with repairing app and deploying.
     self.ExpectGetApplicationRequest(self.Project(), code_bucket='')
     self.ExpectRepairApplicationRequest(self.Project())
-    bucket = u'gs://default-bucket/'
+    bucket = 'gs://default-bucket/'
     self.ExpectGetApplicationRequest(self.Project(), code_bucket=bucket)
     self.ExpectListServicesRequest(self.Project(), None)
     self.ExpectCreateVersion(self.Project(), 'default', '1',
@@ -524,6 +526,23 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.AssertErrContains('Deployed service [default] to [{0}]'.format(url))
     self.AssertPostDeployHints(default_service=True)
 
+  def testDeploy_TiRuntime(self):
+    """Tests that a Ti runtime functions correctly."""
+    self.WriteApp('app.yaml', data='', runtime='nodejs8')
+    self.ExpectServiceDeployed(
+        'default', '1',
+        deployment=self.GetDeploymentMessage(filenames=['app.yaml']),
+        handlers=[],
+        version_call_args={'runtime': 'nodejs8', 'threadsafe': None})
+
+    properties.VALUES.core.user_output_enabled.Set(True)
+    self.Run('app deploy --bucket=gs://default-bucket/ --version=1 {0}'.format(
+        self.FullPath('app.yaml')))
+
+    # Check that if no handlers, we get https
+    url = 'https://{project}.appspot.com'.format(project=self.Project())
+    self.AssertErrContains('Deployed service [default] to [{0}]'.format(url))
+
   def testDeploy_JavaStandard(self):
     """Tests that a Java standard deployment invokes staging etc."""
     with file_utils.TemporaryDirectory() as stage_dir:
@@ -536,7 +555,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
           'default', '1',
           deployment=self.GetDeploymentMessage(
               filenames=['app.yaml'], directory=stage_dir),
-          version_call_args={'runtime': u'java7'})
+          version_call_args={'runtime': 'java7'})
 
       properties.VALUES.core.user_output_enabled.Set(True)
       name = os.path.join('WEB-INF', 'appengine-web.xml')
@@ -560,14 +579,14 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.WriteVmRuntime('app.yaml', 'python-compat')
     expected_deployment = self.GetDeploymentMessage(
         filenames=['app.yaml'],
-        container_image_url=u'appengine.gcr.io/gcloud/1.default')
+        container_image_url='appengine.gcr.io/gcloud/1.default')
     handlers = self.DefaultHandlers(with_static=True)
     beta_settings = self.VmBetaSettings(vm_runtime='python-compat')
     self.ExpectServiceDeployed('default', '1',
                                deployment=expected_deployment,
                                handlers=handlers,
                                beta_settings=beta_settings,
-                               version_call_args={'vm': True, 'runtime': u'vm'})
+                               version_call_args={'vm': True, 'runtime': 'vm'})
 
     structured_output = self.Run(
         ('app deploy --bucket=gs://default-bucket/ --version=1 {0}').format(
@@ -607,8 +626,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     command = staging._BundledCommand('stage.sh', 'stage.cmd')
     staging_area = '/staging-area'
     registry = runtime_registry.Registry({
-        runtime_registry.RegistryEntry('python27', {util.Environment.STANDARD}):
-            command
+        runtime_registry.RegistryEntry('python27', {env.STANDARD}): command
     })
     stager = staging.Stager(registry, staging_area)
     get_stager_mock = self.StartObjectPatch(
@@ -940,7 +958,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.ExpectListServicesRequest(self.Project())
     deployment = self.GetDeploymentMessage()
     version_call = self.GetCreateVersionCall(self.Project(), 'default',
-                                             '1', runtime=u'python27',
+                                             '1', runtime='python27',
                                              api_version='1',
                                              deployment=deployment)
     self.mock_client.apps_services_versions.Create.Expect(
@@ -963,7 +981,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.ExpectListServicesRequest(self.Project())
     deployment = self.GetDeploymentMessage()
     version_call = self.GetCreateVersionCall(self.Project(), 'default',
-                                             '1', runtime=u'python27',
+                                             '1', runtime='python27',
                                              api_version='1',
                                              deployment=deployment)
     self.mock_client.apps_services_versions.Create.Expect(
@@ -971,7 +989,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
         response=self.CreateVersionErrorResponse(
             self.Project(),
             'default',
-            message=u'foo\u3094bar'
+            message='foo\u3094bar'
         )
     )
 
@@ -1022,7 +1040,7 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.WriteFile(self.UTIL_FILE, self.UTIL_CONTENT, directory=config_dir)
     self.WriteFile('fake.zip', 'Dummy', directory=config_dir)
 
-    expected_container = u'appengine.gcr.io/gcloud/1.default'
+    expected_container = 'appengine.gcr.io/gcloud/1.default'
 
     expected_deployment = self.GetDeploymentMessage(
         filenames=[],
@@ -1031,8 +1049,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
     self.ExpectServiceDeployed('default', '1',
                                deployment=expected_deployment,
                                version_call_args={
-                                   'env': u'2',
-                                   'runtime': u'vm'},
+                                   'env': '2',
+                                   'runtime': 'vm'},
                                beta_settings=self.VmBetaSettings(
                                    vm_runtime='python-compat'))
     self.Run(('app deploy --bucket=gs://default-bucket/ --version=1 '
@@ -1044,8 +1062,8 @@ class DeployWithApiTests(DeployWithApiTestsBase):
 
     code_bucket = '{0}-staging.appspot.com'.format(self.Project())
     expected_deployment = self.GetDeploymentMessage(
-        source_url_base=(u'https://storage.googleapis.com/'
-                         u'{}-staging.appspot.com/'.format(self.Project())))
+        source_url_base=('https://storage.googleapis.com/'
+                         '{}-staging.appspot.com/'.format(self.Project())))
     self.ExpectServiceDeployed('default', '1',
                                default_bucket='gs://{0}/'.format(code_bucket),
                                deployment=expected_deployment)
@@ -1296,7 +1314,7 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
   def _ExpectServiceDeployed(self, runtime='python-compat'):
     expected_deployment = self.messages.Deployment(
         container=self.messages.ContainerInfo(
-            image=u'us.gcr.io/{}/appengine/default.1:latest'.format(
+            image='us.gcr.io/{}/appengine/default.1:latest'.format(
                 self.Project())))
     beta_settings = self.VmBetaSettings(vm_runtime=runtime)
     handlers = self.DefaultHandlers(with_static=True)
@@ -1304,12 +1322,12 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
         'default', '1',
         deployment=expected_deployment,
         beta_settings=beta_settings,
-        version_call_args={'env': u'flex', 'runtime': u'vm'},
+        version_call_args={'env': 'flex', 'runtime': 'vm'},
         handlers=handlers)
 
   def _ExpectServiceDeployedWithBuildId(self, runtime='python-compat'):
     expected_deployment = self.messages.Deployment(
-        build=self.messages.BuildInfo(cloudBuildId=u'build-id'))
+        build=self.messages.BuildInfo(cloudBuildId='build-id'))
     beta_settings = self.VmBetaSettings(vm_runtime=runtime)
     handlers = self.DefaultHandlers(with_static=True)
     self.ExpectServiceDeployed(
@@ -1317,8 +1335,8 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
         '1',
         deployment=expected_deployment,
         beta_settings=beta_settings,
-        version_call_args={'env': u'flex',
-                           'runtime': u'vm'},
+        version_call_args={'env': 'flex',
+                           'runtime': 'vm'},
         handlers=handlers)
 
   def _ExpectServiceDeployedWithBuildOptions(self, runtime='python-compat',
@@ -1327,7 +1345,7 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
                                              timeout=None):
     expected_deployment = self.GetDeploymentMessage(filenames=['app.yaml'])
     expected_deployment.cloudBuildOptions = self.messages.CloudBuildOptions(
-        appYamlPath=u'app.yaml',
+        appYamlPath='app.yaml',
         cloudBuildTimeout=timeout)
     create_version_metadata = None
     if build_id:
@@ -1347,8 +1365,8 @@ class DeployWithFlexBase(DeployWithApiTestsBase, build_base.BuildBase):
         '1',
         deployment=expected_deployment,
         beta_settings=beta_settings,
-        version_call_args={'env': u'flex',
-                           'runtime': u'vm'},
+        version_call_args={'env': 'flex',
+                           'runtime': 'vm'},
         operation_metadata=operation_metadata,
         handlers=handlers)
 
@@ -1601,7 +1619,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
                    'response_code': 200}
     self.AddResponse('https://appengine.google.com/api/vms/prepare',
                      **handle_http)
-    image = u'us.gcr.io/fake-project/appengine/default.1:latest'
+    image = 'us.gcr.io/fake-project/appengine/default.1:latest'
 
     handlers = self.DefaultHandlers(with_static=True)
     beta_settings = self.VmBetaSettings()
@@ -1612,7 +1630,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
                                    container_image_url=image
                                ),
                                version_call_args={'vm': True,
-                                                  'runtime': u'vm'},
+                                                  'runtime': 'vm'},
                                handlers=handlers,
                                beta_settings=beta_settings)
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -1631,7 +1649,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
                                      'Unable to check API status\n')}
     self.AddResponse('https://appengine.google.com/api/vms/prepare',
                      **handle_http)
-    image = u'us.gcr.io/fake-project/appengine/default.1:latest'
+    image = 'us.gcr.io/fake-project/appengine/default.1:latest'
 
     handlers = self.DefaultHandlers(with_static=True)
     beta_settings = self.VmBetaSettings()
@@ -1642,7 +1660,7 @@ class FlexDeployWithApiTests(DeployWithFlexBase):
                                    container_image_url=image
                                ),
                                version_call_args={'vm': True,
-                                                  'runtime': u'vm'},
+                                                  'runtime': 'vm'},
                                handlers=handlers,
                                beta_settings=beta_settings)
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -1770,7 +1788,7 @@ class BetaDeploy(DeployWithFlexBase):
                                  runtime='python-compat')
     self.StartObjectPatch(enable_api, 'EnableServiceIfDisabled')
     properties.VALUES.app.cloud_build_timeout.Set('100')
-    self._ExpectServiceDeployedWithBuildOptions(timeout=u'100')
+    self._ExpectServiceDeployedWithBuildOptions(timeout='100')
     self.Run(
         'app deploy --bucket=gs://default-bucket/ --version=1 {0}'.format(
             service_path))

@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 from apitools.base.protorpclite import messages
 
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.concepts import completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
@@ -26,6 +27,7 @@ from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.calliope.concepts import concepts_test_base
+from tests.lib.calliope.concepts import util
 from tests.lib.command_lib.util.apis import base as apis_base
 from tests.lib.command_lib.util.concepts import resource_completer_test_base
 
@@ -617,6 +619,32 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
     self.assertIsNone(completers.CompleterForAttribute(
         self.resource_spec_auto_completers,
         'shelf'))
+
+  def testCompleterWithArbitraryArgFallthrough(self):
+    collections = [
+        ('example.projects.shelves.books', True),
+        ('example.projects.shelves', True),
+        ('cloudresourcemanager.projects', True)]
+    self.MockGetListCreateMethods(*collections)
+    self.PatchBookResourceReturnTypes()
+    parent_name = 'projects/exampleproject/shelves/s0'
+    self.mock_client.projects_shelves_books.List.return_value = (
+        self.BuildBooksList(['{}/books/b0'.format(parent_name),
+                             '{}/books/b1'.format(parent_name)]))
+    resource_spec = util.GetBookResource()
+    resource_spec.attributes[1].fallthroughs.append(
+        deps.ArgFallthrough('--other'))
+
+    expected_results = ['b0', 'b1']
+    self.RunResourceCompleter(
+        resource_spec,
+        'book',
+        presentation_name='--book',
+        dest='book',
+        args={'--book-project': 'exampleproject',
+              '--other': 's0'},
+        flag_name_overrides={'project': '--book-project'},
+        expected_completions=expected_results)
 
 
 if __name__ == '__main__':

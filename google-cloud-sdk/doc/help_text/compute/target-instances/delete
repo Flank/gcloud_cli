@@ -12,7 +12,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
-        The names of the target instances to delete.
+        Names of the target instances to delete.
 
 FLAGS
      --zone=ZONE

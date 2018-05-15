@@ -14,6 +14,9 @@
 
 """Base for Endpoints V1 unit tests."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 import time
 
 from apitools.base.py import encoding
@@ -25,6 +28,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
 import mock as third_party_mock
+from six.moves import range
 
 
 class EV1UnitTestBase(sdk_test_base.WithFakeAuth,
@@ -136,7 +140,7 @@ class EV1UnitTestBase(sdk_test_base.WithFakeAuth,
                                          num_changes=1, num_advices=1):
     advices = [
         self.services_messages.Advice(description='Advice #{0}'.format(n+1))
-        for n in xrange(num_advices)]
+        for n in range(num_advices)]
     config_changes = [
         self.services_messages.ConfigChange(
             advices=advices,
@@ -145,7 +149,7 @@ class EV1UnitTestBase(sdk_test_base.WithFakeAuth,
             newValue='newValue #{0}'.format(n+1),
             changeType=(self.services_messages.ConfigChange.
                         ChangeTypeValueValuesEnum.MODIFIED))
-        for n in xrange(num_changes)]
+        for n in range(num_changes)]
     change_report = self.services_messages.ChangeReport(
         configChanges=config_changes)
 

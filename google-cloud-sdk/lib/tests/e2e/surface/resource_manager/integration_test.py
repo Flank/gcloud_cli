@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.resource_manager import folders
@@ -25,27 +27,27 @@ FOLDER_ACTIVE = messages.Folder.LifecycleStateValueValuesEnum.ACTIVE
 
 TEST_ORGANIZATION_ID = '961309089256'
 TEST_TOP_LEVEL_FOLDER_ID = '79536718298'
-TEST_TOP_LEVEL_FOLDER_NAME = u'folders/{0}'.format(TEST_TOP_LEVEL_FOLDER_ID)
+TEST_TOP_LEVEL_FOLDER_NAME = 'folders/{0}'.format(TEST_TOP_LEVEL_FOLDER_ID)
 
 TEST_TOP_LEVEL_FOLDER = messages.Folder(
     name=TEST_TOP_LEVEL_FOLDER_NAME,
-    parent=u'organizations/{0}'.format(TEST_ORGANIZATION_ID),
-    displayName=u'Elysium gCloud Testing',
+    parent='organizations/{0}'.format(TEST_ORGANIZATION_ID),
+    displayName='Elysium gCloud Testing',
     lifecycleState=FOLDER_ACTIVE,
-    createTime=u'2016-10-21T20:44:47.207Z')
+    createTime='2016-10-21T20:44:47.207Z')
 
 TEST_SUBFOLDER_A = messages.Folder(
-    createTime=u'2016-10-24T18:36:34.280Z',
-    displayName=u'Folder A',
+    createTime='2016-10-24T18:36:34.280Z',
+    displayName='Folder A',
     lifecycleState=FOLDER_ACTIVE,
-    name=u'folders/309449917453',
+    name='folders/309449917453',
     parent=TEST_TOP_LEVEL_FOLDER_NAME)
 
 TEST_SUBFOLDER_B = messages.Folder(
-    createTime=u'2016-10-24T18:36:51.980Z',
-    displayName=u'Folder B',
+    createTime='2016-10-24T18:36:51.980Z',
+    displayName='Folder B',
     lifecycleState=FOLDER_ACTIVE,
-    name=u'folders/740752656255',
+    name='folders/740752656255',
     parent=TEST_TOP_LEVEL_FOLDER_NAME)
 
 
@@ -76,8 +78,8 @@ class FolderIntegrationTest(e2e_base.WithServiceAuth):
     new_policy = self.messages.Policy(
         bindings=[
             self.messages.Binding(
-                members=[u'serviceAccount:' + self.Account()],
-                role=u'roles/owner')
+                members=['serviceAccount:' + self.Account()],
+                role='roles/owner')
         ],
         version=0)
 

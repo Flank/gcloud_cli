@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests of the services_util module."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.endpoints import services_util
 from tests.lib.surface.endpoints import unit_test_base
 
@@ -50,12 +53,12 @@ class ServicesUtilTest(unit_test_base.EV1UnitTestBase):
   def testPushAdvisorConfigChangeToString(self):
     advice = self.services_messages.Advice(
         description='Change the config so that this message does not appear. '
-                    u'\u2019')
+                    '\u2019')
     change_type = (self.services_messages.ConfigChange.ChangeTypeValueValuesEnum
                    .ADDED)
-    element = u'element with unicode char \u2019'
-    new_value = u'bar with unicode char \u2019'
-    old_value = u'foo with unicode char \u2019'
+    element = 'element with unicode char \u2019'
+    new_value = 'bar with unicode char \u2019'
+    old_value = 'foo with unicode char \u2019'
     config_change = self.services_messages.ConfigChange(
         advices=[advice],
         changeType=change_type,
@@ -64,9 +67,9 @@ class ServicesUtilTest(unit_test_base.EV1UnitTestBase):
         oldValue=old_value)
 
     expected_result = (
-        u'Element [{element}] (old value = {old_value}, '
-        u'new value = {new_value}) was {change_type}. Advice:\n'
-        u'\t* {advice}'
+        'Element [{element}] (old value = {old_value}, '
+        'new value = {new_value}) was {change_type}. Advice:\n'
+        '\t* {advice}'
         .format(
             element=config_change.element,
             old_value=config_change.oldValue,

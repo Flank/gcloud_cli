@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for organizations set-iam-policy."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.core import exceptions

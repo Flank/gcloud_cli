@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the SSL certificates create subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from tests.lib import cli_test_base
@@ -71,7 +73,7 @@ class SslCertificatesCreateTest(test_base.BaseTest):
     self.prefix = ''
 
   def RunVersioned(self, command):
-    return self.Run(u'{prefix} {command}'.format(
+    return self.Run('{prefix} {command}'.format(
         prefix=self.prefix, command=command))
 
   def testSimpleCase(self):
@@ -197,11 +199,11 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
   def helperTestManaged(self, domains):
     messages = self.messages
 
-    self.RunVersioned(u"""
+    self.RunVersioned("""
         compute ssl-certificates create my-cert-managed
           --domains {domains}
           --description 'Managed certificate one.'
-        """.format(domains=u','.join(domains)))
+        """.format(domains=','.join(domains)))
 
     self.CheckRequests(
         [(self.compute.sslCertificates, 'Insert',
@@ -222,7 +224,7 @@ class SslCertificatesCreateAlphaTest(SslCertificatesCreateTest):
     self.helperTestManaged(['one.example.com', 'two.example.com'])
 
   def testManagedUnicodeDomain(self):
-    self.helperTestManaged([u'Ṳᾔḯ¢◎ⅾℯ.certsbridge.com'])
+    self.helperTestManaged(['Ṳᾔḯ¢◎ⅾℯ.certsbridge.com'])
 
   def testManagedPunycodeDomain(self):
     self.helperTestManaged(['xn--8a342m2fai5b18csni3w.certsbridge'])

@@ -13,6 +13,9 @@
 # limitations under the License.
 """Unit tests for endpoints services undelete command."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.endpoints import unit_test_base
 

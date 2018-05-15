@@ -21,7 +21,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the target HTTPS proxy to create.
+        Name of the target HTTPS proxy to create.
 
 REQUIRED FLAGS
      --ssl-certificates=SSL_CERTIFICATE,[...]

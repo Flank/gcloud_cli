@@ -19,7 +19,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      NAME
-        The name of the SSL policy to create.
+        Name of the SSL policy to create.
 
 FLAGS
      --custom-features=[CUSTOM_FEATURES,...]

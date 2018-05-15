@@ -158,7 +158,7 @@ class SNV1alphaUnitTestBase(sdk_test_base.WithFakeAuth,
             peerSharedNetworkRequest=self.services_messages.
             PeerSharedNetworkRequest(
                 network=NETWORK_URL_FORMAT % (self.PROJECT_NUMBER, network),
-                reservedPeeringRange=ranges)),
+                reservedPeeringRanges=ranges)),
         op,
         exception=error)
 

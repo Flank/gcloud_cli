@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for using node based sole tenancy."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -33,8 +35,8 @@ class NodeSoleTenantTest(e2e_instances_test_base.InstancesTestBase):
     self.node_type = 'n1-node-96-624'
 
   def _GetResourceName(self):
-    return e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-sole-tenant-test').next()
+    return next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-sole-tenant-test'))
 
   @contextlib.contextmanager
   def _CreateInstance(self, node_group_name):

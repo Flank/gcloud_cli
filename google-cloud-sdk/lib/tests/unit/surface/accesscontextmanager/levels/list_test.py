@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud access-context-manager levels list`."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as base
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
+from six.moves import map
+from six.moves import range
 
 
 @parameterized.parameters((base.ReleaseTrack.ALPHA,))
@@ -34,7 +38,7 @@ class LevelsListTest(accesscontextmanager.Base):
         title='My level #{}'.format(idx))
 
   def _MakeLevels(self, num=3):
-    return map(self._MakeBasicLevelNum, range(num))
+    return list(map(self._MakeBasicLevelNum, list(range(num))))
 
   def _ExpectList(self, levels, policy):
     policy_name = 'accessPolicies/{}'.format(policy)

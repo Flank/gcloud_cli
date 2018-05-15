@@ -21,6 +21,7 @@ import shutil
 from googlecloudsdk.api_lib.regen import generate
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
+import six
 
 
 def _GetClientPath(apis_dir, *path):
@@ -81,7 +82,7 @@ def _MakeTest(base_dir, apis_dir, api_name, api_version, api_config):
                                file_name)),
             files.GetFileContents(os.path.join(output_dir, file_name)))
 
-  TestGenClient.__name__ = 'testGen_{0}_{1}'.format(api_name, api_version)
+  TestGenClient.__name__ = b'testGen_{0}_{1}'.format(api_name, api_version)
   return TestGenClient
 
 
@@ -93,8 +94,8 @@ def MakeTestsFrom(base_dir, config_file, test_class):
   # For each api/version dynamically create a test method and add it to
   # given test class. Standard test runner will scan this class and will
   # register a separate test for each case.
-  for api_name, api_version_config in config['apis'].iteritems():
-    for api_version, api_config in api_version_config.iteritems():
+  for api_name, api_version_config in six.iteritems(config['apis']):
+    for api_version, api_config in six.iteritems(api_version_config):
       test_func = _MakeTest(base_dir, apis_dir,
                             api_name, api_version, api_config)
       setattr(test_class, test_func.__name__, test_func)
