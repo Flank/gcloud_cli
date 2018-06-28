@@ -1,4 +1,7 @@
 # get latest version number from https://cloud.google.com/sdk/downloads
+#
+# https://storage.cloud.google.com/cloud-sdk-release
+#
 # gsutil ls -l gs://cloud-sdk-release/for_packagers/linux > list.txt
 
 VERSION=201.0.0
