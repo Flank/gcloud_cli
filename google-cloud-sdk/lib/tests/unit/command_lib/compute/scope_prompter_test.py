@@ -14,6 +14,8 @@
 
 """Unit tests for the compute scope prompter module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 
 from googlecloudsdk.command_lib.compute import scope as compute_scope

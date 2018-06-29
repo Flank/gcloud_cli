@@ -26,10 +26,11 @@ COMMANDS
         Display all data about an existing instance.
 
      disable-debug
-        Disables debug mode for an instance.
+        Disable debug mode for an instance.
 
      enable-debug
-        Enables debug mode for an instance.
+        Enable debug mode for an instance (only works on the flexible
+        environment).
 
      list
         List the instances affiliated with the current App Engine project.

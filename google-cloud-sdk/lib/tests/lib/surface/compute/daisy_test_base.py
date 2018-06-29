@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base module for testing commands that call Daisy."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import uuid
 
 from apitools.base.py import encoding
@@ -21,10 +23,10 @@ from apitools.base.py.testing import mock as client_mocker
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
-from tests.lib.surface.compute import test_base
+from tests.lib import sdk_test_base
 
 
-class DaisyBaseTest(e2e_base.WithMockHttp, test_base.BaseTest):
+class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
   """Base class for tests that call Daisy."""
 
   def SetUp(self):

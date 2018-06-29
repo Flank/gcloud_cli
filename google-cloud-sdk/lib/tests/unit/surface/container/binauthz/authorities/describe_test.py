@@ -44,7 +44,7 @@ class DescribeTest(base.BinauthzMockedPolicyClientUnitTest):
         systemOwnedDrydockNote=None,
         updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
         userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='providers/{}/notes/{}'.format(proj, name),
+            noteReference='projects/{}/notes/{}'.format(proj, name),
             publicKeys=[
                 self.messages.AttestationAuthorityPublicKey(
                     asciiArmoredPgpPublicKey=ascii_armored_key,

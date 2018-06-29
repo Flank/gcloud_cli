@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -33,7 +35,8 @@ class DatabasesDeleteTest(base.SqlMockTestBeta):
         sqladmin.SqlDatabasesDeleteRequest(
             database='mock-db-name',
             instance='mock-instance',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         sqladmin.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -50,23 +53,25 @@ class DatabasesDeleteTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'mock-instance',
+            targetId='mock-instance',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'56282116-8e0d-43d4-85d1-692b1f0cf044',
+            kind='sql#operation',
+            name='56282116-8e0d-43d4-85d1-692b1f0cf044',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56282116-8e0d-43d4-85d1-692b1f0cf044'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56282116-8e0d-43d4-85d1-692b1f0cf044'.
             format(self.Project()),
-            operationType=u'DELETE_DATABASE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='DELETE_DATABASE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.operations.Get.Expect(
         sqladmin.SqlOperationsGetRequest(
-            operation=u'56282116-8e0d-43d4-85d1-692b1f0cf044',
-            project=self.Project(),),
+            operation='56282116-8e0d-43d4-85d1-692b1f0cf044',
+            project=self.Project(),
+        ),
         sqladmin.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -99,19 +104,20 @@ class DatabasesDeleteTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'mock-instance',
+            targetId='mock-instance',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'56282116-8e0d-43d4-85d1-692b1f0cf044',
+            kind='sql#operation',
+            name='56282116-8e0d-43d4-85d1-692b1f0cf044',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56282116-8e0d-43d4-85d1-692b1f0cf044'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56282116-8e0d-43d4-85d1-692b1f0cf044'.
             format(self.Project()),
-            operationType=u'DELETE_DATABASE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='DELETE_DATABASE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.Run('sql databases delete mock-db-name --instance=mock-instance')
     self.AssertErrContains('Deleted database [{0}].'.format('mock-db-name'))

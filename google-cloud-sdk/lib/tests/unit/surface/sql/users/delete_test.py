@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise user deletion."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case

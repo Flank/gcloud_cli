@@ -22,7 +22,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class SubnetsUpdateTest(test_base.BaseTest):
+class SubnetsUpdateTest(test_base.BaseTest, parameterized.TestCase):
 
   def testNoUpdates(self):
     """Tests running update with no update parameters."""
@@ -304,13 +304,6 @@ class SubnetsUpdateTest(test_base.BaseTest):
             --region us-central2
           """)
 
-
-class SubnetsUpdateTestBeta(SubnetsUpdateTest, parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-
   @parameterized.named_parameters(('Enabled', '--enable-flow-logs', True),
                                   ('Disabled', '--no-enable-flow-logs', False))
   def testToggleEnableFlowLogs(self, enable_flow_logs_flag, enable_flow_logs):
@@ -344,6 +337,13 @@ class SubnetsUpdateTestBeta(SubnetsUpdateTest, parameterized.TestCase):
              region='us-central2',
              subnetwork='subnet-1',
              subnetworkResource=subnetwork_resource))])
+
+
+class SubnetsUpdateTestBeta(SubnetsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
 
 class SubnetsUpdateTestAlpha(SubnetsUpdateTestBeta):

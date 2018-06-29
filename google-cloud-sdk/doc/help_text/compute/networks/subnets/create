@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud compute networks subnets create NAME --network=NETWORK --range=RANGE
-        [--description=DESCRIPTION] [--enable-private-ip-google-access]
-        [--region=REGION] [--secondary-range=PROPERTY=VALUE,[...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--enable-flow-logs]
+        [--enable-private-ip-google-access] [--region=REGION]
+        [--secondary-range=PROPERTY=VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Define a subnet for a network in custom subnet mode. Subnets must be
@@ -26,6 +26,11 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional description of this subnetwork.
+
+     --enable-flow-logs
+        Enable/disable VPC flow logging for this subnet. More information for
+        VPC flow logs can be found at
+        https://cloud.google.com/vpc/docs/using-flow-logs.
 
      --enable-private-ip-google-access
         Enable/disable access to Google Cloud APIs from this subnet for

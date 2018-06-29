@@ -587,101 +587,58 @@ class FeedbackQuietTest(FeedbackTestBase):
     self.AssertOutputContains('Platform: [')
 
 
-class CommonPrefixTest(unittest.TestCase):
-
-  def testCommonPrefixEmpty(self):
-    self.assertEqual(feedback_util._CommonPrefix([
-        ]), '')
-
-  @test_case.Filters.DoNotRunOnWindows
-  def testCommonPrefixSameDir(self):
-    self.assertEqual(feedback_util._CommonPrefix([
-        '/path/to/test.py',
-        '/path/to/test2.py',
-        ]), '/path/to/')
-
-  @test_case.Filters.DoNotRunOnWindows
-  def testCommonPrefixDifferentDirs(self):
-    self.assertEqual(feedback_util._CommonPrefix([
-        '/path/to/test.py',
-        '/path/test2.py',
-        ]), '/path/')
-
-  @test_case.Filters.DoNotRunOnWindows
-  def testCommonPrefixSameFile(self):
-    self.assertEqual(feedback_util._CommonPrefix([
-        '/path/to/test.py',
-        '/path/to/test.py',
-        ]), '/path/to/')
-
-  @test_case.Filters.RunOnlyOnWindows
-  def testCommonPrefixSameDirWindows(self):
-    self.assertEqual(feedback_util._CommonPrefix([
-        'C:\\path\\to\\test.py',
-        'C:\\path\\to\\test2.py',
-        ]), 'C:\\path\\to\\')
-
-  @test_case.Filters.RunOnlyOnWindows
-  def testCommonPrefixDifferentDirsWindows(self):
-    self.assertEqual(feedback_util._CommonPrefix([
-        'C:\\path\\to\\test.py',
-        'C:\\path\\test2.py',
-        ]), 'C:\\path\\')
-
-  @test_case.Filters.RunOnlyOnWindows
-  def testCommonPrefixSameFileWindows(self):
-    self.assertEqual(feedback_util._CommonPrefix([
-        'C:\\path\\to\\test.py',
-        'C:\\path\\to\\test.py',
-        ]), 'C:\\path\\to\\')
-
-
 class FormatTracebackTest(test_case.TestCase):
 
   _EXAMPLE_TRACEBACK_UNIX = textwrap.dedent("""\
   Traceback (most recent call last):
-    File "/path/to/cloudsdk/test.py", line 3, in <module>
-      main()
-    File "/path/to/cloudsdk/./test.py", line 2, in main
-      example.method()
-    File "/path/to/cloudsdk/lib/example.py", line 70, in method
+    File "/path/to/cloudsdk/lib/./example.py", line 70, in method
       a = b + foo.Bar()
     File "/path/to/cloudsdk/lib/googlecloudsdk/foo.py", line 700, in bar
       c.function()
     File "/path/to/cloudsdk/lib/third_party/bread/toast.py", line 1, in function
+      base64.baz()
+    File "/usr/lib/python2.7/base64.py", line 1, in baz
       raise Exception('really quite a fantastically, exceptionally, particularly long message')
   Exception: really quite a fantastically, exceptionally, particularly long message\
 """)
 
   _EXAMPLE_TRACEBACK_WINDOWS = textwrap.dedent("""\
   Traceback (most recent call last):
-    File "C:\\Program Files (x86)\\cloudsdk\\test.py", line 3, in <module>
-      main()
-    File "C:\\Program Files (x86)\\cloudsdk\\.\\test.py", line 2, in main
-      example.method()
-    File "C:\\Program Files (x86)\\cloudsdk\\lib\\example.py", line 70, in method
+    File "C:\\Program Files (x86)\\cloudsdk\\lib\\.\\example.py", line 70, in method
       a = b + foo.Bar()
     File "C:\\Program Files (x86)\\cloudsdk\\lib\\googlecloudsdk\\foo.py", line 700, in bar
       c.function()
     File "C:\\Program Files (x86)\\cloudsdk\\lib\\third_party\\bread\\toast.py", line 1, in function
+      base64.baz()
+    File "D:\\Applications\\Python2.7\\base64.py", line 1, in baz
       raise Exception('really quite a fantastically, exceptionally, particularly long message')
   Exception: really quite a fantastically, exceptionally, particularly long message\
 """)
 
-  def testFormatTraceback_UnixPathSep(self):
+  def _UsePosixPath(self):
     self.StartObjectPatch(os.path, 'sep', posixpath.sep)
     self.StartObjectPatch(os.path, 'dirname', posixpath.dirname)
-    self.StartObjectPatch(os.path, 'commonprefix', posixpath.commonprefix)
+    self.StartObjectPatch(os.path, 'normpath', posixpath.normpath)
+
+  def _UseWindowsPath(self):
+    self.StartObjectPatch(os.path, 'sep', ntpath.sep)
+    self.StartObjectPatch(os.path, 'dirname', ntpath.dirname)
+    self.StartObjectPatch(os.path, 'normpath', ntpath.normpath)
+
+  def testFormatTraceback_UnixPathSep(self):
+    self._UsePosixPath()
+    self.StartObjectPatch(feedback_util, '_SysPath', return_value=[
+        '/path/to/cloudsdk/lib/third_party',
+        '/path/to/cloudsdk/lib',
+        '/usr/lib/python2.7'])
     expected_formatted_stacktrace = textwrap.dedent("""\
-        test.py:3
-         main()
-        test.py:2
-         example.method()
-        lib/example.py:70
+        example.py:70
          a = b + foo.Bar()
         foo.py:700
          c.function()
         bread/toast.py:1
+         base64.baz()
+        base64.py:1
          raise Exception('really quite a fantastically, exceptionally, particularly long ...
          """)
     self.assertEqual(
@@ -691,19 +648,19 @@ class FormatTracebackTest(test_case.TestCase):
         feedback_util._FormatTraceback(self._EXAMPLE_TRACEBACK_UNIX))
 
   def testFormatTraceback_WindowsPathSep(self):
-    self.StartObjectPatch(os.path, 'sep', ntpath.sep)
-    self.StartObjectPatch(os.path, 'dirname', ntpath.dirname)
-    self.StartObjectPatch(os.path, 'commonprefix', ntpath.commonprefix)
+    self._UseWindowsPath()
+    self.StartObjectPatch(feedback_util, '_SysPath', return_value=[
+        'C:\\Program Files (x86)\\cloudsdk\\lib\\third_party',
+        'C:\\Program Files (x86)\\cloudsdk\\lib',
+        'D:\\Applications\\Python2.7'])
     expected_formatted_stacktrace = textwrap.dedent("""\
-        test.py:3
-         main()
-        test.py:2
-         example.method()
-        lib\\example.py:70
+        example.py:70
          a = b + foo.Bar()
         foo.py:700
          c.function()
         bread\\toast.py:1
+         base64.baz()
+        base64.py:1
          raise Exception('really quite a fantastically, exceptionally, particularly long ...
          """)
     self.assertEqual(
@@ -713,14 +670,16 @@ class FormatTracebackTest(test_case.TestCase):
         feedback_util._FormatTraceback(self._EXAMPLE_TRACEBACK_WINDOWS))
 
   def testFormatTraceback_DontMessWithUnderscoreLib(self):
-    self.StartObjectPatch(os.path, 'sep', posixpath.sep)
-    self.StartObjectPatch(os.path, 'dirname', posixpath.dirname)
-    self.StartObjectPatch(os.path, 'commonprefix', posixpath.commonprefix)
+    self._UsePosixPath()
+    self.StartObjectPatch(feedback_util, '_SysPath', return_value=[
+        '/path/to/cloudsdk/lib/third_party',
+        '/path/to/cloudsdk/lib',
+        '/usr/lib/python2.7'])
     traceback = textwrap.dedent("""\
         Traceback (most recent call last):
           File "/foo/api_lib/third_party/example.py", line 14, in Foo
             method()
-          File "/path/to/cloudsdk/core/api_lib/third_party/example.py", line 70, in method
+          File "/path/to/cloudsdk/lib/core/api_lib/third_party/example.py", line 70, in method
             a = b + foo.Bar()
           File "/path/to/cloudsdk/lib/third_party/foo.py", line 100, in Bar
             raise Exception('really quite a fantastically, exceptionally, particularly long message')
@@ -729,9 +688,9 @@ class FormatTracebackTest(test_case.TestCase):
     expected_formatted_stacktrace = textwrap.dedent("""\
         /foo/api_lib/third_party/example.py:14
          method()
-        /path/to/cloudsdk/core/api_lib/third_party/example.py:70
+        core/api_lib/third_party/example.py:70
          a = b + foo.Bar()
-        /path/to/cloudsdk/foo.py:100
+        foo.py:100
          raise Exception('really quite a fantastically, exceptionally, particularly long ...
          """)
     self.assertEqual(
@@ -741,12 +700,14 @@ class FormatTracebackTest(test_case.TestCase):
         feedback_util._FormatTraceback(traceback))
 
   def testFormatTraceback_DontMessWithUnderscoreLib_CommonPrefix(self):
-    self.StartObjectPatch(os.path, 'sep', posixpath.sep)
-    self.StartObjectPatch(os.path, 'dirname', posixpath.dirname)
-    self.StartObjectPatch(os.path, 'commonprefix', posixpath.commonprefix)
+    self._UsePosixPath()
+    self.StartObjectPatch(feedback_util, '_SysPath', return_value=[
+        '/path/to/cloudsdk/lib/third_party',
+        '/path/to/cloudsdk/lib',
+        '/usr/lib/python2.7'])
     traceback = textwrap.dedent("""\
         Traceback (most recent call last):
-          File "/path/to/cloudsdk/core/api_lib/third_party/example.py", line 70, in method
+          File "/path/to/cloudsdk/lib/core/api_lib/third_party/example.py", line 70, in method
             a = b + foo.Bar()
           File "/path/to/cloudsdk/lib/third_party/foo.py", line 100, in Bar
             raise Exception('really quite a fantastically, exceptionally, particularly long message')

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.sql import base
@@ -26,7 +28,7 @@ class DatabasesListsTest(base.SqlMockTestBeta):
         sqladmin.SqlDatabasesListRequest(
             project=self.Project(), instance='mock-instance'),
         sqladmin.DatabasesListResponse(
-            kind=u'sql#databasesList',
+            kind='sql#databasesList',
             items=[
                 sqladmin.Database(
                     # pylint:disable=line-too-long
@@ -36,11 +38,11 @@ class DatabasesListsTest(base.SqlMockTestBeta):
                     charset='utf-8',
                     collation='some-collation',
                     selfLink=
-                    u'https://www.googleapis.com/sql/v1beta4/projects/{0}/databases/mock-db-name'.
+                    'https://www.googleapis.com/sql/v1beta4/projects/{0}/databases/mock-db-name'.
                     format(self.Project()),
                     etag=
                     '\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
-                    kind=u'sql#database'),
+                    kind='sql#database'),
                 sqladmin.Database(
                     # pylint:disable=line-too-long
                     project=self.Project(),
@@ -49,12 +51,13 @@ class DatabasesListsTest(base.SqlMockTestBeta):
                     charset='utf-8',
                     collation='some-collation',
                     selfLink=
-                    u'https://www.googleapis.com/sql/v1beta4/projects/{0}/databases/mock-db-name'.
+                    'https://www.googleapis.com/sql/v1beta4/projects/{0}/databases/mock-db-name'.
                     format(self.Project()),
                     etag=
                     '\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahe\"',
-                    kind=u'sql#database'),
-            ]),)
+                    kind='sql#database'),
+            ]),
+    )
 
     self.Run('sql databases list --instance=mock-instance')
     self.AssertOutputContains("""\

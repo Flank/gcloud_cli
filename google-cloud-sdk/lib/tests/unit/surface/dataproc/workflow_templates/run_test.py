@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'workflow-template run' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 import uuid
 
@@ -100,11 +102,11 @@ class WorkflowTemplatesRunUnitTestBeta(WorkflowTemplatesRunUnitTest):
           self.WORKFLOW_TEMPLATE))
 
   def testRunWorkflowTemplatesHttpError(self):
-    err = self.MakeHttpError(500, 'internal error stuff')
+    message = 'internal error stuff'
+    err = self.MakeHttpError(500, message)
     workflow_template = self.MakeWorkflowTemplate()
     self.ExpectWorkflowTemplatesInstantiate(
         workflow_template.name, exception=err)
-    with self.AssertRaisesExceptionMatches(exceptions.HttpException,
-                                           err.message):
+    with self.AssertRaisesExceptionMatches(exceptions.HttpException, message):
       self.RunDataproc('workflow-templates run {0}'.format(
           self.WORKFLOW_TEMPLATE))

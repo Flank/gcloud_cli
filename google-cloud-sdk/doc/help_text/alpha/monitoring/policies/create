@@ -44,12 +44,13 @@ FLAGS
         https://monitoring.googleapis.com/v3/projects/my-project/notificationChannels/channel-id0
         This represents a Cloud resource. (NOTE) Some attributes are not given
         arguments in this group but can be set in other ways. To set the
-        [project] attribute: Set the property [core/project] or provide the
-        flag [--project] on the command line.
+        [project] attribute: provide the flag [--notification-channels] on the
+        command line with a fully specified name; provide the flag [--project]
+        on the command line; set the property [core/project].
 
          --notification-channels=[NOTIFICATION_CHANNELS,...]
-            The ID of the Notification Channel or a fully qualified identifier
-            for the Notification Channel.
+            IDs of the Notification Channels or fully qualified identifiers for
+            the Notification Channels.
 
      Condition Settings. This will add a condition to the created policy. If
      any conditions are already specified, this condition will be appended.
@@ -95,9 +96,15 @@ FLAGS
           disable.
 
        --user-labels=[KEY=VALUE,...]
-          A list of label KEY=VALUE pairs to add. If the policy was given as a
-          JSON/YAML object from a string or file, this flag will replace the
-          labels value in the given policy.
+          A list of label KEY=VALUE pairs to add.
+
+          Keys must start with a lowercase character and contain only hyphens
+          (-), underscores (_), lowercase characters, and numbers. Values must
+          contain only hyphens (-), underscores (_), lowercase characters, and
+          numbers.
+
+          If the policy was given as a JSON/YAML object from a string or file,
+          this flag will replace the labels value in the given policy.
 
        Documentation
 

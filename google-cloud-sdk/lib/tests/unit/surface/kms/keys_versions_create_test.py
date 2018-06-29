@@ -15,10 +15,15 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class CryptokeysVersionsCreateTest(base.KmsMockTest):
 
   def SetUp(self):
@@ -32,13 +37,15 @@ class CryptokeysVersionsCreateTest(base.KmsMockTest):
             parent=self.version_name.Parent().RelativeName()),
         self.messages.CryptoKeyVersion(name=self.version_name.RelativeName()))
 
-  def testCreateNonPrimary(self):
+  def testCreateNonPrimary(self, track):
+    self.track = track
     self.Run('kms keys versions create '
              '--location={0} --keyring={1} --key={2}'.format(
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id))
 
-  def testCreatePrimary(self):
+  def testCreatePrimary(self, track):
+    self.track = track
     self.kms.projects_locations_keyRings_cryptoKeys.UpdatePrimaryVersion.Expect(
         self.messages.
         CloudkmsProjectsLocationsKeyRingsCryptoKeysUpdatePrimaryVersionRequest(
@@ -53,7 +60,8 @@ class CryptokeysVersionsCreateTest(base.KmsMockTest):
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id))
 
-  def testCreateFullName(self):
+  def testCreateFullName(self, track):
+    self.track = track
     self.Run('kms keys versions create --key={0}'.format(
         self.version_name.Parent().RelativeName()))
 

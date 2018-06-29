@@ -14,10 +14,13 @@
 
 """Tests for genomics operations list command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.genomics import base
+from six.moves import range
 
 
 class ListTest(base.GenomicsUnitTest):
@@ -80,7 +83,7 @@ class ListTest(base.GenomicsUnitTest):
     self.mocked_client_v2.projects_operations.List.Expect(
         request=self.messages_v2.GenomicsProjectsOperationsListRequest(
             name='projects/fake-project/operations',
-            filter='',),
+            filter=None,),
         response=self.messages_v2.ListOperationsResponse(
             operations=[self.createV2OperationResponseMessage(i)
                         for i in range(1)]))
@@ -150,7 +153,7 @@ class ListTest(base.GenomicsUnitTest):
     self.mocked_client_v2.projects_operations.List.Expect(
         request=self.messages_v2.GenomicsProjectsOperationsListRequest(
             name='projects/secret-project/operations',
-            filter='',),
+            filter=None,),
         exception=self.MakeHttpError(403,
                                      'Permission denied; need GET permission'))
 

@@ -1179,7 +1179,7 @@ class EndpointsApiService(_messages.Message):
   r"""Cloud Endpoints (https://cloud.google.com/endpoints) configuration. The
   Endpoints API Service provides tooling for serving Open API and gRPC
   endpoints via an NGINX proxy. Only valid for App Engine Flexible environment
-  deployments.The fields here refer to the name and configuration id of a
+  deployments.The fields here refer to the name and configuration ID of a
   "service" resource in the Service Management API (https://cloud.google.com
   /service-management/overview).
 
@@ -1188,11 +1188,16 @@ class EndpointsApiService(_messages.Message):
       config_id must be specified. If MANAGED, config_id must be omitted.
 
   Fields:
-    configId: Endpoints service configuration id as specified by the Service
-      Management API. For example "2016-09-19r1"By default, the Endpoints
-      service configuration id is fixed and config_id must be specified. To
-      keep the Endpoints service configuration id updated with each rollout,
-      specify RolloutStrategy.MANAGED and omit config_id.
+    configId: Endpoints service configuration ID as specified by the Service
+      Management API. For example "2016-09-19r1".By default, the rollout
+      strategy for Endpoints is RolloutStrategy.FIXED. This means that
+      Endpoints starts up with a particular configuration ID. When a new
+      configuration is rolled out, Endpoints must be given the new
+      configuration ID. The config_id field is used to give the configuration
+      ID and is required in this case.Endpoints also has a rollout strategy
+      called RolloutStrategy.MANAGED. When using this, Endpoints fetches the
+      latest configuration and does not need the configuration ID. In this
+      case, config_id must be omitted.
     name: Endpoints service name which is the name of the "service" resource
       in the Service Management API. For example
       "myapi.endpoints.myproject.cloud.goog"
@@ -1206,9 +1211,9 @@ class EndpointsApiService(_messages.Message):
 
     Values:
       UNSPECIFIED_ROLLOUT_STRATEGY: Not specified. Defaults to FIXED.
-      FIXED: Endpoints service configuration id will be fixed to the
-        configuration id specified by config_id.
-      MANAGED: Endpoints service configuration id will be updated with each
+      FIXED: Endpoints service configuration ID will be fixed to the
+        configuration ID specified by config_id.
+      MANAGED: Endpoints service configuration ID will be updated with each
         rollout.
     """
     UNSPECIFIED_ROLLOUT_STRATEGY = 0
@@ -2237,14 +2242,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -2280,17 +2283,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 class StandardSchedulerSettings(_messages.Message):

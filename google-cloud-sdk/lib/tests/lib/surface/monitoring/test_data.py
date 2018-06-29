@@ -13,6 +13,7 @@
 # limitations under the License.
 """`gcloud monitoring policies update` command."""
 
+from __future__ import unicode_literals
 ALERT_POLICY = """\
 {
     "displayName": "Instance health",

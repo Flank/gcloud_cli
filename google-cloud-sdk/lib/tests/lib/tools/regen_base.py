@@ -14,6 +14,8 @@
 # limitations under the License.
 """Base for tests to make sure that checked in apitools clients are uptodate."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import difflib
 import os
 import shutil
@@ -77,12 +79,13 @@ def _MakeTest(base_dir, apis_dir, api_name, api_version, api_config):
           .format(expected_files, actual_files))
       for file_name in actual_files:
         AssertDiffEqual(
-            files.GetFileContents(
+            files.ReadFileContents(
                 _GetClientPath(base_dir, apis_dir, api_name, api_version,
                                file_name)),
-            files.GetFileContents(os.path.join(output_dir, file_name)))
+            files.ReadFileContents(os.path.join(output_dir, file_name)))
 
-  TestGenClient.__name__ = b'testGen_{0}_{1}'.format(api_name, api_version)
+  format_string = b'testGen_{0}_{1}' if six.PY2 else 'testGen_{0}_{1}'
+  TestGenClient.__name__ = format_string.format(api_name, api_version)
   return TestGenClient
 
 

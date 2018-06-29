@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base class for all bio tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.bio import bio

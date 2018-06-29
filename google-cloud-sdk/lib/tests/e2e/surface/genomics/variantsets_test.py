@@ -14,6 +14,8 @@
 
 """Integration test for the 'variantsets create/delete' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import e2e_utils
 from tests.lib import test_case
@@ -29,8 +31,8 @@ class VariantSetsIntegrationTest(base.GenomicsIntegrationTest):
   def testCreateGetDelete(self):
     try:
       # create a dataset to contain the variantset
-      name = e2e_utils.GetResourceNameGenerator(
-          prefix='genomics-integration').next()
+      name = next(e2e_utils.GetResourceNameGenerator(
+          prefix='genomics-integration'))
       dataset = self.RunGenomics(['datasets', 'create', '--name', name])
 
       # create a variantset

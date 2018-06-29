@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -253,6 +254,8 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
         message,
         {'bool1': {'description': 'a boolean', 'repeated': False,
                    'type': _messages.Variant.BOOL},
+         'bytes1': {'description': 'a byte string', 'repeated': False,
+                    'type': _messages.Variant.BYTES},
          'enum1': {'choices': {'THING_ONE': 'the first thing',
                                'THING_TWO': 'the second thing'},
                    'description': 'a FakeEnum', 'repeated': False,
@@ -347,8 +350,8 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     """Make Test keyword args to compare against arg_utils generated args."""
     k = {'category': None, 'action': 'store', 'completer': None,
          'help': 'foo help',
-         'hidden': False, 'metavar': 'FOO', 'type': str, 'choices': None,
-         'required': False}
+         'hidden': False, 'metavar': 'FOO', 'type': six.text_type,
+         'choices': None, 'required': False}
     k.update(**kwargs)
     return k
 
@@ -404,7 +407,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help')
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string2, a)
     self.assertTrue(isinstance(arg.kwargs['type'], arg_parsers.ArgList))
-    self.assertEqual(arg.kwargs['type'].element_type, str)
+    self.assertEqual(arg.kwargs['type'].element_type, six.text_type)
 
     # Repeated complex type doesn't get re-wrapped.
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help',
@@ -446,7 +449,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     # Force repeated arg to be singular.
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help', repeated=False)
     arg = arg_utils.GenerateFlag(fm.FakeMessage.string2, a)
-    self.assertEqual(arg.kwargs['type'], str)
+    self.assertEqual(arg.kwargs['type'], six.text_type)
 
     # Repeated with custom action is an error.
     a = yaml_command_schema.Argument('foo', 'foo', 'foo help', action='foo')
@@ -489,6 +492,36 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     kwargs = self._MakeKwargs()
     del kwargs['required']
     self.assertEqual(kwargs, arg.kwargs)
+
+  def testParseBasicTypes(self):
+    parser = util.ArgumentParser()
+    def Add(field, name):
+      a = yaml_command_schema.Argument('asdf', name, 'help')
+      arg_utils.GenerateFlag(field, a).AddToParser(parser)
+
+    Add(fm.FakeMessage.string1, 'string1')
+    Add(fm.FakeMessage.enum1, 'enum1')
+    Add(fm.FakeMessage.bool1, 'bool1')
+    Add(fm.FakeMessage.int1, 'int1')
+    Add(fm.FakeMessage.float1, 'float1')
+    Add(fm.FakeMessage.bytes1, 'bytes1')
+
+    result = parser.parse_args(
+        ['--string1', 'foo',
+         '--enum1', 'thing-one',
+         '--bool1',
+         '--int1', '1',
+         '--float1', '1.5',
+         '--bytes1', "¢συℓ∂η'т ѕαу ησ"])
+    self.assertEqual(result.string1, 'foo')
+    # Enums don't get converted until arg processing time.
+    self.assertEqual(result.enum1, 'thing-one')
+    self.assertEqual(result.bool1, True)
+    self.assertEqual(result.int1, 1)
+    self.assertEqual(result.float1, 1.5)
+    self.assertEqual(result.bytes1,
+                     b"\xc2\xa2\xcf\x83\xcf\x85\xe2\x84\x93\xe2\x88\x82\xce\xb7"
+                     b"'\xd1\x82 \xd1\x95\xce\xb1\xd1\x83 \xce\xb7\xcf\x83")
 
   def testParseResourceIntoMessageGet(self):
     self.MockGetListCreateMethods(('foo.projects.locations.instances', True))
@@ -685,7 +718,7 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
     mapper = arg_utils.ChoiceEnumMapper(
         '--test_arg', self.test_enum, custom_mappings=self.tuple_mapping,
         help_str='Auxilio aliis.')
-    expected_choices = dict(self.tuple_mapping.values())
+    expected_choices = dict(list(self.tuple_mapping.values()))
 
     self.assertEqual(mapper.choices, expected_choices)
     self.assertEqual(mapper.custom_mappings, self.tuple_mapping)
@@ -699,7 +732,7 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
     mapper = arg_utils.ChoiceEnumMapper(
         '--test_arg', self.test_enum, custom_mappings=short_mapping,
         help_str='Auxilio aliis.')
-    expected_choices = dict(short_mapping.values())
+    expected_choices = dict(list(short_mapping.values()))
 
     self.assertEqual(mapper.choices, expected_choices)
     self.assertEqual(mapper.custom_mappings, short_mapping)
@@ -799,6 +832,17 @@ class ChoiceEnumMapperTest(sdk_test_base.WithOutputCapture):
       self.parser.parse_args(['-h'])
     self.AssertOutputContains(
         '--test_arg MY_TEST_ARG\nCustom Help', normalize_space=True)
+
+  def testHidden(self):
+    mapper = arg_utils.ChoiceEnumMapper(
+        '--test_arg',
+        self.test_enum,
+        help_str='help',
+        hidden=True)
+    self._AssertAllMappings('test_arg', mapper)
+    with self.assertRaisesRegex(SystemExit, '0'):
+      self.parser.parse_args(['-h'])
+    self.AssertOutputNotContains('--test_arg')
 
   def testFilter_IncludeList(self):
     def MyFilter(value):

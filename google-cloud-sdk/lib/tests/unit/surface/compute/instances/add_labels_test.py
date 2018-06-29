@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for instances add-labels."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import instances_labels_test_base
@@ -27,7 +29,7 @@ class AddLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     add_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=(), fingerprint='fingerprint-42')
+        instance_ref, labels=(), fingerprint=b'fingerprint-42')
     updated_instance = self._MakeInstanceProto(instance_ref, labels=add_labels)
 
     operation_ref = self._GetOperationRef('operation-1', 'atlanta')
@@ -35,7 +37,7 @@ class AddLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
 
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
-        instance_ref, add_labels, 'fingerprint-42', operation)
+        instance_ref, add_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
@@ -58,7 +60,7 @@ class AddLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     ))
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=instance_labels, fingerprint='fingerprint-42')
+        instance_ref, labels=instance_labels, fingerprint=b'fingerprint-42')
     updated_instance = self._MakeInstanceProto(
         instance_ref, labels=edited_labels)
 
@@ -67,7 +69,7 @@ class AddLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
 
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
-        instance_ref, edited_labels, 'fingerprint-42', operation)
+        instance_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
@@ -89,7 +91,7 @@ class AddLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     add_labels = (('key1', 'value1'), ('key3', 'value3'))
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=instance_labels, fingerprint='fingerprint-42')
+        instance_ref, labels=instance_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(instance_ref, instance)
 
@@ -111,7 +113,7 @@ class AddLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     instance_ref = self._GetInstanceRef('instance-1', zone='atlanta')
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels={}, fingerprint='fingerprint-42')
+        instance_ref, labels={}, fingerprint=b'fingerprint-42')
     add_labels = (('+notvalid', 'a'),)
 
     error = http_error.MakeHttpError(
@@ -125,7 +127,7 @@ class AddLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     self._ExpectLabelsSetRequest(
         instance_ref=instance_ref,
         labels=add_labels,
-        fingerprint='fingerprint-42',
+        fingerprint=b'fingerprint-42',
         exception=error)
 
     with self.AssertRaisesHttpExceptionMatches(

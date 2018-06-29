@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise creating on-demand backups."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib.surface.sql import base
 
 

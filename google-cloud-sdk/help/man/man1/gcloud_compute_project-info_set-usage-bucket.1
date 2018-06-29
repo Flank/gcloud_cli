@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute project\-info set\-usage\-bucket \- set the usage reporting bucket for a project
+gcloud compute project\-info set\-usage\-bucket \- set usage reporting bucket for a project
 
 
 
@@ -17,19 +17,21 @@ gcloud compute project\-info set\-usage\-bucket \- set the usage reporting bucke
 
 .SH "DESCRIPTION"
 
-\fBgcloud compute project\-info set\-usage\-bucket\fR is used to configure usage
-reporting for projects.
+\fBgcloud compute project\-info set\-usage\-bucket\fR configures usage reporting
+for projects.
 
 Setting usage reporting will cause a log of usage per resource to be written to
-a specified Google Cloud Storage bucket daily. For example,
+a specified Google Cloud Storage bucket daily.
+
+For example, to write daily logs of the form usage_gce_YYYYMMDD.csv to the
+bucket \f5my\-bucket\fR, run:
 
 .RS 2m
 $ gcloud compute project\-info set\-usage\-bucket \e
-    \-\-bucket gs://my\-bucket
+    \-\-bucket=gs://my\-bucket
 .RE
 
-will cause logs of the form usage_gce_YYYYMMDD.csv to be written daily to the
-bucket \f5my\-bucket\fR. To disable this feature, issue the command:
+To disable this feature, issue the command:
 
 .RS 2m
 $ gcloud compute project\-info set\-usage\-bucket \-\-no\-bucket
@@ -47,12 +49,15 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-bucket\fR=\fIBUCKET\fR
-The URI of a Google Cloud Storage bucket where the usage report object should be
-stored. The Google Service Account for performing usage reporting is granted
-write access to this bucket. The user running this command must be an owner of
-the bucket.
+Name of an existing Google Cloud Storage bucket where the usage report object
+should be stored. This can either be the bucket name by itself, such as
+\f5my\-bucket\fR, or the bucket name with \f5gs://\fR or
+\f5https://storage.googleapis.com/\fR in front of it, such as
+\f5gs://my\-bucket\fR. The Google Service Account for performing usage reporting
+is granted write access to this bucket. The user running this command must be an
+owner of the bucket.
 
-To clear the usage bucket, use \-\-no\-bucket.
+To clear the usage bucket, use \f5\-\-no\-bucket\fR.
 
 .TP 2m
 \fB\-\-no\-bucket\fR
@@ -68,12 +73,12 @@ Unsets the bucket. This disables usage report storage.
 .RS 2m
 .TP 2m
 \fB\-\-prefix\fR=\fIPREFIX\fR
-An optional prefix for the name of the usage report object stored in the bucket.
-If not supplied, then this defaults to \f5\fIusage\fR\fR. The report is stored
-as a CSV file named PREFIX_gce_YYYYMMDD.csv where YYYYMMDD is the day of the
-usage according to Pacific Time. The prefix should conform to Google Cloud
-Storage object naming conventions. This flag must not be provided when clearing
-the usage bucket.
+Optional prefix for the name of the usage report object stored in the bucket. If
+not supplied, then this defaults to \f5\fIusage\fR\fR. The report is stored as a
+CSV file named PREFIX_gce_YYYYMMDD.csv where YYYYMMDD is the day of the usage
+according to Pacific Time. The prefix should conform to Google Cloud Storage
+object naming conventions. This flag must not be provided when clearing the
+usage bucket.
 
 
 .RE

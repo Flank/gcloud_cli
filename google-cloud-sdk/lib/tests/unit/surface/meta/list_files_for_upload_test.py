@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for gcloud meta list-files-for-upload."""
-import cStringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import io
 import itertools
 import os
 
@@ -24,6 +27,7 @@ from googlecloudsdk.core.util import platforms
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
+from six.moves import map
 
 
 class ListFilesForUploadSanityTest(cli_test_base.CliTestBase):
@@ -101,7 +105,7 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
     execution_utils.Exec(['git', 'init'], no_exit=True, out_func=_SwallowOutput)
 
   def _GitAddDryRun(self):
-    output = cStringIO.StringIO()
+    output = io.StringIO()
     execution_utils.Exec(['git', 'add', '--dry-run', '.'], no_exit=True,
                          out_func=output.write)
     text = output.getvalue()
@@ -148,7 +152,7 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
       ('EscapedCrunch', _CombineFormats(['#{}', '{}', '{}#', '#{}#'], 'abcd'),
        '.gitignore\n\\#a\nb#\nc\\#\n\\#d#'),
       ('CombinedBangAndCrunch',
-       itertools.chain.from_iterable(map(_AddCrunchBangPrefixes, 'abcd')),
+       itertools.chain.from_iterable(list(map(_AddCrunchBangPrefixes, 'abcd'))),
        '.gitignore\n!#a\n!\\#b\n\\!#c\n\\!\\#d'),
       ('Comment', ['foo', '#foo'], '.gitignore\n#foo'),
       ('LeadingConsecutiveStars',

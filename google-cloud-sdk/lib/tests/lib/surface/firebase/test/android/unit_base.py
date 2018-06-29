@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base classes for all 'gcloud firebase test android' unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import matrix_ops
 from googlecloudsdk.api_lib.firebase.test.android import matrix_creator
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -37,18 +39,16 @@ ALL_GA_TEST_RUN_ARGS = [
     'locales', 'max_depth', 'max_steps', 'network_profile', 'obb_files',
     'orientations', 'os_version_ids', 'performance_metrics', 'record_video',
     'results_bucket', 'results_dir', 'results_history_name', 'robo_directives',
-    'test', 'test_package', 'test_runner_class', 'test_targets', 'timeout',
-    'type', 'use_orchestrator'
+    'scenario_numbers', 'scenario_labels', 'test', 'test_package',
+    'test_runner_class', 'test_targets', 'timeout', 'type', 'use_orchestrator'
 ]
 
 ALL_TEST_RUN_ARGS = {
     'ga':
         ALL_GA_TEST_RUN_ARGS,
     'beta':
-        ALL_GA_TEST_RUN_ARGS + [
-            'scenario_numbers', 'scenario_labels', 'robo_script',
-            'additional_apks', 'other_files'
-        ]
+        ALL_GA_TEST_RUN_ARGS +
+        ['robo_script', 'additional_apks', 'other_files']
 }
 
 

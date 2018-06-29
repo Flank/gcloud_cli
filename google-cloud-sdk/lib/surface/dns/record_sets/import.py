@@ -11,9 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """gcloud dns record-sets import command."""
 
-import io
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from apitools.base.py import exceptions as apitools_exceptions
@@ -26,6 +29,7 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.dns import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files
 
 
 @base.UnicodeIsSupported
@@ -126,7 +130,7 @@ class Import(base.Command):
 
     # Get the imported record-sets.
     try:
-      with io.open(args.records_file, 'rt') as import_file:
+      with files.FileReader(args.records_file) as import_file:
         if args.zone_file_format:
           imported = import_util.RecordSetsFromZoneFile(
               import_file, zone.dnsName, api_version=api_version)
@@ -134,8 +138,8 @@ class Import(base.Command):
           imported = import_util.RecordSetsFromYamlFile(
               import_file, api_version=api_version)
     except Exception as exp:
-      msg = (u'unable to read record-sets from specified records-file [{0}] '
-             u'because [{1}]')
+      msg = ('unable to read record-sets from specified records-file [{0}] '
+             'because [{1}]')
       msg = msg.format(args.records_file, exp.message)
       raise exceptions.ToolException(msg)
 
@@ -145,7 +149,7 @@ class Import(base.Command):
                                        zone.dnsName, args.replace_origin_ns,
                                        api_version=api_version)
     if not change:
-      msg = u'Nothing to do, all the records in [{0}] already exist.'.format(
+      msg = 'Nothing to do, all the records in [{0}] already exist.'.format(
           args.records_file)
       log.status.Print(msg)
       return None
@@ -161,7 +165,7 @@ class Import(base.Command):
         project=zone_ref.project,
         managedZone=zone.name,
         changeId=result.id)
-    msg = u'Imported record-sets from [{0}] into managed-zone [{1}].'.format(
+    msg = 'Imported record-sets from [{0}] into managed-zone [{1}].'.format(
         args.records_file, zone_ref.Name())
     log.status.Print(msg)
     log.CreatedResource(change_ref)

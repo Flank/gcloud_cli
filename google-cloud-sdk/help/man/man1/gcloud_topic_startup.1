@@ -1,0 +1,116 @@
+
+.TH "GCLOUD_TOPIC_STARTUP" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud topic startup \- supplementary help for gcloud startup options
+
+
+
+.SH "DESCRIPTION"
+
+
+.SH "Choosing a Python Interpreter"
+
+The \f5gcloud\fR CLI runs under Python. On Windows, you have the option of
+installing a bundled Python interpreter, but on Mac and Linux you must have a
+Python interpreter available somewhere on your system. \f5gcloud\fR will attempt
+to locate an interpreter on your system PATH by looking for the following
+binaries (in this order):
+
+.RS 2m
+.IP "\(bu" 2m
+python2
+.IP "\(bu" 2m
+python27
+.IP "\(bu" 2m
+python
+.IP "\(bu" 2m
+python3
+.RE
+.sp
+
+Currently \f5gcloud\fR requires Python version 2.7.x and there is experimental
+support for 3.4 and up. All \f5gcloud\fR commands work under Python 3 except for
+the following command groups:
+
+.RS 2m
+.IP "\(bu" 2m
+\f5gcloud app\fR
+.IP "\(bu" 2m
+\f5gcloud datastore\fR
+.IP "\(bu" 2m
+\f5gcloud scheduler\fR
+.IP "\(bu" 2m
+\f5gcloud tasks\fR
+.RE
+.sp
+
+Other Python tools shipped in the Cloud SDK do not yet support Python 3,
+including:
+
+.RS 2m
+.IP "\(bu" 2m
+\f5dev_appserver\fR
+.IP "\(bu" 2m
+\f5gsutil\fR
+.IP "\(bu" 2m
+\f5bq\fR
+.IP "\(bu" 2m
+\f5datalab\fR
+.RE
+.sp
+
+If you have multiple Python interpreters available or if you don't have one on
+your PATH, you can specify which interpreter to use by setting the
+\f5CLOUDSDK_PYTHON\fR environment variable. For example:
+
+.RS 2m
+# Use the python3 interpreter on your path
+$ export CLOUDSDK_PYTHON=python3
+.RE
+
+
+.RS 2m
+# Use a python you have installed in a special location
+$ export CLOUDSDK_PYTHON=/usr/local/my\-custom\-python\-install/python
+.RE
+
+
+
+.SH "Configuring the Python Interpreter"
+
+While not typically necessary, you are able to pass interpreter level arguments
+to the Python running \f5gcloud\fR via the \f5CLOUDSDK_PYTHON_ARGS\fR
+environment variable.
+
+A common use case for this (which has been special\-cased) is to enable 'site
+packages'. This allows Python to pick up libraries from the system ( for
+example, those that may have been installed with \f5pip\fR). Site packages may
+be necessary if you require certain native libraries (as is the case if you work
+with service accounts using a legacy .p12 key, for example). To enable site
+packages, set \f5CLOUDSDK_PYTHON_SITEPACKAGES=1\fR. Note that enabling site
+packages may cause conflicts with \f5gcloud\fR packaged libraries, depending on
+what you have installed on your system.
+
+
+
+.SH "Setting Configurations and Properties"
+
+Your active configuration can also be set via the environment variable
+\f5CLOUDSDK_ACTIVE_CONFIG_NAME\fR. This allows you to specify a certain
+configuration in a given terminal session without changing the global default
+configuration.
+
+In addition to being able to set them via \f5gcloud config set\fR, each
+\f5gcloud\fR property has a corresponding environment variable. They take the
+form: \f5CLOUDSDK_SECTION_PROPERTY\fR. For example, if you wanted to change your
+active project for just one terminal you could run:
+
+.RS 2m
+$ export CLOUDSDK_CORE_PROJECT=my\-project
+.RE
+
+For more information, see \f5gcloud topic configurations\fR.

@@ -1,0 +1,36 @@
+NAME
+    gcloud beta compute sole-tenancy node-groups - read Google Compute Engine
+        sole-tenancy node groups
+
+SYNOPSIS
+    gcloud beta compute sole-tenancy node-groups COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Read Google Compute Engine sole-tenancy node groups.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Creates a Google Compute Engine node group.
+
+     delete
+        (BETA) Deletes a Google Compute Engine node group.
+
+     describe
+        (BETA) Describes a Google Compute Engine node group.
+
+     list
+        (BETA) List Google Compute Engine node groups.
+
+     update
+        (BETA) Updates a Google Compute Engine node group.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

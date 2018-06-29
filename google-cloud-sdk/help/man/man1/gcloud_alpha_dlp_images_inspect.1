@@ -57,7 +57,7 @@ included by default.
 .TP 2m
 \fB\-\-include\-quote\fR
 If True, the server will attempt to filter out profanities, replacing all but
-the initial character in each filtered word with asterisks, e.g. \e"f**\fB\e".
+the initial character in each filtered word with asterisks, e.g. "f**\fB".
 
 .TP 2m
 \fR\-\-max\-findings\fB=\fIMAX_FINDINGS\fR; default=1000
@@ -67,11 +67,9 @@ If not specified, will return up to the system maximum of 1000 findings.
 
 .TP 2m
 \fR\-\-min\-likelihood\fB=\fIMIN_LIKELIHOOD\fR; default="possible"
-Only return findings equal to or above this threshold. One of:
-\f5very\-unlikely\fR, \f5unlikely\fR, \f5possible\fR, \f5likely\fR,
-\f5very\-likely\fR. The default value is \f5possible\fR. \fIMIN_LIKELIHOOD\fR
-must be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB,
-\fRvery\-likely\fB, \fRvery\-unlikely\fB.
+Only return findings equal to or above this threshold. \fIMIN_LIKELIHOOD\fR must
+be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB, \fRvery\-likely\fB,
+\fRvery\-unlikely\fB.
 
 
 \fR

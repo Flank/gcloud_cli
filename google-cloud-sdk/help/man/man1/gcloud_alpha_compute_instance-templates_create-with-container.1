@@ -318,6 +318,11 @@ this option won't apply. The default value for this is \f5\fIno\fR\fR.
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
 
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
 .TP 2m
 \fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]
 Attaches a local SSD to the instances.

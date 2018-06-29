@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -31,27 +33,28 @@ class RemoteCompletionTest(base.SqlMockTestBeta,
         self.messages.SqlInstancesListRequest(
             pageToken=None,
             project=self.Project(),
-            maxResults=100,),
+            maxResults=100,
+        ),
         self.messages.InstancesListResponse(
             items=[
                 self.messages.DatabaseInstance(
                     currentDiskSize=287571860,
-                    databaseVersion=u'MYSQL_5_5',
-                    etag=u'"yGhHGJDUk5hWK-gppo_8C-KD7iU/nbMj8WWUtdJPpSjOHUxEh"',
-                    name=u'backupless-instance',
-                    instanceType=u'CLOUD_SQL_INSTANCE',
+                    databaseVersion='MYSQL_5_5',
+                    etag='"yGhHGJDUk5hWK-gppo_8C-KD7iU/nbMj8WWUtdJPpSjOHUxEh"',
+                    name='backupless-instance',
+                    instanceType='CLOUD_SQL_INSTANCE',
                     ipAddresses=[],
-                    ipv6Address=u'2001:4860:4864:1:df7c:6a7a:d107:ab9d',
-                    kind=u'sql#instance',
+                    ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:ab9d',
+                    kind='sql#instance',
                     masterInstanceName=None,
                     maxDiskSize=268435456000,
                     project=self.Project(),
-                    region=u'us-central',
+                    region='us-central',
                     replicaNames=[],
                     serverCaCert=self.messages.SslCert(
-                        cert=u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAg',
-                        certSerialNumber=u'0',
-                        commonName=u'C=US,O=Google\\, Inc,CN=Google Cloud SQL ',
+                        cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAg',
+                        certSerialNumber='0',
+                        commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL ',
                         createTime=datetime.datetime(
                             2014,
                             8,
@@ -72,37 +75,43 @@ class RemoteCompletionTest(base.SqlMockTestBeta,
                             788000,
                             tzinfo=protorpc_util.TimeZoneOffset(
                                 datetime.timedelta(0))),
-                        instance=u'backupless-instance',
-                        kind=u'sql#sslCert',
-                        sha1Fingerprint=u'a691db45f7dee0827650fd2eb277d2ca81b9',
+                        instance='backupless-instance',
+                        kind='sql#sslCert',
+                        sha1Fingerprint='a691db45f7dee0827650fd2eb277d2ca81b9',
                     ),
                     settings=self.messages.Settings(
-                        activationPolicy=u'ON_DEMAND',
+                        activationPolicy='ON_DEMAND',
                         authorizedGaeApplications=[],
                         backupConfiguration=self.messages.BackupConfiguration(
                             binaryLogEnabled=False,
                             enabled=False,
-                            kind=u'sql#backupConfiguration',
-                            startTime=u'00:00',),
+                            kind='sql#backupConfiguration',
+                            startTime='00:00',
+                        ),
                         databaseFlags=[],
                         databaseReplicationEnabled=None,
                         ipConfiguration=self.messages.IpConfiguration(
                             authorizedNetworks=[],
                             ipv4Enabled=False,
-                            requireSsl=False,),
-                        kind=u'sql#settings',
+                            requireSsl=False,
+                        ),
+                        kind='sql#settings',
                         locationPreference=self.messages.LocationPreference(
                             followGaeApplication=None,
-                            kind=u'sql#locationPreference',
-                            zone=None,),
-                        pricingPlan=u'PER_USE',
-                        replicationType=u'SYNCHRONOUS',
+                            kind='sql#locationPreference',
+                            zone=None,
+                        ),
+                        pricingPlan='PER_USE',
+                        replicationType='SYNCHRONOUS',
                         settingsVersion=1,
-                        tier=u'db-n1-standard-1',),
-                    state=u'RUNNABLE',),
+                        tier='db-n1-standard-1',
+                    ),
+                    state='RUNNABLE',
+                ),
             ],
-            kind=u'sql#instancesList',
-            nextPageToken=None,))
+            kind='sql#instancesList',
+            nextPageToken=None,
+        ))
 
   def testDescribeCompletion(self):
     self.RunCompletion('sql instances describe ', ['backupless-instance'])

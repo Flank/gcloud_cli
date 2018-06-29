@@ -14,6 +14,8 @@
 
 """Test of the 'operations list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -88,7 +90,7 @@ class OperationsListUnitTest(unit_base.DataprocUnitTestBase):
         exception=self.MakeHttpError(403))
     with self.AssertRaisesHttpErrorMatchesAsHttpException(
         'Permission denied API reason: Permission denied.'):
-      self.RunDataproc('operations list').next()
+      next(self.RunDataproc('operations list'))
 
   def testListOperationsPagination(self):
     self.mock_client.projects_regions_operations.List.Expect(

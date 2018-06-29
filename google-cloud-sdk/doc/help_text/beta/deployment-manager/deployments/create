@@ -42,6 +42,11 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --preview
         Preview the requested create without actually instantiating the
         underlying resources. (default=False)

@@ -15,11 +15,13 @@
 """Module to parse .yaml files for an appengine app."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.app import env
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
+from googlecloudsdk.core.util import files
 from googlecloudsdk.third_party.appengine.api import appinfo
 from googlecloudsdk.third_party.appengine.api import appinfo_errors
 from googlecloudsdk.third_party.appengine.api import appinfo_includes
@@ -32,13 +34,18 @@ from googlecloudsdk.third_party.appengine.api import yaml_errors
 from googlecloudsdk.third_party.appengine.datastore import datastore_index
 
 
-HINT_PROJECT = ('Project name should instead be specified either by '
+HINT_PROJECT = ('This field is not used by gcloud and must be removed. '
+                'Project name should instead be specified either by '
                 '`gcloud config set project MY_PROJECT` or by setting the '
                 '`--project` flag on individual command executions.')
 
-HINT_VERSION = ('Versions are generated automatically by default but can also '
+HINT_VERSION = ('This field is not used by gcloud and must be removed. '
+                'Versions are generated automatically by default but can also '
                 'be manually specified by setting the `--version` flag on '
                 'individual command executions.')
+
+HINT_THREADSAFE = ('This field is not supported with runtime [{}] and can '
+                   'safely be removed.')
 
 MANAGED_VMS_DEPRECATION_WARNING = """\
 Deployments using `vm: true` have been deprecated.  Please update your \
@@ -141,7 +148,7 @@ class _YamlInfo(object):
     Returns:
       The result of the parse.
     """
-    with open(file_path, 'r') as fp:
+    with files.FileReader(file_path) as fp:
       return parser(fp)
 
 
@@ -192,9 +199,10 @@ class ConfigYamlInfo(_YamlInfo):
     Returns:
       A ConfigYamlInfo object for the parsed file.
     """
-    (base, _) = os.path.splitext(os.path.basename(file_path))
+    base, ext = os.path.splitext(os.path.basename(file_path))
     parser = (ConfigYamlInfo.CONFIG_YAML_PARSERS.get(base)
-              if os.path.isfile(file_path) else None)
+              if os.path.isfile(file_path) and ext.lower() in ['.yaml', '.yml']
+              else None)
     if not parser:
       return None
     try:
@@ -338,6 +346,14 @@ class ServiceYamlInfo(_YamlInfo):
         GetRuntimeConfigAttr(self.parsed, 'python_version') == '3.4'):
       log.warning(FLEX_PY34_WARNING)
 
+    if self.is_ti_runtime:
+      _CheckIllegalAttribute(
+          name='threadsafe',
+          yaml_info=self.parsed,
+          extractor_func=lambda yaml: yaml.threadsafe,
+          file_path=self.file,
+          msg=HINT_THREADSAFE.format(self.runtime))
+
     _CheckIllegalAttribute(
         name='application',
         yaml_info=self.parsed,
@@ -386,9 +402,8 @@ class ServiceYamlInfo(_YamlInfo):
     if getattr(parsed, 'skip_files', None) == appinfo.DEFAULT_SKIP_FILES:
       # Make sure that this was actually a default, not from the file.
       try:
-        with open(file_path, 'r') as readfile:
-          contents = readfile.read()
-      except IOError:  # If the class was initiated with a non-existent file
+        contents = files.ReadFileContents(file_path)
+      except files.Error:  # If the class was initiated with a non-existent file
         contents = ''
       self._has_explicit_skip_files = 'skip_files' in contents
     else:
@@ -455,5 +470,5 @@ def _CheckIllegalAttribute(name, yaml_info, extractor_func, file_path, msg=''):
   if attribute is not None:
     # Disallow use of the given attribute.
     raise YamlValidationError(
-        'The [{0}] field is specified in file [{1}]. This field is not used '
-        'by gcloud and must be removed. '.format(name, file_path) + msg)
+        'The [{0}] field is specified in file [{1}]. '.format(name, file_path)
+        + msg)

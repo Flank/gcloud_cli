@@ -60,15 +60,20 @@ supported): \fBencryption\fR.
 .RS 2m
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
-The containing keyring.
+Key ring of the key.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
 
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-The location of the requested resource.
+Location of the key.
 
 .TP 2m
 \fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR

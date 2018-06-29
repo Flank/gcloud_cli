@@ -14,6 +14,10 @@
 
 """The meta cache completers run command."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import sys
 
 from googlecloudsdk.calliope import arg_parsers
@@ -22,10 +26,13 @@ from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.command_lib.meta import cache_util
 from googlecloudsdk.command_lib.util import parameter_info_lib
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
+from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import module_util
 from googlecloudsdk.core.console import console_io
+
+import six
 
 
 class _FunctionCompleter(object):
@@ -52,7 +59,7 @@ def _GetPresentationSpec(resource_spec_path, **kwargs):
       o.split(':')[0]: o.split(':')[1] if ':' in o else ''
       for o in flag_name_overrides.split(';')}
   prefixes = kwargs.pop('prefixes', False)
-  return concept_parsers.ResourcePresentationSpec(
+  return presentation_specs.ResourcePresentationSpec(
       kwargs.pop('name', resource_spec.name),
       resource_spec,
       'help text',
@@ -70,7 +77,7 @@ def _GetCompleter(module_path, cache=None, qualify=None,
     presentation_spec = _GetPresentationSpec(resource_spec,
                                              **presentation_kwargs)
     completer = module_util.ImportModule(module_path)(
-        presentation_spec.resource_spec,
+        presentation_spec.concept_spec,
         attribute)
 
   else:
@@ -102,7 +109,8 @@ class AddCompleterResourceFlags(parser_extensions.DynamicPositionalAction):
     if namespace.resource_spec_path:
       spec = _GetPresentationSpec(namespace.resource_spec_path,
                                   **presentation_kwargs)
-      for arg in spec.GetAttributeArgs():
+      info = concept_parsers.ConceptParser([spec]).GetInfo(spec.name)
+      for arg in info.GetAttributeArgs():
         if arg.name.startswith('--'):
           arg.kwargs['required'] = False
         else:
@@ -237,7 +245,7 @@ class Run(base.Command):
             args.resource_spec_path,
             **presentation_kwargs)
         spec.required = False
-        resource_info = spec.GetInfo()
+        resource_info = concept_parsers.ConceptParser([spec]).GetInfo(spec.name)
         # Since the argument being completed doesn't have the correct
         # dest, make sure the handler always gives the same ResourceInfo
         # object.
@@ -267,9 +275,9 @@ class Run(base.Command):
           if args.stack_trace:
             exceptions.reraise(Exception(e))
           else:
-            log.error(unicode(e))
+            log.error(six.text_type(e))
           continue
         if completions:
-          print '\n'.join(completions)
+          print('\n'.join(completions))
       sys.stderr.write('\n')
       return None

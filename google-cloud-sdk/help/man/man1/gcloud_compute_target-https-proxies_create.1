@@ -11,7 +11,7 @@ gcloud compute target\-https\-proxies create \- create a target HTTPS proxy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute target\-https\-proxies create\fR \fINAME\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...] \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute target\-https\-proxies create\fR \fINAME\fR \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...] \fB\-\-url\-map\fR=\fIURL_MAP\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR;\ default="NONE"] [\fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,6 +67,26 @@ target HTTPS proxy.
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional, textual description for the target HTTPS proxy.
 
+.TP 2m
+\fB\-\-quic\-override\fR=\fIQUIC_OVERRIDE\fR; default="NONE"
+Controls whether load balancer may negotiate QUIC with clients. QUIC is a new
+transport which reduces latency compared to that of TCP. See
+https://www.chromium.org/quic for more details. \fIQUIC_OVERRIDE\fR must be one
+of:
+
+.RS 2m
+.TP 2m
+\fBDISABLE\fR
+Disallows load balancer to negotiate QUIC with clients.
+.TP 2m
+\fBENABLE\fR
+Allows load balancer to negotiate QUIC with clients.
+.TP 2m
+\fBNONE\fR
+Allows Google to control when QUIC is rolled out.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-ssl\-policy\fR=\fISSL_POLICY\fR
 A reference to an SSL policy resource that defines the server\-side support for

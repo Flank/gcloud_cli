@@ -18,6 +18,7 @@
 """Test suite for external runtime loaders."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import shutil
 import socket
@@ -136,7 +137,7 @@ class LoaderTests(sdk_test_base.SdkBase):
     # Verify that updating an existing repo works.  (We do a commit and then
     # update the latest tag to verify that both tags and objects get fetched).
     self._CommitFile(b'third contents', b'third commit')
-    self.repo['refs/tags/latest'] = self.repo['refs/heads/master']
+    self.repo[b'refs/tags/latest'] = self.repo[b'refs/heads/master']
     loader.InstallRuntimeDef(self._GetRepoUrl(), self.repo_clone)
     self.AssertFileExistsWithContents(b'third contents', self.repo_clone,
                                       'myfile')
@@ -207,7 +208,7 @@ class LoaderTests(sdk_test_base.SdkBase):
     self._MakeRepo()
     loader.InstallRuntimeDef(self._GetRepoUrl(), self.repo_clone)
     self._CommitFile(b'third contents', b'third commit')
-    self.repo['refs/tags/latest'] = self.repo['refs/heads/master']
+    self.repo[b'refs/tags/latest'] = self.repo[b'refs/heads/master']
 
     # Make the files in the target dir readonly.
     for dirpath, dirnames, filenames in os.walk(self.repo_clone):

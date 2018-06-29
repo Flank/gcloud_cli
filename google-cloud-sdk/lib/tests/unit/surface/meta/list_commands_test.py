@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for gcloud meta list-commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import walker
 from tests.lib import calliope_test_base
 

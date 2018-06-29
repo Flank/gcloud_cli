@@ -14,6 +14,8 @@
 
 """e2e tests for automatica enablement of disabled APIs."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.resource_manager import operations
 from googlecloudsdk.api_lib.services import enable_api as services_enable_api
@@ -43,7 +45,7 @@ class EnablementTest(e2e_base.WithServiceAuth):
 
   def SetUp(self):
     self.name_generator = e2e_utils.GetResourceNameGenerator('sdk-e2e')
-    project_name = self.name_generator.next()
+    project_name = next(self.name_generator)
     self.project_id = command_lib_util.IdFromName(project_name)
     self.project_ref = command_lib_util.ParseProject(self.project_id)
     create_op = projects_api.Create(
@@ -87,7 +89,7 @@ class EnablementTest(e2e_base.WithServiceAuth):
     service = 'compute.googleapis.com'
     self.assertFalse(services_enable_api.IsServiceEnabled(self.project_id,
                                                           service))
-    instance_name = self.name_generator.next()
+    instance_name = next(self.name_generator)
     self._Run(
         'compute instances create --zone=us-east1-d {}'.format(instance_name))
     self._Run('compute instances list')

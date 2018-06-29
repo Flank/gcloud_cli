@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for Spanner write util lib."""
+from __future__ import absolute_import
 from __future__ import unicode_literals
 from collections import OrderedDict
 import re
@@ -83,12 +84,12 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
         self._TableCreatedWithExpectedNamesAndPrimaryKeys(
             table, 'Singers', ['SingerId']))
     self.assertEqual(['SingerId', 'FirstName', 'LastName'],
-                     table._columns.keys())
+                     list(table._columns.keys()))
     self.assertEqual([
         self._GivenScalarColumn('SingerId', 'INT64'),
         self._GivenScalarColumn('FirstName', 'STRING'),
         self._GivenScalarColumn('LastName', 'STRING'),
-    ], table._columns.values())
+    ], list(table._columns.values()))
 
   def testTableCreationWithArrayColumn(self):
     database_ddl_songs = [
@@ -103,13 +104,13 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
         self._TableCreatedWithExpectedNamesAndPrimaryKeys(
             table, 'Songs', ['SingerId', 'AlbumName']))
     self.assertEqual(['SingerId', 'AlbumName', 'Genre', 'Modification'],
-                     table._columns.keys())
+                     list(table._columns.keys()))
     self.assertEqual([
         self._GivenScalarColumn('SingerId', 'INT64'),
         self._GivenScalarColumn('AlbumName', 'STRING'),
         self._GivenScalarColumn('Genre', 'BYTES'),
         self._GivenArrayColumn('Modification', 'BOOL'),
-    ], table._columns.values())
+    ], list(table._columns.values()))
 
   def testTableCreationWithBytesColumn(self):
     database_ddl_bytes = [
@@ -121,11 +122,11 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
     self.assertTrue(
         self._TableCreatedWithExpectedNamesAndPrimaryKeys(
             table, 'bytesTable', ['id']))
-    self.assertEqual(['id', 'name'], table._columns.keys())
+    self.assertEqual(['id', 'name'], list(table._columns.keys()))
     self.assertEqual([
         self._GivenScalarColumn('id', 'INT64'),
         self._GivenScalarColumn('name', 'BYTES'),
-    ], table._columns.values())
+    ], list(table._columns.values()))
 
   def testTableCreationFromComplicatedDdl(self):
     database_ddl_pk = [
@@ -139,14 +140,14 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
         self._TableCreatedWithExpectedNamesAndPrimaryKeys(
             table, 'pkTest', ['col1', 'col2', 'col3', 'col4']))
     self.assertEqual(['col1', 'col2', 'col3', 'col4', 'name'],
-                     table._columns.keys())
+                     list(table._columns.keys()))
     self.assertEqual([
         self._GivenScalarColumn('col1', 'BOOL'),
         self._GivenScalarColumn('col2', 'FLOAT64'),
         self._GivenScalarColumn('col3', 'STRING'),
         self._GivenScalarColumn('col4', 'TIMESTAMP'),
         self._GivenScalarColumn('name', 'STRING'),
-    ], table._columns.values())
+    ], list(table._columns.values()))
 
   def testTableCreationFromAnotherComplicatedDdl(self):
     database_ddl_events = [
@@ -160,14 +161,14 @@ class TableTest(base.SpannerTestBase, parameterized.TestCase):
         self._TableCreatedWithExpectedNamesAndPrimaryKeys(
             table, 'events', ['eventId', 'userId']))
     self.assertEqual(['eventId', 'userId', 'Name', 'Duration', 'date'],
-                     table._columns.keys())
+                     list(table._columns.keys()))
     self.assertEqual([
         self._GivenScalarColumn('eventId', 'STRING'),
         self._GivenScalarColumn('userId', 'INT64'),
         self._GivenScalarColumn('Name', 'STRING'),
         self._GivenScalarColumn('Duration', 'INT64'),
         self._GivenArrayColumn('date', 'TIMESTAMP'),
-    ], table._columns.values())
+    ], list(table._columns.values()))
 
   @parameterized.parameters('singers', 'songs', 'users', 'BytesTable', 'Event',
                             'PostsByUsername')

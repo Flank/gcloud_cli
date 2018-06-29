@@ -24,7 +24,7 @@ import mock
 class NodeTemplatesListTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
@@ -54,4 +54,3 @@ template-2  region-1  a cold template  n1-node-96-624  environment=prod       CR
 
 if __name__ == '__main__':
   test_case.main()
-

@@ -18,6 +18,7 @@ Based on the runtime and environment, this can entail generating a new
 """
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.app import env
@@ -46,6 +47,9 @@ _GCLOUDIGNORE_REGISTRY = {
         env.NODE_TI_RUNTIME_EXPR, {env.STANDARD}): _NODE_GCLOUDIGNORE,
     runtime_registry.RegistryEntry(
         env.PHP_TI_RUNTIME_EXPR, {env.STANDARD}): _PHP_GCLOUDIGNORE,
+    runtime_registry.RegistryEntry(
+        env.PYTHON_TI_RUNTIME_EXPR, {env.STANDARD}):
+    gcloudignore.DEFAULT_IGNORE_FILE,
 }
 
 

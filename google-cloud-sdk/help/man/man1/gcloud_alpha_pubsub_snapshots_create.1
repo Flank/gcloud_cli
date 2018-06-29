@@ -58,6 +58,11 @@ to the subscription's topic following the successful creation of the snapshot.
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
 
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
 .TP 2m
 \fB\-\-subscription\-project\fR=\fISUBSCRIPTION_PROJECT\fR
 The name of the project the provided subscription belongs to. If not set, it

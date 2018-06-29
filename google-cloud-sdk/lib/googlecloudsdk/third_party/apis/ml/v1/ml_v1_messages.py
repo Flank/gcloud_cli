@@ -93,10 +93,12 @@ class GoogleCloudMlV1AcceleratorConfig(_messages.Message):
         no GPU.
       NVIDIA_TESLA_K80: Nvidia tesla k80 GPU.
       NVIDIA_TESLA_P100: Nvidia tesla P100 GPU.
+      NVIDIA_TESLA_V100: Nvidia tesla V100 GPU.
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
     NVIDIA_TESLA_P100 = 2
+    NVIDIA_TESLA_V100 = 3
 
   count = _messages.IntegerField(1)
   type = _messages.EnumField('TypeValueValuesEnum', 2)
@@ -108,18 +110,24 @@ class GoogleCloudMlV1AutoScaling(_messages.Message):
   Fields:
     minNodes: Optional. The minimum number of nodes to allocate for this
       model. These nodes are always up, starting from the time the model is
-      deployed, so the cost of operating this model will be at least `rate` *
-      `min_nodes` * number of hours since last billing cycle, where `rate` is
-      the cost per node-hour as documented in the [pricing guide](/ml-
-      engine/docs/pricing), even if no predictions are performed. There is
-      additional cost for each prediction performed.  Unlike manual scaling,
-      if the load gets too heavy for the nodes that are up, the service will
-      automatically add nodes to handle the increased load as well as scale
-      back as traffic drops, always maintaining at least `min_nodes`. You will
-      be charged for the time in which additional nodes are used.  If not
-      specified, `min_nodes` defaults to 0, in which case, when traffic to a
-      model stops (and after a cool-down period), nodes will be shut down and
-      no charges will be incurred until traffic to the model resumes.
+      deployed. Therefore, the cost of operating this model will be at least
+      `rate` * `min_nodes` * number of hours since last billing cycle, where
+      `rate` is the cost per node-hour as documented in the [pricing guide
+      ](/ml-engine/docs/pricing), even if no predictions are performed. There
+      is additional cost for each prediction performed.  Unlike manual
+      scaling, if the load gets too heavy for the nodes that are up, the
+      service will automatically add nodes to handle the increased load as
+      well as scale back as traffic drops, always maintaining at least
+      `min_nodes`. You will be charged for the time in which additional nodes
+      are used.  If not specified, `min_nodes` defaults to 0, in which case,
+      when traffic to a model stops (and after a cool-down period), nodes will
+      be shut down and no charges will be incurred until traffic to the model
+      resumes.  You can set `min_nodes` when creating the model version, and
+      you can also update `min_nodes` for an existing version: <pre>
+      update_body.json: {   'autoScaling': {     'minNodes': 5   } } </pre>
+      HTTP request: <pre> PATCH https://ml.googleapis.com/v1/{name=projects/*/
+      models/*/versions/*}?update_mask=autoScaling.minNodes -d
+      @./update_body.json </pre>
   """
 
   minNodes = _messages.IntegerField(1, variant=_messages.Variant.INT32)
@@ -148,10 +156,12 @@ class GoogleCloudMlV1Capability(_messages.Message):
       ACCELERATOR_TYPE_UNSPECIFIED: <no description>
       NVIDIA_TESLA_K80: <no description>
       NVIDIA_TESLA_P100: <no description>
+      NVIDIA_TESLA_V100: <no description>
     """
     ACCELERATOR_TYPE_UNSPECIFIED = 0
     NVIDIA_TESLA_K80 = 1
     NVIDIA_TESLA_P100 = 2
+    NVIDIA_TESLA_V100 = 3
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""TypeValueValuesEnum enum type.
@@ -779,6 +789,8 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
 
   Enums:
     DataFormatValueValuesEnum: Required. The format of the input data files.
+    OutputDataFormatValueValuesEnum: Optional. Format of the output data
+      files, defaults to JSON.
 
   Fields:
     accelerator: Optional. The type and number of accelerators to be attached
@@ -796,6 +808,8 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
     modelName: Use this field if you want to use the default version for the
       specified model. The string must use the following format:
       `"projects/YOUR_PROJECT/models/YOUR_MODEL"`
+    outputDataFormat: Optional. Format of the output data files, defaults to
+      JSON.
     outputPath: Required. The output Google Cloud Storage location.
     region: Required. The Google Compute Engine region to run the prediction
       job in. See the <a href="/ml-engine/docs/tensorflow/regions">available
@@ -830,12 +844,36 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
       TF_RECORD: INPUT ONLY. The source file is a TFRecord file.
       TF_RECORD_GZIP: INPUT ONLY. The source file is a GZIP-compressed
         TFRecord file.
+      CSV: OUTPUT ONLY. Output values will be in comma-separated rows, with
+        keys in a separate file.
     """
     DATA_FORMAT_UNSPECIFIED = 0
     JSON = 1
     TEXT = 2
     TF_RECORD = 3
     TF_RECORD_GZIP = 4
+    CSV = 5
+
+  class OutputDataFormatValueValuesEnum(_messages.Enum):
+    r"""Optional. Format of the output data files, defaults to JSON.
+
+    Values:
+      DATA_FORMAT_UNSPECIFIED: Unspecified format.
+      JSON: Each line of the file is a JSON dictionary representing one
+        record.
+      TEXT: Deprecated. Use JSON instead.
+      TF_RECORD: INPUT ONLY. The source file is a TFRecord file.
+      TF_RECORD_GZIP: INPUT ONLY. The source file is a GZIP-compressed
+        TFRecord file.
+      CSV: OUTPUT ONLY. Output values will be in comma-separated rows, with
+        keys in a separate file.
+    """
+    DATA_FORMAT_UNSPECIFIED = 0
+    JSON = 1
+    TEXT = 2
+    TF_RECORD = 3
+    TF_RECORD_GZIP = 4
+    CSV = 5
 
   accelerator = _messages.MessageField('GoogleCloudMlV1AcceleratorConfig', 1)
   batchSize = _messages.IntegerField(2)
@@ -843,12 +881,13 @@ class GoogleCloudMlV1PredictionInput(_messages.Message):
   inputPaths = _messages.StringField(4, repeated=True)
   maxWorkerCount = _messages.IntegerField(5)
   modelName = _messages.StringField(6)
-  outputPath = _messages.StringField(7)
-  region = _messages.StringField(8)
-  runtimeVersion = _messages.StringField(9)
-  signatureName = _messages.StringField(10)
-  uri = _messages.StringField(11)
-  versionName = _messages.StringField(12)
+  outputDataFormat = _messages.EnumField('OutputDataFormatValueValuesEnum', 7)
+  outputPath = _messages.StringField(8)
+  region = _messages.StringField(9)
+  runtimeVersion = _messages.StringField(10)
+  signatureName = _messages.StringField(11)
+  uri = _messages.StringField(12)
+  versionName = _messages.StringField(13)
 
 
 class GoogleCloudMlV1PredictionOutput(_messages.Message):
@@ -902,33 +941,28 @@ class GoogleCloudMlV1TrainingInput(_messages.Message):
       workers of the cluster when your   model requires more computation than
       the standard machine can handle   satisfactorily.   </dd>
       <dt>complex_model_m</dt>   <dd>   A machine with roughly twice the
-      number of cores and roughly double the   memory of <code
-      suppresswarning="true">complex_model_s</code>.   </dd>
-      <dt>complex_model_l</dt>   <dd>   A machine with roughly twice the
-      number of cores and roughly double the   memory of <code
-      suppresswarning="true">complex_model_m</code>.   </dd>
-      <dt>standard_gpu</dt>   <dd>   A machine equivalent to <code
-      suppresswarning="true">standard</code> that   also includes a single
+      number of cores and roughly double the   memory of
+      <i>complex_model_s</i>.   </dd>   <dt>complex_model_l</dt>   <dd>   A
+      machine with roughly twice the number of cores and roughly double the
+      memory of <i>complex_model_m</i>.   </dd>   <dt>standard_gpu</dt>   <dd>
+      A machine equivalent to <i>standard</i> that   also includes a single
       NVIDIA Tesla K80 GPU. See more about   <a href="/ml-
       engine/docs/tensorflow/using-gpus">using GPUs to   train your model</a>.
       </dd>   <dt>complex_model_m_gpu</dt>   <dd>   A machine equivalent to
-      <code suppresswarning="true">complex_model_m</code> that also includes
-      four NVIDIA Tesla K80 GPUs.   </dd>   <dt>complex_model_l_gpu</dt>
-      <dd>   A machine equivalent to   <code
-      suppresswarning="true">complex_model_l</code> that also includes   eight
-      NVIDIA Tesla K80 GPUs.   </dd>   <dt>standard_p100</dt>   <dd>   A
-      machine equivalent to <code suppresswarning="true">standard</code> that
-      also includes a single NVIDIA Tesla P100 GPU. The availability of these
-      GPUs is in the Beta launch stage.   </dd>
-      <dt>complex_model_m_p100</dt>   <dd>   A machine equivalent to   <code
-      suppresswarning="true">complex_model_m</code> that also includes   four
-      NVIDIA Tesla P100 GPUs. The availability of these GPUs is in   the Beta
-      launch stage.   </dd>   <dt>standard_tpu</dt>   <dd>   A TPU VM
-      including one Cloud TPU. The availability of Cloud TPU is in
-      <i>Beta</i> launch stage. See more about   <a href="/ml-
-      engine/docs/tensorflow/using-tpus">using TPUs to train   your model</a>.
-      </dd> </dl>  You must set this value when `scaleTier` is set to
-      `CUSTOM`.
+      <i>complex_model_m</i> that also includes   four NVIDIA Tesla K80 GPUs.
+      </dd>   <dt>complex_model_l_gpu</dt>   <dd>   A machine equivalent to
+      <i>complex_model_l</i> that also includes   eight NVIDIA Tesla K80 GPUs.
+      </dd>   <dt>standard_p100</dt>   <dd>   A machine equivalent to
+      <i>standard</i> that   also includes a single NVIDIA Tesla P100 GPU. The
+      availability of these   GPUs is in the <i>Beta</i> launch stage.   </dd>
+      <dt>complex_model_m_p100</dt>   <dd>   A machine equivalent to
+      <i>complex_model_m</i> that also includes   four NVIDIA Tesla P100 GPUs.
+      The availability of these GPUs is in   the <i>Beta</i> launch stage.
+      </dd>   <dt>cloud_tpu</dt>   <dd>   A TPU VM including one Cloud TPU.
+      The availability of Cloud TPU is in   <i>Beta</i> launch stage. See more
+      about   <a href="/ml-engine/docs/tensorflow/using-tpus">using TPUs to
+      train   your model</a>.   </dd> </dl>  You must set this value when
+      `scaleTier` is set to `CUSTOM`.
     packageUris: Required. The Google Cloud Storage location of the packages
       with the training program and any additional dependencies. The maximum
       number of package URIs is 100.
@@ -1107,9 +1141,13 @@ class GoogleCloudMlV1Version(_messages.Message):
     lastUseTime: Output only. The time the version was last used for
       prediction.
     machineType: Optional. The type of machine on which to serve the model.
-      The following are currently supported:   mls1-highmem-1    1 core    2
-      Gb RAM   mls1-highcpu-4    4 core    2 Gb RAM If not set, mls1-highmem-1
-      is used. Currently only applies to online prediction.
+      Currently only applies to online prediction service. Naming design doc
+      for CMLE online prediction Machine Types: https://docs.google.com/docume
+      nt/d/1V3tko3VJ64PcpsmNxCXiPoPGccL9_K8gX1YjC8UofzQ/edit#heading=h.7lvy6ow
+      fx4eh. The following are currently supported and will be deprecated in
+      Beta release.   mls1-highmem-1    1 core    2 Gb RAM   mls1-highcpu-4
+      4 core    2 Gb RAM The following are available in Beta:   mls1-c1-m2
+      1 core    2 Gb RAM   Default   mls1-c4-m2        1 core    4 Gb RAM
     manualScaling: Manually select the number of nodes to use for serving the
       model. You should generally use `auto_scaling` with an appropriate
       `min_nodes` instead, but this option is available if you want more
@@ -1135,10 +1173,10 @@ class GoogleCloudMlV1Version(_messages.Message):
     the runtime version of the model to 1.4 or greater.
 
     Values:
-      FRAMEWORK_UNSPECIFIED: <no description>
-      TENSORFLOW: <no description>
-      SCIKIT_LEARN: <no description>
-      XGBOOST: <no description>
+      FRAMEWORK_UNSPECIFIED: Unspecified framework. Defaults to TensorFlow.
+      TENSORFLOW: Tensorflow framework.
+      SCIKIT_LEARN: Scikit-learn framework.
+      XGBOOST: XGBoost framework.
     """
     FRAMEWORK_UNSPECIFIED = 0
     TENSORFLOW = 1
@@ -2057,14 +2095,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -2100,17 +2136,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 encoding.AddCustomJsonFieldMapping(

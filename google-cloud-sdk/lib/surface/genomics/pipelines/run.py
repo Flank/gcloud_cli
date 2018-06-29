@@ -14,6 +14,8 @@
 
 """Implementation of gcloud genomics pipelines run.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib import genomics as lib
 from googlecloudsdk.api_lib.genomics import exceptions
 from googlecloudsdk.api_lib.genomics import genomics_util
@@ -23,6 +25,7 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
+import six
 
 CLOUD_SDK_IMAGE = 'google/cloud-sdk:alpine'
 SHARED_DISK = 'gcloud-shared'
@@ -71,8 +74,8 @@ def _ValidateAndMergeArgInputs(args):
     arg_inputs.update(args.inputs)
 
   # Read up the inputs-from-file and add the values from the file
-  for key, value in args.inputs_from_file.iteritems():
-    arg_inputs[key] = files.GetFileContents(value)
+  for key, value in six.iteritems(args.inputs_from_file):
+    arg_inputs[key] = files.ReadFileContents(value)
 
   return arg_inputs
 
@@ -282,8 +285,9 @@ https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_regio
     genomics_messages = genomics_util.GetGenomicsMessages('v1alpha2')
     if args.pipeline_file:
       if args.command_line:
+        # TODO(b/79982664): Use a mutex argument group instead.
         raise exceptions.GenomicsError(
-            '--command_line cannot be used with --pipeline-file.')
+            '--command-line cannot be used with --pipeline-file.')
 
       pipeline = genomics_util.GetFileAsMessage(
           args.pipeline_file,
@@ -310,7 +314,7 @@ https://cloud.google.com/compute/docs/gcloud-compute/#set_default_zone_and_regio
               entrypoint='bash')])
     else:
       raise exceptions.GenomicsError(
-          'Either --pipeline-file or --command_line is required.')
+          'Either --pipeline-file or --command-line is required.')
 
     arg_inputs = _ValidateAndMergeArgInputs(args)
 

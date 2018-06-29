@@ -49,6 +49,11 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --zsk-algorithm=ZSK_ALGORITHM
         String mnemonic specifying the DNSSEC algorithm of the zone-signing
         key. Requires DNSSEC enabled. Example algorithms: RSASHA1, RSASHA256,

@@ -15,7 +15,7 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      [-- JOB_ARGS ...]
-        The arguments to pass to the driver.
+        Arguments to pass to the driver.
 
         The '--' argument must be specified between gcloud specific args on the
         left and JOB_ARGS on the right.
@@ -46,7 +46,7 @@ OPTIONAL FLAGS
         configured bucket.
 
      --driver-log-levels=[PACKAGE=LEVEL,...]
-        A list of package to log4j log level pairs to configure driver logging.
+        List of package to log4j log level pairs to configure driver logging.
         For example: root=FATAL,com.example=INFO
 
      --files=[FILE,...]
@@ -59,13 +59,22 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --max-failures-per-hour=MAX_FAILURES_PER_HOUR
         Specifies maximum number of times a job can be restarted in event of
         failure. Expressed as a per-hour rate. Default is 0 (no failure
         retries).
 
      --properties=[PROPERTY=VALUE,...]
-        A list of key value pairs to configure Spark.
+        List of key value pairs to configure Spark. For a list of available
+        properties, see:
+        https://spark.apache.org/docs/latest/configuration.html#available-properties.
+        Alternatively, to see examples of how to use the properties flag, see:
+        https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties#how_the_properties_flag_works
 
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an

@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests that ensure deserialization of server responses work properly."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core.console import console_io
@@ -26,7 +29,7 @@ class UpdateTest(unit_test_base.BaseTest):
     self.role_from_file = self.msgs.Role(
         description='Access to view GCP projects.',
         title='Viewer',
-        etag='\x00',
+        etag=b'\x00',
         stage=iam_util.StageTypeFromString('alpha'),
         includedPermissions=[
             'resourcemanager.projects.get',
@@ -42,8 +45,8 @@ class UpdateTest(unit_test_base.BaseTest):
         ],)
     self.origin_role2 = self.msgs.Role(
         name='organizations/123/roles/viewer',
-        description=u'A custom role.',
-        title=u'Custom Project Creator',
+        description='A custom role.',
+        title='Custom Project Creator',
         stage=iam_util.StageTypeFromString('beta'),
         includedPermissions=['resourcemanager.projects.get'],)
     self.updated_role = self.msgs.Role(
@@ -53,22 +56,22 @@ class UpdateTest(unit_test_base.BaseTest):
         includedPermissions=['resourcemanager.projects.create'],)
     self.res_role1 = self.msgs.Role(
         name='organizations/123/roles/viewer',
-        description=u'Access to view GCP projects.',
-        title=u'Viewer',
+        description='Access to view GCP projects.',
+        title='Viewer',
         includedPermissions=[
-            u'resourcemanager.projects.get',
+            'resourcemanager.projects.get',
             'resourcemanager.projects.list',
         ],)
     self.res_role2 = self.msgs.Role(
         name='organizations/123/roles/viewer',
-        description=u'A custom role.',
-        title=u'Custom Project Creator',
+        description='A custom role.',
+        title='Custom Project Creator',
         stage=iam_util.StageTypeFromString('beta'),
         includedPermissions=['resourcemanager.projects.create'],)
     self.role_no_permissions = self.msgs.Role(
         name='organizations/123/roles/viewer',
-        description=u'Access to view GCP projects.',
-        title=u'Viewer',
+        description='Access to view GCP projects.',
+        title='Viewer',
         stage=iam_util.StageTypeFromString('alpha'),)
 
   def testUpdateRoleWithFile(self):
@@ -76,13 +79,15 @@ class UpdateTest(unit_test_base.BaseTest):
         request=self.msgs.IamOrganizationsRolesPatchRequest(
             name='organizations/123/roles/viewer', role=self.role_from_file),
         response=self.res_role1)
-    in_file = self.MockFileRead('title: "Viewer"\n'
-                                'etag: "AA=="\n'
-                                'description: "Access to view GCP projects."\n'
-                                'stage: "alpha"\n'
-                                'includedPermissions:\n'
-                                '- resourcemanager.projects.get\n'
-                                '- resourcemanager.projects.list')
+    in_file = self.Touch(
+        self.temp_path,
+        contents='title: "Viewer"\n'
+                 'etag: "AA=="\n'
+                 'description: "Access to view GCP projects."\n'
+                 'stage: "alpha"\n'
+                 'includedPermissions:\n'
+                 '- resourcemanager.projects.get\n'
+                 '- resourcemanager.projects.list')
     result = self.Run(
         'iam roles update viewer --organization 123 --file={0} --quiet'.
         format(in_file))
@@ -276,13 +281,15 @@ class UpdateTest(unit_test_base.BaseTest):
         request=self.msgs.IamOrganizationsRolesPatchRequest(
             name='organizations/123/roles/viewer', role=self.role_from_file),
         exception=self.MockHttpError(409, 'Conflict'))
-    in_file = self.MockFileRead('title: "Viewer"\n'
-                                'etag: "AA=="\n'
-                                'description: "Access to view GCP projects."\n'
-                                'stage: "alpha"\n'
-                                'includedPermissions:\n'
-                                '- resourcemanager.projects.get\n'
-                                '- resourcemanager.projects.list')
+    in_file = self.Touch(
+        self.temp_path,
+        contents='title: "Viewer"\n'
+                 'etag: "AA=="\n'
+                 'description: "Access to view GCP projects."\n'
+                 'stage: "alpha"\n'
+                 'includedPermissions:\n'
+                 '- resourcemanager.projects.get\n'
+                 '- resourcemanager.projects.list')
     with self.assertRaises(exceptions.HttpException):
       self.Run(
           'iam roles update viewer --organization 123 --file={0} --quiet'
@@ -305,10 +312,11 @@ class UpdateTest(unit_test_base.BaseTest):
     self.assertEqual(result, self.role_no_permissions)
 
   def testUpdateErrors(self):
-    in_file = self.MockFileRead(
-        'title: "Viewer"\n'
-        'description: "Access to delete GCP projects."\n'
-        'stage: "alpha"')
+    in_file = self.Touch(
+        self.temp_path,
+        contents='title: "Viewer"\n'
+                 'description: "Access to delete GCP projects."\n'
+                 'stage: "alpha"')
     with self.assertRaises(exceptions.RequiredArgumentException):
       self.Run('iam roles update viewer')
 

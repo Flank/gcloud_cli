@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.firebase.test import arg_file
@@ -63,21 +65,21 @@ class IosArgFileTests(unit_base.IosUnitTestBase):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-robo')
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       PrepareIosArgs(args)
-    self.assertIn("'robo' is not a valid test type.", unicode(e.exception))
+    self.assertIn("'robo' is not a valid test type.", str(e.exception))
 
   def testType_IntIsInvalid(self):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-int')
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       PrepareIosArgs(args)
-    self.assertIn('Invalid value for [type]:', unicode(e.exception))
-    self.assertIn("'42' is not a valid test type.", unicode(e.exception))
+    self.assertIn('Invalid value for [type]:', str(e.exception))
+    self.assertIn("'42' is not a valid test type.", str(e.exception))
 
   def testType_BoolIsInvalid(self):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-bool')
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       PrepareIosArgs(args)
-    self.assertIn('Invalid value for [type]:', unicode(e.exception))
-    self.assertIn("'True' is not a valid test type.", unicode(e.exception))
+    self.assertIn('Invalid value for [type]:', str(e.exception))
+    self.assertIn("'True' is not a valid test type.", str(e.exception))
 
   # Tests for --device arg
 
@@ -117,22 +119,22 @@ class IosArgFileTests(unit_base.IosUnitTestBase):
   def testDevice_InvalidSparseMatrix_1(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse1', self.ios_args_set)
-    self.assertIn('Invalid value for [device]:', unicode(e.exception))
+    self.assertIn('Invalid value for [device]:', str(e.exception))
 
   def testDevice_InvalidSparseMatrix_2(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse2', self.ios_args_set)
-    self.assertIn('Invalid value for [device]:', unicode(e.exception))
+    self.assertIn('Invalid value for [device]:', str(e.exception))
 
   def testDevice_InvalidSparseMatrix_3(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse3', self.ios_args_set)
-    self.assertIn('Invalid value for [model]:', unicode(e.exception))
+    self.assertIn('Invalid value for [model]:', str(e.exception))
 
   def testDevice_InvalidSparseMatrix_4(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse4', self.ios_args_set)
-    self.assertIn('Invalid value for [model]:', unicode(e.exception))
+    self.assertIn('Invalid value for [model]:', str(e.exception))
 
 
 def PrepareIosArgs(args):

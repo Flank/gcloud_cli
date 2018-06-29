@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for common App Engine flags."""
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import string
 
 from googlecloudsdk.calliope import arg_parsers

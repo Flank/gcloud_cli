@@ -33,10 +33,15 @@ FLAGS
      Notification channel settings
 
        --channel-labels=[KEY=VALUE,...]
-          A list of label KEY=VALUE pairs to add.These are configuration fields
-          that define the channel and its behavior. If the channel was given as
-          a JSON/YAML object from a string or file, this flag will replace the
-          labels value in the given channel.
+          A list of label KEY=VALUE pairs to add.
+
+          Keys must start with a lowercase character and contain only hyphens
+          (-), underscores (_), lowercase characters, and numbers.
+
+          These are configuration fields that define the channel and its
+          behavior.If the channel was given as a JSON/YAML object from a string
+          or file, this flag will replace the labels value in the given
+          channel.
 
        --description=DESCRIPTION
           An optional description for the channel.
@@ -53,9 +58,15 @@ FLAGS
           the NotificationChannelDescriptor type field.
 
        --user-labels=[KEY=VALUE,...]
-          A list of label KEY=VALUE pairs to add. If the channel was given as a
-          JSON/YAML object from a string or file, this flag will replace the
-          labels value in the given channel.
+          A list of label KEY=VALUE pairs to add.
+
+          Keys must start with a lowercase character and contain only hyphens
+          (-), underscores (_), lowercase characters, and numbers. Values must
+          contain only hyphens (-), underscores (_), lowercase characters, and
+          numbers.
+
+          If the channel was given as a JSON/YAML object from a string or file,
+          this flag will replace the labels value in the given channel.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

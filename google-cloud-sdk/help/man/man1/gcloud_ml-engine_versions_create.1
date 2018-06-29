@@ -11,7 +11,7 @@ gcloud ml\-engine versions create \- create a new Cloud ML Engine version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -89,8 +89,19 @@ arguments, the command line arguments override the configuration file.
 The description of the version.
 
 .TP 2m
+\fB\-\-framework\fR=\fIFRAMEWORK\fR
+The ML framework used to train this version of the model. If not specified,
+defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
+\fBscikit\-learn\fR, \fBtensorflow\fR, \fBxgboost\fR.
+
+.TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 \fB\-\-origin\fR=\fIORIGIN\fR

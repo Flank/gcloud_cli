@@ -2,8 +2,9 @@ NAME
     gcloud alpha kms keys create - create a new key
 
 SYNOPSIS
-    gcloud alpha kms keys create KEY --purpose=PURPOSE
-        [--labels=[KEY=VALUE,...]] [--next-rotation-time=NEXT_ROTATION_TIME]
+    gcloud alpha kms keys create KEY --purpose=PURPOSE [--keyring=KEYRING]
+        [--labels=[KEY=VALUE,...]] [--location=LOCATION]
+        [--next-rotation-time=NEXT_ROTATION_TIME]
         [--rotation-period=ROTATION_PERIOD] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -30,8 +31,19 @@ REQUIRED FLAGS
         supported): encryption.
 
 OPTIONAL FLAGS
+     --keyring=KEYRING
+        Key ring of the key.
+
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --location=LOCATION
+        Location of the key.
 
      --next-rotation-time=NEXT_ROTATION_TIME
         Next automatic rotation time of the key. See $ gcloud topic datetimes

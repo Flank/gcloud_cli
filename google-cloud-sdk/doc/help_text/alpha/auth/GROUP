@@ -29,7 +29,7 @@ COMMANDS
         account.
 
      configure-docker
-        (ALPHA) Registers gcloud as a Docker credential helper.
+        (ALPHA) Register gcloud as a Docker credential helper.
 
      list
         (ALPHA) Lists credentialed accounts.

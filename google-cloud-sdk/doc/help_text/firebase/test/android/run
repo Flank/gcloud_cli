@@ -12,7 +12,9 @@ SYNOPSIS
         [--record-video] [--results-bucket=RESULTS_BUCKET]
         [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME]
-        [--test-package=TEST_PACKAGE] [--test-runner-class=TEST_RUNNER_CLASS]
+        [--scenario-labels=LABEL,[LABEL,...]]
+        [--scenario-numbers=int,[int,...]] [--test-package=TEST_PACKAGE]
+        [--test-runner-class=TEST_RUNNER_CLASS]
         [--test-targets=TEST_TARGET,[TEST_TARGET,...]] [--use-orchestrator]
         [--app-initial-activity=APP_INITIAL_ACTIVITY] [--max-depth=int]
         [--max-steps=int] [--robo-directives=[TYPE:RESOURCE_NAME=INPUT,...]]
@@ -28,7 +30,7 @@ DESCRIPTION
     gcloud firebase test android run invokes and monitors tests in Firebase
     Test Lab for Android.
 
-    Two main types of tests are currently supported:
+    Three main types of Android tests are currently supported:
       o robo: runs a smart, automated exploration of the activities in your
         Android app which records any installation failures or crashes and
         builds an activity map with associated screenshots and video.
@@ -36,11 +38,18 @@ DESCRIPTION
         using a testing framework. Firebase Test Lab for Android currently
         supports the Espresso, Robotium and UI Automator 2.0 testing
         frameworks.
+      o game-loop: executes a special intent built into the game app (a "demo
+        mode") that simulates the actions of a real player. This test type can
+        include multiple game loops (also called "scenarios"), which can be
+        logically organized using scenario labels so that you can run related
+        loops together. Refer to
+        https://firebase.google.com/docs/test-lab/android/game-loop for more
+        information about how to build and run Game Loop tests.
 
     The type of test to run can be specified with the --type flag, although the
     type can often be inferred from other flags. Specifically, if the --test
-    flag is present, the test --type will default to instrumentation. If --test
-    is not present, then --type defaults to robo.
+    flag is present, the test --type defaults to instrumentation. If --test is
+    not present, then --type defaults to robo.
 
     All arguments for gcloud firebase test android run may be specified on the
     command line and/or within an argument file. Run $ gcloud topic arg-files
@@ -94,7 +103,8 @@ COMMONLY USED FLAGS
         * --timeout 100 is 100 seconds
 
      --type=TYPE
-        The type of test to run. TYPE must be one of: instrumentation, robo.
+        The type of test to run. TYPE must be one of: instrumentation, robo,
+        game-loop.
 
 FLAGS
      --app-package=APP_PACKAGE
@@ -162,6 +172,23 @@ FLAGS
         which use the same history name will have their results grouped
         together in the Firebase console in a time-ordered test history list.
 
+ANDROID GAME-LOOP TEST FLAGS
+     --scenario-labels=LABEL,[LABEL,...]
+        A list of game-loop scenario labels (default: None). Each game-loop
+        scenario may be labeled in the APK manifest file with one or more
+        arbitrary strings, creating logical groupings (e.g.
+        GPU_COMPATIBILITY_TESTS). If --scenario-numbers and --scenario-labels
+        are specified together, Firebase Test Lab will first execute each
+        scenario from --scenario-numbers. It will then expand each given
+        scenario label into a list of scenario numbers marked with that label,
+        and execute those scenarios.
+
+     --scenario-numbers=int,[int,...]
+        A list of game-loop scenario numbers which will be run as part of the
+        test (default: all scenarios). A maximum of 1024 scenarios may be
+        specified in one test matrix, but the maximum number may also be
+        limited by the overall test --timeout setting.
+
 ANDROID INSTRUMENTATION TEST FLAGS
      --test-package=TEST_PACKAGE
         The Java package name of the instrumentation test (default: extracted
@@ -189,16 +216,29 @@ ANDROID INSTRUMENTATION TEST FLAGS
 
 ANDROID ROBO TEST FLAGS
      --app-initial-activity=APP_INITIAL_ACTIVITY
-        The initial activity used to start the app during a robo test.
+        (DEPRECATED) The initial activity used to start the app during a Robo
+        test.
+
+        The --app-initial-activity flag is deprecated and no longer has any
+        effect on the Robo crawler. Alternatively, the --robo-script flag (in
+        beta) can be used to guide Robo to a specific part of your app before
+        the Robo test begins.
 
      --max-depth=int
-        The maximum depth of the traversal stack a robo test can explore. Needs
-        to be at least 2 to make Robo explore the app beyond the first activity
-        (default: 50).
+        (DEPRECATED) The maximum depth of the traversal stack a Robo test can
+        explore. Needs to be at least 2 to make Robo explore the app beyond the
+        first activity (default: 50).
+
+        The --max-depth flag is deprecated and no longer has any effect on the
+        actions of the Robo crawler.
 
      --max-steps=int
-        The maximum number of steps/actions a robo test can execute (default:
-        no limit).
+        (DEPRECATED) The maximum number of steps/actions a Robo test can
+        execute (default: no limit).
+
+        The --max-steps flag is deprecated and no longer has any effect on the
+        Robo crawler. The --timeout flag may be optionally used to limit the
+        maximum length of a Robo test.
 
      --robo-directives=[TYPE:RESOURCE_NAME=INPUT,...]
         A comma-separated (<type>:<key>=<value>) map of robo_directives that

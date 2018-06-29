@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.api_lib.firebase.test import arg_util
@@ -21,6 +23,7 @@ from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import fake_args
 from tests.lib.surface.firebase.test import unit_base
+import six
 
 
 class ArgUtilTests(unit_base.TestMockClientTest):
@@ -31,11 +34,11 @@ class ArgUtilTests(unit_base.TestMockClientTest):
   def testGetSetOfAllTestArgs_OnTestRules(self):
     all_args = arg_util.GetSetOfAllTestArgs(fake_args.TypedArgRules(),
                                             fake_args.SharedArgRules())
-    self.assertItemsEqual(fake_args.AllArgsSet(), all_args)
+    self.assertEquals(fake_args.AllArgsSet(), all_args)
 
   def testArgNamesInRulesAreInternalNames(self):
     # Verify that ArgRules use internal arg names with underscores, not hyphens
-    for arg_rules in fake_args.TypedArgRules().itervalues():
+    for arg_rules in six.itervalues(fake_args.TypedArgRules()):
       self.CheckArgNamesForHyphens(arg_rules)
     self.CheckArgNamesForHyphens(fake_args.SharedArgRules())
 
@@ -54,7 +57,7 @@ class ArgUtilTests(unit_base.TestMockClientTest):
       arg_mgr.GetTestTypeOrRaise(args)
     ex = e.exception
     self.assertEqual(ex.parameter_name, 'type')
-    self.assertIn("'psych-test' is not a valid test type", ex.message)
+    self.assertIn("'psych-test' is not a valid test type", six.text_type(ex))
 
   # Tests for applying default args
 

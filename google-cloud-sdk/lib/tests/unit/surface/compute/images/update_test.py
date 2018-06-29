@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for images update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute import images_labels_test_base
@@ -38,7 +40,7 @@ class UpdateLabelsTestBeta(images_labels_test_base.ImagesLabelsTestBase):
         ('key2', 'update2'), ('key3', 'value3'), ('key4', 'value4'))
 
     image = self._MakeImageProto(
-        image_ref, labels=image_labels, fingerprint='fingerprint-42')
+        image_ref, labels=image_labels, fingerprint=b'fingerprint-42')
     updated_image = self._MakeImageProto(
         image_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1')
@@ -46,7 +48,7 @@ class UpdateLabelsTestBeta(images_labels_test_base.ImagesLabelsTestBase):
 
     self._ExpectGetRequest(image_ref, image)
     self._ExpectLabelsSetRequest(
-        image_ref, edited_labels, 'fingerprint-42', operation)
+        image_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(image_ref, updated_image)
 
@@ -67,7 +69,7 @@ class UpdateLabelsTestBeta(images_labels_test_base.ImagesLabelsTestBase):
     edited_labels = ()
 
     image = self._MakeImageProto(
-        image_ref, labels=image_labels, fingerprint='fingerprint-42')
+        image_ref, labels=image_labels, fingerprint=b'fingerprint-42')
     updated_image = self._MakeImageProto(
         image_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1')
@@ -75,7 +77,7 @@ class UpdateLabelsTestBeta(images_labels_test_base.ImagesLabelsTestBase):
 
     self._ExpectGetRequest(image_ref, image)
     self._ExpectLabelsSetRequest(
-        image_ref, edited_labels, 'fingerprint-42', operation)
+        image_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(image_ref, updated_image)
 
@@ -90,14 +92,14 @@ class UpdateLabelsTestBeta(images_labels_test_base.ImagesLabelsTestBase):
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     image = self._MakeImageProto(
-        image_ref, labels=(), fingerprint='fingerprint-42')
+        image_ref, labels=(), fingerprint=b'fingerprint-42')
     updated_image = self._MakeImageProto(image_ref, labels=update_labels)
     operation_ref = self._GetOperationRef('operation-1')
     operation = self._MakeOperationMessage(operation_ref, image_ref)
 
     self._ExpectGetRequest(image_ref, image)
     self._ExpectLabelsSetRequest(
-        image_ref, update_labels, 'fingerprint-42', operation)
+        image_ref, update_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(image_ref, updated_image)
 
@@ -113,7 +115,7 @@ class UpdateLabelsTestBeta(images_labels_test_base.ImagesLabelsTestBase):
   def testRemoveWithNoLabelsOnImage(self):
     image_ref = self._GetImageRef('image-1')
     image = self._MakeImageProto(
-        image_ref, labels={}, fingerprint='fingerprint-42')
+        image_ref, labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(image_ref, image)
 
@@ -131,7 +133,7 @@ class UpdateLabelsTestBeta(images_labels_test_base.ImagesLabelsTestBase):
         ('key1', 'value1'), ('key3', 'value3'), ('key4', 'value4'))
 
     image = self._MakeImageProto(
-        image_ref, labels=image_labels, fingerprint='fingerprint-42')
+        image_ref, labels=image_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(image_ref, image)
 

@@ -58,7 +58,7 @@ class ImportTest(sdk_test_base.WithTempCWD,
         self.messages.AdmissionRule.NonConformanceActionValueValuesEnum)
     cluster_rules = [
         self.messages.Policy.ClusterAdmissionRulesValue.AdditionalProperty(
-            key=u'us-east1-b.my-cluster-1',
+            key='us-east1-b.my-cluster-1',
             value=self.messages.AdmissionRule(
                 evaluationMode=EvaluationModeEnum.REQUIRE_ATTESTATION,
                 nonConformanceAction=(
@@ -73,7 +73,7 @@ class ImportTest(sdk_test_base.WithTempCWD,
         name='projects/{}/policy'.format(self.Project()),
         admissionWhitelistPatterns=[
             self.messages.AdmissionWhitelistPattern(
-                namePattern=u'gcr.io/{}/*'.format(self.Project()),
+                namePattern='gcr.io/{}/*'.format(self.Project()),
             ),
         ],
         clusterAdmissionRules=self.messages.Policy.ClusterAdmissionRulesValue(
@@ -129,7 +129,7 @@ class ImportTest(sdk_test_base.WithTempCWD,
         self.messages.AdmissionRule.NonConformanceActionValueValuesEnum)
     cluster_rules = [
         self.messages.Policy.ClusterAdmissionRulesValue.AdditionalProperty(
-            key=u'us-east1-b.my-cluster-1',
+            key='us-east1-b.my-cluster-1',
             value=self.messages.AdmissionRule(
                 evaluationMode=EvaluationModeEnum.REQUIRE_ATTESTATION,
                 nonConformanceAction=(
@@ -144,7 +144,7 @@ class ImportTest(sdk_test_base.WithTempCWD,
         name='projects/{}/policy'.format(self.Project()),
         admissionWhitelistPatterns=[
             self.messages.AdmissionWhitelistPattern(
-                namePattern=u'gcr.io/google/*',
+                namePattern='gcr.io/google/*',
             ),
         ],
         clusterAdmissionRules=self.messages.Policy.ClusterAdmissionRulesValue(

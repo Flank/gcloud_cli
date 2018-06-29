@@ -22,35 +22,112 @@ from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.util import completers
 from googlecloudsdk.core import properties
+import six
 
 
-def MakeAttributeConfigs(with_completers=False):
+def MakeAttributeConfigs(with_completers=False, attribute_names=None):
   """Makes default attribute configs for the test book resource."""
-  return {
+  attribute_names = attribute_names or ['projectsId', 'shelvesId', 'booksId']
+  project_completer = None
+  shelf_completer = None
+  book_completer = None
+  case_completer = None
+  org_completer = None
+  if with_completers:
+    project_completer = MockProjectCompleter
+    shelf_completer = MockShelfCompleter
+    book_completer = MockBookCompleter
+    case_completer = MockCaseCompleter
+    org_completer = MockOrgCompleter
+  attribute_config_dict = {
       'projectsId': concepts.ResourceParameterAttributeConfig(
           name='project',
           help_text='The Cloud Project of the {resource}.',
           fallthroughs=[
               deps.PropertyFallthrough(properties.VALUES.core.project)],
-          completer=MockProjectCompleter if with_completers else None),
+          completer=project_completer),
       'shelvesId': concepts.ResourceParameterAttributeConfig(
           name='shelf',
           help_text='The shelf of the {resource}. Shelves hold books.',
-          completer=MockShelfCompleter if with_completers else None),
+          completer=shelf_completer),
       'booksId': concepts.ResourceParameterAttributeConfig(
           name='book',
           help_text='The book of the {resource}.',
-          completer=MockBookCompleter if with_completers else None)}
+          completer=book_completer),
+      'casesId': concepts.ResourceParameterAttributeConfig(
+          name='case',
+          help_text='The bookcase of the {resource}.',
+          completer=case_completer),
+      'organizationsId': concepts.ResourceParameterAttributeConfig(
+          name='organization',
+          help_text='The Cloud Organization of the {resource}.',
+          completer=org_completer)}
+  return {k: v for k, v in six.iteritems(attribute_config_dict)
+          if k in attribute_names}
 
 
-def GetBookResource(with_completers=False, auto_completers=False,
-                    resource_name='book'):
-  """Makes the test book resource."""
+def _GetFakeResource(collection_name, name, attribute_names=None,
+                     with_completers=False, auto_completers=False):
   return concepts.ResourceSpec(
-      'example.projects.shelves.books',
-      resource_name,
+      collection_name,
+      name,
       disable_auto_completers=not auto_completers,
-      **MakeAttributeConfigs(with_completers=with_completers))
+      **MakeAttributeConfigs(
+          attribute_names=attribute_names,
+          with_completers=with_completers))
+
+
+def GetBookResource(name='book', with_completers=False, auto_completers=False):
+  """Makes the test book resource."""
+  return _GetFakeResource(
+      'example.projects.shelves.books',
+      name,
+      with_completers=with_completers,
+      auto_completers=auto_completers)
+
+
+def GetProjShelfResource(name='shelf', with_completers=False,
+                         auto_completers=False):
+  """Makes the test shelf resource."""
+  return _GetFakeResource(
+      'example.projects.shelves',
+      name,
+      attribute_names=['projectsId', 'shelvesId'],
+      with_completers=with_completers,
+      auto_completers=auto_completers)
+
+
+def GetProjCaseBookResource(name='book', with_completers=False,
+                            auto_completers=False):
+  """Makes the test book resource."""
+  return _GetFakeResource(
+      'example.projects.cases.books',
+      name,
+      attribute_names=['projectsId', 'casesId', 'booksId'],
+      with_completers=with_completers,
+      auto_completers=auto_completers)
+
+
+def GetOrgCaseBookResource(name='book', with_completers=False,
+                           auto_completers=False):
+  """Makes the test book resource."""
+  return _GetFakeResource(
+      'example.organizations.cases.books',
+      name,
+      attribute_names=['organizationsId', 'casesId', 'booksId'],
+      with_completers=with_completers,
+      auto_completers=auto_completers)
+
+
+def GetOrgShelfBookResource(name='book', with_completers=False,
+                            auto_completers=False):
+  """Makes the test book resource."""
+  return _GetFakeResource(
+      'example.organizations.shelves.books',
+      name,
+      attribute_names=['organizationsId', 'shelvesId', 'booksId'],
+      with_completers=with_completers,
+      auto_completers=auto_completers)
 
 
 class MockProjectCompleter(completers.ListCommandCompleter):
@@ -75,3 +152,19 @@ class MockBookCompleter(completers.ListCommandCompleter):
     super(MockBookCompleter, self).__init__(
         collection='example.projects.shelves.books',
         list_command='example.projects.shelves.books.list')
+
+
+class MockCaseCompleter(completers.ListCommandCompleter):
+
+  def __init__(self):
+    super(MockCaseCompleter, self).__init__(
+        collection='example.projects.cases',
+        list_command='example.projects.cases.list')
+
+
+class MockOrgCompleter(completers.ListCommandCompleter):
+
+  def __init__(self):
+    super(MockOrgCompleter, self).__init__(
+        collection='example.organizations',
+        list_command='example.organizations.list')

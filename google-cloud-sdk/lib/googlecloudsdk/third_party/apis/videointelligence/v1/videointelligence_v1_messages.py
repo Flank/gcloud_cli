@@ -339,260 +339,6 @@ class GoogleCloudVideointelligenceV1VideoSegment(_messages.Message):
   startTimeOffset = _messages.StringField(2)
 
 
-class GoogleCloudVideointelligenceV1beta1AnnotateVideoProgress(_messages.Message):
-  r"""Video annotation progress. Included in the `metadata` field of the
-  `Operation` returned by the `GetOperation` call of the
-  `google::longrunning::Operations` service.
-
-  Fields:
-    annotationProgress: Progress metadata for all videos specified in
-      `AnnotateVideoRequest`.
-  """
-
-  annotationProgress = _messages.MessageField('GoogleCloudVideointelligenceV1beta1VideoAnnotationProgress', 1, repeated=True)
-
-
-class GoogleCloudVideointelligenceV1beta1AnnotateVideoResponse(_messages.Message):
-  r"""Video annotation response. Included in the `response` field of the
-  `Operation` returned by the `GetOperation` call of the
-  `google::longrunning::Operations` service.
-
-  Fields:
-    annotationResults: Annotation results for all videos specified in
-      `AnnotateVideoRequest`.
-  """
-
-  annotationResults = _messages.MessageField('GoogleCloudVideointelligenceV1beta1VideoAnnotationResults', 1, repeated=True)
-
-
-class GoogleCloudVideointelligenceV1beta1LabelAnnotation(_messages.Message):
-  r"""Label annotation.
-
-  Fields:
-    description: Textual description, e.g. `Fixed-gear bicycle`.
-    languageCode: Language code for `description` in BCP-47 format.
-    locations: Where the label was detected and with what confidence.
-  """
-
-  description = _messages.StringField(1)
-  languageCode = _messages.StringField(2)
-  locations = _messages.MessageField('GoogleCloudVideointelligenceV1beta1LabelLocation', 3, repeated=True)
-
-
-class GoogleCloudVideointelligenceV1beta1LabelLocation(_messages.Message):
-  r"""Label location.
-
-  Enums:
-    LevelValueValuesEnum: Label level.
-
-  Fields:
-    confidence: Confidence that the label is accurate. Range: [0, 1].
-    level: Label level.
-    segment: Video segment. Set to [-1, -1] for video-level labels. Set to
-      [timestamp, timestamp] for frame-level labels. Otherwise, corresponds to
-      one of `AnnotateSpec.segments` (if specified) or to shot boundaries (if
-      requested).
-  """
-
-  class LevelValueValuesEnum(_messages.Enum):
-    r"""Label level.
-
-    Values:
-      LABEL_LEVEL_UNSPECIFIED: Unspecified.
-      VIDEO_LEVEL: Video-level. Corresponds to the whole video.
-      SEGMENT_LEVEL: Segment-level. Corresponds to one of
-        `AnnotateSpec.segments`.
-      SHOT_LEVEL: Shot-level. Corresponds to a single shot (i.e. a series of
-        frames without a major camera position or background change).
-      FRAME_LEVEL: Frame-level. Corresponds to a single video frame.
-    """
-    LABEL_LEVEL_UNSPECIFIED = 0
-    VIDEO_LEVEL = 1
-    SEGMENT_LEVEL = 2
-    SHOT_LEVEL = 3
-    FRAME_LEVEL = 4
-
-  confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
-  level = _messages.EnumField('LevelValueValuesEnum', 2)
-  segment = _messages.MessageField('GoogleCloudVideointelligenceV1beta1VideoSegment', 3)
-
-
-class GoogleCloudVideointelligenceV1beta1SafeSearchAnnotation(_messages.Message):
-  r"""Safe search annotation (based on per-frame visual signals only). If no
-  unsafe content has been detected in a frame, no annotations are present for
-  that frame. If only some types of unsafe content have been detected in a
-  frame, the likelihood is set to `UNKNOWN` for all other types of unsafe
-  content.
-
-  Enums:
-    AdultValueValuesEnum: Likelihood of adult content.
-    MedicalValueValuesEnum: Likelihood of medical content.
-    RacyValueValuesEnum: Likelihood of racy content.
-    SpoofValueValuesEnum: Likelihood that an obvious modification was made to
-      the original version to make it appear funny or offensive.
-    ViolentValueValuesEnum: Likelihood of violent content.
-
-  Fields:
-    adult: Likelihood of adult content.
-    medical: Likelihood of medical content.
-    racy: Likelihood of racy content.
-    spoof: Likelihood that an obvious modification was made to the original
-      version to make it appear funny or offensive.
-    timeOffset: Video time offset in microseconds.
-    violent: Likelihood of violent content.
-  """
-
-  class AdultValueValuesEnum(_messages.Enum):
-    r"""Likelihood of adult content.
-
-    Values:
-      UNKNOWN: Unknown likelihood.
-      VERY_UNLIKELY: Very unlikely.
-      UNLIKELY: Unlikely.
-      POSSIBLE: Possible.
-      LIKELY: Likely.
-      VERY_LIKELY: Very likely.
-    """
-    UNKNOWN = 0
-    VERY_UNLIKELY = 1
-    UNLIKELY = 2
-    POSSIBLE = 3
-    LIKELY = 4
-    VERY_LIKELY = 5
-
-  class MedicalValueValuesEnum(_messages.Enum):
-    r"""Likelihood of medical content.
-
-    Values:
-      UNKNOWN: Unknown likelihood.
-      VERY_UNLIKELY: Very unlikely.
-      UNLIKELY: Unlikely.
-      POSSIBLE: Possible.
-      LIKELY: Likely.
-      VERY_LIKELY: Very likely.
-    """
-    UNKNOWN = 0
-    VERY_UNLIKELY = 1
-    UNLIKELY = 2
-    POSSIBLE = 3
-    LIKELY = 4
-    VERY_LIKELY = 5
-
-  class RacyValueValuesEnum(_messages.Enum):
-    r"""Likelihood of racy content.
-
-    Values:
-      UNKNOWN: Unknown likelihood.
-      VERY_UNLIKELY: Very unlikely.
-      UNLIKELY: Unlikely.
-      POSSIBLE: Possible.
-      LIKELY: Likely.
-      VERY_LIKELY: Very likely.
-    """
-    UNKNOWN = 0
-    VERY_UNLIKELY = 1
-    UNLIKELY = 2
-    POSSIBLE = 3
-    LIKELY = 4
-    VERY_LIKELY = 5
-
-  class SpoofValueValuesEnum(_messages.Enum):
-    r"""Likelihood that an obvious modification was made to the original
-    version to make it appear funny or offensive.
-
-    Values:
-      UNKNOWN: Unknown likelihood.
-      VERY_UNLIKELY: Very unlikely.
-      UNLIKELY: Unlikely.
-      POSSIBLE: Possible.
-      LIKELY: Likely.
-      VERY_LIKELY: Very likely.
-    """
-    UNKNOWN = 0
-    VERY_UNLIKELY = 1
-    UNLIKELY = 2
-    POSSIBLE = 3
-    LIKELY = 4
-    VERY_LIKELY = 5
-
-  class ViolentValueValuesEnum(_messages.Enum):
-    r"""Likelihood of violent content.
-
-    Values:
-      UNKNOWN: Unknown likelihood.
-      VERY_UNLIKELY: Very unlikely.
-      UNLIKELY: Unlikely.
-      POSSIBLE: Possible.
-      LIKELY: Likely.
-      VERY_LIKELY: Very likely.
-    """
-    UNKNOWN = 0
-    VERY_UNLIKELY = 1
-    UNLIKELY = 2
-    POSSIBLE = 3
-    LIKELY = 4
-    VERY_LIKELY = 5
-
-  adult = _messages.EnumField('AdultValueValuesEnum', 1)
-  medical = _messages.EnumField('MedicalValueValuesEnum', 2)
-  racy = _messages.EnumField('RacyValueValuesEnum', 3)
-  spoof = _messages.EnumField('SpoofValueValuesEnum', 4)
-  timeOffset = _messages.IntegerField(5)
-  violent = _messages.EnumField('ViolentValueValuesEnum', 6)
-
-
-class GoogleCloudVideointelligenceV1beta1VideoAnnotationProgress(_messages.Message):
-  r"""Annotation progress for a single video.
-
-  Fields:
-    inputUri: Video file location in [Google Cloud
-      Storage](https://cloud.google.com/storage/).
-    progressPercent: Approximate percentage processed thus far. Guaranteed to
-      be 100 when fully processed.
-    startTime: Time when the request was received.
-    updateTime: Time of the most recent update.
-  """
-
-  inputUri = _messages.StringField(1)
-  progressPercent = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  startTime = _messages.StringField(3)
-  updateTime = _messages.StringField(4)
-
-
-class GoogleCloudVideointelligenceV1beta1VideoAnnotationResults(_messages.Message):
-  r"""Annotation results for a single video.
-
-  Fields:
-    error: If set, indicates an error. Note that for a single
-      `AnnotateVideoRequest` some videos may succeed and some may fail.
-    inputUri: Video file location in [Google Cloud
-      Storage](https://cloud.google.com/storage/).
-    labelAnnotations: Label annotations. There is exactly one element for each
-      unique label.
-    safeSearchAnnotations: Safe search annotations.
-    shotAnnotations: Shot annotations. Each shot is represented as a video
-      segment.
-  """
-
-  error = _messages.MessageField('GoogleRpcStatus', 1)
-  inputUri = _messages.StringField(2)
-  labelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta1LabelAnnotation', 3, repeated=True)
-  safeSearchAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta1SafeSearchAnnotation', 4, repeated=True)
-  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1beta1VideoSegment', 5, repeated=True)
-
-
-class GoogleCloudVideointelligenceV1beta1VideoSegment(_messages.Message):
-  r"""Video segment.
-
-  Fields:
-    endTimeOffset: End offset in microseconds (inclusive). Unset means 0.
-    startTimeOffset: Start offset in microseconds (inclusive). Unset means 0.
-  """
-
-  endTimeOffset = _messages.IntegerField(1)
-  startTimeOffset = _messages.IntegerField(2)
-
-
 class GoogleCloudVideointelligenceV1beta2AnnotateVideoProgress(_messages.Message):
   r"""Video annotation progress. Included in the `metadata` field of the
   `Operation` returned by the `GetOperation` call of the
@@ -812,55 +558,6 @@ class GoogleCloudVideointelligenceV1p1beta1AnnotateVideoResponse(_messages.Messa
   annotationResults = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults', 1, repeated=True)
 
 
-class GoogleCloudVideointelligenceV1p1beta1EmotionAttribute(_messages.Message):
-  r"""Emotion attribute.
-
-  Enums:
-    EmotionValueValuesEnum: Emotion entry.
-
-  Fields:
-    emotion: Emotion entry.
-    score: Confidence score.
-  """
-
-  class EmotionValueValuesEnum(_messages.Enum):
-    r"""Emotion entry.
-
-    Values:
-      EMOTION_UNSPECIFIED: Unspecified emotion.
-      AMUSEMENT: Amusement.
-      ANGER: Anger.
-      CONCENTRATION: Concentration.
-      CONTENTMENT: Contentment.
-      DESIRE: Desire.
-      DISAPPOINTMENT: Disappointment.
-      DISGUST: Disgust.
-      ELATION: Elation.
-      EMBARRASSMENT: Embarrassment.
-      INTEREST: Interest.
-      PRIDE: Pride.
-      SADNESS: Sadness.
-      SURPRISE: Surprise.
-    """
-    EMOTION_UNSPECIFIED = 0
-    AMUSEMENT = 1
-    ANGER = 2
-    CONCENTRATION = 3
-    CONTENTMENT = 4
-    DESIRE = 5
-    DISAPPOINTMENT = 6
-    DISGUST = 7
-    ELATION = 8
-    EMBARRASSMENT = 9
-    INTEREST = 10
-    PRIDE = 11
-    SADNESS = 12
-    SURPRISE = 13
-
-  emotion = _messages.EnumField('EmotionValueValuesEnum', 1)
-  score = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
-
-
 class GoogleCloudVideointelligenceV1p1beta1Entity(_messages.Message):
   r"""Detected entity from video analysis.
 
@@ -923,55 +620,6 @@ class GoogleCloudVideointelligenceV1p1beta1ExplicitContentFrame(_messages.Messag
   timeOffset = _messages.StringField(2)
 
 
-class GoogleCloudVideointelligenceV1p1beta1FaceDetectionAnnotation(_messages.Message):
-  r"""Face detection annotation.
-
-  Fields:
-    frames: All video frames where a face was detected.
-    segments: All video segments where a face was detected.
-  """
-
-  frames = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1FaceDetectionFrame', 1, repeated=True)
-  segments = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1FaceSegment', 2, repeated=True)
-
-
-class GoogleCloudVideointelligenceV1p1beta1FaceDetectionAttribute(_messages.Message):
-  r"""Face detection attribute.
-
-  Fields:
-    emotions: Emotion attributes.
-    normalizedBoundingBox: Normalized Bounding box.
-  """
-
-  emotions = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1EmotionAttribute', 1, repeated=True)
-  normalizedBoundingBox = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1NormalizedBoundingBox', 2)
-
-
-class GoogleCloudVideointelligenceV1p1beta1FaceDetectionFrame(_messages.Message):
-  r"""Video frame level annotation results for face detection.
-
-  Fields:
-    attributes: Face attributes in a frame. There can be more than one
-      attributes if the same face is detected in multiple locations within the
-      current frame.
-    timeOffset: Time-offset, relative to the beginning of the video,
-      corresponding to the video frame for this location.
-  """
-
-  attributes = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1FaceDetectionAttribute', 1, repeated=True)
-  timeOffset = _messages.StringField(2)
-
-
-class GoogleCloudVideointelligenceV1p1beta1FaceSegment(_messages.Message):
-  r"""Video segment level annotation results for face detection.
-
-  Fields:
-    segment: Video segment where a face was detected.
-  """
-
-  segment = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoSegment', 1)
-
-
 class GoogleCloudVideointelligenceV1p1beta1LabelAnnotation(_messages.Message):
   r"""Label annotation.
 
@@ -1013,23 +661,6 @@ class GoogleCloudVideointelligenceV1p1beta1LabelSegment(_messages.Message):
 
   confidence = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
   segment = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoSegment', 2)
-
-
-class GoogleCloudVideointelligenceV1p1beta1NormalizedBoundingBox(_messages.Message):
-  r"""Normalized bounding box. The normalized vertex coordinates are relative
-  to the original image. Range: [0, 1].
-
-  Fields:
-    bottom: Bottom Y coordinate.
-    left: Left X coordinate.
-    right: Right X coordinate.
-    top: Top Y coordinate.
-  """
-
-  bottom = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
-  left = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
-  right = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
-  top = _messages.FloatField(4, variant=_messages.Variant.FLOAT)
 
 
 class GoogleCloudVideointelligenceV1p1beta1SpeechRecognitionAlternative(_messages.Message):
@@ -1093,7 +724,6 @@ class GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults(_messages.Mess
       Note that for a single `AnnotateVideoRequest` some videos may succeed
       and some may fail.
     explicitAnnotation: Explicit content annotation.
-    faceDetectionAnnotations: Face detection annotations.
     frameLabelAnnotations: Label annotations on frame level. There is exactly
       one element for each unique label.
     inputUri: Output only. Video file location in [Google Cloud
@@ -1110,13 +740,12 @@ class GoogleCloudVideointelligenceV1p1beta1VideoAnnotationResults(_messages.Mess
 
   error = _messages.MessageField('GoogleRpcStatus', 1)
   explicitAnnotation = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1ExplicitContentAnnotation', 2)
-  faceDetectionAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1FaceDetectionAnnotation', 3, repeated=True)
-  frameLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 4, repeated=True)
-  inputUri = _messages.StringField(5)
-  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 6, repeated=True)
-  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoSegment', 7, repeated=True)
-  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 8, repeated=True)
-  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1SpeechTranscription', 9, repeated=True)
+  frameLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 3, repeated=True)
+  inputUri = _messages.StringField(4)
+  segmentLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 5, repeated=True)
+  shotAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1VideoSegment', 6, repeated=True)
+  shotLabelAnnotations = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1LabelAnnotation', 7, repeated=True)
+  speechTranscriptions = _messages.MessageField('GoogleCloudVideointelligenceV1p1beta1SpeechTranscription', 8, repeated=True)
 
 
 class GoogleCloudVideointelligenceV1p1beta1VideoSegment(_messages.Message):
@@ -1379,14 +1008,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -1422,17 +1049,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 class VideointelligenceOperationsCancelRequest(_messages.Message):

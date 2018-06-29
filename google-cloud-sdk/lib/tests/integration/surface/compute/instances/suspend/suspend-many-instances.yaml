@@ -1682,8 +1682,7 @@ response:
 ---
 output:
   stderr: |
-    <START PROGRESS TRACKER>Suspending instance(s) z1, z2, z3
-    <END PROGRESS TRACKER>SUCCESS
+    {"ux": "PROGRESS_TRACKER", "message": "Suspending instance(s) z1, z2, z3", "status": "SUCCESS"}
     Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z1].
     Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z2].
     Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z3].

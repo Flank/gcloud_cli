@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 import datetime
 
@@ -22,6 +24,7 @@ from googlecloudsdk.calliope import exceptions as core_exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test.ios import fake_catalogs
 from tests.lib.surface.firebase.test.ios import unit_base
+import six
 
 
 class IosArgsTests(unit_base.IosMockClientTest):
@@ -32,11 +35,11 @@ class IosArgsTests(unit_base.IosMockClientTest):
   def testGetSetOfAllTestArgs_OnActualRules(self):
     all_args = arg_manager.AllArgsSet()
     # arg_manager tests include GA and beta args
-    self.assertItemsEqual(set(unit_base.ALL_TEST_RUN_ARGS['beta']), all_args)
+    self.assertEquals(set(unit_base.ALL_TEST_RUN_ARGS['beta']), all_args)
 
   def testArgNamesInRulesAreInternalNames(self):
     # Verify that ArgRules use internal arg names with underscores, not hyphens
-    for arg_rules in arg_manager.TypedArgRules().itervalues():
+    for arg_rules in six.itervalues(arg_manager.TypedArgRules()):
       self.CheckArgNamesForHyphens(arg_rules)
     self.CheckArgNamesForHyphens(arg_manager.SharedArgRules())
 
@@ -137,14 +140,16 @@ class IosArgsTests(unit_base.IosMockClientTest):
     arg_mgr = _IosArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.ModelNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    self.assertIn("'iPadBad' is not a valid model", ex_ctx.exception.message)
+    self.assertIn("'iPadBad' is not a valid model",
+                  six.text_type(ex_ctx.exception))
 
   def testPrepareArgs_SparseMatrix_InvalidVersion(self):
     args = self.NewTestArgs(test='a', device=[{'version': 'v9'}])
     arg_mgr = _IosArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.VersionNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    self.assertIn("'v9' is not a valid OS version", ex_ctx.exception.message)
+    self.assertIn("'v9' is not a valid OS version",
+                  six.text_type(ex_ctx.exception))
 
   @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testPrepareArgs_SparseMatrix_InvalidLocale(self):
@@ -152,7 +157,8 @@ class IosArgsTests(unit_base.IosMockClientTest):
     arg_mgr = _IosArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.LocaleNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    self.assertIn("'here' is not a valid locale", ex_ctx.exception.message)
+    self.assertIn("'here' is not a valid locale",
+                  six.text_type(ex_ctx.exception))
 
   @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testPrepareArgs_SparseMatrix_InvalidOrientation(self):
@@ -160,7 +166,7 @@ class IosArgsTests(unit_base.IosMockClientTest):
     arg_mgr = _IosArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.OrientationNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    msg = ex_ctx.exception.message
+    msg = six.text_type(ex_ctx.exception)
     self.assertIn("'down' is not a valid device orientation", msg)
 
   def testPrepareArgs_SparseMatrix_InvalidDimensionName(self):
@@ -168,7 +174,7 @@ class IosArgsTests(unit_base.IosMockClientTest):
     arg_mgr = _IosArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.InvalidIosDimensionNameError) as ex_ctx:
       arg_mgr.Prepare(args)
-    msg = ex_ctx.exception.message
+    msg = six.text_type(ex_ctx.exception)
     self.assertIn("'ver' is not a valid dimension name", msg)
 
   def testPrepareArgs_StripsOffResultsBucketGcsPrefix(self):

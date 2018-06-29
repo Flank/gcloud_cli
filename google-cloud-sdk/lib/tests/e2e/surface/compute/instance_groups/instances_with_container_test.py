@@ -16,7 +16,6 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import sdk_test_base
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -27,8 +26,7 @@ TEST_SCRIPT = """\
 until sudo docker ps | grep -q nginx; do sleep 1; done; sudo docker ps"""
 
 
-class InstancesWithContainerTest(e2e_instances_test_base.InstancesTestBase,
-                                 sdk_test_base.WithCommandCapture):
+class InstancesWithContainerTest(e2e_instances_test_base.InstancesTestBase):
 
   def SetUp(self):
     self.prefix = b'create-with-container'

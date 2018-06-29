@@ -14,6 +14,8 @@
 
 """Utility methods to aid in interacting with a GCS results bucket."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from apitools.base.py import exceptions as apitools_exceptions
@@ -80,7 +82,7 @@ class ResultsBucketOps(object):
         projectId=self._project)
     try:
       response = tr_client.projects.InitializeSettings(request)
-      return response.defaultBucket.decode('utf8')
+      return response.defaultBucket
     except apitools_exceptions.HttpError as error:
       code, err_msg = util.GetErrorCodeAndMessage(error)
       if code == HTTP_FORBIDDEN:

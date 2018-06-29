@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration test for 'genomics callsets' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from tests.lib import e2e_utils
@@ -29,8 +31,8 @@ class CallsetsIntegrationTest(base.GenomicsIntegrationTest):
     properties.VALUES.core.disable_prompts.Set(True)
     properties.VALUES.core.user_output_enabled.Set(False)
     try:
-      dataset_name = e2e_utils.GetResourceNameGenerator(
-          prefix='callsetstest').next()
+      dataset_name = next(e2e_utils.GetResourceNameGenerator(
+          prefix='callsetstest'))
       self.dataset = self.RunGenomics(['datasets', 'create', '--name',
                                        dataset_name])
       variantset = self.RunGenomics(

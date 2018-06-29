@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Spanner database operations library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.spanner import database_operations
 from googlecloudsdk.core import resources
 from tests.lib.surface.spanner import base
@@ -98,5 +100,5 @@ class DatabaseOperationsClientTest(base.SpannerTestBase):
         self.msgs.SpannerProjectsInstancesDatabasesOperationsListRequest(
             name=ref.RelativeName()+'/operations', pageSize=100),
         response=response)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         database_operations.List('insId', 'dbId'), [operation])

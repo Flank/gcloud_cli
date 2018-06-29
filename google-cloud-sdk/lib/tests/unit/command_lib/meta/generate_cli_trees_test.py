@@ -15,6 +15,9 @@
 
 """Tests for the command_lib.meta.generate_cli_trees module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import json
 import os
 import subprocess
@@ -526,7 +529,7 @@ ls-url,man7.org-0.1,1,CONFIG/ls-url.json,
 
 
 _MAN_COMMAND_OUTPUT = {
-    'ls': u"""\
+    'ls': """\
 LS(1)                            User Commands                           LS(1)
 
 
@@ -819,7 +822,7 @@ This is BigQuery CLI 2.0.27
 }
 
 _MAN_URL_OUTPUT = {
-    'ls': u"""\
+    'ls': """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
         "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -1417,7 +1420,7 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
   def testUpdateCliTrees(self):
     # The first update should create the trees.
     generate_cli_trees.UpdateCliTrees(
-        commands=generate_cli_trees.GENERATORS.keys(),
+        commands=list(generate_cli_trees.GENERATORS.keys()),
         directory=self.temp_path,
         verbose=True)
     self.AssertErrContains('Generating the [bq] CLI tree')
@@ -1427,7 +1430,7 @@ class UpdateCliTreesTest(calliope_test_base.CalliopeTestBase):
     # The second update should accept the already generated trees.
     self.ClearErr()
     generate_cli_trees.UpdateCliTrees(
-        commands=generate_cli_trees.GENERATORS.keys(),
+        commands=list(generate_cli_trees.GENERATORS.keys()),
         directory=self.temp_path,
         verbose=True)
     self.AssertErrContains("""\
@@ -1473,7 +1476,7 @@ class LoadAllTest(calliope_test_base.CalliopeTestBase):
     # Load all CLI trees into one tree. 'gcloud' is not pre-populated in this
     # test, 'cat' is from CliTreeConfigDir.
     tree = generate_cli_trees.LoadAll()
-    self.assertEqual(['cat'], tree[cli_tree.LOOKUP_COMMANDS].keys())
+    self.assertEqual(['cat'], list(tree[cli_tree.LOOKUP_COMMANDS].keys()))
 
 
 if __name__ == '__main__':

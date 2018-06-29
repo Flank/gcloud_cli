@@ -1,0 +1,144 @@
+NAME
+    gcloud alpha kms keys update - update a key
+
+SYNOPSIS
+    gcloud alpha kms keys update KEY [--keyring=KEYRING] [--location=LOCATION]
+        [--next-rotation-time=NEXT_ROTATION_TIME]
+        [--primary-version=PRIMARY_VERSION] [--remove-rotation-schedule]
+        [--rotation-period=ROTATION_PERIOD] [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) 1. Update the rotation schedule for the given key.
+
+    Updates the rotation schedule for the given key. The schedule automatically
+    creates a new primary version for the key according to the
+    --next-rotation-time and --rotation-period flags.
+
+    The flag --next-rotation-time must be in ISO or RFC3339 format, and
+    --rotation-period must be in the form INTEGER[UNIT], where units can be one
+    of seconds (s), minutes (m), hours (h) or days (d).
+
+    Key rotations performed manually via update-primary-version and the version
+    create do not affect the stored --next-rotation-time.
+
+    2. Remove the rotation schedule for the given key with
+    --remove-rotation-schedule.
+
+    3. Update/Remove the labels for the given key with --update-labels and/or
+    --remove-labels.
+
+    4. Update the primary version for the given key with --primary-version.
+
+POSITIONAL ARGUMENTS
+     KEY
+        Name of the key to update.
+
+FLAGS
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the key.
+
+     --next-rotation-time=NEXT_ROTATION_TIME
+        Next automatic rotation time of the key. See $ gcloud topic datetimes
+        for information on time formats.
+
+     --primary-version=PRIMARY_VERSION
+        Primary version to make primary.
+
+     --remove-rotation-schedule
+        Remove any existing rotation schedule on the key.
+
+     --rotation-period=ROTATION_PERIOD
+        Automatic rotation period of the key. See $ gcloud topic datetimes for
+        information on duration formats.
+
+     --update-labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to update. If a label exists its value
+        is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Removes all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud alpha kms keys update --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud alpha kms keys update --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          A list of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command sets a 30 day rotation period for the key named frodo
+    within the keyring fellowship and location global starting at the specified
+    time:
+
+        $ gcloud alpha kms keys update frodo \
+            --location global \
+            --keyring fellowship \
+            --rotation-period 30d \
+            --next-rotation-time 2017-10-12T12:34:56.1234Z
+
+    The following command removes the rotation schedule for the key named frodo
+    within the keyring fellowship and location global:
+
+        $ gcloud alpha kms keys update frodo \
+            --location global \
+            --keyring fellowship \
+            --remove-rotation-schedule
+
+    The following command updates the labels value for the key named frodo
+    within the keyring fellowship and location global. If the label key does
+    not exist at the time, it will be added:
+
+        $ gcloud alpha kms keys update frodo \
+            --location global \
+            --keyring fellowship \
+            --update-labels k1=v1
+
+    The following command removes labels k1 and k2 from the key named frodo
+    within the keyring fellowship and location global:
+
+        $ gcloud alpha kms keys update frodo \
+            --location global \
+            --keyring fellowship \
+            --remove-labels k1,k2
+
+    The following command updates the primary version for the key named frodo
+    within the keyring fellowship and location global:
+
+        $ gcloud alpha kms keys update frodo \
+            --location global \
+            --keyring fellowship \
+            --primary-version 1
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. These variants are also available:
+
+        $ gcloud kms keys update
+        $ gcloud beta kms keys update
+

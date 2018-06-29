@@ -24,8 +24,9 @@ COMMANDS
         (BETA) Update a Google Compute Engine partner interconnect attachment.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute interconnects attachments partner
         $ gcloud alpha compute interconnects attachments partner
 

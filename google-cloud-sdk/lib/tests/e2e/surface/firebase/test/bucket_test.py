@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import results_bucket
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import e2e_base
+import six
 
 
 class ResultsBucketOpsIntegrationTests(e2e_base.TestIntegrationTestBase):
@@ -70,7 +74,8 @@ class ResultsBucketOpsIntegrationTests(e2e_base.TestIntegrationTestBase):
     with self.assertRaises(exceptions.BadFileException) as ex_ctx:
       bucket_ops.UploadFileToGcs('missing-file.apk')
     self.AssertErrContains('Uploading [missing-file.apk]')
-    self.assertIn('[missing-file.apk] not found', ex_ctx.exception.message)
+    self.assertIn('[missing-file.apk] not found',
+                  six.text_type(ex_ctx.exception))
 
   def testUploadApkToGcs_FileExists_BucketNotWritable(self):
     apk_path = self.Touch(directory=self.temp_path,
@@ -80,7 +85,7 @@ class ResultsBucketOpsIntegrationTests(e2e_base.TestIntegrationTestBase):
       bucket_ops = self._CreateBucketOps(
           'bucket-for-gcloud-e2e-testing-private')
       bucket_ops.UploadFileToGcs(apk_path)
-    msg = ex_ctx.exception.message
+    msg = six.text_type(ex_ctx.exception)
     self.assertIn('[bucket-for-gcloud-e2e-testing-private]', msg)
     self.assertIn('error 403', msg)
 

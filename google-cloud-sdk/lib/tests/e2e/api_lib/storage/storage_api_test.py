@@ -74,7 +74,7 @@ class UploadDownloadTest(e2e_base.WithServiceAuth):
 
     # Check regular file download
     self.AssertFileExists(download_path)
-    actual_contents = self.GetFileContents(download_path, encoding='utf-8')
+    actual_contents = files.ReadFileContents(download_path)
     self.assertEqual(contents, actual_contents)
 
     # Check stream download

@@ -15,12 +15,11 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import re
 
-from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps as deps_lib
 from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
+from googlecloudsdk.command_lib.util.concepts import info_holders
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -48,8 +47,10 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
     Returns:
       (handlers.ConceptInfo) the concept handler.
     """
-    resource_info = handlers.ResourceInfo(
+    resource_info = info_holders.ResourceInfo(
+        name,
         self.resource_spec,
+        'a resource',
         {'book': name, 'shelf': '--shelf', 'project': '--book-project'},
         {})
     return resource_info
@@ -86,48 +87,37 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
     handler.parsed_args = parsed_args
     self.assertEqual(parsed_args, handler.ParsedArgs())
 
-  @parameterized.named_parameters(
-      ('Flag', '--book',
-       ['--book', 'examplebook', '--shelf', 'exampleshelf', '--book-project',
-        'exampleproject']),
-      ('Positional', 'BOOK',
-       ['examplebook', '--shelf', 'exampleshelf', '--book-project',
-        'exampleproject']))
-  def testParse(self, name, arg_list):
-    """Tests Parse method correctly parses with different anchor names."""
-    resource_info = self.SetUpResourceInfo(name)
-    self.SetUpConceptParser(name)
-    parsed_args = self.parser.parser.parse_args(arg_list)
+  def testRuntimeHandlerAddConcept(self):
+    """Tests that AddConcept adds attributes correctly to RuntimeHandler."""
+    resource_infos = [self.SetUpResourceInfo('--book'),
+                      self.SetUpResourceInfo('--other-book')]
+    runtime_handler = handlers.RuntimeHandler()
+    runtime_handler.AddConcept('book', resource_infos[0])
+    runtime_handler.AddConcept('other_book', resource_infos[1])
+    self.assertTrue(hasattr(runtime_handler, 'book'))
+    self.assertTrue(hasattr(runtime_handler, 'other_book'))
 
-    parsed = resource_info.Parse(parsed_args)
-
+  def testRuntimeHandlerArgNameToConceptInfo(self):
+    resource_info = info_holders.ResourceInfo(
+        '--book',
+        self.resource_spec,
+        'group help',
+        {'book': '--book', 'shelf': '--shelf', 'project': '--book-project'},
+        {})
+    runtime_handler = handlers.RuntimeHandler()
+    runtime_handler.AddConcept('book', resource_info)
     self.assertEqual(
-        'projects/exampleproject/shelves/exampleshelf/books/examplebook',
-        parsed.RelativeName())
-
-  @parameterized.named_parameters(
-      ('MissingProject',
-       ['--book', 'examplename', '--shelf', 'exampleshelf'], '[project]'),
-      ('MissingShelf',
-       ['--book', 'examplename', '--book-project', 'exampleproject'],
-       '[shelf]'))
-  def testParseError(self, arg_list, error_msg):
-    """Tests that Parse method raises InitializationError when necessary."""
-    resource_info = self.SetUpResourceInfo('--book')
-    self.SetUpConceptParser('--book')
-    parsed_args = self.parser.parser.parse_args(arg_list)
-
-    with self.assertRaisesRegex(concepts.InitializationError,
-                                re.escape(error_msg)):
-      resource_info.Parse(parsed_args)
+        resource_info, runtime_handler.ArgNameToConceptInfo('book'))
+    self.assertEqual(
+        resource_info, runtime_handler.ArgNameToConceptInfo('shelf'))
+    self.assertEqual(
+        resource_info, runtime_handler.ArgNameToConceptInfo('book_project'))
 
   def testParseCached(self):
     """Tests that the result of parsing a resource argument is cached."""
     project_ids = ['my-project']  # one entry, so calling pop() twice will error
-    self.SetUpConceptParserWithFallthroughs(
-        '--book',
-        {'project': [
-            deps_lib.Fallthrough(project_ids.pop, 'hint')]})
+    fallthroughs = {'project': [deps_lib.Fallthrough(project_ids.pop, 'hint')]}
+    self.SetUpConceptParserWithFallthroughs('--book', fallthroughs)
     parsed_args = self.parser.parser.parse_args(
         ['--book', 'examplebook', '--shelf', 'exampleshelf'])
 
@@ -145,10 +135,8 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
   def testClearCache(self):
     """Tests that ClearCache method allows new resource to be parsed."""
     project_ids = ['another-project', 'my-project']
-    self.SetUpConceptParserWithFallthroughs(
-        '--book',
-        {'project': [
-            deps_lib.Fallthrough(project_ids.pop, 'hint')]})
+    fallthroughs = {'project': [deps_lib.Fallthrough(project_ids.pop, 'hint')]}
+    self.SetUpConceptParserWithFallthroughs('--book', fallthroughs)
     parsed_args = self.parser.parser.parse_args(
         ['--book', 'examplebook', '--shelf', 'exampleshelf'])
 
@@ -169,10 +157,8 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
   def testReset(self):
     """Tests that ClearCache method allows new resource to be parsed."""
     project_ids = ['another-project', 'my-project']
-    self.SetUpConceptParserWithFallthroughs(
-        '--book',
-        {'project': [
-            deps_lib.Fallthrough(project_ids.pop, 'hint')]})
+    fallthroughs = {'project': [deps_lib.Fallthrough(project_ids.pop, 'hint')]}
+    self.SetUpConceptParserWithFallthroughs('--book', fallthroughs)
     parsed_args = self.parser.parser.parse_args(
         ['--book', 'examplebook', '--shelf', 'exampleshelf'])
 
@@ -204,79 +190,6 @@ class HandlersTest(concepts_test_base.ConceptsTestBase,
         'projects/{}/shelves/exampleshelf/books/examplebook'.format(
             self.Project()),
         parsed.RelativeName())
-
-  def testBuildFullFallthroughsMapEmptyFallthroughs(self):
-    """Tests fallthroughs map is properly built."""
-    spec = concept_parsers.ResourcePresentationSpec(
-        '--book',
-        self.resource_spec,
-        'a resource',
-        flag_name_overrides={
-            'shelf': '',
-            'project': '--book-project'})
-    resource_info = spec.GetInfo()
-
-    result = resource_info.BuildFullFallthroughsMap()
-
-    expected = {
-        'project': [
-            deps_lib.ArgFallthrough('--book-project'),
-            deps_lib.PropertyFallthrough(properties.VALUES.core.project)],
-        'shelf': [],
-        'book': [
-            deps_lib.ArgFallthrough('--book')]}
-    self.assertEqual(expected, result)
-
-  @parameterized.named_parameters(
-      ('Flag', '--book', False, True,
-       [deps_lib.ArgFallthrough('--book')]),
-      ('Positional', 'BOOK', False, True,
-       [deps_lib.ArgFallthrough('BOOK')]),
-      ('FlagPlural', '--books', True, True,
-       [deps_lib.ArgFallthrough('--books', plural=True)]),
-      ('PositionalPlural', 'BOOKS', True, True,
-       [deps_lib.ArgFallthrough('BOOKS', plural=True)]))
-  def testBuildFullFallthroughsMapAnchor(self, name, plural, required,
-                                         expected_book_fallthroughs):
-    """Tests fallthroughs map is properly built."""
-    spec = concept_parsers.ResourcePresentationSpec(
-        name,
-        self.resource_spec,
-        'a resource',
-        flag_name_overrides={
-            'project': '--book-project'},
-        plural=plural,
-        prefixes=False,
-        required=required)
-    resource_info = spec.GetInfo()
-
-    result = resource_info.BuildFullFallthroughsMap()
-
-    self.assertEqual(expected_book_fallthroughs, result['book'])
-
-  def testRuntimeHandlerAddConcept(self):
-    """Tests that AddConcept adds attributes correctly to RuntimeHandler."""
-    resource_infos = [self.SetUpResourceInfo('--book'),
-                      self.SetUpResourceInfo('--other-book')]
-    runtime_handler = handlers.RuntimeHandler()
-    runtime_handler.AddConcept('book', resource_infos[0])
-    runtime_handler.AddConcept('other_book', resource_infos[1])
-    self.assertTrue(hasattr(runtime_handler, 'book'))
-    self.assertTrue(hasattr(runtime_handler, 'other_book'))
-
-  def testRuntimeHandlerArgNameToConceptInfo(self):
-    resource_info = handlers.ResourceInfo(
-        self.resource_spec,
-        {'book': '--book', 'shelf': '--shelf', 'project': '--book-project'},
-        {})
-    runtime_handler = handlers.RuntimeHandler()
-    runtime_handler.AddConcept('book', resource_info)
-    self.assertEqual(
-        resource_info, runtime_handler.ArgNameToConceptInfo('book'))
-    self.assertEqual(
-        resource_info, runtime_handler.ArgNameToConceptInfo('shelf'))
-    self.assertEqual(
-        resource_info, runtime_handler.ArgNameToConceptInfo('book_project'))
 
   @parameterized.named_parameters(
       ('Positional', 'BOOKS', False,

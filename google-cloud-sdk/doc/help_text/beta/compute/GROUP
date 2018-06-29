@@ -116,6 +116,9 @@ GROUPS
      snapshots
         (BETA) List, describe, and delete Google Compute Engine snapshots.
 
+     sole-tenancy
+        (BETA) Read and manage Google Compute Engine sole-tenancy resources.
+
      ssl-certificates
         (BETA) List, create, and delete Google Compute Engine SSL certificates.
 

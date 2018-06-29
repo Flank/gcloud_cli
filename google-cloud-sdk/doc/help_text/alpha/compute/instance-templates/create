@@ -4,8 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute instance-templates create NAME
-        [--accelerator=[type=TYPE,[count=COUNT],...]]
-        [--no-boot-disk-auto-delete]
+        [--accelerator=[count=COUNT],[type=TYPE]] [--no-boot-disk-auto-delete]
         [--boot-disk-device-name=BOOT_DISK_DEVICE_NAME]
         [--boot-disk-size=BOOT_DISK_SIZE] [--boot-disk-type=BOOT_DISK_TYPE]
         [--can-ip-forward] [--configure-disk=[PROPERTY=VALUE,...]]
@@ -31,7 +30,8 @@ SYNOPSIS
           | --image-family=IMAGE_FAMILY]
         [--maintenance-policy=MAINTENANCE_POLICY
           | --on-host-maintenance=MAINTENANCE_POLICY]
-        [--scopes=[SCOPE,...] | --no-scopes]
+        [--node=NODE | --node-affinity-file=NODE_AFFINITY_FILE
+          | --node-group=NODE_GROUP] [--scopes=[SCOPE,...] | --no-scopes]
         [--service-account=SERVICE_ACCOUNT | --no-service-account]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -52,7 +52,7 @@ POSITIONAL ARGUMENTS
         Name of the instance template to create.
 
 FLAGS
-     --accelerator=[type=TYPE,[count=COUNT],...]
+     --accelerator=[count=COUNT],[type=TYPE]
         Attaches accelerators (e.g. GPUs) to the instances.
 
          type
@@ -110,7 +110,7 @@ FLAGS
 
          instantiate-from
             Specifies whether to include the disk and which image to use. Valid
-            values are: attach-read-only, do-not-include, custom-image,
+            values are: attach-read-only, blank, custom-image, do-not-include,
             source-image, source-image-family
 
          custom-image
@@ -215,6 +215,11 @@ FLAGS
 
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE],[size=SIZE]
         Attaches a local SSD to the instances.
@@ -505,6 +510,33 @@ FLAGS
           impact the performance of instances during a migration event.
        TERMINATE
           The instances should be terminated.
+
+     Sole Tenancy At most one of these may be specified:
+
+       --node=NODE
+          The name of the node to schedule this instance on.
+
+       --node-affinity-file=NODE_AFFINITY_FILE
+          The JSON/YAML file containing the configuration of desired nodes onto
+          which this instance could be scheduled. These rules filter the nodes
+          according to their node affinity labels. A node's affinity labels
+          come from the node template of the group the node is in.
+
+          The file should contain a list of a JSON/YAML objects with the
+          following fields:
+
+       key
+          Corresponds to the node affinity label keys of the Node resource.
+       operator
+          Specifies the node selection type. Must be one of: IN: Requires
+          Compute Engine to seek for matched nodes. NOT_IN: Requires Compute
+          Engine to avoid certain nodes.
+       values
+          Optional. A list of values which correspond to the node affinity
+          label values of the Node resource.
+
+       --node-group=NODE_GROUP
+          The name of the node group to schedule this instance on.
 
      At most one of these may be specified:
 

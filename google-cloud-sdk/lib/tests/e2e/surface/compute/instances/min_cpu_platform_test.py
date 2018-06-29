@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for creating/using/deleting instances."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import test_case

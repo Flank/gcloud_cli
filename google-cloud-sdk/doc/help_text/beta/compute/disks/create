@@ -10,6 +10,8 @@ SYNOPSIS
         [--no-require-csek-key-create] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
+        [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
+          --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -82,6 +84,11 @@ FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --licenses=[LICENSE,...]
         A list of URIs to license resources. The provided licenses will be
         added onto the created disks to indicate the licensing and billing
@@ -153,6 +160,24 @@ FLAGS
           When using this option, the size of the disks must be at least as
           large as the snapshot size. Use --size to adjust the size of the
           disks.
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the disk. The arguments in this group can be used to
+     specify the attributes of this resource.
+
+       --kms-key=KMS_KEY
+          The ID of the key or a fully qualified identifier for the key. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --kms-keyring=KMS_KEYRING
+          The KMS keyring of the key.
+
+       --kms-location=KMS_LOCATION
+          The Cloud location for the key.
+
+       --kms-project=KMS_PROJECT
+          The Cloud project for the key.
 
      At most one of these may be specified:
 

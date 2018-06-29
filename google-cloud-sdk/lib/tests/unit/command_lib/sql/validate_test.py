@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for SQL validation methods."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.sql import validate

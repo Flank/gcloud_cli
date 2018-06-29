@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the docker command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import base64
 import json
 import os
@@ -23,6 +25,7 @@ from googlecloudsdk.core.credentials import store
 from googlecloudsdk.core.docker import client_lib
 from googlecloudsdk.core.docker import constants
 from googlecloudsdk.core.docker import docker
+from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
@@ -33,7 +36,7 @@ import mock
 _PROJECT = 'my-project-7465'
 
 _TOKEN = 'ma-token'
-_ACCESS_TOKEN_USERNAME = 'oauth2accesstoken'
+_ACCESS_TOKEN_USERNAME = 'gclouddockertoken'
 _EMAIL = 'not@val.id'
 _EXPECTED_DOCKER_OPTIONS = ['--username=' + _ACCESS_TOKEN_USERNAME,
                             '--password=' + _TOKEN]
@@ -87,16 +90,15 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     directory = os.path.dirname(new_cfg)
     if not os.path.exists(directory):
       os.makedirs(directory)
-    with files.OpenForWritingPrivate(new_cfg) as writer:
-      writer.write('{}')
+    files.WriteFileContents(new_cfg, '{}', private=True)
 
   def WriteNewDockerConfig(self, full_cfg):
     new_cfg, unused_true = client_lib.GetDockerConfigPath(force_new=True)
     directory = os.path.dirname(new_cfg)
     if not os.path.exists(directory):
       os.makedirs(directory)
-    with files.OpenForWritingPrivate(new_cfg) as writer:
-      writer.write(json.dumps(full_cfg))
+    files.WriteFileContents(new_cfg, encoding.Decode(json.dumps(full_cfg)),
+                            private=True)
 
   def AssertRegistryLogin(self, registry):
 
@@ -113,7 +115,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
       target_server = exec_args[-1]
 
       # Verify that all of the options are as expected.
-      self.assertItemsEqual(docker_login_options, _EXPECTED_DOCKER_OPTIONS)
+      self.assertCountEqual(docker_login_options, _EXPECTED_DOCKER_OPTIONS)
 
       # Verify that the target server was correct, i.e. the last argument.
       self.assertEqual(registry, target_server)
@@ -140,7 +142,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
       target_server = exec_args[-1]
 
       # Verify that all of the options are as expected.
-      self.assertItemsEqual(docker_login_options, _EXPECTED_DOCKER_OPTIONS)
+      self.assertCountEqual(docker_login_options, _EXPECTED_DOCKER_OPTIONS)
 
       # Verify that the target server was correct, i.e. the last argument.
       self.assertEqual(registry, target_server)
@@ -157,7 +159,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     def MockExecute(*args, **kwargs):
       exec_args = args[0]
 
-      self.assertItemsEqual(
+      self.assertCountEqual(
           exec_args,
           expected_command,
           'Unexpected arguments, wanted {want}, but got: {got}'.format(
@@ -181,7 +183,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
       target_server = exec_args[-1]
 
       # Verify that all of docker login's options are as expected.
-      self.assertItemsEqual(docker_login_options, _EXPECTED_DOCKER_OPTIONS)
+      self.assertCountEqual(docker_login_options, _EXPECTED_DOCKER_OPTIONS)
 
       self.logins.append(target_server)
       self.process_mock.communicate.return_value = ('Login Succeeded\n', '')
@@ -202,7 +204,8 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self.CheckDockerConfig(
         dict(('https://' + registry, {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': base64.b64encode(
+                (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
         }) for registry in constants.DEFAULT_REGISTRIES_TO_AUTHENTICATE))
 
   def testAuthorizeOnlyWithNewFile(self):
@@ -217,7 +220,8 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self.CheckDockerConfig(
         dict(('https://' + registry, {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': base64.b64encode(
+                (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
         }) for registry in constants.DEFAULT_REGISTRIES_TO_AUTHENTICATE))
 
   def testAuthorizeOnlyWithCredStore(self):
@@ -317,7 +321,8 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self.CheckDockerConfig(
         dict(('https://' + registry, {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': base64.b64encode(
+                (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
         }) for registry in constants.DEFAULT_REGISTRIES_TO_AUTHENTICATE))
 
   def testSimpleDockerCommand(self):
@@ -405,7 +410,8 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self.CheckDockerConfig({
         'https://' + registry: {
             'email': 'not@val.id',
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': base64.b64encode(
+                (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
         }
     })
 
@@ -414,7 +420,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -428,18 +434,19 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     # Check that we Refresh explicitly regardless of Load refreshing
     self.assertTrue(self.refreshed)
     self.CheckDockerConfig(
-        dict(initial_entry.items() + {
+        dict(list(initial_entry.items()) + list({
             'https://' + registry: {
                 'email': _EMAIL,
-                'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+                'auth': base64.b64encode(
+                    (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
             }
-        }.items()))
+        }.items())))
 
   def testAuthorizeOnlyDefaultRegistryWithPath(self):
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -453,19 +460,20 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     # Check that we Refresh explicitly regardless of Load refreshing
     self.assertTrue(self.refreshed)
     self.CheckDockerConfig(
-        dict(initial_entry.items() + {
+        dict(list(initial_entry.items()) + list({
             'https://' + registry: {
                 'email': _EMAIL,
-                'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+                'auth': base64.b64encode(
+                    (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
             }
-        }.items()))
+        }.items())))
 
   def testAuthorizeOnlyDefaultRegistryWithScheme(self):
     self.TouchNewDockerConfig()
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -479,18 +487,20 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     # Check that we Refresh explicitly regardless of Load refreshing
     self.assertTrue(self.refreshed)
     self.CheckDockerConfig(
-        dict(initial_entry.items() + {
+        dict(list(initial_entry.items()) + list({
             registry: {
                 'email': _EMAIL,
-                'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+                'auth': base64.b64encode(
+                    (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
             }
-        }.items()))
+        }.items())))
 
   def testAuthorizeOnlyAllowRegionalRegistries(self):
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': base64.b64encode(
+                (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -503,18 +513,19 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     # Check that we Refresh explicitly regardless of Load refreshing
     self.assertTrue(self.refreshed)
     self.CheckDockerConfig(
-        dict(initial_entry.items() + {
+        dict(list(initial_entry.items()) + list({
             'https://' + registry: {
                 'email': _EMAIL,
-                'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+                'auth': base64.b64encode(
+                    (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
             }
-        }.items()))
+        }.items())))
 
   def testAuthorizeOnlyStaleEntry(self):
     initial_entry = {
         constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -530,7 +541,8 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     self.CheckDockerConfig(
         dict(('https://' + registry, {
             'email': _EMAIL,
-            'auth': base64.b64encode(_ACCESS_TOKEN_USERNAME + ':' + _TOKEN)
+            'auth': base64.b64encode(
+                (_ACCESS_TOKEN_USERNAME + ':' + _TOKEN).encode()).decode()
         }) for registry in constants.DEFAULT_REGISTRIES_TO_AUTHENTICATE))
 
   # Non-Default authorization tests.
@@ -543,7 +555,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -564,7 +576,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -585,7 +597,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -606,7 +618,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)
@@ -627,7 +639,7 @@ class DockerTests(e2e_base.WithMockHttp, sdk_test_base.WithFakeAuth):
     initial_entry = {
         'https://' + constants.DEFAULT_REGISTRY: {
             'email': _EMAIL,
-            'auth': base64.b64encode('another-user:another-token')
+            'auth': base64.b64encode(b'another-user:another-token').decode()
         }
     }
     docker.WriteDockerAuthConfig(initial_entry)

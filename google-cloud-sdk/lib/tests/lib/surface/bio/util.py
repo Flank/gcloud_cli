@@ -14,6 +14,8 @@
 
 """Testing resources for Bio."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 
 
@@ -24,13 +26,13 @@ def GetTestOperationsList():
   return [
       v1.Operation(
           done=True,
-          name=u'operation-1'),
+          name='operation-1'),
       v1.Operation(
           done=False,
-          name=u'operation-2'),
+          name='operation-2'),
       v1.Operation(
           done=True,
-          name=u'operation-3',
+          name='operation-3',
           error=v1.Status(code=1, message='Operation canceled')),
   ]
 
@@ -41,7 +43,7 @@ def GetTestOperation():
   v1 = core_apis.GetMessagesModule('bio', 'v1')
   return v1.Operation(
       done=True,
-      name=u'operation-3',
+      name='operation-3',
       error=v1.Status(code=1, message='Operation canceled'))
 
 

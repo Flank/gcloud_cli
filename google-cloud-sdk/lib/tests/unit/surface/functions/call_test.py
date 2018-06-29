@@ -65,7 +65,7 @@ class FunctionsGetWithoutProjectTest(base.FunctionsTestBase):
 
   def testGetNoProject(self):
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegex(Exception, base.NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_PROJECT_RESOURCE_ARG_REGEXP):
       self.Run('functions call my-test')
 
 if __name__ == '__main__':

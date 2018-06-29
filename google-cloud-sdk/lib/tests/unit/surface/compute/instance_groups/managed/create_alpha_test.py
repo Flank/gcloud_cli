@@ -461,5 +461,54 @@ class RegionalInstanceGroupManagersCreateTestWithStateful(
     )
 
 
+class InstanceGroupManagersCreateTestWithInstanceRedistributionType(
+    test_base.BaseTest):
+
+  def SetUp(self):
+    SetUpRegional(self, API_VERSION)
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateSimple(self):
+    self.Run("""
+        compute instance-groups managed create group-1
+          --region us-central2
+          --template template-1
+          --size 1
+          --instance-redistribution-type proactive
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Insert',
+          self.messages.ComputeRegionInstanceGroupManagersInsertRequest(
+              instanceGroupManager=self.messages.InstanceGroupManager(
+                  name='group-1',
+                  region=self.region_uri,
+                  baseInstanceName='group-1',
+                  instanceTemplate=self.template_1_uri,
+                  targetSize=1,
+                  updatePolicy=self.messages.InstanceGroupManagerUpdatePolicy(
+                      instanceRedistributionType=self.messages.
+                      InstanceGroupManagerUpdatePolicy.
+                      InstanceRedistributionTypeValueValuesEnum.PROACTIVE)),
+              project='my-project',
+              region='us-central2'))],
+        self.region_ig_list_request,
+        self.region_as_list_request,
+    )
+
+  def testCreateForZonalScope(self):
+    with self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        'Flag --instance-redistribution-type may be specified for regional '
+        'managed instance groups only.'):
+      self.Run("""
+          compute instance-groups managed create group-1
+            --zone us-central2-a
+            --template template-1
+            --size 1
+            --instance-redistribution-type proactive
+          """)
+
+
 if __name__ == '__main__':
   test_case.main()

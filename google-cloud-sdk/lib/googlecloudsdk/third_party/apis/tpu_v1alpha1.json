@@ -44,11 +44,6 @@
       ],
       "location": "query"
     },
-    "bearer_token": {
-      "type": "string",
-      "description": "OAuth bearer token.",
-      "location": "query"
-    },
     "callback": {
       "type": "string",
       "description": "JSONP",
@@ -67,12 +62,6 @@
     "oauth_token": {
       "type": "string",
       "description": "OAuth 2.0 token for the current user.",
-      "location": "query"
-    },
-    "pp": {
-      "type": "boolean",
-      "description": "Pretty-print response.",
-      "default": "true",
       "location": "query"
     },
     "prettyPrint": {
@@ -355,6 +344,9 @@
           "type": "string",
           "format": "google-datetime"
         },
+        "schedulingConfig": {
+          "$ref": "SchedulingConfig"
+        },
         "networkEndpoints": {
           "description": "Output only. The network endpoints where TPU workers can be accessed and sent work.\nIt is recommended that Tensorflow clients of the node reach out to the 0th\nentry in this map first.",
           "type": "array",
@@ -384,6 +376,15 @@
           "additionalProperties": {
             "type": "string"
           }
+        }
+      }
+    },
+    "SchedulingConfig": {
+      "id": "SchedulingConfig",
+      "type": "object",
+      "properties": {
+        "preemptible": {
+          "type": "boolean"
         }
       }
     },

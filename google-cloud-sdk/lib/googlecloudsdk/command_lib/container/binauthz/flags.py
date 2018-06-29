@@ -20,19 +20,19 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope.concepts import concepts
-from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
-from googlecloudsdk.core import properties
+from googlecloudsdk.command_lib.util.concepts import presentation_specs as presentation_specs_lib
 
 
 def _GetNoteResourceSpec():
   return concepts.ResourceSpec(
-      'containeranalysis.providers.notes',
+      'containeranalysis.projects.notes',
       resource_name='note',
-      providersId=concepts.ResourceParameterAttributeConfig(
+      projectsId=concepts.ResourceParameterAttributeConfig(
           name='project',
           help_text=(
-              'The Container Analysis provider project for the {resource}.'),
+              'The Container Analysis project for the {resource}.'),
       ),
       notesId=concepts.ResourceParameterAttributeConfig(
           name='note',
@@ -48,18 +48,23 @@ def _FormatArgName(base_name, positional):
     return '--' + base_name.replace('_', '-').lower()
 
 
-def GetAuthorityNotePresentationSpec(base_name,
-                                     group_help,
+def GetAuthorityNotePresentationSpec(group_help,
+                                     base_name='authority-note',
                                      required=True,
-                                     positional=True):
-  return concept_parsers.ResourcePresentationSpec(
+                                     positional=True,
+                                     use_global_project_flag=False):
+  """Construct a resource spec for an attestation authority note flag."""
+  flag_overrides = None
+  if not use_global_project_flag:
+    flag_overrides = {
+        'project': _FormatArgName('{}-project'.format(base_name), positional),
+    }
+  return presentation_specs_lib.ResourcePresentationSpec(
       name=_FormatArgName(base_name, positional),
       concept_spec=_GetNoteResourceSpec(),
       group_help=group_help,
       required=required,
-      flag_name_overrides={
-          'project': _FormatArgName('{}-project'.format(base_name), positional),
-      },
+      flag_name_overrides=flag_overrides,
   )
 
 
@@ -67,12 +72,7 @@ def _GetAuthorityResourceSpec():
   return concepts.ResourceSpec(
       'binaryauthorization.projects.attestationAuthorities',
       resource_name='authority',
-      projectsId=concepts.ResourceParameterAttributeConfig(
-          name='project',
-          help_text='The project of the {resource}.',
-          fallthroughs=[
-              deps.PropertyFallthrough(properties.VALUES.core.project)],
-      ),
+      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG,
       attestationAuthoritiesId=concepts.ResourceParameterAttributeConfig(
           name='name',
           help_text='The ID of the {resource}.',
@@ -81,13 +81,22 @@ def _GetAuthorityResourceSpec():
 
 
 def GetAuthorityPresentationSpec(group_help,
+                                 base_name='authority',
                                  required=True,
-                                 positional=True):
-  return concept_parsers.ResourcePresentationSpec(
-      name=_FormatArgName('authority', positional),
+                                 positional=True,
+                                 use_global_project_flag=True):
+  """Construct a resource spec for an attestation authority flag."""
+  flag_overrides = None
+  if not use_global_project_flag:
+    flag_overrides = {
+        'project': _FormatArgName('{}-project'.format(base_name), positional),
+    }
+  return presentation_specs_lib.ResourcePresentationSpec(
+      name=_FormatArgName(base_name, positional),
       concept_spec=_GetAuthorityResourceSpec(),
       group_help=group_help,
       required=required,
+      flag_name_overrides=flag_overrides,
   )
 
 
@@ -107,11 +116,24 @@ def AddArtifactUrlFlag(parser, required=True):
 
 def AddListAttestationsFlags(parser):
   AddArtifactUrlFlag(parser, required=False)
+
+  mutex_group = parser.add_mutually_exclusive_group(required=True)
   AddConcepts(
-      parser,
+      mutex_group,
+      GetAuthorityPresentationSpec(
+          base_name='attestation-authority',
+          required=False,  # one-of requirement is set in mutex_group.
+          positional=False,
+          use_global_project_flag=False,
+          group_help=textwrap.dedent("""\
+            The Attestation Authority whose Container Analysis Note will be
+            queried for attestations. Note that the caller must have the
+            `containeranalysis.notes.listOccurrences` permission on the note
+            being queried.""")
+      ),
       GetAuthorityNotePresentationSpec(
           base_name='attestation-authority-note',
-          required=False,
+          required=False,  # one-of requirement is set in mutex_group.
           positional=False,
           group_help=textwrap.dedent("""\
             The Container Analysis ATTESTATION_AUTHORITY Note that will be
@@ -121,7 +143,7 @@ def AddListAttestationsFlags(parser):
             the note lives.  Note that the caller must have the
             `containeranalysis.notes.listOccurrences` permission on the note
             being queried.""")
-      )
+      ),
   )
 
 
@@ -137,10 +159,25 @@ def AddCreateAttestationFlags(parser):
         Path to file containing the signature to store, or `-` to read signature
         from stdin."""))
 
+  mutex_group = parser.add_mutually_exclusive_group(required=True)
   AddConcepts(
-      parser,
+      mutex_group,
+      GetAuthorityPresentationSpec(
+          base_name='attestation-authority',
+          required=False,  # one-of requirement is set in mutex_group.
+          positional=False,
+          use_global_project_flag=False,
+          group_help=textwrap.dedent("""\
+            The Attestation Authority whose Container Analysis Note will be used
+            to host the created attestation. In order to successfully attach the
+            attestation, the active gcloud account (core/account) must have the
+            `containeranalysis.notes.attachOccurrence` permission for the
+            Authority's underlying Note resource (usually via the
+            `containeranalysis.notes.attacher` role).""")
+      ),
       GetAuthorityNotePresentationSpec(
           base_name='attestation-authority-note',
+          required=False,  # one-of requirement is set in mutex_group.
           positional=False,
           group_help=textwrap.dedent("""\
             The Container Analysis ATTESTATION_AUTHORITY Note that the created
@@ -149,7 +186,7 @@ def AddCreateAttestationFlags(parser):
             `containeranalysis.notes.attachOccurrence` permission for the note
             resource (usually via the `containeranalysis.notes.attacher`
             role).""")
-      )
+      ),
   )
 
   parser.add_argument(

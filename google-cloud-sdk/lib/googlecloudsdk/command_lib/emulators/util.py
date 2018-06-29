@@ -13,9 +13,11 @@
 # limitations under the License.
 """Utility functions for gcloud emulators datastore group."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import abc
 import contextlib
-import errno
 import os
 import random
 import re
@@ -34,6 +36,7 @@ from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
 import portpicker
+import six
 
 
 _IPV6_RE = re.compile(r'\[(.*)\]:(\d*)')
@@ -116,7 +119,7 @@ def WriteEnvYaml(env, output_dir):
     output_dir: str, Path of directory to which env.yaml file should be written.
   """
   env_file_path = os.path.join(output_dir, 'env.yaml')
-  with open(env_file_path, 'w') as env_file:
+  with files.FileWriter(env_file_path) as env_file:
     resource_printer.Print([env], print_format='yaml', out=env_file)
 
 
@@ -131,13 +134,10 @@ def ReadEnvYaml(output_dir):
   """
   env_file_path = os.path.join(output_dir, 'env.yaml')
   try:
-    with open(env_file_path, 'r') as env_file:
-      return yaml.load(env_file)
-  except IOError as err:
-    if err.errno == errno.ENOENT:
-      raise NoEnvYamlError(output_dir)
-    else:
-      raise err
+    with files.FileReader(env_file_path) as f:
+      return yaml.load(f)
+  except files.MissingFileError:
+    raise NoEnvYamlError(output_dir)
 
 
 def PrintEnvExport(env):
@@ -150,7 +150,7 @@ def PrintEnvExport(env):
   export_command = 'export'
   if current_os is platforms.OperatingSystem.WINDOWS:
     export_command = 'set'
-  for var, value in env.iteritems():
+  for var, value in six.iteritems(env):
     if ' ' in value:
       value = '"{value}"'.format(value=value)
     log.Print('{export_command} {var}={value}'.format(
@@ -169,7 +169,7 @@ def PrintEnvUnset(env):
   export_command = 'unset {var}'
   if current_os is platforms.OperatingSystem.WINDOWS:
     export_command = 'set {var}='
-  for var in env.iterkeys():
+  for var in six.iterkeys(env):
     log.Print(export_command.format(var=var))
 
 
@@ -347,7 +347,7 @@ class AttrDict(object):
     """
     if recurse:
       dict_copy = {}
-      for key, value in _dict.iteritems():
+      for key, value in six.iteritems(_dict):
         toset = value
         if isinstance(value, dict):
           toset = AttrDict(value, recurse)
@@ -367,9 +367,8 @@ class AttrDict(object):
       self._dict[attr] = value
 
 
-class Emulator:
+class Emulator(six.with_metaclass(abc.ABCMeta)):
   """This organizes the information to expose an emulator."""
-  __metaclass__ = abc.ABCMeta
 
   # TODO(b/35871640) Right now, there is no error handling contract with the
   #   subclasses. This means that if the subclass process fails, there is no

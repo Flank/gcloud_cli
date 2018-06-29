@@ -15,6 +15,8 @@
 """Package containing unit tests for the deploy_app_command_util module.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 import json
 import os
@@ -37,6 +39,7 @@ from googlecloudsdk.third_party.appengine.api import appinfo
 from googlecloudsdk.third_party.appengine.tools import context_util
 
 import mock
+import six
 
 
 _FILES = {
@@ -61,7 +64,7 @@ _FILES_WITH_SOURCE_CONTEXTS.update({
 
 
 def _CreateFiles(tmp_dir):
-  for name, contents in _FILES.iteritems():
+  for name, contents in six.iteritems(_FILES):
     path = os.path.join(tmp_dir, name)
     _WriteFile(path, contents)
 
@@ -149,7 +152,7 @@ class CopyFilesToCodeBucketTest(
   def testSingleModuleEmptyBucketOneThread(self):
     properties.VALUES.app.num_file_upload_threads.Set('1')
     self.ExpectList([])
-    self.ExpectUploads(_FILES.iteritems())
+    self.ExpectUploads(six.iteritems(_FILES))
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
         self.default_module, self.default_source_dir, self._BUCKET)
@@ -161,7 +164,7 @@ class CopyFilesToCodeBucketTest(
 
   def testSingleModuleEmptyBucket(self):
     self.ExpectList([])
-    self.ExpectUploads(_FILES.iteritems())
+    self.ExpectUploads(six.iteritems(_FILES))
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
         self.default_module, self.default_source_dir, self._BUCKET)
@@ -185,7 +188,7 @@ class CopyFilesToCodeBucketTest(
 
   def testSingleModuleEmptyBucketSourceContext(self):
     self.ExpectList([])
-    self.ExpectUploads(_FILES_WITH_SOURCE_CONTEXTS.iteritems())
+    self.ExpectUploads(six.iteritems(_FILES_WITH_SOURCE_CONTEXTS))
     with mock.patch.object(
         context_util, '_GetSourceContexts', autospec=True,
         return_value=source_context_util.FAKE_CONTEXTS) as get_source_context:
@@ -199,7 +202,7 @@ class CopyFilesToCodeBucketTest(
         manifest)
 
   def testSingleModulePartialUpload(self):
-    all_files = sorted(_FILES.iteritems())
+    all_files = sorted(six.iteritems(_FILES))
     # Pretend that two of these are already in the bucket.
     existing_files = all_files[:2]
     remaining_files = all_files[2:]
@@ -216,10 +219,10 @@ class CopyFilesToCodeBucketTest(
 
   def testMultiModuleEmptyBucket(self):
     self.ExpectList([])
-    self.ExpectUploads(_FILES.iteritems())
+    self.ExpectUploads(six.iteritems(_FILES))
     # We'll call List again for the second module, and all files should already
     # be uploaded.
-    self.ExpectList(_FILES.iteritems())
+    self.ExpectList(six.iteritems(_FILES))
 
     manifest1 = deploy_app_command_util.CopyFilesToCodeBucket(
         self.default_module, self.default_source_dir, self._BUCKET)
@@ -238,7 +241,7 @@ class CopyFilesToCodeBucketTest(
         manifest2)
 
   def testMultiModulePartialUpload(self):
-    all_files = sorted(_FILES.iteritems())
+    all_files = sorted(six.iteritems(_FILES))
     # Pretend that some of these are already in the bucket.
     existing_files = all_files[:4]
     remaining_files = all_files[4:]
@@ -246,7 +249,7 @@ class CopyFilesToCodeBucketTest(
     self.ExpectUploads(remaining_files)
     # We'll call List again for the second module, and all files should already
     # be uploaded.
-    self.ExpectList(_FILES.iteritems())
+    self.ExpectList(six.iteritems(_FILES))
 
     manifest1 = deploy_app_command_util.CopyFilesToCodeBucket(
         self.default_module, self.default_source_dir, self._BUCKET)
@@ -337,7 +340,7 @@ class CopyFilesToCodeBucketTest(
     files_without_node_modules = {k: v for k, v in _FILES.items()
                                   if not k.startswith('node_modules')}
     self.ExpectList([])
-    self.ExpectUploads(files_without_node_modules.iteritems())
+    self.ExpectUploads(six.iteritems(files_without_node_modules))
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
         self.node_module, self.node_source_dir, self._BUCKET)
@@ -351,7 +354,7 @@ class CopyFilesToCodeBucketTest(
     files_without_vendor_dir = {k: v for k, v in _FILES.items()
                                 if not k.startswith('vendor')}
     self.ExpectList([])
-    self.ExpectUploads(files_without_vendor_dir.iteritems())
+    self.ExpectUploads(six.iteritems(files_without_vendor_dir))
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
         self.php_module_standard, self.php_source_dir, self._BUCKET)
@@ -363,7 +366,7 @@ class CopyFilesToCodeBucketTest(
 
   def testPhpVendorDirUploadedFlex(self):
     self.ExpectList([])
-    self.ExpectUploads(_FILES.iteritems())
+    self.ExpectUploads(six.iteritems(_FILES))
 
     manifest = deploy_app_command_util.CopyFilesToCodeBucket(
         self.php_module_flex, self.php_source_dir, self._BUCKET)
@@ -386,7 +389,7 @@ class CopyFilesToCodeBucketTest(
           if not k.startswith('extra')
       }
       self.ExpectList([])
-      self.ExpectUploads(files_without_extra_dir.iteritems())
+      self.ExpectUploads(six.iteritems(files_without_extra_dir))
 
       manifest = deploy_app_command_util.CopyFilesToCodeBucket(
           self.default_module, self.default_source_dir, self._BUCKET)

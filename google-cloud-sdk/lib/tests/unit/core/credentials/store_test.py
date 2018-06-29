@@ -51,6 +51,7 @@ class StoreTests(sdk_test_base.WithLogCapture):
                                               autospec=True)
     self.response_mock = self.StartObjectPatch(httplib2, 'Response',
                                                autospec=True)
+    self.accounts_mock = self.StartObjectPatch(c_gce.Metadata(), 'Accounts')
     self.StartPatch('oauth2client.crypt.Signer', autospec=True)
     self.adc_file = self.Touch(self.root_path, contents="""\
 {
@@ -208,6 +209,7 @@ gs_oauth2_refresh_token = fake-token
       store.Revoke()
 
   def testRevokeCredentialsAfterRefresh(self):
+    self.accounts_mock = ''
     self.response_mock.status = 200
     fake_content = 'fake-content'
     self.request_mock.return_value = self.response_mock, fake_content
@@ -227,6 +229,7 @@ gs_oauth2_refresh_token = fake-token
       loaded = store.Load()
 
   def testRevokeNoRefresh(self):
+    self.accounts_mock = ''
     self.response_mock.status = 200
     fake_content = 'fake-content'
     self.request_mock.return_value = self.response_mock, fake_content
@@ -244,6 +247,7 @@ gs_oauth2_refresh_token = fake-token
       store.Load()
 
   def testRevokeAlreadyRevoked(self):
+    self.accounts_mock = ''
     self.response_mock.status = 400
     fake_content = '{"error":"invalid_token"}'
     self.request_mock.return_value = self.response_mock, fake_content

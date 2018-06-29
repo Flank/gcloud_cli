@@ -4,11 +4,13 @@ NAME
 
 SYNOPSIS
     gcloud alpha container binauthz attestations list
-        [--artifact-url=ARTIFACT_URL]
-        [--attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
-          : --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT]
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
+        ([--attestation-authority=ATTESTATION_AUTHORITY
+          : --attestation-authority-project=ATTESTATION_AUTHORITY_PROJECT]
+          | [--attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
+          : --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT])
+        [--artifact-url=ARTIFACT_URL] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command lists Binary Authorization attestations for your
@@ -16,27 +18,44 @@ DESCRIPTION
     for. If no artifact is specified, then this lists all URLs with associated
     occurrences.
 
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       Authority resource - The Attestation Authority whose Container Analysis
+       Note will be queried for attestations. Note that the caller must have
+       the containeranalysis.notes.listOccurrences permission on the note being
+       queried. The arguments in this group can be used to specify the
+       attributes of this resource.
+
+         --attestation-authority=ATTESTATION_AUTHORITY
+            The ID of the authority or a fully qualified identifier for the
+            authority. This flag must be specified if any of the other
+            arguments in this group are specified.
+
+         --attestation-authority-project=ATTESTATION_AUTHORITY_PROJECT
+            The Cloud project for the authority.
+
+       Note resource - The Container Analysis ATTESTATION_AUTHORITY Note that
+       will be queried for attestations. When this option is passed, only
+       occurrences with kind ATTESTATION_AUTHORITY will be returned. The
+       occurrences might be from any project, not just the project where the
+       note lives. Note that the caller must have the
+       containeranalysis.notes.listOccurrences permission on the note being
+       queried. The arguments in this group can be used to specify the
+       attributes of this resource.
+
+         --attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
+            The ID of the note or a fully qualified identifier for the note.
+            This flag must be specified if any of the other arguments in this
+            group are specified.
+
+         --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT
+            The Container Analysis project for the note.
+
 FLAGS
      --artifact-url=ARTIFACT_URL
         Container URL. May be in the .gcr.io/repository/image format, or may
         optionally contain the http or https scheme
-
-     Note resource - The Container Analysis ATTESTATION_AUTHORITY Note that
-     will be queried for attestations. When this option is passed, only
-     occurrences with kind ATTESTATION_AUTHORITY will be returned. The
-     occurrences might be from any project, not just the project where the note
-     lives. Note that the caller must have the
-     containeranalysis.notes.listOccurrences permission on the note being
-     queried. The arguments in this group can be used to specify the attributes
-     of this resource.
-
-       --attestation-authority-note=ATTESTATION_AUTHORITY_NOTE
-          The ID of the note or a fully qualified identifier for the note. This
-          flag must be specified if any of the other arguments in this group
-          are specified.
-
-       --attestation-authority-note-project=ATTESTATION_AUTHORITY_NOTE_PROJECT
-          The Container Analysis provider project for the note.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -74,17 +93,17 @@ GCLOUD WIDE FLAGS
 
 EXAMPLES
     List all artifact URLs for which an attestation exists and is bound to the
-    passed attestation authority note:
+    passed attestation authority:
 
         $ gcloud alpha container binauthz attestations list \
-            --attestation-authority-note=providers/example-prj/notes/note-id
+            --attestation-authority=projects/foo/attestationAuthorities/bar
 
     List the (pgp_key_fingerprint, signature) pairs for all attestations for
-    the passed artifact-url bound to the passed attestation authority note:
+    the passed artifact-url bound to the passed attestation authority:
 
         $ gcloud alpha container binauthz attestations list \
-            --attestation-authority-note=providers/exmple-prj/notes/note-id \
-            --artifact-url='gcr.io/example-project/example-image@sha256:abcd'
+            --attestation-authority=projects/foo/attestationAuthorities/bar \
+            --artifact-url='gcr.io/foo/example-image@sha256:abcd'
 
 NOTES
     This command is an internal implementation detail and may change or

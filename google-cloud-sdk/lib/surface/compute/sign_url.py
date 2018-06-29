@@ -13,12 +13,14 @@
 # limitations under the License.
 """Implements the command for generating Cloud CDN Signed URLs."""
 
-from googlecloudsdk.api_lib.compute import file_utils
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
-
 from googlecloudsdk.command_lib.compute import sign_url_utils
 from googlecloudsdk.command_lib.compute import signed_url_flags
+from googlecloudsdk.core.util import files
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
@@ -101,7 +103,7 @@ class SignUrl(base.Command):
       Signed URL. The 'validationResponseCode' key in the dictionary maps to
       the response code obtained for the HEAD request issued to the Signed URL.
     """
-    key_value = file_utils.ReadFile(args.key_file, 'key').rstrip()
+    key_value = files.ReadBinaryFileContents(args.key_file).rstrip()
     result = {}
     result['signedUrl'] = sign_url_utils.SignUrl(args.url, args.key_name,
                                                  key_value, args.expires_in)

@@ -3,6 +3,8 @@
 
 """A convenience wrapper for starting dev_appserver for appengine for Java."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 import bootstrapping
@@ -39,6 +41,7 @@ def main():
 
 
 if __name__ == '__main__':
+  bootstrapping.DisallowPython3()
   bootstrapping.CommandStart('dev_appserver_java', component_id='core')
   bootstrapping.CheckUpdates('dev_appserver_java')
   main()

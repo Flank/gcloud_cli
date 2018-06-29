@@ -65,14 +65,15 @@ class LocalPredictTestBase(object):
         subprocess, 'Popen', return_value=popen_mock, autospec=True)
 
   def _AssertPopenCalledCorrectly(self, popen_mock, instances,
-                                  additional_env=None):
+                                  additional_env=None, framework='tensorflow'):
     expected_env = {'CLOUDSDK_ROOT': 'fake-sdk-root'}
     if additional_env:
       expected_env.update(additional_env)
     self.assertEqual(popen_mock.call_count, 1)
     args, kwargs = popen_mock.call_args
     self.assertEqual(args[0], ['/tmp/python', local_predict.__file__,
-                               '--model-dir', self.temp_path])
+                               '--model-dir', self.temp_path,
+                               '--framework', framework])
     self.assertEqual(set(kwargs.keys()), {'stdout', 'stderr', 'stdin', 'env'})
     self.assertEqual(kwargs['stdout'], subprocess.PIPE)
     self.assertEqual(kwargs['stderr'], subprocess.PIPE)
@@ -155,6 +156,31 @@ class LocalPredictTestBase(object):
     self.assertEqual(results, [])
     self._AssertPopenCalledCorrectly(popen_mock, self.TEXT_INSTANCES_NORMALIZED)
     self.AssertErrNotContains('WARNING: warning!\n')
+
+  def _RunFrameworkTest(self, framework):
+    framework = framework.replace('-', '_')
+    popen_mock = self._MockPopen()
+    instances_file = self.Touch(self.temp_path, 'instances.txt',
+                                contents=self.TEXT_INSTANCES_UNNORMALIZED)
+    results = self.Run(
+        'ml-engine local predict '
+        '--model-dir {} '
+        '--framework {} '
+        '--text-instances {}'.format(self.temp_path, framework, instances_file))
+
+    self.assertEqual(results, [])
+    self._AssertPopenCalledCorrectly(popen_mock, self.TEXT_INSTANCES_NORMALIZED,
+                                     framework=framework)
+    self.AssertErrNotContains('WARNING: warning!\n')
+
+  def testLocalPredict_TensorFlowFramework(self):
+    self._RunFrameworkTest('tensorflow')
+
+  def testLocalPredict_XgboostFramework(self):
+    self._RunFrameworkTest('xgboost')
+
+  def testLocalPredict_ScikitLearnFramework(self):
+    self._RunFrameworkTest('scikit-learn')
 
   def testLocalPredict_TextInstancesWindowsLineBreaks(self):
     popen_mock = self._MockPopen()
@@ -327,3 +353,4 @@ class LocalPredictBetaFormatTest(LocalPredictFormatTestBase,
 
 if __name__ == '__main__':
   test_case.main()
+

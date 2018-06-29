@@ -11,7 +11,7 @@ gcloud alpha ml speech recognize\-long\-running \- get transcripts of longer aud
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml speech recognize\-long\-running\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-async\fR] [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-confidence\fR] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fB\-\-enable\-speaker\-diarization\fR\ :\ \fB\-\-diarization\-speaker\-count\fR=\fIDIARIZATION_SPEAKER_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml speech recognize\-long\-running\fR \fIAUDIO\fR \fB\-\-language\-code\fR=\fILANGUAGE_CODE\fR [\fB\-\-additional\-language\-codes\fR=[\fILANGUAGE_CODE\fR,...]] [\fB\-\-async\fR] [\fB\-\-encoding\fR=\fIENCODING\fR;\ default="encoding\-unspecified"] [\fB\-\-filter\-profanity\fR] [\fB\-\-hints\fR=[\fIHINTS\fR,...]] [\fB\-\-include\-word\-confidence\fR] [\fB\-\-include\-word\-time\-offsets\fR] [\fB\-\-max\-alternatives\fR=\fIMAX_ALTERNATIVES\fR;\ default=1] [\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR] [\fB\-\-enable\-speaker\-diarization\fR\ :\ \fB\-\-diarization\-speaker\-count\fR=\fIDIARIZATION_SPEAKER_COUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,14 +25,14 @@ To block the command from completing until analysis is finished, run:
 
 .RS 2m
 $ gcloud alpha ml speech recognize\-long\-running AUDIO_FILE \e
-    \-\-language LANGUAGE \-\-sample\-rate SAMPLE_RATE
+    \-\-language\-code LANGUAGE_CODE \-\-sample\-rate SAMPLE_RATE
 .RE
 
 You can also receive an operation as the result of the command by running:
 
 .RS 2m
 $ gcloud alpha ml speech recognize\-long\-running AUDIO_FILE \e
-    \-\-language LANGUAGE \-\-sample\-rate SAMPLE_RATE \-\-async
+    \-\-language\-code LANGUAGE_CODE \-\-sample\-rate SAMPLE_RATE \-\-async
 .RE
 
 This will return information about an operation. To get information about the
@@ -79,6 +79,14 @@ supported language codes.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-additional\-language\-codes\fR=[\fILANGUAGE_CODE\fR,...]
+The BCP\-47 language tags of other languages that the speech may be in. Up to 3
+can be provided.
+
+If alternative languages are listed, recognition result will contain recognition
+in the most likely language detected including the main language\-code.
+
 .TP 2m
 \fB\-\-async\fR
 Display information about the operation in progress, without waiting for the

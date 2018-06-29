@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -32,13 +34,13 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
 
     self.mocked_client.sslCerts.List.Expect(
         self.messages.SqlSslCertsListRequest(
-            instance=u'integration-test', project=self.Project()),
+            instance='integration-test', project=self.Project()),
         self.messages.SslCertsListResponse(
             items=[
                 self.messages.SslCert(
-                    cert=u'cert data',
-                    certSerialNumber=u'1264712781',
-                    commonName=u'cert',
+                    cert='cert data',
+                    certSerialNumber='1264712781',
+                    commonName='cert',
                     createTime=datetime.datetime(
                         2014,
                         2,
@@ -59,14 +61,14 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    instance=u'integration-test',
-                    kind=u'sql#sslCert',
-                    sha1Fingerprint=u'77299aad4c8136911c1f0b07dd9802a9a72124e8',
+                    instance='integration-test',
+                    kind='sql#sslCert',
+                    sha1Fingerprint='77299aad4c8136911c1f0b07dd9802a9a72124e8',
                 ),
                 self.messages.SslCert(
-                    cert=u'cert data',
-                    certSerialNumber=u'976069575',
-                    commonName=u'newcert',
+                    cert='cert data',
+                    certSerialNumber='976069575',
+                    commonName='newcert',
                     createTime=datetime.datetime(
                         2014,
                         7,
@@ -87,17 +89,18 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
                         170000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    instance=u'integration-test',
-                    kind=u'sql#sslCert',
-                    sha1Fingerprint=u'd926e1fb26e4dba2f73a14bea4ee9554577deda9',
+                    instance='integration-test',
+                    kind='sql#sslCert',
+                    sha1Fingerprint='d926e1fb26e4dba2f73a14bea4ee9554577deda9',
                 ),
             ],
-            kind=u'sql#sslCertsList',))
+            kind='sql#sslCertsList',
+        ))
     self.mocked_client.sslCerts.Delete.Expect(
         self.messages.SqlSslCertsDeleteRequest(
-            instance=u'integration-test',
+            instance='integration-test',
             project=self.Project(),
-            sha1Fingerprint=u'd926e1fb26e4dba2f73a14bea4ee9554577deda9'),
+            sha1Fingerprint='d926e1fb26e4dba2f73a14bea4ee9554577deda9'),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -130,23 +133,25 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'integration-test',
+            targetId='integration-test',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'0163a566-7103-4ebf-98a9-64673b60359b',
+            kind='sql#operation',
+            name='0163a566-7103-4ebf-98a9-64673b60359b',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/0163a566-7103-4ebf-98a9-64673b60359b'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/0163a566-7103-4ebf-98a9-64673b60359b'.
             format(self.Project()),
-            operationType=u'UPDATE',
-            status=u'RUNNING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='UPDATE',
+            status='RUNNING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
             operation='0163a566-7103-4ebf-98a9-64673b60359b',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -179,19 +184,20 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'integration-test',
+            targetId='integration-test',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'0163a566-7103-4ebf-98a9-64673b60359b',
+            kind='sql#operation',
+            name='0163a566-7103-4ebf-98a9-64673b60359b',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/0163a566-7103-4ebf-98a9-64673b60359b'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/0163a566-7103-4ebf-98a9-64673b60359b'.
             format(self.Project()),
-            operationType=u'UPDATE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='UPDATE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.Run('sql ssl-certs delete --instance=integration-test newcert')
     self.AssertErrContains(
@@ -200,17 +206,21 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
         '/d926e1fb26e4dba2f73a14bea4ee9554577deda9].'.format(self.Project()))
     self.assertEqual(prompt_mock.call_count, 1)
 
+    # Checking for deprecation warning.
+    self.AssertErrContains('`gcloud sql ssl-certs` is deprecated')
+
   def testSslCertsBadDelete(self):
     self.mocked_client.sslCerts.List.Expect(
         self.messages.SqlSslCertsListRequest(
-            instance=u'integration-test',
-            project=self.Project(),),
+            instance='integration-test',
+            project=self.Project(),
+        ),
         self.messages.SslCertsListResponse(
             items=[
                 self.messages.SslCert(
-                    cert=u'cert data',
-                    certSerialNumber=u'1264712781',
-                    commonName=u'cert',
+                    cert='cert data',
+                    certSerialNumber='1264712781',
+                    commonName='cert',
                     createTime=datetime.datetime(
                         2014,
                         2,
@@ -231,14 +241,14 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    instance=u'integration-test',
-                    kind=u'sql#sslCert',
-                    sha1Fingerprint=u'77299aad4c8136911c1f0b07dd9802a9a72124e8',
+                    instance='integration-test',
+                    kind='sql#sslCert',
+                    sha1Fingerprint='77299aad4c8136911c1f0b07dd9802a9a72124e8',
                 ),
                 self.messages.SslCert(
-                    cert=u'cert data',
-                    certSerialNumber=u'976069575',
-                    commonName=u'newcert',
+                    cert='cert data',
+                    certSerialNumber='976069575',
+                    commonName='newcert',
                     createTime=datetime.datetime(
                         2014,
                         7,
@@ -259,12 +269,13 @@ class SslCertsDeleteTest(base.SqlMockTestBeta):
                         170000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    instance=u'integration-test',
-                    kind=u'sql#sslCert',
-                    sha1Fingerprint=u'd926e1fb26e4dba2f73a14bea4ee9554577deda9',
+                    instance='integration-test',
+                    kind='sql#sslCert',
+                    sha1Fingerprint='d926e1fb26e4dba2f73a14bea4ee9554577deda9',
                 ),
             ],
-            kind=u'sql#sslCertsList',))
+            kind='sql#sslCertsList',
+        ))
     with self.assertRaisesRegex(
         exceptions.ResourceNotFoundError,
         r'no ssl cert named \[noncert\] for instance \[https://'

@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure deserialization of server responses work properly."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.iam import iam_util
 from tests.lib import cli_test_base
@@ -29,20 +33,21 @@ class GetPublicKeyTest(unit_test_base.BaseTest):
         response=self.msgs.ServiceAccountKey(
             name=('projects/test-project/serviceAccounts/%s/keys/1234'
                   % iam_account),
-            publicKeyData='key data goes here'))
+            publicKeyData=b'key data goes here'))
 
   def testGetServiceAccountPublicKey(self):
     iam_account = 'test@test-project.iam.gserviceaccount.com'
     key_id = '1234'
     self._SetUpGetPublicKeyExpectations(iam_account, key_id)
 
-    tmp_file = self.MockFileWrite('key data goes here')
+    tmp_file = self.Touch(self.temp_path)
     self.Run('beta iam service-accounts keys get-public-key 1234 --iam-account '
              '{0} --output-file {1}'.
              format(iam_account, tmp_file))
 
     self.AssertErrContains(('written key [{0}] for [{1}] as [{2}]').format(
         key_id, iam_account, tmp_file))
+    self.AssertBinaryFileEquals(b'key data goes here', tmp_file)
 
   def testGetServiceAccountPublicKeyByName(self):
     iam_account = 'test@test-project.iam.gserviceaccount.com'
@@ -50,13 +55,14 @@ class GetPublicKeyTest(unit_test_base.BaseTest):
     name = ('projects/-/serviceAccounts/%s/keys/1234' % iam_account)
     self._SetUpGetPublicKeyExpectations(iam_account, key_id)
 
-    tmp_file = self.MockFileWrite('key data goes here')
+    tmp_file = self.Touch(self.temp_path)
     self.Run('beta iam service-accounts keys get-public-key {0} --iam-account '
              '{1} --output-file {2}'.
              format(name, iam_account, tmp_file))
 
     self.AssertErrContains(('written key [{0}] for [{1}] as [{2}]').format(
         key_id, iam_account, tmp_file))
+    self.AssertBinaryFileEquals(b'key data goes here', tmp_file)
 
   def testGetServiceAccountPublicKeyInvalidAccount(self):
     with self.assertRaisesRegex(
@@ -71,7 +77,7 @@ class GetPublicKeyTest(unit_test_base.BaseTest):
     iam_account = self.sample_unique_id
     self._SetUpGetPublicKeyExpectations(iam_account)
 
-    tmp_file = self.MockFileWrite('key data goes here')
+    tmp_file = self.Touch(self.temp_path)
     try:
       self.Run('beta iam service-accounts keys get-public-key 1234 '
                '--iam-account {0} --output-file {1}'.

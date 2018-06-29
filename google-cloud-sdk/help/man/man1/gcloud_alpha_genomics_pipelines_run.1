@@ -98,6 +98,11 @@ pipeline\-file must also set preemptible to "true" for this flag to take effect.
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
 
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
 .TP 2m
 \fB\-\-pipeline\-file\fR=\fIPIPELINE_FILE\fR
 A YAML or JSON file containing a v2alpha1 or v1alpha2 Pipeline object. See

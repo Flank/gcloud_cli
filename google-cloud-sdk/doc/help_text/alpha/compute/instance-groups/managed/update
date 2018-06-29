@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha compute instance-groups managed update NAME
         [--add-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
+        [--instance-redistribution-type=TYPE]
         [--remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]]
         [--stateful-names] [--region=REGION | --zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
@@ -44,6 +45,27 @@ FLAGS
         instances; however, in the case of stateful disks, these disks are
         detached from the deleted instance and attached to new instances the
         managed instance group creates.
+
+     --instance-redistribution-type=TYPE
+        Specify type of instance redistribution policy. Instance redistribution
+        type gives possibility to enable or disable automatic instance
+        redistribution between zones to its target distribution. Target
+        distribution is a state of regional managed instance group where all
+        instances are spread out equally between all target zones.
+
+        Instance redistribution type may be specified for non-autoscaled
+        regional managed instance group only. By default it is set to
+        PROACTIVE.
+
+        The following types are available:
+
+        * NONE - managed instance group will not take any action to bring
+          instances to its target distribution.
+
+        * PROACTIVE - managed instance group will actively converge all
+          instances between zones to its target distribution.
+
+    TYPE must be one of: NONE, PROACTIVE.
 
      --remove-stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]
         Stop considering the disks stateful by the instance group.

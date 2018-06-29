@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Base class for gcloud app logs tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis
@@ -30,7 +32,7 @@ class LogsTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
   def SetUp(self):
     properties.VALUES.core.project.Set(PROJECT)
     self.log_name_filter = (
-        u'logName=('
+        'logName=('
         '"projects/{project}/logs/appengine.googleapis.com%2Fcrash.log" OR '
         '"projects/{project}/logs/appengine.googleapis.com%2Fnginx.request" '
         'OR '
@@ -46,7 +48,7 @@ class LogsTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.addCleanup(self.v2_client.Unmock)
 
   def _CreateRequest(self, log_filter=None, page_token=None, page_size=200,
-                     order_by=u'timestamp desc'):
+                     order_by='timestamp desc'):
     """Simply an internal wrapper method to create request objects.
 
     Args:
@@ -61,8 +63,8 @@ class LogsTestBase(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     if log_filter is None:
       log_filter = self.default_filter
     return self.messages.ListLogEntriesRequest(
-        filter=log_filter.format(project=unicode(PROJECT)),
+        filter=log_filter.format(project=PROJECT),
         orderBy=order_by,
         pageSize=page_size,
         pageToken=page_token,
-        resourceNames=[u'projects/{}'.format(unicode(PROJECT))])
+        resourceNames=['projects/{}'.format(PROJECT)])

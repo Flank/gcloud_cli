@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for creating/using/deleting instances."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import sys
 
 from googlecloudsdk.calliope import base
@@ -25,7 +27,7 @@ class InstancesTest(e2e_instances_test_base.InstancesTestBase):
     self.track = base.ReleaseTrack.ALPHA
     self.template_name_generator = e2e_utils.GetResourceNameGenerator(
         prefix='instance-from-instance-template', sequence_start=1)
-    self.template_name = self.template_name_generator.next()
+    self.template_name = next(self.template_name_generator)
     self.Run(
         'compute instance-templates create {}'.format(self.template_name),
         track=base.ReleaseTrack.GA)
@@ -43,19 +45,19 @@ class InstancesTest(e2e_instances_test_base.InstancesTestBase):
 
   def testCreate(self):
     instance_name = self.GetInstanceName()
-    result = iter(self.Run('compute instances create {} '
-                           '--source-instance-template {} '
-                           '--format=disable '
-                           '--zone={}'.format(instance_name, self.template_name,
-                                              self.zone))).next()
+    result = next(iter(self.Run(
+        'compute instances create {} '
+        '--source-instance-template {} '
+        '--format=disable '
+        '--zone={}'.format(instance_name, self.template_name, self.zone))))
     self.assertEqual(result.name, instance_name, result)
 
   def testCreateWithContainer(self):
     instance_name = self.GetInstanceName()
-    result = iter(self.Run('compute instances create-with-container {} '
-                           '--source-instance-template {} '
-                           '--format=disable '
-                           '--container-image=gcr.io/google-containers/busybox '
-                           '--zone={}'.format(instance_name, self.template_name,
-                                              self.zone))).next()
+    result = next(iter(self.Run(
+        'compute instances create-with-container {} '
+        '--source-instance-template {} '
+        '--format=disable '
+        '--container-image=gcr.io/google-containers/busybox '
+        '--zone={}'.format(instance_name, self.template_name, self.zone))))
     self.assertEqual(result.name, instance_name, result)

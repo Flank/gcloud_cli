@@ -14,6 +14,8 @@
 
 """Tests for tests.lib.command_capture."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import io
 import os
 import StringIO
@@ -113,7 +115,7 @@ class CommandCaptureTest(CommandCaptureTestBase):
   def testCaptureWithFileObjects(self):
     """Make sure file object capture works properly."""
     with io.open('in', 'wt') as fp:
-      fp.write(u'test input')
+      fp.write('test input')
     with io.open('in', 'rt') as i_f:
       with io.open('out', 'wt') as of:
         with io.open('err', 'wt') as ef:
@@ -131,7 +133,7 @@ class CommandCaptureTest(CommandCaptureTestBase):
     with io.open('out', 'wt') as of:
       p = subprocess.Popen(self.program, stdin=subprocess.PIPE, stdout=of,
                            stderr=subprocess.STDOUT)
-      p.communicate(u'test input')
+      p.communicate('test input')
     # NOTE: The redirect directive affects both actual output and capture.
     self.AssertCaptureEquals(
         stdin='test input',
@@ -142,7 +144,7 @@ class CommandCaptureTest(CommandCaptureTestBase):
   def testCaptureWithFileDescriptors(self):
     """Make sure file descriptor capture works properly."""
     with io.open('in', 'wt') as fp:
-      fp.write(u'test input')
+      fp.write('test input')
     i_fd = os.open('in', os.O_RDONLY)
     o_fd = os.open('out', os.O_CREAT | os.O_WRONLY)
     e_fd = os.open('err', os.O_CREAT | os.O_WRONLY)

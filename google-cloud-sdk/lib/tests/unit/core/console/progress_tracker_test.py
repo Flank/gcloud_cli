@@ -63,9 +63,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
         properties.VALUES.core.InteractiveUXStyles.TESTING.name)
     with progress_tracker.ProgressTracker('tracker', autotick=False):
       pass
-    self.AssertErrEquals(
-        '<START PROGRESS TRACKER>tracker\n'
-        '<END PROGRESS TRACKER>SUCCESS\n')
+    self.AssertErrEquals('{"ux": "PROGRESS_TRACKER", "message": "tracker", '
+                         '"status": "SUCCESS"}\n')
 
   def testStubError(self):
     properties.VALUES.core.interactive_ux_style.Set(
@@ -73,9 +72,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
     with self.assertRaises(ValueError):
       with progress_tracker.ProgressTracker('tracker', autotick=False):
         raise ValueError()
-    self.AssertErrEquals(
-        '<START PROGRESS TRACKER>tracker\n'
-        '<END PROGRESS TRACKER>FAILURE\n')
+    self.AssertErrEquals('{"ux": "PROGRESS_TRACKER", "message": "tracker", '
+                         '"status": "FAILURE"}\n')
 
   def testProgressTrackerDoesNotCrash(self):
     self.console_size_mock.return_value = (0, 'unused size')
@@ -401,9 +399,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
         os.kill(os.getpid(), signal.SIGINT)
         t.Tick()
     self.AssertOutputEquals('')
-    self.AssertErrContains(
-        '<START PROGRESS TRACKER>tracker\n'
-        '<END PROGRESS TRACKER>INTERRUPTED\n')
+    self.AssertErrContains('{"ux": "PROGRESS_TRACKER", "message": "tracker",'
+                           ' "status": "INTERRUPTED"}\n')
 
   @test_case.Filters.DoNotRunOnWindows
   def testUnInterruptable(self):
@@ -436,9 +433,8 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture):
       os.kill(os.getpid(), signal.SIGINT)
       t.Tick()
     self.AssertOutputEquals('')
-    self.AssertErrEquals(
-        '<START PROGRESS TRACKER>tracker\n'
-        '<END PROGRESS TRACKER>SUCCESS\n')
+    self.AssertErrEquals('{"ux": "PROGRESS_TRACKER", "message": "tracker", '
+                         '"status": "SUCCESS"}\n')
 
 
 @test_case.Filters.SkipOnWindows('Enable completion on Windows', 'b/24905560')

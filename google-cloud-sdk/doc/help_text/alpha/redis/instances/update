@@ -22,8 +22,9 @@ POSITIONAL ARGUMENTS
      instance you want to update. The arguments in this group can be used to
      specify the attributes of this resource. (NOTE) Some attributes are not
      given arguments in this group but can be set in other ways. To set the
-     [project] attribute: Set the property [core/project] or provide the flag
-     [--project] on the command line. This must be specified.
+     [project] attribute: provide the flag [instance] on the command line with
+     a fully specified name; provide the flag [--project] on the command line;
+     set the property [core/project]. This must be specified.
 
        INSTANCE
           The ID of the instance or a fully qualified identifier for the
@@ -52,6 +53,11 @@ FLAGS
      --update-labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to update. If a label exists its value
         is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --update-redis-config=KEY=VALUE
         A list of Redis config KEY=VALUE pairs to update according to

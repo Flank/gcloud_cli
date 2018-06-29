@@ -47,28 +47,9 @@ class NetworkEndpointGroupsListTest(test_base.BaseTest):
         errors=[])
 
     self.AssertOutputEquals("""\
----
-description: My NEG 1
-kind: compute#networkEndpointGroup
-loadBalancer:
-  network: https://www.googleapis.com/compute/v1/projects/my-project/global/networks/network-1
-  zone: zone-1
-name: my-neg1
-networkEndpointType: GCE_VM_IP_PORT
-selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
-size: 5
-type: LOAD_BALANCING
----
-description: My NEG Too
-kind: compute#networkEndpointGroup
-loadBalancer:
-  network: https://www.googleapis.com/compute/v1/projects/my-project/global/networks/network-2
-  zone: zone-2
-name: my-neg2
-networkEndpointType: GCE_VM_IP_PORT
-selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-2/networkEndpointGroups/my-neg2
-size: 2
-type: LOAD_BALANCING
+NAME     LOCATION  TYPE            ENDPOINT_TYPE   SIZE
+my-neg1  zone-1    LOAD_BALANCING  GCE_VM_IP_PORT  5
+my-neg2  zone-2    LOAD_BALANCING  GCE_VM_IP_PORT  2
 """, normalize_space=True)
 
   def testCommandOuput(self):

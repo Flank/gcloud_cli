@@ -17,8 +17,8 @@ SYNOPSIS
           | --password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME) [--async]
         [--master-authorized-networks=NETWORK,[NETWORK,...]]
-        [--node-pool=NODE_POOL] [--zone=ZONE, -z ZONE]
-        [--max-nodes=MAX_NODES --min-nodes=MIN_NODES] [GCLOUD_WIDE_FLAG ...]
+        [--node-pool=NODE_POOL] [--max-nodes=MAX_NODES --min-nodes=MIN_NODES]
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Update cluster settings for an existing container cluster.
@@ -207,10 +207,6 @@ OPTIONAL FLAGS
      --node-pool=NODE_POOL
         Node pool to be updated.
 
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
-
      Cluster autoscaling
 
        --max-nodes=MAX_NODES
@@ -226,6 +222,15 @@ OPTIONAL FLAGS
           Minimum number of nodes to which the node pool specified by
           --node-pool (or default node pool if unspecified) can scale. Ignored
           unless --enable-autoscaling is also specified.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

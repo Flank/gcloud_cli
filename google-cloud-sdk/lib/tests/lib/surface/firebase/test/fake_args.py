@@ -14,6 +14,8 @@
 
 """Fake arguments for testing arg-file parsing and arg validation."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 
 

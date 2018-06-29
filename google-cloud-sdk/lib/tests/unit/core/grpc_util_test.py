@@ -14,16 +14,26 @@
 
 """Tests for the grpc_util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import types
 
 from googlecloudsdk.core import grpc_util
 from tests.lib import sdk_test_base
 from tests.lib import test_case
-import grpc
+
+import six
 
 from google.bigtable.admin.v2 import table_pb2
 
+if six.PY2:
+  # TODO(b/78118402): gRPC support on Python 3.
+  # This doesn't work on py3. We skip the import here just so tests can load
+  # and be skipped without crashing.
+  import grpc  # pylint: disable=g-import-not-at-top
 
+
+@test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/78118402')
 class GrpcUtilTest(sdk_test_base.WithFakeAuth):
 
   def testMakeChannel(self):

@@ -49,7 +49,10 @@ class Binding(_messages.Message):
 
 
 class CreateSnapshotRequest(_messages.Message):
-  r"""Request for the `CreateSnapshot` method.
+  r"""Request for the `CreateSnapshot` method.<br><br> <b>ALPHA:</b> This
+  feature is part of an alpha release. This API might be changed in backward-
+  incompatible ways and is not recommended for production use. It is not
+  subject to any SLA or deprecation policy.
 
   Messages:
     LabelsValue: User labels.
@@ -106,7 +109,10 @@ class Empty(_messages.Message):
 
 
 class ListSnapshotsResponse(_messages.Message):
-  r"""Response for the `ListSnapshots` method.
+  r"""Response for the `ListSnapshots` method.<br><br> <b>ALPHA:</b> This
+  feature is part of an alpha release. This API might be changed in backward-
+  incompatible ways and is not recommended for production use. It is not
+  subject to any SLA or deprecation policy.
 
   Fields:
     nextPageToken: If not empty, indicates that there may be more snapshot
@@ -134,8 +140,10 @@ class ListSubscriptionsResponse(_messages.Message):
 
 
 class ListTopicSnapshotsResponse(_messages.Message):
-  r"""Response for the `ListTopicSnapshots` method. [ALPHA] This method is a
-  part of a closed Alpha API.
+  r"""Response for the `ListTopicSnapshots` method.<br><br> <b>ALPHA:</b> This
+  feature is part of an alpha release. This API might be changed in backward-
+  incompatible ways and is not recommended for production use. It is not
+  subject to any SLA or deprecation policy.
 
   Fields:
     nextPageToken: If not empty, indicates that there may be more snapshots
@@ -174,6 +182,21 @@ class ListTopicsResponse(_messages.Message):
 
   nextPageToken = _messages.StringField(1)
   topics = _messages.MessageField('Topic', 2, repeated=True)
+
+
+class MessageStoragePolicy(_messages.Message):
+  r"""A MessageStoragePolicy object.
+
+  Fields:
+    allowedPersistenceRegions: The list of GCP regions where messages that are
+      published to the topic may be persisted in storage. Messages published
+      by publishers running in non-allowed GCP regions (or running outside of
+      GCP altogether) will be routed for storage in one of the allowed
+      regions. An empty list indicates a misconfiguration at the project or
+      organization level, which will result in all Publish operations failing.
+  """
+
+  allowedPersistenceRegions = _messages.StringField(1, repeated=True)
 
 
 class ModifyAckDeadlineRequest(_messages.Message):
@@ -873,7 +896,10 @@ class ReceivedMessage(_messages.Message):
 
 
 class SeekRequest(_messages.Message):
-  r"""Request for the `Seek` method.
+  r"""Request for the `Seek` method.<br><br> <b>ALPHA:</b> This feature is
+  part of an alpha release. This API might be changed in backward-incompatible
+  ways and is not recommended for production use. It is not subject to any SLA
+  or deprecation policy.
 
   Fields:
     snapshot: The snapshot to seek to. The snapshot's topic must be the same
@@ -913,7 +939,10 @@ class SetIamPolicyRequest(_messages.Message):
 
 
 class Snapshot(_messages.Message):
-  r"""A snapshot resource.
+  r"""A snapshot resource.<br><br> <b>ALPHA:</b> This feature is part of an
+  alpha release. This API might be changed in backward-incompatible ways and
+  is not recommended for production use. It is not subject to any SLA or
+  deprecation policy.
 
   Messages:
     LabelsValue: User labels.
@@ -977,14 +1006,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -1020,17 +1047,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 class Subscription(_messages.Message):
@@ -1062,8 +1087,10 @@ class Subscription(_messages.Message):
       `retain_acked_messages` is true, then this also configures the retention
       of acknowledged messages, and thus configures how far back in time a
       `Seek` can be done. Defaults to 7 days. Cannot be more than 7 days or
-      less than 10 minutes. [ALPHA] This field is a part of a closed Alpha
-      API.
+      less than 10 minutes.<br><br> <b>ALPHA:</b> This feature is part of an
+      alpha release. This API might be changed in backward-incompatible ways
+      and is not recommended for production use. It is not subject to any SLA
+      or deprecation policy.
     name: The name of the subscription. It must have the format
       `"projects/{project}/subscriptions/{subscription}"`. `{subscription}`
       must start with a letter, and contain only letters (`[A-Za-z]`), numbers
@@ -1076,8 +1103,10 @@ class Subscription(_messages.Message):
     retainAckedMessages: Indicates whether to retain acknowledged messages. If
       true, then messages are not expunged from the subscription's backlog,
       even if they are acknowledged, until they fall out of the
-      `message_retention_duration` window. [ALPHA] This field is a part of a
-      closed Alpha API.
+      `message_retention_duration` window.<br><br> <b>ALPHA:</b> This feature
+      is part of an alpha release. This API might be changed in backward-
+      incompatible ways and is not recommended for production use. It is not
+      subject to any SLA or deprecation policy.
     topic: The name of the topic from which this subscription is receiving
       messages. Format is `projects/{project}/topics/{topic}`. The value of
       this field will be `_deleted-topic_` if the topic has been deleted.
@@ -1148,6 +1177,13 @@ class Topic(_messages.Message):
 
   Fields:
     labels: User labels.
+    messageStoragePolicy: Policy constraining how messages published to the
+      topic may be stored. It is determined when the topic is created based on
+      the policy configured at the project level. It must not be set by the
+      caller in the request to CreateTopic or to UpdateTopic. This field will
+      be populated in the responses for GetTopic, CreateTopic, and
+      UpdateTopic: if not present in the response, then no constraints are in
+      effect.
     name: The name of the topic. It must have the format
       `"projects/{project}/topics/{topic}"`. `{topic}` must start with a
       letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes
@@ -1181,14 +1217,18 @@ class Topic(_messages.Message):
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   labels = _messages.MessageField('LabelsValue', 1)
-  name = _messages.StringField(2)
+  messageStoragePolicy = _messages.MessageField('MessageStoragePolicy', 2)
+  name = _messages.StringField(3)
 
 
 class UpdateSnapshotRequest(_messages.Message):
-  r"""Request for the UpdateSnapshot method.
+  r"""Request for the UpdateSnapshot method.<br><br> <b>ALPHA:</b> This
+  feature is part of an alpha release. This API might be changed in backward-
+  incompatible ways and is not recommended for production use. It is not
+  subject to any SLA or deprecation policy.
 
   Fields:
-    snapshot: The updated snpashot object.
+    snapshot: The updated snapshot object.
     updateMask: Indicates which fields in the provided snapshot to update.
       Must be specified and non-empty.
   """

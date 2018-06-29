@@ -43,7 +43,16 @@ class RoutesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
                          'network/default'),
                 nextHopPeering=('peering-1'),
                 selfLink=('https://www.googleapis.com/compute/v1/projects/'
-                          'my-project/global/routes/route-5'))
+                          'my-project/global/routes/route-5')),
+            core_apis.GetMessagesModule('compute', 'v1').Route(
+                destRange='10.10.0.0/16',
+                name='route-6',
+                network=('v1/projects/my-project/'
+                         'network/default'),
+                nextHopNetwork=('network-1'),
+                selfLink=('https://www.googleapis.com/compute/v1/projects/'
+                          'my-project/global/routes/route-6')),
+
         ]))
 
   def testTableOutput(self):
@@ -65,6 +74,7 @@ class RoutesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
             route-3 default 10.10.0.0/16 default-internet-gateway    1
             route-4 default 10.10.0.0/16 region-1/vpnTunnels/tunnel-1
             route-5 default 10.10.0.0/16 peering-1
+            route-6 default 10.10.0.0/16 network-1
             """), normalize_space=True)
 
   def testUriFlagOutput(self):
@@ -84,6 +94,7 @@ https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-2
 https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-3
 https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-4
 https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-5
+https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-6
 """, normalize_space=True)
 
   def testRoutesCompleter(self):
@@ -103,6 +114,7 @@ https://www.googleapis.com/compute/v1/projects/my-project/global/routes/route-5
             'route-3',
             'route-4',
             'route-5',
+            'route-6',
         ],
         cli=self.cli,
     )

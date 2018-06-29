@@ -37,6 +37,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.configurations import named_configs
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.resource import session_capturer
+from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import pkg_resources
 
 import six
@@ -590,7 +591,7 @@ class _CompletionFinder(argcomplete.CompletionFinder):
     # argcomplete original. We drop { '!', ' ', '\n' } from _NO_QUOTE_SPECIAL
     # and { '!' } from _DOUBLE_QUOTE_SPECIAL. argcomplete should make these
     # settable properties.
-    no_quote_special = '\\();<>|&$*\t`"\''
+    no_quote_special = '\\();<>|&$* \t\n`"\''
     double_quote_special = '\\`"$'
     single_quote_special = '\\'
     continuation_special = '=/:'
@@ -871,7 +872,8 @@ class CLI(object):
 
     finally:
       if session_capturer.SessionCapturer.capturer is not None:
-        with open(properties.VALUES.core.capture_session_file.Get(), 'w') as f:
+        with files.FileWriter(
+            properties.VALUES.core.capture_session_file.Get()) as f:
           session_capturer.SessionCapturer.capturer.Print(f)
       properties.VALUES.PopInvocationValues()
       named_configs.FLAG_OVERRIDE_STACK.Pop()

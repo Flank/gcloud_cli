@@ -14,6 +14,8 @@
 
 """Tests for rolling-updates list command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 
@@ -78,14 +80,14 @@ class UpdatesListTest(base.UpdaterMockTest):
         ),
         messages.RollingUpdateList(
             items=[UPDATE_1, UPDATE_2],
-            nextPageToken=u'1396059067464',
+            nextPageToken='1396059067464',
         ),
     )
     self.mocked_client_v1beta1.rollingUpdates.List.Expect(
         messages.ReplicapoolupdaterRollingUpdatesListRequest(
             project=self.Project(),
             zone=base.ZONE,
-            pageToken=u'1396059067464',
+            pageToken='1396059067464',
             maxResults=100,
         ),
         messages.RollingUpdateList(

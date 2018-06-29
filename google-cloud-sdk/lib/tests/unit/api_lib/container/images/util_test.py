@@ -14,6 +14,8 @@
 
 """Tests for googlecloudsdk.api_lib.container.images.utils."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import time
 
 from apitools.base.py.testing import mock as apitools_mock
@@ -376,7 +378,10 @@ class GetDigestFromNameTest(cli_test_base.CliTestBase,
     list_registry.return_value.__enter__.return_value.exists.return_value = (
         False)
 
-    with self.assertRaises(util.InvalidImageNameError):
+    with self.assertRaisesRegexp(
+        util.InvalidImageNameError,
+        'Expected tag in the form "base:tag" or "tag" or digest in the form '
+        '"sha256:<digest>"'):
       util.GetDigestFromName(repo)
 
 

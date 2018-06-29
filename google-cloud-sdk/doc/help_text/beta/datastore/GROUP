@@ -25,6 +25,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     indexes
+        (BETA) Manage Cloud Datastore indexes.
+
      operations
         (BETA) Manage Long Running Operations for Cloud Datastore.
 

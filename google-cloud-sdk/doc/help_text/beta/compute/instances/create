@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud beta compute instances create INSTANCE_NAMES [INSTANCE_NAMES ...]
-        [--accelerator=[type=TYPE,[count=COUNT],...]] [--async]
+        [--accelerator=[count=COUNT],[type=TYPE]] [--async]
         [--no-boot-disk-auto-delete]
         [--boot-disk-device-name=BOOT_DISK_DEVICE_NAME]
         [--boot-disk-size=BOOT_DISK_SIZE] [--boot-disk-type=BOOT_DISK_TYPE]
@@ -23,12 +23,20 @@ SYNOPSIS
         [--network-tier=NETWORK_TIER] [--preemptible]
         [--private-network-ip=PRIVATE_NETWORK_IP]
         [--no-require-csek-key-create] [--no-restart-on-failure]
+        [--shielded-vm-integrity-monitoring] [--shielded-vm-secure-boot]
+        [--shielded-vm-vtpm]
         [--source-instance-template=SOURCE_INSTANCE_TEMPLATE] [--subnet=SUBNET]
         [--tags=TAG,[TAG,...]] [--zone=ZONE] [--address=ADDRESS | --no-address]
+        [--boot-disk-kms-key=BOOT_DISK_KMS_KEY
+          : --boot-disk-kms-keyring=BOOT_DISK_KMS_KEYRING
+          --boot-disk-kms-location=BOOT_DISK_KMS_LOCATION
+          --boot-disk-kms-project=BOOT_DISK_KMS_PROJECT]
         [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
           : --custom-extensions]
         [--image-project=IMAGE_PROJECT --image=IMAGE
-          | --image-family=IMAGE_FAMILY] [--public-ptr | --no-public-ptr]
+          | --image-family=IMAGE_FAMILY]
+        [--node=NODE | --node-affinity-file=NODE_AFFINITY_FILE
+          | --node-group=NODE_GROUP] [--public-ptr | --no-public-ptr]
         [--public-ptr-domain=PUBLIC_PTR_DOMAIN | --no-public-ptr-domain]
         [--scopes=[SCOPE,...] | --no-scopes]
         [--service-account=SERVICE_ACCOUNT | --no-service-account]
@@ -57,7 +65,7 @@ POSITIONAL ARGUMENTS
         Names of the instances to create.
 
 FLAGS
-     --accelerator=[type=TYPE,[count=COUNT],...]
+     --accelerator=[count=COUNT],[type=TYPE]
         Attaches accelerators (e.g. GPUs) to the instances.
 
          type
@@ -163,6 +171,40 @@ FLAGS
             the instance, this option won't apply. The default value for this
             is no.
 
+         kms-key
+            Fully qualified Cloud KMS cryptokey name that will protect the
+            disk. This can either be the fully qualified path or the name. The
+            fully qualified Cloud KMS cryptokey name format is:
+            projects/<kms-project>/locations/<kms-location>/keyRings/<kms-keyring>/
+            cryptoKeys/<key-name>. If the value is not fully qualified then
+            kms-location, kms-keyring, and optionally kms-project are required.
+            See
+            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+            for more details.
+
+         kms-project
+            Project that contains the Cloud KMS cryptokey that will protect the
+            disk. If the project is not specified then the project where the
+            disk is being created will be used. If this flag is set then
+            key-location, kms-keyring, and kms-key are required. See
+            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+            for more details.
+
+         kms-location
+            Location of the Cloud KMS cryptokey to be used for protecting the
+            disk. All Cloud KMS cryptokeys are reside in a 'location'. To get a
+            list of possible locations run 'gcloud kms locations list'. If this
+            flag is set then kms-keyring and kms-key are required. See
+            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+            for more details.
+
+         kms-keyring
+            The keyring which contains the Cloud KMS cryptokey that will
+            protect the disk. If this flag is set then kms-location and kms-key
+            are required. See
+            https://cloud.google.com/compute/docs/disks/customer-managed-encryption
+            for more details.
+
      --csek-key-file=FILE
         Path to a Customer-Supplied Encryption Key (CSEK) key file, mapping
         Google Compute Engine resources to user managed keys to be used when
@@ -219,6 +261,11 @@ FLAGS
 
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE]
         Attaches a local SSD to the instances.
@@ -387,6 +434,21 @@ FLAGS
         Engine. This does not affect terminations performed by the user.
         Enabled by default, use --no-restart-on-failure to disable.
 
+     --shielded-vm-integrity-monitoring
+        Enables monitoring and attestation of the boot integrity of the
+        instance. The attestation is performed against the integrity policy
+        baseline. This baseline is initially derived from the implicitly
+        trusted boot image when the instance is created. This baseline can be
+        updated by using --shielded-vm-learn-integrity-policy.
+
+     --shielded-vm-secure-boot
+        The instance will boot with secure boot enabled.
+
+     --shielded-vm-vtpm
+        The instance will boot with the TPM (Trusted Platform Module) enabled.
+        A TPM is a hardware module that can be used for different security
+        operations such as remote attestation, encryption and sealing of keys.
+
      --source-instance-template=SOURCE_INSTANCE_TEMPLATE
         The name of the instance template that the instance will be created
         from.
@@ -445,6 +507,24 @@ FLAGS
           If provided, the instances will not be assigned external IP
           addresses.
 
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the disk. The arguments in this group can be used to
+     specify the attributes of this resource.
+
+       --boot-disk-kms-key=BOOT_DISK_KMS_KEY
+          The ID of the key or a fully qualified identifier for the key. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --boot-disk-kms-keyring=BOOT_DISK_KMS_KEYRING
+          The KMS keyring of the key.
+
+       --boot-disk-kms-location=BOOT_DISK_KMS_LOCATION
+          The Cloud location for the key.
+
+       --boot-disk-kms-project=BOOT_DISK_KMS_PROJECT
+          The Cloud project for the key.
+
      Custom machine type extensions.
 
        --custom-cpu=CUSTOM_CPU
@@ -493,6 +573,33 @@ FLAGS
           needed.
 
           By default, debian-9 is assumed for this flag.
+
+     Sole Tenancy At most one of these may be specified:
+
+       --node=NODE
+          The name of the node to schedule this instance on.
+
+       --node-affinity-file=NODE_AFFINITY_FILE
+          The JSON/YAML file containing the configuration of desired nodes onto
+          which this instance could be scheduled. These rules filter the nodes
+          according to their node affinity labels. A node's affinity labels
+          come from the node template of the group the node is in.
+
+          The file should contain a list of a JSON/YAML objects with the
+          following fields:
+
+       key
+          Corresponds to the node affinity label keys of the Node resource.
+       operator
+          Specifies the node selection type. Must be one of: IN: Requires
+          Compute Engine to seek for matched nodes. NOT_IN: Requires Compute
+          Engine to avoid certain nodes.
+       values
+          Optional. A list of values which correspond to the node affinity
+          label values of the Node resource.
+
+       --node-group=NODE_GROUP
+          The name of the node group to schedule this instance on.
 
      At most one of these may be specified:
 

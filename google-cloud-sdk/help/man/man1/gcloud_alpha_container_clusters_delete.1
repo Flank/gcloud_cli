@@ -17,7 +17,32 @@ gcloud alpha container clusters delete \- delete an existing cluster for running
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Delete an existing cluster for running containers.
+\fB(ALPHA)\fR When you delete a cluster, the following resources are deleted:
+
+.RS 2m
+.IP "\(bu" 2m
+The master resources
+.IP "\(bu" 2m
+All of the node instances in the cluster
+.IP "\(bu" 2m
+Any Pods that are running on those instances
+.IP "\(bu" 2m
+Any firewalls and routes created by Kubernetes Engine at the time of cluster
+creation
+.IP "\(bu" 2m
+Data stored in host hostPath and emptyDir volumes
+.RE
+.sp
+
+The following resources are not deleted:
+
+.RS 2m
+.IP "\(bu" 2m
+External load balancers created by the cluster
+.IP "\(bu" 2m
+Persistent disk volumes
+.RE
+.sp
 
 
 

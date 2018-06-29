@@ -63,8 +63,9 @@ class EnvironmentPatchUtilTest(base.EnvironmentsUnitTest):
                               self.patch_environment, False)
     self.assertIsNone(retval)
     self.AssertErrMatches(
-        r'^<START PROGRESS TRACKER>Waiting for \[{}] to be updated with \[{}]'
-        .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
+        r'^{{"ux": "PROGRESS_TRACKER", "message": "Waiting for \[{}] to be '
+        r'updated with \[{}]"'.format(self.TEST_ENVIRONMENT_NAME,
+                                      self.TEST_OPERATION_NAME))
 
   def testPatch_Asynchronous(self):
     self.ExpectEnvironmentPatch(

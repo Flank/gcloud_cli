@@ -25,10 +25,10 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --keyring=KEYRING
-        The containing keyring.
+        Key ring of the key.
 
      --location=LOCATION
-        The location of the requested resource.
+        Location of the key.
 
      --next-rotation-time=NEXT_ROTATION_TIME
         Next automatic rotation time of the key. See $ gcloud topic datetimes

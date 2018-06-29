@@ -120,7 +120,7 @@ class CopyFileTest(sdk_test_base.SdkBase):
                                         self.target_path)
 
 
-class CopyFileFromGCSTest(sdk_test_base.SdkBase):
+class CopyFileFromGCSTest(sdk_test_base.WithFakeAuth):
 
   _BUCKET = storage_util.BucketReference.FromBucketUrl('gs://mybucket/')
 
@@ -188,7 +188,7 @@ class CopyFileFromGCSTest(sdk_test_base.SdkBase):
                                           self.local_path)
 
 
-class ReadObjectTest(sdk_test_base.SdkBase):
+class ReadObjectTest(sdk_test_base.WithFakeAuth):
 
   _OBJECT = storage_util.ObjectReference.FromUrl('gs://bucket/object')
 

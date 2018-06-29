@@ -16,6 +16,7 @@
 """Tests for `gcloud app logs` command group."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 
 from googlecloudsdk.api_lib.util import apis
@@ -81,10 +82,10 @@ UNICODE_ENTRY_1 = messages.LogEntry(
     logName=('projects/{0}/logs/appengine.googleapis.com%2Fstderr'
              .format(PROJECT)),
     insertId='ID005',
-    textPayload=u'Ṳᾔḯ¢◎ⅾℯ',
+    textPayload='Ṳᾔḯ¢◎ⅾℯ',
     timestamp='2016-04-06T00:44:30Z')
 
-UNICODE_ENTRY_1_FORMATTED = u'2016-04-06 00:44:30 Ṳᾔḯ¢◎ⅾℯ'
+UNICODE_ENTRY_1_FORMATTED = '2016-04-06 00:44:30 Ṳᾔḯ¢◎ⅾℯ'
 
 # Request log sometimes had project number instead of project ID, so mimic that
 REQUEST_LOG_ENTRY_1 = messages.LogEntry(
@@ -348,7 +349,7 @@ class LogsReadTest(logs_base.LogsTestBase):
   def testCustomLogs(self):
     """Test `gcloud app logs read` with --logs flag."""
     log_filter = (
-        u'resource.type="gae_app" AND logName=('
+        'resource.type="gae_app" AND logName=('
         '"projects/{project}/logs/appengine.googleapis.com%2Frequest_log" OR '
         '"projects/{project}/logs/appengine.googleapis.com%2Fsyslog")'
         .format(project=PROJECT))

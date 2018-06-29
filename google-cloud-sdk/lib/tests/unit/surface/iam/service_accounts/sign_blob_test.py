@@ -14,6 +14,9 @@
 
 """Tests that ensure deserialization of server responses work properly."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
@@ -28,12 +31,12 @@ class SignBlobTest(unit_test_base.BaseTest):
             name=('projects/-/serviceAccounts/'
                   'test@test-project.iam.gserviceaccount.com'),
             signBlobRequest=self.msgs.SignBlobRequest(
-                bytesToSign='blob to sign')),
+                bytesToSign=b'blob to sign')),
         response=self.msgs.SignBlobResponse(keyId=test_key,
-                                            signature='signed blob'))
+                                            signature=b'signed blob'))
 
-    in_file = self.MockFileRead('blob to sign')
-    out_file = self.MockFileWrite('signed blob')
+    in_file = self.Touch(self.temp_path, contents=b'blob to sign')
+    out_file = self.Touch(self.temp_path)
     self.Run('iam service-accounts sign-blob '
              '--iam-account test@test-project.iam.gserviceaccount.com '
              '{0} {1}'.format(in_file, out_file))
@@ -42,6 +45,7 @@ class SignBlobTest(unit_test_base.BaseTest):
                             '[test@test-project.iam.gserviceaccount.com] '
                             'using key [{2}]').format(in_file, out_file,
                                                       test_key))
+    self.AssertBinaryFileEquals(b'signed blob', out_file)
 
   def testMissingInputFile(self):
     with self.assertRaises(files.Error):

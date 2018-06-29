@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for creating/using/deleting instances."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_instances_test_base
@@ -38,7 +40,7 @@ class MultiNicTestBase(e2e_instances_test_base.InstancesTestBase):
         res_type, name, creation_args), **additional_kwargs)
 
   def _CreateSubnetAlphaBeta(self, cidr_range):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     self._CreateResourceScheduleCleanUp(name, 'networks', e2e_test_base.GLOBAL,
                                         '--subnet-mode custom')
     self._CreateResourceScheduleCleanUp(
@@ -48,7 +50,7 @@ class MultiNicTestBase(e2e_instances_test_base.InstancesTestBase):
     return name
 
   def _CreateSubnetGA(self, cidr_range):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     self._CreateResourceScheduleCleanUp(name, 'networks', e2e_test_base.GLOBAL,
                                         '--subnet-mode custom')
     self._CreateResourceScheduleCleanUp(
@@ -83,7 +85,7 @@ class MultiNicAlphaTest(MultiNicTestBase):
     self._created_resources = []
 
   def testCreateMultiNicInstance(self):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     subnet_1 = self._CreateSubnetAlphaBeta('10.0.1.0/24')
     subnet_2 = self._CreateSubnetAlphaBeta('10.0.2.0/24')
     # If the test passes the instance will be deleted and the clean up will have
@@ -118,7 +120,7 @@ class MultiNicBetaTest(MultiNicTestBase):
     self._created_resources = []
 
   def testCreateMultiNicInstance(self):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     subnet_1 = self._CreateSubnetAlphaBeta('10.0.1.0/24')
     subnet_2 = self._CreateSubnetAlphaBeta('10.0.2.0/24')
     # If the test passes the instance will be deleted and the clean up will have
@@ -153,7 +155,7 @@ class MultiNicGATest(MultiNicTestBase):
     self._created_resources = []
 
   def testCreateMultiNicInstance(self):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     subnet_1 = self._CreateSubnetGA('10.0.1.0/24')
     subnet_2 = self._CreateSubnetGA('10.0.2.0/24')
     # If the test passes the instance will be deleted and the clean up will have
@@ -189,7 +191,7 @@ class AliasIpRangeTest(MultiNicTestBase):
     self._created_resources = []
 
   def testCreateInstanceWithAliasIpRange(self):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     subnet = self._CreateSubnetAlphaBeta('10.0.3.0/24')
     self._CreateResourceScheduleCleanUp(
         name,

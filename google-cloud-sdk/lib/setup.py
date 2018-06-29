@@ -16,6 +16,8 @@
 
 """Setup installation module for gcloud-cli."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 from setuptools import find_packages
 from setuptools import setup

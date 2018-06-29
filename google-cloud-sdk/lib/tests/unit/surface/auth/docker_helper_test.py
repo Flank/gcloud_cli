@@ -15,6 +15,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
 import json
 
 from googlecloudsdk.core import exceptions
@@ -24,38 +25,51 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
+import mock
 
-class DockerHelperTest(sdk_test_base.WithFakeAuth,
-                       cli_test_base.CliTestBase):
+
+class DockerHelperTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def SetUp(self):
+
     def FakeRefresh(cred, http=None):
       del http
       if cred:
         cred.access_token = self.FakeAuthAccessToken()
-    self.StartObjectPatch(c_store, 'Refresh', side_effect=FakeRefresh)
+
+    self.refresh_mock = self.StartObjectPatch(
+        c_store, 'Refresh', side_effect=FakeRefresh)
+
+  def GetFakeCred(self, token_expiry):
+    cred_mock = mock.MagicMock()
+    cred_mock.token_expiry = token_expiry
+    cred_mock.access_token = self.FakeAuthAccessToken()
+    return cred_mock
+
+  def SetMockLoadCreds(self, expiry_time):
+    mock_load = self.StartObjectPatch(c_store, 'Load', autospec=True)
+    fake_cred = self.GetFakeCred(expiry_time)
+    mock_load.return_value = fake_cred
 
   def testGet(self):
     self.WriteInput('gcr.io\n')
     self.Run('auth docker-helper get')
     data = json.loads(self.GetOutput())
-    self.assertEqual(
-        data,
-        {
-            'Secret': self.FakeAuthAccessToken(),
-            'Username': 'oauth2accesstoken'
-        })
+    self.assertEqual(data, {
+        'Secret': self.FakeAuthAccessToken(),
+        'Username': '_dcgcloud_token'
+    })
+    self.refresh_mock.assert_not_called()
 
   def testGet_WithScheme(self):
     self.WriteInput('https://gcr.io\n')
     self.Run('auth docker-helper get')
     data = json.loads(self.GetOutput())
-    self.assertEqual(
-        data,
-        {
-            'Secret': self.FakeAuthAccessToken(),
-            'Username': 'oauth2accesstoken'
-        })
+    self.assertEqual(data, {
+        'Secret': self.FakeAuthAccessToken(),
+        'Username': '_dcgcloud_token'
+    })
+    self.refresh_mock.assert_not_called()
 
   def testGet_AllSupported(self):
     for supported_registry in credential_utils.SupportedRegistries():
@@ -64,8 +78,9 @@ class DockerHelperTest(sdk_test_base.WithFakeAuth,
       data = json.loads(self.GetOutput())
       self.assertEqual(data, {
           'Secret': self.FakeAuthAccessToken(),
-          'Username': 'oauth2accesstoken'
+          'Username': '_dcgcloud_token'
       })
+      self.refresh_mock.assert_not_called()
       self.ClearOutput()
       self.ClearErr()
 
@@ -76,17 +91,57 @@ class DockerHelperTest(sdk_test_base.WithFakeAuth,
       data = json.loads(self.GetOutput())
       self.assertEqual(data, {
           'Secret': self.FakeAuthAccessToken(),
-          'Username': 'oauth2accesstoken'
+          'Username': '_dcgcloud_token'
       })
+      self.refresh_mock.assert_not_called()
       self.ClearOutput()
       self.ClearErr()
+
+  def testRefresh_ExpiryTime30minRemaining(self):
+    expiry_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+    self.SetMockLoadCreds(expiry_time)
+
+    self.WriteInput('gcr.io\n')
+    self.Run('auth docker-helper get')
+    data = json.loads(self.GetOutput())
+    self.assertEqual(data, {
+        'Secret': self.FakeAuthAccessToken(),
+        'Username': '_dcgcloud_token'
+    })
+    self.refresh_mock.assert_called_once()
+
+  def testRefresh_ExpiryTimeExpired(self):
+    expiry_time = datetime.datetime(2000, 1, 23, 4, 56, 7, 89)
+    self.SetMockLoadCreds(expiry_time)
+
+    self.WriteInput('gcr.io\n')
+    self.Run('auth docker-helper get')
+    data = json.loads(self.GetOutput())
+    self.assertEqual(data, {
+        'Secret': self.FakeAuthAccessToken(),
+        'Username': '_dcgcloud_token'
+    })
+    self.refresh_mock.assert_called_once()
+
+  def testRefresh_FreshToken(self):
+    expiry_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=56)
+    self.SetMockLoadCreds(expiry_time)
+
+    self.WriteInput('gcr.io\n')
+    self.Run('auth docker-helper get')
+    data = json.loads(self.GetOutput())
+    self.assertEqual(data, {
+        'Secret': self.FakeAuthAccessToken(),
+        'Username': '_dcgcloud_token'
+    })
+    self.refresh_mock.assert_not_called()
 
   def testList(self):
     self.Run('auth docker-helper list')
 
     for supported_registry in credential_utils.DefaultAuthenticatedRegistries():
       self.AssertOutputContains(
-          '"https://{registry}": "oauth2accesstoken"'.format(
+          '"https://{registry}": "_dcgcloud_token"'.format(
               registry=supported_registry))
 
   def testStore(self):
@@ -96,8 +151,7 @@ class DockerHelperTest(sdk_test_base.WithFakeAuth,
   def testUnknownRepo(self):
     self.WriteInput('foo.io\n')
     with self.AssertRaisesExceptionMatches(
-        exceptions.Error,
-        'Repository url [foo.io] is not supported'):
+        exceptions.Error, 'Repository url [foo.io] is not supported'):
       self.Run('auth docker-helper get')
 
   def testNoCreds(self):

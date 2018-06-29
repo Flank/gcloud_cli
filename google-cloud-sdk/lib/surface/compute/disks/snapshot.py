@@ -13,6 +13,8 @@
 # limitations under the License.
 """Command for snapshotting disks."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import csek_utils
 from googlecloudsdk.api_lib.compute import name_generator
@@ -23,9 +25,11 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute.disks import flags as disks_flags
+from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import exceptions as core_exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from six.moves import zip
 
 
 DETAILED_HELP = {
@@ -131,6 +135,9 @@ class SnapshotDisks(base.SilentCommand):
       if (hasattr(args, 'storage_location') and
           args.IsSpecified('storage_location')):
         snapshot_message.storageLocations = [args.storage_location]
+      if (hasattr(args, 'labels') and args.IsSpecified('labels')):
+        snapshot_message.labels = labels_util.ParseCreateArgs(
+            args, messages.Snapshot.LabelsValue)
 
       if disk_ref.Collection() == 'compute.disks':
         request = messages.ComputeDisksCreateSnapshotRequest(
@@ -189,6 +196,7 @@ class SnapshotDisksBeta(SnapshotDisks):
   def Args(parser):
     SnapshotDisks.disks_arg = disks_flags.MakeDiskArgZonalOrRegional(
         plural=True)
+    labels_util.AddCreateLabelsFlags(parser)
     _CommonArgs(parser)
 
 

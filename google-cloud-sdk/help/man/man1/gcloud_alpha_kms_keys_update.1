@@ -1,0 +1,204 @@
+
+.TH "GCLOUD_ALPHA_KMS_KEYS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha kms keys update \- update a key
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha kms keys update\fR \fIKEY\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-primary\-version\fR=\fIPRIMARY_VERSION\fR] [\fB\-\-remove\-rotation\-schedule\fR] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR 1. Update the rotation schedule for the given key.
+
+Updates the rotation schedule for the given key. The schedule automatically
+creates a new primary version for the key according to the
+\f5\-\-next\-rotation\-time\fR and \f5\-\-rotation\-period\fR flags.
+
+The flag \f5\-\-next\-rotation\-time\fR must be in ISO or RFC3339 format, and
+\f5\-\-rotation\-period\fR must be in the form INTEGER[UNIT], where units can be
+one of seconds (s), minutes (m), hours (h) or days (d).
+
+Key rotations performed manually via \f5update\-primary\-version\fR and the
+version \f5create\fR do not affect the stored \f5\-\-next\-rotation\-time\fR.
+
+2. Remove the rotation schedule for the given key with
+\-\-remove\-rotation\-schedule.
+
+3. Update/Remove the labels for the given key with \-\-update\-labels and/or
+\-\-remove\-labels.
+
+4. Update the primary version for the given key with \-\-primary\-version.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIKEY\fR
+Name of the key to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the key.
+
+.TP 2m
+\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR
+Next automatic rotation time of the key. See $ gcloud topic datetimes for
+information on time formats.
+
+.TP 2m
+\fB\-\-primary\-version\fR=\fIPRIMARY_VERSION\fR
+Primary version to make primary.
+
+.TP 2m
+\fB\-\-remove\-rotation\-schedule\fR
+Remove any existing rotation schedule on the key.
+
+.TP 2m
+\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR
+Automatic rotation period of the key. See $ gcloud topic datetimes for
+information on duration formats.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Removes all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha kms keys update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha kms keys update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+A list of label keys to remove. If a label does not exist it is silently
+ignored.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command sets a 30 day rotation period for the key named
+\f5frodo\fR within the keyring \f5fellowship\fR and location \f5global\fR
+starting at the specified time:
+
+.RS 2m
+$ gcloud alpha kms keys update frodo \e
+    \-\-location global \e
+    \-\-keyring fellowship \e
+    \-\-rotation\-period 30d \e
+    \-\-next\-rotation\-time 2017\-10\-12T12:34:56.1234Z
+.RE
+
+The following command removes the rotation schedule for the key named
+\f5frodo\fR within the keyring \f5fellowship\fR and location \f5global\fR:
+
+.RS 2m
+$ gcloud alpha kms keys update frodo \e
+    \-\-location global \e
+    \-\-keyring fellowship \e
+    \-\-remove\-rotation\-schedule
+.RE
+
+The following command updates the labels value for the key named \f5frodo\fR
+within the keyring \f5fellowship\fR and location \f5global\fR. If the label key
+does not exist at the time, it will be added:
+
+.RS 2m
+$ gcloud alpha kms keys update frodo \e
+    \-\-location global \e
+    \-\-keyring fellowship \e
+    \-\-update\-labels k1=v1
+.RE
+
+The following command removes labels k1 and k2 from the key named \f5frodo\fR
+within the keyring \f5fellowship\fR and location \f5global\fR:
+
+.RS 2m
+$ gcloud alpha kms keys update frodo \e
+    \-\-location global \e
+    \-\-keyring fellowship \e
+    \-\-remove\-labels k1,k2
+.RE
+
+The following command updates the primary version for the key named \f5frodo\fR
+within the keyring \f5fellowship\fR and location \f5global\fR:
+
+.RS 2m
+$ gcloud alpha kms keys update frodo \e
+    \-\-location global \e
+    \-\-keyring fellowship \e
+    \-\-primary\-version 1
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/. These variants are also available:
+
+.RS 2m
+$ gcloud kms keys update
+$ gcloud beta kms keys update
+.RE
+

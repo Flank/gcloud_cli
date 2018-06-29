@@ -27,12 +27,12 @@ best matching route.
 Routes match packets by destination IP address, preferring smaller or more
 specific ranges over larger ones (see \f5\fI\-\-destination\-range\fR\fR). If
 there is a tie, the system selects the route with the smallest priority value.
-If there is still a tie, it uses the layer three and four packet headers to
-select just one of the remaining matching routes. The packet is then forwarded
-as specified by \f5\fI\-\-next\-hop\-address\fR\fR,
-\f5\fI\-\-next\-hop\-instance\fR\fR, \f5\fI\-\-next\-hop\-vpn\-tunnel\fR\fR, or
-\f5\fI\-\-next\-hop\-gateway\fR\fR of the winning route. Packets that do not
-match any route in the sending virtual machine routing table will be dropped.
+If there is still a tie, it uses the layer 3 and 4 packet headers to select just
+one of the remaining matching routes. The packet is then forwarded as specified
+by \f5\fI\-\-next\-hop\-address\fR\fR, \f5\fI\-\-next\-hop\-instance\fR\fR,
+\f5\fI\-\-next\-hop\-vpn\-tunnel\fR\fR, or \f5\fI\-\-next\-hop\-gateway\fR\fR of
+the winning route. Packets that do not match any route in the sending virtual
+machine routing table will be dropped.
 
 Exactly one of \f5\fI\-\-next\-hop\-address\fR\fR,
 \f5\fI\-\-next\-hop\-gateway\fR\fR, \f5\fI\-\-next\-hop\-vpn\-tunnel\fR\fR, or

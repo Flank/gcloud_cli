@@ -38,10 +38,11 @@ Cloud SQL instance ID.
 .TP 2m
 \fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR
 The activation policy for this instance. This specifies when the instance should
-be activated and is applicable only when the instance state is RUNNABLE. The
-default is ON_DEMAND. More information on activation policies can be found here:
-https://cloud.google.com/sql/faq#activation_policy. \fIACTIVATION_POLICY\fR must
-be one of: \fBALWAYS\fR, \fBNEVER\fR, \fBON_DEMAND\fR.
+be activated and is applicable only when the instance state is \f5RUNNABLE\fR.
+The default is \f5on\-demand\fR. More information on activation policies can be
+found here: https://cloud.google.com/sql/faq#activation_policy.
+\fIACTIVATION_POLICY\fR must be one of: \fBalways\fR, \fBnever\fR,
+\fBon\-demand\fR.
 
 .TP 2m
 \fB\-\-[no\-]assign\-ip\fR
@@ -147,8 +148,8 @@ First Generation instances only. The pricing plan for this instance.
 
 .TP 2m
 \fB\-\-replication\fR=\fIREPLICATION\fR
-The type of replication this instance uses. The default is SYNCHRONOUS.
-\fIREPLICATION\fR must be one of: \fBSYNCHRONOUS\fR, \fBASYNCHRONOUS\fR.
+The type of replication this instance uses. The default is synchronous.
+\fIREPLICATION\fR must be one of: \fBsynchronous\fR, \fBasynchronous\fR.
 
 .TP 2m
 \fB\-\-[no\-]require\-ssl\fR
@@ -184,8 +185,10 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]
-First Generation instances only. List of IDs for App Engine applications running
-in the Standard environment that can access this instance.
+First Generation instances only. List of project IDs for App Engine applications
+running in the Standard environment that can access this instance.
+
+The value given for this argument \fBreplaces\fR the existing list.
 
 .TP 2m
 \fB\-\-clear\-gae\-apps\fR
@@ -203,6 +206,8 @@ At most one of these may be specified:
 The list of external networks that are allowed to connect to the instance.
 Specified in CIDR notation, also known as 'slash' notation (e.g.
 192.168.100.0/24).
+
+The value given for this argument \fBreplaces\fR the existing list.
 
 .TP 2m
 \fB\-\-clear\-authorized\-networks\fR

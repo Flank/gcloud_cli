@@ -142,8 +142,9 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest):
         self.TEST_ENVIRONMENT_ID,
     )
     self.AssertErrMatches(
-        r'^<START PROGRESS TRACKER>Waiting for \[{}] to be updated with \[{}]'
-        .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
+        r'^{{"ux": "PROGRESS_TRACKER", "message": '
+        r'"Waiting for \[{}] to be updated with \[{}]"'.format(
+            self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
   def testNodeCountUpdateTooFew(self):
     """Tests that updating the node count to a value < 3 fails."""
@@ -194,9 +195,11 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest):
         self.TEST_PROJECT,
         self.TEST_ENVIRONMENT_ID,
     )
+
     self.AssertErrMatches(
-        r'^<START PROGRESS TRACKER>Waiting for \[{}] to be updated with \[{}]'
-        .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
+        r'^{{"ux": "PROGRESS_TRACKER", "message": "Waiting for \[{}] to be '
+        r'updated with \[{}]"'.format(self.TEST_ENVIRONMENT_NAME,
+                                      self.TEST_OPERATION_NAME))
 
   def testSetPythonDependenciesSlowFailureSync(self):
     """Tests the failed synchronous update of pypi dependencies from a file."""
@@ -403,9 +406,10 @@ class EnvironmentsUpdateTest(base.EnvironmentsUnitTest):
         self.TEST_ENVIRONMENT_ID,
     )
     self.AssertErrMatches(
-        r'^<START PROGRESS TRACKER>Waiting for \[{}] to be updated with \[{}]'
-        r'\s*^<END PROGRESS TRACKER>SUCCESS'.format(self.TEST_ENVIRONMENT_NAME,
-                                                    self.TEST_OPERATION_NAME))
+        r'^{{"ux": "PROGRESS_TRACKER", "message": '
+        r'"Waiting for \[{}] to be updated with \[{}]", '
+        r'"status": "SUCCESS"}}'.format(
+            self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
 
   def testLabelsMultipleUpdateMerge(self):
     """Tests merging when --update-labels is provided multiple times."""

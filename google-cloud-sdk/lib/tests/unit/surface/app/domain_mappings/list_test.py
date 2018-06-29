@@ -15,36 +15,10 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.app import domain_mappings_base
 
 
 class DomainMappingsListTest(domain_mappings_base.DomainMappingsBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-
-  def testListDomainMappings(self):
-    mappings = [
-        self.MakeDomainMapping('*.example.com', '1'),
-        self.MakeDomainMapping('example2.com', '2')
-    ]
-
-    self.ExpectListDomainMappings(mappings)
-    self.Run('app domain-mappings list')
-    self.AssertOutputEquals(
-        """\
-          ID               SSL_CERTIFICATE_ID
-          *.example.com    1
-          example2.com     2
-        """,
-        normalize_space=True)
-
-
-class DomainMappingsListBetaTest(domain_mappings_base.DomainMappingsBetaBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
 
   def testListDomainMappings(self):
     mappings = [
@@ -52,7 +26,8 @@ class DomainMappingsListBetaTest(domain_mappings_base.DomainMappingsBetaBase):
                                self._ManagementTypeFromString('MANUAL')),
         self.MakeDomainMapping('example2.com', '2',
                                self._ManagementTypeFromString('AUTOMATIC')),
-        self.MakeDomainMapping('example3.com', '3', None),
+        self.MakeDomainMapping('example3.com', '3',
+                               self._ManagementTypeFromString('AUTOMATIC')),
     ]
 
     self.ExpectListDomainMappings(mappings)
@@ -66,3 +41,26 @@ class DomainMappingsListBetaTest(domain_mappings_base.DomainMappingsBetaBase):
         """,
         normalize_space=True)
 
+
+class DomainMappingsListBetaTest(domain_mappings_base.DomainMappingsBase):
+  APPENGINE_API_VERSION = 'v1beta'
+
+  def testListDomainMappings(self):
+    mappings = [
+        self.MakeDomainMapping('*.example.com', '1',
+                               self._ManagementTypeFromString('MANUAL')),
+        self.MakeDomainMapping('example2.com', '2',
+                               self._ManagementTypeFromString('AUTOMATIC')),
+        self.MakeDomainMapping('example3.com', '3', None),
+    ]
+
+    self.ExpectListDomainMappings(mappings)
+    self.Run('beta app domain-mappings list')
+    self.AssertOutputEquals(
+        """\
+        ID            SSL_CERTIFICATE_ID  SSL_MANAGEMENT_TYPE  PENDING_AUTO_CERT
+        *.example.com   1                   MANUAL
+        example2.com    2                   AUTOMATIC
+        example3.com    3                   AUTOMATIC
+        """,
+        normalize_space=True)

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Base class for images integration testing."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from tests.lib import e2e_utils
@@ -40,24 +42,24 @@ class ImagesTestBase(e2e_test_base.BaseTest):
   def _GetDiskName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up.
-    disk_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-disks', hash_len=4).next()
+    disk_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-compute-test-disks', hash_len=4))
     self.disk_names_used.append(disk_name)
     return disk_name
 
   def _GetImageName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up.
-    image_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-images', hash_len=4).next()
+    image_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-compute-test-images', hash_len=4))
     self.image_names_used.append(image_name)
     return image_name
 
   def _GetInstanceName(self):
     # Make sure a new name is used if the test is retried, and make sure all
     # used names get cleaned up
-    name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test').next()
+    name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-compute-test'))
     self.instance_name = name
     self.instance_names_used.append(name)
     return name

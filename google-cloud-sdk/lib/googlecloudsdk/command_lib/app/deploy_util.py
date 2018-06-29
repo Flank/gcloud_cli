@@ -18,6 +18,7 @@ Mostly created to selectively enable Cloud Endpoints in the beta/preview release
 tracks.
 """
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 from apitools.base.py import exceptions as apitools_exceptions
 import enum
@@ -119,7 +120,7 @@ class FlexImageBuildOptions(enum.Enum):
 def GetFlexImageBuildOption(default_strategy=FlexImageBuildOptions.ON_CLIENT):
   """Determines where the build should be performed."""
   trigger_build_server_side = (properties.VALUES.app.trigger_build_server_side
-                               .Get(required=False))
+                               .GetBool(required=False))
   if trigger_build_server_side is None:
     return default_strategy
   elif trigger_build_server_side:
@@ -256,16 +257,6 @@ class ServiceDeployer(object):
         an in-progress build, or the name of the container image for a serial
         build. Possibly None if the service does not require an image.
     """
-    if (service.RequiresImage() and
-        flex_image_build_option == FlexImageBuildOptions.ON_SERVER):
-      cloud_build_options = {
-          'appYamlPath': service.GetAppYamlBasename(),
-      }
-      timeout = properties.VALUES.app.cloud_build_timeout.Get()
-      if timeout:
-        cloud_build_options['cloudBuildTimeout'] = timeout
-      return app_cloud_build.BuildArtifact.MakeBuildOptionsArtifact(
-          cloud_build_options)
 
     build = None
     if image:
@@ -275,11 +266,21 @@ class ServiceDeployer(object):
                     'already been built.'.format(new_version.service))
       return app_cloud_build.BuildArtifact.MakeImageArtifact(image)
     elif service.RequiresImage():
-      build = deploy_command_util.BuildAndPushDockerImage(
-          new_version.project, service, source_dir, new_version.id,
-          code_bucket_ref, gcr_domain,
-          self.deploy_options.runtime_builder_strategy,
-          self.deploy_options.parallel_build)
+      if flex_image_build_option == FlexImageBuildOptions.ON_SERVER:
+        cloud_build_options = {
+            'appYamlPath': service.GetAppYamlBasename(),
+        }
+        timeout = properties.VALUES.app.cloud_build_timeout.Get()
+        if timeout:
+          cloud_build_options['cloudBuildTimeout'] = timeout
+        build = app_cloud_build.BuildArtifact.MakeBuildOptionsArtifact(
+            cloud_build_options)
+      else:
+        build = deploy_command_util.BuildAndPushDockerImage(
+            new_version.project, service, source_dir, new_version.id,
+            code_bucket_ref, gcr_domain,
+            self.deploy_options.runtime_builder_strategy,
+            self.deploy_options.parallel_build)
 
     return build
 
@@ -332,8 +333,9 @@ class ServiceDeployer(object):
     manifest = None
     # "Non-hermetic" services require file upload outside the Docker image
     # unless an image was already built.
-    if flex_image_build_option == FlexImageBuildOptions.ON_SERVER or (
-        not image and not service_info.is_hermetic):
+    if (not image and
+        (flex_image_build_option == FlexImageBuildOptions.ON_SERVER or
+         not service_info.is_hermetic)):
       limit = None
       if service_info.env == env.STANDARD:
         limit = _MAX_FILE_SIZE_STANDARD

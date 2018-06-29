@@ -17,10 +17,10 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --keyring=KEYRING
-        The containing keyring.
+        Key ring of the key.
 
      --location=LOCATION
-        The location of the requested resource.
+        Location of the key.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

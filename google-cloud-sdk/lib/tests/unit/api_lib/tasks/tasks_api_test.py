@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit tests for Cloud Tasks API tasks service in gcloud."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.py import encoding
@@ -21,6 +23,8 @@ from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.api_lib.util import list_slicer
 from tests.lib.surface.tasks import test_base
+from six.moves import range
+from six.moves import zip
 
 
 class TasksTest(test_base.CloudTasksTestBase):
@@ -111,7 +115,7 @@ class TasksTest(test_base.CloudTasksTestBase):
   def testCreate_AllOptions_PullTask(self):
     task_ref = self.task_ref
     schedule_time = self._MakeScheduleTime()
-    pull_message = self.messages.PullMessage(tag='tag', payload='payload')
+    pull_message = self.messages.PullMessage(tag='tag', payload=b'payload')
     self._TestTaskCreation(task_ref=task_ref, schedule_time=schedule_time,
                            pull_message=pull_message)
 
@@ -125,14 +129,14 @@ class TasksTest(test_base.CloudTasksTestBase):
             self.messages.AppEngineHttpRequest.HeadersValue),
         httpMethod=self.messages.AppEngineHttpRequest.HttpMethodValueValuesEnum(
             'POST'),
-        payload='payload', relativeUrl='/paths/a/')
+        payload=b'payload', relativeUrl='/paths/a/')
     self._TestTaskCreation(task_ref=task_ref, schedule_time=schedule_time,
                            app_engine_http_request=app_engine_http_request)
 
   def testCreate_AttemptPullandAppEngineTask(self):
     task_ref = self.task_ref
     schedule_time = self._MakeScheduleTime()
-    pull_message = self.messages.PullMessage(tag='tag', payload='payload')
+    pull_message = self.messages.PullMessage(tag='tag', payload=b'payload')
     app_engine_http_request = self.messages.AppEngineHttpRequest(
         appEngineRouting=self.messages.AppEngineRouting(service='abc'),
         headers=encoding.DictToAdditionalPropertyMessage(
@@ -140,7 +144,7 @@ class TasksTest(test_base.CloudTasksTestBase):
             self.messages.AppEngineHttpRequest.HeadersValue),
         httpMethod=self.messages.AppEngineHttpRequest.HttpMethodValueValuesEnum(
             'POST'),
-        payload='payload', relativeUrl='/paths/a/')
+        payload=b'payload', relativeUrl='/paths/a/')
     with self.assertRaises(tasks_api.ModifyingPullAndAppEngineTaskError):
       self.tasks_client.Create(parent_ref=self.queue_ref, task_ref=task_ref,
                                schedule_time=schedule_time,

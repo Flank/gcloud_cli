@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.firebase.test import exceptions
@@ -27,7 +29,7 @@ class IosDeviceDimensionsIntegrationTests(e2e_base.TestIntegrationTestBase):
 
   def testArgConflicts_BadDimensionNameInArgFile(self):
     with self.assertRaises(exceptions.InvalidIosDimensionNameError):
-      self.Run(u'{cmd} {argfile}:ios-bad-dimension '.format(
+      self.Run('{cmd} {argfile}:ios-bad-dimension '.format(
           cmd=commands.IOS_TEST_RUN, argfile=e2e_base.INTEGRATION_ARGS))
 
     self.AssertErrContains("'brand' is not a valid dimension name.")

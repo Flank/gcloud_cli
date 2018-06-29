@@ -5,6 +5,10 @@
 
 """Do initial setup for the Cloud SDK."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import bootstrapping
 
 # pylint:disable=g-bad-import-order
@@ -74,7 +78,7 @@ def ParseArgs():
                       'required, defaults will be used or an error will be '
                       'raised')
 
-  return parser.parse_args()
+  return parser.parse_args(bootstrapping.GetDecodedArgv()[1:])
 
 
 def Prompts(usage_reporting):

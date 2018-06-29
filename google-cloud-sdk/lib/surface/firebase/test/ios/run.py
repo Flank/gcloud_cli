@@ -13,6 +13,8 @@
 # limitations under the License.
 """The 'gcloud firebase test ios run' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import arg_util
 from googlecloudsdk.api_lib.firebase.test import ctrl_c_handler
 from googlecloudsdk.api_lib.firebase.test import exit_code
@@ -130,6 +132,8 @@ class Run(base.ListCommand):
                                                  args.results_dir, tr_client,
                                                  tr_messages, storage_client)
     bucket_ops.UploadFileToGcs(args.test)
+    if args.xctestrun_file:
+      bucket_ops.UploadFileToGcs(args.xctestrun_file)
     bucket_ops.LogGcsResultsUrl()
 
     tr_history_picker = history_picker.ToolResultsHistoryPicker(

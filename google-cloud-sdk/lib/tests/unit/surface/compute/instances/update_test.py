@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for instances update."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base
@@ -39,7 +41,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
         ('key2', 'update2'), ('key3', 'value3'), ('key4', 'value4'))
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=instance_labels, fingerprint='fingerprint-42')
+        instance_ref, labels=instance_labels, fingerprint=b'fingerprint-42')
     updated_instance = self._MakeInstanceProto(
         instance_ref, labels=edited_labels)
 
@@ -48,7 +50,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
 
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
-        instance_ref, edited_labels, 'fingerprint-42', operation)
+        instance_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
@@ -69,7 +71,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
     edited_labels = ()
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=instance_labels, fingerprint='fingerprint-42')
+        instance_ref, labels=instance_labels, fingerprint=b'fingerprint-42')
     updated_instance = self._MakeInstanceProto(
         instance_ref, labels=edited_labels)
 
@@ -78,7 +80,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
 
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
-        instance_ref, edited_labels, 'fingerprint-42', operation)
+        instance_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
@@ -93,7 +95,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=(), fingerprint='fingerprint-42')
+        instance_ref, labels=(), fingerprint=b'fingerprint-42')
     updated_instance = self._MakeInstanceProto(
         instance_ref, labels=update_labels)
     operation_ref = self._GetOperationRef('operation-1', 'atlanta')
@@ -101,7 +103,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
 
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
-        instance_ref, update_labels, 'fingerprint-42', operation)
+        instance_ref, update_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
@@ -117,7 +119,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
   def testRemoveWithNoLabelsOnInstance(self):
     instance_ref = self._GetInstanceRef('instance-1', zone='atlanta')
     instance = self._MakeInstanceProto(
-        instance_ref, labels={}, fingerprint='fingerprint-42')
+        instance_ref, labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(instance_ref, instance)
 
@@ -135,7 +137,7 @@ class UpdateLabelsTestBeta(instances_labels_test_base.InstancesLabelsTestBase):
         ('key1', 'value1'), ('key3', 'value3'), ('key4', 'value4'))
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=instance_labels, fingerprint='fingerprint-42')
+        instance_ref, labels=instance_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(instance_ref, instance)
 
@@ -356,8 +358,8 @@ class DeletionProtectionTest(UpdateTestBaseClass, parameterized.TestCase):
         'Setting deletion protection of instance [instance-1] to')
 
 
-class InstancesSetShieldedVMConfigTest(UpdateTestBaseClass,
-                                       parameterized.TestCase):
+class InstancesSetShieldedVMConfigAlphaTest(UpdateTestBaseClass,
+                                            parameterized.TestCase):
 
   def ApiVersion(self):
     return 'alpha'
@@ -443,8 +445,18 @@ class InstancesSetShieldedVMConfigTest(UpdateTestBaseClass,
         'Setting shieldedVMConfig  of instance [instance-1]')
 
 
-class InstancesSetShieldedVMIntegrityPolicyTest(UpdateTestBaseClass,
-                                                parameterized.TestCase):
+class InstancesSetShieldedVMConfigBetaTest(
+    InstancesSetShieldedVMConfigAlphaTest):
+
+  def ApiVersion(self):
+    return 'beta'
+
+  def ReleaseTrack(self):
+    return base.ReleaseTrack.BETA
+
+
+class InstancesSetShieldedVMIntegrityPolicyAlphaTest(UpdateTestBaseClass,
+                                                     parameterized.TestCase):
 
   def ApiVersion(self):
     return 'alpha'
@@ -505,6 +517,16 @@ class InstancesSetShieldedVMIntegrityPolicyTest(UpdateTestBaseClass,
     self.AssertOutputEquals('')
     self.AssertErrContains(
         'Setting shieldedVMIntegrityPolicy of instance [instance-1]')
+
+
+class InstancesSetShieldedVMIntegrityPolicyBetaTest(
+    InstancesSetShieldedVMIntegrityPolicyAlphaTest):
+
+  def ApiVersion(self):
+    return 'beta'
+
+  def ReleaseTrack(self):
+    return base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

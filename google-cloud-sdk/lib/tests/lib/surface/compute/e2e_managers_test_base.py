@@ -119,6 +119,11 @@ class ManagedTestBase(e2e_test_base.BaseTest):
     instance_template_name = self.CreateInstanceTemplate()
     return self.CreateInstanceGroupManager(instance_template_name, size)
 
+  def DescribeManagedInstanceGroup(self, name):
+    self.Run("""
+      compute instance-groups managed describe {group_name} \
+        {scope_flag}""".format(group_name=name, scope_flag=self.GetScopeFlag()))
+
   def RunInstanceGroupManagerCreationTest(self, scope_flag=None):
     instance_template_name = self.CreateInstanceTemplate()
     igm_name = self.CreateInstanceGroupManager(

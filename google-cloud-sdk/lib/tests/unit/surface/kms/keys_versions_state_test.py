@@ -15,10 +15,15 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class CryptokeysVersionsStateTest(base.KmsMockTest):
 
   def SetUp(self):
@@ -36,7 +41,8 @@ class CryptokeysVersionsStateTest(base.KmsMockTest):
         self.messages.CryptoKeyVersion(
             name=self.version_name.RelativeName(), state=state))
 
-  def testEnable(self):
+  def testEnable(self, track):
+    self.track = track
     self.ExpectStateChange(
         self.messages.CryptoKeyVersion.StateValueValuesEnum.ENABLED)
 
@@ -45,7 +51,8 @@ class CryptokeysVersionsStateTest(base.KmsMockTest):
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id, self.version_name.version_id))
 
-  def testDisable(self):
+  def testDisable(self, track):
+    self.track = track
     self.ExpectStateChange(
         self.messages.CryptoKeyVersion.StateValueValuesEnum.DISABLED)
 
@@ -54,7 +61,8 @@ class CryptokeysVersionsStateTest(base.KmsMockTest):
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id, self.version_name.version_id))
 
-  def testDestroy(self):
+  def testDestroy(self, track):
+    self.track = track
     # pylint: disable=line-too-long
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Destroy.Expect(
@@ -71,7 +79,8 @@ class CryptokeysVersionsStateTest(base.KmsMockTest):
                  self.version_name.location_id, self.version_name.key_ring_id,
                  self.version_name.crypto_key_id, self.version_name.version_id))
 
-  def testRestore(self):
+  def testRestore(self, track):
+    self.track = track
     # pylint: disable=line-too-long
     ckv = self.kms.projects_locations_keyRings_cryptoKeys_cryptoKeyVersions
     ckv.Restore.Expect(

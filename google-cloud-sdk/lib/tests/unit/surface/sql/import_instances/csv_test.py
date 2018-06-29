@@ -15,8 +15,8 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -37,7 +37,7 @@ class _BaseInstancesImportCsvTest(object):
             columns=columns or [], table=table),
         database=database,
         fileType='CSV',
-        kind=u'sql#importContext',
+        kind='sql#importContext',
         uri='gs://speckletest/testinstance.gz',
         importUser=user)
 
@@ -64,23 +64,25 @@ class _BaseInstancesImportCsvTest(object):
             error=None,
             exportContext=None,
             importContext=import_context,
-            targetId=u'testinstance',
+            targetId='testinstance',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'ffa26eae-a675-47f1-a8c8-579849098aeb',
+            kind='sql#operation',
+            name='ffa26eae-a675-47f1-a8c8-579849098aeb',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'.
             format(self.Project()),
-            operationType=u'IMPORT',
-            status=u'PENDING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='IMPORT',
+            status='PENDING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'ffa26eae-a675-47f1-a8c8-579849098aeb',
-            project=self.Project(),),
+            operation='ffa26eae-a675-47f1-a8c8-579849098aeb',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -113,19 +115,20 @@ class _BaseInstancesImportCsvTest(object):
             error=None,
             exportContext=None,
             importContext=import_context,
-            targetId=u'testinstance',
+            targetId='testinstance',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'ffa26eae-a675-47f1-a8c8-579849098aeb',
+            kind='sql#operation',
+            name='ffa26eae-a675-47f1-a8c8-579849098aeb',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/ffa26eae-a675-47f1-a8c8-579849098aeb'.
             format(self.Project()),
-            operationType=u'IMPORT',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='IMPORT',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
   def testSimpleImport(self):
     self._ExpectImport(database='somedb', table='sometable')
@@ -161,11 +164,10 @@ class _BaseInstancesImportCsvTest(object):
     # Generate CSV import context.
     import_context = self.messages.ImportContext(
         csvImportOptions=self.messages.ImportContext.CsvImportOptionsValue(
-            columns=[],
-            table='sometable'),
+            columns=[], table='sometable'),
         database='somedb',
         fileType='CSV',
-        kind=u'sql#importContext',
+        kind='sql#importContext',
         uri='gs://nosuchbucket/testinstance.gz')
 
     self.mocked_client.instances.Import.Expect(
@@ -190,22 +192,23 @@ class _BaseInstancesImportCsvTest(object):
             error=None,
             exportContext=None,
             importContext=import_context,
-            targetId=u'testinstance',
+            targetId='testinstance',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
+            kind='sql#operation',
+            name='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/bf159e2a-fe9b-4eaa-9d88-00d801fe9e04'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/bf159e2a-fe9b-4eaa-9d88-00d801fe9e04'.
             format(self.Project()),
-            operationType=u'IMPORT',
-            status=u'PENDING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='IMPORT',
+            status='PENDING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
+            operation='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
             project=self.Project()),
         self.messages.Operation(
             # pylint:disable=line-too-long
@@ -239,25 +242,26 @@ class _BaseInstancesImportCsvTest(object):
             error=self.messages.OperationErrors(
                 errors=[
                     self.messages.OperationError(
-                        code=u'ERROR_RESOURCE_DOES_NOT_EXIST',
-                        kind=u'sql#operationError'),
+                        code='ERROR_RESOURCE_DOES_NOT_EXIST',
+                        kind='sql#operationError'),
                 ],
-                kind=u'sql#operationErrors'),
+                kind='sql#operationErrors'),
             exportContext=None,
             importContext=import_context,
-            targetId=u'testinstance',
+            targetId='testinstance',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
+            kind='sql#operation',
+            name='bf159e2a-fe9b-4eaa-9d88-00d801fe9e04',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/bf159e2a-fe9b-4eaa-9d88-00d801fe9e04'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/bf159e2a-fe9b-4eaa-9d88-00d801fe9e04'.
             format(self.Project()),
-            operationType=u'IMPORT',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='IMPORT',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     with self.assertRaises(exceptions.OperationError):
       self.Run(
@@ -271,6 +275,10 @@ class _BaseInstancesImportCsvTest(object):
       self.Run(
           'sql import csv testinstance  gs://speckletest/testinstance.gz '
           '--database=somedb --table=sometable')
+    self.AssertErrContains(
+        'Data from [gs://speckletest/testinstance.gz] will be imported to '
+        '[testinstance].')
+    self.AssertErrContains('Do you want to continue (Y/n)?')
 
   def testImportWithColumns(self):
     self._ExpectImport(

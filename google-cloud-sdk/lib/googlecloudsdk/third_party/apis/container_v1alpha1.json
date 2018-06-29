@@ -44,11 +44,6 @@
       ],
       "location": "query"
     },
-    "bearer_token": {
-      "type": "string",
-      "description": "OAuth bearer token.",
-      "location": "query"
-    },
     "callback": {
       "type": "string",
       "description": "JSONP",
@@ -67,12 +62,6 @@
     "oauth_token": {
       "type": "string",
       "description": "OAuth 2.0 token for the current user.",
-      "location": "query"
-    },
-    "pp": {
-      "type": "boolean",
-      "description": "Pretty-print response.",
-      "default": "true",
       "location": "query"
     },
     "prettyPrint": {
@@ -276,6 +265,18 @@
           "description": "The IP prefix in CIDR notation to use for the hosted master network.\nThis prefix will be used for assigning private IP addresses to the\nmaster or set of masters, as well as the ILB VIP.",
           "type": "string"
         },
+        "defaultMaxPodsConstraint": {
+          "description": "The default constraint on the maximum number of pods that can be run\nsimultaneously on a node in the node pool of this cluster. Only honored\nif cluster created with IP Alias support.",
+          "$ref": "MaxPodsConstraint"
+        },
+        "enableNamespaceLevelIam": {
+          "description": "If this cluster supports namespace-level IAM policies. Clusters that\nsupport namespace-level IAM may have IAM policies set on their namespaces\nusing SetIamPolicy.",
+          "type": "boolean"
+        },
+        "managedPodIdentityConfig": {
+          "description": "Configuration for the use of GCP IAM Service Accounts in applications in\nthis cluster.",
+          "$ref": "ManagedPodIdentityConfig"
+        },
         "selfLink": {
           "description": "[Output only] Server-defined URL for the resource.",
           "type": "string"
@@ -366,6 +367,10 @@
         "tpuIpv4CidrBlock": {
           "description": "[Output only] The IP address range of the Cloud TPUs in this cluster, in\n[CIDR](http:\/\/en.wikipedia.org\/wiki\/Classless_Inter-Domain_Routing)\nnotation (e.g. `1.2.3.4\/29`).",
           "type": "string"
+        },
+        "databaseEncryptionKeyId": {
+          "description": "ResourceID of a CloudKMS key to be used for the encryption of secrets in\netcd. Ex.\nprojects\/kms-project\/locations\/global\/keyRings\/ring-1\/cryptoKeys\/key-1",
+          "type": "string"
         }
       }
     },
@@ -440,7 +445,7 @@
           }
         },
         "diskType": {
-          "description": "Type of the disk attached to each node (e.g. 'pd-standard' or 'pd-ssd')\n\nIf unspecified, the default disk type is 'pd-standard'\nCurrently restricted because of b\/36071127#comment27",
+          "description": "Type of the disk attached to each node (e.g. 'pd-standard' or 'pd-ssd')\n\nIf unspecified, the default disk type is 'pd-standard'",
           "type": "string"
         },
         "minCpuPlatform": {
@@ -765,6 +770,10 @@
           "description": "NodeManagement configuration for this NodePool.",
           "$ref": "NodeManagement"
         },
+        "maxPodsConstraint": {
+          "description": "The constraint on the maximum number of pods that can be run\nsimultaneously on a node in the node pool.",
+          "$ref": "MaxPodsConstraint"
+        },
         "selfLink": {
           "description": "[Output only] Server-defined URL for the resource.",
           "type": "string"
@@ -868,6 +877,18 @@
         "requestedUpgradeStartTime": {
           "description": "User requested start time, in\n[RFC3339](https:\/\/www.ietf.org\/rfc\/rfc3339.txt) text format.",
           "type": "string"
+        }
+      }
+    },
+    "MaxPodsConstraint": {
+      "id": "MaxPodsConstraint",
+      "description": "Constraints applied to pods.",
+      "type": "object",
+      "properties": {
+        "maxPodsPerNode": {
+          "description": "Constraint enforced on the max num of pods per node.",
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1159,6 +1180,17 @@
         },
         "enableSharedNetwork": {
           "description": "Enable the ability to reference subnets belonging to other projects.",
+          "type": "boolean"
+        }
+      }
+    },
+    "ManagedPodIdentityConfig": {
+      "id": "ManagedPodIdentityConfig",
+      "description": "Configuration for the use of GCP IAM Service Accounts in applications in\nthis cluster.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enable the use of GCP IAM Service Accounts in applications in this cluster.",
           "type": "boolean"
         }
       }

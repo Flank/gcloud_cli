@@ -31,14 +31,8 @@ class TaxonomiesDeleteIntTest(base.CategoryManagerUnitTestBase):
         taxonomiesId=self.project_taxonomy_id)
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _ExpectDeleteProjectTaxonomy(self, project_taxonomy_name):
-    self.mock_client.projects_taxonomies.Delete.Expect(
-        self.messages.CategorymanagerProjectsTaxonomiesDeleteRequest(
-            name=project_taxonomy_name),
-        self.messages.Empty())
-
   def testDeleteProjectTaxonomyPromptingWithYes(self):
-    self._ExpectDeleteProjectTaxonomy(self.project_taxonomy_ref.RelativeName())
+    self.ExpectDeleteProjectTaxonomy(self.project_taxonomy_ref.RelativeName())
     self.WriteInput('Y\n')
     self.Run('category-manager taxonomies delete ' +
              self.project_taxonomy_ref.Name())

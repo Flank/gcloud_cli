@@ -2,8 +2,8 @@ NAME
     gcloud alpha kms keys versions create - create a new version
 
 SYNOPSIS
-    gcloud alpha kms keys versions create [--key=KEY] [--primary]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keys versions create [--key=KEY] [--keyring=KEYRING]
+        [--location=LOCATION] [--primary] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a new version within the given key.
@@ -11,6 +11,12 @@ DESCRIPTION
 FLAGS
      --key=KEY
         The containing key.
+
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the keyring.
 
      --primary
         If specified, immediately make the new version primary.

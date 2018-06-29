@@ -7,7 +7,11 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Retrieves information about an SSL cert for a Cloud SQL instance.
+    (DEPRECATED) Retrieves information about an SSL cert for a Cloud SQL
+    instance.
+
+    gcloud sql ssl-certs is deprecated. Use gcloud sql ssl client-certs
+    instead.
 
 POSITIONAL ARGUMENTS
      COMMON_NAME

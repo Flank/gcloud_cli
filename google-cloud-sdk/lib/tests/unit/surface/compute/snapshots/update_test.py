@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for snapshots update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.surface.compute import snapshots_labels_test_base
@@ -38,7 +40,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
         ('key2', 'update2'), ('key3', 'value3'), ('key4', 'value4'))
 
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels=snapshot_labels, fingerprint='fingerprint-42')
+        snapshot_ref, labels=snapshot_labels, fingerprint=b'fingerprint-42')
     updated_snapshot = self._MakeSnapshotProto(
         snapshot_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1')
@@ -46,7 +48,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
 
     self._ExpectGetRequest(snapshot_ref, snapshot)
     self._ExpectLabelsSetRequest(
-        snapshot_ref, edited_labels, 'fingerprint-42', operation)
+        snapshot_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(snapshot_ref, updated_snapshot)
 
@@ -67,7 +69,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     edited_labels = ()
 
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels=snapshot_labels, fingerprint='fingerprint-42')
+        snapshot_ref, labels=snapshot_labels, fingerprint=b'fingerprint-42')
     updated_snapshot = self._MakeSnapshotProto(
         snapshot_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1')
@@ -75,7 +77,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
 
     self._ExpectGetRequest(snapshot_ref, snapshot)
     self._ExpectLabelsSetRequest(
-        snapshot_ref, edited_labels, 'fingerprint-42', operation)
+        snapshot_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(snapshot_ref, updated_snapshot)
 
@@ -89,7 +91,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels=(), fingerprint='fingerprint-42')
+        snapshot_ref, labels=(), fingerprint=b'fingerprint-42')
     updated_snapshot = self._MakeSnapshotProto(
         snapshot_ref, labels=update_labels)
     operation_ref = self._GetOperationRef('operation-1')
@@ -97,7 +99,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
 
     self._ExpectGetRequest(snapshot_ref, snapshot)
     self._ExpectLabelsSetRequest(
-        snapshot_ref, update_labels, 'fingerprint-42', operation)
+        snapshot_ref, update_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(snapshot_ref, updated_snapshot)
 
@@ -113,7 +115,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
   def testRemoveWithNoLabelsOnSnapshot(self):
     snapshot_ref = self._GetSnapshotRef('snapshot-1')
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels={}, fingerprint='fingerprint-42')
+        snapshot_ref, labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(snapshot_ref, snapshot)
 
@@ -131,7 +133,7 @@ class UpdateLabelsTestBeta(snapshots_labels_test_base.SnapshotsLabelsTestBase):
         ('key1', 'value1'), ('key3', 'value3'), ('key4', 'value4'))
 
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels=snapshot_labels, fingerprint='fingerprint-42')
+        snapshot_ref, labels=snapshot_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(snapshot_ref, snapshot)
 

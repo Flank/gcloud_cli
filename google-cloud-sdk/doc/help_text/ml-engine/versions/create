@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud ml-engine versions create VERSION --model=MODEL [--async]
-        [--config=CONFIG] [--description=DESCRIPTION]
+        [--config=CONFIG] [--description=DESCRIPTION] [--framework=FRAMEWORK]
         [--labels=[KEY=VALUE,...]] [--origin=ORIGIN]
         [--runtime-version=RUNTIME_VERSION] [--staging-bucket=STAGING_BUCKET]
         [GCLOUD_WIDE_FLAG ...]
@@ -59,8 +59,18 @@ OPTIONAL FLAGS
      --description=DESCRIPTION
         The description of the version.
 
+     --framework=FRAMEWORK
+        The ML framework used to train this version of the model. If not
+        specified, defaults to tensorflow. FRAMEWORK must be one of:
+        scikit-learn, tensorflow, xgboost.
+
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --origin=ORIGIN
         Location of model/ "directory" (as output by

@@ -20,7 +20,7 @@ gcloud beta firebase test android run \- invoke a test in Firebase Test Lab for 
 \fB(BETA)\fR \fBgcloud beta firebase test android run\fR invokes and monitors
 tests in Firebase Test Lab for Android.
 
-Two main types of tests are currently supported:
+Three main types of Android tests are currently supported:
 .RS 2m
 .IP "\(bu" 2m
 \fBrobo\fR: runs a smart, automated exploration of the activities in your
@@ -30,12 +30,19 @@ activity map with associated screenshots and video.
 \fBinstrumentation\fR: runs automated unit or integration tests written using a
 testing framework. Firebase Test Lab for Android currently supports the
 Espresso, Robotium and UI Automator 2.0 testing frameworks.
+.IP "\(bu" 2m
+\fBgame\-loop\fR: executes a special intent built into the game app (a "demo
+mode") that simulates the actions of a real player. This test type can include
+multiple game loops (also called "scenarios"), which can be logically organized
+using scenario labels so that you can run related loops together. Refer to
+https://firebase.google.com/docs/test\-lab/android/game\-loop for more
+information about how to build and run Game Loop tests.
 .RE
 .sp
 
 The type of test to run can be specified with the \fB\-\-type\fR flag, although
 the type can often be inferred from other flags. Specifically, if the
-\fB\-\-test\fR flag is present, the test \fB\-\-type\fR will default to
+\fB\-\-test\fR flag is present, the test \fB\-\-type\fR defaults to
 \f5instrumentation\fR. If \fB\-\-test\fR is not present, then \fB\-\-type\fR
 defaults to \f5robo\fR.
 
@@ -313,16 +320,30 @@ for more information about Android Test Orchestrator.
 .RS 2m
 .TP 2m
 \fB\-\-app\-initial\-activity\fR=\fIAPP_INITIAL_ACTIVITY\fR
-The initial activity used to start the app during a robo test.
+(DEPRECATED) The initial activity used to start the app during a Robo test.
+
+The \f5\-\-app\-initial\-activity\fR flag is deprecated and no longer has any
+effect on the Robo crawler. Alternatively, the \f5\-\-robo\-script\fR flag (in
+beta) can be used to guide Robo to a specific part of your app before the Robo
+test begins.
 
 .TP 2m
 \fB\-\-max\-depth\fR=\fIint\fR
-The maximum depth of the traversal stack a robo test can explore. Needs to be at
-least 2 to make Robo explore the app beyond the first activity (default: 50).
+(DEPRECATED) The maximum depth of the traversal stack a Robo test can explore.
+Needs to be at least 2 to make Robo explore the app beyond the first activity
+(default: 50).
+
+The \f5\-\-max\-depth\fR flag is deprecated and no longer has any effect on the
+actions of the Robo crawler.
 
 .TP 2m
 \fB\-\-max\-steps\fR=\fIint\fR
-The maximum number of steps/actions a robo test can execute (default: no limit).
+(DEPRECATED) The maximum number of steps/actions a Robo test can execute
+(default: no limit).
+
+The \f5\-\-max\-steps\fR flag is deprecated and no longer has any effect on the
+Robo crawler. The \f5\-\-timeout\fR flag may be optionally used to limit the
+maximum length of a Robo test.
 
 .TP 2m
 \fB\-\-robo\-directives\fR=[\fITYPE\fR:\fIRESOURCE_NAME\fR=\fIINPUT\fR,...]

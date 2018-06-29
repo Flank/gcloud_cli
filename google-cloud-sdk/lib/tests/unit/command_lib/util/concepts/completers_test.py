@@ -22,6 +22,7 @@ from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.concepts import completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
+from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -72,13 +73,14 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
     self.mock_client = mock.MagicMock()
     self.StartObjectPatch(apis, 'GetClientInstance',
                           return_value=self.mock_client)
-    self.presentation_spec = concept_parsers.ResourcePresentationSpec(
+    self.presentation_spec = presentation_specs.ResourcePresentationSpec(
         '--book',
         self.resource_spec_auto_completers,
         'a resource',
         flag_name_overrides={'project': '--book-project'},
         prefixes=False)
-    self.resource_info = self.presentation_spec.GetInfo()
+    self.resource_info = concept_parsers.ConceptParser(
+        [self.presentation_spec]).GetInfo(self.presentation_spec.name)
 
   def BuildBooksList(self, books):
     """Helper function to build return message for fake books List method."""
@@ -431,7 +433,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
     self.assertEqual(self.resource_info, result.resource_info)
     self.assertEqual(self.parsed_args, result.parsed_args)
     self.assertEqual(argument, result.argument)
-    self.assertEqual(2, len(result._updaters.keys()))
+    self.assertEqual(2, len(list(result._updaters.keys())))
     self.assertEqual(result._updaters['shelvesId'][1], True)
     self.assertEqual(result._updaters['shelvesId'][0]().collection,
                      'example.projects.shelves')
@@ -477,8 +479,10 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
         ('example.projects.shelves', True),
         ('cloudresourcemanager.projects', True)]
     self.MockGetListCreateMethods(*collections)
+    info = concept_parsers.ConceptParser([self.presentation_spec]).GetInfo(
+        self.presentation_spec.name)
 
-    attribute_args = self.presentation_spec.GetAttributeArgs()
+    attribute_args = info.GetAttributeArgs()
 
     for arg, attribute_name in zip(attribute_args,
                                    ['project', 'shelf', 'book']):

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for Spanner sql command lib."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 from googlecloudsdk.command_lib.spanner.sql import DisplayQueryAggregateStats
 from googlecloudsdk.command_lib.spanner.sql import DisplayQueryPlan
@@ -20,6 +22,7 @@ from googlecloudsdk.command_lib.spanner.sql import Node
 from googlecloudsdk.command_lib.spanner.sql import QueryHasAggregateStats
 from googlecloudsdk.core import log
 from tests.lib.surface.spanner import base
+import six
 
 
 class SqlTest(base.SpannerTestBase):
@@ -85,7 +88,7 @@ class SqlTest(base.SpannerTestBase):
       return None
 
     props = []
-    for k, v in prop_dict.iteritems():
+    for k, v in six.iteritems(prop_dict):
       prop = extra_types.JsonObject.Property(
           key=k, value=extra_types.JsonValue(string_value=v))
       props.append(prop)
@@ -369,9 +372,11 @@ class SqlTest(base.SpannerTestBase):
     results = self._GivenResultsWithQueryStats()
     DisplayQueryAggregateStats(results.stats.queryStats, self.out)
     self.AssertOutputContains(
-        'TOTAL_ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED')
+        'TOTAL_ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED',
+        normalize_space=True)
     # 1.7 msecs         |  .3 msecs    | 9    | 2000
-    self.AssertOutputMatches(r'1\.7 msecs[\s|]+\.3 msecs[\s|]+9[\s|]+2000')
+    self.AssertOutputMatches(r'1\.7 msecs[\s|]+\.3 msecs[\s|]+9[\s|]+2000',
+                             normalize_space=True)
 
   def testQueryAggregateStatsKeyNotFound(self):
     # Given stats with an unknown key name.
@@ -380,9 +385,11 @@ class SqlTest(base.SpannerTestBase):
     DisplayQueryAggregateStats(results.stats.queryStats, self.out)
     # Then the unknown column name should be included.
     self.AssertOutputContains(
-        'TOTAL_ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED')
+        'TOTAL_ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED',
+        normalize_space=True)
     # Unknown         |  .3 msecs    | 9    | 2000
-    self.AssertOutputMatches(r'Unknown[\s|]+\.3 msecs[\s|]+9[\s|]+2000')
+    self.AssertOutputMatches(r'Unknown[\s|]+\.3 msecs[\s|]+9[\s|]+2000',
+                             normalize_space=True)
 
   def testDisplayQueryPlan(self):
     query_plan = self._GivenResultSetStats()

@@ -14,6 +14,8 @@
 
 """Shared module for 'gcloud firebase test' integration tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from tests.lib import e2e_base

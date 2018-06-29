@@ -28,9 +28,10 @@ gcloud beta dns managed\-zones update \- update an existing Cloud DNS managed\-z
 
 Zone resource \- The name of the managed\-zone to be updated. This represents a
 Cloud resource. (NOTE) Some attributes are not given arguments in this group but
-can be set in other ways. To set the [project] attribute: Set the property
-[core/project] or provide the flag [\-\-project] on the command line. This must
-be specified.
+can be set in other ways. To set the [project] attribute: provide the flag
+[zone] on the command line with a fully specified name; provide the flag
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
 
 .RS 2m
 .TP 2m
@@ -85,6 +86,11 @@ Length of the key\-signing key in bits. Requires DNSSEC enabled.
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to update. If a label exists its value is
 modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 \fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR

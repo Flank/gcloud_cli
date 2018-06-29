@@ -2,9 +2,9 @@ NAME
     gcloud alpha functions deploy - create or update a Google Cloud Function
 
 SYNOPSIS
-    gcloud alpha functions deploy NAME [--entry-point=ENTRY_POINT]
-        [--memory=MEMORY] [--region=REGION] [--retry] [--source=SOURCE]
-        [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
+    gcloud alpha functions deploy (NAME : --region=REGION)
+        [--entry-point=ENTRY_POINT] [--memory=MEMORY] [--retry]
+        [--source=SOURCE] [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
         [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]]
         [--trigger-bucket=TRIGGER_BUCKET | --trigger-http
@@ -16,8 +16,21 @@ DESCRIPTION
     (ALPHA) Create or update a Google Cloud Function.
 
 POSITIONAL ARGUMENTS
-     NAME
-        Name of the function to deploy.
+     Function resource - The Cloud function name to deploy. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the flag [NAME] on the
+     command line with a fully specified name; provide the flag [--project] on
+     the command line; set the property [core/project]. This must be specified.
+
+       NAME
+          The ID of the function or a fully qualified identifier for the
+          function. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --region=REGION
+          The Cloud region for the function. Overrides the default
+          functions/region property value for this command invocation.
 
 FLAGS
      --entry-point=ENTRY_POINT
@@ -35,10 +48,6 @@ FLAGS
         default, a new function is limited to 256MB of memory. When deploying
         an update to an existing function, the function will keep its old
         memory limit unless you specify this flag.
-
-     --region=REGION
-        The region in which the function will run. Overrides the default
-        functions/region property value for this command invocation.
 
      --retry
         If specified, then the function will be retried in case of a failure.
@@ -109,9 +118,15 @@ FLAGS
 
      --update-labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to update. If a label exists its value
-        is modified, otherwise a new label is created. Label keys starting with
-        deployment are reserved for use by deployment tools and cannot be
-        specified manually.
+        is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+        Label keys starting with deployment are reserved for use by deployment
+        tools and cannot be specified manually.
 
      At most one of these may be specified:
 
@@ -130,8 +145,8 @@ FLAGS
 
        --remove-labels=[KEY,...]
           A list of label keys to remove. If a label does not exist it is
-          silently ignored. Label keys starting with deployment are reserved
-          for use by deployment tools and cannot be specified manually.
+          silently ignored.Label keys starting with deployment are reserved for
+          use by deployment tools and cannot be specified manually.
 
      If you don't specify a trigger when deploying an update to an existing
      function it will keep its current trigger. You must specify

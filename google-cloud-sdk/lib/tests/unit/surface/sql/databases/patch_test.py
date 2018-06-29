@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.sql import base
@@ -35,10 +37,10 @@ class DatabasesPatchTest(base.SqlMockTestBeta):
             charset='utf-8',
             collation='some-collation',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
             format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
-            kind=u'sql#database'))
+            kind='sql#database'))
     self.mocked_client.databases.Patch.Expect(
         sqladmin.SqlDatabasesPatchRequest(
             project=self.Project(),
@@ -49,14 +51,15 @@ class DatabasesPatchTest(base.SqlMockTestBeta):
                 instance='mock-instance',
                 name='mock-db',
                 collation='another-collation',
-                kind=u'sql#database')),
-        sqladmin.Operation(name=u'd11c5da9-8ca5-4add-8cfe-d564b57fe4c5'))
+                kind='sql#database')),
+        sqladmin.Operation(name='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5'))
 
     self.mocked_client.operations.Get.Expect(
         sqladmin.SqlOperationsGetRequest(
-            operation=u'd11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
-            project=self.Project(),),
-        sqladmin.Operation(status=u'DONE'))
+            operation='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
+            project=self.Project(),
+        ),
+        sqladmin.Operation(status='DONE'))
     self.mocked_client.databases.Get.Expect(
         sqladmin.SqlDatabasesGetRequest(
             instance='mock-instance',
@@ -70,10 +73,10 @@ class DatabasesPatchTest(base.SqlMockTestBeta):
             charset='utf-8',
             collation='another-collation',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
             format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
-            kind=u'sql#database'))
+            kind='sql#database'))
 
     self.Run('sql databases patch mock-db --instance=mock-instance '
              '--collation=another-collation')
@@ -108,10 +111,10 @@ selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-ins
             charset='utf-8',
             collation='some-collation',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
             format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
-            kind=u'sql#database'))
+            kind='sql#database'))
     self.mocked_client.databases.Patch.Expect(
         sqladmin.SqlDatabasesPatchRequest(
             project=self.Project(),
@@ -123,14 +126,15 @@ selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-ins
                 name='mock-db',
                 charset='another-charset',
                 collation='another-collation',
-                kind=u'sql#database')),
-        sqladmin.Operation(name=u'd11c5da9-8ca5-4add-8cfe-d564b57fe4c5'))
+                kind='sql#database')),
+        sqladmin.Operation(name='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5'))
 
     self.mocked_client.operations.Get.Expect(
         sqladmin.SqlOperationsGetRequest(
-            operation=u'd11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
-            project=self.Project(),),
-        sqladmin.Operation(status=u'DONE'))
+            operation='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
+            project=self.Project(),
+        ),
+        sqladmin.Operation(status='DONE'))
     self.mocked_client.databases.Get.Expect(
         sqladmin.SqlDatabasesGetRequest(
             instance='mock-instance',
@@ -144,10 +148,10 @@ selfLink: https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-ins
             charset='another-charset',
             collation='another-collation',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
             format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
-            kind=u'sql#database'))
+            kind='sql#database'))
 
     self.Run('sql databases patch mock-db --instance=mock-instance '
              '--collation=another-collation --charset=another-charset --diff')

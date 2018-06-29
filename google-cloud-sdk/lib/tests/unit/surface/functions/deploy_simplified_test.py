@@ -43,7 +43,7 @@ _OP_FAILED_UPLOAD = (
 _REPO_URL = 'the_string_for_the_URL_is_not_validated_in_gcloud'
 _REPO_PATH = 'random/path/that/is/not/checked/either'
 _SUCCESFULL_DEPLOY_STDERR = """\
-Deploying function (may take a while - up to 2 minutes)
+{"ux": "PROGRESS_TRACKER", "message": "Deploying function (may take a while - up to 2 minutes)", "status": "SUCCESS"}
 """
 
 
@@ -329,8 +329,9 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.StartObjectPatch(http_wrapper, 'MakeRequest', MockMakeRequest)
 
   @parameterized.named_parameters(
-      ('UsCentralRegion', 'us-central1'),
-      ('UsEastRegion', 'us-east1'))
+      ('UsEastRegion', 'us-east1'),  # NOTICE: Neither of these are the default
+      ('UsWestRegion', 'us-west1'),  # functions.region value.
+  )
   def testCreateWithPubSub(self, region):
     self.MockUnpackedSourcesDirSize()
     # Mock out making archive containing the function to deploy.

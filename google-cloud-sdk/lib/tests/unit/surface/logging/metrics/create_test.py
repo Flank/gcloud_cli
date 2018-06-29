@@ -14,6 +14,8 @@
 
 """Tests of the 'metrics create' subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.logging import util
@@ -93,7 +95,7 @@ class MetricsCreateBetaTest(base.LoggingTestBase, sdk_test_base.WithTempCWD):
             labels=[
                 msgs.LabelDescriptor(
                     description=None,
-                    key=u'label1',
+                    key='label1',
                     valueType=msgs.LabelDescriptor
                     .ValueTypeValueValuesEnum.STRING)
             ],
@@ -116,26 +118,26 @@ class MetricsCreateBetaTest(base.LoggingTestBase, sdk_test_base.WithTempCWD):
     # what is produced when parsing JSON.
     new_metric = msgs.LogMetric(
         name='my-metric',
-        description=u'My fun filter.',
-        filter=u'severity>=ERROR',
+        description='My fun filter.',
+        filter='severity>=ERROR',
         labelExtractors=msgs.LogMetric.LabelExtractorsValue(
             additionalProperties=[
                 msgs.LogMetric.LabelExtractorsValue.AdditionalProperty(
-                    key='label1', value=u'REGEXP_EXTRACT(jsonPayload.request, '
+                    key='label1', value='REGEXP_EXTRACT(jsonPayload.request, '
                     '"before ([a-zA-Z ]+) after")')]
         ),
         metricDescriptor=msgs.MetricDescriptor(
-            displayName=u'displayname',
+            displayName='displayname',
             valueType=msgs.MetricDescriptor.ValueTypeValueValuesEnum.DOUBLE,
             labels=[
                 msgs.LabelDescriptor(
                     description=None,
-                    key=u'label1',
+                    key='label1',
                     valueType=msgs.LabelDescriptor
                     .ValueTypeValueValuesEnum.STRING)
             ],
             metricKind=msgs.MetricDescriptor.MetricKindValueValuesEnum.DELTA),
-        valueExtractor=u'REGEXP_EXTRACT(jsonPayload.request, '
+        valueExtractor='REGEXP_EXTRACT(jsonPayload.request, '
         '".*quantity=(\d+).*")')  # pylint: disable=anomalous-backslash-in-string
     self.mock_client_v2.projects_metrics.Create.Expect(
         msgs.LoggingProjectsMetricsCreateRequest(

@@ -24,7 +24,7 @@ REQUIRED FLAGS
           choose a node type that fits the requirements on Node Group creation.
           If multiple node types match your defined criteria, the NodeType with
           the least amount of each resource will be selected. You can specify
-          'any' to indicate no preference for a certain resource.
+          'any' to indicate any non-zero value for a certain resource.
 
           The following keys are allowed:
 
@@ -39,7 +39,8 @@ REQUIRED FLAGS
            localSSD
               Optional. The amount of SSD space available on the node. This
               value should include unit (eg. 3072MB or 9GB). If no units are
-              specified, GB is assumed.
+              specified, GB is assumed. If this key is not specified, local SSD
+              is unconstrained.
 
        --node-type=NODE_TYPE
           The node type to use for nodes in node groups using this template.
@@ -90,5 +91,8 @@ NOTES
     without notice. Usually, users of ALPHA commands and flags need to apply
     for access, agree to applicable terms, and have their projects whitelisted.
     Contact Google or sign up on a product's page for ALPHA access. Product
-    pages can be found at https://cloud.google.com/products/.
+    pages can be found at https://cloud.google.com/products/. This variant is
+    also available:
+
+        $ gcloud beta compute sole-tenancy node-templates create
 

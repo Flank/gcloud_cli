@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the disks snapshot subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import itertools
 import os
 import re
@@ -28,6 +30,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.compute import utils
+from six.moves import range
 
 
 class DisksSnapshotTestBase(sdk_test_base.WithFakeAuth,
@@ -305,26 +308,26 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
   def testSnapshotOfManyDisksWithDefaultNames(self):
     n_disks = 3
     disk_refs = [self._GetDiskRef('disk-{}'.format(c))
-                 for c in xrange(n_disks)]
+                 for c in range(n_disks)]
     snapshot_refs = [self._GetSnapshotRef('random-name-{}'.format(c))
-                     for c in xrange(n_disks)]
+                     for c in range(n_disks)]
     operation_refs = [self._GetOperationRef('operation-{}'.format(c))
-                      for c in xrange(n_disks)]
+                      for c in range(n_disks)]
 
     self.api_mock.batch_responder.ExpectBatch([
         (self._GetCreateSnapshotRequest(disk_refs[c], snapshot_refs[c]),
          self._GetOperationMessage(operation_refs[c], self.status_enum.PENDING))
-        for c in xrange(n_disks)
+        for c in range(n_disks)
     ])
     self.api_mock.batch_responder.ExpectBatch([
         (self._GetOperationGetRequest(operation_refs[c]),
          self._GetOperationMessage(operation_refs[c], self.status_enum.DONE))
-        for c in xrange(n_disks)
+        for c in range(n_disks)
     ])
     self.api_mock.batch_responder.ExpectBatch([
         (self._GetSnapshotGetRequest(snapshot_refs[c]),
          self._GetSnapshotMessage(snapshot_refs[c], disk_refs[c]))
-        for c in xrange(n_disks)
+        for c in range(n_disks)
     ])
 
     self.Run('compute disks snapshot {disks} --zone {zone}'
@@ -360,16 +363,16 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
   def testSnapshotOfManyDisksWithCustomNames(self):
     n_disks = 3
     disk_refs = [self._GetDiskRef('disk-{}'.format(c))
-                 for c in xrange(n_disks)]
+                 for c in range(n_disks)]
     snapshot_refs = [self._GetSnapshotRef('snapshot-{}'.format(c))
-                     for c in xrange(n_disks)]
+                     for c in range(n_disks)]
     operation_refs = [self._GetOperationRef('operation-{}'.format(c))
-                      for c in xrange(n_disks)]
+                      for c in range(n_disks)]
 
     self.api_mock.batch_responder.ExpectBatch([
         (self._GetCreateSnapshotRequest(disk_refs[c], snapshot_refs[c]),
          self._GetOperationMessage(operation_refs[c], self.status_enum.PENDING))
-        for c in xrange(n_disks)
+        for c in range(n_disks)
     ])
 
     self.Run('compute disks snapshot {disks} '
@@ -620,6 +623,40 @@ class DisksSnapshotBetaTest(DisksSnapshotTestBase):
         'Disk snapshot in progress for [{}].\n'
         'Use [gcloud compute operations describe URI] command to check '
         'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
+
+  def testLabels(self):
+    disk_ref = self._GetDiskRef('disk-1')
+    snapshot_ref = self._GetSnapshotRef('random-name-0')
+    operation_ref = self._GetOperationRef('operation-1')
+
+    # request_tuple actual request messages is in the 3rd field of tuple.
+    request_tuple = self._GetCreateSnapshotRequest(disk_ref, snapshot_ref)
+
+    m = self.api_mock.messages
+    labels_in_request = (('a', 'b'), ('c', 'd'))
+    request_tuple[2].snapshot.labels = m.Snapshot.LabelsValue(
+        additionalProperties=[
+            m.Snapshot.LabelsValue.AdditionalProperty(
+                key=pair[0], value=pair[1])
+            for pair in labels_in_request])
+
+    self.api_mock.batch_responder.ExpectBatch([
+        (request_tuple,
+         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
+    ])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._GetOperationGetRequest(operation_ref),
+         self._GetOperationMessage(operation_ref, self.status_enum.DONE)),
+    ])
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._GetSnapshotGetRequest(snapshot_ref),
+         self._GetSnapshotMessage(snapshot_ref, disk_ref)),
+    ])
+
+    self.Run('compute disks snapshot disk-1 --zone central2-a --labels=a=b,c=d')
+
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Creating snapshot(s) random-name-0')
 
   def testSnapshotCsekKeyFileRsaWrappedKey(self):
     disk_ref = self._GetDiskRef('disk-1')

@@ -15,13 +15,19 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class CryptokeysListTest(base.KmsMockTest):
 
-  def testList(self):
+  def testList(self, track):
+    self.track = track
     key_1 = self.project_name.Descendant('global/my_kr/my_key1')
     key_2 = self.project_name.Descendant('global/my_kr/my_key2/my_version2')
     key_with_labels = self.project_name.Descendant('global/my_kr/my_key')
@@ -94,7 +100,8 @@ class CryptokeysListTest(base.KmsMockTest):
 """.format(key_1.RelativeName(), key_2.Parent().RelativeName(),
            key_with_labels.RelativeName()), normalize_space=True)
 
-  def testListParentFlag(self):
+  def testListParentFlag(self, track):
+    self.track = track
     key_1 = self.project_name.Descendant('global/my_kr/my_key1')
 
     self.kms.projects_locations_keyRings_cryptoKeys.List.Expect(

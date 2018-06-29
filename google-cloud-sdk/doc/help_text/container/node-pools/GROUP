@@ -3,16 +3,21 @@ NAME
         Kubernetes Engine node pools
 
 SYNOPSIS
-    gcloud container node-pools COMMAND [--zone=ZONE, -z ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud container node-pools COMMAND
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Create and delete operations for Google Kubernetes Engine node pools.
 
 FLAGS
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

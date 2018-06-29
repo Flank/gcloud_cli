@@ -33,10 +33,10 @@ FLAGS
      --activation-policy=ACTIVATION_POLICY
         The activation policy for this instance. This specifies when the
         instance should be activated and is applicable only when the instance
-        state is RUNNABLE. The default is ON_DEMAND. More information on
+        state is RUNNABLE. The default is on-demand. More information on
         activation policies can be found here:
         https://cloud.google.com/sql/faq#activation_policy. ACTIVATION_POLICY
-        must be one of: ALWAYS, NEVER, ON_DEMAND.
+        must be one of: always, never, on-demand.
 
      --assign-ip
         The instance must be assigned an IP address.
@@ -46,7 +46,7 @@ FLAGS
         for the operation to complete.
 
      --authorized-gae-apps=APP,[APP,...]
-        First Generation instances only. List of IDs for App Engine
+        First Generation instances only. List of project IDs for App Engine
         applications running in the Standard environment that can access this
         instance.
 
@@ -152,8 +152,8 @@ FLAGS
         FAILOVER.
 
      --replication=REPLICATION
-        The type of replication this instance uses. The default is SYNCHRONOUS.
-        REPLICATION must be one of: SYNCHRONOUS, ASYNCHRONOUS.
+        The type of replication this instance uses. The default is synchronous.
+        REPLICATION must be one of: synchronous, asynchronous.
 
      --require-ssl
         Specified if users connecting over IP must use SSL.

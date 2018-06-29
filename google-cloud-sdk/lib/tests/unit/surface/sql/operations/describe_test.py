@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -29,7 +31,8 @@ class OperationsDescribeTest(base.SqlMockTestBeta):
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
             operation='1cb8a924-898d-41ec-b695-39a6dc018d16',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.Operation(
             insertTime=datetime.datetime(
                 2014,
@@ -61,19 +64,20 @@ class OperationsDescribeTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'integration-test',
+            targetId='integration-test',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'1cb8a924-898d-41ec-b695-39a6dc018d16',
+            kind='sql#operation',
+            name='1cb8a924-898d-41ec-b695-39a6dc018d16',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'.
             format(self.Project()),
-            operationType=u'CREATE_USER',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CREATE_USER',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.Run('sql operations describe 1cb8a924-898d-41ec-b695-39a6dc018d16')
     # pylint: disable=line-too-long

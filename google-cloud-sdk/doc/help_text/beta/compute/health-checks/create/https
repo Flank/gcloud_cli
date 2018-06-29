@@ -9,7 +9,7 @@ SYNOPSIS
         [--healthy-threshold=HEALTHY_THRESHOLD; default=2] [--host=HOST]
         [--port=PORT; default=80] [--port-name=PORT_NAME]
         [--proxy-header=PROXY_HEADER; default="NONE"]
-        [--request-path=REQUEST_PATH; default="/"]
+        [--request-path=REQUEST_PATH; default="/"] [--response=RESPONSE]
         [--timeout=TIMEOUT; default="5s"]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2]
         [GCLOUD_WIDE_FLAG ...]
@@ -66,6 +66,11 @@ FLAGS
      --request-path=REQUEST_PATH; default="/"
         The request path that this health check monitors. For example,
         /healthcheck. The default value is ``/''.
+
+     --response=RESPONSE
+        When empty, status code of the response determines health. When not
+        empty, presence of specified string in first 1024 characters of
+        response body determines health. Only ASCII characters allowed.
 
      --timeout=TIMEOUT; default="5s"
         If Google Compute Engine doesn't receive a healthy response from the

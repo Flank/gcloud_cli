@@ -22,7 +22,7 @@ from tests.lib.surface.compute import test_base
 class NodeTemplatesDeleteTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
@@ -31,13 +31,11 @@ class NodeTemplatesDeleteTest(test_base.BaseTest):
     self.Run('compute sole-tenancy node-templates delete template-1 '
              '--region region-1')
 
-    self.CheckRequests(
-        [(self.compute_alpha.nodeTemplates,
-          'Delete',
-          self.messages.ComputeNodeTemplatesDeleteRequest(
-              nodeTemplate='template-1',
-              project='my-project',
-              region='region-1'))])
+    self.CheckRequests([(self.compute_beta.nodeTemplates, 'Delete',
+                         self.messages.ComputeNodeTemplatesDeleteRequest(
+                             nodeTemplate='template-1',
+                             project='my-project',
+                             region='region-1'))])
 
 
 if __name__ == '__main__':

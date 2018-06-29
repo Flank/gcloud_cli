@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for Spanner database sessions library."""
+from __future__ import absolute_import
 from __future__ import unicode_literals
 from collections import OrderedDict
 import textwrap
@@ -57,7 +58,7 @@ class DatabaseSessionsClientTest(base.SpannerTestBase):
         database=self.session_ref.RelativeName())
     self.client.projects_instances_databases_sessions.List.Expect(
         request=request, response=response)
-    self.assertEqual(database_sessions.List(self.session_ref).next(), session)
+    self.assertEqual(next(database_sessions.List(self.session_ref)), session)
 
   def testListWithFilter(self):
     session = self.msgs.Session(
@@ -72,7 +73,7 @@ class DatabaseSessionsClientTest(base.SpannerTestBase):
     self.client.projects_instances_databases_sessions.List.Expect(
         request=request, response=response)
     self.assertEqual(
-        database_sessions.List(self.session_ref, server_filter).next(), session)
+        next(database_sessions.List(self.session_ref, server_filter)), session)
 
   def testDelete(self):
     response = self.msgs.Empty()

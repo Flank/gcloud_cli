@@ -6,7 +6,30 @@
 # path so cloud sdk imports will actually work, so it must come first.
 # pylint: disable=C6203
 # pylint: disable=W0611
-import setup
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+# Python 3 is strict about imports and we use this file in different ways, which
+# makes sub-imports difficult. In general, when a script is executed, that
+# directory is put on the PYTHONPATH. The issue is that some of the wrapper
+# scripts are executed from within the bootstrapping/ directory and some are
+# executed from within the bin/ directory.
+# pylint: disable=g-statement-before-imports
+if '.' in __name__:
+  # Here, __name__ will be bootstrapping.bootstrapping. This indicates that this
+  # file was loaded as a member of package bootstrapping. This in turn indicates
+  # that the main file that was executed was not in the bootstrapping directory,
+  # so bin/ is on the path and bootstrapping is considered a python package.
+  # Do an import of setup from this current package.
+  from . import setup  # pylint:disable=g-import-not-at-top
+else:
+  # In this case, __name__ is bootstrapping, which indicates that the main
+  # script was executed from within this directory meaning that Python doesn't
+  # consider this a package but rather the root of the PYTHONPATH. We can't do
+  # the above import because since we are not in a package, the '.' doesn't
+  # refer to anything. Just do a direct import which will find setup on the
+  # PYTHONPATH (which is just this directory).
+  import setup  # pylint:disable=g-import-not-at-top
 
 import json
 import os
@@ -16,16 +39,28 @@ from googlecloudsdk.core import config
 from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.credentials import store as c_store
 from googlecloudsdk.core.updater import local_state
 from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files
+from googlecloudsdk.core.util import platforms
+from six.moves import input
 
 
 BOOTSTRAPPING_DIR = os.path.dirname(os.path.realpath(__file__))
 BIN_DIR = os.path.dirname(BOOTSTRAPPING_DIR)
 SDK_ROOT = os.path.dirname(BIN_DIR)
+
+
+def DisallowPython3():
+  if not platforms.PythonVersion().IsCompatible(allow_py3=False):
+    sys.exit(1)
+
+
+def GetDecodedArgv():
+  return [console_attr.Decode(arg) for arg in sys.argv]
 
 
 def _FullPath(tool_dir, exec_name):
@@ -144,7 +179,10 @@ def CheckForBlacklistedCommand(args, blacklist, warn=True, die=False):
   """
   bad_arg = None
   for arg in args[1:]:
-    if arg and arg[0] is '-':
+    # Flags are skipped and --flag=value are skipped. It is possible for
+    # '--flag value' to result in a false positive if value happens to be in
+    # the blacklist.
+    if arg and arg[0] == '-':
       continue
     if arg in blacklist:
       bad_arg = arg
@@ -159,7 +197,7 @@ def CheckForBlacklistedCommand(args, blacklist, warn=True, die=False):
       sys.stderr.write('The "%s" command is no longer needed with the '
                        'Cloud SDK.\n' % bad_arg)
       sys.stderr.write(blacklist[bad_arg] + '\n')
-      answer = raw_input('Really run this command? (y/N) ')
+      answer = input('Really run this command? (y/N) ')
       if answer in ['y', 'Y']:
         return False
 
@@ -215,9 +253,9 @@ def GetActiveProjectAndAccount():
   return (project_name, account)
 
 
-def GetFileContents(*path_parts):
+def ReadFileContents(*path_parts):
   """Returns file content at specified relative path wrt SDK root path."""
-  return files.GetFileContents(os.path.join(SDK_ROOT, *path_parts)).strip()
+  return files.ReadFileContents(os.path.join(SDK_ROOT, *path_parts)).strip()
 
 
 # Register some other sources for credentials and project.

@@ -1068,6 +1068,306 @@ class TablePrinterWrapTest(resource_printer_test_base.Base):
         my-instance-az-1  Morem ipsum dolor sit amet,
         """))
 
+# pylint: disable=line-too-long
+  def testWrapDefaultMinimum(self):
+    self.SetUpPrinter('table(name, description, extra:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.')},  # 27 chars
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # The last column is wrapped and will be printed at a minimum width of 10.
+    self.AssertOutputEquals("""\
+NAME              DESCRIPTION                                               EXTRA
+my-instance-a-0   Lorem ipsum dolor sit amet, consectetur adipiscing elit.  The quick
+                                                                            brown fox.
+my-instance-az-1  Lorem ipsum dolor sit amet, consectetur adipiscing elit.  x
+""")
+
+  def testWrapDefaultMinimumTwoWrapped(self):
+    self.SetUpPrinter('table(name, description, extra:wrap, more:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.'),  # 27 chars
+         'more': (
+             'Jumps over the lazy dog.')},  # 24
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x'),
+         'more': ('y')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # Each column should print in a minimum of 10.
+    self.AssertOutputEquals("""\
+NAME              DESCRIPTION                                               EXTRA       MORE
+my-instance-a-0   Lorem ipsum dolor sit amet, consectetur adipiscing elit.  The quick   Jumps over
+                                                                            brown fox.  the lazy
+                                                                                        dog.
+my-instance-az-1  Lorem ipsum dolor sit amet, consectetur adipiscing elit.  x           y
+""")
+
+  def testWrapDefaultMinimumBox(self):
+    self.SetUpPrinter('table[box](name, description, extra:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.')},  # 27 chars
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    self.AssertOutputEquals("""\
++------------------+----------------------------------------------------------+------------+
+|       NAME       |                       DESCRIPTION                        |   EXTRA    |
++------------------+----------------------------------------------------------+------------+
+| my-instance-a-0  | Lorem ipsum dolor sit amet, consectetur adipiscing elit. | The quick  |
+|                  |                                                          | brown fox. |
+| my-instance-az-1 | Lorem ipsum dolor sit amet, consectetur adipiscing elit. | x          |
++------------------+----------------------------------------------------------+------------+
+""")
+
+  def testWrapDefaultMinimumTwoWrappedBox(self):
+    self.SetUpPrinter('table[box](name, description, extra:wrap, more:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.'),  # 27 chars
+         'more': (
+             'Jumps over the lazy dog.')},  # 24
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x'),
+         'more': ('y')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    self.AssertOutputEquals("""\
++------------------+----------------------------------------------------------+------------+------------+
+|       NAME       |                       DESCRIPTION                        |   EXTRA    |    MORE    |
++------------------+----------------------------------------------------------+------------+------------+
+| my-instance-a-0  | Lorem ipsum dolor sit amet, consectetur adipiscing elit. | The quick  | Jumps over |
+|                  |                                                          | brown fox. | the lazy   |
+|                  |                                                          |            | dog.       |
+| my-instance-az-1 | Lorem ipsum dolor sit amet, consectetur adipiscing elit. | x          | y          |
++------------------+----------------------------------------------------------+------------+------------+
+""")
+
+  def testWrapMinimumOverridesShorter(self):
+    self.SetUpPrinter('table(name, description, extra:wrap=5)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.')},  # 27 chars
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # The minimum is shorter than the default but still more than the available
+    # space.
+    self.AssertOutputEquals("""\
+NAME              DESCRIPTION                                               EXTRA
+my-instance-a-0   Lorem ipsum dolor sit amet, consectetur adipiscing elit.  The
+                                                                            quick
+                                                                            brown
+                                                                            fox.
+my-instance-az-1  Lorem ipsum dolor sit amet, consectetur adipiscing elit.  x
+""")
+
+  def testWrapMinimumOverridesZero(self):
+    self.SetUpPrinter('table(name, description, a:wrap=1)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. abc'),  # 60 chars
+         'a': (
+             'foo')},  # 3 chars
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'a': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # The default minimum is 0, but should be increased to 1.
+    self.AssertOutputEquals("""\
+NAME              DESCRIPTION                                                   A
+my-instance-a-0   Lorem ipsum dolor sit amet, consectetur adipiscing elit. abc  f
+                                                                                o
+                                                                                o
+my-instance-az-1  Lorem ipsum dolor sit amet, consectetur adipiscing elit.      x
+""")
+
+  def testWrapMinimumOverridesLonger(self):
+    self.SetUpPrinter('table(name, description, extra:wrap=15)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.')},  # 27 chars
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # The minimum is longer than the default.
+    self.AssertOutputEquals("""\
+NAME              DESCRIPTION                                               EXTRA
+my-instance-a-0   Lorem ipsum dolor sit amet, consectetur adipiscing elit.  The quick brown
+                                                                            fox.
+my-instance-az-1  Lorem ipsum dolor sit amet, consectetur adipiscing elit.  x
+""")
+
+  def testWrapMinimumOverridesTwoDifferentValues(self):
+    self.SetUpPrinter('table(name, description, extra:wrap=15, more:wrap=5)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.'),  # 27 chars
+         'more': 'Jumps over the lazy dog.'},  # 24 chars
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # Each column has a different minimum override.
+    self.AssertOutputEquals("""\
+NAME              DESCRIPTION                                               EXTRA            MORE
+my-instance-a-0   Lorem ipsum dolor sit amet, consectetur adipiscing elit.  The quick brown  Jumps
+                                                                            fox.             over
+                                                                                             the
+                                                                                             lazy
+                                                                                             dog.
+my-instance-az-1  Lorem ipsum dolor sit amet, consectetur adipiscing elit.  x
+""")
+
+  def testWrapMinimumOverridesOneOverrideTwoWrapped(self):
+    self.SetUpPrinter('table(name, description, extra:wrap=15, more:wrap)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.'),  # 27 chars
+         'more': 'Jumps over the lazy dog.'},  # 24 chars
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # EXTRA prints with a width of 15 (override), MORE with the default minimum.
+    self.AssertOutputEquals("""\
+NAME              DESCRIPTION                                               EXTRA            MORE
+my-instance-a-0   Lorem ipsum dolor sit amet, consectetur adipiscing elit.  The quick brown  Jumps over
+                                                                            fox.             the lazy
+                                                                                             dog.
+my-instance-az-1  Lorem ipsum dolor sit amet, consectetur adipiscing elit.  x
+""")
+
+  def testWrapMinimumOverridesNoWrapNeeded(self):
+    self.SetUpPrinter('table(name, a:wrap=15, description)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'a': ('foo')},
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'a': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # Column A prints as usual because it's shorter than the available space.
+    self.AssertOutputEquals("""\
+NAME              A    DESCRIPTION
+my-instance-a-0   foo  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+my-instance-az-1  x    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+""")
+
+  def testWrapMinimumOverridesMoreThanNeeded(self):
+    self.SetUpPrinter('table(name, extra:wrap=15, description)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('foobar')},
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    # Column A prints with a width of 6 even though the override is 15, because
+    # that's all the space it needs.
+    self.AssertOutputEquals("""\
+NAME              EXTRA   DESCRIPTION
+my-instance-a-0   foobar  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+my-instance-az-1  x       Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+""")
+
+  def testWrapMinimumOverridesBox(self):
+    self.SetUpPrinter('table[box](name, description, extra:wrap=15)')
+    for resource in [
+        {'name': 'my-instance-a-0',  # 15 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': (
+             'The quick brown fox.')},  # 27 chars
+        {'name': 'my-instance-az-1',  # 16 chars
+         'description': (
+             'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),  # 56 chars
+         'extra': ('x')}
+    ]:
+      self._printer.AddRecord(resource)
+    self._printer.Finish()
+    self.AssertOutputEquals("""\
++------------------+----------------------------------------------------------+-----------------+
+|       NAME       |                       DESCRIPTION                        |      EXTRA      |
++------------------+----------------------------------------------------------+-----------------+
+| my-instance-a-0  | Lorem ipsum dolor sit amet, consectetur adipiscing elit. | The quick brown |
+|                  |                                                          | fox.            |
+| my-instance-az-1 | Lorem ipsum dolor sit amet, consectetur adipiscing elit. | x               |
++------------------+----------------------------------------------------------+-----------------+
+""")
+
+# pylint: enable=line-too-long
+
   def testTablePrinterVariableWidthMultiLine(self):
     self.SetUpPrinter('table[box](head, data:wrap, tail)', encoding='utf8')
     for resource in self.multiline_width_resource:

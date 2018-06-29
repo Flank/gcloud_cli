@@ -14,6 +14,8 @@
 
 """Tests for googlecloudsdk.api_lib.firebase.test.results_summary."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import exit_code
 from googlecloudsdk.api_lib.firebase.test import results_summary
 from googlecloudsdk.api_lib.firebase.test import tool_results

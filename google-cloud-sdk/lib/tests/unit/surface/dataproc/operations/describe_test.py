@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Test of the 'operations describe' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base

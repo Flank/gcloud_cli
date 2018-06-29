@@ -23,6 +23,7 @@ from tests.lib import test_case
 from tests.lib.surface.debug import base
 
 import mock
+from six.moves import range
 
 
 class DeleteTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):

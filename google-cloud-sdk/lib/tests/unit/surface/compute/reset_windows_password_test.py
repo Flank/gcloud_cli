@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the reset-windows-password subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 import textwrap
 import time
@@ -21,6 +23,7 @@ from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 import mock
+from six.moves import range
 
 try:
   # pylint:disable=g-import-not-at-top
@@ -275,7 +278,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
         name='instance-1',
         networkInterfaces=network_interfaces,
         metadata=messages.Metadata(
-            fingerprint='my-fingerprint',
+            fingerprint=b'my-fingerprint',
             items=metadata_items),
         status=messages.Instance.StatusValueValuesEnum.RUNNING,
         selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
@@ -310,7 +313,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
             messages.ComputeInstancesSetMetadataRequest(
                 instance='instance-1',
                 metadata=messages.Metadata(
-                    fingerprint='my-fingerprint',
+                    fingerprint=b'my-fingerprint',
                     items=[
                         messages.Metadata.ItemsValueListEntry(
                             key='a',
@@ -500,7 +503,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
         compute reset-windows-password instance-1 --zone zone-1
         """)
 
-    self.assertIn(expected_warning, self.stderr.getvalue())
+    self.assertIn(expected_warning, self.GetErr())
     self.AssertOutputEquals(expected_output)
 
   def testInstanceWithNoIpAddress(self):
@@ -526,7 +529,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
         [self.GetMetadataSetRequest(windows_key_entry)],
         [self.GetSerialPortGetRequest()],
     )
-    self.assertIn(expected_warning, self.stderr.getvalue())
+    self.assertIn(expected_warning, self.GetErr())
     self.AssertOutputEquals(expected_output)
 
   def testExpiredKeyRemoved(self):
@@ -639,7 +642,7 @@ class ResetWindowsPasswordTest(test_base.BaseTest):
     existing_keys = []
     test_key = self.windows_key_entry.format(
         EMAIL, self.expire_on, EXPONENT, MODULUS, USERNAME)
-    max_keys = 262144 / len(test_key + '\n')
+    max_keys = 262144 // len(test_key + '\n')
 
     for key_num in range(max_keys):
       key = test_key.replace(MODULUS, 'key-{0:06d}-{1}'

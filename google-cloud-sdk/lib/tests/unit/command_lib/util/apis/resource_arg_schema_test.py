@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import itertools
 
 from googlecloudsdk.api_lib.util import resource as resource_util
-from googlecloudsdk.calliope.concepts import concepts
+from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.apis import resource_arg_schema
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema_util as util
@@ -66,9 +66,33 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     project_attr, zone_attr = spec.attributes[0], spec.attributes[1]
     self.assertEqual(project_attr.name, 'project')
     self.assertEqual(project_attr.help_text, 'help1')
+    self.assertEqual(
+        project_attr.fallthroughs,
+        project_resource_args.PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
     self.assertEqual(zone_attr.name, 'zone')
-    self.assertEqual(zone_attr.help_text, concepts.ANCHOR_HELP)
+    self.assertEqual(zone_attr.help_text, 'help2')
+    self.assertEqual(zone_attr.fallthroughs, [])
     self.assertTrue(spec.disable_auto_completers)
+
+  def testPluralNameInResource(self):
+    r = resource_arg_schema.YAMLResourceArgument.FromData(
+        {
+            'help_text': 'group help',
+            'spec': {'name': 'zone', 'collection': 'foo.projects.zones',
+                     'plural_name': 'zones',
+                     'attributes': [
+                         {'parameter_name': 'projectsId',
+                          'attribute_name': 'project',
+                          'help': 'help1'},
+                         {'parameter_name': 'zonesId',
+                          'attribute_name': 'zone',
+                          'help': 'help2'}]},
+            'removed_flags': ['zone'],
+            'is_positional': False})
+
+    spec = r._GenerateResourceSpec(
+        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    self.assertEqual('zones', spec.plural_name)
 
   def testResourceWithFlagNameOverride(self):
     arg_schema = resource_arg_schema.YAMLResourceArgument.FromData(
@@ -95,8 +119,56 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(project_attr.name, 'project')
     self.assertEqual(project_attr.help_text, 'help1')
     self.assertEqual(spec.name, 'alt-zone')
-    self.assertEqual(zone_attr.help_text, concepts.ANCHOR_HELP)
+    self.assertEqual(zone_attr.help_text, 'help2')
     self.assertTrue(spec.disable_auto_completers)
+
+  def testResourceWithProjectProperty(self):
+    r = resource_arg_schema.YAMLResourceArgument.FromData(
+        {
+            'help_text': 'group help',
+            'spec': {'name': 'zone', 'collection': 'foo.projects.zones',
+                     'attributes': [
+                         {'parameter_name': 'projectsId',
+                          'attribute_name': 'project',
+                          'help': 'help1',
+                          'prop': 'core/project'},
+                         {'parameter_name': 'zonesId',
+                          'attribute_name': 'zone',
+                          'help': 'help2'}]},
+            'removed_flags': ['zone'],
+            'is_positional': False})
+
+    spec = r._GenerateResourceSpec(
+        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    project_attr = spec.attributes[0]
+
+    # Should only use the project property one time.
+    self.assertEqual(
+        project_attr.fallthroughs,
+        project_resource_args.PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
+
+  def testResourceWithIgnoredProject(self):
+    r = resource_arg_schema.YAMLResourceArgument.FromData(
+        {
+            'help_text': 'group help',
+            'spec': {'name': 'zone', 'collection': 'foo.projects.zones',
+                     'attributes': [
+                         {'parameter_name': 'zonesId',
+                          'attribute_name': 'zone',
+                          'help': 'help2'}]},
+            'removed_flags': ['zone'],
+            'is_positional': False})
+
+    spec = r._GenerateResourceSpec(
+        'foo.projects.zones', 'v1', ['projectsId', 'zonesId'])
+    project_attr = spec.attributes[0]
+
+    self.assertEqual(project_attr.name, 'project')
+    self.assertEqual(project_attr.help_text,
+                     'The Cloud project for the {resource}.')
+    self.assertEqual(
+        project_attr.fallthroughs,
+        project_resource_args.PROJECT_ATTRIBUTE_CONFIG.fallthroughs)
 
   def testResourceWithCompleters(self):
     r = resource_arg_schema.YAMLResourceArgument.FromData(
@@ -169,6 +241,27 @@ class ResourceArgSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
             'help': 'h'},
            {'parameter_name': 'extraId', 'attribute_name': 'extra',
             'help': 'h'}])
+
+  @parameterized.named_parameters(
+      ('Flag', {'arg_name': 'other-zone'}, '--other-zone'),
+      ('Positional', {'arg_name': 'other-zone', 'is_positional': True},
+       'OTHER_ZONE'))
+  def testWithCommandFallthroughs(self, fallthrough_def, arg_name):
+    r = resource_arg_schema.YAMLResourceArgument.FromData(
+        {
+            'help_text': 'group help',
+            'spec': {'name': 'zone', 'collection': 'foo.projects.zones',
+                     'attributes': [
+                         {'parameter_name': 'projectsId',
+                          'attribute_name': 'project',
+                          'help': 'help1'},
+                         {'parameter_name': 'zonesId',
+                          'attribute_name': 'zone',
+                          'help': 'help2'}]},
+            'command_level_fallthroughs': {
+                'zone': [fallthrough_def]}})
+    expected = {'zone': [arg_name]}
+    self.assertEqual(expected, r.command_level_fallthroughs)
 
 
 class CollectionValidationTests(base.Base, parameterized.TestCase):

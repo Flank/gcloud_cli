@@ -24,14 +24,14 @@ To block the command from completing until analysis is finished, run:
 
 .RS 2m
 $ gcloud ml speech recognize\-long\-running AUDIO_FILE \e
-    \-\-language LANGUAGE \-\-sample\-rate SAMPLE_RATE
+    \-\-language\-code LANGUAGE_CODE \-\-sample\-rate SAMPLE_RATE
 .RE
 
 You can also receive an operation as the result of the command by running:
 
 .RS 2m
 $ gcloud ml speech recognize\-long\-running AUDIO_FILE \e
-    \-\-language LANGUAGE \-\-sample\-rate SAMPLE_RATE \-\-async
+    \-\-language\-code LANGUAGE_CODE \-\-sample\-rate SAMPLE_RATE \-\-async
 .RE
 
 This will return information about an operation. To get information about the

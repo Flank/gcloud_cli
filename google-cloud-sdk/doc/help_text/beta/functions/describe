@@ -2,20 +2,28 @@ NAME
     gcloud beta functions describe - display details of a Google Cloud Function
 
 SYNOPSIS
-    gcloud beta functions describe NAME [--region=REGION]
+    gcloud beta functions describe (NAME : --region=REGION)
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Display details of a Google Cloud Function.
 
 POSITIONAL ARGUMENTS
-     NAME
-        The name of the function to describe.
+     Function resource - The Cloud function name to describe. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the flag [NAME] on the
+     command line with a fully specified name; provide the flag [--project] on
+     the command line; set the property [core/project]. This must be specified.
 
-FLAGS
-     --region=REGION
-        The region of the function to describe. Overrides the default
-        functions/region property value for this command invocation.
+       NAME
+          The ID of the function or a fully qualified identifier for the
+          function. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --region=REGION
+          The Cloud region for the function. Overrides the default
+          functions/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

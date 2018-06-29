@@ -40,6 +40,11 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --params=[PARAM=VALUE,...]
         A list of key value pairs to set variables in the Hive queries.
 

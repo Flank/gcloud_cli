@@ -1,12 +1,10 @@
-- release_tracks: [ALPHA]
-
-  help_text:
+- help_text:
     brief: List Cloud TPUs
     DESCRIPTION: List Cloud TPUs
 
   request:
     collection: tpu.projects.locations.nodes
-    api_version: v1alpha1
+    api_version: v1
 
   response:
     id_field: name
@@ -16,9 +14,12 @@
       help_text: |
         The compute/zone of the Cloud TPU.
 
-        If not specified, will use `default` compute/zone.
+        If not specified, will use the value of the [compute/zone] property in the current
+        gcloud configuration. To find a list of compute zones available for Cloud TPUs in your
+        project, run `{parent_command} locations list`.
+
       spec: !REF googlecloudsdk.command_lib.compute.tpus.resources:location
-      is_positional: False
+      is_positional: false
 
   output:
     format: |

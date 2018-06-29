@@ -14,6 +14,7 @@
 """Tests for gcloud app firewall-rules."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import cli_test_base

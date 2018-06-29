@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +17,8 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
+import io
 import os
 
 from googlecloudsdk.core import platforms_install
@@ -27,8 +30,6 @@ from googlecloudsdk.core.util import platforms
 from tests.lib import sdk_test_base
 from tests.lib import subtests
 from tests.lib import test_case
-
-from six.moves import builtins
 
 
 class PlatformsInstallTest(test_case.WithInput,
@@ -104,7 +105,7 @@ class PlatformsInstallTest(test_case.WithInput,
     os_mock.return_value = platforms.OperatingSystem.LINUX
 
     rc_path = self.Touch(directory=self.temp_path,
-                         name='.bashrc', contents='# Empty\n')
+                         name='.bashrc', contents='# Empty ⚡️⚡️⚡\n')
     self.SetAnswers(rc_path)
 
     platforms_install.UpdateRC(
@@ -115,7 +116,7 @@ class PlatformsInstallTest(test_case.WithInput,
         sdk_root=self.sdk_root_path)
 
     expected_content = """\
-# Empty
+# Empty ⚡️⚡️⚡
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '{path}' ]; then source '{path}'; fi
@@ -518,7 +519,7 @@ if [ -f '{path}' ]; then source '{path}'; fi
   def testFailWhenRcPathCannotBeWritten(self):
     os_mock = self.StartObjectPatch(platforms.OperatingSystem, 'Current')
     os_mock.return_value = platforms.OperatingSystem.LINUX
-    open_mock = self.StartObjectPatch(builtins,
+    open_mock = self.StartObjectPatch(io,
                                       'open',
                                       side_effect=IOError)
     rc_path = os.path.join(self.temp_path, 'temp_subdir', '.bashrc')
@@ -1054,7 +1055,7 @@ class RcUpdaterTest(subtests.Base, sdk_test_base.SdkBase):
 
     # Generate the old contents.
     old_rc_lines = [
-        '# RC file.\n',
+        '# RC file with unicode ⚡️️️⚡️⚡️.\n',
         '\n',
         'precious user top\n',
     ]
@@ -1086,13 +1087,12 @@ class RcUpdaterTest(subtests.Base, sdk_test_base.SdkBase):
         '\n',
         'precious user extra\n',
     ])
-    with open(updater.rc_path, 'w') as f:
-      f.write(''.join(old_rc_lines))
+    files.WriteFileContents(updater.rc_path, ''.join(old_rc_lines))
 
     # Generate the expected contents.
     add_then, add_fi = ' ', '; '
     add_rc_lines = [
-        '# RC file.\n',
+        '# RC file with unicode ⚡️️️⚡️⚡️.\n',
         '\n',
         'precious user top\n',
     ]
@@ -1152,8 +1152,7 @@ class RcUpdaterTest(subtests.Base, sdk_test_base.SdkBase):
 
     # Get the actual contents.
     updater.Update()
-    with open(updater.rc_path, 'r') as f:
-      actual = f.read()
+    actual = files.ReadFileContents(updater.rc_path)
     return expected, actual
 
   def testRcUpdater(self):

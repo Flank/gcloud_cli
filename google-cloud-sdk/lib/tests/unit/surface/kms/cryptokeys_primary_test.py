@@ -15,17 +15,23 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope.base import DeprecationException
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class CryptokeysPrimaryTest(base.KmsMockTest):
 
   def SetUp(self):
     self.version_name = self.project_name.Descendant('global/my_kr/my_key/3')
 
-  def testSet(self):
+  def testSet(self, track):
+    self.track = track
     with self.assertRaises(DeprecationException):
       self.Run('kms cryptokeys set-primary-version '
                '--location={0} --keyring={1} {2} --version={3}'.format(

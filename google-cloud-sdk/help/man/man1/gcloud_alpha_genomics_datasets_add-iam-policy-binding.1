@@ -42,8 +42,8 @@ The member to add the binding for. Should be of the form
 \f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
 
 Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
-\f5serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com\fR, or
-\f5domain:example.com\fR.
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
 
 Can also be one of the following special values:
 .RS 2m
@@ -86,14 +86,15 @@ $ gcloud alpha genomics datasets add\-iam\-policy\-binding 1000 \e
     \-\-member='user:test\-user@gmail.com' \-\-role='roles/editor'
 .RE
 
-For a service account 'my\-sa' linked to project 'test\-123', the following
+For a service account \f5test\-proj1@example.domain.com\fR, the following
 command will add an IAM policy binding for the role of 'roles/editor' to the
 given service account:
 
 .RS 2m
-$ gcloud alpha genomics datasets add\-iam\-policy\-binding test\-123 \e
-    \-\-member='serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com'\e
- \-\-role='roles/editor'
+$ gcloud alpha genomics datasets add\-iam\-policy\-binding \e
+    test\-proj1@example.domain.com \e
+    \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
+    \-\-role='roles/editor'
 .RE
 
 The following command will add an IAM policy binding for the role of

@@ -27,13 +27,11 @@ OPTIONAL FLAGS
      --include-quote
         If True, the server will attempt to filter out profanities, replacing
         all but the initial character in each filtered word with asterisks,
-        e.g. \"f**\".
+        e.g. "f**".
 
      --min-likelihood=MIN_LIKELIHOOD; default="possible"
-        Only return findings equal to or above this threshold. One of:
-        very-unlikely, unlikely, possible, likely, very-likely. The default
-        value is possible. MIN_LIKELIHOOD must be one of: likely, possible,
-        unlikely, very-likely, very-unlikely.
+        Only return findings equal to or above this threshold. MIN_LIKELIHOOD
+        must be one of: likely, possible, unlikely, very-likely, very-unlikely.
 
      --redact-all-text
         If specified, all text info in the image will be removed, whether it is

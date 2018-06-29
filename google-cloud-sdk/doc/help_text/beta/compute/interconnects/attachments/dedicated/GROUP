@@ -26,8 +26,9 @@ COMMANDS
         attachment.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute interconnects attachments dedicated
         $ gcloud alpha compute interconnects attachments dedicated
 

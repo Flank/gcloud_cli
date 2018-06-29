@@ -42,8 +42,8 @@ class GetIamPolicyIntegrationTest(base.CategoryManagerUnitTestBase):
             resource='taxonomyStores/2',
             getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
         self.policy)
-    result = self.Run(
-        'alpha category-manager stores get-iam-policy organizations/1')
+    result = self.Run('alpha category-manager stores get-iam-policy '
+                      '--organization organizations/1')
     self.assertEqual(self.policy, result)
 
   def testAddIamPolicyBindingWithOrganizationId(self):
@@ -54,7 +54,8 @@ class GetIamPolicyIntegrationTest(base.CategoryManagerUnitTestBase):
             getIamPolicyRequest=self.messages.GetIamPolicyRequest()),
         self.policy)
 
-    result = self.Run('alpha category-manager stores get-iam-policy 3')
+    result = self.Run('alpha category-manager stores get-iam-policy '
+                      '--organization=3')
     self.assertEqual(self.policy, result)
 
 

@@ -28,6 +28,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
 import six
+from six.moves import range
 
 # Some tests could potentially wait forever if the test is broken.
 # GLOBAL_MAX_WAIT provides an upper limit in such cases. It should never be

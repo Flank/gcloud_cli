@@ -218,6 +218,20 @@ class ClusterMetrics(_messages.Message):
   yarnMetrics = _messages.MessageField('YarnMetricsValue', 2)
 
 
+class ClusterOperation(_messages.Message):
+  r"""The cluster operation triggered by a workflow.
+
+  Fields:
+    done: Output only. Indicates the operation is done.
+    error: Output only. Error, if operation failed.
+    operationId: Output only. The id of the cluster operation.
+  """
+
+  done = _messages.BooleanField(1)
+  error = _messages.StringField(2)
+  operationId = _messages.StringField(3)
+
+
 class ClusterOperationMetadata(_messages.Message):
   r"""Metadata describing the operation.
 
@@ -752,6 +766,9 @@ class DiskConfig(_messages.Message):
 
   Fields:
     bootDiskSizeGb: Optional. Size in GB of the boot disk (default is 500GB).
+    bootDiskType: Optional. Type of the boot disk (default is "pd-standard").
+      Valid values: "pd-ssd" (Persistent Disk Solid State Drive) or "pd-
+      standard" (Persistent Disk Hard Disk Drive).
     numLocalSsds: Optional. Number of attached SSDs, from 0 to 4 (default is
       0). If SSDs are not attached, the boot disk is used to store runtime
       logs and HDFS
@@ -762,7 +779,8 @@ class DiskConfig(_messages.Message):
   """
 
   bootDiskSizeGb = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  numLocalSsds = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  bootDiskType = _messages.StringField(2)
+  numLocalSsds = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
 class Empty(_messages.Message):
@@ -1951,14 +1969,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -1994,17 +2010,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 class Status(_messages.Message):
@@ -2100,6 +2114,129 @@ class SubmitJobRequest(_messages.Message):
 
   job = _messages.MessageField('Job', 1)
   requestId = _messages.StringField(2)
+
+
+class WorkflowGraph(_messages.Message):
+  r"""The workflow graph.
+
+  Fields:
+    nodes: Output only. The workflow nodes.
+  """
+
+  nodes = _messages.MessageField('WorkflowNode', 1, repeated=True)
+
+
+class WorkflowMetadata(_messages.Message):
+  r"""A Cloud Dataproc workflow template resource.
+
+  Enums:
+    StateValueValuesEnum: Output only. The workflow state.
+
+  Messages:
+    ParametersValue: Map from parameter names to values that were used for
+      those parameters.
+
+  Fields:
+    clusterName: Output only. The name of the managed cluster.
+    createCluster: Output only. The create cluster operation metadata.
+    deleteCluster: Output only. The delete cluster operation metadata.
+    graph: Output only. The workflow graph.
+    parameters: Map from parameter names to values that were used for those
+      parameters.
+    state: Output only. The workflow state.
+    template: Output only. The "resource name" of the template.
+    version: Output only. The version of template at the time of workflow
+      instantiation.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The workflow state.
+
+    Values:
+      UNKNOWN: Unused.
+      PENDING: The operation has been created.
+      RUNNING: The operation is running.
+      DONE: The operation is done; either cancelled or completed.
+    """
+    UNKNOWN = 0
+    PENDING = 1
+    RUNNING = 2
+    DONE = 3
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class ParametersValue(_messages.Message):
+    r"""Map from parameter names to values that were used for those
+    parameters.
+
+    Messages:
+      AdditionalProperty: An additional property for a ParametersValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type ParametersValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a ParametersValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  clusterName = _messages.StringField(1)
+  createCluster = _messages.MessageField('ClusterOperation', 2)
+  deleteCluster = _messages.MessageField('ClusterOperation', 3)
+  graph = _messages.MessageField('WorkflowGraph', 4)
+  parameters = _messages.MessageField('ParametersValue', 5)
+  state = _messages.EnumField('StateValueValuesEnum', 6)
+  template = _messages.StringField(7)
+  version = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+
+
+class WorkflowNode(_messages.Message):
+  r"""The workflow node.
+
+  Enums:
+    StateValueValuesEnum: Output only. The node state.
+
+  Fields:
+    error: Output only. The error detail.
+    jobId: Output only. The job id; populated after the node enters RUNNING
+      state.
+    prerequisiteStepIds: Output only. Node's prerequisite nodes.
+    state: Output only. The node state.
+    stepId: Output only. The name of the node.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""Output only. The node state.
+
+    Values:
+      NODE_STATE_UNSPECIFIED: State is unspecified.
+      BLOCKED: The node is awaiting prerequisite node to finish.
+      RUNNABLE: The node is runnable but not running.
+      RUNNING: The node is running.
+      COMPLETED: The node completed successfully.
+      FAILED: The node failed. A node can be marked FAILED because its
+        ancestor or peer failed.
+    """
+    NODE_STATE_UNSPECIFIED = 0
+    BLOCKED = 1
+    RUNNABLE = 2
+    RUNNING = 3
+    COMPLETED = 4
+    FAILED = 5
+
+  error = _messages.StringField(1)
+  jobId = _messages.StringField(2)
+  prerequisiteStepIds = _messages.StringField(3, repeated=True)
+  state = _messages.EnumField('StateValueValuesEnum', 4)
+  stepId = _messages.StringField(5)
 
 
 class YarnApplication(_messages.Message):

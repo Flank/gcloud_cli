@@ -13,11 +13,15 @@
 # limitations under the License.
 """Unit tests for Cloud Tasks API queues service in gcloud."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.tasks import queues as queues_api
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.api_lib.util import list_slicer
 from tests.lib.surface.tasks import test_base
+from six.moves import range
+from six.moves import zip
 
 
 class QueuesTest(test_base.CloudTasksTestBase):

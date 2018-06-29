@@ -32,13 +32,18 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --keyring=KEYRING
-        The containing keyring.
+        Key ring of the key.
 
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --location=LOCATION
-        The location of the requested resource.
+        Location of the key.
 
      --next-rotation-time=NEXT_ROTATION_TIME
         Next automatic rotation time of the key. See $ gcloud topic datetimes

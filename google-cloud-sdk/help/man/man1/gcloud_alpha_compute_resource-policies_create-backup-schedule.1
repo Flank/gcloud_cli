@@ -11,7 +11,7 @@ gcloud alpha compute resource\-policies create\-backup\-schedule \- create a Goo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute resource\-policies create\-backup\-schedule\fR \fINAME\fR \fB\-\-max\-retention\-days\fR=\fIMAX_RETENTION_DAYS\fR (\fB\-\-weekly\-schedule\-from\-file\fR=\fIWEEKLY_CYCLE_FROM_FILE\fR\ |\ \fB\-\-start\-time\fR=\fISTART_TIME\fR\ (\fB\-\-daily\-schedule\fR\ |\ \fB\-\-hourly\-schedule\fR=\fIHOURS\fR\ |\ \fB\-\-weekly\-schedule\fR=\fIWEEKLY_CYCLE\fR)) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute resource\-policies create\-backup\-schedule\fR \fINAME\fR \fB\-\-max\-retention\-days\fR=\fIMAX_RETENTION_DAYS\fR (\fB\-\-weekly\-schedule\-from\-file\fR=\fIWEEKLY_CYCLE_FROM_FILE\fR\ |\ \fB\-\-start\-time\fR=\fISTART_TIME\fR\ (\fB\-\-daily\-schedule\fR\ |\ \fB\-\-hourly\-schedule\fR=\fIHOURS\fR\ |\ \fB\-\-weekly\-schedule\fR=\fIWEEKLY_CYCLE\fR)) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-guest\-flush\fR\ \fB\-\-snapshot\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -59,7 +59,7 @@ A file which defines a weekly cadence with multiple days and start times. The
 format is a JSON/YAML file containing a list of objects with the following
 fields:
 
-day: Day of the week with the same choices as \-\-weekly\-window. startTime:
+day: Day of the week with the same choices as \-\-weekly\-schedule. startTime:
 Start time of the snapshot schedule with the same format as \-\-start\-time.
 
 .RE
@@ -71,11 +71,8 @@ From flags
 .RS 2m
 .TP 2m
 \fB\-\-start\-time\fR=\fISTART_TIME\fR
-Start time for the disk snapshot schedule to start.. Valid choices are 00:00,
-04:00, 08:00,12:00, 16:00 and 20:00 UTC. See $ gcloud topic datetimes for
-information on time formats. For example, \f5\-\-start\-time="03:00\-05"\fR
-(which gets converted to 08:00 UTC). This flag must be specified if any of the
-other arguments in this group are specified.
+Start time for the disk snapshot schedule to start. This flag must be specified
+if any of the other arguments in this group are specified.
 
 .TP 2m
 
@@ -92,7 +89,7 @@ Snapshot schedule occurs every n hours starting at START_TIME.
 
 .TP 2m
 \fB\-\-weekly\-schedule\fR=\fIWEEKLY_CYCLE\fR
-Snapshot schedule occurs weekly on WEEKLY_WINDOW at START_TIME.
+Snapshot schedule occurs weekly on WEEKLY_SCHEDULE at START_TIME.
 \fIWEEKLY_CYCLE\fR must be one of: \fBmonday\fR, \fBtuesday\fR, \fBwednesday\fR,
 \fBthursday\fR, \fBfriday\fR, \fBsaturday\fR, \fBsunday\fR.
 
@@ -137,7 +134,29 @@ $ gcloud config unset compute/region
 Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
+.TP 2m
 
+Snapshot properties
+
+.RS 2m
+.TP 2m
+\fB\-\-guest\-flush\fR
+Create an application consistent snapshot by informing the OS to prepare for the
+snapshot process.
+
+.TP 2m
+\fB\-\-snapshot\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+A list of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+These will be added to the disk snapshots on creation.
+
+
+.RE
 .RE
 .sp
 

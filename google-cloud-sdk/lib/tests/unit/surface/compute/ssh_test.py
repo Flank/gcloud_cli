@@ -11,8 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for the ssh subcommand."""
-import cStringIO
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import io
 import os
 import textwrap
 
@@ -31,7 +36,9 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
+
 import mock
+import six
 
 MESSAGES = apis.GetMessagesModule('compute', 'v1')
 
@@ -946,10 +953,10 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # Ensure that a non-ASCII public key doesn't cause a crash.
     # Same with non-ASCII local username
 
-    modified_public_key_material = unicode(self.public_key_material) + u'\u0394'
-    self.pubkey.comment += u'\u0394'
+    modified_public_key_material = str(self.public_key_material) + '\u0394'
+    self.pubkey.comment += '\u0394'
 
-    ssh_keys = textwrap.dedent(u"""\
+    ssh_keys = textwrap.dedent("""\
         me:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwqx8+h4c6K0ipqLqXt1y4ohpbk6PxDdWzprGxNFrsir/QrOy6iQBAyvlbAb/kM5RaNkjliakfmNEMBH3/tmhBIEmSAsZ0dfhwBof0Hm+bRFI475ik/p7QKSpPXf2nCgG3QF75jfLrk+4R6P+0w3zxbq63LxrB7umUxTA2tGMqgNIW0OQ/w2mfl4DfFTTXQeJ4/Gu6grpl1+Mi7RwtV9RPE5UuveXpcj7htiqj8sv8Zip9kVE7lNQFB0xdy1pcUw93ddo4lbGIJX7PTS0fvXfFdnAZ4huVrdqCOBBMApSx3QdRYUnyz+PrxasQIu7pK8Cl0yACBFUbMhMazqzo2485 me@my-computer
         """)
     project_resource_with_existing_key = self.messages.Project(
@@ -990,7 +997,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
                   items=[
                       self.messages.Metadata.ItemsValueListEntry(
                           key='ssh-keys',
-                          value=(ssh_keys + unicode('me') + u':' +
+                          value=(ssh_keys + str('me') + ':' +
                                  modified_public_key_material)),
                   ]),
 
@@ -1405,7 +1412,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
         selfLink=INSTANCE_WITH_EXTERNAL_ADDRESS.selfLink,
         zone=INSTANCE_WITH_EXTERNAL_ADDRESS.zone,
         metadata=self.messages.Metadata(
-            fingerprint='deadbeef',
+            fingerprint=b'deadbeef',
             items=[
                 self.messages.Metadata.ItemsValueListEntry(
                     key='a',
@@ -1444,7 +1451,7 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
           self.messages.ComputeInstancesSetMetadataRequest(
               instance=instance.name,
               metadata=self.messages.Metadata(
-                  fingerprint='deadbeef',
+                  fingerprint=b'deadbeef',
                   items=[
                       self.messages.Metadata.ItemsValueListEntry(
                           key='a',
@@ -1765,11 +1772,11 @@ class SSHTest(test_base.BaseSSHTest, test_case.WithInput):
 
     # Fills up a buffer with enough ssh_keys until we go just over
     # the max size allowed.
-    buf = cStringIO.StringIO()
+    buf = io.StringIO()
     i = 0
     while len(buf.getvalue()) < self.max_metadata_value_size_in_bytes:
       buf.write('user-')
-      buf.write(str(i))
+      buf.write(six.text_type(i))
       buf.write(':')
       buf.write(ssh_key)
       i += 1
@@ -2056,9 +2063,9 @@ class SshCompletionTests(test_base.BaseTest, completer_test_base.CompleterBase):
         scope_set=self.MakeAllScopes(zonal=True),
         result=resource_projector.MakeSerializable(test_resources.INSTANCES_V1))
     self.RunCompletion('compute ssh in',
-                       ['instance-1 --zone=zone-1',
-                        'instance-2 --zone=zone-1',
-                        'instance-3 --zone=zone-1'])
+                       ['instance-1\\ --zone=zone-1',
+                        'instance-2\\ --zone=zone-1',
+                        'instance-3\\ --zone=zone-1'])
 
   def testSshCompletionWithZone(self):
     self.ExpectListerInvoke(

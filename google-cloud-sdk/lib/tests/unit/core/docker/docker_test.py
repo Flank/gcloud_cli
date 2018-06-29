@@ -33,7 +33,7 @@ from tests.lib import test_case
 import mock
 
 _TOKEN = 'ma-token'
-_ACCESS_TOKEN_USERNAME = 'oauth2accesstoken'
+_ACCESS_TOKEN_USERNAME = 'gclouddockertoken'
 _EMAIL = 'not@val.id'
 _EXPECTED_DOCKER_OPTIONS = [
     '--username=' + _ACCESS_TOKEN_USERNAME, '--password=' + _TOKEN
@@ -80,8 +80,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     directory = os.path.dirname(new_cfg)
     if not os.path.exists(directory):
       os.makedirs(directory)
-    with files.OpenForWritingPrivate(new_cfg) as writer:
-      writer.write(contents)
+    files.WriteFileContents(new_cfg, contents, private=True)
     return new_cfg
 
   def TouchOldDockerConfig(self):
@@ -90,8 +89,7 @@ class DockerTest(sdk_test_base.WithFakeAuth):
     directory = os.path.dirname(cfg)
     if not os.path.exists(directory):
       os.makedirs(directory)
-    with files.OpenForWritingPrivate(cfg) as writer:
-      writer.write('{}')
+    files.WriteFileContents(cfg, '{}', private=True)
     return cfg
 
   def CheckDockerConfigAuths(self, expected):

@@ -328,7 +328,6 @@ class MiscWorkflowTest(DeployE2ETestBase):
         'Called function: {} - Hello World!'.format(function_name))
     self.AssertOutputContains(function_name)
 
-  @test_case.Filters.skip('Failing consistently', 'b/78307868')
   def testLogRead(self):
     """Test deploy and read logs."""
     with self._DeployFunction('--trigger-http',

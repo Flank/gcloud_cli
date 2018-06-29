@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure setting an IAM policy works properly."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import base64
 import textwrap
@@ -31,14 +35,15 @@ _ETAG_CONFIRM_PROMPT = textwrap.dedent("""\
 
 class SetIamPolicy(unit_test_base.BaseTest):
 
-  def PostSetUp(self):
+  def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def _CreatePolicyAndFile(self, include_etag=False):
-    etag_bin = 'abcde'
+    etag_bin = b'abcde'
     if include_etag:
       etag_field = ''',
-              "etag": "{}"'''.format(base64.urlsafe_b64encode(etag_bin))
+              "etag": "{}"'''.format(
+                  base64.urlsafe_b64encode(etag_bin).decode('ascii'))
     else:
       etag_field = ''
     policy = self.msgs.Policy(
@@ -51,7 +56,9 @@ class SetIamPolicy(unit_test_base.BaseTest):
                 role='roles/viewer',
                 members=['allUsers'])],
         etag=(etag_bin if include_etag else None))
-    f = self.MockFileRead(
+    f = self.Touch(
+        self.temp_path,
+        contents=
         '''{{
           "version": 1,
           "bindings": [
@@ -129,14 +136,16 @@ class SetIamPolicy(unit_test_base.BaseTest):
                 role='roles/viewer', members=['allUsers'])
         ],
         etag=None)
-    in_file = self.MockFileRead('version: 1\n'
-                                'bindings:\n'
-                                '- members:\n'
-                                '  - user:test-user@gmail.com\n'
-                                '  role: roles/owner\n'
-                                '- members:\n'
-                                '  - allUsers\n'
-                                '  role: roles/viewer')
+    in_file = self.Touch(
+        self.temp_path,
+        contents='version: 1\n'
+                 'bindings:\n'
+                 '- members:\n'
+                 '  - user:test-user@gmail.com\n'
+                 '  role: roles/owner\n'
+                 '- members:\n'
+                 '  - allUsers\n'
+                 '  role: roles/viewer')
 
     self.client.projects_serviceAccounts.SetIamPolicy.Expect(
         request=self.msgs.IamProjectsServiceAccountsSetIamPolicyRequest(

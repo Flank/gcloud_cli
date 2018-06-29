@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud kms decrypt \- decrypt a ciphertext file using a key
+gcloud kms decrypt \- decrypt a ciphertext file using a Cloud KMS key
 
 
 
@@ -17,17 +17,24 @@ gcloud kms decrypt \- decrypt a ciphertext file using a key
 
 .SH "DESCRIPTION"
 
-Decrypts the given ciphertext file using the given CryptoKey and writes the
-result to the named plaintext file.
+gcloud kms decrypt decrypts the given ciphertext file using the given Cloud KMS
+key and writes the result to the named plaintext file. Note that to permit users
+to decrypt using a key, they must be have at least one of the following IAM
+roles for that key: \f5roles/cloudkms.cryptoKeyDecrypter\fR,
+\f5roles/cloudkms.cryptoKeyEncrypterDecrypter\fR.
 
-If an additional authenticated data file is provided, its contents must match
-the additional authenticated data provided during encryption. The file must not
-be larger than 64KiB.
+Additional authenticated data (AAD) is used as an additional check by Cloud KMS
+to authenticate a decryption request. If an additional authenticated data file
+is provided, its contents must match the additional authenticated data provided
+during encryption and must not be larger than 64KiB. If you don't provide a
+value for \f5\-\-additional\-authenticated\-data\-file\fR, an empty string is
+used. For a thorough explanation of AAD, refer to this guide:
+https://cloud.google.com/kms/docs/additional\-authenticated\-data
 
 If \f5\-\-ciphertext\-file\fR or \f5\-\-additional\-authenticated\-data\-file\fR
-is set to '\-', that file is read from stdin. Similarly, if
-\f5\-\-plaintext\-file\fR is set to '\-', the decrypted plaintext is written to
-stdout.
+is set to '\-', that file is read from stdin. Note that both files cannot be
+read from stdin. Similarly, if \f5\-\-plaintext\-file\fR is set to '\-', the
+decrypted plaintext is written to stdout.
 
 
 
@@ -36,11 +43,11 @@ stdout.
 .RS 2m
 .TP 2m
 \fB\-\-ciphertext\-file\fR=\fICIPHERTEXT_FILE\fR
-Path to the ciphertext file to decrypt.
+File path of the ciphertext file to decrypt.
 
 .TP 2m
 \fB\-\-plaintext\-file\fR=\fIPLAINTEXT_FILE\fR
-Path to the plaintext file to output.
+File path of the plaintext file to output.
 
 
 .RE
@@ -51,19 +58,19 @@ Path to the plaintext file to output.
 .RS 2m
 .TP 2m
 \fB\-\-additional\-authenticated\-data\-file\fR=\fIADDITIONAL_AUTHENTICATED_DATA_FILE\fR
-Path to the optional file containing the additional authenticated data.
+File path to the optional file containing the additional authenticated data.
 
 .TP 2m
 \fB\-\-key\fR=\fIKEY\fR
-The key to use for decryption.
+Cloud KMS key to use for decryption.
 
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
-The containing keyring.
+Key ring of the key.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-The location of the requested resource.
+Location of the keyring.
 
 
 .RE
@@ -80,17 +87,31 @@ help\fR for details.
 
 .SH "EXAMPLES"
 
-The following command will read the file 'path/to/ciphertext', decrypt it using
-the CryptoKey \f5frodo\fR with the KeyRing \f5fellowship\fR and Location
-\f5global\fR, and write the plaintext to 'path/to/plaintext'.
+To decrypt the file 'path/to/ciphertext' using the key \f5frodo\fR with key ring
+\f5fellowship\fR and location \f5global\fR and write the plaintext to
+\'path/to/plaintext.dec', run:
 
 .RS 2m
 $ gcloud kms decrypt \e
-    \-\-key frodo \e
-    \-\-keyring fellowship \e
-    \-\-location global \e
-    \-\-ciphertext\-file path/to/input/ciphertext \e
-    \-\-plaintext\-file path/to/output/plaintext
+    \-\-key=frodo \e
+    \-\-keyring=fellowship \e
+    \-\-location=global \e
+    \-\-ciphertext\-file=path/to/input/ciphertext \e
+    \-\-plaintext\-file=path/to/output/plaintext.dec
+.RE
+
+To decrypt the file 'path/to/ciphertext' using the key \f5frodo\fR and the
+additional authenticated data that was used to encrypt the ciphertext, and write
+the decrypted plaintext to stdout, run:
+
+.RS 2m
+$ gcloud kms decrypt \e
+    \-\-key=frodo \e
+    \-\-keyring=fellowship \e
+    \-\-location=global \e
+    \-\-additional\-authenticated\-data\-file=path/to/aad \e
+    \-\-ciphertext\-file=path/to/input/ciphertext \e
+    \-\-plaintext\-file='\-'
 .RE
 
 

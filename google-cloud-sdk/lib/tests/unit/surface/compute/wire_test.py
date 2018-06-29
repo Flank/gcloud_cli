@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests that ensure deserialization of server responses work properly."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
 from tests.lib import test_case
+from six.moves import range
 
 
 class WireTest(e2e_base.WithMockHttp, test_case.WithOutputCapture):

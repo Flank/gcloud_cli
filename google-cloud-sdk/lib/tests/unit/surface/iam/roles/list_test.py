@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests that ensure deserialization of server responses work properly."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
@@ -23,7 +26,7 @@ class ListTest(unit_test_base.BaseTest):
   def testEmptyResponse(self):
     self.client.organizations_roles.List.Expect(
         request=self.msgs.IamOrganizationsRolesListRequest(
-            parent=u'organizations/1', showDeleted=False, pageSize=100),
+            parent='organizations/1', showDeleted=False, pageSize=100),
         response=self.msgs.ListRolesResponse(roles=[]))
 
     self.Run('iam roles list --organization 1')
@@ -55,7 +58,7 @@ class ListTest(unit_test_base.BaseTest):
   def testPopulatedResponse(self):
     self.client.organizations_roles.List.Expect(
         request=self.msgs.IamOrganizationsRolesListRequest(
-            parent=u'organizations/1', showDeleted=True, pageSize=100),
+            parent='organizations/1', showDeleted=True, pageSize=100),
         response=self.msgs.ListRolesResponse(roles=[
             self.msgs.Role(
                 name='organizations/1/roles/customEditor',
@@ -80,7 +83,7 @@ class ListTest(unit_test_base.BaseTest):
   def testLimitedResponse(self):
     self.client.organizations_roles.List.Expect(
         request=self.msgs.IamOrganizationsRolesListRequest(
-            parent=u'organizations/1', showDeleted=False, pageSize=1),
+            parent='organizations/1', showDeleted=False, pageSize=1),
         response=self.msgs.ListRolesResponse(roles=[
             self.msgs.Role(
                 name='organizations/1/roles/customEditor',
@@ -105,7 +108,7 @@ class ListTest(unit_test_base.BaseTest):
   def testFilteredResponse(self):
     self.client.organizations_roles.List.Expect(
         request=self.msgs.IamOrganizationsRolesListRequest(
-            parent=u'organizations/1', showDeleted=False, pageSize=100),
+            parent='organizations/1', showDeleted=False, pageSize=100),
         response=self.msgs.ListRolesResponse(roles=[
             self.msgs.Role(
                 name='organizations/1/roles/customEditor',

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for instances update."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.compute import containers_utils
 from googlecloudsdk.api_lib.util import apis as core_apis

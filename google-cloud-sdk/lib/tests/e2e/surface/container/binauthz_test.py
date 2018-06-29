@@ -15,7 +15,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.container import binauthz_util as binauthz_api_util
 from googlecloudsdk.api_lib.util import apis
@@ -32,8 +32,8 @@ from tests.lib.surface.container.binauthz import base as binauthz_test_base
 
 def GetNoteRef(project_id, note_id):
   return resources.REGISTRY.ParseRelativeName(
-      relative_name='providers/{}/notes/{}'.format(project_id, note_id),
-      collection='containeranalysis.providers.notes',
+      relative_name='projects/{}/notes/{}'.format(project_id, note_id),
+      collection='containeranalysis.projects.notes',
   )
 
 
@@ -87,10 +87,8 @@ class BinauthzTest(
     self.artifact_url = self.GenerateArtifactUrl()
     self.project_ref = resources.REGISTRY.Parse(
         self.Project(), collection='cloudresourcemanager.projects')
-    self.provider_ref = resources.REGISTRY.Parse(
-        self.project_ref.Name(), collection='containeranalysis.providers')
-    self.note_id = self.note_id_generator.next()
-    self.note_relative_name = 'providers/{}/notes/{}'.format(
+    self.note_id = next(self.note_id_generator)
+    self.note_relative_name = 'projects/{}/notes/{}'.format(
         self.Project(), self.note_id)
 
   def RunAndUnwindWithRetry(self, cmd, result_predicate=bool):
@@ -103,9 +101,9 @@ class BinauthzTest(
         run_fn=RunAndUnwind, result_predicate=result_predicate)
 
   def CleanUpAttestationAuthority(self, note):
-    self.containeranalysis_client.providers_notes.Delete(
+    self.containeranalysis_client.projects_notes.Delete(
         self.containeranalysis_messages.
-        ContaineranalysisProvidersNotesDeleteRequest(name=note.name))
+        ContaineranalysisProjectsNotesDeleteRequest(name=note.name))
 
   def CleanUpAttestation(self, occurrence):
     self.containeranalysis_client.projects_occurrences.Delete(
@@ -115,8 +113,8 @@ class BinauthzTest(
   def CreateAttestationAuthority(self, note_id):
     """There is no surface to do this, so we use the client directly."""
 
-    request = self.ProvidersNotesCreateRequest(
-        name=self.provider_ref.RelativeName(),
+    request = self.ProjectsNotesCreateRequest(
+        parent=self.project_ref.RelativeName(),
         noteId=note_id,
         note=self.Note(
             kind=self.Note.KindValueValuesEnum.ATTESTATION_AUTHORITY,
@@ -124,7 +122,7 @@ class BinauthzTest(
             attestationAuthority=self.AttestationAuthority(),
         ),
     )
-    note = self.containeranalysis_client.providers_notes.Create(request)
+    note = self.containeranalysis_client.projects_notes.Create(request)
     self.addCleanup(self.CleanUpAttestationAuthority, note=note)
 
   def GetOccurrence(self, occurrence_name):
@@ -194,8 +192,8 @@ class BinauthzTest(
     def HasAtLeastTwoElements(result):
       return len(result) >= 2
 
-    self.assertItemsEqual(
-        self.RunAndUnwindWithRetry(
+    self.assertEqual(
+        set(self.RunAndUnwindWithRetry(
             [
                 'container',
                 'binauthz',
@@ -204,11 +202,11 @@ class BinauthzTest(
                 '--attestation-authority-note',
                 self.note_relative_name,
             ],
-            result_predicate=HasAtLeastTwoElements),
-        [self.artifact_url, artifact_url2],
+            result_predicate=HasAtLeastTwoElements)),
+        set([self.artifact_url, artifact_url2]),
     )
-    self.assertItemsEqual(
-        self.RunAndUnwindWithRetry([
+    self.assertEqual(
+        set(self.RunAndUnwindWithRetry([
             'container',
             'binauthz',
             'attestations',
@@ -217,8 +215,8 @@ class BinauthzTest(
             self.note_relative_name,
             '--artifact-url',
             self.artifact_url,
-        ]),
-        [('bogus_pk_id', 'bogus_sig')],
+        ])),
+        set([('bogus_pk_id', 'bogus_sig')]),
     )
 
 

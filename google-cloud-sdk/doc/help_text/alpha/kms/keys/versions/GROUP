@@ -2,15 +2,11 @@ NAME
     gcloud alpha kms keys versions - create and manage versions
 
 SYNOPSIS
-    gcloud alpha kms keys versions COMMAND [--key=KEY] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keys versions COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) A version represents an individual cryptographic key and the
     associated key material.
-
-FLAGS
-     --key=KEY
-        The containing key.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 import os
 import re
@@ -36,9 +38,9 @@ class SslCertsCreateTest(base.SqlMockTestBeta):
         self.messages.SslCertsInsertResponse(
             clientCert=self.messages.SslCertDetail(
                 certInfo=self.messages.SslCert(
-                    cert=u'cert data client',
-                    certSerialNumber=u'976069575',
-                    commonName=u'newcert',
+                    cert='cert data client',
+                    certSerialNumber='976069575',
+                    commonName='newcert',
                     createTime=datetime.datetime(
                         2014,
                         7,
@@ -50,14 +52,15 @@ class SslCertsCreateTest(base.SqlMockTestBeta):
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
                     expirationTime=None,
-                    instance=u'integration-test',
-                    sha1Fingerprint=u'd926e1fb26e4dba2f73a14bea4ee9554577deda9',
+                    instance='integration-test',
+                    sha1Fingerprint='d926e1fb26e4dba2f73a14bea4ee9554577deda9',
                 ),
-                certPrivateKey=u'cert private key',),
+                certPrivateKey='cert private key',
+            ),
             serverCaCert=self.messages.SslCert(
-                cert=u'cert data server',
-                certSerialNumber=u'0',
-                commonName=u'some nonsense',
+                cert='cert data server',
+                certSerialNumber='0',
+                commonName='some nonsense',
                 createTime=datetime.datetime(
                     2014,
                     1,
@@ -76,8 +79,10 @@ class SslCertsCreateTest(base.SqlMockTestBeta):
                     28,
                     96000,
                     tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-                instance=u'integration-test',
-                sha1Fingerprint=u'515917f85cf67be2912ca94c9f9bf8e35ee2aa47',),))
+                instance='integration-test',
+                sha1Fingerprint='515917f85cf67be2912ca94c9f9bf8e35ee2aa47',
+            ),
+        ))
     cert_file = os.path.join(self.temp_path, 'cert')
     self.Run('sql ssl-certs create --instance=integration-test newcert {0}'
              .format(cert_file))
@@ -86,6 +91,9 @@ NAME     SHA1_FINGERPRINT                          EXPIRATION
 newcert  d926e1fb26e4dba2f73a14bea4ee9554577deda9  -
 """, normalize_space=True)
     self.assertEqual(open(cert_file).read(), 'cert private key\n')
+
+    # Checking for deprecation warning.
+    self.AssertErrContains('`gcloud sql ssl-certs` is deprecated')
 
   def testSslCertsCreateBadDestination(self):
     with self.assertRaisesRegex(

@@ -22,7 +22,7 @@ from tests.lib.surface.compute import test_base
 class NodeGroupsDeleteTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
@@ -31,13 +31,11 @@ class NodeGroupsDeleteTest(test_base.BaseTest):
     self.Run('compute sole-tenancy node-groups delete group-1 '
              '--zone zone-1')
 
-    self.CheckRequests(
-        [(self.compute_alpha.nodeGroups,
-          'Delete',
-          self.messages.ComputeNodeGroupsDeleteRequest(
-              nodeGroup='group-1',
-              project='my-project',
-              zone='zone-1'))])
+    self.CheckRequests([(self.compute_beta.nodeGroups, 'Delete',
+                         self.messages.ComputeNodeGroupsDeleteRequest(
+                             nodeGroup='group-1',
+                             project='my-project',
+                             zone='zone-1'))])
 
 
 if __name__ == '__main__':

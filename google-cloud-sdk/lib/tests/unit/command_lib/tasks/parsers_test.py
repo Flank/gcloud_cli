@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from apitools.base.py import encoding
@@ -24,7 +26,6 @@ from googlecloudsdk.command_lib.tasks import parsers
 from googlecloudsdk.command_lib.util import time_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
-from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -340,22 +341,20 @@ class ParsePullTaskArgsTest(ParseArgsTestBase):
     self.schedule_time = time_util.CalculateExpiration(20)
 
   def testParseCreateTaskArgs_NoArgs(self):
-    expected_config = _MESSAGES_MODULE.Task()
-    expected_config.pullMessage = _MESSAGES_MODULE.PullMessage()
-    args = self.parser.parse_args([])
-    actual_config = parsers.ParseCreateTaskArgs(
-        args, constants.PULL_QUEUE, _MESSAGES_MODULE)
-    self.assertEqual(actual_config, expected_config)
+    with self.AssertRaisesArgumentErrorMatches(
+        '(--id --queue): Must be specified'):
+      self.parser.parse_args([])
 
   def testParseCreateTaskArgs_AllArgs_PayloadContent(self):
     expected_config = _MESSAGES_MODULE.Task()
     schedule_time = self.schedule_time
     expected_config.scheduleTime = schedule_time
     expected_config.pullMessage = _MESSAGES_MODULE.PullMessage(
-        tag='tag', payload='payload')
+        tag='tag', payload=b'payload')
     args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
                                    '--tag=tag',
-                                   '--payload-content=payload'])
+                                   '--payload-content=payload',
+                                   '--id=my-task'])
     actual_config = parsers.ParseCreateTaskArgs(
         args, constants.PULL_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
@@ -365,21 +364,22 @@ class ParsePullTaskArgsTest(ParseArgsTestBase):
     schedule_time = self.schedule_time
     expected_config.scheduleTime = schedule_time
     expected_config.pullMessage = _MESSAGES_MODULE.PullMessage(
-        tag='tag', payload='payload')
-    with files.TemporaryDirectory() as tmp_dir:
-      self.Touch(tmp_dir, 'payload.txt', contents='payload')
-      payload_file = os.path.join(tmp_dir, 'payload.txt')
-      args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
-                                     '--tag=tag',
-                                     '--payload-file={}'.format(payload_file)])
-      actual_config = parsers.ParseCreateTaskArgs(
-          args, constants.PULL_QUEUE, _MESSAGES_MODULE)
-      self.assertEqual(actual_config, expected_config)
+        tag='tag', payload=b'payload')
+    self.Touch(self.temp_path, 'payload.txt', contents='payload')
+    payload_file = os.path.join(self.temp_path, 'payload.txt')
+    args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
+                                   '--tag=tag',
+                                   '--id=my-task',
+                                   '--payload-file={}'.format(payload_file)])
+    actual_config = parsers.ParseCreateTaskArgs(
+        args, constants.PULL_QUEUE, _MESSAGES_MODULE)
+    self.assertEqual(actual_config, expected_config)
 
   def testParseCreateTaskArgs_IncludeAppEngineArgs(self):
     with self.AssertRaisesArgumentErrorMatches('unrecognized arguments:'):
       self.parser.parse_args(['--schedule-time={}'.format(self.schedule_time),
                               '--tag=tag',
+                              '--id=my-task',
                               '--payload-content=payload',
                               '--method=POST',
                               '--url=/paths/a/',
@@ -394,13 +394,9 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
     self.schedule_time = time_util.CalculateExpiration(20)
 
   def testParseCreateTaskArgs_NoArgs(self):
-    expected_config = _MESSAGES_MODULE.Task()
-    expected_config.appEngineHttpRequest = (
-        _MESSAGES_MODULE.AppEngineHttpRequest())
-    args = self.parser.parse_args([])
-    actual_config = parsers.ParseCreateTaskArgs(
-        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
-    self.assertEqual(actual_config, expected_config)
+    with self.AssertRaisesArgumentErrorMatches(
+        '(--id --queue): Must be specified'):
+      self.parser.parse_args([])
 
   def testParseCreateTaskArgs_AllArgs_PayloadContent(self):
     expected_config = _MESSAGES_MODULE.Task()
@@ -415,11 +411,12 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header1': 'value1', 'header2': 'value2'},
                 _MESSAGES_MODULE.AppEngineHttpRequest.HeadersValue),
-            httpMethod=http_method, payload='payload',
+            httpMethod=http_method, payload=b'payload',
             relativeUrl='/paths/a/'))
     args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
                                    '--payload-content=payload',
                                    '--method=POST',
+                                   '--id=my-task',
                                    '--url=/paths/a/',
                                    '--header=header1:value1',
                                    '--header=header2:value2',
@@ -441,21 +438,21 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header1': 'value1', 'header2': 'value2'},
                 _MESSAGES_MODULE.AppEngineHttpRequest.HeadersValue),
-            httpMethod=http_method, payload='payload',
+            httpMethod=http_method, payload=b'payload',
             relativeUrl='/paths/a/'))
-    with files.TemporaryDirectory() as tmp_dir:
-      self.Touch(tmp_dir, 'payload.txt', contents='payload')
-      payload_file = os.path.join(tmp_dir, 'payload.txt')
-      args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
-                                     '--payload-file={}'.format(payload_file),
-                                     '--method=POST',
-                                     '--url=/paths/a/',
-                                     '--header=header1:value1',
-                                     '--header=header2:value2',
-                                     '--routing=service:abc'])
-      actual_config = parsers.ParseCreateTaskArgs(
-          args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
-      self.assertEqual(actual_config, expected_config)
+    self.Touch(self.temp_path, 'payload.txt', contents='payload')
+    payload_file = os.path.join(self.temp_path, 'payload.txt')
+    args = self.parser.parse_args(['--schedule-time={}'.format(schedule_time),
+                                   '--payload-file={}'.format(payload_file),
+                                   '--method=POST',
+                                   '--id=my-task',
+                                   '--url=/paths/a/',
+                                   '--header=header1:value1',
+                                   '--header=header2:value2',
+                                   '--routing=service:abc'])
+    actual_config = parsers.ParseCreateTaskArgs(
+        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
+    self.assertEqual(actual_config, expected_config)
 
   def testParseCreateTaskArgs_RepeatedHeadersKey(self):
     expected_config = _MESSAGES_MODULE.Task()
@@ -464,7 +461,8 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header': 'value2'},
                 _MESSAGES_MODULE.AppEngineHttpRequest.HeadersValue)))
-    args = self.parser.parse_args(['--header=header:value1',
+    args = self.parser.parse_args(['--id=my-task',
+                                   '--header=header:value1',
                                    '--header=header:value2'])
     actual_config = parsers.ParseCreateTaskArgs(
         args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)

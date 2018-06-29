@@ -2,22 +2,11 @@ NAME
     gcloud kms keys versions - create and manage versions
 
 SYNOPSIS
-    gcloud kms keys versions COMMAND [--key=KEY] [--keyring=KEYRING]
-        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+    gcloud kms keys versions COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     A version represents an individual cryptographic key and the associated key
     material.
-
-FLAGS
-     --key=KEY
-        The containing key.
-
-     --keyring=KEYRING
-        The containing keyring.
-
-     --location=LOCATION
-        The location of the requested resource.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

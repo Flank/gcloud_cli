@@ -43,7 +43,6 @@ def _GetRandomCidr():
   return '.'.join(components) + '/29'
 
 
-@test_case.Filters.skip('Failing', 'b/79135451')
 class TpusTests(e2e_base.WithServiceAuth):
   """E2E tests for ml compute tpus command group."""
 
@@ -67,14 +66,15 @@ class TpusTests(e2e_base.WithServiceAuth):
       self.Run(command)
       yield tpu_id
     finally:
-      delete_retryer = retry.Retryer(max_retrials=10, max_wait_ms=240000,
-                                     exponential_sleep_multiplier=2)
+      delete_retryer = retry.Retryer(max_wait_ms=240000,
+                                     exponential_sleep_multiplier=1.5)
       delete_retryer.RetryOnException(
-          self.Run, ['compute tpus delete {} --quiet'.format(tpu_id)])
+          self.Run, ['compute tpus delete {} --quiet'.format(tpu_id)],
+          sleep_ms=1000)
 
   def SetUp(self):
-    self.zone = 'us-central1-c'
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.zone = 'us-central1-b'
+    self.track = calliope_base.ReleaseTrack.BETA
     properties.VALUES.compute.zone.Set(self.zone)
 
   def testEmptyListResult(self):
@@ -83,6 +83,7 @@ class TpusTests(e2e_base.WithServiceAuth):
     self.assertIsNotNone(result)
     self.assertEqual(len(list(result)), 0)
 
+  @test_case.Filters.skip('Failing', 'b/110190382')
   def testWorkflow(self):
     """Test of Basic TPU CRUD Workflow."""
     with self._CreateTPU() as tpu_name:

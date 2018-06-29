@@ -192,6 +192,105 @@ class CreateBackupScheduleTest(resource_policies_base.TestBase,
     self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
     self.assertEqual(result, policy)
 
+  def testCreate_WeeklyScheduleDayIsConverted(self):
+    schedule = self.messages.ResourcePolicyBackupSchedulePolicySchedule(
+        weeklySchedule=self.messages.ResourcePolicyWeeklyCycle(
+            dayOfWeeks=[
+                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
+                    day=self.day_enum.THURSDAY,
+                    startTime='00:00')]))
+    policy = self.messages.ResourcePolicy(
+        name='pol1',
+        region=self.region,
+        backupSchedulePolicy=self.messages.ResourcePolicyBackupSchedulePolicy(
+            retentionPolicy=
+            self.messages.ResourcePolicyBackupSchedulePolicyRetentionPolicy(
+                maxRetentionDays=1),
+            schedule=schedule))
+    request = self._ExpectCreate(policy)
+
+    result = self.Run(
+        'compute resource-policies create-backup-schedule pol1 --region {} '
+        ' --start-time 17:00-07 --weekly-schedule wednesday '
+        '--max-retention-days 1'
+        .format(self.region))
+
+    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
+    self.assertEqual(result, policy)
+
+  def testCreate_WeeklyScheduleFromFileDayIsConverted(self):
+    schedule = self.messages.ResourcePolicyBackupSchedulePolicySchedule(
+        weeklySchedule=self.messages.ResourcePolicyWeeklyCycle(
+            dayOfWeeks=[
+                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
+                    day=self.day_enum.SUNDAY,
+                    startTime='23:00'),
+                self.messages.ResourcePolicyWeeklyCycleDayOfWeek(
+                    day=self.day_enum.THURSDAY,
+                    startTime='00:00')]))
+    policy = self.messages.ResourcePolicy(
+        name='pol1',
+        region=self.region,
+        backupSchedulePolicy=self.messages.ResourcePolicyBackupSchedulePolicy(
+            retentionPolicy=
+            self.messages.ResourcePolicyBackupSchedulePolicyRetentionPolicy(
+                maxRetentionDays=3),
+            schedule=schedule))
+    request = self._ExpectCreate(policy)
+
+    contents = ('[{"day": "MONDAY", "startTime": "04:00+05"}, '
+                '{"day": "WEDNESDAY", "startTime": "16:00-8:00"}]')
+    schedule_file = self.Touch(self.temp_path, 'my-schedule.json',
+                               contents=contents)
+    result = self.Run(
+        'compute resource-policies create-backup-schedule pol1 --region {0} '
+        '--max-retention-days 3 --weekly-schedule-from-file {1}'
+        .format(self.region, schedule_file))
+
+    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
+    self.assertEqual(result, policy)
+
+  def testCreate_SnapshotProperties(self):
+    description = 'This is a maintenance policy.'
+    schedule = self.messages.ResourcePolicyBackupSchedulePolicySchedule(
+        dailySchedule=self.messages.ResourcePolicyDailyCycle(
+            daysInCycle=1,
+            startTime='04:00'))
+    labels_cls = (
+        self.messages.ResourcePolicyBackupSchedulePolicySnapshotProperties
+        .LabelsValue)
+    snapshot_properties = (
+        self.messages.ResourcePolicyBackupSchedulePolicySnapshotProperties(
+            guestFlush=True,
+            labels=labels_cls(
+                additionalProperties=[
+                    labels_cls.AdditionalProperty(
+                        key='k1',
+                        value='v1'),
+                    labels_cls.AdditionalProperty(
+                        key='k2',
+                        value='v2')])))
+    policy = self.messages.ResourcePolicy(
+        name='pol1',
+        region=self.region,
+        description=description,
+        backupSchedulePolicy=self.messages.ResourcePolicyBackupSchedulePolicy(
+            retentionPolicy=
+            self.messages.ResourcePolicyBackupSchedulePolicyRetentionPolicy(
+                maxRetentionDays=1),
+            schedule=schedule,
+            snapshotProperties=snapshot_properties))
+    request = self._ExpectCreate(policy)
+
+    result = self.Run(
+        'compute resource-policies create-backup-schedule pol1 '
+        '--start-time 04:00Z --region {} --description "{}" --daily-schedule '
+        '--max-retention-days 1 --guest-flush --snapshot-labels k1=v1,k2=v2'
+        .format(self.region, description))
+
+    self.CheckRequests([(self.compute.resourcePolicies, 'Insert', request)])
+    self.assertEqual(result, policy)
+
   def testCreate_NoDailyCycleShouldFail(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,

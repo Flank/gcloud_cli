@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -31,7 +33,8 @@ class OperationsListsTest(base.SqlMockTestBeta):
             instance='integration-test',
             maxResults=10,
             pageToken=None,
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.OperationsListResponse(items=[
             self.messages.Operation(
                 insertTime=datetime.datetime(
@@ -64,19 +67,20 @@ class OperationsListsTest(base.SqlMockTestBeta):
                 error=None,
                 exportContext=None,
                 importContext=None,
-                targetId=u'integration-test',
+                targetId='integration-test',
                 targetLink=
-                u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
+                'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
                 format(self.Project()),
                 targetProject=self.Project(),
-                kind=u'sql#operation',
-                name=u'1cb8a924-898d-41ec-b695-39a6dc018d16',
+                kind='sql#operation',
+                name='1cb8a924-898d-41ec-b695-39a6dc018d16',
                 selfLink=
-                u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'.
+                'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1cb8a924-898d-41ec-b695-39a6dc018d16'.
                 format(self.Project()),
-                operationType=u'CREATE_USER',
-                status=u'DONE',
-                user=u'170350250316@developer.gserviceaccount.com',),
+                operationType='CREATE_USER',
+                status='DONE',
+                user='170350250316@developer.gserviceaccount.com',
+            ),
             self.messages.Operation(
                 insertTime=datetime.datetime(
                     2014,
@@ -108,19 +112,20 @@ class OperationsListsTest(base.SqlMockTestBeta):
                 error=None,
                 exportContext=None,
                 importContext=None,
-                targetId=u'integration-test',
+                targetId='integration-test',
                 targetLink=
-                u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
+                'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/integration-test'.
                 format(self.Project()),
                 targetProject=self.Project(),
-                kind=u'sql#operation',
-                name=u'27e060bf-4e4b-4fbb-b451-a9ee6c8a433a',
+                kind='sql#operation',
+                name='27e060bf-4e4b-4fbb-b451-a9ee6c8a433a',
                 selfLink=
-                u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/27e060bf-4e4b-4fbb-b451-a9ee6c8a433a'.
+                'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/27e060bf-4e4b-4fbb-b451-a9ee6c8a433a'.
                 format(self.Project()),
-                operationType=u'RESTART',
-                status=u'DONE',
-                user=u'1@developer.gserviceaccount.com',),
+                operationType='RESTART',
+                status='DONE',
+                user='1@developer.gserviceaccount.com',
+            ),
         ]))
     self.Run('sql operations list -i=integration-test --limit=10')
     # pylint: disable=line-too-long

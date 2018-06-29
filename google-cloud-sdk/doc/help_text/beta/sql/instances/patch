@@ -37,10 +37,10 @@ FLAGS
      --activation-policy=ACTIVATION_POLICY
         The activation policy for this instance. This specifies when the
         instance should be activated and is applicable only when the instance
-        state is RUNNABLE. The default is ON_DEMAND. More information on
+        state is RUNNABLE. The default is on-demand. More information on
         activation policies can be found here:
         https://cloud.google.com/sql/faq#activation_policy. ACTIVATION_POLICY
-        must be one of: ALWAYS, NEVER, ON_DEMAND.
+        must be one of: always, never, on-demand.
 
      --[no-]assign-ip
         The instance must be assigned an IP address. Use --assign-ip to enable
@@ -125,8 +125,8 @@ FLAGS
         PRICING_PLAN must be one of: PER_USE, PACKAGE.
 
      --replication=REPLICATION
-        The type of replication this instance uses. The default is SYNCHRONOUS.
-        REPLICATION must be one of: SYNCHRONOUS, ASYNCHRONOUS.
+        The type of replication this instance uses. The default is synchronous.
+        REPLICATION must be one of: synchronous, asynchronous.
 
      --[no-]require-ssl
         mysqld should default to 'REQUIRE X509' for users connecting over IP.
@@ -161,12 +161,19 @@ FLAGS
         A list of label KEY=VALUE pairs to update. If a label exists its value
         is modified, otherwise a new label is created.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      At most one of these may be specified:
 
        --authorized-gae-apps=APP,[APP,...]
-          First Generation instances only. List of IDs for App Engine
+          First Generation instances only. List of project IDs for App Engine
           applications running in the Standard environment that can access this
           instance.
+
+          The value given for this argument replaces the existing list.
 
        --clear-gae-apps
           Specified to clear the list of App Engine apps that can access this
@@ -178,6 +185,8 @@ FLAGS
           The list of external networks that are allowed to connect to the
           instance. Specified in CIDR notation, also known as 'slash' notation
           (e.g. 192.168.100.0/24).
+
+          The value given for this argument replaces the existing list.
 
        --clear-authorized-networks
           Clear the list of external networks that are allowed to connect to

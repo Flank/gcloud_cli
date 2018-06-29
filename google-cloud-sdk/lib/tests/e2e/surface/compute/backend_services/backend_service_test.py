@@ -47,8 +47,8 @@ class BackendServicesTest(e2e_test_base.BaseTest):
   def CreateInstance(self):
     """Creates an instance and returns its name."""
     name = self.UniqueName('instance')
-    result = self.Run('compute instances create {0} --zone {1}'
-                      .format(name, self.zone))
+    result = self.Run('compute instances create {0} --zone {1}'.format(
+        name, self.zone))
     result_list = resource_projector.MakeSerializable(result)
     self.assertEqual(1, len(result_list))
     self.assertEqual(name, result_list[0]['name'])
@@ -148,8 +148,8 @@ class BackendServicesTest(e2e_test_base.BaseTest):
     # Add backend to backend service
     result = self.Run('compute backend-services add-backend {0} '
                       '--instance-group {1} --instance-group-zone {2} '
-                      '--balancing-mode RATE --max-rate 100 --global'
-                      .format(bs_name, ig_name, self.zone))
+                      '--balancing-mode RATE --max-rate 100 --global'.format(
+                          bs_name, ig_name, self.zone))
     self.assertEqual(1, len(result))
     self.assertEqual('RATE', str(result[0].backends[0].balancingMode))
     self.assertEqual(100, result[0].backends[0].maxRate)
@@ -158,8 +158,8 @@ class BackendServicesTest(e2e_test_base.BaseTest):
     result = self.Run('compute backend-services update-backend {0} '
                       '--instance-group {1} --instance-group-zone {2} '
                       '--balancing-mode UTILIZATION '
-                      '--max-utilization 0.5 --global'
-                      .format(bs_name, ig_name, self.zone))
+                      '--max-utilization 0.5 --global'.format(
+                          bs_name, ig_name, self.zone))
     self.assertEqual(1, len(result))
     self.assertEqual('UTILIZATION', str(result[0].backends[0].balancingMode))
     self.assertEqual(100, result[0].backends[0].maxRate)
@@ -219,21 +219,34 @@ class BackendServicesTest(e2e_test_base.BaseTest):
     self.assertEqual('CONNECTION', str(result[0].backends[0].balancingMode))
     self.assertEqual(200, result[0].backends[0].maxConnections)
 
+  def testPatch(self):
+    """Verifies backend service update via PATCH API."""
+    hc_name = self.CreateHealthCheck()
+    bs_name = self.CreateTcpBackendService(hc_name)
+
+    # Update description
+    result = self.Run('compute backend-services update {0} --description {1} '
+                      '--global'.format(bs_name, 'new-desc'))
+    self.assertEqual(1, len(result))
+    self.assertEqual('new-desc', result[0].description)
+
+    # Clear description
+    result = self.Run('compute backend-services update {0} --description {1} '
+                      '--global'.format(bs_name, '""'))
+    self.assertEqual(1, len(result))
+    self.assertEqual('', result[0].description)
+
   def TearDown(self):
     for name in self.backend_service_names:
-      self.CleanUpResource(name, 'backend-services',
-                           scope=e2e_test_base.EXPLICIT_GLOBAL)
+      self.CleanUpResource(
+          name, 'backend-services', scope=e2e_test_base.EXPLICIT_GLOBAL)
     for name in self.health_check_names:
-      self.CleanUpResource(name, 'health-checks',
-                           scope=e2e_test_base.GLOBAL)
+      self.CleanUpResource(name, 'health-checks', scope=e2e_test_base.GLOBAL)
     for name in self.http_health_check_names:
-      self.CleanUpResource(name, 'http-health-checks',
-                           scope=e2e_test_base.GLOBAL)
-    self.DeleteResources(self.instance_names,
-                         self.DeleteInstance,
-                         'instance')
-    self.DeleteResources(self.instance_group_names,
-                         self.DeleteInstanceGroup,
+      self.CleanUpResource(
+          name, 'http-health-checks', scope=e2e_test_base.GLOBAL)
+    self.DeleteResources(self.instance_names, self.DeleteInstance, 'instance')
+    self.DeleteResources(self.instance_group_names, self.DeleteInstanceGroup,
                          'instance group')
 
 
@@ -258,6 +271,11 @@ class BackendServicesTestBeta(BackendServicesTest):
                       .format(bs_name))
     result_list = resource_projector.MakeSerializable(result)
     self.assertEqual('Test:', result_list['customRequestHeaders'][0])
+
+    # Clear custom request headers
+    result = self.Run('compute backend-services update {0} --global '
+                      '--no-custom-request-headers'.format(bs_name))
+    self.assertEqual(0, len(result[0].customRequestHeaders))
 
 
 class BackendServicesTestAlpha(BackendServicesTestBeta):

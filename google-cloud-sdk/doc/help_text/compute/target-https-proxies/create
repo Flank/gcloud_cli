@@ -4,8 +4,9 @@ NAME
 SYNOPSIS
     gcloud compute target-https-proxies create NAME
         --ssl-certificates=SSL_CERTIFICATE,[...] --url-map=URL_MAP
-        [--description=DESCRIPTION] [--ssl-policy=SSL_POLICY]
-        [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION]
+        [--quic-override=QUIC_OVERRIDE; default="NONE"]
+        [--ssl-policy=SSL_POLICY] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute target-https-proxies create is used to create target HTTPS
@@ -37,6 +38,19 @@ REQUIRED FLAGS
 OPTIONAL FLAGS
      --description=DESCRIPTION
         An optional, textual description for the target HTTPS proxy.
+
+     --quic-override=QUIC_OVERRIDE; default="NONE"
+        Controls whether load balancer may negotiate QUIC with clients. QUIC is
+        a new transport which reduces latency compared to that of TCP. See
+        https://www.chromium.org/quic for more details. QUIC_OVERRIDE must be
+        one of:
+
+         DISABLE
+            Disallows load balancer to negotiate QUIC with clients.
+         ENABLE
+            Allows load balancer to negotiate QUIC with clients.
+         NONE
+            Allows Google to control when QUIC is rolled out.
 
      --ssl-policy=SSL_POLICY
         A reference to an SSL policy resource that defines the server-side

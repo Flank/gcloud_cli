@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for creating/using/deleting instances."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib import test_case
@@ -40,7 +42,7 @@ class SoleTenantTest(e2e_instances_test_base.InstancesTestBase):
                                                         creation_args))
 
   def _CreateHost(self):
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     self._CreateResourceScheduleCleanUp(
         name, 'sole-tenancy hosts', e2e_test_base.ZONAL,
         '--zone {0} --host-type {1}'.format(self.zone, self.host_type))
@@ -53,7 +55,7 @@ class SoleTenantTest(e2e_instances_test_base.InstancesTestBase):
   @test_case.Filters.skip('Failing', 'b/77953407')
   def testCreateInstanceOnSoleTenancyHost(self):
     host = self._CreateHost()
-    name = self._name_generator.next()
+    name = next(self._name_generator)
     self._CreateResourceScheduleCleanUp(
         name, 'instances', e2e_test_base.ZONAL,
         '--zone {0} --sole-tenancy-host {1}'.format(self.zone, host))

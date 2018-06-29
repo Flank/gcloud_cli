@@ -20,11 +20,13 @@ import re
 
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.calliope.concepts import concepts_test_base
 
 
-class DepsTest(concepts_test_base.ConceptsTestBase):
+class DepsTest(concepts_test_base.ConceptsTestBase,
+               parameterized.TestCase):
   """Test for the calliope.concepts.deps module."""
 
   def Project(self):
@@ -58,11 +60,62 @@ class DepsTest(concepts_test_base.ConceptsTestBase):
     with self.assertRaises(deps.FallthroughNotFoundError):
       fallthrough.GetValue(self._GetMockNamespace())
 
+  def testArgFallthrough(self):
+    """Test functionality of a property fallthrough."""
+    fallthrough = deps.ArgFallthrough('--a')
+    self.assertEqual('foo',
+                     fallthrough.GetValue(self._GetMockNamespace(a='foo')))
+
+  @parameterized.named_parameters(
+      ('Arg', deps.ArgFallthrough('--a'), True),
+      ('Generic',
+       deps.Fallthrough(lambda: 'projects/p/shelves/s/books/b', hint='h'),
+       False),
+      ('GenericActive',
+       deps.Fallthrough(lambda: 'projects/p/shelves/s/books/b', hint='h',
+                        active=True),
+       True))
+  def testAnchorFallthrough(self, orig_fallthrough, active):
+    """Test the FullySpecifiedAnchorFallthrough gives other parameters."""
+    proj_fallthrough = deps.FullySpecifiedAnchorFallthrough(
+        orig_fallthrough,
+        self.book_collection,
+        'projectsId')
+    shelf_fallthrough = deps.FullySpecifiedAnchorFallthrough(
+        orig_fallthrough,
+        self.book_collection,
+        'shelvesId')
+    parsed_args = self._GetMockNamespace(a='projects/p/shelves/s/books/b')
+
+    self.assertEqual(
+        'p',
+        proj_fallthrough.GetValue(parsed_args))
+    self.assertEqual(
+        's',
+        shelf_fallthrough.GetValue(parsed_args))
+    self.assertEqual(active, proj_fallthrough.active)
+    self.assertEqual(active, shelf_fallthrough.active)
+
+  @parameterized.named_parameters(
+      ('CantParse', 'projectsId', 'b'),
+      ('WrongParam', 'project', 'projects/p/shelves/s/books/b'))
+  def testAnchorFallthroughFails(self, proj_param, anchor_value):
+    """Test failures with FullySpecifiedAnchorFallthrough."""
+    proj_fallthrough = deps.FullySpecifiedAnchorFallthrough(
+        deps.ArgFallthrough('--a'),
+        self.book_collection,
+        proj_param)
+    parsed_args = self._GetMockNamespace(a=anchor_value)
+
+    with self.assertRaises(deps.FallthroughNotFoundError):
+      proj_fallthrough.GetValue(parsed_args)
+
   def testDeps_ArgsGiven(self):
     """Test the deps object can initialize attributes using ArgFallthrough."""
     deps_object = deps.Deps(
         {'name': [deps.ArgFallthrough('--myresource-name')],
          'project': [deps.ArgFallthrough('--myresource-project'),
+                     deps.ArgFallthrough('--project'),
                      deps.PropertyFallthrough(properties.VALUES.core.project)]},
         parsed_args=self._GetMockNamespace(
             myresource_name='example',
@@ -75,6 +128,7 @@ class DepsTest(concepts_test_base.ConceptsTestBase):
     """
     deps_object = deps.Deps(
         {'project': [deps.ArgFallthrough('--myresource-project'),
+                     deps.ArgFallthrough('--project'),
                      deps.PropertyFallthrough(properties.VALUES.core.project)]},
         parsed_args=self._GetMockNamespace(myresource_project=None))
     self.assertEqual(self.Project(), deps_object.Get('project'))
@@ -84,14 +138,15 @@ class DepsTest(concepts_test_base.ConceptsTestBase):
     self.UnsetProject()
     deps_object = deps.Deps(
         {'project': [deps.ArgFallthrough('--myresource-project'),
+                     deps.ArgFallthrough('--project'),
                      deps.PropertyFallthrough(properties.VALUES.core.project)]},
         parsed_args=self._GetMockNamespace(myresource_project=None))
     regex = re.escape(
         'Failed to find attribute [project]. The attribute can be set in the '
         'following ways: \n'
-        '- Provide the flag [--myresource-project] on the command line\n'
-        '- Set the property [core/project] or provide the flag [--project] '
-        'on the command line')
+        '- provide the flag [--myresource-project] on the command line\n'
+        '- provide the flag [--project] on the command line\n'
+        '- set the property [core/project]')
     with self.assertRaisesRegex(deps.AttributeNotFoundError, regex):
       deps_object.Get('project')
 
@@ -112,14 +167,14 @@ class DepsTest(concepts_test_base.ConceptsTestBase):
     deps_object = deps.Deps(
         {'zone': [deps.ArgFallthrough('--myresource-zone'),
                   deps.PropertyFallthrough(properties.VALUES.compute.zone),
-                  deps.Fallthrough(lambda: None, 'Custom hint')]},
+                  deps.Fallthrough(lambda: None, 'custom hint')]},
         parsed_args=self._GetMockNamespace(myresource_zone=None))
     regex = re.escape(
         'Failed to find attribute [zone]. The attribute can be set in the '
         'following ways: \n'
-        '- Provide the flag [--myresource-zone] on the command line\n'
-        '- Set the property [compute/zone]\n'
-        '- Custom hint')
+        '- provide the flag [--myresource-zone] on the command line\n'
+        '- set the property [compute/zone]\n'
+        '- custom hint')
     with self.assertRaisesRegex(deps.AttributeNotFoundError, regex):
       deps_object.Get('zone')
 

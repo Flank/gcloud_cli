@@ -13,6 +13,8 @@
 # limitations under the License.
 """Export image command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import base_classes
 from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.api_lib.compute import image_utils
@@ -58,6 +60,13 @@ class Export(base.CreateCommand):
         help=('Specify the format to export to, such as '
               '`vmdk`, `vhdx`, `vpc`, or `qcow2`.'),
     )
+
+    parser.add_argument(
+        '--network',
+        help=('The name of the network in your project to use for the image '
+              'export. The network must have access to Google Cloud Storage. '
+              'If not specified, the network named `default` is used.'),
+    )
     daisy_utils.AddCommonDaisyArgs(parser)
     parser.display_info.AddCacheUpdater(flags.ImagesCompleter)
 
@@ -84,6 +93,10 @@ class Export(base.CreateCommand):
       variables += """,format={0}""".format(args.export_format.lower())
     else:
       workflow = _DEFAULT_WORKFLOW
+
+    if args.network:
+      variables += """,export_network=global/networks/{0}""".format(
+          args.network.lower())
 
     tags = ['gce-daisy-image-export']
     return daisy_utils.RunDaisyBuild(args, workflow, variables,

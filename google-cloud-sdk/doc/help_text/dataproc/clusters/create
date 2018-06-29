@@ -54,6 +54,11 @@ FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --master-boot-disk-size=MASTER_BOOT_DISK_SIZE
         The size of the boot disk. The value must be a whole number followed by
         a size unit of KB for kilobyte, MB for megabyte, GB for gigabyte, or TB
@@ -126,9 +131,8 @@ FLAGS
         property value for this command invocation.
 
      --scopes=SCOPE,[SCOPE,...]
-        Specifies scopes for the node instances. The project's default service
-        account is used. Multiple SCOPEs can specified, separated by commas.
-        Examples:
+        Specifies scopes for the node instances. Multiple SCOPEs can be
+        specified, separated by commas. Examples:
 
             $ gcloud dataproc clusters create example-cluster \
                 --scopes https://www.googleapis.com/auth/bigtable.admin
@@ -136,14 +140,14 @@ FLAGS
             $ gcloud dataproc clusters create example-cluster \
                 --scopes sqlservice,bigquery
 
-        The following scopes necessary for the cluster to function properly are
-        always added, even if not explicitly specified:
+        The following minimum scopes are necessary for the cluster to function
+        properly and are always added, even if not explicitly specified:
 
           https://www.googleapis.com/auth/devstorage.read_write
           https://www.googleapis.com/auth/logging.write
 
-        If this flag is not specified the following default scopes are also
-        included:
+        If the --scopes flag is not specified, the following default scopes are
+        also included:
 
           https://www.googleapis.com/auth/bigquery
           https://www.googleapis.com/auth/bigtable.admin.table

@@ -11,7 +11,7 @@ gcloud ml\-engine local predict \- run prediction locally
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud ml\-engine local predict\fR \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud ml\-engine local predict\fR \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR (\fB\-\-json\-instances\fR=\fIJSON_INSTANCES\fR\ |\ \fB\-\-text\-instances\fR=\fITEXT_INSTANCES\fR) [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -67,6 +67,19 @@ This flag accepts "\-" for stdin.
 
 
 .RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-framework\fR=\fIFRAMEWORK\fR
+The ML framework used to train this version of the model. If not specified,
+defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
+\fBscikit\-learn\fR, \fBtensorflow\fR, \fBxgboost\fR.
+
+
 .RE
 .sp
 

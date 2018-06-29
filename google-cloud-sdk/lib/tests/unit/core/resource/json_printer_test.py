@@ -26,8 +26,6 @@ from googlecloudsdk.core.resource import resource_printer
 from tests.lib import sdk_test_base
 from tests.lib.core.resource import resource_printer_test_base
 
-import six
-
 
 class JsonPrinterTest(resource_printer_test_base.Base):
 
@@ -990,6 +988,8 @@ class JsonPrintTest(resource_printer_test_base.Base):
             'start': datetime.datetime(2015, 10, 21, 10, 11, 12, 0),
         }
     ]
+    # blech: Python 3.6 adds a fold "bool" that takes value [0, 1].
+    has_fold = hasattr(resource[0]['start'], 'fold')
     resource_printer.Print(resource, 'json')
     self.AssertOutputEquals(textwrap.dedent("""\
         [
@@ -1006,7 +1006,7 @@ class JsonPrintTest(resource_printer_test_base.Base):
             }}
           }}
         ]
-        """.format(fold='\n              "fold": 0,' if six.PY3 else '')))
+        """.format(fold='\n              "fold": 0,' if has_fold else '')))
 
   def testPrintIterEmpty(self):
     resource = [{'empty': iter([])}]

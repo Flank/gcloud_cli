@@ -9,14 +9,16 @@ SYNOPSIS
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
         [--cluster-version=CLUSTER_VERSION]
-        [--create-subnetwork=[KEY=VALUE,...]] [--disk-size=DISK_SIZE]
-        [--enable-autorepair] [--enable-autoupgrade]
-        [--no-enable-cloud-logging] [--no-enable-cloud-monitoring]
-        [--enable-ip-alias] [--enable-kubernetes-alpha]
-        [--enable-legacy-authorization] [--enable-network-policy]
-        [--enable-pod-security-policy] [--enable-stackdriver-kubernetes]
-        [--image-type=IMAGE_TYPE] [--no-issue-client-certificate]
-        [--istio-config=[auth=NONE,...]] [--labels=[KEY=VALUE,...]]
+        [--create-subnetwork=[KEY=VALUE,...]]
+        [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
+        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
+        [--enable-autoupgrade] [--no-enable-cloud-logging]
+        [--no-enable-cloud-monitoring] [--enable-ip-alias]
+        [--enable-kubernetes-alpha] [--enable-legacy-authorization]
+        [--enable-network-policy] [--enable-pod-security-policy]
+        [--enable-stackdriver-kubernetes] [--image-type=IMAGE_TYPE]
+        [--no-issue-client-certificate] [--istio-config=[auth=NONE,...]]
+        [--labels=[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--maintenance-window=MAINTENANCE_WINDOW]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL] [--min-cpu-platform=PLATFORM]
@@ -147,8 +149,21 @@ FLAGS
         Can not be specified unless '--enable-ip-alias' is also specified. Can
         not be used in conjunction with the '--subnetwork' option.
 
+     --default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE
+        The default max number of pods per node for node pools in the cluster.
+
+        This flag sets the default max-pods-per-node for node pools in the
+        cluster. If --max-pods-per-node is not specified explicitly for a node
+        pool, this flag value will be used.
+
+        Must be used in conjunction with '--enable-ip-alias'.
+
      --disk-size=DISK_SIZE
         Size in GB for node VM boot disks. Defaults to 100GB.
+
+     --disk-type=DISK_TYPE
+        Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
+        be one of: pd-standard, pd-ssd.
 
      --enable-autorepair
         Sets autorepair feature for a cluster's default node-pool(s).
@@ -319,6 +334,11 @@ FLAGS
         these labels on the kubernetes API node object and can be used in
         nodeSelectors. See http://kubernetes.io/docs/user-guide/node-selection/
         for examples.
+
+        Note that kubernetes labels, intended to associate cluster components
+        and resources with one another and manage resource lifecycles, are
+        different from Kubernetes Engine labels that are used for the purpose
+        of tracking billing and usage information.
 
      --node-taints=[NODE_TAINT,...]
         Applies the given kubernetes taints on all nodes in default
@@ -698,19 +718,18 @@ FLAGS
             Enabled by default, use --no-enable-cloud-endpoints to disable.
 
          --scopes=[SCOPE,...]; default="gke-default"
-            Specifies scopes for the node instances. The project's default
-            service account is used. Examples:
+            Specifies scopes for the node instances. Examples:
 
-                $ gcloud alpha container clusters create example-cluster \
-                  --scopes=https://www.googleapis.com/auth/devstorage.read_only
+            $ gcloud alpha container clusters create example-cluster \
+            --scopes=https://www.googleapis.com/auth/devstorage.read_only
 
-                $ gcloud alpha container clusters create example-cluster \
-                  --scopes=bigquery,storage-rw,compute-ro
+            $ gcloud alpha container clusters create example-cluster \
+            --scopes=bigquery,storage-rw,compute-ro
 
-            Multiple SCOPEs can specified, separated by commas. logging-write
-            and/or monitoring are added unless Cloud Logging and/or Cloud
-            Monitoring are disabled (see --enable-cloud-logging and
-            --enable-cloud-monitoring for more info).
+            Multiple SCOPEs can be specified, separated by commas.
+            logging-write and/or monitoring are added unless Cloud Logging
+            and/or Cloud Monitoring are disabled (see --enable-cloud-logging
+            and --enable-cloud-monitoring for more information).
 
             Unless container/new_scopes_behavior property is true, compute-rw
             and storage-ro are always added, even if not explicitly specified,

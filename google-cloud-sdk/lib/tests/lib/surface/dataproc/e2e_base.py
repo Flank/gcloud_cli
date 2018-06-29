@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Base for all Dataproc e2e tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
@@ -75,7 +77,7 @@ class DataprocIntegrationTestBase(
     # TODO(b/36052524): Clean up clusters after beta release
     cluster_name_generator = e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-dataproc-test')
-    self.cluster_name = cluster_name_generator.next()
+    self.cluster_name = next(cluster_name_generator)
 
   def TearDown(self):
     """Tears down the cluster."""
@@ -114,7 +116,7 @@ class DataprocIntegrationTestBase(
 
   def CreateClusterWithRetries(self, max_retrials=1, args=''):
     def CleanUpFailure(result, unused_status):
-      message = result[1][1].message
+      message = str(result[1][1])
       self.log.warning(
           'Cluster creation Operation failed. Details:\n' + message)
       self.DeleteCluster()

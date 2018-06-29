@@ -90,7 +90,7 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
     self.assertEqual(2, result['files_written'])
     self.assertEqual(0, result['files_skipped'])
     self.assertEqual(
-        sum([len(file_utils.GetFileContents(path)) for path in full_paths]),
+        sum([len(file_utils.ReadFileContents(path)) for path in full_paths]),
         result['size_written'])
 
     cloud_repo = result['source_contexts'][0]['context']['cloudRepo']
@@ -157,7 +157,7 @@ class UploadManagerTest(sdk_test_base.WithOutputCapture,
       self.assertEqual(256 * 2**10, original_size_threshold)
       full_paths = self.CreateFiles(['file1', 'filethatistoolarge'])
       upload.UploadManager.SIZE_THRESHOLD = len(
-          file_utils.GetFileContents(full_paths[1])) - 1
+          file_utils.ReadFileContents(full_paths[1])) - 1
 
       result = upload.UploadManager().Upload('branch1', self.tmpdir)
 

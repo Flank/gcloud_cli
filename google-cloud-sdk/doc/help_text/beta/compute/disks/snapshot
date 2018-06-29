@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud beta compute disks snapshot DISK_NAME [DISK_NAME ...] [--async]
         [--csek-key-file=FILE] [--description=DESCRIPTION] [--guest-flush]
-        [--snapshot-names=SNAPSHOT_NAME,[...]] [--region=REGION | --zone=ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+        [--labels=[KEY=VALUE,...]] [--snapshot-names=SNAPSHOT_NAME,[...]]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create snapshots of Google Compute Engine persistent disks.
@@ -42,6 +42,14 @@ FLAGS
         Create an application consistent snapshot by informing the OS to
         prepare for the snapshot process. Currently only supported on Windows
         instances using the Volume Shadow Copy Service (VSS).
+
+     --labels=[KEY=VALUE,...]
+        A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --snapshot-names=SNAPSHOT_NAME,[...]
         Names to assign to the snapshots. Without this option, the name of each

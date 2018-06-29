@@ -38,7 +38,7 @@ OPTIONAL FLAGS
      --include-quote
         If True, the server will attempt to filter out profanities, replacing
         all but the initial character in each filtered word with asterisks,
-        e.g. \"f**\".
+        e.g. "f**".
 
      --max-findings=MAX_FINDINGS; default=1000
         Maximum number of findings that will be returned per execution.
@@ -47,10 +47,8 @@ OPTIONAL FLAGS
         findings.
 
      --min-likelihood=MIN_LIKELIHOOD; default="possible"
-        Only return findings equal to or above this threshold. One of:
-        very-unlikely, unlikely, possible, likely, very-likely. The default
-        value is possible. MIN_LIKELIHOOD must be one of: likely, possible,
-        unlikely, very-likely, very-unlikely.
+        Only return findings equal to or above this threshold. MIN_LIKELIHOOD
+        must be one of: likely, possible, unlikely, very-likely, very-unlikely.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

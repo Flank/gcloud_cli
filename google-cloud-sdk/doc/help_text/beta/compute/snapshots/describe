@@ -9,8 +9,8 @@ DESCRIPTION
     (BETA) gcloud beta compute snapshots describe displays all data associated
     with a Compute Engine snapshot in a project.
 
-        Given an existing snapshot is queried, successful output of this command
-        looks like the following:
+    Given an existing snapshot is queried, successful output of this command
+    looks like the following:
 
         creationTimestamp: '2018-05-07T10:45:46.988-07:00'
         diskSizeGb: '500'
@@ -38,12 +38,13 @@ EXAMPLES
     To run gcloud beta compute snapshots describe, you'll need the name of a
     snapshot. To list existing snapshots by name, run:
 
-        gcloud compute snapshots list
+        $ gcloud beta compute snapshots list
 
     To display specific details of an existing Compute Engine snapshot (like
     its creation time, status, and storage details), run:
 
-        gcloud compute snapshots describe [SNAPSHOT_NAME]          --format="table(creationTimestamp, status, storageBytes, storageBytesStatus)"
+        $ gcloud beta compute snapshots describe SNAPSHOT_NAME \
+            --format="table(creationTimestamp, status, storageBytesStatus)"
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -13,6 +13,9 @@
 # limitations under the License.
 """Integration tests for the emulators pubsub commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.util import java
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base

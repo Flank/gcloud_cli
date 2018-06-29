@@ -13,8 +13,15 @@
 # limitations under the License.
 """Flags for workflow templates related commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.calliope.concepts import concepts
+from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
+from googlecloudsdk.command_lib.util import completers
+from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.core import properties
 
 
@@ -35,9 +42,12 @@ def AddVersionFlag(parser):
       '--version', type=int, help='The version of the workflow template.')
 
 
-def AddTemplateFlag(parser, action):
+def AddFileFlag(parser, input_type, action):
+  # Examples: workflow template to run/export/import, cluster to create.
   parser.add_argument(
-      'template', help='The ID of the workflow template to {0}.'.format(action))
+      '--file',
+      help='The YAML file containing the {0} to {1}'.format(input_type, action),
+      required=True)
 
 
 def AddJobFlag(parser, action):
@@ -59,6 +69,21 @@ def AddTimeoutFlag(parser, default='10m'):
       help=('Client side timeout on how long to wait for Datproc operations. '
             'See $ gcloud topic datetimes for information on duration '
             'formats.'),
+      hidden=True)
+
+
+def AddParametersFlag(parser):
+  parser.add_argument(
+      '--parameters',
+      metavar='PARAM=VALUE',
+      type=arg_parsers.ArgDict(),
+      help="""
+          A map from parameter names to values that should be used for those
+          parameters. A value must be provided for every configured parameter.
+          Parameters can be configured when creating or updating a workflow
+          template.
+          """,
+      dest='parameters',
       hidden=True)
 
 
@@ -88,3 +113,67 @@ def AddMinCpuPlatformArgs(parser, track):
       metavar='PLATFORM',
       required=False,
       help=help_text)
+
+
+class RegionsCompleter(completers.ListCommandCompleter):
+
+  def __init__(self, **kwargs):
+    super(RegionsCompleter, self).__init__(
+        collection='dataproc.projects.regions',
+        list_command='alpha dataproc regions list --uri',
+        **kwargs)
+
+
+def TemplateAttributeConfig():
+  return concepts.ResourceParameterAttributeConfig(
+      name='template',
+      help_text='The workflow template name.',
+  )
+
+
+def RegionAttributeConfig():
+  return concepts.ResourceParameterAttributeConfig(
+      name='region',
+      help_text=(
+          'The Cloud DataProc region for the {resource}. Each Cloud Dataproc '
+          'region constitutes an independent resource namespace constrained to '
+          'deploying instances into Google Compute Engine zones inside the '
+          'region. The default value of "global" is a special multi-region '
+          'namespace which is capable of deploying instances into all Google '
+          'Compute Engine zones globally, and is disjoint from other Cloud '
+          'Dataproc regions. Overrides the default `dataproc/region` property '
+          'value for this command invocation.'),
+      completer=RegionsCompleter,
+      fallthroughs=[
+          deps.PropertyFallthrough(properties.VALUES.dataproc.region),
+      ],
+  )
+
+
+def GetTemplateResourceSpec():
+  return concepts.ResourceSpec(
+      'dataproc.projects.regions.workflowTemplates',
+      api_version='v1beta2',
+      resource_name='template',
+      disable_auto_completers=False,
+      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG,
+      regionsId=RegionAttributeConfig(),
+      workflowTemplatesId=TemplateAttributeConfig(),
+  )
+
+
+def AddTemplateResourceArg(parser, verb, positional=True):
+  """Adds a workflow template resource argument.
+
+  Args:
+    parser: the argparse parser for the command.
+    verb: str, the verb to describe the resource, such as 'to update'.
+    positional: bool, if True, means that the instance ID is a positional rather
+      than a flag.
+  """
+  name = 'TEMPLATE' if positional else '--template'
+  concept_parsers.ConceptParser.ForResource(
+      name,
+      GetTemplateResourceSpec(),
+      'The name of the workflow template to {}.'.format(verb),
+      required=True).AddToParser(parser)

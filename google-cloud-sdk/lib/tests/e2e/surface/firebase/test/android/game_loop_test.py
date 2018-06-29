@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import e2e_base
@@ -23,12 +25,10 @@ class GameLoopRunTest(e2e_base.TestIntegrationTestBase):
 
   @test_case.Filters.skip('Failing', 'b/68211846')
   def testGameLoopTestType(self):
-    self.Run(
-        u'{cmd} --type=game-loop --app={app} --async '
-        u'--device model=shamu,version=23 '
-        u'--scenario-numbers=3 --scenario-labels=compatibility '
-        .format(cmd=commands.ANDROID_BETA_TEST_RUN,
-                app=e2e_base.FTLGAME_APP))
+    self.Run('{cmd} --type=game-loop --app={app} --async '
+             '--device model=shamu,version=23 '
+             '--scenario-numbers=3 --scenario-labels=compatibility '.format(
+                 cmd=commands.ANDROID_BETA_TEST_RUN, app=e2e_base.FTLGAME_APP))
 
     self.AssertErrMatches(r'Uploading.*ftlgame.apk')
     self.AssertErrContains('execute your game-loop test on 1 device')
@@ -39,17 +39,17 @@ class GameLoopRunTest(e2e_base.TestIntegrationTestBase):
     # ftlgame.apk only supports scenarios from 1 to 5.
     with self.assertRaises(exceptions.BadMatrixError):
       self.Run(
-          u'{cmd} --type=game-loop --app={app} --scenario-numbers=2,6 '
-          .format(cmd=commands.ANDROID_BETA_TEST_RUN,
-                  app=e2e_base.FTLGAME_APP))
+          '{cmd} --type=game-loop --app={app} --scenario-numbers=2,6 '.format(
+              cmd=commands.ANDROID_BETA_TEST_RUN, app=e2e_base.FTLGAME_APP))
 
   @test_case.Filters.skip('Failing', 'b/68211846')
   def testGameLoopTestType_InvalidScenarioLabel(self):
     with self.assertRaises(exceptions.BadMatrixError):
-      self.Run(
-          u'{cmd} --type=game-loop --app={app} --scenario-labels=bad-label '
-          .format(cmd=commands.ANDROID_BETA_TEST_RUN,
-                  app=e2e_base.FTLGAME_APP))
+      self.Run('{cmd} --type=game-loop --app={app} --scenario-labels=bad-label '
+               .format(
+                   cmd=commands.ANDROID_BETA_TEST_RUN,
+                   app=e2e_base.FTLGAME_APP))
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -1,0 +1,58 @@
+NAME
+    gcloud alpha compute snapshots remove-iam-policy-binding - remove a policy
+        binding from a Google Compute Engine snapshot
+
+SYNOPSIS
+    gcloud alpha compute snapshots remove-iam-policy-binding SNAPSHOT_NAME
+        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Removes an IAM policy binding from the given snapshot.
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+POSITIONAL ARGUMENTS
+     SNAPSHOT_NAME
+        Name of the snapshot to operate on.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
+
+        Can also be one of the following special values:
+        * allUsers - anyone who is on the internet, with or without a Google
+          account.
+        * allAuthenticatedUsers - anyone who is authenticated with a Google
+          account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+EXAMPLES
+    The following command will remove an IAM policy binding for the role of
+    'roles/editor' for the user 'test-user@gmail.com' on the snapshot
+    my_snapshot:
+
+        $ gcloud alpha compute snapshots remove-iam-policy-binding \
+            my_snapshot \
+            --member='user:test-user@gmail.com' \
+            --role='roles/editor'
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

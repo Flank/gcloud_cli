@@ -240,7 +240,7 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def testDeleteBadInput(self):
     image_name = 'badi$mage'
-    with self.assertRaises(docker_name.BadNameException):
+    with self.assertRaises(util.InvalidImageNameError):
       self.Delete([image_name])
 
   def testIncompleteImageName(self):
@@ -251,12 +251,18 @@ class DeleteTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def testDeleteUnsupportedInputTag(self):
     image_name = 'myregistry.io/badimage:'
-    with self.assertRaises(docker_name.BadNameException):
+    with self.assertRaises(util.InvalidImageNameError):
       self.Delete([image_name])
 
   def testDeleteUnsupportedInputDigest(self):
     image_name = 'myregistry.io/badimage@'
     with self.assertRaises(util.InvalidImageNameError):
+      self.Delete([image_name])
+
+  def testDeleteUnsupportedInputDigestNoAtSign(self):
+    image_name = 'myregistry.io:badimage'
+    with self.assertRaisesRegexp(
+        util.InvalidImageNameError, r'\[{}\]'.format(image_name)):
       self.Delete([image_name])
 
   def testNonUniqueDigest(self):

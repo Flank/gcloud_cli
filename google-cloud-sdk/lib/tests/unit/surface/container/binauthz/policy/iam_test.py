@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests that exercise IAM-related `binauthz policy` commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import textwrap
 
 from tests.lib import sdk_test_base
@@ -31,7 +34,7 @@ class PolicyGetIamTest(base.BinauthzMockedPolicyClientUnitTest):
         self.messages.
         BinaryauthorizationProjectsPolicyGetIamPolicyRequest(
             resource=self.resource),
-        self.messages.IamPolicy(etag='foo'))
+        self.messages.IamPolicy(etag=b'foo'))
 
     self.RunBinauthz('policy get-iam-policy')
     self.AssertOutputContains('etag: Zm9v')  # "foo" in b64
@@ -40,7 +43,7 @@ class PolicyGetIamTest(base.BinauthzMockedPolicyClientUnitTest):
     self.client.projects_policy.GetIamPolicy.Expect(
         self.messages.BinaryauthorizationProjectsPolicyGetIamPolicyRequest(
             resource=self.resource),
-        self.messages.IamPolicy(etag='foo'))
+        self.messages.IamPolicy(etag=b'foo'))
 
     self.RunBinauthz(
         'policy get-iam-policy '
@@ -58,7 +61,7 @@ class PolicyModifyIamTest(sdk_test_base.WithTempCWD,
 
   def testSetBindings(self):
     policy = self.messages.IamPolicy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
@@ -95,10 +98,10 @@ class PolicyModifyIamTest(sdk_test_base.WithTempCWD,
         self.messages.
         BinaryauthorizationProjectsPolicyGetIamPolicyRequest(
             resource=self.resource),
-        self.messages.IamPolicy(etag='foo'))
+        self.messages.IamPolicy(etag=b'foo'))
 
     policy = self.messages.IamPolicy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
@@ -123,11 +126,11 @@ class PolicyModifyIamTest(sdk_test_base.WithTempCWD,
 
   def testRemoveBinding(self):
     policy_before = self.messages.IamPolicy(
-        etag='foo',
+        etag=b'foo',
         bindings=[
             self.messages.Binding(members=['people'], role='roles/owner')
         ])
-    policy_after = self.messages.IamPolicy(etag='foo', bindings=[])
+    policy_after = self.messages.IamPolicy(etag=b'foo', bindings=[])
 
     self.client.projects_policy.GetIamPolicy.Expect(
         self.messages.BinaryauthorizationProjectsPolicyGetIamPolicyRequest(

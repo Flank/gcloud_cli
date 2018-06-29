@@ -13,10 +13,13 @@
 # limitations under the License.
 """Tests for `gcloud tasks lease`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.util import time_util
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.tasks import test_base
+from six.moves import range
 
 
 class TasksLeaseTest(test_base.CloudTasksTestBase):
@@ -109,7 +112,6 @@ class TasksLeaseTest(test_base.CloudTasksTestBase):
     self.Run('tasks lease --queue {} --lease-duration {}'.format(
         self.queue_name, self.lease_duration))
 
-    # TODO(b/67471603): In-line create_time and schedule_time in the output
     self.AssertOutputEquals("""\
         TASK_NAME  TYPE   CREATE_TIME      SCHEDULE_TIME      DISPATCH_ATTEMPTS  RESPONSE_ATTEMPTS  LAST_ATTEMPT_STATUS
         my-task0   pull   {0}              {1}                1                  0                  Unknown

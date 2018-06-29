@@ -14,6 +14,8 @@
 
 """Tests for the generator.py script."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import textwrap
 
@@ -24,6 +26,7 @@ from googlecloudsdk.core import yaml
 from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from googlecloudsdk.third_party.apis import apis_map
+import six
 
 
 class ApiMapGeneratorTest(test_case.Base):
@@ -135,17 +138,17 @@ class ApiMapGeneratorTest(test_case.Base):
       dir_path = os.path.join(tmp_dir, 'fruits')
       os.makedirs(dir_path)
       generate.GenerateApiMap(tmp_dir, 'fruits', config)
-      content = self.GetFileContents(os.path.join(dir_path, 'apis_map.py'))
+      content = files.ReadFileContents(os.path.join(dir_path, 'apis_map.py'))
 
     self.maxDiff = None
     self.assertMultiLineEqual(
-        self.GetFileContents(os.path.join(os.path.dirname(__file__),
-                                          'testdata', 'api_map_sample.txt')),
+        files.ReadFileContents(os.path.join(os.path.dirname(__file__),
+                                            'testdata', 'api_map_sample.txt')),
         content)
 
   def testSanityOfGeneratedApisMap(self):
-    for api_name, ver_map in apis_map.MAP.iteritems():
-      for ver, api_definition in ver_map.iteritems():
+    for api_name, ver_map in six.iteritems(apis_map.MAP):
+      for ver, api_definition in six.iteritems(ver_map):
         self.assertEqual(api_definition, core_apis._GetApiDef(api_name, ver))
 
 

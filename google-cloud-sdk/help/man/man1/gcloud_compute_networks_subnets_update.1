@@ -11,7 +11,7 @@ gcloud compute networks subnets update \- updates properties of an existing Goog
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks subnets update\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks subnets update\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-add\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]\ |\ \fB\-\-[no\-]enable\-flow\-logs\fR\ |\ \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR\ |\ \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -86,12 +86,19 @@ secondary range 192.168.64.0/24 with name range1.
 
 .RS 2m
 .TP 2m
+\fB\-\-[no\-]enable\-flow\-logs\fR
+Enable/disable VPC flow logging for this subnet. More information for VPC flow
+logs can be found at https://cloud.google.com/vpc/docs/using\-flow\-logs. Use
+\fB\-\-enable\-flow\-logs\fR to enable and \fB\-\-no\-enable\-flow\-logs\fR to
+disable.
+
+.RS 2m
+.TP 2m
 \fB\-\-[no\-]enable\-private\-ip\-google\-access\fR
 Enable/disable access to Google Cloud APIs from this subnet for instances
 without a public ip address. Use \fB\-\-enable\-private\-ip\-google\-access\fR
 to enable and \fB\-\-no\-enable\-private\-ip\-google\-access\fR to disable.
 
-.RS 2m
 .TP 2m
 \fB\-\-remove\-secondary\-ranges\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]
 Removes secondary ranges from the subnetwork.

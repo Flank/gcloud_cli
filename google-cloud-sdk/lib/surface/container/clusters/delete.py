@@ -28,7 +28,22 @@ from googlecloudsdk.core.console import console_io
 
 
 class Delete(base.DeleteCommand):
-  """Delete an existing cluster for running containers."""
+  """Delete an existing cluster for running containers.
+
+  When you delete a cluster, the following resources are deleted:
+
+  - The master resources
+  - All of the node instances in the cluster
+  - Any Pods that are running on those instances
+  - Any firewalls and routes created by Kubernetes Engine at the time of cluster
+    creation
+  - Data stored in host hostPath and emptyDir volumes
+
+  The following resources are not deleted:
+
+  - External load balancers created by the cluster
+  - Persistent disk volumes
+  """
 
   @staticmethod
   def Args(parser):
@@ -81,9 +96,6 @@ class Delete(base.DeleteCommand):
     # Issue all deletes first
     for cluster_ref in cluster_refs:
       try:
-        # Make sure it exists (will raise appropriate error if not)
-        adapter.GetCluster(cluster_ref)
-
         op_ref = adapter.DeleteCluster(cluster_ref)
         operations.append((op_ref, cluster_ref))
       except apitools_exceptions.HttpError as error:

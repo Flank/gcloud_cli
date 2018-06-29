@@ -14,6 +14,7 @@
 """Tests for gcloud app operations describe."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 
 from googlecloudsdk.core import properties

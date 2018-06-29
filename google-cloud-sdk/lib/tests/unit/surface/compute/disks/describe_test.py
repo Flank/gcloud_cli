@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the disks describe subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py.testing import mock
@@ -57,7 +59,7 @@ class DisksDescribeTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         """)
 
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        self.GetOutput(),
         textwrap.dedent("""\
             name: disk-1
             selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/disks/disk-1
@@ -114,7 +116,7 @@ class RegionalDisksDescribeTest(sdk_test_base.WithFakeAuth,
         """)
 
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        self.GetOutput(),
         textwrap.dedent("""\
             name: disk-1
             region: https://www.googleapis.com/compute/v1/projects/my-project/regions/region-1

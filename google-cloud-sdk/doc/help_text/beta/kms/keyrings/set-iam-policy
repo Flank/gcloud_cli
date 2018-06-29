@@ -14,14 +14,14 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      KEYRING
-        Name of the keyring whose IAM policy to update.
+        Name of the key ring whose IAM policy to update.
 
      POLICY_FILE
         JSON or YAML file with the IAM policy
 
 FLAGS
      --location=LOCATION
-        The location of the requested resource.
+        Location of the keyring.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

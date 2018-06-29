@@ -14,6 +14,8 @@
 
 """Test of the 'clusters create' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 import textwrap
 
@@ -126,8 +128,7 @@ class ClustersCreateUnitTest(
          [4] us-central1-b
         Please enter your numeric choice:  \n\
         Waiting on operation [{operation}].
-        <START PROGRESS TRACKER>Waiting for cluster creation operation
-        <END PROGRESS TRACKER>SUCCESS
+        {{"ux": "PROGRESS_TRACKER", "message": "Waiting for cluster creation operation", "status": "SUCCESS"}}
         Created [{cluster_uri}] Cluster placed in zone [{zone}].
         """.format(
             operation=self.OperationName(),
@@ -532,6 +533,8 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         zoneUri=zone)
     self.AddMinCpuPlatform(expected_request_cluster, master_min_cpu_platform,
                            worker_min_cpu_platform)
+    self.AddEncryptionConfig(expected_request_cluster,
+                             'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
 
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
@@ -553,6 +556,10 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                '--no-address '
                '--master-min-cpu-platform="{master_min_cpu_platform}" '
                '--worker-min-cpu-platform="{worker_min_cpu_platform}" '
+               '--gce-pd-kms-key-project=p '
+               '--gce-pd-kms-key-location=l '
+               '--gce-pd-kms-key-keyring=kr '
+               '--gce-pd-kms-key=k '
                '--zone {zone} ').format(
                    project=project,
                    cluster=cluster_name,
@@ -767,6 +774,60 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         '--image-version may be specified.'):
       self.RunDataproc(command)
 
+  def testCreateClusterWithIncompleteGcePdKmsKeyFlags(self):
+    """Test command partially specified gce-pd-kms-key flags fail."""
+    # No Location
+    with self.AssertRaisesExceptionMatches(
+        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
+      self.RunDataproc(
+          ('clusters create {cluster} --zone={zone} '
+           '--gce-pd-kms-key-project={keyProject} '
+           '--gce-pd-kms-key-keyring={keyRing} '
+           '--gce-pd-kms-key={key}').format(
+               cluster='test-cluster',
+               zone='test-zone',
+               keyProject='test-project',
+               keyRing='test-keyring',
+               key='test-key'))
+
+    # No KeyRing
+    with self.AssertRaisesExceptionMatches(
+        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
+      self.RunDataproc(
+          ('clusters create {cluster} --zone={zone} '
+           '--gce-pd-kms-key-project={keyProject} '
+           '--gce-pd-kms-key-location={keyLocation} '
+           '--gce-pd-kms-key={key}').format(
+               cluster='test-cluster',
+               zone='test-zone',
+               keyProject='test-project',
+               keyLocation='test-key-location',
+               key='test-key'))
+
+    # No Key
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --gce-pd-kms-key-keyring --gce-pd-kms-key-location '
+        '--gce-pd-kms-key-project: --gce-pd-kms-key must be specified.'):
+      self.RunDataproc(
+          ('clusters create {cluster} --zone={zone} '
+           '--gce-pd-kms-key-project={keyProject} '
+           '--gce-pd-kms-key-location={keyLocation} '
+           '--gce-pd-kms-key-keyring={keyRing}').format(
+               cluster='test-cluster',
+               zone='test-zone',
+               keyProject='test-project',
+               keyLocation='test-key-location',
+               keyRing='test-keyring'))
+
+    # Invalid relative name
+    with self.AssertRaisesExceptionMatches(
+        exceptions.ArgumentError, '--gce-pd-kms-key was not fully specified.'):
+      self.RunDataproc(
+          ('clusters create {cluster} --zone={zone} '
+           '--gce-pd-kms-key={key}').format(
+               cluster='test-cluster',
+               zone='test-zone',
+               key='locations/l/keyRings/kr/cryptoKeys/k'))
 
 if __name__ == '__main__':
   sdk_test_base.main()

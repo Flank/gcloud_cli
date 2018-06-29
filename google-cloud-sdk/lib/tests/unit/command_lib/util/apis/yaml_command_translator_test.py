@@ -423,6 +423,36 @@ class DescribeCommandTests(CommandTestsBase):
     result = cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
     self.assertEqual(result, {'foo': 'bar', 'a': 'p', 'b': 'z'})
 
+  def testRunWithCommandFallthroughs(self):
+    self.Expect()
+    data = self.MakeCommandData()
+    data['arguments']['resource']['command_level_fallthroughs'] = {
+        'zone': [{'arg_name': 'foo'}]}
+    additional_args_mock = mock.MagicMock()
+    side_effect = [calliope_base.Argument('--foo', help='Auxilio aliis.')]
+    additional_args_mock.side_effect = lambda: side_effect
+    d = yaml_command_schema.CommandData('describe', data)
+    d.arguments.additional_arguments_hook = additional_args_mock
+
+    cli = self.MakeCLI(d)
+    result = cli.Execute(['command', '--project', 'p', '--foo', 'z', 'i'])
+    self.assertEqual(result, {'foo': 'bar'})
+
+  def testRunWithCommandFallthroughsPositional(self):
+    self.Expect()
+    data = self.MakeCommandData()
+    data['arguments']['resource']['command_level_fallthroughs'] = {
+        'zone': [{'arg_name': 'foo', 'is_positional': True}]}
+    additional_args_mock = mock.MagicMock()
+    side_effect = [calliope_base.Argument('FOO', help='Auxilio aliis.')]
+    additional_args_mock.side_effect = lambda: side_effect
+    d = yaml_command_schema.CommandData('describe', data)
+    d.arguments.additional_arguments_hook = additional_args_mock
+
+    cli = self.MakeCLI(d)
+    result = cli.Execute(['command', '--project', 'p', 'i', 'z'])
+    self.assertEqual(result, {'foo': 'bar'})
+
 
 class ListCommandTests(CommandTestsBase):
 
@@ -1456,6 +1486,318 @@ class SetIamPolicyCommandTests(CommandTestsBase):
     with self.assertRaises(SystemExit):
       cli.Execute(['command', '--project', 'p', '--region', 'r', 'i', 'myfile'])
     self.AssertErrContains('Code: [10] Message: [message]')
+
+
+class AddIamPolicyBindingCommandTests(CommandTestsBase):
+
+  def _MakePolicy(self, bindings=None, etag=b'ACAB', messages=None):
+    m = messages or self.messages
+    return m.Policy(bindings=bindings or [], etag=etag)
+
+  def _MakeBinding(self, role, members=None, messages=None):
+    m = messages or self.messages
+    return m.Binding(role=role, members=members)
+
+  def SetUp(self):
+    self.client = apis.GetClientClass('cloudiot', 'v1')
+    self.mocked_client = apitools_mock.Client(self.client)
+    self.mocked_client.Mock()
+    self.addCleanup(self.mocked_client.Unmock)
+    self.messages = self.client.MESSAGES_MODULE
+    self.start_policy = self._MakePolicy()
+    self.updated_policy = self._MakePolicy(
+        [self._MakeBinding('roles/viewer', ['user:admin@foo.com'])])
+
+  def _ExpectGetIamPolicy(self):
+    req = self.messages.CloudiotProjectsLocationsRegistriesGetIamPolicyRequest(
+        resource='projects/p/locations/r/registries/i')
+
+    self.mocked_client.projects_locations_registries.GetIamPolicy.Expect(
+        request=req, response=self.start_policy)
+
+  def _ExpectSetUpdatedIamPolicy(self, response=None):
+    req = self.messages.SetIamPolicyRequest(policy=self.updated_policy)
+    self.mocked_client.projects_locations_registries.SetIamPolicy.Expect(
+        request=self.messages.
+        CloudiotProjectsLocationsRegistriesSetIamPolicyRequest(
+            resource='projects/p/locations/r/registries/i',
+            setIamPolicyRequest=req),
+        response=response or self.updated_policy)
+
+  def Expect(self, instance='i', response=None):
+    self._ExpectGetIamPolicy()
+    self._ExpectSetUpdatedIamPolicy(response=response)
+
+  def MakeCommandData(self,
+                      brief=None,
+                      description=None,
+                      notes=None,
+                      params=None):
+    collection = 'cloudiot.projects.locations.registries'
+    spec = {
+        'name':
+            'registry',
+        'collection':
+            collection,
+        'attributes': [
+            {
+                'parameter_name': 'locationsId',
+                'attribute_name': 'region',
+                'help': 'The name of the Cloud IoT region.',
+            },
+            {
+                'parameter_name': 'registriesId',
+                'attribute_name': 'registry',
+                'help': 'The name of the Cloud IoT registry.',
+            },
+        ],
+    }
+    data = {
+        'help_text': {
+            'brief': brief or '<brief>',
+            'DESCRIPTION': description or '<DESCRIPTION>',
+            'NOTES': notes,
+        },
+        'request': {
+            'collection': collection,
+        },
+        'arguments': {
+            'resource': {
+                'help_text': (
+                    'The {resource} for which to add the IAM policy binding '
+                    'to.'),
+                'spec':
+                    spec,
+            },
+        },
+    }
+    if params:
+      data['arguments']['params'] = params
+
+    return data
+
+  def MakeProjectCommandData(self,
+                             brief=None,
+                             description=None,
+                             notes=None,
+                             params=None):
+    collection = 'cloudresourcemanager.projects'
+    spec = {
+        'name':
+            'project',
+        'collection':
+            collection,
+        'attributes': [{
+            'parameter_name': 'projectId',
+            'attribute_name': 'project_id',
+            'help': 'The name of the Project.',
+        }],
+    }
+    data = {
+        'help_text': {
+            'brief': brief or '<brief>',
+            'DESCRIPTION': description or '<DESCRIPTION>',
+            'NOTES': notes,
+        },
+        'request': {
+            'collection': collection,
+        },
+        'arguments': {
+            'resource': {
+                'help_text': 'The {resource} for which to set the IAM policy.',
+                'spec': spec,
+            },
+        },
+    }
+    if params:
+      data['arguments']['params'] = params
+
+    return data
+
+  def MakeMlCommandData(self,
+                        brief=None,
+                        description=None,
+                        notes=None,
+                        params=None):
+    collection = 'ml.projects.models'
+    spec = {
+        'name':
+            'model',
+        'collection':
+            collection,
+        'attributes': [{
+            'parameter_name': 'projectsId',
+            'attribute_name': 'project',
+            'help': 'The name of the Project.',
+        }, {
+            'parameter_name': 'modelsId',
+            'attribute_name': 'model',
+            'help': 'The name of the Model.',
+        }],
+    }
+    data = {
+        'help_text': {
+            'brief': brief or '<brief>',
+            'DESCRIPTION': description or '<DESCRIPTION>',
+            'NOTES': notes,
+        },
+        'request': {
+            'collection': collection,
+        },
+        'arguments': {
+            'resource': {
+                'help_text': 'The {resource} for which to set the IAM policy.',
+                'spec': spec,
+            },
+        },
+    }
+    if params:
+      data['arguments']['params'] = params
+
+    return data
+
+  def testGenerationExplicitHelp(self):
+    brief = 'explicit brief'
+    description = 'explicit description'
+    command = yaml_command_translator.Translator().Translate(
+        ['foo', 'add_iam_policy_binding'],
+        self.MakeCommandData(brief=brief, description=description))
+    self.assertTrue(issubclass(command, calliope_base.Command))
+    self.assertEqual(brief, command.detailed_help.get('brief'))
+    self.assertEqual(description, command.detailed_help.get('DESCRIPTION'))
+
+  def testGenerationDefaultHelp(self):
+    command = yaml_command_translator.Translator().Translate(
+        ['foo', 'add_iam_policy_binding'], self.MakeCommandData())
+    self.assertTrue(issubclass(command, calliope_base.Command))
+    self.assertEqual('<brief>', command.detailed_help.get('brief'))
+    self.assertEqual('<DESCRIPTION>', command.detailed_help.get('DESCRIPTION'))
+
+  def testRun(self):
+    self.Expect()
+    d = yaml_command_schema.CommandData('add_iam_policy_binding',
+                                        self.MakeCommandData())
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'REGISTRY', '--region', '--member', '--role')
+    result = cli.Execute([
+        'command', '--project', 'p', '--region', 'r', 'i', '--role',
+        'roles/viewer', '--member', 'user:admin@foo.com'
+    ])
+    self.assertEqual(result, self.updated_policy)
+    self.AssertErrContains(
+        """
+    Updated IAM policy for registry [i].
+    """.lstrip('\n'),
+        normalize_space=True)
+    self.AssertOutputEquals(
+        """
+    bindings:
+    - members:
+    - user:admin@foo.com
+    role: roles/viewer
+    etag: QUNBQg==
+    """.lstrip('\n'),
+        normalize_space=True)
+
+  def testRunWithOverrides(self):
+    client = apis.GetClientClass('ml', 'v1')
+    mocked_client = apitools_mock.Client(client)
+    mocked_client.Mock()
+    self.addCleanup(mocked_client.Unmock)
+    messages = client.MESSAGES_MODULE
+    policy = messages.GoogleIamV1Policy(bindings=[{
+        'role': 'roles/owner',
+        'members': ['user:mike@example.com']
+    }])
+
+    updated_policy = messages.GoogleIamV1Policy(bindings=[{
+        'role': 'roles/owner',
+        'members': [
+            'user:mike@example.com',
+            'group:admins@example.com',
+        ]
+    }])
+    self.StartObjectPatch(
+        iam_util,
+        'ParsePolicyFileWithUpdateMask',
+        return_value=(updated_policy, 'bindings,etag,version'))
+
+    mocked_client.projects_models.GetIamPolicy.Expect(
+        messages.MlProjectsModelsGetIamPolicyRequest(
+            resource='projects/p/models/m'),
+        policy)
+
+    set_iam_policy_request = messages.GoogleIamV1SetIamPolicyRequest(
+        policy=updated_policy)
+    mocked_client.projects_models.SetIamPolicy.Expect(
+        messages.MlProjectsModelsSetIamPolicyRequest(
+            resource='projects/p/models/m',
+            googleIamV1SetIamPolicyRequest=set_iam_policy_request),
+        updated_policy)
+    d = yaml_command_schema.CommandData('add_iam_policy_binding',
+                                        self.MakeMlCommandData())
+    o = yaml_command_schema.IamData({
+        'set_iam_policy_request_path': 'googleIamV1SetIamPolicyRequest',
+        'message_type_overrides': {
+            'policy': 'GoogleIamV1Policy',
+            'set_iam_policy_request': 'GoogleIamV1SetIamPolicyRequest'
+        }
+    })
+    d.iam = o
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'MODEL', '--member', '--role')
+    result = cli.Execute([
+        'command', '--project', 'p', '--project', 'p', 'm', '--role',
+        'roles/owner', '--member', 'group:admins@example.com'
+    ])
+    self.assertEqual(result, policy)
+    self.AssertErrContains(
+        'Updated IAM policy for model [m].', normalize_space=True)
+    self.AssertOutputEquals(
+        """
+      bindings:
+      - members:
+      - user:mike@example.com
+      - group:admins@example.com
+      role: roles/owner
+      """.lstrip('\n'),
+        normalize_space=True)
+
+  def testRunWithResponseErrorHandler(self):
+
+    class Good(object):
+      c = 2
+      d = 3
+
+    class Error(object):
+      code = 10
+      message = 'message'
+
+    class Bad(object):
+      error = Error
+
+    class Response(object):
+      a = 1
+      b = [Good, Bad]
+
+    self.Expect(response=Response)
+    d = yaml_command_schema.CommandData('add_iam_policy_binding',
+                                        self.MakeCommandData())
+    d.response = yaml_command_schema.Response({
+        'error': {
+            'field': 'b.error',
+            'code': 'code',
+            'message': 'message'
+        }
+    })
+    cli = self.MakeCLI(d)
+    with self.assertRaises(SystemExit):
+      cli.Execute([
+          'command', '--project', 'p', '--region', 'r', 'i', '--role',
+          'roles/viewer', '--member', 'user:admin@foo.com'
+      ])
+    self.AssertErrContains('Code: [10] Message: [message]')
+
 
 if __name__ == '__main__':
   base.main()

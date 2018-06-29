@@ -11,7 +11,7 @@ gcloud alpha compute interconnects attachments partner update \- update a Google
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute interconnects attachments partner update\fR \fINAME\fR [\fB\-\-admin\-enabled\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute interconnects attachments partner update\fR \fINAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-admin\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -39,14 +39,14 @@ Name of the interconnect attachment to patch.
 
 .RS 2m
 .TP 2m
-\fB\-\-admin\-enabled\fR
-Administrative status of the interconnect attachment. When this is enabled, the
-attachment is operational and will carry traffic. Use \-\-no\-admin\-enabled to
-disable it.
-
-.TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Human\-readable plain\-text description of attachment.
+
+.TP 2m
+\fB\-\-enable\-admin\fR
+Administrative status of the interconnect attachment. When this is enabled, the
+attachment is operational and will carry traffic. Use \-\-no\-enable\-admin to
+disable it.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -79,6 +79,11 @@ Alternatively, the region can be stored in the environment variable
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to update. If a label exists its value is
 modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 
@@ -129,9 +134,10 @@ This command is currently in ALPHA and may change without notice. Usually, users
 of ALPHA commands and flags need to apply for access, agree to applicable terms,
 and have their projects whitelisted. Contact Google or sign up on a product's
 page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. This variant is also available:
+https://cloud.google.com/products/. These variants are also available:
 
 .RS 2m
+$ gcloud compute interconnects attachments partner update
 $ gcloud beta compute interconnects attachments partner update
 .RE
 

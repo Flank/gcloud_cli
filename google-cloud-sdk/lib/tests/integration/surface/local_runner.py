@@ -14,11 +14,14 @@
 
 """Testing recorded sessions."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from tests.lib import sdk_test_base
 from tests.lib import session_test_base
 from tests.lib import test_case
+import six
 
 
 class SessionTestMeta(type):
@@ -45,9 +48,10 @@ class SessionTestMeta(type):
     return Test
 
 
-class SessionTest(session_test_base.SessionTestBase):
+class SessionTest(
+    six.with_metaclass(SessionTestMeta, session_test_base.SessionTestBase)):
 
-  __metaclass__ = SessionTestMeta
+  pass
 
 
 if __name__ == '__main__':

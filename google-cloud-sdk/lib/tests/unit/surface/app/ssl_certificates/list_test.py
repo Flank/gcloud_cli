@@ -14,6 +14,7 @@
 """Tests for gcloud app ssl-certificates."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib.surface.app import ssl_certificates_base
 

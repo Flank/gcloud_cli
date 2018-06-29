@@ -35,7 +35,7 @@ COMMANDS
         account.
 
      configure-docker
-        (BETA) Registers gcloud as a Docker credential helper.
+        (BETA) Register gcloud as a Docker credential helper.
 
      list
         (BETA) Lists credentialed accounts.

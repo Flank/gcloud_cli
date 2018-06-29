@@ -470,20 +470,20 @@ class FunctionsDeployTest(FunctionsDeployTestBase):
           'functions deploy my-test --trigger-topic topic --stage-bucket buck')
 
   def testCreateExplicitRegion(self):
+    self.SetRegion('asia-east1')
     self.MockUnpackedSourcesDirSize()
     self.MockChooserAndMakeZipFromFileList()
     self.StartObjectPatch(archive, 'MakeZipFromDir', self.FakeMakeZipFromDir)
-    test_name = 'projects/{0}/locations/asia-east1/functions/my-test'.format(
-        self.Project())
+    test_name = 'projects/{}/locations/{}/functions/my-test'.format(
+        self.Project(), self.GetRegion())
     self._ExpectGsutilCall(self._ExpectFunctionCreateWithPubsub)
     self.mock_client.projects_locations_functions.Get.Expect(
         self.messages.CloudfunctionsProjectsLocationsFunctionsGetRequest(
             name=test_name),
         exception=testutil.CreateTestHttpError(404, 'Not Found'))
-    self.SetRegion('asia-east1')
     self.Run(
         'functions deploy my-test --trigger-topic topic --stage-bucket buck '
-        '--region asia-east1')
+        '--region {}'.format(self.GetRegion()))
 
 
 class FunctionsDeployArgumentValidationTest(FunctionsDeployTestBase):
@@ -571,7 +571,7 @@ class FunctionsDeployWithoutProjectTest(base.FunctionsTestBase):
   def testDeployNoProject(self):
     self.MockUnpackedSourcesDirSize()
     # We don't care what type of exception is raised here.
-    with self.assertRaisesRegex(Exception, base.NO_PROJECT_REGEXP):
+    with self.assertRaisesRegex(Exception, base.NO_PROJECT_RESOURCE_ARG_REGEXP):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck')
 

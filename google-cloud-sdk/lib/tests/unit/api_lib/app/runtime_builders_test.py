@@ -14,6 +14,8 @@
 
 """Unit tests for api_lib.app.runtime_builders."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import io
 import re
 
@@ -26,6 +28,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+import six
 
 
 def _URLFromFile(*args):
@@ -290,7 +293,7 @@ class ManifestTest(sdk_test_base.WithFakeAuth):
         runtime_builders.ManifestError,
         r'A circular dependency was found while resolving the builder for '
         r'runtime \[foo\]'):
-      print m.GetBuilderReference('foo')
+      m.GetBuilderReference('foo')
 
 
 class ResolverTest(sdk_test_base.SdkBase):
@@ -309,7 +312,7 @@ class ResolverTest(sdk_test_base.SdkBase):
   }
 
   def SetUp(self):
-    for name, contents in ResolverTest._BUILDER_FILES.iteritems():
+    for name, contents in six.iteritems(ResolverTest._BUILDER_FILES):
       self.Touch(self.temp_path, name, contents)
     properties.VALUES.app.runtime_builders_root.Set(
         _URLFromFile(self.temp_path))

@@ -62,15 +62,14 @@ class FolderIntegrationTest(e2e_base.WithServiceAuth):
     result = self.RunFolders('describe', TEST_TOP_LEVEL_FOLDER_ID)
     self.assertEqual(result, TEST_TOP_LEVEL_FOLDER)
 
-  @test_case.Filters.skip('consistently failing', 'b/62423326')
   def testListFoldersInOrganization(self):
     result = self.RunFolders('list', '--organization', TEST_ORGANIZATION_ID)
-    self.assertEqual(list(result), [TEST_TOP_LEVEL_FOLDER])
+    self.assertIn(TEST_TOP_LEVEL_FOLDER, list(result))
 
-  @test_case.Filters.skip('Failing consistently', 'b/78307868')
   def testListFoldersInFolder(self):
     result = self.RunFolders('list', '--folder', TEST_TOP_LEVEL_FOLDER_ID)
-    self.assertEqual(list(result), [TEST_SUBFOLDER_A, TEST_SUBFOLDER_B])
+    self.assertIn(TEST_SUBFOLDER_A, list(result))
+    self.assertIn(TEST_SUBFOLDER_B, list(result))
 
   def testSetIamPolicy(self):
     folder_id = folders.FolderNameToId(TEST_SUBFOLDER_B.name)

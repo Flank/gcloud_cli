@@ -992,8 +992,9 @@ class ResourceProjectionTest(test_case.Base):
             'year': 9999
         }
     }
-    if six.PY3:
-      expected['MAX']['fold'] = 0
+    # blech: Python 3.6 adds a fold "bool" that takes value [0, 1].
+    if hasattr(resource['MAX'], 'fold'):
+      expected['MAX']['fold'] = resource['MAX'].fold
     self.CheckProjection('(MAX)', expected, resource=resource)
 
   def testProjectDateTimeStart(self):
@@ -1012,8 +1013,9 @@ class ResourceProjectionTest(test_case.Base):
             'year': 2015
         }
     }
-    if six.PY3:
-      expected['start']['fold'] = 0
+    # blech: Python 3.6 adds a fold "bool" that takes value [0, 1].
+    if hasattr(resource['start'], 'fold'):
+      expected['start']['fold'] = resource['start'].fold
     self.CheckProjection('(start)', expected, resource=resource)
 
   def testProjectList(self):
@@ -1114,6 +1116,12 @@ class ResourceProjectionTest(test_case.Base):
     expected = ['ONE', 123, 4]
     self.assertEqual(expected, actual)
 
+  def testIdentityProjector(self):
+    projector = resource_projector.IdentityProjector()
+    resource = projector
+    actual = projector.Evaluate(resource)
+    self.assertTrue(actual is resource)
+
 
 class ResourceProjectorAttrTest(test_case.Base):
 
@@ -1140,10 +1148,10 @@ class ResourceProjectorAttrTest(test_case.Base):
     projector.Projection().Print(buf)
     actual = buf.getvalue()
     self.assertEqual("""\
-   a : (2, UNORDERED, 'Time', left, 3, [map().iso()])
-   b : (1, UNORDERED, None, left, None, None)
-     x : (2, 1, 'X', left, None, None)
-   c : (2, UNORDERED, 'C', center, 3, [fun().iso()])
+   a : (2, UNORDERED, 'Time', left, 3, False, [map().iso()])
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 1, 'X', left, None, False, None)
+   c : (2, UNORDERED, 'C', center, 3, False, [fun().iso()])
 """, actual)
 
   def testPrintDefaultsNoSymbols(self):
@@ -1167,13 +1175,13 @@ class ResourceProjectorAttrTest(test_case.Base):
     projector.Projection().Print(buf)
     actual = buf.getvalue()
     self.assertEqual("""\
-   a : (2, 2, 'Time', right, 3, [iso().lower()])
-   b : (1, UNORDERED, None, left, None, None)
-     x : (2, 1, 'B_X', left, 1, [lower()])
-   c : (2, UNORDERED, 'C', center, None, None)
-   x : (0, 3, 'X', left, None, None)
-   y : (0, UNORDERED, 'Y', right, None, None)
-   z : (0, UNORDERED, 'ZZZ', left, None, None)
+   a : (2, 2, 'Time', right, 3, False, [iso().lower()])
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 1, 'B_X', left, 1, False, [lower()])
+   c : (2, UNORDERED, 'C', center, None, False, None)
+   x : (0, 3, 'X', left, None, False, None)
+   y : (0, UNORDERED, 'Y', right, None, False, None)
+   z : (0, UNORDERED, 'ZZZ', left, None, False, None)
 """, actual)
 
   def testDefaultAlignments(self):
@@ -1271,12 +1279,12 @@ class ResourceProjectorAttrTest(test_case.Base):
     projector.Projection().Print(buf)
     actual = buf.getvalue()
     self.assertEqual("""\
-   a : (2, 102, 'A', left, None, None)
-   b : (1, UNORDERED, None, left, None, None)
-     x : (2, 101, 'X', left, None, None)
-   x : (2, 103, 'X', left, None, None)
-   y : (2, UNORDERED, 'Y', right, None, None)
-   z : (2, UNORDERED, 'ZZZ', left, None, None)
+   a : (2, 102, 'A', left, None, False, None)
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 101, 'X', left, None, False, None)
+   x : (2, 103, 'X', left, None, False, None)
+   y : (2, UNORDERED, 'Y', right, None, False, None)
+   z : (2, UNORDERED, 'ZZZ', left, None, False, None)
 """, actual)
 
   def testPrintKeyAttributesOnly(self):
@@ -1288,13 +1296,13 @@ class ResourceProjectorAttrTest(test_case.Base):
     projector.Projection().Print(buf)
     actual = buf.getvalue()
     self.assertEqual("""\
-   a : (2, 1, 'Time', right, None, None)
-   b : (1, UNORDERED, None, left, None, None)
-     x : (2, 2, 'B_X', left, None, None)
-   c : (0, UNORDERED, 'C', center, None, None)
-   x : (2, 4, 'X', left, None, None)
-   y : (2, UNORDERED, 'Y', right, None, None)
-   z : (2, UNORDERED, 'ZZZ', left, None, None)
+   a : (2, 1, 'Time', right, None, False, None)
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 2, 'B_X', left, None, False, None)
+   c : (0, UNORDERED, 'C', center, None, False, None)
+   x : (2, 4, 'X', left, None, False, None)
+   y : (2, UNORDERED, 'Y', right, None, False, None)
+   z : (2, UNORDERED, 'ZZZ', left, None, False, None)
 """, actual)
 
   def testPrintKeyAttributesOnlyUsingAliases(self):
@@ -1309,12 +1317,12 @@ class ResourceProjectorAttrTest(test_case.Base):
     projector.Projection().Print(buf)
     actual = buf.getvalue()
     self.assertEqual("""\
-   a : (2, 1, 'Time', right, None, None)
-   b : (1, UNORDERED, None, left, None, None)
-     x : (2, 3, 'B_X', left, None, None)
-   x : (2, 5, 'X', center, None, None)
-   y : (2, UNORDERED, 'Y', right, None, None)
-   z : (2, 2, 'ZZZ', left, None, None)
+   a : (2, 1, 'Time', right, None, False, None)
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 3, 'B_X', left, None, False, None)
+   x : (2, 5, 'X', center, None, False, None)
+   y : (2, UNORDERED, 'Y', right, None, False, None)
+   z : (2, 2, 'ZZZ', left, None, False, None)
 """, actual)
 
   def testPrintKeyAttributesOnlyWithAlignChange(self):
@@ -1326,32 +1334,32 @@ class ResourceProjectorAttrTest(test_case.Base):
     projector.Projection().Print(buf)
     actual = buf.getvalue()
     self.assertEqual("""\
-   a : (2, 1, '', left, None, None)
-   b : (1, UNORDERED, None, left, None, None)
-     x : (2, 2, 'B_X', left, None, None)
-   c : (0, UNORDERED, 'C', center, None, None)
-   x : (2, 4, 'X', left, None, None)
-   y : (2, UNORDERED, 'Y', right, None, None)
-   z : (2, UNORDERED, 'ZZZ', left, None, None)
+   a : (2, 1, '', left, None, False, None)
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 2, 'B_X', left, None, False, None)
+   c : (0, UNORDERED, 'C', center, None, False, None)
+   x : (2, 4, 'X', left, None, False, None)
+   y : (2, UNORDERED, 'Y', right, None, False, None)
+   z : (2, UNORDERED, 'ZZZ', left, None, False, None)
 """, actual)
 
   def testPrintKeyAttributesOnlyWithBooleanSet(self):
 
     projector = resource_projector.Compile(
         '(a, b, c, d, f)'
-        ':(a:optional, b:reverse, c:optional:reverse, d:format=yaml, f:wrap)'
+        ':(a:optional, b:reverse, c:optional:reverse, d:format=yaml, f:wrap=15)'
         ':(a:sort=1, e:sort=2)'
     )
     buf = io.StringIO()
     projector.Projection().Print(buf)
     actual = buf.getvalue()
     self.assertEqual("""\
-   a : (2, 1, 'A', left, None, None, [optional])
-   b : (2, UNORDERED, 'B', left, None, None, [reverse])
-   c : (2, UNORDERED, 'C', left, None, None, [optional|reverse])
-   d : (2, UNORDERED, 'D', left, None, None, [subformat])
-   e : (2, 2, 'E', left, None, None, [hidden])
-   f : (2, UNORDERED, 'F', left, None, None, [wrap])
+   a : (2, 1, 'A', left, None, False, None, [optional])
+   b : (2, UNORDERED, 'B', left, None, False, None, [reverse])
+   c : (2, UNORDERED, 'C', left, None, False, None, [optional|reverse])
+   d : (2, UNORDERED, 'D', left, None, False, None, [subformat])
+   e : (2, 2, 'E', left, None, False, None, [hidden])
+   f : (2, UNORDERED, 'F', left, None, 15, None)
 """, actual)
 
   def testPrintKeyAttributesWithDuplicateColumns(self):
@@ -1366,7 +1374,7 @@ class ResourceProjectorAttrTest(test_case.Base):
     projector.Projection().Print(buf)
     actual = buf.getvalue()
     self.assertEqual("""\
-   a : (2, 102, '#1', left, 2, [id(1)])
+   a : (2, 102, '#1', left, 2, False, [id(1)])
 """, actual)
 
 

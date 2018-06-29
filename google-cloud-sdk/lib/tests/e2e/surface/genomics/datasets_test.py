@@ -14,6 +14,8 @@
 
 """Integration test for 'genomics datasets' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import arg_parsers
@@ -42,8 +44,8 @@ class DatasetsIntegrationTest(base.GenomicsIntegrationTest):
     return failed_cleanup_list
 
   def testCreateUpdateDescribe(self):
-    name = e2e_utils.GetResourceNameGenerator(
-        prefix='genomics-integration').next()
+    name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='genomics-integration'))
     result = self.RunGenomics(['datasets', 'create', '--name', name])
 
     try:

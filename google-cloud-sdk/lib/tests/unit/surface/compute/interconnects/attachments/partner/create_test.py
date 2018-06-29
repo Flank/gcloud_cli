@@ -142,3 +142,21 @@ class InterconnectAttachmentsPartnerCreateTest(test_base.BaseTest):
            [3] region-3
           Please enter your numeric choice:  """))
     self.AssertOutputEquals('')
+
+
+class InterconnectAttachmentsPartnerCreateBetaTest(
+    InterconnectAttachmentsPartnerCreateTest):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.message_version = self.compute_beta
+
+
+class InterconnectAttachmentsPartnerCreateGaTest(
+    InterconnectAttachmentsPartnerCreateBetaTest):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.GA
+    self.SelectApi('v1')
+    self.message_version = self.compute_v1

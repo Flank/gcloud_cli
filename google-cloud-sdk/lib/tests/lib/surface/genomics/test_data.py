@@ -14,6 +14,8 @@
 
 """Testing resources for genomics commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 
 GENOMICS_V1_MESSAGES = apis.GetMessagesModule('genomics', 'v1')
@@ -28,6 +30,6 @@ TEST_IAM_POLICY = GENOMICS_V1_MESSAGES.Policy(
             role='roles/editor'),
         GENOMICS_V1_MESSAGES.Binding(
             members=['user:test_owner@test.com'],
-            role=u'roles/owner')],
-    etag='<< Unique versioning etag bytefield >>',
+            role='roles/owner')],
+    etag=b'<< Unique versioning etag bytefield >>',
     version=0)

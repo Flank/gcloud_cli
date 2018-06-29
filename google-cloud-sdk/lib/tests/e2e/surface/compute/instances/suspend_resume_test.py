@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for suspending and resuming instances."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -35,7 +37,7 @@ class SuspendResumeTest(e2e_test_base.BaseTest):
   def GetInstanceName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up.
-    name = e2e_utils.GetResourceNameGenerator(prefix='compute-suspend').next()
+    name = next(e2e_utils.GetResourceNameGenerator(prefix='compute-suspend'))
     self.instance_names_used.append(name)
     return name
 

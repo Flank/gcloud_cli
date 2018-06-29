@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for stopping and starting instances."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from tests.lib import e2e_utils
@@ -32,8 +34,8 @@ class StopStartTest(e2e_test_base.BaseTest):
   def GetInstanceName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up
-    self.instance_name = e2e_utils.GetResourceNameGenerator(
-        prefix='compute-stopstart').next()
+    self.instance_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='compute-stopstart'))
     self.instance_names_used.append(self.instance_name)
 
   def testInstanceStopStart(self):

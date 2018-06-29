@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.compute.csek_utils."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.compute import csek_utils
@@ -61,7 +63,7 @@ class CsekKeyUtilsTest(sdk_test_base.SdkBase):
   def testParseFailEmptyString(self):
     with self.assertRaisesRegex(
         core_exceptions.Error,
-        'No JSON object could be decoded'):
+        '(No JSON object could be decoded|Expecting value.*)'):
       csek_utils.CsekKeyStore._ParseAndValidate('')
 
   def testParseFailNotArray(self):

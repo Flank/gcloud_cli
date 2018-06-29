@@ -13,6 +13,8 @@
 # limitations under the License.
 """Unit test base for help search."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import cli_tree
 from googlecloudsdk.command_lib.search_help import lookup
 from tests.lib import calliope_test_base

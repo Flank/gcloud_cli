@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.firebase.test import arg_file
@@ -23,6 +25,7 @@ from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import fake_args
 from tests.lib.surface.firebase.test.android import unit_base
+import six
 
 GOOD_ARGS = os.path.join(unit_base.TEST_DATA_PATH, 'good_args')
 BAD_ARGS = os.path.join(unit_base.TEST_DATA_PATH, 'bad_args')
@@ -53,7 +56,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     # Args merged from GOOD_ARGS file
     self.assertEqual(args.type, 'instrumentation')
     self.assertEqual(args.test, 'startrek.apk')
-    self.assertItemsEqual(args.locales, ['klingon', 'romulan'])
+    self.assertEquals(sorted(args.locales), sorted(['klingon', 'romulan']))
     self.assertEqual(args.max_steps, 333)
     self.assertEqual(args.results_dir, 'my/results/dir')
     self.assertEqual(args.robo_directives, {
@@ -83,21 +86,23 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-misspell')
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       PrepareAndroidArgs(args)
-    self.assertIn("'robot' is not a valid test type.", unicode(e.exception))
+    self.assertIn("'robot' is not a valid test type.",
+                  six.text_type(e.exception))
 
   def testType_IntIsInvalid(self):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-int')
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       PrepareAndroidArgs(args)
-    self.assertIn('Invalid value for [type]:', unicode(e.exception))
-    self.assertIn("'42' is not a valid test type.", unicode(e.exception))
+    self.assertIn('Invalid value for [type]:', six.text_type(e.exception))
+    self.assertIn("'42' is not a valid test type.", six.text_type(e.exception))
 
   def testType_BoolIsInvalid(self):
     args = self.NewTestArgs(argspec=TEST_TYPES + ':type-bool')
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       PrepareAndroidArgs(args)
-    self.assertIn('Invalid value for [type]:', unicode(e.exception))
-    self.assertIn("'True' is not a valid test type.", unicode(e.exception))
+    self.assertIn('Invalid value for [type]:', six.text_type(e.exception))
+    self.assertIn("'True' is not a valid test type.",
+                  six.text_type(e.exception))
 
   # Integer arg validation tests
 
@@ -115,14 +120,14 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':int-string',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [max-depth]: 2', msg)
 
   def testIntegers_PositiveParamIsZero(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':not-positive',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [max-depth]:', msg)
     self.assertIn('Value must be greater than or equal to 1; received: 0', msg)
 
@@ -130,7 +135,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':delay-neg1',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [max-steps]:', msg)
     self.assertIn('Value must be greater than or equal to 0; received: -1', msg)
 
@@ -138,28 +143,29 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':max-depth-10x',
                                   self.android_args_set)
-    self.assertEqual('Invalid value for [max-depth]: 10x', unicode(e.exception))
+    self.assertEqual('Invalid value for [max-depth]: 10x',
+                     six.text_type(e.exception))
 
   def testIntegers_InvalidNumberWithComma(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':comma-steps',
                                   self.android_args_set)
     self.assertEqual('Invalid value for [max-steps]: 123,456',
-                     unicode(e.exception))
+                     six.text_type(e.exception))
 
   def testIntegers_InvalidFloatNumber(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':float-steps',
                                   self.android_args_set)
     self.assertEqual('Invalid value for [max-steps]: 12.34',
-                     unicode(e.exception))
+                     six.text_type(e.exception))
 
   def testIntegers_InvalidNumberList(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':list-steps',
                                   self.android_args_set)
     self.assertEqual('Invalid value for [max-steps]: [1234]',
-                     unicode(e.exception))
+                     six.text_type(e.exception))
 
   # Various int-list arg validation tests
 
@@ -177,7 +183,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-zero',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-numbers]:', msg)
     self.assertIn('Value must be greater than or equal to 1; received: 0', msg)
 
@@ -185,7 +191,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-neg',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-numbers]:', msg)
     self.assertIn('must be greater than or equal to 1; received: -1024', msg)
 
@@ -193,7 +199,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-neg-in-list',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-numbers]:', msg)
     self.assertIn('must be greater than or equal to 1; received: -1', msg)
 
@@ -201,28 +207,28 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-float',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-numbers]: 3.14', msg)
 
   def testIntList_InvalidSingleString(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-str',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-numbers]: 1a', msg)
 
   def testIntList_InvalidListOfStrings(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-str-list',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-numbers]: 1', msg)
 
   def testIntList_InvalidDictValue(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INTEGERS + ':scenario-dict',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-numbers]: {', msg)
     self.assertIn("'foo'", msg)
 
@@ -274,14 +280,14 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
       arg_file.GetArgsFromArgFile(STR_LISTS + ':ori-vert',
                                   self.android_args_set)
     self.assertEqual("'vert' is not a valid device orientation",
-                     unicode(e.exception))
+                     six.text_type(e.exception))
 
   def testOrientationList_InvalidNameInList(self):
     with self.assertRaises(exceptions.OrientationNotFoundError) as e:
       arg_file.GetArgsFromArgFile(STR_LISTS + ':ori-horiz',
                                   self.android_args_set)
     self.assertEqual("'horiz' is not a valid device orientation",
-                     unicode(e.exception))
+                     six.text_type(e.exception))
 
   def testOrientationList_DuplicateCase1(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
@@ -289,7 +295,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
                                   self.android_args_set)
     self.assertEqual(
         'Invalid value for [orientations]: orientations may not be repeated.',
-        unicode(e.exception))
+        six.text_type(e.exception))
 
   def testOrientationList_DuplicateCase2(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
@@ -297,14 +303,14 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
                                   self.android_args_set)
     self.assertEqual(
         'Invalid value for [orientations]: orientations may not be repeated.',
-        unicode(e.exception))
+        six.text_type(e.exception))
 
   def testDeviceIdList_NestedList(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(STR_LISTS + ':dev-nestedlist',
                                   self.android_args_set)
     self.assertEqual("Invalid value for [device-ids]: ['Nexus6', 'Nexus7']",
-                     unicode(e.exception))
+                     six.text_type(e.exception))
 
   def testScenarioLabels_ValidLabelList(self):
     args = arg_file.GetArgsFromArgFile(STR_LISTS + ':labels-good',
@@ -315,7 +321,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(STR_LISTS + ':labels-dict',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-labels]: {', msg)
     self.assertIn("'label1': 'foo'", msg)
 
@@ -323,7 +329,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(STR_LISTS + ':labels-nested-list',
                                   self.android_args_set)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [scenario-labels]:', msg)
     self.assertIn("['label2', 'label3']", msg)
 
@@ -508,22 +514,22 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
   def testDevice_InvalidSparseMatrix_1(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse1', self.android_args_set)
-    self.assertIn('Invalid value for [device]:', unicode(e.exception))
+    self.assertIn('Invalid value for [device]:', six.text_type(e.exception))
 
   def testDevice_InvalidSparseMatrix_2(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse2', self.android_args_set)
-    self.assertIn('Invalid value for [device]:', unicode(e.exception))
+    self.assertIn('Invalid value for [device]:', six.text_type(e.exception))
 
   def testDevice_InvalidSparseMatrix_3(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse3', self.android_args_set)
-    self.assertIn('Invalid value for [model]:', unicode(e.exception))
+    self.assertIn('Invalid value for [model]:', six.text_type(e.exception))
 
   def testDevice_InvalidSparseMatrix_4(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':sparse4', self.android_args_set)
-    self.assertIn('Invalid value for [model]:', unicode(e.exception))
+    self.assertIn('Invalid value for [model]:', six.text_type(e.exception))
 
   # Tests of include: keyword
 
@@ -555,28 +561,28 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     with self.assertRaises(calliope_exceptions.BadFileException) as e:
       arg_file.GetArgsFromArgFile(INCLUDES + ':incl-int', self.android_args_set)
     self.assertIn('Could not find argument group [1] in argument file.',
-                  unicode(e.exception))
+                  six.text_type(e.exception))
 
   def testInclude_GroupNameIsBool(self):
     with self.assertRaises(calliope_exceptions.BadFileException) as e:
       arg_file.GetArgsFromArgFile(INCLUDES + ':incl-bool',
                                   self.android_args_set)
     self.assertIn('Could not find argument group [False] in argument file.',
-                  unicode(e.exception))
+                  six.text_type(e.exception))
 
   def testInclude_GroupIsNestedList(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(INCLUDES + ':incl-nested',
                                   self.android_args_set)
     self.assertEqual("Invalid value for [include]: ['group3', 'group4']",
-                     unicode(e.exception))
+                     six.text_type(e.exception))
 
   def testInclude_GroupNameIsMissing(self):
     with self.assertRaises(calliope_exceptions.BadFileException) as e:
       arg_file.GetArgsFromArgFile(INCLUDES + ':incl-missing',
                                   self.android_args_set)
     self.assertIn('Could not find argument group [missing] in argument file.',
-                  unicode(e.exception))
+                  six.text_type(e.exception))
 
   def testInclude_GroupNameIsSelf(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
@@ -584,7 +590,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
                                   self.android_args_set)
     self.assertIn(
         '[include]: Detected cyclic reference to arg group [incl-self]',
-        unicode(e.exception))
+        six.text_type(e.exception))
 
   def testInclude_FormsAGraphCycle(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
@@ -592,7 +598,7 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
                                   self.android_args_set)
     self.assertIn(
         '[include]: Detected cyclic reference to arg group [incl-cycle-a]',
-        unicode(e.exception))
+        six.text_type(e.exception))
 
 
 def PrepareAndroidArgs(args):

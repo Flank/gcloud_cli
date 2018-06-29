@@ -1,0 +1,57 @@
+NAME
+    gcloud beta compute sole-tenancy node-groups update - updates a Google
+        Compute Engine node group
+
+SYNOPSIS
+    gcloud beta compute sole-tenancy node-groups update NAME
+        [--node-template=NODE_TEMPLATE] [--zone=ZONE]
+        [--add-nodes=ADD_NODES | --delete-nodes=[NODE,...]]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Updates a Google Compute Engine node group.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the node group to operate on.
+
+FLAGS
+     --node-template=NODE_TEMPLATE
+        The name of the node template resource to be set for this node group.
+
+     --zone=ZONE
+        The zone of the node group to operate on. If not specified and the
+        compute/zone property isn't set, you may be prompted to select a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+     At most one of these may be specified:
+
+       --add-nodes=ADD_NODES
+          The number of nodes to add to the node group.
+
+       --delete-nodes=[NODE,...]
+          The names of the nodes to remove from the group.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

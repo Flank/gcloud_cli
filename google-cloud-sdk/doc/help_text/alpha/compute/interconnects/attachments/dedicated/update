@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute interconnects attachments dedicated update NAME
-        [--admin-enabled] [--description=DESCRIPTION] [--region=REGION]
+        [--description=DESCRIPTION] [--enable-admin] [--region=REGION]
         [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -19,13 +19,13 @@ POSITIONAL ARGUMENTS
         Name of the interconnect attachment to patch.
 
 FLAGS
-     --admin-enabled
-        Administrative status of the interconnect attachment. When this is
-        enabled, the attachment is operational and will carry traffic. Use
-        --no-admin-enabled to disable it.
-
      --description=DESCRIPTION
         Human-readable plain-text description of attachment.
+
+     --enable-admin
+        Administrative status of the interconnect attachment. When this is
+        enabled, the attachment is operational and will carry traffic. Use
+        --no-enable-admin to disable it.
 
      --region=REGION
         The region of the interconnect attachment to patch. If not specified,
@@ -50,6 +50,11 @@ FLAGS
      --update-labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to update. If a label exists its value
         is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      At most one of these may be specified:
 
@@ -81,7 +86,8 @@ NOTES
     users of ALPHA commands and flags need to apply for access, agree to
     applicable terms, and have their projects whitelisted. Contact Google or
     sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. This variant is also available:
+    https://cloud.google.com/products/. These variants are also available:
 
+        $ gcloud compute interconnects attachments dedicated update
         $ gcloud beta compute interconnects attachments dedicated update
 

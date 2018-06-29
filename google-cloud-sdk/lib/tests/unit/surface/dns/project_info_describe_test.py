@@ -14,6 +14,8 @@
 
 """Tests that exercise the 'gcloud dns project-info describe' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.dns import base
 
@@ -23,10 +25,10 @@ class ProjectInfoDescribeTest(base.DnsMockTest):
   def testDescribe(self):
     test_project = self.messages.Project(
         id=self.Project(),
-        kind=u'dns#project',
+        kind='dns#project',
         number=1234567,
         quota=self.messages.Quota(
-            kind=u'dns#quota',
+            kind='dns#quota',
             managedZones=100,
             resourceRecordsPerRrset=20,
             rrsetAdditionsPerChange=100,
@@ -61,10 +63,10 @@ class ProjectInfoDescribeBetaTest(base.DnsMockBetaTest):
   def testDescribe(self):
     test_project = self.messages_beta.Project(
         id=self.Project(),
-        kind=u'dns#project',
+        kind='dns#project',
         number=1234567,
         quota=self.messages_beta.Quota(
-            kind=u'dns#quota',
+            kind='dns#quota',
             managedZones=100,
             resourceRecordsPerRrset=20,
             rrsetAdditionsPerChange=100,

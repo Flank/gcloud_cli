@@ -11,7 +11,7 @@ gcloud alpha compute tpus create \- create a new Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-preemptible\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -29,8 +29,9 @@ gcloud alpha compute tpus create \- create a new Cloud TPU
 Tpu resource \- The Cloud TPU you want to create. The arguments in this group
 can be used to specify the attributes of this resource. (NOTE) Some attributes
 are not given arguments in this group but can be set in other ways. To set the
-[project] attribute: Set the property [core/project] or provide the flag
-[\-\-project] on the command line. This must be specified.
+[project] attribute: provide the flag [tpu] on the command line with a fully
+specified name; provide the flag [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -96,6 +97,14 @@ operation to complete.
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Specifies a text description of the TPU.
 
+.TP 2m
+\fB\-\-preemptible\fR
+If provided, the TPU will be preemptible and time\-limited. It may be preempted
+to free up resources for standard TPUs, and will only be able to run for a
+limited amount of time.
+
+Preemptible TPUs cannot be restarted.
+
 
 .RE
 .sp
@@ -111,8 +120,8 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBtpu/v1alpha1\fR API. The full documentation for this
-API can be found at: https://cloud.google.com/tpu/
+This command uses the \fBtpu/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/tpu/
 
 
 

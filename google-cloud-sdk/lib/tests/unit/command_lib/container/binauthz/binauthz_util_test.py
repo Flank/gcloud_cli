@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for command_lib.binauth.binauthz_command_util."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.container.binauthz import binauthz_util as binauthz_command_util
 from tests.lib import parameterized
 from tests.lib import test_case

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -29,8 +31,9 @@ class ListsTest(base.SqlMockTestBeta):
         self.messages.SqlInstancesListRequest(
             maxResults=100, project=self.Project()),
         self.messages.InstancesListResponse(
-            kind=u'sql#instancesList',
-            items=[],))
+            kind='sql#instancesList',
+            items=[],
+        ))
     self.Run('sql instances list')
     self.AssertErrContains("""Listed 0 items.""", normalize_space=True)
 
@@ -104,73 +107,80 @@ backupless-instance2 MYSQL_5_5        us-central D1   -       RUNNABLE
     self.mocked_client.instances.List.Expect(
         self.messages.SqlInstancesListRequest(
             maxResults=100,
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.InstancesListResponse(
             # pylint:disable=line-too-long
             items=[
                 self.messages.DatabaseInstance(
                     currentDiskSize=52690837,
-                    databaseVersion=u'MYSQL_5_5',
-                    etag=u'"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
-                    name=u'testinstance',
+                    databaseVersion='MYSQL_5_5',
+                    etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
+                    name='testinstance',
                     ipAddresses=[],
-                    ipv6Address=u'2001:4860:4864:1:df7c:6a7a:d107:ab9d',
-                    kind=u'sql#instance',
+                    ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:ab9d',
+                    kind='sql#instance',
                     maxDiskSize=268435456000,
                     project=self.Project(),
-                    region=u'us-central',
+                    region='us-central',
                     serverCaCert=None,
                     settings=self.messages.Settings(
-                        activationPolicy=u'ON_DEMAND',
+                        activationPolicy='ON_DEMAND',
                         authorizedGaeApplications=[],
                         backupConfiguration=self.messages.BackupConfiguration(
                             binaryLogEnabled=False,
                             enabled=True,
-                            kind=u'sql#backupConfiguration',
-                            startTime=u'11:54'),
+                            kind='sql#backupConfiguration',
+                            startTime='11:54'),
                         databaseFlags=[],
                         ipConfiguration=self.messages.IpConfiguration(
                             authorizedNetworks=[],
                             ipv4Enabled=False,
-                            requireSsl=None,),
-                        kind=u'sql#settings',
+                            requireSsl=None,
+                        ),
+                        kind='sql#settings',
                         userLabels=self.messages.Settings.UserLabelsValue(
                             additionalProperties=[
                                 self.messages.Settings.UserLabelsValue.
                                 AdditionalProperty(
                                     key='bar',
-                                    value='value',),
+                                    value='value',
+                                ),
                                 self.messages.Settings.UserLabelsValue.
                                 AdditionalProperty(
                                     key='baz',
-                                    value='qux',),
+                                    value='qux',
+                                ),
                                 self.messages.Settings.UserLabelsValue.
                                 AdditionalProperty(
                                     key='foo',
-                                    value='bar',),
+                                    value='bar',
+                                ),
                             ],),
                         locationPreference=None,
-                        pricingPlan=u'PER_USE',
-                        replicationType=u'SYNCHRONOUS',
+                        pricingPlan='PER_USE',
+                        replicationType='SYNCHRONOUS',
                         settingsVersion=1,
-                        tier=u'D0',),
-                    state=u'RUNNABLE',
-                    instanceType=u'CLOUD_SQL_INSTANCE',),
+                        tier='D0',
+                    ),
+                    state='RUNNABLE',
+                    instanceType='CLOUD_SQL_INSTANCE',
+                ),
                 self.messages.DatabaseInstance(
                     currentDiskSize=287571860,
-                    databaseVersion=u'MYSQL_5_5',
-                    etag=u'"yGhHGJDUk5hWK-gppo_8C-KD7iU/QWyUhySo75iWP2WEOzCGc"',
-                    name=u'backupless-instance1',
+                    databaseVersion='MYSQL_5_5',
+                    etag='"yGhHGJDUk5hWK-gppo_8C-KD7iU/QWyUhySo75iWP2WEOzCGc"',
+                    name='backupless-instance1',
                     ipAddresses=[],
-                    ipv6Address=u'2001:4860:4864:1:df7c:6a7a:d107:aaaa',
-                    kind=u'sql#instance',
+                    ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:aaaa',
+                    kind='sql#instance',
                     maxDiskSize=268435456000,
                     project=self.Project(),
-                    region=u'us-central',
+                    region='us-central',
                     serverCaCert=self.messages.SslCert(
-                        cert=u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAg',
-                        certSerialNumber=u'0',
-                        commonName=u'C=US,O=Google\\, Inc,CN=Google Cloud SQL ',
+                        cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAg',
+                        certSerialNumber='0',
+                        commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL ',
                         createTime=datetime.datetime(
                             2014,
                             8,
@@ -191,69 +201,76 @@ backupless-instance2 MYSQL_5_5        us-central D1   -       RUNNABLE
                             329000,
                             tzinfo=protorpc_util.TimeZoneOffset(
                                 datetime.timedelta(0))),
-                        instance=u'backupless-instance1',
-                        kind=u'sql#sslCert',
-                        sha1Fingerprint=u'70bd50bd905e822ce428b8a1345ffc68d5aa',
+                        instance='backupless-instance1',
+                        kind='sql#sslCert',
+                        sha1Fingerprint='70bd50bd905e822ce428b8a1345ffc68d5aa',
                     ),
                     settings=self.messages.Settings(
-                        activationPolicy=u'ON_DEMAND',
+                        activationPolicy='ON_DEMAND',
                         authorizedGaeApplications=[],
                         backupConfiguration=self.messages.BackupConfiguration(
                             binaryLogEnabled=True,
                             enabled=True,
-                            kind=u'sql#backupConfiguration',
-                            startTime=u'12:00'),
+                            kind='sql#backupConfiguration',
+                            startTime='12:00'),
                         databaseFlags=[],
                         ipConfiguration=self.messages.IpConfiguration(
                             authorizedNetworks=[],
                             ipv4Enabled=False,
-                            requireSsl=None,),
-                        kind=u'sql#settings',
+                            requireSsl=None,
+                        ),
+                        kind='sql#settings',
                         userLabels=self.messages.Settings.UserLabelsValue(
                             additionalProperties=[
                                 self.messages.Settings.UserLabelsValue.
                                 AdditionalProperty(
                                     key='bar',
-                                    value='another',),
+                                    value='another',
+                                ),
                                 self.messages.Settings.UserLabelsValue.
                                 AdditionalProperty(
                                     key='foo',
-                                    value='bar',),
+                                    value='bar',
+                                ),
                             ],),
                         locationPreference=None,
-                        pricingPlan=u'PER_USE',
-                        replicationType=u'SYNCHRONOUS',
+                        pricingPlan='PER_USE',
+                        replicationType='SYNCHRONOUS',
                         settingsVersion=1,
-                        tier=u'D1',),
-                    state=u'RUNNABLE',
-                    instanceType=u'CLOUD_SQL_INSTANCE',),
+                        tier='D1',
+                    ),
+                    state='RUNNABLE',
+                    instanceType='CLOUD_SQL_INSTANCE',
+                ),
             ],
-            kind=u'sql#instancesList',
-            nextPageToken='100',))
+            kind='sql#instancesList',
+            nextPageToken='100',
+        ))
 
     self.mocked_client.instances.List.Expect(
         self.messages.SqlInstancesListRequest(
-            pageToken=u'100',
+            pageToken='100',
             project=self.Project(),
-            maxResults=100,),
+            maxResults=100,
+        ),
         self.messages.InstancesListResponse(
             # pylint:disable=line-too-long
             items=[
                 self.messages.DatabaseInstance(
                     currentDiskSize=287571860,
-                    databaseVersion=u'MYSQL_5_5',
-                    etag=u'"yGhHGJDUk5hWK-gppo_8C-KD7iU/nbMj8WWUtdJPpSjOHUxEh"',
-                    name=u'backupless-instance2',
+                    databaseVersion='MYSQL_5_5',
+                    etag='"yGhHGJDUk5hWK-gppo_8C-KD7iU/nbMj8WWUtdJPpSjOHUxEh"',
+                    name='backupless-instance2',
                     ipAddresses=[],
-                    ipv6Address=u'2001:4860:4864:1:df7c:6a7a:d107:aaaa',
-                    kind=u'sql#instance',
+                    ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:aaaa',
+                    kind='sql#instance',
                     maxDiskSize=268435456000,
                     project=self.Project(),
-                    region=u'us-central',
+                    region='us-central',
                     serverCaCert=self.messages.SslCert(
-                        cert=u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAg',
-                        certSerialNumber=u'0',
-                        commonName=u'C=US,O=Google\\, Inc,CN=Google Cloud SQL ',
+                        cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAg',
+                        certSerialNumber='0',
+                        commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL ',
                         createTime=datetime.datetime(
                             2014,
                             8,
@@ -274,49 +291,56 @@ backupless-instance2 MYSQL_5_5        us-central D1   -       RUNNABLE
                             788000,
                             tzinfo=protorpc_util.TimeZoneOffset(
                                 datetime.timedelta(0))),
-                        instance=u'backupless-instance',
-                        kind=u'sql#sslCert',
-                        sha1Fingerprint=u'a691db45f7dee0827650fd2eb277d2ca81b9',
+                        instance='backupless-instance',
+                        kind='sql#sslCert',
+                        sha1Fingerprint='a691db45f7dee0827650fd2eb277d2ca81b9',
                     ),
                     settings=self.messages.Settings(
-                        activationPolicy=u'ON_DEMAND',
+                        activationPolicy='ON_DEMAND',
                         authorizedGaeApplications=[],
                         backupConfiguration=self.messages.BackupConfiguration(
                             binaryLogEnabled=False,
                             enabled=False,
-                            kind=u'sql#backupConfiguration',
-                            startTime=u'00:00'),
+                            kind='sql#backupConfiguration',
+                            startTime='00:00'),
                         databaseFlags=[],
                         databaseReplicationEnabled=None,
                         ipConfiguration=self.messages.IpConfiguration(
                             authorizedNetworks=[],
                             ipv4Enabled=False,
-                            requireSsl=None,),
-                        kind=u'sql#settings',
+                            requireSsl=None,
+                        ),
+                        kind='sql#settings',
                         userLabels=self.messages.Settings.UserLabelsValue(
                             additionalProperties=[
                                 self.messages.Settings.UserLabelsValue.
                                 AdditionalProperty(
                                     key='bar',
-                                    value='athird',),
+                                    value='athird',
+                                ),
                                 self.messages.Settings.UserLabelsValue.
                                 AdditionalProperty(
                                     key='baz',
-                                    value='qux',),
+                                    value='qux',
+                                ),
                             ],),
                         locationPreference=self.messages.LocationPreference(
                             followGaeApplication=None,
-                            kind=u'sql#locationPreference',
-                            zone=None,),
-                        pricingPlan=u'PER_USE',
-                        replicationType=u'SYNCHRONOUS',
+                            kind='sql#locationPreference',
+                            zone=None,
+                        ),
+                        pricingPlan='PER_USE',
+                        replicationType='SYNCHRONOUS',
                         settingsVersion=1,
-                        tier=u'D1',),
-                    state=u'RUNNABLE',
-                    instanceType=u'CLOUD_SQL_INSTANCE',),
+                        tier='D1',
+                    ),
+                    state='RUNNABLE',
+                    instanceType='CLOUD_SQL_INSTANCE',
+                ),
             ],
-            kind=u'sql#instancesList',
-            nextPageToken=None,))
+            kind='sql#instancesList',
+            nextPageToken=None,
+        ))
 
     self.Run('sql instances list --format="table(name,labels.bar)"')
     self.AssertOutputContains(

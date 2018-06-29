@@ -86,8 +86,8 @@ class AndroidInstrumentationTest(_messages.Message):
       following benefits:  - No shared state  - Crashes are isolated  - Logs
       are scoped per test  See <https://developer.android.com/training/testing
       /junit-runner.html#using-android-test-orchestrator> for more information
-      about Android Test Orchestrator.  Optional, if empty, test will be run
-      without orchestrator.
+      about Android Test Orchestrator.  Optional. If not set, the test will be
+      run without the orchestrator.
 
   Fields:
     appApk: The APK for the application under test. Required
@@ -100,7 +100,7 @@ class AndroidInstrumentationTest(_messages.Message):
       state  - Crashes are isolated  - Logs are scoped per test  See
       <https://developer.android.com/training/testing/junit-runner.html#using-
       android-test-orchestrator> for more information about Android Test
-      Orchestrator.  Optional, if empty, test will be run without
+      Orchestrator.  Optional. If not set, the test will be run without the
       orchestrator.
     testApk: The APK containing the test code to be executed. Required
     testPackageId: The java package for the test to be executed. Optional,
@@ -121,14 +121,15 @@ class AndroidInstrumentationTest(_messages.Message):
     are isolated  - Logs are scoped per test  See
     <https://developer.android.com/training/testing/junit-runner.html#using-
     android-test-orchestrator> for more information about Android Test
-    Orchestrator.  Optional, if empty, test will be run without orchestrator.
+    Orchestrator.  Optional. If not set, the test will be run without the
+    orchestrator.
 
     Values:
-      ORCHESTRATOR_OPTION_UNSPECIFIED: This means that the server should
-        choose the mode. And test will be run without orchestrator. Using
-        orchestrator is highly encouraged because of all the benefits it
-        offers. And in the future, all instrumentation tests will be run with
-        orchestrator by default if preference unspecified.
+      ORCHESTRATOR_OPTION_UNSPECIFIED: Default value: the server will choose
+        the mode. Currently implies that the test will run without the
+        orchestrator. In the future, all instrumentation tests will be run
+        with the orchestrator. Using the orchestrator is highly encouraged
+        because of all the benefits it offers.
       USE_ORCHESTRATOR: Run test using orchestrator. ** Only compatible with
         AndroidJUnitRunner version 1.0 or higher! ** Recommended.
       DO_NOT_USE_ORCHESTRATOR: Run test without using orchestrator.
@@ -629,10 +630,12 @@ class IosDevice(_messages.Message):
       EnvironmentDiscoveryService to get supported options. Required
     iosVersionId: The id of the iOS major software version to be used. Use the
       EnvironmentDiscoveryService to get supported options. Required
-    locale: The locale the test device used for testing. Use the
-      EnvironmentDiscoveryService to get supported options. Required
-    orientation: How the device is oriented during the test. Use the
-      EnvironmentDiscoveryService to get supported options. Required
+    locale: The locale the test device used for testing (only "en" is
+      currently supported). Use the EnvironmentDiscoveryService to get
+      supported options (not yet implemented). Required
+    orientation: How the device is oriented during the test (only "portrait"
+      is currently supported). Use the EnvironmentDiscoveryService to get
+      supported options. (not yet implemented). Required
   """
 
   iosModelId = _messages.StringField(1)
@@ -718,14 +721,14 @@ class IosXcTest(_messages.Message):
   r"""A test of an iOS application that uses the XCTest framework. Xcode
   supports the option to "build for testing", which generates an .xctestrun
   file that contains a test specification (arguments, test methods, etc). This
-  test type accepts a zip file containing the .xctestrun file and its
-  corresponding Debug-iphoneos directory that contains all of the binaries
-  needed to run the tests.
+  test type accepts a zip file containing the .xctestrun file and the
+  corresponding contents of the Build/Products directory that contains all the
+  binaries needed to run the tests.
 
   Fields:
-    testsZip: The .zip containing the .xctestrun file and the Debug-iphoneos
-      directory from DerivedData/Build/Products. The .xctestrun file in this
-      zip is ignored if the xctestrun field is specified. Required
+    testsZip: The .zip containing the .xctestrun file and the contents of the
+      DerivedData/Build/Products directory. The .xctestrun file in this zip is
+      ignored if the xctestrun field is specified. Required
     xctestrun: An .xctestrun file that will override the .xctestrun file in
       the tests zip. Because the .xctestrun file contains environment
       variables along with test methods to run and/or ignore, this can be
@@ -815,6 +818,18 @@ class Orientation(_messages.Message):
   tags = _messages.StringField(3, repeated=True)
 
 
+class ProvidedSoftwareCatalog(_messages.Message):
+  r"""The currently provided software environment on the devices under test.
+
+  Fields:
+    orchestratorVersion: A string representing the current version of Android
+      Test Orchestrator that is provided by TestExecutionService. Example:
+      "1.0.2 beta"
+  """
+
+  orchestratorVersion = _messages.StringField(1)
+
+
 class RegularFile(_messages.Message):
   r"""A file or directory to install on the device before the test starts
 
@@ -871,7 +886,7 @@ class RoboDirective(_messages.Message):
       directive will be treated as a CLICK on the element matching the
       resource_name. Optional
     resourceName: The android resource name of the target UI element For
-      example,    in Java: R.string.foo    in xml: @string/foo Only the \u201cfoo\u201d
+      example,    in Java: R.string.foo    in xml: @string/foo Only the "foo"
       part is needed. Reference doc:
       https://developer.android.com/guide/topics/resources/accessing-
       resources.html Required
@@ -920,14 +935,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -963,17 +976,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 class StartActivityIntent(_messages.Message):
@@ -1019,11 +1030,14 @@ class TestEnvironmentCatalog(_messages.Message):
       Instrumentation Tests.
     iosDeviceCatalog: Supported iOS devices
     networkConfigurationCatalog: Supported network configurations
+    softwareCatalog: The software test environment provided by
+      TestExecutionService.
   """
 
   androidDeviceCatalog = _messages.MessageField('AndroidDeviceCatalog', 1)
   iosDeviceCatalog = _messages.MessageField('IosDeviceCatalog', 2)
   networkConfigurationCatalog = _messages.MessageField('NetworkConfigurationCatalog', 3)
+  softwareCatalog = _messages.MessageField('ProvidedSoftwareCatalog', 4)
 
 
 class TestExecution(_messages.Message):
@@ -1172,8 +1186,8 @@ class TestMatrix(_messages.Message):
       DEVICE_ADMIN_RECEIVER: Device administrator applications are not
         allowed.
       MALFORMED_XC_TEST_ZIP: The zipped XCTest was malformed. The zip did not
-        contain a single .xctestrun file alongside a Debug-iphoneos directory
-        containing the compiled artifacts for the test.
+        contain a single .xctestrun file and the contents of the
+        DerivedData/Build/Products directory.
       BUILT_FOR_IOS_SIMULATOR: The zipped XCTest was built for the iOS
         simulator rather than for a physical device.
       NO_TESTS_IN_XC_TEST_ZIP: The .xctestrun file did not specify any test
@@ -1182,7 +1196,7 @@ class TestMatrix(_messages.Message):
         the .xctestrun file specifies "UseDestinationArtifacts", which is
         disallowed.
       TEST_ONLY_APK: The APK is marked as "testOnly". NOT USED
-      MALFORMED_IPA: The input IPA could not be parsed.
+      MALFORMED_IPA: The input IPA could not be parsed. NOT USED
       NO_CODE_APK: APK contains no code. See also
         https://developer.android.com/guide/topics/manifest/application-
         element.html#code
@@ -1406,11 +1420,13 @@ class TestingTestEnvironmentCatalogGetRequest(_messages.Message):
       ANDROID: <no description>
       IOS: <no description>
       NETWORK_CONFIGURATION: <no description>
+      PROVIDED_SOFTWARE: <no description>
     """
     ENVIRONMENT_TYPE_UNSPECIFIED = 0
     ANDROID = 1
     IOS = 2
     NETWORK_CONFIGURATION = 3
+    PROVIDED_SOFTWARE = 4
 
   environmentType = _messages.EnumField('EnvironmentTypeValueValuesEnum', 1, required=True)
   projectId = _messages.StringField(2)

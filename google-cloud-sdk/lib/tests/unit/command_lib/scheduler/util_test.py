@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Cloud Scheduler Utilities."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 

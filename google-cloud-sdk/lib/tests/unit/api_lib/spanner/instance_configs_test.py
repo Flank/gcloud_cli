@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Spanner instance configs library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.spanner import instance_configs
 from googlecloudsdk.core import resources
 from tests.lib.surface.spanner import base
@@ -40,4 +42,4 @@ class InstanceConfigsClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstanceConfigsListRequest(
             parent='projects/'+self.Project(), pageSize=100),
         response=response)
-    self.assertItemsEqual(instance_configs.List(), config_list)
+    self.assertCountEqual(instance_configs.List(), config_list)

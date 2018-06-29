@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud compute networks subnets update NAME [--region=REGION]
-        [--add-secondary-ranges=PROPERTY=VALUE,[...]
+        [--add-secondary-ranges=PROPERTY=VALUE,[...] | --[no-]enable-flow-logs
           | --[no-]enable-private-ip-google-access
           | --remove-secondary-ranges=PROPERTY=VALUE,[...]]
         [GCLOUD_WIDE_FLAG ...]
@@ -47,6 +47,12 @@ FLAGS
 
           + RANGE_NAME - Name of the secondary range.
           + RANGE - IP range in CIDR format.
+
+         --[no-]enable-flow-logs
+            Enable/disable VPC flow logging for this subnet. More information
+            for VPC flow logs can be found at
+            https://cloud.google.com/vpc/docs/using-flow-logs. Use
+            --enable-flow-logs to enable and --no-enable-flow-logs to disable.
 
          --[no-]enable-private-ip-google-access
             Enable/disable access to Google Cloud APIs from this subnet for

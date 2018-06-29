@@ -11,7 +11,7 @@ gcloud beta compute tpus reimage \- reimages the OS on a Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute tpus reimage\fR (\fITPU_ID\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-version\fR=\fIVERSION\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute tpus reimage\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,15 +26,16 @@ gcloud beta compute tpus reimage \- reimages the OS on a Cloud TPU
 .RS 2m
 .TP 2m
 
-Tpu resource \- The Cloud TPU to reimage. The arguments in this group can be
-used to specify the attributes of this resource. (NOTE) Some attributes are not
-given arguments in this group but can be set in other ways. To set the [project]
-attribute: Set the property [core/project] or provide the flag [\-\-project] on
-the command line. This must be specified.
+Tpu resource \- The Cloud TPU you want to reimage. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the flag [tpu] on the command line with a fully
+specified name; provide the flag [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
-\fITPU_ID\fR
+\fITPU\fR
 The ID of the tpu or a fully qualified identifier for the tpu. This positional
 must be specified if any of the other arguments in this group are specified.
 
@@ -54,7 +55,20 @@ If not specified, will use \f5default\fR compute/zone.
 .RS 2m
 .TP 2m
 \fB\-\-version\fR=\fIVERSION\fR
-The Tensorflow version to Reimage Cloud TPU with.
+TensorFlow version for the TPU, such as \f51.6\fR. For a list of available
+TensorFlow versions please see https://www.tensorflow.org/versions/.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
 
 
 .RE
@@ -66,6 +80,13 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBtpu/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/tpu/
 
 
 

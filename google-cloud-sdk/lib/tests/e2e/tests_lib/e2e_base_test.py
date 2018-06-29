@@ -14,6 +14,8 @@
 
 """Tests for the e2e_base module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core.credentials import store
 from tests.lib import cli_test_base
 from tests.lib import e2e_base

@@ -14,6 +14,8 @@
 
 """Base class for instances tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
@@ -23,6 +25,7 @@ from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.app import api_test_util
+from six.moves import map
 
 
 class InstancesTestBase(cli_test_base.CliTestBase,
@@ -101,7 +104,7 @@ class InstancesTestBase(cli_test_base.CliTestBase,
     return instances_util.Instance(service, version, instance, instance_msg)
 
   def _ExpectListServicesCall(self, services):
-    services = map(self._MakeService, services)
+    services = list(map(self._MakeService, services))
     self.mocked_client.apps_services.List.Expect(
         request=self.messages.AppengineAppsServicesListRequest(
             parent=self._FormatApp(), pageSize=100),

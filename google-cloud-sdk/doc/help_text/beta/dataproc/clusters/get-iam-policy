@@ -2,7 +2,7 @@ NAME
     gcloud beta dataproc clusters get-iam-policy - get IAM policy for a cluster
 
 SYNOPSIS
-    gcloud beta dataproc clusters get-iam-policy NAME [--region=REGION]
+    gcloud beta dataproc clusters get-iam-policy CLUSTER [--region=REGION]
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -10,8 +10,8 @@ DESCRIPTION
     (BETA) Gets the IAM policy for a cluster, given a cluster name.
 
 POSITIONAL ARGUMENTS
-     NAME
-        The name of the cluster to retrieve the policy for.
+     CLUSTER
+        The id of the cluster to retrieve the policy for.
 
 FLAGS
      --region=REGION

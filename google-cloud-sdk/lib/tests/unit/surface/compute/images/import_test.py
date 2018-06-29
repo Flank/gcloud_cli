@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the images import subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_io
@@ -531,6 +533,23 @@ class ImagesCreateTest(daisy_test_base.DaisyBaseTest):
       self.Run("""
                compute images import --source-file {0} {1}
                """.format(self.source_image, self.destination_image))
+
+  def testTarGzFile(self):
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                name='my-project-daisy-bkt'),
+            project='my-project',
+        ),
+        response='foo',
+    )
+    with self.AssertRaisesToolExceptionRegexp(
+        '.+does not support compressed archives.+'):
+      self.Run("""
+               compute images import {0}
+               --data-disk
+               --source-file my-cool-file.tar.gz
+               """.format(self.image_name))
 
 if __name__ == '__main__':
   test_case.main()

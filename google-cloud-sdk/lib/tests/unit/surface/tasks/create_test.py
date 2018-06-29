@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for `gcloud tasks create`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from apitools.base.py import encoding
@@ -62,7 +64,7 @@ class CreatePullTaskTest(CreateTestBase):
   def testCreate_AllOptions_Payload_Content(self):
     expected_task = self.messages.Task(
         name=self.task_name, scheduleTime=self.schedule_time,
-        pullMessage=self.messages.PullMessage(tag='tag', payload='payload'))
+        pullMessage=self.messages.PullMessage(tag='tag', payload=b'payload'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
             parent=self.queue_name,
@@ -89,7 +91,7 @@ class CreatePullTaskTest(CreateTestBase):
 
     expected_task = self.messages.Task(
         name=task_name, scheduleTime=self.schedule_time,
-        pullMessage=self.messages.PullMessage(tag='tag', payload='payload'))
+        pullMessage=self.messages.PullMessage(tag='tag', payload=b'payload'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
             parent=queue_name,
@@ -108,7 +110,7 @@ class CreatePullTaskTest(CreateTestBase):
   def testCreate_AllOptions_Payload_File(self):
     expected_task = self.messages.Task(
         name=self.task_name, scheduleTime=self.schedule_time,
-        pullMessage=self.messages.PullMessage(tag='tag', payload='payload'))
+        pullMessage=self.messages.PullMessage(tag='tag', payload=b'payload'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
             parent=self.queue_name,
@@ -153,7 +155,7 @@ class CreateAppEngineTaskTest(CreateTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header1': 'value1', 'header2': 'value2'},
                 self.messages.AppEngineHttpRequest.HeadersValue),
-            httpMethod=http_method, payload='payload',
+            httpMethod=http_method, payload=b'payload',
             relativeUrl='/paths/a/'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
@@ -181,7 +183,7 @@ class CreateAppEngineTaskTest(CreateTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header1': 'value1', 'header2': 'value2'},
                 self.messages.AppEngineHttpRequest.HeadersValue),
-            httpMethod=http_method, payload='payload',
+            httpMethod=http_method, payload=b'payload',
             relativeUrl='/paths/a/'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(
@@ -209,7 +211,7 @@ class CreateAppEngineTaskTest(CreateTestBase):
             headers=encoding.DictToAdditionalPropertyMessage(
                 {'header1': 'value1', 'header2': 'value2'},
                 self.messages.AppEngineHttpRequest.HeadersValue),
-            httpMethod=http_method, payload='payload',
+            httpMethod=http_method, payload=b'payload',
             relativeUrl='/paths/a/'))
     self.tasks_service.Create.Expect(
         self.messages.CloudtasksProjectsLocationsQueuesTasksCreateRequest(

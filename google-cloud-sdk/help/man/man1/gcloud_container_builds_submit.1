@@ -61,9 +61,16 @@ The .yaml or .json file to use for build configuration.
 
 .TP 2m
 \fB\-\-tag\fR=\fITAG\fR, \fB\-t\fR \fITAG\fR
-The tag to use with a "docker build" image creation. The Container Builder
-service will run a remote "docker build \-t $TAG .", where $TAG is the tag
-provided by this flag. The tag must be in the gcr.io/* or *.gcr.io/* namespaces.
+The tag to use with a \f5docker build\fR image creation. Container Builder will
+run a remote \f5docker build \-t $TAG .\fR, where $TAG is the tag provided by
+this flag. The tag must be in the \f5gcr.io/*\fR or \f5*.gcr.io/*\fR namespaces.
+
+Specify a tag if you want Container Builder to build using a Dockerfile instead
+of a build config file. If you specify a tag in this command, your source must
+include a Dockerfile.
+
+For instructions on building using a Dockerfile, see
+https://cloud.google.com/container\-builder/docs/quickstart\-docker.
 
 
 .RE

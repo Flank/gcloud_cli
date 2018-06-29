@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Tests for the `gcloud meta cache list` command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.compute import lister
 from googlecloudsdk.command_lib.meta import cache_util
 from googlecloudsdk.core.resource import resource_projector
@@ -35,16 +39,15 @@ class ListCommandTest(test_base.BaseTest, completer_test_base.CompleterBase):
              'googlecloudsdk.command_lib.compute.completers:InstancesCompleter '
              '--format=none --project=my-project --zone=zone-1 '
              '--verbosity=info i')
-    self.AssertErrContains("""\
-resource.cache
-INFO: cache collection=compute.instances api_version=v1 params=[u'project', u'zone', u'instance']
-INFO: cache template=['*', '*', 'i*']
+    self.AssertErrMatches(r"""resource.cache
+INFO: cache collection=compute.instances api_version=v1 params=\[u?'project', u?'zone', u?'instance']
+INFO: cache template=\['\*', '\*', 'i\*']
 INFO: cache parameter=project column=0 value=my-project aggregate=True
 INFO: cache parameter=zone column=1 value=zone-1 aggregate=False
-INFO: cache table=compute.instances.my-project aggregations=[project=my-project zone=zone-1]
+INFO: cache table=compute.instances.my-project aggregations=\[project=my-project zone=zone-1]
 INFO: cache update command: compute instances list --uri --quiet --format=disable --project=my-project
-INFO: cache collection=compute.instances api_version=v1 params=[u'project', u'zone', u'instance']
-INFO: cache rows=[(u'my-project', u'zone-1', u'instance-1'), (u'my-project', u'zone-1', u'instance-2'), (u'my-project', u'zone-1', u'instance-3')]
+INFO: cache collection=compute.instances api_version=v1 params=\[u?'project', u?'zone', u?'instance']
+INFO: cache rows=\[\(u?'my-project', u?'zone-1', u?'instance-1'\), \(u?'my-project', u?'zone-1', u?'instance-2'\), \(u?'my-project', u?'zone-1', u?'instance-3'\)]
 INFO: Display format: "default none"
 """)
 
@@ -54,15 +57,14 @@ INFO: Display format: "default none"
     self.Run('meta cache completers run '
              'googlecloudsdk.command_lib.compute.completers:ZonesCompleter '
              '--format=none --verbosity=info i')
-    self.AssertErrContains("""\
-resource.cache
-INFO: cache collection=compute.zones api_version=v1 params=[u'project', u'zone']
-INFO: cache template=['*', 'i*']
+    self.AssertErrMatches(r"""resource.cache
+INFO: cache collection=compute.zones api_version=v1 params=\[u?'project', u?'zone']
+INFO: cache template=\['\*', 'i\*']
 INFO: cache parameter=project column=0 value=my-project aggregate=True
-INFO: cache table=compute.zones.my-project aggregations=[project=my-project]
+INFO: cache table=compute.zones.my-project aggregations=\[project=my-project]
 INFO: cache update command: compute zones list --uri --quiet --format=disable
-INFO: cache collection=compute.zones api_version=v1 params=[u'project', u'zone']
-INFO: cache rows=[]
+INFO: cache collection=compute.zones api_version=v1 params=\[u?'project', u?'zone']
+INFO: cache rows=\[]
 INFO: Display format: "default none"
 """)
 
@@ -130,14 +132,13 @@ INFO: Display format: "default none"
              'googlecloudsdk.command_lib.compute.completers:'
              'SearchInstancesCompleter '
              '--format=none --zone=zone-1 --verbosity=info i')
-    self.AssertErrContains("""\
-resource.cache
-INFO: cache collection=compute.instances api_version=v1 params=[u'project', u'zone', u'instance']
-INFO: cache template=['*', '*', 'i*']
+    self.AssertErrMatches(r"""resource.cache
+INFO: cache collection=compute.instances api_version=v1 params=\[u?'project', u?'zone', u?'instance']
+INFO: cache template=\['\*', '\*', 'i\*']
 INFO: cache parameter=zone column=1 value=zone-1 aggregate=None
-INFO: cache table=compute.instances aggregations=[zone=zone-1]
+INFO: cache table=compute.instances aggregations=\[zone=zone-1]
 INFO: cloud resource search query: @type:compute.instances
-INFO: cache rows=[(u'my-project', u'zone-1', u'instance-1'), (u'my-project', u'zone-1', u'instance-2'), (u'my-project', u'zone-1', u'instance-3')]
+INFO: cache rows=\[\(u?'my-project', u?'zone-1', u?'instance-1'\), \(u?'my-project', u?'zone-1', u?'instance-2'\), \(u?'my-project', u?'zone-1', u?'instance-3'\)]
 INFO: Display format: "default none"
 """)
 
@@ -147,15 +148,14 @@ INFO: Display format: "default none"
     self.Run('meta cache completers run '
              'googlecloudsdk.command_lib.compute.completers:ZonesCompleter '
              '--format=none --verbosity=info i')
-    self.AssertErrContains("""\
-resource.cache
-INFO: cache collection=compute.zones api_version=v1 params=[u'project', u'zone']
-INFO: cache template=['*', 'i*']
+    self.AssertErrMatches(r"""resource.cache
+INFO: cache collection=compute.zones api_version=v1 params=\[u?'project', u?'zone']
+INFO: cache template=\['\*', 'i\*']
 INFO: cache parameter=project column=0 value=my-project aggregate=True
-INFO: cache table=compute.zones.my-project aggregations=[project=my-project]
+INFO: cache table=compute.zones.my-project aggregations=\[project=my-project]
 INFO: cache update command: compute zones list --uri --quiet --format=disable
-INFO: cache collection=compute.zones api_version=v1 params=[u'project', u'zone']
-INFO: cache rows=[]
+INFO: cache collection=compute.zones api_version=v1 params=\[u?'project', u?'zone']
+INFO: cache rows=\[]
 INFO: Display format: "default none"
 """)
 

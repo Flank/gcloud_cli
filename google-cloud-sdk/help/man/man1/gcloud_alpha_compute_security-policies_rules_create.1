@@ -37,7 +37,9 @@ $ gcloud alpha compute security\-policies rules create 1000 \e
 .RS 2m
 .TP 2m
 \fIPRIORITY\fR
-The priority of the rule to add.
+The priority of the rule to add. Rules are evaluated in order from highest
+priority to lowest priority where 0 is the highest priority and 2147483647 is
+the lowest priority.
 
 
 .RE

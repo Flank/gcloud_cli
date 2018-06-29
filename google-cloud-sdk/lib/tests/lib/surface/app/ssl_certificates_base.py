@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base class for ssl_certificates tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as apitools_mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis

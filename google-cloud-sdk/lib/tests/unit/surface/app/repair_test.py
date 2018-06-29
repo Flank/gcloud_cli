@@ -45,10 +45,8 @@ class RepairTest(api_test_util.ApiTestBase):
     self.Run('beta app repair')
     # Explicitly check for the nesting of the trackers.
     self.AssertErrEquals("""\
-<START PROGRESS TRACKER>Repairing the app [fake-project]
-<START PROGRESS TRACKER>Waiting for operation [apps/fake-project/operations/12345] to complete
-<END PROGRESS TRACKER>SUCCESS
-<END PROGRESS TRACKER>SUCCESS
+{"ux": "PROGRESS_TRACKER", "message": "Waiting for operation [apps/fake-project/operations/12345] to complete", "status": "SUCCESS"}
+{"ux": "PROGRESS_TRACKER", "message": "Repairing the app [fake-project]", "status": "SUCCESS"}
 """)
 
 

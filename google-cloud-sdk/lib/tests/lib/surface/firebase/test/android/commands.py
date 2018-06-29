@@ -13,6 +13,8 @@
 # limitations under the License.
 """Command strings for 'gcloud firebase test android' unit & end-2-end tests."""
 
+from __future__ import unicode_literals
+
 ANDROID_PREFIX = 'firebase test android '
 ANDROID_TEST_RUN = ANDROID_PREFIX + 'run '
 ANDROID_BETA_TEST_RUN = 'beta ' + ANDROID_PREFIX + 'run '

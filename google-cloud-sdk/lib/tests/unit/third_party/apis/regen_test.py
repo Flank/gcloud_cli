@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests to make sure that checked in apitools clients are uptodate."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 import googlecloudsdk
@@ -25,6 +27,7 @@ _CONFIG = os.path.join(
     _BASE_DIR, 'googlecloudsdk', 'third_party', 'regen_apis_config.yaml')
 
 
+@test_case.Filters.SkipOnPy3('Not yet modernized', 'b/80532599')
 class ClientGenCliTest(test_case.TestCase):
   pass
 

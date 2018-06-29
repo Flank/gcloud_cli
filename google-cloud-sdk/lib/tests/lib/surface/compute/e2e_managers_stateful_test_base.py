@@ -104,11 +104,6 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
     self.Run(command)
     return name
 
-  def DescribeManagedInstanceGroup(self, name):
-    self.Run("""
-      compute instance-groups managed describe {group_name} \
-        {scope_flag}""".format(group_name=name, scope_flag=self.GetScopeFlag()))
-
   def DescribeInstance(self, name):
     self.Run('compute instances describe {name}'.format(name=name))
 

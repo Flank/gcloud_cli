@@ -15,6 +15,7 @@
 """Tests for gcloud app instances."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.app import instances_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io

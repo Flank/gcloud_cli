@@ -30,6 +30,7 @@ from tests.lib import sdk_test_base
 import mock
 
 NO_PROJECT_REGEXP = r'The required property \[project\] is not currently set'
+NO_PROJECT_RESOURCE_ARG_REGEXP = r'Failed to find attribute \[project\]'
 NO_AUTH_REGEXP = (r'Your current active account \[.*\] does not have any valid '
                   'credentials')
 OP_FAILED_REGEXP = r'OperationError: code=13, message=Operation has failed.'

@@ -11,7 +11,7 @@ gcloud app domain\-mappings update \- updates a domain mapping
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud app domain\-mappings update\fR \fIDOMAIN\fR [\fB\-\-certificate\-id\fR=\fICERTIFICATE_ID\fR\ |\ \fB\-\-no\-certificate\-id\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud app domain\-mappings update\fR \fIDOMAIN\fR [\fB\-\-certificate\-management\fR=\fICERTIFICATE_MANAGEMENT\fR] [\fB\-\-certificate\-id\fR=\fICERTIFICATE_ID\fR\ |\ \fB\-\-no\-certificate\-id\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,6 +37,13 @@ A valid domain which may begin with a wildcard, such as: \f5example.com\fR or
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-certificate\-management\fR=\fICERTIFICATE_MANAGEMENT\fR
+Type of certificate management. 'automatic' will provision an SSL certificate
+automatically while 'manual' requires the user to provide a certificate id to
+provision. \fICERTIFICATE_MANAGEMENT\fR must be one of: \fBautomatic\fR,
+\fBmanual\fR.
+
 .TP 2m
 
 At most one of these may be specified:

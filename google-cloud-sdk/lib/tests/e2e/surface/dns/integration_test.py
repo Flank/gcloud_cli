@@ -14,10 +14,13 @@
 
 """Integration tests for the 'gcloud dns' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import e2e_utils
 from tests.lib import test_case
 from tests.lib.surface.dns import base
+import six
 
 
 class ProjectInfoTest(base.DnsTest):
@@ -36,20 +39,22 @@ class ManagedZonesTest(base.DnsTest):
   def SetUp(self):
     messages = core_apis.GetMessagesModule('dns', 'v1')
     self.test_zone = messages.ManagedZone(
-        description=u'Zone!',
-        dnsName=unicode(
-            e2e_utils.GetResourceNameGenerator(suffix='.com.',
-                                               hash_len=13,
-                                               delimiter='',
-                                               timestamp_format=None).next()),
-        kind=u'dns#managedZone',
-        name=unicode(e2e_utils.GetResourceNameGenerator(prefix='zone').next()),
+        description='Zone!',
+        dnsName=six.text_type(
+            next(
+                e2e_utils.GetResourceNameGenerator(
+                    suffix='.com.',
+                    hash_len=13,
+                    delimiter='',
+                    timestamp_format=None))),
+        kind='dns#managedZone',
+        name=six.text_type(
+            next(e2e_utils.GetResourceNameGenerator(prefix='zone'))),
         nameServers=[])
 
     self.Run(
         'dns managed-zones create {0} --dns-name {1} --description {2}'.format(
-            self.test_zone.name,
-            self.test_zone.dnsName,
+            self.test_zone.name, self.test_zone.dnsName,
             self.test_zone.description))
     self.AssertErrContains("""\
 Created [https://www.googleapis.com/dns/v1/projects/{0}/managedZones/{1}].

@@ -18,17 +18,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import io
-
-from googlecloudsdk.core import exceptions
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from tests.lib import cli_test_base
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base
-from tests.lib.scenario import assertions
 from tests.lib.scenario import schema
 from tests.lib.scenario import session
+from tests.lib.scenario import updates
 
 
 class _LocalOnly(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
@@ -41,64 +39,52 @@ class _MakeAPICalls(e2e_base.WithServiceAuth):
     properties.VALUES.core.project.Set('cloudsdktest')
 
 
+def CreateStreamMocker(test_base_instance):
+  """Make a stream mocker that points to the given test base instance."""
+
+  def _GetStdout():
+    data = test_base_instance.GetOutput()
+    test_base_instance.ClearOutput()
+    return data
+
+  def _GetStderr():
+    data = test_base_instance.GetErr()
+    test_base_instance.ClearErr()
+    return data
+
+  def _WriteStdin(*lines):
+    test_base_instance.WriteInput(*lines)
+
+  return session.StreamMocker(_GetStdout, _GetStderr, _WriteStdin)
+
+
+def LoadTracksFromFile(spec_path):
+  full_spec_path = sdk_test_base.SdkBase.Resource(spec_path)
+  spec_data = yaml.load_path(full_spec_path, round_trip=True)
+  return [calliope_base.ReleaseTrack.FromId(t)
+          for t in spec_data.get('release_tracks') or ['GA']]
+
+
 class ScenarioTestBase(
-    _MakeAPICalls if assertions.UpdateMode.MakesApiCalls() else _LocalOnly):
+    _MakeAPICalls if updates.Mode.MakesApiCalls() else _LocalOnly):
   """A base class for all scenario tests."""
 
-  def _GetStdout(self):
-    data = self.GetOutput()
-    self.ClearOutput()
-    return data
-
-  def _GetStderr(self):
-    data = self.GetErr()
-    self.ClearErr()
-    return data
-
-  def _WriteStdin(self, *lines):
-    self.WriteInput(*lines)
-
-  def RunScenario(self, spec_path, update_modes=None):
-    full_spec_path = self.Resource(spec_path)
+  def RunScenario(self, spec_path, track, update_modes=None):
+    full_spec_path = sdk_test_base.SdkBase.Resource(spec_path)
     spec_data = yaml.load_path(full_spec_path, round_trip=True)
+    validator = schema.Validator(spec_data)
+    self.assertTrue(validator.Validate())
+
     spec = schema.Scenario.FromData(spec_data)
 
-    stream_mocker = session.StreamMocker(
-        self._GetStdout, self._GetStderr, self._WriteStdin)
+    self.track = track
+    stream_mocker = CreateStreamMocker(self)
 
-    for ce in spec.command_executions:
-      # Set up test data input files
-      # TODO(b/78588819): Support input files.
+    scenario_context = schema.ScenarioContext(
+        full_spec_path, spec_data, update_modes, stream_mocker, self.Run)
 
-      event_data = []
-      try:
-        with assertions.FailureCollector(update_modes=update_modes) as failures:
-          with session.Session(
-              ce.events, failures, update_modes=update_modes,
-              stream_mocker=stream_mocker) as s:
-            code = 0
-            try:
-              # TODO(b/78588819): Fix the error handling here. We want the later
-              # assertions to trigger even if there are errors here, but we also
-              # need to make sure we do all the updates correctly.
-              self.Run(ce.command)
-            except exceptions.Error:
-              code = 1
-
-            s.HandleExit(code)
-            event_data = s.GetEventSequence()
-      finally:
-        # Update spec file
-        if update_modes or (
-            update_modes is None and assertions.UpdateMode.Current()):
-          if event_data:
-            ce.original_event_data[:] = event_data
-          with io.open(full_spec_path, 'wt') as f:
-            yaml.dump(spec_data, f, round_trip=True)
-
-      remaining_stdin = self.stdin.read()
-      if remaining_stdin:
-        self.fail('Not all stdin was consumed: [{}]'.format(remaining_stdin))
+    for a in spec.actions:
+      a.Execute(scenario_context)
 
 
 def main():

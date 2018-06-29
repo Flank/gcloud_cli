@@ -157,8 +157,7 @@ class WaiterTest(waiter_test_base.Base):
 
     self.AssertOutputEquals('')
     self.AssertErrEquals("""\
-<START PROGRESS TRACKER>Making Cheese
-<END PROGRESS TRACKER>INTERRUPTED
+{"ux": "PROGRESS_TRACKER", "message": "Making Cheese", "status": "INTERRUPTED"}
 """)
 
 

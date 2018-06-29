@@ -205,7 +205,7 @@ class SessionFileIoMock(session_capturer.FileIoCapturerBase):
     self._test = test
     self._accessed_files = set()
 
-  def Open(self, name, mode='r', buffering=-1):
+  def Open(self, name, mode='r', buffering=-1, **kwargs):
     if 'w' in mode:
       if not self._ShouldCaptureFile(name, sys._getframe().f_back):  # pylint: disable=protected-access
         return self._real_open(name, mode, buffering)
@@ -217,11 +217,6 @@ class SessionFileIoMock(session_capturer.FileIoCapturerBase):
         return self._real_open(name, mode, buffering)
       self._accessed_files.add(name)
       return SessionInputMock(self._files[name])
-
-  def OpenForWritingPrivate(self, path, binary=False):
-    capturer = SessionOutputMock()
-    self._Save(self._private_outputs, path, capturer)
-    return capturer
 
   def Finalize(self):
     for k in self._files:

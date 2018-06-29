@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud scheduler jobs create-pubsub-job`."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized

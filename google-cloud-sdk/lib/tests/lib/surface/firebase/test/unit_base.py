@@ -14,6 +14,8 @@
 
 """Base classes for all 'gcloud firebase test' unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 
 from googlecloudsdk.api_lib.firebase.test import history_picker
@@ -84,7 +86,8 @@ class TestMockClientTest(TestUnitTestBase):
         self.PROJECT_ID, self.tr_client, self.toolresults_msgs)
 
   def CheckArgNamesForHyphens(self, arg_rules):
-    args = (arg_rules['required'] + arg_rules['optional'] +
-            arg_rules['defaults'].keys())
+    args = (
+        arg_rules['required'] + arg_rules['optional'] + list(
+            arg_rules['defaults'].keys()))
     for arg in args:
       self.assertNotIn('-', arg, 'arg names in rules should use underscores')

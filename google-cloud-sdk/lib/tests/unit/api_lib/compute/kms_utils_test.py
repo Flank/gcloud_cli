@@ -17,6 +17,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import kms_utils
 from googlecloudsdk.calliope import parser_errors
+from googlecloudsdk.core import properties
 from tests.lib import test_case
 
 DEFAULT_PROJECT = 'default-project'
@@ -77,35 +78,18 @@ class BootDiskKmsKeyWithParts(object):
 class KmsKeyUtilsTest(test_case.TestCase):
 
   def testDictToKmsKey(self):
-    self.assertIsNone(kms_utils._DictToKmsKey(None, DEFAULT_PROJECT))
-    self.assertIsNone(kms_utils._DictToKmsKey({}, DEFAULT_PROJECT))
+    properties.VALUES.core.project.Set(DEFAULT_PROJECT)
+    self.assertIsNone(kms_utils._DictToKmsKey(None))
+    self.assertIsNone(kms_utils._DictToKmsKey({}))
     self.assertEqual(
         kms_utils._DictToKmsKey(
-            {'kms-key': EXAMPLE_KEY}, DEFAULT_PROJECT).RelativeName(),
+            {'kms-key': EXAMPLE_KEY}).RelativeName(),
         EXAMPLE_KEY)
     self.assertEqual(
         kms_utils._DictToKmsKey(
             {'kms-key': KEY_NAME,
              'kms-keyring': KEY_KEYRING,
-             'kms-location': KEY_LOCATION}, DEFAULT_PROJECT).RelativeName(),
-        EXAMPLE_KEY_IN_DEFAULT_PROJECT)
-
-  def testArgsToKmsKey(self):
-    self.assertEqual(
-        kms_utils._ArgsToKmsKey(EmptyClass(), DEFAULT_PROJECT),
-        None)
-
-    key = BootDiskKmsKey()
-    key.boot_disk_kms_key = EXAMPLE_KEY
-    key.boot_disk_kms_project = None
-    self.assertEqual(
-        kms_utils._ArgsToKmsKey(key, DEFAULT_PROJECT).RelativeName(),
-        EXAMPLE_KEY)
-
-    key_parts = BootDiskKmsKeyWithParts()
-    key_parts.boot_disk_kms_project = None
-    self.assertEqual(
-        kms_utils._ArgsToKmsKey(key_parts, DEFAULT_PROJECT).RelativeName(),
+             'kms-location': KEY_LOCATION}).RelativeName(),
         EXAMPLE_KEY_IN_DEFAULT_PROJECT)
 
   def testGetSpecifiedKmsArgs(self):

@@ -23,8 +23,29 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --bandwidth=BANDWIDTH
-        Provisioned capacity of the attachment. BANDWIDTH must be one of:
+        Provisioned capacity of the attachment in bits/s. BANDWIDTH must be one
+        of:
 
+         50m
+            50 Mbit/s
+         100m
+            100 Mbit/s
+         200m
+            200 Mbit/s
+         300m
+            300 Mbit/s
+         400m
+            400 Mbit/s
+         500m
+            500 Mbit/s
+         1g
+            1 Gbit/s
+         2g
+            2 Gbit/s
+         5g
+            5 Gbit/s
+         10g
+            10 Gbit/s
          bps-50m
             50 Mbit/s
          bps-100m
@@ -73,6 +94,11 @@ FLAGS
         A list of label KEY=VALUE pairs to update. If a label exists its value
         is modified, otherwise a new label is created.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      At most one of these may be specified:
 
        --clear-labels
@@ -105,7 +131,7 @@ FLAGS
 
        --partner-portal-url=PARTNER_PORTAL_URL
           URL of the Partner's portal for this Attachment. The Partner may wish
-          to customise this to be a deep-link to the specific resource on the
+          to customize this to be a deep-link to the specific resource on the
           Partner portal. This value may be validated to match approved Partner
           values.
 

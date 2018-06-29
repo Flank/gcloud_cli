@@ -3,8 +3,8 @@ NAME
         for a key
 
 SYNOPSIS
-    gcloud alpha kms keys set-rotation-schedule KEY
-        [--next-rotation-time=NEXT_ROTATION_TIME]
+    gcloud alpha kms keys set-rotation-schedule KEY [--keyring=KEYRING]
+        [--location=LOCATION] [--next-rotation-time=NEXT_ROTATION_TIME]
         [--rotation-period=ROTATION_PERIOD] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -24,6 +24,12 @@ POSITIONAL ARGUMENTS
         Name of the key to update the schedule of.
 
 FLAGS
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the key.
+
      --next-rotation-time=NEXT_ROTATION_TIME
         Next automatic rotation time of the key. See $ gcloud topic datetimes
         for information on time formats.

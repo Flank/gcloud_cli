@@ -36,17 +36,17 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --keyring=KEYRING
-        The containing keyring.
+        Key ring of the key.
 
      --location=LOCATION
-        The location of the requested resource.
+        Location of the key.
 
      --next-rotation-time=NEXT_ROTATION_TIME
         Next automatic rotation time of the key. See $ gcloud topic datetimes
         for information on time formats.
 
      --primary-version=PRIMARY_VERSION
-        The primary version to make primary.
+        Primary version to make primary.
 
      --remove-rotation-schedule
         Remove any existing rotation schedule on the key.
@@ -58,6 +58,11 @@ FLAGS
      --update-labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to update. If a label exists its value
         is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      At most one of these may be specified:
 
@@ -128,8 +133,9 @@ EXAMPLES
             --primary-version 1
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud kms keys update
+        $ gcloud alpha kms keys update
 

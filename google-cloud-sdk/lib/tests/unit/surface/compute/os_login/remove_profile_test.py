@@ -34,6 +34,21 @@ class RemoveProfileTest(test_base.OsloginBaseTest):
     self.SetUpMockApis(self.track)
     self.profiles = self.GetProfiles(self.messages)
 
+  def _GetDeleteRequest(self, track,
+                        name='users/user@google.com/projects/fake-project',
+                        operating_system='LINUX'):
+
+    if track == calliope_base.ReleaseTrack.ALPHA:
+      os_message = (self.messages.OsloginUsersProjectsDeleteRequest
+                    .OperatingSystemTypeValueValuesEnum(operating_system))
+      message = self.messages.OsloginUsersProjectsDeleteRequest(
+          name=name,
+          operatingSystemType=os_message)
+    else:
+      message = self.messages.OsloginUsersProjectsDeleteRequest(name=name)
+
+    return message
+
   def testSimpleCaseWithAccountId(self, track):
     self._RunSetUp(track)
     self.mock_oslogin_client.users.GetLoginProfile.Expect(
@@ -42,8 +57,7 @@ class RemoveProfileTest(test_base.OsloginBaseTest):
         response=self.profiles['profile_with_account_id'])
 
     self.mock_oslogin_client.users_projects.Delete.Expect(
-        request=self.messages.OsloginUsersProjectsDeleteRequest(
-            name='users/user@google.com/projects/fake-project'),
+        request=self._GetDeleteRequest(track),
         response={})
 
     self.Run("""
@@ -64,6 +78,30 @@ class RemoveProfileTest(test_base.OsloginBaseTest):
         """)
 
     self.AssertErrContains('No profile found with accountId [fake-project]')
+
+  def testOperatingSystemFlag(self, track):
+    self._RunSetUp(track)
+    if track != calliope_base.ReleaseTrack.ALPHA:
+      with self.AssertRaisesArgumentError():
+        self.Run("""
+            compute os-login remove-profile --operating-system WiNdOws
+            """)
+
+    else:
+      self.mock_oslogin_client.users.GetLoginProfile.Expect(
+          request=self.messages.OsloginUsersGetLoginProfileRequest(
+              name='users/user@google.com'),
+          response=self.profiles['profile_with_account_id'])
+
+      self.mock_oslogin_client.users_projects.Delete.Expect(
+          request=self._GetDeleteRequest(track, operating_system='WINDOWS'),
+          response={})
+
+      self.Run("""
+          compute os-login remove-profile --operating-system WiNdOws
+          """)
+
+      self.AssertErrContains('Deleted [fake-project] posix account(s)')
 
   def testSimpleCaseWithUnsetProject(self, track):
     self._RunSetUp(track)

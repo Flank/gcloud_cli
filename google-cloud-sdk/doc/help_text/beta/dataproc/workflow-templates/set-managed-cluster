@@ -3,8 +3,9 @@ NAME
         cluster for the workflow template
 
 SYNOPSIS
-    gcloud beta dataproc workflow-templates set-managed-cluster TEMPLATE
-        [--no-address] [--bucket=BUCKET] [--cluster-name=CLUSTER_NAME]
+    gcloud beta dataproc workflow-templates set-managed-cluster
+        (TEMPLATE : --region=REGION) [--no-address] [--bucket=BUCKET]
+        [--cluster-name=CLUSTER_NAME]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
         [--initialization-actions=CLOUD_STORAGE_URI,[...]]
         [--labels=[KEY=VALUE,...]]
@@ -19,9 +20,8 @@ SYNOPSIS
         [--num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS]
         [--preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE]
         [--preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE]
-        [--properties=[PREFIX:PROPERTY=VALUE,...]] [--region=REGION]
-        [--scopes=SCOPE,[SCOPE,...]] [--service-account=SERVICE_ACCOUNT]
-        [--tags=TAG,[TAG,...]]
+        [--properties=[PREFIX:PROPERTY=VALUE,...]] [--scopes=SCOPE,[SCOPE,...]]
+        [--service-account=SERVICE_ACCOUNT] [--tags=TAG,[TAG,...]]
         [--worker-accelerator=[type=TYPE,[count=COUNT],...]]
         [--worker-boot-disk-size=WORKER_BOOT_DISK_SIZE]
         [--worker-boot-disk-type=WORKER_BOOT_DISK_TYPE]
@@ -37,8 +37,28 @@ DESCRIPTION
     (BETA) Set a managed cluster for the workflow template.
 
 POSITIONAL ARGUMENTS
-     TEMPLATE
-        The ID of the workflow template to set managed cluster.
+     Template resource - The name of the workflow template to set managed
+     cluster. The arguments in this group can be used to specify the attributes
+     of this resource. (NOTE) Some attributes are not given arguments in this
+     group but can be set in other ways. To set the [project] attribute:
+     provide the flag [TEMPLATE] on the command line with a fully specified
+     name; provide the flag [--project] on the command line; set the property
+     [core/project]. This must be specified.
+
+       TEMPLATE
+          The ID of the template or a fully qualified identifier for the
+          template. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --region=REGION
+          The Cloud DataProc region for the template. Each Cloud Dataproc
+          region constitutes an independent resource namespace constrained to
+          deploying instances into Google Compute Engine zones inside the
+          region. The default value of "global" is a special multi-region
+          namespace which is capable of deploying instances into all Google
+          Compute Engine zones globally, and is disjoint from other Cloud
+          Dataproc regions. Overrides the default dataproc/region property
+          value for this command invocation.
 
 FLAGS
      --no-address
@@ -67,6 +87,11 @@ FLAGS
 
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --master-accelerator=[type=TYPE,[count=COUNT],...]
         Attaches accelerators (e.g. GPUs) to the master instance(s).
@@ -168,19 +193,9 @@ FLAGS
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties
         for more information.
 
-     --region=REGION
-        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-        independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
-
      --scopes=SCOPE,[SCOPE,...]
-        Specifies scopes for the node instances. The project's default service
-        account is used. Multiple SCOPEs can specified, separated by commas.
-        Examples:
+        Specifies scopes for the node instances. Multiple SCOPEs can be
+        specified, separated by commas. Examples:
 
             $ gcloud beta dataproc workflow-templates set-managed-cluster \
                 example-cluster \
@@ -189,14 +204,14 @@ FLAGS
             $ gcloud beta dataproc workflow-templates set-managed-cluster \
                 example-cluster --scopes sqlservice,bigquery
 
-        The following scopes necessary for the cluster to function properly are
-        always added, even if not explicitly specified:
+        The following minimum scopes are necessary for the cluster to function
+        properly and are always added, even if not explicitly specified:
 
           https://www.googleapis.com/auth/devstorage.read_write
           https://www.googleapis.com/auth/logging.write
 
-        If this flag is not specified the following default scopes are also
-        included:
+        If the --scopes flag is not specified, the following default scopes are
+        also included:
 
           https://www.googleapis.com/auth/bigquery
           https://www.googleapis.com/auth/bigtable.admin.table

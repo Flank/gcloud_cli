@@ -20,6 +20,10 @@ POSITIONAL ARGUMENTS
      POLICY_FILE
         Path to a local JSON or YAML formatted file containing a valid policy.
 
+        The output of the get-iam-policy command is a valid file, as is any
+        JSON or YAML file conforming to the structure of a Policy
+        (https://cloud.google.com/iam/reference/rest/v1/Policy).
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,

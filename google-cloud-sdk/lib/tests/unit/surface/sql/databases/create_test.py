@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.sql import exceptions
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
@@ -29,14 +31,14 @@ class DatabasesInsertTest(base.SqlMockTestBeta):
             instance='mock-instance',
             name='mock-db',
             collation='another-collation',
-            kind=u'sql#database'),
-        sqladmin.Operation(name=u'd11c5da9-8ca5-4add-8cfe-d564b57fe4c5'))
+            kind='sql#database'),
+        sqladmin.Operation(name='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5'))
 
     self.mocked_client.operations.Get.Expect(
         sqladmin.SqlOperationsGetRequest(
-            operation=u'd11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
+            operation='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
             project=self.Project()),
-        sqladmin.Operation(status=u'DONE'))
+        sqladmin.Operation(status='DONE'))
 
     self.Run('sql databases create mock-db --instance=mock-instance '
              '--collation=another-collation')
@@ -57,14 +59,14 @@ project: {0}
             instance='mock-instance',
             name='mock-db',
             collation='another-collation',
-            kind=u'sql#database'),
-        sqladmin.Operation(name=u'd11c5da9-8ca5-4add-8cfe-d564b57fe4c5'))
+            kind='sql#database'),
+        sqladmin.Operation(name='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5'))
 
     self.mocked_client.operations.Get.Expect(
         sqladmin.SqlOperationsGetRequest(
-            operation=u'd11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
+            operation='d11c5da9-8ca5-4add-8cfe-d564b57fe4c5',
             project=self.Project()),
-        sqladmin.Operation(status=u'DONE'))
+        sqladmin.Operation(status='DONE'))
 
     self.Run('sql databases create mock-db --instance=mock-instance '
              '--collation=another-collation --async')
@@ -78,15 +80,14 @@ project: {0}
             project=self.Project(),
             instance='mock-instance',
             name='mock-db',
-            kind=u'sql#database'),
+            kind='sql#database'),
         sqladmin.Operation(name='op1'))
     self.mocked_client.operations.Get.Expect(
         sqladmin.SqlOperationsGetRequest(
-            operation=u'op1',
-            project=self.Project()),
+            operation='op1', project=self.Project()),
         sqladmin.Operation(
-            error=sqladmin.OperationErrors(errors=[
-                sqladmin.OperationError(code='INTERNAL_ERROR')])))
+            error=sqladmin.OperationErrors(
+                errors=[sqladmin.OperationError(code='INTERNAL_ERROR')])))
 
     with self.assertRaises(exceptions.OperationError):
       self.Run('sql databases create mock-db --instance=mock-instance')

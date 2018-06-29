@@ -29,7 +29,7 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
   def SetUp(self):
     self._SetUpReleaseTrack('v1', calliope_base.ReleaseTrack.GA)
 
-  def testSimpleCase(self):
+  def testSimpleCaseWithoutQuic(self):
     messages = self.messages
     self.make_requests.side_effect = [[
         messages.TargetHttpsProxy(
@@ -71,55 +71,7 @@ class TargetHTTPSProxiesCreateGATest(test_base.BaseTest):
                      '/projects/my-project/global/sslPolicies/my-ssl-policy'))))
     ],)
 
-  def testUriSupport(self):
-    messages = self.messages
-    self.Run("""
-        compute target-https-proxies create
-          {uri}/projects/my-project/global/targetHttpsProxies/my-proxy
-          --ssl-certificates {uri}/projects/my-project/global/sslCertificates/my-cert
-          --url-map {uri}/projects/my-project/global/urlMaps/my-map
-        """.format(uri=self.compute_uri))
-
-    self.CheckRequests(
-        [(self.compute.targetHttpsProxies, 'Insert',
-          messages.ComputeTargetHttpsProxiesInsertRequest(
-              project='my-project',
-              targetHttpsProxy=messages.TargetHttpsProxy(
-                  name='my-proxy',
-                  sslCertificates=[
-                      (self.compute_uri + '/projects/my-project/global/'
-                       'sslCertificates/my-cert')
-                  ],
-                  urlMap=(self.compute_uri +
-                          '/projects/my-project/global/urlMaps/my-map'))))],)
-
-  def testWithoutSSLCertificate(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --ssl-certificates: Must be specified.'):
-      self.Run("""
-          compute target-https-proxies create my-proxy
-            --url-map my-map
-          """)
-
-    self.CheckRequests()
-
-  def testWithoutURLMap(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --url-map: Must be specified.'):
-      self.Run("""
-          compute target-https-proxies create my-proxy
-            --ssl-certificates my-cert
-          """)
-
-    self.CheckRequests()
-
-
-class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
-
-  def SetUp(self):
-    self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
-
-  def testSimpleCase(self):
+  def testSimpleCaseWithQuicEnabled(self):
     messages = self.messages
     quic_enum = messages.TargetHttpsProxy.QuicOverrideValueValuesEnum
 
@@ -168,7 +120,6 @@ class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
 
   def testUriSupport(self):
     messages = self.messages
-    quic_enum = messages.TargetHttpsProxy.QuicOverrideValueValuesEnum
 
     self.Run("""
         compute target-https-proxies create
@@ -188,8 +139,33 @@ class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
                        'sslCertificates/my-cert')
                   ],
                   urlMap=(self.compute_uri +
-                          '/projects/my-project/global/urlMaps/my-map'),
-                  quicOverride=quic_enum.NONE)))],)
+                          '/projects/my-project/global/urlMaps/my-map'))))],)
+
+  def testWithoutSSLCertificate(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --ssl-certificates: Must be specified.'):
+      self.Run("""
+          compute target-https-proxies create my-proxy
+            --url-map my-map
+          """)
+
+    self.CheckRequests()
+
+  def testWithoutURLMap(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --url-map: Must be specified.'):
+      self.Run("""
+          compute target-https-proxies create my-proxy
+            --ssl-certificates my-cert
+          """)
+
+    self.CheckRequests()
+
+
+class TargetHTTPSProxiesCreateBetaTest(TargetHTTPSProxiesCreateGATest):
+
+  def SetUp(self):
+    self._SetUpReleaseTrack('beta', calliope_base.ReleaseTrack.BETA)
 
 
 class TargetHTTPSProxiesCreateAlphaTest(TargetHTTPSProxiesCreateBetaTest):

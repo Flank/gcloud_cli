@@ -21,6 +21,10 @@ gcloud beta compute ssh \- SSH into a virtual machine instance
 \fBssh(1)\fR command that takes care of authentication and the translation of
 the instance name into an IP address.
 
+Note, this command does not work for Windows VMs. To connect to a Windows
+instance using a command\-line method, refer to this guide:
+https://cloud.google.com/compute/docs/instances/connecting\-to\-instance#windows_cli
+
 The default network comes preconfigured to allow ssh access to all VMs. If the
 default network was edited, or if not using the default network, you may need to
 explicitly enable ssh access by adding a firewall\-rule:
@@ -30,13 +34,10 @@ $ gcloud compute firewall\-rules create \-\-network=NETWORK           \e
       default\-allow\-ssh \-\-allow tcp:22
 .RE
 
-This command does not work for Windows VMs.
-
-This command uses the Compute Accounts API to ensure that the user's public SSH
-key is availibe to the VM. This form of key management will only work with VMs
-configured to work with the Compute Accounts API. If the user does not have a
-public SSH key, one is generated using \fBssh\-keygen(1)\fR (if \f5the
-\-\-quiet\fR flag is given, the generated key will have an empty passphrase).
+gcloud beta compute ssh ensures that the user's public SSH key is present in the
+project's metadata. If the user does not have a public SSH key, one is generated
+using \fBssh\-keygen(1)\fR (if the \f5\-\-quiet\fR flag is given, the generated
+key will have an empty passphrase).
 
 
 

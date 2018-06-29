@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Support for e2e tests that use the Cloud Storage API."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.api_lib.storage import storage_util

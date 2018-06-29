@@ -11,7 +11,7 @@ gcloud alpha tasks create\-app\-engine\-task \- create and add a task to an App 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks create\-app\-engine\-task\fR [\fB\-\-header\fR=\fIHEADER_FIELD\fR:\ \fIHEADER_VALUE\fR] [\fB\-\-id\fR=\fITASK_ID\fR] [\fB\-\-method\fR=\fIMETHOD\fR] [\fB\-\-queue\fR=\fIQUEUE\fR] [\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-url\fR=\fIURL\fR] [\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR\ |\ \fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks create\-app\-engine\-task\fR (\fB\-\-id\fR=\fITASK_ID\fR\ \fB\-\-queue\fR=\fIQUEUE\fR) [\fB\-\-header\fR=\fIHEADER_FIELD\fR:\ \fIHEADER_VALUE\fR] [\fB\-\-method\fR=\fIMETHOD\fR] [\fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-url\fR=\fIURL\fR] [\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR\ |\ \fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -21,14 +21,14 @@ gcloud alpha tasks create\-app\-engine\-task \- create and add a task to an App 
 
 
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
 
 .RS 2m
 .TP 2m
-\fB\-\-header\fR=\fIHEADER_FIELD\fR: \fIHEADER_VALUE\fR
-An HTTP request header. Header values can contain commas. This flag can be
-repeated. Repeated header fields will have their values overridden.
 
+At least one of these must be specified:
+
+.RS 2m
 .TP 2m
 \fB\-\-id\fR=\fITASK_ID\fR
 The ID of the task to create.
@@ -43,12 +43,25 @@ created with IDs have significantly increased latency. Using hashed strings for
 the task ID or for the prefix of the task ID is recommended.
 
 .TP 2m
-\fB\-\-method\fR=\fIMETHOD\fR
-The HTTP method to use for the request. If not specified, "POST" will be used.
-
-.TP 2m
 \fB\-\-queue\fR=\fIQUEUE\fR
 The queue the task belongs to.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-header\fR=\fIHEADER_FIELD\fR: \fIHEADER_VALUE\fR
+An HTTP request header. Header values can contain commas. This flag can be
+repeated. Repeated header fields will have their values overridden.
+
+.TP 2m
+\fB\-\-method\fR=\fIMETHOD\fR
+The HTTP method to use for the request. If not specified, "POST" will be used.
 
 .TP 2m
 \fB\-\-routing\fR=\fIKEY\fR:\fIVALUE\fR,[...]

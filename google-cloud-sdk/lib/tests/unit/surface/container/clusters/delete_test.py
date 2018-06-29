@@ -60,8 +60,6 @@ class DeleteTestGA(base.TestBaseV1,
     self._TestDefaultAuth(c_config)
     properties.PersistProperty(
         properties.VALUES.container.cluster, cluster.name)
-    # Get to verify existence.
-    self.ExpectGetCluster(cluster, zone=location)
     # Delete cluster returns operation pending
     self.ExpectDeleteCluster(
         self.CLUSTER_NAME,
@@ -101,7 +99,7 @@ class DeleteTestGA(base.TestBaseV1,
 
   def testDeleteAsync(self):
     properties.VALUES.core.disable_prompts.Set(False)
-    self.ExpectGetCluster(self._MakeCluster())
+    self._MakeCluster()
     # Delete cluster returns operation pending
     self.ExpectDeleteCluster(
         self.CLUSTER_NAME,
@@ -115,7 +113,7 @@ class DeleteTestGA(base.TestBaseV1,
 
   def testDeleteQuiet(self):
     properties.VALUES.core.disable_prompts.Set(False)
-    self.ExpectGetCluster(self._MakeCluster())
+    self._MakeCluster()
     # Delete cluster returns operation pending
     self.ExpectDeleteCluster(
         self.CLUSTER_NAME,
@@ -156,7 +154,6 @@ class DeleteTestGA(base.TestBaseV1,
     ]
     for cluster in clusters:
       c_util.ClusterConfig.Persist(cluster, self.PROJECT_ID)
-      self.ExpectGetCluster(cluster)
       self.ExpectDeleteCluster(
           cluster.name,
           self._MakeOperation(
@@ -201,12 +198,11 @@ class DeleteTestGA(base.TestBaseV1,
 
     for cluster in not_found, wrong_zone:
       # return 404
-      self.ExpectGetCluster(cluster, exception=base.NOT_FOUND_ERROR)
+      self.ExpectDeleteCluster(cluster.name, exception=base.NOT_FOUND_ERROR)
       self.ExpectListClusters(existing + [actual_zone])
     for cluster in existing:
       c_util.ClusterConfig.Persist(cluster, self.PROJECT_ID)
       mock_operation_id = cluster.name + '-mock-operation-id'
-      self.ExpectGetCluster(cluster)
       self.ExpectDeleteCluster(
           cluster.name,
           response=self._MakeOperation(
@@ -254,8 +250,6 @@ class DeleteTestGA(base.TestBaseV1,
 
     cluster = self._MakeCluster(
         name='http_error', endpoint='1.2.3.4')
-
-    self.ExpectGetCluster(cluster)
     self.ExpectDeleteCluster(cluster.name, exception=self.HttpError())
     self.ClearOutput()
     self.ClearErr()
@@ -286,7 +280,7 @@ class DeleteTestGA(base.TestBaseV1,
     self.assertIsNone(c_util.ClusterConfig.Load(
         self.CLUSTER_NAME, self.ZONE, self.PROJECT_ID))
     # Delete cluster returns operation pending
-    self.ExpectGetCluster(self._MakeCluster())
+    self._MakeCluster()
     self.ExpectDeleteCluster(
         self.CLUSTER_NAME,
         self._MakeOperation(operationType=self.op_delete))
@@ -321,7 +315,7 @@ class DeleteTestGA(base.TestBaseV1,
         'HOMEPATH': '',
         'USERPROFILE': ''
     })
-    self.ExpectGetCluster(self._MakeCluster())
+    self._MakeCluster()
     self.ExpectDeleteCluster(
         self.CLUSTER_NAME, self._MakeOperation(operationType=self.op_delete))
     self.ExpectGetOperation(

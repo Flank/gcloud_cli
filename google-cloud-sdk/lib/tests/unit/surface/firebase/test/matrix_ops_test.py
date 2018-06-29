@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import test_utils
 from tests.lib.surface.firebase.test.android import unit_base
+import six
 
 TESTING_V1_MESSAGES = apis.GetMessagesModule('testing', 'v1')
 
@@ -80,8 +84,9 @@ class MatrixMonitorTests(unit_base.AndroidMockClientTest):
 
     with self.assertRaises(exceptions.TestExecutionNotFoundError) as ex_ctx:
       monitor._GetTestExecutionStatus('kam_test9')
-    self.assertEqual(ex_ctx.exception.message,
-                     'Test execution [kam_test9] not found in matrix [kam].')
+    self.assertEqual(
+        six.text_type(ex_ctx.exception),
+        'Test execution [kam_test9] not found in matrix [kam].')
 
   def testMatrixMonitor_MonitorMatrixProgress_ExitsIfMatrixFinished(self):
     m_id = 'matrix9'
@@ -186,8 +191,9 @@ class MatrixMonitorTests(unit_base.AndroidMockClientTest):
 
     self.AssertOutputEquals('')
     self.AssertErrEquals('09:26:53 handoff\n')
-    self.assertEqual(ex_ctx.exception.message,
-                     'Firebase Test Lab infrastructure failure: fumble')
+    self.assertEqual(
+        six.text_type(ex_ctx.exception),
+        'Firebase Test Lab infrastructure failure: fumble')
 
   def testMatrixMonitor_MonitorTestProgress_TestErrorLater(self):
     """Simulate the test state going from PENDING to RUNNING to ERROR."""
@@ -215,8 +221,9 @@ class MatrixMonitorTests(unit_base.AndroidMockClientTest):
 09:26:53 Test is Running
 09:26:53 Pass
 """)
-    self.assertEqual(ex_ctx.exception.message,
-                     'Firebase Test Lab infrastructure failure: interception')
+    self.assertEqual(
+        six.text_type(ex_ctx.exception),
+        'Firebase Test Lab infrastructure failure: interception')
 
   def testMatrixMonitor_MonitorTestProgress_EnvironmentIsUnsupported(self):
     m_id = 'the-matrix'
@@ -229,8 +236,9 @@ class MatrixMonitorTests(unit_base.AndroidMockClientTest):
 
     self.AssertOutputEquals('')
     self.AssertErrEquals('09:26:53 lateral\n')
-    self.assertIn('dimensions are not compatible', ex_ctx.exception.message)
-    self.assertIn('[OS-version 10 on Nexus0]', ex_ctx.exception.message)
+    self.assertIn('dimensions are not compatible',
+                  six.text_type(ex_ctx.exception))
+    self.assertIn('[OS-version 10 on Nexus0]', six.text_type(ex_ctx.exception))
 
   def testMatrixMonitor_MonitorTestProgress_TestFinishes(self):
     """Simulate the test state going from PENDING to RUNNING to FINISHED.

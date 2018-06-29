@@ -14,6 +14,8 @@
 
 """Base for Dataproc tests that need to mock compute."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import base_api
 
 from googlecloudsdk.api_lib.util import apis

@@ -33,14 +33,8 @@ class AnnotationsDeleteIntTest(base.CategoryManagerUnitTestBase):
         annotationsId=self.annotation_id)
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _ExpectDeleteAnnotation(self, annotation_name):
-    self.mock_client.projects_taxonomies_annotations.Delete.Expect(
-        self.messages.CategorymanagerProjectsTaxonomiesDeleteRequest(
-            name=annotation_name),
-        self.messages.Empty())
-
   def testDeleteAnnotationPromptingWithYes(self):
-    self._ExpectDeleteAnnotation(self.annotation_ref.RelativeName())
+    self.ExpectProjectAnnotationDelete(self.annotation_ref.RelativeName())
     self.WriteInput('Y\n')
     args = '{} --taxonomy {}'.format(self.annotation_ref.annotationsId,
                                      self.annotation_ref.taxonomiesId)

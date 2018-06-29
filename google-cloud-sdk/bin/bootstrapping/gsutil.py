@@ -5,8 +5,9 @@
 
 """A convenience wrapper for starting gsutil."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
-import sys
 
 
 import bootstrapping
@@ -89,15 +90,17 @@ def main():
 
 
 if __name__ == '__main__':
+  bootstrapping.DisallowPython3()
   try:
-    version = bootstrapping.GetFileContents('platform/gsutil', 'VERSION')
+    version = bootstrapping.ReadFileContents('platform/gsutil', 'VERSION')
     bootstrapping.CommandStart('gsutil', version=version)
 
     blacklist = {
         'update': 'To update, run: gcloud components update',
     }
 
-    bootstrapping.CheckForBlacklistedCommand(sys.argv, blacklist, warn=True,
+    argv = bootstrapping.GetDecodedArgv()
+    bootstrapping.CheckForBlacklistedCommand(argv, blacklist, warn=True,
                                              die=True)
     # Don't call bootstrapping.PreRunChecks because anonymous access is
     # supported for some endpoints. gsutil will output the appropriate

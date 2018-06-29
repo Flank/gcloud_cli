@@ -2,12 +2,19 @@ NAME
     gcloud alpha kms keys list - list the keys within a keyring
 
 SYNOPSIS
-    gcloud alpha kms keys list [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keys list [--keyring=KEYRING] [--location=LOCATION]
+        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
+        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Lists all keys within the given keyring.
+
+FLAGS
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the key.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

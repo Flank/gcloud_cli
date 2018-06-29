@@ -28,7 +28,7 @@ from six.moves import range
 
 class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   """Base class for all TPU unit tests."""
-  API_VERSION = 'v1alpha1'
+  API_VERSION = 'v1'
 
   def _SetTrack(self, track):
     self.track = track
@@ -39,7 +39,7 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
     self.mock_client = mock.Client(
         core_apis.GetClientClass('tpu', self.API_VERSION),
         real_client=core_apis.GetClientInstance(
-            'tpu', self.API_VERSION, no_http=True))
+            'tpu', TpuUnitTestBase.API_VERSION, no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -56,7 +56,8 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
                  network='data-test',
                  version=None,
                  port='2222',
-                 accelerator_type='v2-8'
+                 accelerator_type='v2-8',
+                 preemptible=False
                 ):
     return self.messages.Node(
         name=name,
@@ -69,7 +70,8 @@ class TpuUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
         tensorflowVersion=version,
         port=port,
         acceleratorType=accelerator_type,
-        networkEndpoints=self._GetNetworkEndpoints(cidr, port, 2)
+        networkEndpoints=self._GetNetworkEndpoints(cidr, port, 2),
+        schedulingConfig=self.messages.SchedulingConfig(preemptible=preemptible)
     )
 
   def _GetNetworkEndpoints(self, base_range, port, count):

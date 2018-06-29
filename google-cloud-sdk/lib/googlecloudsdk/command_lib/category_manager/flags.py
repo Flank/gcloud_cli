@@ -16,18 +16,17 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from googlecloudsdk.calliope.concepts import concepts
-from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
-from googlecloudsdk.core import properties
+from googlecloudsdk.command_lib.util.concepts import presentation_specs
 
 
 def AddOrganizationIdArg(parser):
   """Adds 'organization' resource argument as a required CLI input."""
   concept_parsers.ConceptParser.ForResource(
-      name='organization',
+      name='--organization',
       resource_spec=concepts.ResourceSpec(
-          'cloudresourcemanager.organizations',
-          resource_name='organization'),
+          'cloudresourcemanager.organizations', resource_name='organization'),
       group_help='Your organization\'s id.',
       required=True).AddToParser(parser)
 
@@ -35,13 +34,6 @@ def AddOrganizationIdArg(parser):
 def _AssetAttributeConfig():
   return concepts.ResourceParameterAttributeConfig(
       name='asset', help_text='An asset reference.')
-
-
-def _ProjectAttributeConfig():
-  return concepts.ResourceParameterAttributeConfig(
-      name='project',
-      help_text='The Cloud project for the {resource}.',
-      fallthroughs=[deps.PropertyFallthrough(properties.VALUES.core.project)])
 
 
 def _TaxonomyAttributeConfig():
@@ -66,7 +58,7 @@ def _GetProjectAnnotationResourceSpec():
   return concepts.ResourceSpec(
       'categorymanager.projects.taxonomies.annotations',
       resource_name='annotation',
-      projectsId=_ProjectAttributeConfig(),
+      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG,
       taxonomiesId=_TaxonomyAttributeConfig(),
       annotationsId=_AnnotationsAttributeConfig())
 
@@ -75,7 +67,7 @@ def _GetProjectTaxonomyResourceSpec():
   return concepts.ResourceSpec(
       'categorymanager.projects.taxonomies',
       resource_name='taxonomy',
-      projectsId=_ProjectAttributeConfig(),
+      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG,
       taxonomiesId=_TaxonomyAttributeConfig())
 
 
@@ -85,7 +77,7 @@ def CreateAnnotationResourceArg(plural=False, positional=False, required=True):
   if plural:
     name = 'annotations'
     help_text = 'A comma separated list of annotation references.'
-  return concept_parsers.ResourcePresentationSpec(
+  return presentation_specs.ResourcePresentationSpec(
       name if positional else ('--' + name),
       _GetProjectAnnotationResourceSpec(),
       help_text,
@@ -95,7 +87,7 @@ def CreateAnnotationResourceArg(plural=False, positional=False, required=True):
 
 
 def CreateTaxonomyResourceArg(positional=False):
-  return concept_parsers.ResourcePresentationSpec(
+  return presentation_specs.ResourcePresentationSpec(
       'taxonomy' if positional else '--taxonomy',
       _GetProjectTaxonomyResourceSpec(),
       'A taxonomy reference.',
@@ -104,7 +96,7 @@ def CreateTaxonomyResourceArg(positional=False):
 
 
 def CreateAssetResourceArg(positional=False):
-  return concept_parsers.ResourcePresentationSpec(
+  return presentation_specs.ResourcePresentationSpec(
       'asset' if positional else '--asset',
       _GetAssetResourceSpec(),
       group_help='The asset reference.',
@@ -120,9 +112,20 @@ def AddSubAssetFlag(parser, hidden=False):
   parser.add_argument('--sub-asset', help=help_text, hidden=hidden)
 
 
-def AddDescriptionFlag(parser, required=True):
-  help_text = 'A human-readable description of the taxonomy.'
+def AddDisplayNameFlag(parser, resource, required=True):
+  help_text = 'A human-readable name for the {}.'.format(resource)
+  parser.add_argument('--display-name', help=help_text, required=required)
+
+
+def AddDescriptionFlag(parser, resource, required=True):
+  help_text = 'A human-readable description of the {}.'.format(resource)
   parser.add_argument('--description', help=help_text, required=required)
+
+
+def AddParentAnnotationFlag(parser):
+  help_text = ('The ID of the parent annotation for this annotation. If not '
+               'given, this annotation will be at the root of the hierarchy.')
+  parser.add_argument('--parent-annotation', help=help_text, required=False)
 
 
 def AddMatchChildAnnotationsFlag(parser, hidden=False):

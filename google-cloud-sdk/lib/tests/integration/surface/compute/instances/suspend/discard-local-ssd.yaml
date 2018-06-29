@@ -241,6 +241,5 @@ response:
 ---
 output:
   stderr: |
-    <START PROGRESS TRACKER>Suspending instance(s) z4
-    <END PROGRESS TRACKER>SUCCESS
+    {"ux": "PROGRESS_TRACKER", "message": "Suspending instance(s) z4", "status": "SUCCESS"}
     Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-east1-b/instances/z4].

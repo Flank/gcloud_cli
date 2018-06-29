@@ -14,6 +14,8 @@
 
 """Base classes for all 'gcloud firebase test network-profiles' unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib.surface.firebase.test import unit_base
 

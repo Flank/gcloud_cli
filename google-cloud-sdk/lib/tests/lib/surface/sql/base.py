@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base class for all sql tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -47,8 +49,8 @@ class SqlIntegrationTestBaseWithNewInstance(SqlIntegrationTestBase):
 
   @sdk_test_base.Retry(why=('Because sql backend service is flaky.'))
   def CreateInstance(self):
-    self.test_instance = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-sql-test').next()
+    self.test_instance = next(
+        e2e_utils.GetResourceNameGenerator(prefix='gcloud-sql-test'))
     self.instance_created = False
     self.RunCreateInstanceCmd()
     self.instance_created = True

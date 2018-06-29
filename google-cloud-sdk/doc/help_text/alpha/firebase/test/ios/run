@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
     gcloud alpha firebase test ios run [ARGSPEC]
         [--device=DIMENSION=VALUE,[...]] [--test=XCTEST_ZIP]
-        [--timeout=TIMEOUT] [--async] [--record-video]
-        [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
+        [--timeout=TIMEOUT] [--xctestrun-file=XCTESTRUN_FILE] [--async]
+        [--record-video] [--results-bucket=RESULTS_BUCKET]
+        [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME] [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
         [GCLOUD_WIDE_FLAG ...]
@@ -55,7 +56,9 @@ COMMONLY USED FLAGS
      --test=XCTEST_ZIP
         The path to the test package (a zip file containing the iOS app and
         XCTest files). The given path may be in the local filesystem or in
-        Google Cloud Storage using a URL beginning with gs://.
+        Google Cloud Storage using a URL beginning with gs://. Note: any
+        .xctestrun file in this zip file will be ignored if --xctestrun-file is
+        specified.
 
      --timeout=TIMEOUT
         The max time this test execution can run before it is cancelled
@@ -67,6 +70,14 @@ COMMONLY USED FLAGS
         * --timeout 5m is 5 minutes
         * --timeout 200s is 200 seconds
         * --timeout 100 is 100 seconds
+
+     --xctestrun-file=XCTESTRUN_FILE
+        The path to an .xctestrun file that will override any .xctestrun file
+        contained in the --test package. Because the .xctestrun file contains
+        environment variables along with test methods to run and/or ignore,
+        this can be useful for customizing or sharding test suites. The given
+        path may be in the local filesystem or in Google Cloud Storage using a
+        URL beginning with gs://.
 
 FLAGS
      --async

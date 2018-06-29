@@ -59,25 +59,61 @@ class PlatformsTest(test_case.TestCase):
 class PythonVersionTest(test_case.WithOutputCapture, parameterized.TestCase):
 
   @parameterized.parameters([
-      ((2, 5), False, False, 'ERROR: Python 2.5 is not compatible '),
-      ((2, 6), False, True, 'WARNING:  Python 2.6.x is no longer'),
+      ((2, 5), False, False,
+       'ERROR: Python 2.5 is not compatible with the Google Cloud SDK. Please '
+       'use Python version 2.7.x.'),
+      ((2, 6), False, True,
+       'WARNING:  Python 2.6.x is no longer officially supported by the Google '
+       'Cloud SDK\nand may not function correctly.  Please use Python version '
+       '2.7.x.'),
       ((2, 7), False, True, ''),
-      ((3, 0), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((3, 1), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((3, 2), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((3, 3), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((3, 4), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((3, 5), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((3, 6), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((3, 7), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((4, 0), False, False, 'ERROR: Python 3 and later is not compatible'),
-      ((2, 5), True, False, 'ERROR: Python 2.5 is not compatible '),
-      ((2, 6), True, True, 'WARNING:  Python 2.6.x is no longer'),
+      ((3, 0), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((3, 1), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((3, 2), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((3, 3), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((3, 4), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((3, 5), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((3, 6), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((3, 7), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((4, 0), False, False,
+       'ERROR: Python 3 and later is not compatible with the Google Cloud SDK. '
+       'Please use Python version 2.7.x.'),
+      ((2, 5), True, False,
+       'ERROR: Python 2.5 is not compatible with the Google Cloud SDK. Please '
+       'use Python version 2.7.x or 3.4 and up.'),
+      ((2, 6), True, True,
+       'WARNING:  Python 2.6.x is no longer officially supported by the Google '
+       'Cloud SDK\nand may not function correctly.  Please use Python version '
+       '2.7.x or 3.4 and up.'),
       ((2, 7), True, True, ''),
-      ((3, 0), True, False, 'ERROR: Python 3.0 is not compatible '),
-      ((3, 1), True, False, 'ERROR: Python 3.1 is not compatible '),
-      ((3, 2), True, False, 'ERROR: Python 3.2 is not compatible '),
-      ((3, 3), True, False, 'ERROR: Python 3.3 is not compatible '),
+      ((3, 0), True, False,
+       'ERROR: Python 3.0 is not compatible with the Google Cloud SDK. Please '
+       'use Python version 2.7.x or 3.4 and up.'),
+      ((3, 1), True, False,
+       'ERROR: Python 3.1 is not compatible with the Google Cloud SDK. Please '
+       'use Python version 2.7.x or 3.4 and up.'),
+      ((3, 2), True, False,
+       'ERROR: Python 3.2 is not compatible with the Google Cloud SDK. Please '
+       'use Python version 2.7.x or 3.4 and up.'),
+      ((3, 3), True, False,
+       'ERROR: Python 3.3 is not compatible with the Google Cloud SDK. Please '
+       'use Python version 2.7.x or 3.4 and up.'),
       ((3, 4), True, True, ''),
       ((3, 5), True, True, ''),
       ((3, 6), True, True, ''),
@@ -89,9 +125,24 @@ class PythonVersionTest(test_case.WithOutputCapture, parameterized.TestCase):
         is_compatible,
         platforms.PythonVersion(version).IsCompatible(allow_py3=allow_py3))
     if error_string:
-      self.AssertErrContains(error_string)
+      error_string += """\
+
+
+If you have a compatible Python interpreter installed, you can use it by setting
+the CLOUDSDK_PYTHON environment variable to point to it.
+
+"""
+      self.AssertErrEquals(error_string)
     else:
       self.AssertErrEquals('')
+
+  def testRaise(self):
+    with self.assertRaisesRegex(
+        platforms.Error,
+        'ERROR: Python 3 and later is not compatible with the Google Cloud SDK.'
+        ' Please use Python version 2.7.x.'):
+      platforms.PythonVersion((3, 0)).IsCompatible(
+          allow_py3=False, raise_exception=True)
 
   @parameterized.parameters([True, False])
   def testUnknownVersion(self, allow_py3):

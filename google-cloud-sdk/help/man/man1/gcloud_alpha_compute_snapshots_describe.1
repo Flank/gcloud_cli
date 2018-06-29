@@ -20,10 +20,8 @@ gcloud alpha compute snapshots describe \- describe a Google Compute Engine snap
 \fB(ALPHA)\fR \fBgcloud alpha compute snapshots describe\fR displays all data
 associated with a Compute Engine snapshot in a project.
 
-.RS 2m
-Given an existing snapshot is queried, successful output of this command
-looks like the following:
-.RE
+Given an existing snapshot is queried, successful output of this command looks
+like the following:
 
 .RS 2m
 creationTimestamp: '2018\-05\-07T10:45:46.988\-07:00'
@@ -68,14 +66,15 @@ To run \f5gcloud alpha compute snapshots describe\fR, you'll need the name of a
 snapshot. To list existing snapshots by name, run:
 
 .RS 2m
-gcloud compute snapshots list
+$ gcloud alpha compute snapshots list
 .RE
 
 To display specific details of an existing Compute Engine snapshot (like its
 creation time, status, and storage details), run:
 
 .RS 2m
-gcloud compute snapshots describe [SNAPSHOT_NAME]          \-\-format="table(creationTimestamp, status, storageBytes, storageBytesStatus)"
+$ gcloud alpha compute snapshots describe SNAPSHOT_NAME \e
+    \-\-format="table(creationTimestamp, status, storageBytesStatus)"
 .RE
 
 

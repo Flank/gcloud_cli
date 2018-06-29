@@ -11,7 +11,7 @@ gcloud beta compute instances create \- create Google Compute Engine virtual mac
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-vm\-integrity\-monitoring\fR] [\fB\-\-shielded\-vm\-secure\-boot\fR] [\fB\-\-shielded\-vm\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,7 +54,7 @@ Names of the instances to create.
 
 .RS 2m
 .TP 2m
-\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]
+\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
 Attaches accelerators (e.g. GPUs) to the instances.
 
 .RS 2m
@@ -180,6 +180,42 @@ If \f5\fIyes\fR\fR, this persistent disk will be automatically deleted when the
 instance is deleted. However, if the disk is later detached from the instance,
 this option won't apply. The default value for this is \f5\fIno\fR\fR.
 
+.TP 2m
+\fBkms\-key\fR
+Fully qualified Cloud KMS cryptokey name that will protect the disk. This can
+either be the fully qualified path or the name. The fully qualified Cloud KMS
+cryptokey name format is:
+\f5\fIprojects/<kms\-project>/locations/<kms\-location>/keyRings/<kms\-keyring>/
+cryptoKeys/<key\-name>\fR\fR. If the value is not fully qualified then
+kms\-location, kms\-keyring, and optionally kms\-project are required. See
+https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption for
+more details.
+
+.TP 2m
+\fBkms\-project\fR
+Project that contains the Cloud KMS cryptokey that will protect the disk. If the
+project is not specified then the project where the disk is being created will
+be used. If this flag is set then key\-location, kms\-keyring, and kms\-key are
+required. See
+https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption for
+more details.
+
+.TP 2m
+\fBkms\-location\fR
+Location of the Cloud KMS cryptokey to be used for protecting the disk. All
+Cloud KMS cryptokeys are reside in a 'location'. To get a list of possible
+locations run 'gcloud kms locations list'. If this flag is set then kms\-keyring
+and kms\-key are required. See
+https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption for
+more details.
+
+.TP 2m
+\fBkms\-keyring\fR
+The keyring which contains the Cloud KMS cryptokey that will protect the disk.
+If this flag is set then kms\-location and kms\-key are required. See
+https://cloud.google.com/compute/docs/disks/customer\-managed\-encryption for
+more details.
+
 .RE
 .sp
 .TP 2m
@@ -250,6 +286,11 @@ region as the instance. The default value for this is \f5\fIzonal\fR\fR.
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 \fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]
@@ -451,6 +492,24 @@ does not affect terminations performed by the user. Enabled by default, use
 \fB\-\-no\-restart\-on\-failure\fR to disable.
 
 .TP 2m
+\fB\-\-shielded\-vm\-integrity\-monitoring\fR
+Enables monitoring and attestation of the boot integrity of the instance. The
+attestation is performed against the integrity policy baseline. This baseline is
+initially derived from the implicitly trusted boot image when the instance is
+created. This baseline can be updated by using
+\f5\-\-shielded\-vm\-learn\-integrity\-policy\fR.
+
+.TP 2m
+\fB\-\-shielded\-vm\-secure\-boot\fR
+The instance will boot with secure boot enabled.
+
+.TP 2m
+\fB\-\-shielded\-vm\-vtpm\fR
+The instance will boot with the TPM (Trusted Platform Module) enabled. A TPM is
+a hardware module that can be used for different security operations such as
+remote attestation, encryption and sealing of keys.
+
+.TP 2m
 \fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR
 The name of the instance template that the instance will be created from.
 
@@ -528,6 +587,32 @@ If provided, the instances will not be assigned external IP addresses.
 .sp
 .TP 2m
 
+Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
+used to protect the disk. The arguments in this group can be used to specify the
+attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR
+The ID of the key or a fully qualified identifier for the key. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR
+The KMS keyring of the key.
+
+.TP 2m
+\fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR
+The Cloud location for the key.
+
+.TP 2m
+\fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR
+The Cloud project for the key.
+
+.RE
+.sp
+.TP 2m
+
 Custom machine type extensions.
 
 .RS 2m
@@ -593,6 +678,43 @@ associated with that family is used. It is best practice to use
 \f5\-\-image\-family\fR when the latest version of an image is needed.
 
 By default, \f5\fIdebian\-9\fR\fR is assumed for this flag.
+
+.RE
+.sp
+.TP 2m
+
+Sole Tenancy At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-node\fR=\fINODE\fR
+The name of the node to schedule this instance on.
+
+.TP 2m
+\fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR
+The JSON/YAML file containing the configuration of desired nodes onto which this
+instance could be scheduled. These rules filter the nodes according to their
+node affinity labels. A node's affinity labels come from the node template of
+the group the node is in.
+
+The file should contain a list of a JSON/YAML objects with the following fields:
+
+.TP 2m
+\fBkey\fR
+Corresponds to the node affinity label keys of the Node resource.
+.TP 2m
+\fBoperator\fR
+Specifies the node selection type. Must be one of: \f5IN\fR: Requires Compute
+Engine to seek for matched nodes. \f5NOT_IN\fR: Requires Compute Engine to avoid
+certain nodes.
+.TP 2m
+\fBvalues\fR
+Optional. A list of values which correspond to the node affinity label values of
+the Node resource.
+
+.TP 2m
+\fB\-\-node\-group\fR=\fINODE_GROUP\fR
+The name of the node group to schedule this instance on.
 
 .RE
 .sp

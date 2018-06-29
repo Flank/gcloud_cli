@@ -31,8 +31,9 @@ name can contain uppercase and lowercase letters, numbers, and hyphens \-\- that
 is, it must match the regular expression:\f5[a\-zA\-Z\e\ed\-]+\fR. The maximum
 length is 100 characters. If not supplied, the system generates one. This
 represents a Cloud resource. (NOTE) Some attributes are not given arguments in
-this group but can be set in other ways. To set the [project] attribute: Set the
-property [core/project] or provide the flag [\-\-project] on the command line.
+this group but can be set in other ways. To set the [project] attribute: provide
+the flag [job_trigger] on the command line with a fully specified name; provide
+the flag [\-\-project] on the command line; set the property [core/project].
 This must be specified.
 
 
@@ -84,7 +85,7 @@ project_id, dataset_id, and table_id in the format
 .TP 2m
 \fB\-\-path\fR=\fIPATH\fR
 Google Cloud Storage URL to scan for files with optional wildcard character
-('**\fB') \-\- for example, \f5gs://my\-bucket/**\fR\fR.
+(\f5*\fR) \-\- for example, gs://my\-bucket/\f5*\fR.
 
 .RE
 .sp
@@ -95,9 +96,10 @@ Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-output\-tables\fR=[\fIOUTPUT_TABLES\fR,...]
-Publishes results of a Cloud DLP job to one or more BigQuery tables. BigQuery
-tables are uniquely identified by their project_id, dataset_id, and table_id in
-the format \f5<project_id>.<dataset_id>.<table_id>\fR.
+Publishes results of a Cloud DLP job to one or more BigQuery tables.
+
+BigQuery tables are uniquely identified by their project_id, dataset_id, and
+table_id in the format \f5<project_id>.<dataset_id>.<table_id>\fR.
 
 .TP 2m
 \fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]
@@ -130,7 +132,7 @@ included by default.
 .TP 2m
 \fB\-\-include\-quote\fR
 If True, the server will attempt to filter out profanities, replacing all but
-the initial character in each filtered word with asterisks, e.g. \e"f**\fB\e".
+the initial character in each filtered word with asterisks, e.g. "f**\fB".
 
 .TP 2m
 \fR\-\-max\-findings\fB=\fIMAX_FINDINGS\fR; default=1000
@@ -146,11 +148,9 @@ If not specified, no limits are applied.
 
 .TP 2m
 \fR\-\-min\-likelihood\fB=\fIMIN_LIKELIHOOD\fR; default="possible"
-Only return findings equal to or above this threshold. One of:
-\f5very\-unlikely\fR, \f5unlikely\fR, \f5possible\fR, \f5likely\fR,
-\f5very\-likely\fR. The default value is \f5possible\fR. \fIMIN_LIKELIHOOD\fR
-must be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB,
-\fRvery\-likely\fB, \fRvery\-unlikely\fB.
+Only return findings equal to or above this threshold. \fIMIN_LIKELIHOOD\fR must
+be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB, \fRvery\-likely\fB,
+\fRvery\-unlikely\fB.
 
 
 \fR

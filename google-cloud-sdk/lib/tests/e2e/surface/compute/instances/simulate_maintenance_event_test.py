@@ -13,15 +13,17 @@
 # limitations under the License.
 """Integration tests for simulating maintenance on instances."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
-@test_case.Filters.SkipOnWindows('Too flaky', 'b/79499707')
 class SimulateMaintenanceEventTest(e2e_instances_test_base.InstancesTestBase):
 
+  @test_case.Filters.skip('Failing', 'b/80485653')
   def testSimulateMaintenanceEvent(self):
     self.GetInstanceName()
     self.Run('compute instances create {} --zone {} '.format(

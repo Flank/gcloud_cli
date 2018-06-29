@@ -553,19 +553,15 @@ class DeploymentsCreateTest(unit_test_base.DmV2UnitTestBase):
              + '"')
 
     self.AssertErrContains("""MTIzNDU2""")
-    self.AssertErrContains(
-        """
-<START PROGRESS TRACKER>Waiting for create [operation-12345-67890]
-<END PROGRESS TRACKER>FAILURE
+    self.AssertErrContains("""\
+{"ux": "PROGRESS_TRACKER", "message": "Waiting for create [operation-12345-67890]", "status": "FAILURE"}
 WARNING: There was an error deploying deployment-name:
 Error in Operation [operation-12345-67890]: errors:
 - message: baderrormessage
 
 `--automatic-rollback-on-error` flag was supplied; deleting failed deployment
-<START PROGRESS TRACKER>Waiting for delete [operation-delete]
-<END PROGRESS TRACKER>SUCCESS
-""",
-        normalize_space='.')
+{"ux": "PROGRESS_TRACKER", "message": "Waiting for delete [operation-delete]", "status": "SUCCESS"}
+""", normalize_space='.')
 
     self.AssertOutputEquals(
         """NAME                   TYPE    STATUS  TARGET  ERRORS  WARNINGS

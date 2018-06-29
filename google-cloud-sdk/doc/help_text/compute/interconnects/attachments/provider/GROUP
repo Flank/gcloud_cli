@@ -1,0 +1,31 @@
+NAME
+    gcloud compute interconnects attachments provider - create or manipulate
+        partner provider interconnect attachments
+
+SYNOPSIS
+    gcloud compute interconnects attachments provider COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create or manipulate partner provider interconnect attachments.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Google Compute Engine partner provider interconnect
+        attachment.
+
+     update
+        Update a Google Compute Engine partner provider interconnect
+        attachment.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice.
+

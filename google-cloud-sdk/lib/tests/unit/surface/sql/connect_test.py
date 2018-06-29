@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -43,31 +45,33 @@ class _BaseConnectTest(object):
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance=self.instance['id'],
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.DatabaseInstance(
             # pylint:disable=line-too-long
-            backendType=u'SECOND_GEN',
-            connectionName=u'{0}:us-central1:{1}'.format(
-                self.Project(), self.instance['id']),
+            backendType='SECOND_GEN',
+            connectionName='{0}:us-central1:{1}'.format(self.Project(),
+                                                        self.instance['id']),
             currentDiskSize=None,
             databaseVersion=self.instance['databaseVersion'],
-            etag=u'"DlgRosmIegBpXj_rR5uyhdXAbP8/MQ"',
+            etag='"DlgRosmIegBpXj_rR5uyhdXAbP8/MQ"',
             failoverReplica=None,
-            instanceType=u'CLOUD_SQL_INSTANCE',
+            instanceType='CLOUD_SQL_INSTANCE',
             ipAddresses=[
                 self.messages.IpMapping(
-                    ipAddress=u'104.154.166.249',
+                    ipAddress='104.154.166.249',
                     timeToRetire=None,
-                    type=u'PRIMARY',),
+                    type='PRIMARY',
+                ),
             ],
             ipv6Address=None,
-            kind=u'sql#instance',
+            kind='sql#instance',
             masterInstanceName=None,
             maxDiskSize=None,
             name=self.instance['id'],
             onPremisesConfiguration=None,
             project=self.Project(),
-            region=u'us-central1',
+            region='us-central1',
             replicaConfiguration=None,
             replicaNames=[],
             selfLink=
@@ -75,9 +79,9 @@ class _BaseConnectTest(object):
             format(self.Project(), self.instance['id']),
             serverCaCert=self.messages.SslCert(
                 cert=
-                u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
-                certSerialNumber=u'0',
-                commonName=u'C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
+                '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
+                certSerialNumber='0',
+                commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
                 createTime=datetime.datetime(
                     2017,
                     5,
@@ -97,65 +101,71 @@ class _BaseConnectTest(object):
                     844000,
                     tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
                 instance=self.instance['id'],
-                kind=u'sql#sslCert',
+                kind='sql#sslCert',
                 selfLink=None,
-                sha1Fingerprint=u'fcddb49c4a00ff8796ba099933dbeb208b8599bd',),
+                sha1Fingerprint='fcddb49c4a00ff8796ba099933dbeb208b8599bd',
+            ),
             serviceAccountEmailAddress=
-            u'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
+            'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
             settings=self.messages.Settings(
-                activationPolicy=u'ALWAYS',
+                activationPolicy='ALWAYS',
                 authorizedGaeApplications=[],
                 availabilityType=None,
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=None,
                     enabled=False,
-                    kind=u'sql#backupConfiguration',
-                    startTime=u'10:00',),
+                    kind='sql#backupConfiguration',
+                    startTime='10:00',
+                ),
                 crashSafeReplicationEnabled=None,
                 dataDiskSizeGb=10,
-                dataDiskType=u'PD_SSD',
+                dataDiskType='PD_SSD',
                 databaseFlags=[],
                 databaseReplicationEnabled=None,
                 ipConfiguration=self.messages.IpConfiguration(
                     authorizedNetworks=[],
                     ipv4Enabled=True,
-                    requireSsl=None,),
-                kind=u'sql#settings',
+                    requireSsl=None,
+                ),
+                kind='sql#settings',
                 locationPreference=None,
                 maintenanceWindow=None,
-                pricingPlan=u'PER_USE',
-                replicationType=u'SYNCHRONOUS',
+                pricingPlan='PER_USE',
+                replicationType='SYNCHRONOUS',
                 settingsVersion=1,
                 storageAutoResize=None,
                 storageAutoResizeLimit=None,
-                tier=self.instance['tier'],),
-            state=u'RUNNABLE',
-            suspensionReason=[],))
+                tier=self.instance['tier'],
+            ),
+            state='RUNNABLE',
+            suspensionReason=[],
+        ))
     patch_request = self.messages.SqlInstancesPatchRequest(
         databaseInstance=self.messages.DatabaseInstance(
             # pylint:disable=line-too-long
-            backendType=u'SECOND_GEN',
-            connectionName=u'{0}:us-central1:{1}'.format(
-                self.Project(), self.instance['id']),
+            backendType='SECOND_GEN',
+            connectionName='{0}:us-central1:{1}'.format(self.Project(),
+                                                        self.instance['id']),
             currentDiskSize=None,
             databaseVersion=self.instance['databaseVersion'],
-            etag=u'"DlgRosmIegBpXj_rR5uyhdXAbP8/MQ"',
+            etag='"DlgRosmIegBpXj_rR5uyhdXAbP8/MQ"',
             failoverReplica=None,
-            instanceType=u'CLOUD_SQL_INSTANCE',
+            instanceType='CLOUD_SQL_INSTANCE',
             ipAddresses=[
                 self.messages.IpMapping(
-                    ipAddress=u'104.154.166.249',
+                    ipAddress='104.154.166.249',
                     timeToRetire=None,
-                    type=u'PRIMARY',),
+                    type='PRIMARY',
+                ),
             ],
             ipv6Address=None,
-            kind=u'sql#instance',
+            kind='sql#instance',
             masterInstanceName=None,
             maxDiskSize=None,
             name=self.instance['id'],
             onPremisesConfiguration=None,
             project=self.Project(),
-            region=u'us-central1',
+            region='us-central1',
             replicaConfiguration=None,
             replicaNames=[],
             selfLink=
@@ -163,9 +173,9 @@ class _BaseConnectTest(object):
             format(self.Project(), self.instance['id']),
             serverCaCert=self.messages.SslCert(
                 cert=
-                u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
-                certSerialNumber=u'0',
-                commonName=u'C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
+                '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
+                certSerialNumber='0',
+                commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
                 createTime=datetime.datetime(
                     2017,
                     5,
@@ -185,23 +195,25 @@ class _BaseConnectTest(object):
                     844000,
                     tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
                 instance=self.instance['id'],
-                kind=u'sql#sslCert',
+                kind='sql#sslCert',
                 selfLink=None,
-                sha1Fingerprint=u'fcddb49c4a00ff8796ba099933dbeb208b8599bd',),
+                sha1Fingerprint='fcddb49c4a00ff8796ba099933dbeb208b8599bd',
+            ),
             serviceAccountEmailAddress=
-            u'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
+            'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
             settings=self.messages.Settings(
-                activationPolicy=u'ALWAYS',
+                activationPolicy='ALWAYS',
                 authorizedGaeApplications=[],
                 availabilityType=None,
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=None,
                     enabled=False,
-                    kind=u'sql#backupConfiguration',
-                    startTime=u'10:00',),
+                    kind='sql#backupConfiguration',
+                    startTime='10:00',
+                ),
                 crashSafeReplicationEnabled=None,
                 dataDiskSizeGb=10,
-                dataDiskType=u'PD_SSD',
+                dataDiskType='PD_SSD',
                 databaseFlags=[],
                 databaseReplicationEnabled=None,
                 ipConfiguration=self.messages.IpConfiguration(
@@ -209,26 +221,31 @@ class _BaseConnectTest(object):
                         self.messages.AclEntry(
                             expirationTime=self.time_of_connection +
                             datetime.timedelta(minutes=5),
-                            kind=u'sql#aclEntry',
+                            kind='sql#aclEntry',
                             name='sql connect at time {0}'.format(
                                 str(self.time_of_connection)),
-                            value='CLIENT_IP',),
+                            value='CLIENT_IP',
+                        ),
                     ],
                     ipv4Enabled=True,
-                    requireSsl=None,),
-                kind=u'sql#settings',
+                    requireSsl=None,
+                ),
+                kind='sql#settings',
                 locationPreference=None,
                 maintenanceWindow=None,
-                pricingPlan=u'PER_USE',
-                replicationType=u'SYNCHRONOUS',
+                pricingPlan='PER_USE',
+                replicationType='SYNCHRONOUS',
                 settingsVersion=1,
                 storageAutoResize=None,
                 storageAutoResizeLimit=None,
-                tier=self.instance['tier'],),
-            state=u'RUNNABLE',
-            suspensionReason=[],),
+                tier=self.instance['tier'],
+            ),
+            state='RUNNABLE',
+            suspensionReason=[],
+        ),
         instance=self.instance['id'],
-        project=self.Project(),)
+        project=self.Project(),
+    )
     if error:
       self.mocked_client.instances.Patch.Expect(
           patch_request,
@@ -254,26 +271,27 @@ class _BaseConnectTest(object):
                   50,
                   514000,
                   tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-              kind=u'sql#operation',
-              name=u'8b7ffa62-e950-45c0-bdad-1d366ad8b964',
-              operationType=u'UPDATE',
+              kind='sql#operation',
+              name='8b7ffa62-e950-45c0-bdad-1d366ad8b964',
+              operationType='UPDATE',
               selfLink=
-              u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/8b7ffa62-e9'.
+              'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/8b7ffa62-e9'.
               format(self.Project()),
               startTime=None,
-              status=u'PENDING',
+              status='PENDING',
               targetId=self.instance['id'],
               targetLink=
-              u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
+              'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
               format(self.Project(), self.instance['id']),
               targetProject=self.Project(),
               user=
-              u'462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com',
+              '462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com',
           ))
       self.mocked_client.operations.Get.Expect(
           self.messages.SqlOperationsGetRequest(
-              operation=u'8b7ffa62-e950-45c0-bdad-1d366ad8b964',
-              project=self.Project(),),
+              operation='8b7ffa62-e950-45c0-bdad-1d366ad8b964',
+              project=self.Project(),
+          ),
           self.messages.Operation(
               # pylint:disable=line-too-long
               endTime=datetime.datetime(
@@ -297,11 +315,11 @@ class _BaseConnectTest(object):
                   50,
                   514000,
                   tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-              kind=u'sql#operation',
-              name=u'8b7ffa62-e950-45c0-bdad-1d366ad8b964',
-              operationType=u'UPDATE',
+              kind='sql#operation',
+              name='8b7ffa62-e950-45c0-bdad-1d366ad8b964',
+              operationType='UPDATE',
               selfLink=
-              u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/8b7ffa62-e9'.
+              'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/8b7ffa62-e9'.
               format(self.Project()),
               startTime=datetime.datetime(
                   2017,
@@ -312,54 +330,56 @@ class _BaseConnectTest(object):
                   50,
                   707000,
                   tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-              status=u'DONE',
+              status='DONE',
               targetId=self.instance['id'],
               targetLink=
-              u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
+              'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
               format(self.Project(), self.instance['id']),
               targetProject=self.Project(),
               user=
-              u'462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com',
+              '462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com',
           ))
       self.mocked_client.instances.Get.Expect(
           self.messages.SqlInstancesGetRequest(
               instance=self.instance['id'],
-              project=self.Project(),),
+              project=self.Project(),
+          ),
           self.messages.DatabaseInstance(
               # pylint:disable=line-too-long
-              backendType=u'SECOND_GEN',
+              backendType='SECOND_GEN',
               connectionName='{0}:us-central1:{1}'.format(
                   self.Project(), self.instance['id']),
               currentDiskSize=None,
               databaseVersion=self.instance['databaseVersion'],
-              etag=u'"DlgRosmIegBpXj_rR5uyhdXAbP8/Mw"',
+              etag='"DlgRosmIegBpXj_rR5uyhdXAbP8/Mw"',
               failoverReplica=None,
-              instanceType=u'CLOUD_SQL_INSTANCE',
+              instanceType='CLOUD_SQL_INSTANCE',
               ipAddresses=[
                   self.messages.IpMapping(
-                      ipAddress=u'104.154.166.249',
+                      ipAddress='104.154.166.249',
                       timeToRetire=None,
-                      type=u'PRIMARY',),
+                      type='PRIMARY',
+                  ),
               ],
               ipv6Address=None,
-              kind=u'sql#instance',
+              kind='sql#instance',
               masterInstanceName=None,
               maxDiskSize=None,
               name=self.instance['id'],
               onPremisesConfiguration=None,
               project=self.Project(),
-              region=u'us-central1',
+              region='us-central1',
               replicaConfiguration=None,
               replicaNames=[],
               selfLink=
-              u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
+              'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'.
               format(self.Project(), self.instance['id']),
               serverCaCert=self.messages.SslCert(
                   cert=
-                  u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
-                  certSerialNumber=u'0',
+                  '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
+                  certSerialNumber='0',
                   commonName=
-                  u'C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
+                  'C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
                   createTime=datetime.datetime(
                       2017,
                       5,
@@ -381,23 +401,25 @@ class _BaseConnectTest(object):
                       tzinfo=protorpc_util.TimeZoneOffset(
                           datetime.timedelta(0))),
                   instance=self.instance['id'],
-                  kind=u'sql#sslCert',
+                  kind='sql#sslCert',
                   selfLink=None,
-                  sha1Fingerprint=u'fcddb49c4a00ff8796ba099933dbeb208b8599bd',),
+                  sha1Fingerprint='fcddb49c4a00ff8796ba099933dbeb208b8599bd',
+              ),
               serviceAccountEmailAddress=
-              u'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
+              'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
               settings=self.messages.Settings(
-                  activationPolicy=u'ALWAYS',
+                  activationPolicy='ALWAYS',
                   authorizedGaeApplications=[],
                   availabilityType=None,
                   backupConfiguration=self.messages.BackupConfiguration(
                       binaryLogEnabled=None,
                       enabled=False,
-                      kind=u'sql#backupConfiguration',
-                      startTime=u'10:00',),
+                      kind='sql#backupConfiguration',
+                      startTime='10:00',
+                  ),
                   crashSafeReplicationEnabled=None,
                   dataDiskSizeGb=10,
-                  dataDiskType=u'PD_SSD',
+                  dataDiskType='PD_SSD',
                   databaseFlags=[],
                   databaseReplicationEnabled=None,
                   ipConfiguration=self.messages.IpConfiguration(
@@ -405,24 +427,28 @@ class _BaseConnectTest(object):
                           self.messages.AclEntry(
                               expirationTime=self.time_of_connection +
                               datetime.timedelta(minutes=5),
-                              kind=u'sql#aclEntry',
+                              kind='sql#aclEntry',
                               name='sql connect at time {0}'.format(
                                   str(self.time_of_connection)),
-                              value='192.0.0.1',),
+                              value='192.0.0.1',
+                          ),
                       ],
                       ipv4Enabled=True,
-                      requireSsl=None,),
-                  kind=u'sql#settings',
+                      requireSsl=None,
+                  ),
+                  kind='sql#settings',
                   locationPreference=None,
                   maintenanceWindow=None,
-                  pricingPlan=u'PER_USE',
-                  replicationType=u'SYNCHRONOUS',
+                  pricingPlan='PER_USE',
+                  replicationType='SYNCHRONOUS',
                   settingsVersion=3,
                   storageAutoResize=True,
                   storageAutoResizeLimit=0,
-                  tier=self.instance['tier'],),
-              state=u'RUNNABLE',
-              suspensionReason=[],))
+                  tier=self.instance['tier'],
+              ),
+              state='RUNNABLE',
+              suspensionReason=[],
+          ))
 
 
 class _BaseMysqlConnectTest(_BaseConnectTest):

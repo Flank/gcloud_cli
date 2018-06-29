@@ -1,0 +1,59 @@
+NAME
+    gcloud compute interconnects attachments dedicated update - update a Google
+        Compute Engine dedicated interconnect attachment
+
+SYNOPSIS
+    gcloud compute interconnects attachments dedicated update NAME
+        [--description=DESCRIPTION] [--enable-admin] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    gcloud compute interconnects attachments dedicated update is used to update
+    interconnect attachments. An interconnect attachment is what binds the
+    underlying connectivity of an interconnect to a path into and out of the
+    customer's cloud network.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the interconnect attachment to patch.
+
+FLAGS
+     --description=DESCRIPTION
+        Human-readable plain-text description of attachment.
+
+     --enable-admin
+        Administrative status of the interconnect attachment. When this is
+        enabled, the attachment is operational and will carry traffic. Use
+        --no-enable-admin to disable it.
+
+     --region=REGION
+        The region of the interconnect attachment to patch. If not specified,
+        you may be prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute interconnects attachments dedicated update
+        $ gcloud beta compute interconnects attachments dedicated update
+

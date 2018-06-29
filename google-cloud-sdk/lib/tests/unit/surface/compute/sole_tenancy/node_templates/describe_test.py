@@ -24,7 +24,7 @@ from tests.lib.surface.compute import test_resources
 class NodeTemplatesDescribeTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
@@ -34,16 +34,14 @@ class NodeTemplatesDescribeTest(test_base.BaseTest):
     result = self.Run('compute sole-tenancy node-templates describe '
                       'template-1 --region region-1')
 
-    self.CheckRequests(
-        [(self.compute_alpha.nodeTemplates,
-          'Get',
-          self.messages.ComputeNodeTemplatesGetRequest(
-              nodeTemplate='template-1',
-              project='my-project',
-              region='region-1'))],
-    )
+    self.CheckRequests([(self.compute_beta.nodeTemplates, 'Get',
+                         self.messages.ComputeNodeTemplatesGetRequest(
+                             nodeTemplate='template-1',
+                             project='my-project',
+                             region='region-1'))],)
     self.assertEqual(test_resources.NODE_TEMPLATES[1], result)
-    self.AssertOutputEquals("""\
+    self.AssertOutputEquals(
+        """\
     creationTimestamp: '2018-01-15T10:00:00.0Z'
     description: a cold template
     kind: compute#nodeTemplate
@@ -52,11 +50,12 @@ class NodeTemplatesDescribeTest(test_base.BaseTest):
       environment: prod
       nodeGrouping: backend
     nodeType: n1-node-96-624
-    region: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1
-    selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/regions/region-1/nodeTemplates/template-2
+    region: https://www.googleapis.com/compute/beta/projects/my-project/regions/region-1
+    selfLink: https://www.googleapis.com/compute/beta/projects/my-project/regions/region-1/nodeTemplates/template-2
     status: CREATING
     statusMessage: Template is being created.
-    """, normalize_space=True)
+    """,
+        normalize_space=True)
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ gcloud alpha tasks create\-pull\-task \- create and add a task to a pull queue
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha tasks create\-pull\-task\fR [\fB\-\-id\fR=\fITASK_ID\fR] [\fB\-\-queue\fR=\fIQUEUE\fR] [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR\ |\ \fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha tasks create\-pull\-task\fR (\fB\-\-id\fR=\fITASK_ID\fR\ \fB\-\-queue\fR=\fIQUEUE\fR) [\fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR] [\fB\-\-tag\fR=\fITAG\fR] [\fB\-\-payload\-content\fR=\fIPAYLOAD_CONTENT\fR\ |\ \fB\-\-payload\-file\fR=\fIPAYLOAD_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -21,7 +21,12 @@ gcloud alpha tasks create\-pull\-task \- create and add a task to a pull queue
 
 
 
-.SH "FLAGS"
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+At least one of these must be specified:
 
 .RS 2m
 .TP 2m
@@ -41,6 +46,14 @@ the task ID or for the prefix of the task ID is recommended.
 \fB\-\-queue\fR=\fIQUEUE\fR
 The queue the task belongs to.
 
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
 .TP 2m
 \fB\-\-schedule\-time\fR=\fISCHEDULE_TIME\fR
 The time when the task is scheduled to be first attempted. Defaults to "now" if

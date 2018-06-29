@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.firebase.test.ios import catalog_manager
 from tests.lib import test_case
 from tests.lib.surface.firebase.test.ios import fake_catalogs
 from tests.lib.surface.firebase.test.ios import unit_base
+import six
 
 
 class IosCatalogManagerTests(unit_base.IosMockClientTest):
@@ -35,14 +39,14 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     mgr = catalog_manager.IosCatalogManager(empty_catalog)
     with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
       mgr.GetDefaultModel()
-    self.assertIn('model', ex_ctx.exception.message)
+    self.assertIn('model', six.text_type(ex_ctx.exception))
 
   def testVersionDefaultIsMissing(self):
     empty_catalog = fake_catalogs.EmptyIosCatalog()
     mgr = catalog_manager.IosCatalogManager(empty_catalog)
     with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
       mgr.GetDefaultVersion()
-    self.assertIn('version', ex_ctx.exception.message)
+    self.assertIn('version', six.text_type(ex_ctx.exception))
 
   def testLocaleDefaultIsEnglish(self):
     empty_catalog = fake_catalogs.EmptyIosCatalog()
@@ -87,14 +91,16 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     mgr = catalog_manager.IosCatalogManager(catalog)
     with self.assertRaises(exceptions.ModelNotFoundError) as ex_ctx:
       mgr.ValidateDimensionAndValue('model', 'iPear')
-    self.assertIn("'iPear' is not a valid model", ex_ctx.exception.message)
+    self.assertIn("'iPear' is not a valid model",
+                  six.text_type(ex_ctx.exception))
 
   def testValidateVersion_InvalidValue(self):
     catalog = fake_catalogs.FakeIosCatalog()
     mgr = catalog_manager.IosCatalogManager(catalog)
     with self.assertRaises(exceptions.VersionNotFoundError) as ex_ctx:
       mgr.ValidateDimensionAndValue('version', '99')
-    self.assertIn("'99' is not a valid OS version", ex_ctx.exception.message)
+    self.assertIn("'99' is not a valid OS version",
+                  six.text_type(ex_ctx.exception))
 
   @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testValidateLocale_InvalidValuel(self):
@@ -102,7 +108,8 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     mgr = catalog_manager.IosCatalogManager(catalog)
     with self.assertRaises(exceptions.LocaleNotFoundError) as ex_ctx:
       mgr.ValidateDimensionAndValue('locale', 'mtv')
-    self.assertIn("'mtv' is not a valid locale", ex_ctx.exception.message)
+    self.assertIn("'mtv' is not a valid locale",
+                  six.text_type(ex_ctx.exception))
 
   @test_case.Filters.skip('Need ios locale/orientation support.', 'b/78015882')
   def testValidateOrientation_InvalidValue(self):
@@ -111,14 +118,15 @@ class IosCatalogManagerTests(unit_base.IosMockClientTest):
     with self.assertRaises(exceptions.OrientationNotFoundError) as ex_ctx:
       mgr.ValidateDimensionAndValue('orientation', 'diagonal')
     self.assertIn("'diagonal' is not a valid device orientation",
-                  ex_ctx.exception.message)
+                  six.text_type(ex_ctx.exception))
 
   def testValidateDimension_InvalidDimensionName(self):
     catalog = fake_catalogs.FakeIosCatalog()
     mgr = catalog_manager.IosCatalogManager(catalog)
     with self.assertRaises(exceptions.InvalidIosDimensionNameError) as ex_ctx:
       mgr.ValidateDimensionAndValue('clone', 'iPear')
-    self.assertIn("'clone' is not a valid dimension", ex_ctx.exception.message)
+    self.assertIn("'clone' is not a valid dimension",
+                  six.text_type(ex_ctx.exception))
 
 
 if __name__ == '__main__':

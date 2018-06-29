@@ -2,7 +2,8 @@ NAME
     gcloud alpha kms keys describe - get metadata for a given key
 
 SYNOPSIS
-    gcloud alpha kms keys describe KEY [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keys describe KEY [--keyring=KEYRING]
+        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Returns metadata for the given key.
@@ -10,6 +11,13 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      KEY
         Name of the key to describe.
+
+FLAGS
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the key.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

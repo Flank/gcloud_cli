@@ -29,8 +29,9 @@ gcloud beta pubsub subscriptions add\-iam\-policy\-binding \- add IAM policy bin
 Subscription resource \- Name of the subscription to add an IAM policy binding
 to. This represents a Cloud resource. (NOTE) Some attributes are not given
 arguments in this group but can be set in other ways. To set the [project]
-attribute: Set the property [core/project] or provide the flag [\-\-project] on
-the command line. This must be specified.
+attribute: provide the flag [subscription] on the command line with a fully
+specified name; provide the flag [\-\-project] on the command line; set the
+property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -51,8 +52,8 @@ The member to add the binding for. Should be of the form
 \f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
 
 Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
-\f5serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com\fR, or
-\f5domain:example.com\fR.
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
 
 Can also be one of the following special values:
 .RS 2m
@@ -96,14 +97,15 @@ $ gcloud beta pubsub subscriptions add\-iam\-policy\-binding \e
     \-\-role='roles/editor'
 .RE
 
-For a service account 'my\-sa' linked to project 'test\-123', the following
+For a service account \f5test\-proj1@example.domain.com\fR, the following
 command will add an IAM policy binding for the role of 'roles/editor' to the
 given service account:
 
 .RS 2m
-$ gcloud beta pubsub subscriptions add\-iam\-policy\-binding test\-123 \e
-    \-\-member='serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com'\e
- \-\-role='roles/editor'
+$ gcloud beta pubsub subscriptions add\-iam\-policy\-binding \e
+    test\-proj1@example.domain.com \e
+    \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
+    \-\-role='roles/editor'
 .RE
 
 The following command will add an IAM policy binding for the role of

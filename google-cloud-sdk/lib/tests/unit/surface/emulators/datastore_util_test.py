@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests of the datastore_util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.command_lib.emulators import datastore_util
@@ -44,7 +47,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
 
     os_isdir_mock = self.StartObjectPatch(os.path, 'isdir')
     os_isdir_mock.return_value = True
-    args = type('args_mock',
+    args = type(str('args_mock'),
                 (object,),
                 dict(legacy=legacy))
 
@@ -67,7 +70,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
   def _DoTestArgsForGCDEmulatorOnNonWindows(self, gcd_exec, legacy):
     gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
     gcd_root_mock.return_value = 'pathtogcdroot'
-    args = type('args_mock',
+    args = type(str('args_mock'),
                 (object,),
                 dict(legacy=legacy))
 
@@ -89,7 +92,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
     gcd_root_mock = self.StartObjectPatch(datastore_util, 'GetGCDRoot')
     gcd_root_mock.return_value = 'pathtogcdroot'
 
-    args = type('args_mock',
+    args = type(str('args_mock'),
                 (object,),
                 dict(legacy=legacy))
 
@@ -113,7 +116,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
     prefix_mock = self.StartObjectPatch(util, 'PrefixOutput')
 
     data_dir = self.CreateTempDir()
-    args = type('args_mock',
+    args = type(str('args_mock'),
                 (object,),
                 dict(legacy=legacy,
                      data_dir=data_dir))
@@ -159,7 +162,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
     gcd_root_mock.return_value = 'pathtogcdroot'
     exec_mock = self.StartObjectPatch(util, 'Exec')
 
-    args = type('args_mock',
+    args = type(str('args_mock'),
                 (object,),
                 dict(host_port=arg_parsers.HostPort('localhost', '8080'),
                      store_on_disk=True,
@@ -186,7 +189,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
   def _DoTestWriteGCDEnvYaml(self, legacy):
     env_mock = self.StartObjectPatch(util, 'WriteEnvYaml')
 
-    args = type('args_mock',
+    args = type(str('args_mock'),
                 (object,),
                 dict(host_port=arg_parsers.HostPort('localhost', '8080'),
                      store_on_disk=True,
@@ -203,7 +206,7 @@ class DatastoreUtilTests(sdk_test_base.WithFakeAuth):
   def testWriteIPV6EnvYaml(self):
     env_mock = self.StartObjectPatch(util, 'WriteEnvYaml')
 
-    args = type('args_mock',
+    args = type(str('args_mock'),
                 (object,),
                 dict(host_port=arg_parsers.HostPort('::', '8080'),
                      store_on_disk=True,

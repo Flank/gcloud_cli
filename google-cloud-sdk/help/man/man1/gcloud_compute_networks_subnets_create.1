@@ -11,7 +11,7 @@ gcloud compute networks subnets create \- define a subnet for a network in custo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,6 +54,11 @@ The IP space allocated to this subnetwork in CIDR format.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 An optional description of this subnetwork.
+
+.TP 2m
+\fB\-\-enable\-flow\-logs\fR
+Enable/disable VPC flow logging for this subnet. More information for VPC flow
+logs can be found at https://cloud.google.com/vpc/docs/using\-flow\-logs.
 
 .TP 2m
 \fB\-\-enable\-private\-ip\-google\-access\fR

@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Test of the 'workflow-template run' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 import uuid
-
+from apitools.base.py import encoding
 from googlecloudsdk import calliope
-
 from googlecloudsdk.calliope import exceptions
 from tests.lib import cli_test_base
 from tests.lib.surface.dataproc import compute_base
@@ -34,6 +35,7 @@ class WorkflowTemplatesInstantiateUnitTest(unit_base.DataprocUnitTestBase,
   def ExpectWorkflowTemplatesInstantiate(self,
                                          workflow_template_name=None,
                                          version=None,
+                                         parameters=None,
                                          response=None,
                                          exception=None):
     if not workflow_template_name:
@@ -43,6 +45,10 @@ class WorkflowTemplatesInstantiateUnitTest(unit_base.DataprocUnitTestBase,
     instantiate_request.instanceId = self.frozen_uuid.hex
     if version:
       instantiate_request.version = version
+    if parameters:
+      instantiate_request.parameters = encoding.DictToMessage(
+          parameters,
+          self.messages.InstantiateWorkflowTemplateRequest.ParametersValue)
     if not (response or exception):
       response = self.MakeOperation()
     self.mock_client.projects_regions_workflowTemplates.Instantiate.Expect(
@@ -56,10 +62,13 @@ class WorkflowTemplatesInstantiateUnitTest(unit_base.DataprocUnitTestBase,
   def ExpectWorkflowTemplatesInstantiateCalls(self,
                                               workflow_template_name=None,
                                               version=None,
+                                              parameters=None,
                                               error=None):
 
     self.ExpectWorkflowTemplatesInstantiate(
-        workflow_template_name=workflow_template_name, version=version)
+        workflow_template_name=workflow_template_name,
+        version=version,
+        parameters=parameters)
     # Initial get operation returns pending
     self.ExpectGetOperation(
         self.MakeOperation(template=workflow_template_name, state='RUNNING'))
@@ -110,11 +119,33 @@ class WorkflowTemplatesInstantiateUnitTestBeta(
               self.WORKFLOW_TEMPLATE))
 
   def testInstantiateWorkflowTemplatesHttpError(self):
-    err = self.MakeHttpError(500, 'internal error stuff')
+    message = 'internal error stuff'
+    err = self.MakeHttpError(500, message)
     workflow_template = self.MakeWorkflowTemplate()
     self.ExpectWorkflowTemplatesInstantiate(
         workflow_template.name, exception=err)
-    with self.AssertRaisesExceptionMatches(exceptions.HttpException,
-                                           err.message):
+    with self.AssertRaisesExceptionMatches(exceptions.HttpException, message):
       self.RunDataproc('workflow-templates instantiate {0}'.format(
           self.WORKFLOW_TEMPLATE))
+
+  def testInstantiateWorkflowTemplatesWithParameters(self):
+    workflow_template = self.MakeWorkflowTemplate()
+    self.ExpectWorkflowTemplatesInstantiateCalls(
+        workflow_template_name=workflow_template.name,
+        parameters={
+            'k1': 'v1',
+            'k2': 'v2'
+        })
+    done = self.MakeCompletedOperation(
+        template=workflow_template.name, state='DONE')
+    result = self.RunDataproc(
+        'workflow-templates instantiate {0} --parameters=k1=v1,k2=v2'.format(
+            self.WORKFLOW_TEMPLATE))
+    self.AssertMessagesEqual(done, result)
+    self.AssertOutputEquals('')
+    self.AssertErrEquals(
+        textwrap.dedent("""\
+        Waiting on operation [{0}].
+        WorkflowTemplate [{1}] RUNNING
+        WorkflowTemplate [{1}] DONE
+          """.format(self.OperationName(), workflow_template.name)))

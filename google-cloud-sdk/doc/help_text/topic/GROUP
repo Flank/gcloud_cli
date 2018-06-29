@@ -48,3 +48,6 @@ TOPICS
 
      resource-keys
         Resource keys supplementary help.
+
+     startup
+        Supplementary help for gcloud startup options.

@@ -14,8 +14,8 @@
 """Tests that exercise instance exports to csv."""
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -30,14 +30,13 @@ class _BaseInstancesExportCsvTest(object):
   def _ExpectExport(self, databases=None, query=None):
     # Generate CSV export context.
     export_context = self.messages.ExportContext(
-        csvExportOptions=self.messages.ExportContext.
-        CsvExportOptionsValue(
+        csvExportOptions=self.messages.ExportContext.CsvExportOptionsValue(
             selectQuery=query,),
         databases=databases or [],
         fileType='CSV',
-        kind=u'sql#exportContext',
+        kind='sql#exportContext',
         sqlExportOptions=None,
-        uri=u'gs://speckletest/testinstance.gz')
+        uri='gs://speckletest/testinstance.gz')
 
     # Mock out endpoints for export.
     self.mocked_client.instances.Export.Expect(
@@ -62,22 +61,22 @@ class _BaseInstancesExportCsvTest(object):
             error=None,
             exportContext=export_context,
             importContext=None,
-            targetId=u'testinstance',
+            targetId='testinstance',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'af859489-ca9c-470f-8340-86da167b368f',
+            kind='sql#operation',
+            name='af859489-ca9c-470f-8340-86da167b368f',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'.
             format(self.Project()),
-            operationType=u'EXPORT',
-            status=u'PENDING',
-            user=u'170350250316@developer.gserviceaccount.com'))
+            operationType='EXPORT',
+            status='PENDING',
+            user='170350250316@developer.gserviceaccount.com'))
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'af859489-ca9c-470f-8340-86da167b368f',
+            operation='af859489-ca9c-470f-8340-86da167b368f',
             project=self.Project()),
         self.messages.Operation(
             # pylint:disable=line-too-long
@@ -111,19 +110,19 @@ class _BaseInstancesExportCsvTest(object):
             error=None,
             exportContext=export_context,
             importContext=None,
-            targetId=u'testinstance',
+            targetId='testinstance',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/testinstance'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'af859489-ca9c-470f-8340-86da167b368f',
+            kind='sql#operation',
+            name='af859489-ca9c-470f-8340-86da167b368f',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/af859489-ca9c-470f-8340-86da167b368f'.
             format(self.Project()),
-            operationType=u'EXPORT',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com'))
+            operationType='EXPORT',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com'))
 
   def testSimpleExport(self):
     self._ExpectExport(query='SELECT * FROM table')

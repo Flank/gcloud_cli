@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -190,6 +191,26 @@ class ResizeTestGA(base.TestBaseV1,
   def testResizeMoreNodesRegional(self):
     self.WriteInput('y\ny')
     self._TestResizeMoreNodes(self.REGION)
+
+  def testCanResizeAfterFailedGet(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    self.WriteInput('y')
+    location = self.ZONE
+    kwargs = {'zone': location, 'nodePoolName': 'default-pool'}
+    cluster = self._RunningClusterWithNodePool(**kwargs)
+    self.ExpectGetCluster(
+        cluster, exception=
+        apitools_exceptions.HttpForbiddenError(
+            {'status': 403, 'reason': 'missing permission'},
+            'forbidden', 'foo.com/bar'))
+    ops = self._ExpectResizeOperations(
+        cluster, 4, cluster.nodePools[0], zone=location)
+    self._ExpectGetOperations(ops)
+    self.ClearOutput()
+    self.ClearErr()
+    self.Run(self.clusters_command_base.format(location) +
+             ' resize {0} --size 4'.format(self.CLUSTER_NAME))
+    self.AssertErrContains('Problem loading details of cluster')
 
 
 # TODO(b/64575339): switch to use parameterized testing.

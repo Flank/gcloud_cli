@@ -13,13 +13,17 @@
 # limitations under the License.
 """Unit tests for the broker library."""
 
-import httplib
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import socket
 
 from googlecloudsdk.command_lib.emulators import broker
 from tests.lib import test_case
 import httplib2
 import mock
+
+import six.moves.http_client
 
 
 def AllRequestErrors():
@@ -49,7 +53,8 @@ class BrokerTest(test_case.TestCase):
       mock_httplib2.Http.return_value = mock_client
 
       with self.assertRaises(broker.RequestTimeoutError):
-        mock_client.request.side_effect = httplib.ResponseNotReady('Not ready')
+        mock_client.request.side_effect = (
+            six.moves.http_client.ResponseNotReady('Not ready'))
         b = broker.Broker('host:1234', broker_dir='dir')
         b._SendJsonRequest('GET', '/')
 
@@ -72,7 +77,7 @@ class BrokerTest(test_case.TestCase):
       mock_httplib2.Http.return_value = mock_client
 
       with self.assertRaises(broker.RequestError):
-        mock_client.request.side_effect = httplib.HTTPException()
+        mock_client.request.side_effect = six.moves.http_client.HTTPException()
         b = broker.Broker('host:1234', broker_dir='dir')
         b._SendJsonRequest('GET', '/')
 

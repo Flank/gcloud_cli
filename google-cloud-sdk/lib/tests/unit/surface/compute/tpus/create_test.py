@@ -52,10 +52,12 @@ class CreateTest(base.TpuUnitTestBase):
   def testCreateWithDefaults(self, track):
     self._SetTrack(track)
     properties.VALUES.core.user_output_enabled.Set(True)
-    node = self.messages.Node(cidrBlock='10.20.10.0/29',
-                              acceleratorType='v2-8',
-                              network='my-tf-network',
-                              tensorflowVersion='1.6')
+    node = self.messages.Node(
+        cidrBlock='10.20.10.0/29',
+        acceleratorType='v2-8',
+        network='my-tf-network',
+        tensorflowVersion='1.6',
+        schedulingConfig=self.messages.SchedulingConfig(preemptible=False))
     create_response = self.GetOperationResponse(
         self.create_op_ref.RelativeName())
     create_response.response = self._GetNodeResponseValue(node)
@@ -87,6 +89,7 @@ class CreateTest(base.TpuUnitTestBase):
         network='my-tf-network',
         tensorflowVersion='1.6',
         acceleratorType='v2-8',
+        schedulingConfig=self.messages.SchedulingConfig(preemptible=False)
     )
 
     create_response = self.GetOperationResponse(
@@ -123,6 +126,7 @@ class CreateTest(base.TpuUnitTestBase):
         network='my-tf-network',
         tensorflowVersion='1.6',
         acceleratorType='v2-8',
+        schedulingConfig=self.messages.SchedulingConfig(preemptible=False)
     )
 
     create_response = self.GetOperationResponse(
@@ -151,13 +155,53 @@ class CreateTest(base.TpuUnitTestBase):
         op_done_response.response
     )
 
+  def testCreateWithPreemptible(self, track):
+    self._SetTrack(track)
+    node = self.messages.Node(
+        cidrBlock='10.240.0.0/29',
+        description='My TF Node',
+        network='my-tf-network',
+        tensorflowVersion='1.6',
+        acceleratorType='v2-8',
+        schedulingConfig=self.messages.SchedulingConfig(preemptible=True)
+    )
+
+    create_response = self.GetOperationResponse(
+        self.create_op_ref.RelativeName())
+    create_response.response = self._GetNodeResponseValue(node)
+    create_request = self.messages.TpuProjectsLocationsNodesCreateRequest(
+        node=node, nodeId='mytpu', parent=self.GetParent())
+
+    self.mock_client.projects_locations_nodes.Create.Expect(
+        request=create_request,
+        response=create_response
+    )
+
+    op_done_response = self.ExpectLongRunningOpResult(
+        'create',
+        response_value=create_response.response
+    )
+
+    self.WriteInput('Y\n')
+    self.assertEqual(
+        self.Run("""\
+          compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29 \
+      --accelerator-type 'v2-8' --network my-tf-network  --version '1.6' \
+      --description 'My TF Node' --preemptible
+          """),
+        op_done_response.response
+    )
+
   def testCreateDefaultOutput(self, track):
     self._SetTrack(track)
     properties.VALUES.core.user_output_enabled.Set(True)
-    node = self.messages.Node(cidrBlock='10.20.10.0/29',
-                              acceleratorType='v2-8',
-                              network='my-tf-network',
-                              tensorflowVersion='1.6')
+    node = self.messages.Node(
+        cidrBlock='10.20.10.0/29',
+        acceleratorType='v2-8',
+        network='my-tf-network',
+        tensorflowVersion='1.6',
+        schedulingConfig=self.messages.SchedulingConfig(preemptible=False))
+
     create_response = self.GetOperationResponse(
         self.create_op_ref.RelativeName())
     create_response.response = self._GetNodeResponseValue(node)
@@ -182,10 +226,12 @@ class CreateTest(base.TpuUnitTestBase):
 
   def testCreateFailed(self, track):
     self._SetTrack(track)
-    node = self.messages.Node(cidrBlock='10.20.10.0/29',
-                              acceleratorType='v2-8',
-                              network='my-tf-network',
-                              tensorflowVersion='1.6')
+    node = self.messages.Node(
+        cidrBlock='10.20.10.0/29',
+        acceleratorType='v2-8',
+        network='my-tf-network',
+        tensorflowVersion='1.6',
+        schedulingConfig=self.messages.SchedulingConfig(preemptible=False))
     create_response = self.GetOperationResponse(
         self.create_op_ref.RelativeName())
     create_response.response = self._GetNodeResponseValue(node)

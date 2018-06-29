@@ -11,7 +11,7 @@ gcloud beta compute health\-checks create https \- create a HTTPS health check t
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute health\-checks create https\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-port\fR=\fIPORT\fR;\ default=80] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR;\ default="/"] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute health\-checks create https\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-host\fR=\fIHOST\fR] [\fB\-\-port\fR=\fIPORT\fR;\ default=80] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\-path\fR=\fIREQUEST_PATH\fR;\ default="/"] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -90,6 +90,12 @@ Adds the header "PROXY UNKNOWN\er\en".
 \fB\-\-request\-path\fR=\fIREQUEST_PATH\fR; default="/"
 The request path that this health check monitors. For example,
 \f5\fI/healthcheck\fR\fR. The default value is ``/''.
+
+.TP 2m
+\fB\-\-response\fR=\fIRESPONSE\fR
+When empty, status code of the response determines health. When not empty,
+presence of specified string in first 1024 characters of response body
+determines health. Only ASCII characters allowed.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="5s"

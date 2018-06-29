@@ -24,6 +24,7 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute.sole_tenancy import util as sole_tenancy_util
+from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -1246,9 +1247,9 @@ class InstanceTemplatesCreateTest(test_base.BaseTest):
   def testWithMetadataFromNonExistentFile(self):
     metadata_file = self.Touch(
         self.temp_path, 'file-1', contents='hello')
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Could not read metadata key \[y\] from file '
-        r'\[garbage\]: No such file or directory'):
+    with self.assertRaisesRegex(
+        files.Error,
+        r'Unable to read file \[garbage\]: .*No such file or directory'):
       self.Run("""
           compute instance-templates create template-1
             --metadata-from-file x={},y=garbage
@@ -3687,6 +3688,48 @@ class InstanceTemplatesCreateTestBeta(InstanceTemplatesCreateTest,
       ('Alpha', 'alpha', calliope_base.ReleaseTrack.ALPHA),
       ('Beta', 'beta', calliope_base.ReleaseTrack.BETA),
   )
+  def testCreateWithSourceInstanceAndConfigureBlankDisk(
+      self, api_version, track):
+    SetUp(self, api_version)
+    self.track = track
+    m = self.messages
+    self.Run("""
+        compute instance-templates create template-1
+          --source-instance tkul-konnn-test --source-instance-zone asia-east1-a
+          --configure-disk auto-delete=true,device-name=foo,instantiate-from=blank
+        """)
+
+    disk_config = m.DiskInstantiationConfig(
+        autoDelete=True,
+        deviceName='foo',
+        instantiateFrom=(
+            m.DiskInstantiationConfig.InstantiateFromValueValuesEnum)(
+                'BLANK'),
+    )
+    template = m.InstanceTemplate(
+        name='template-1',
+        sourceInstance=(
+            self.compute_uri +
+            '/projects/my-project/zones/asia-east1-a/'
+            'instances/tkul-konnn-test'),
+        sourceInstanceParams=m.SourceInstanceParams(
+            diskConfigs=[
+                disk_config,
+            ],
+        ),
+    )
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',))],)
+
+  @parameterized.named_parameters(
+      ('Alpha', 'alpha', calliope_base.ReleaseTrack.ALPHA),
+      ('Beta', 'beta', calliope_base.ReleaseTrack.BETA),
+  )
   def testCreateWithSourceInstanceAndConfigureDiskNoAutoDelete(
       self, api_version, track):
     SetUp(self, api_version)
@@ -4044,8 +4087,8 @@ class LabelsTest(test_base.BaseTest):
           """)
 
 
-class InstanceTemplatesCreateShieldedVMConfigTest(InstanceTemplatesCreateTest,
-                                                  parameterized.TestCase):
+class InstanceTemplatesCreateShieldedVMConfigAlphaTest(
+    InstanceTemplatesCreateTest, parameterized.TestCase):
   """Test creation of VM instances with shielded VM config."""
 
   def SetUp(self):
@@ -4168,13 +4211,22 @@ class InstanceTemplatesCreateShieldedVMConfigTest(InstanceTemplatesCreateTest,
     )
 
 
+class InstanceTemplatesCreateShieldedVMConfigBetaTest(
+    InstanceTemplatesCreateShieldedVMConfigAlphaTest):
+  """Test creation of VM instances with shielded VM config."""
+
+  def SetUp(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
 class InstanceTemplatesCreateWithNodeAffinity(test_base.BaseTest,
                                               parameterized.TestCase):
   """Test creation of VM instances on sole tenant host."""
 
   def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
     self.node_affinity = self.messages.SchedulingNodeAffinity
     self.operator_enum = self.node_affinity.OperatorValueValuesEnum
 
@@ -4376,30 +4428,19 @@ class InstanceTemplatesCreateWithNodeAffinity(test_base.BaseTest,
 
     self._CheckCreateRequests(node_affinities)
 
-  def testCreate_NodeGroupAndNodeIndex(self):
+  def testCreate_Node(self):
     node_affinities = [
         self.node_affinity(
-            key='compute.googleapis.com/node-group-name',
+            key='compute.googleapis.com/node-name',
             operator=self.operator_enum.IN,
-            values=['my-node-group']),
-        self.node_affinity(
-            key='compute.googleapis.com/node-index',
-            operator=self.operator_enum.IN,
-            values=['2'])]
+            values=['my-node'])
+    ]
     self.Run("""
         compute instance-templates create template-1
-          --node-group my-node-group --node-index 2
+          --node my-node
         """)
 
     self._CheckCreateRequests(node_affinities)
-
-  def testCreate_OnlyNodeIndex(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --node-index: --node-group must be specified.'):
-      self.Run("""
-          compute instance-templates create template-1
-            --node-index 2
-          """)
 
 
 if __name__ == '__main__':

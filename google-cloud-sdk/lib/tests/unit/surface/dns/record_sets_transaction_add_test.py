@@ -14,6 +14,8 @@
 
 """Tests for the 'gcloud dns record-sets transaction add' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import shutil
 from googlecloudsdk.api_lib.dns import transaction_util

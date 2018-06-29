@@ -14,6 +14,8 @@
 
 """Tests for genomics variant list command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -66,8 +68,8 @@ class ListTest(base.GenomicsUnitTest):
                            '--variant-set-id', '42',
                            '--call-set-ids', '42-1',
                            '--reference-name', 'MT',
-                           '--start', '15L',
-                           '--end', '30L',
+                           '--start', '15',
+                           '--end', '30',
                            '--limit', '50',
                            '--limit-calls', '500'])))
 

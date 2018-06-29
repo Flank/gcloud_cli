@@ -3,18 +3,19 @@ NAME
         taxonomy store
 
 SYNOPSIS
-    gcloud alpha category-manager stores get-iam-policy ORGANIZATION
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha category-manager stores get-iam-policy
+        --organization=ORGANIZATION [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Get iam policy of a taxonomy store.
 
-POSITIONAL ARGUMENTS
+REQUIRED FLAGS
      Organization resource - Your organization's id. This represents a Cloud
      resource. This must be specified.
 
-       ORGANIZATION
+       --organization=ORGANIZATION
           The ID of the organization or a fully qualified identifier for the
           organization.
 

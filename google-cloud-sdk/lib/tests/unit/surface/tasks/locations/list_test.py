@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for `gcloud tasks locations list`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import test_case

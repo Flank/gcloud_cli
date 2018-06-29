@@ -11,7 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """General IAM utilities used by the Cloud SDK."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import binascii
 import re
 
 from apitools.base.protorpclite import messages as apitools_messages
@@ -66,8 +72,8 @@ The member {verb}. Should be of the form `user|group|serviceAccount:email` or
 `domain:domain`.
 
 Examples: `user:test-user@gmail.com`, `group:admins@example.com`,
-`serviceAccount:my-sa@test-123.iam.gserviceaccount.com`, or
-`domain:example.com`.
+`serviceAccount:test123@example.domain.com`, or
+`domain:example.domain.com`.
 
 Can also be one of the following special values:
 * `allUsers` - anyone who is on the internet, with or without a Google account.
@@ -92,6 +98,10 @@ def AddArgForPolicyFile(parser):
       metavar='POLICY_FILE',
       help="""\
         Path to a local JSON or YAML formatted file containing a valid policy.
+
+        The output of the `get-iam-policy` command is a valid file, as is any
+        JSON or YAML file conforming to the structure of a
+        [Policy](https://cloud.google.com/iam/reference/rest/v1/Policy).
         """)
 
 
@@ -206,7 +216,7 @@ def ConstructUpdateMaskFromPolicy(policy_file_path):
     a FieldMask containing policy fields to be modified, based on which fields
     are present in the input file.
   """
-  policy_file = files.GetFileContents(policy_file_path)
+  policy_file = files.ReadFileContents(policy_file_path)
   # Since json is a subset of yaml, parse file as yaml.
   policy = yaml.load(policy_file)
 
@@ -295,8 +305,8 @@ def ParseYamlOrJsonPolicyFile(policy_file_path, policy_message_type):
         'Policy file [{0}] is not a properly formatted YAML or JSON '
         'policy file. {1}'
         .format(policy_file_path, str(e)))
-  except (apitools_messages.DecodeError) as e:
- # DecodeError is raised when etag is badly formatted (not proper Base64)
+  except (apitools_messages.DecodeError, binascii.Error) as e:
+  # DecodeError is raised when etag is badly formatted (not proper Base64)
     raise IamEtagReadError(
         'The etag of policy file [{0}] is not properly formatted. {1}'
         .format(policy_file_path, str(e)))
@@ -325,7 +335,7 @@ def ParseYamlToRole(file_path, role_message_type):
     raise gcloud_exceptions.BadFileException(
         'Role file {0} is not a properly formatted YAML role file. {1}'
         .format(file_path, str(e)))
-  except (apitools_messages.DecodeError) as e:
+  except (apitools_messages.DecodeError, binascii.Error) as e:
     # DecodeError is raised when etag is badly formatted (not proper Base64)
     raise IamEtagReadError(
         'The etag of role file {0} is not properly formatted. {1}'
@@ -403,11 +413,11 @@ def GetDetailedHelpForAddIamPolicyBinding(collection, example_id,
 
             $ {{command}} {example_id} --member='user:test-user@gmail.com' --role='{role}'
 
-          For a service account 'my-sa' linked to project 'test-123', the
-          following command will add an IAM policy binding for the role of
+          For a service account `test-proj1@example.domain.com`,
+          the following command will add an IAM policy binding for the role of
           '{role}' to the given service account:
 
-            $ {{command}} test-123 --member='serviceAccount:my-sa@test-123.iam.gserviceaccount.com' --role='{role}'
+            $ {{command}} test-proj1@example.domain.com --member='serviceAccount:test-proj1@example.domain.com' --role='{role}'
 
           The following command will add an IAM policy binding for the role of
           '{role}' for all authenticated users on {a} {collection} with

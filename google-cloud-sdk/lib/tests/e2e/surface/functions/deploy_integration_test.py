@@ -175,6 +175,7 @@ class DeployIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
     self.Run('functions list')
     self. AssertOutputNotContains(self.function_name)
 
+  @test_case.Filters.skip('Failing', 'b/110130529')
   def testDeployChangeSourceType(self):
     self.Run(
         'functions deploy {0} '

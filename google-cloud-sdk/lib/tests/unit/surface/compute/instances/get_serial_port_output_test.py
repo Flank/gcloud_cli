@@ -14,6 +14,8 @@
 
 """Tests for the instances get-serial-port-output subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core import exceptions as core_exceptions

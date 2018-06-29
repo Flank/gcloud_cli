@@ -27,6 +27,10 @@ SYNOPSIS
         [--worker-machine-type=WORKER_MACHINE_TYPE]
         [--worker-min-cpu-platform=PLATFORM] [--zone=ZONE, -z ZONE]
         [--expiration-time=EXPIRATION_TIME | --max-age=MAX_AGE]
+        [--gce-pd-kms-key=GCE_PD_KMS_KEY
+          : --gce-pd-kms-key-keyring=GCE_PD_KMS_KEY_KEYRING
+          --gce-pd-kms-key-location=GCE_PD_KMS_KEY_LOCATION
+          --gce-pd-kms-key-project=GCE_PD_KMS_KEY_PROJECT]
         [--image=IMAGE | --image-version=VERSION]
         [--network=NETWORK | --subnet=SUBNET]
         [--single-node | --num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS
@@ -67,6 +71,11 @@ FLAGS
 
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --master-accelerator=[type=TYPE,[count=COUNT],...]
         Attaches accelerators (e.g. GPUs) to the master instance(s).
@@ -178,9 +187,8 @@ FLAGS
         property value for this command invocation.
 
      --scopes=SCOPE,[SCOPE,...]
-        Specifies scopes for the node instances. The project's default service
-        account is used. Multiple SCOPEs can specified, separated by commas.
-        Examples:
+        Specifies scopes for the node instances. Multiple SCOPEs can be
+        specified, separated by commas. Examples:
 
             $ gcloud beta dataproc clusters create example-cluster \
                 --scopes https://www.googleapis.com/auth/bigtable.admin
@@ -188,14 +196,14 @@ FLAGS
             $ gcloud beta dataproc clusters create example-cluster \
                 --scopes sqlservice,bigquery
 
-        The following scopes necessary for the cluster to function properly are
-        always added, even if not explicitly specified:
+        The following minimum scopes are necessary for the cluster to function
+        properly and are always added, even if not explicitly specified:
 
           https://www.googleapis.com/auth/devstorage.read_write
           https://www.googleapis.com/auth/logging.write
 
-        If this flag is not specified the following default scopes are also
-        included:
+        If the --scopes flag is not specified, the following default scopes are
+        also included:
 
           https://www.googleapis.com/auth/bigquery
           https://www.googleapis.com/auth/bigtable.admin.table
@@ -326,6 +334,26 @@ FLAGS
           The lifespan of the cluster before it is auto-deleted, such as "2h"
           or "1d". See $ gcloud topic datetimes for information on duration
           formats.
+
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the cluster. The 'Compute Engine Service Agent' service
+     account must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'.
+     The arguments in this group can be used to specify the attributes of this
+     resource.
+
+       --gce-pd-kms-key=GCE_PD_KMS_KEY
+          The ID of the key or a fully qualified identifier for the key. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --gce-pd-kms-key-keyring=GCE_PD_KMS_KEY_KEYRING
+          The KMS keyring of the key.
+
+       --gce-pd-kms-key-location=GCE_PD_KMS_KEY_LOCATION
+          The Cloud location for the key.
+
+       --gce-pd-kms-key-project=GCE_PD_KMS_KEY_PROJECT
+          The Cloud project for the key.
 
      At most one of these may be specified:
 

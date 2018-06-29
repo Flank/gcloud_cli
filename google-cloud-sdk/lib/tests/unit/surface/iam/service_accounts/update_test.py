@@ -11,8 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure deserialization of server responses work properly."""
 
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -25,12 +29,12 @@ class UpdateTest(unit_test_base.BaseTest):
     self.client.projects_serviceAccounts.Get.Expect(
         request=self.msgs.IamProjectsServiceAccountsGetRequest(
             name='projects/-/serviceAccounts/' + service_account),
-        response=self.msgs.ServiceAccount(etag='etag'))
+        response=self.msgs.ServiceAccount(etag=b'etag'))
 
     self.client.projects_serviceAccounts.Update.Expect(
         request=self.msgs.ServiceAccount(
             name=('projects/-/serviceAccounts/' + service_account),
-            etag='etag',
+            etag=b'etag',
             displayName='New Name'),
         response=
         self.msgs.ServiceAccount(

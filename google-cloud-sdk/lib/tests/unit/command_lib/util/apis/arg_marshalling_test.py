@@ -43,7 +43,8 @@ def CheckArgs(args):
         arg.AddToParser(parser)
       if isinstance(arg, concept_parsers.ConceptParser):
         for spec in arg._specs.values():
-          expanded_args.update({a.name: a for a in spec.GetAttributeArgs()})
+          expanded_args.update(
+              {a.name: a for a in arg.GetInfo(spec.name).GetAttributeArgs()})
       elif isinstance(arg, calliope_base.ArgumentGroup):
         _AddArgs(arg.arguments)
       else:
@@ -394,6 +395,38 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
     # the resource name
     (parser, _) = CheckArgs(gen.GenerateArgs())
     namespace = parser.parse_args(['projects/p/parents/parent/instances/i'])
+    req = gen.CreateRequest(namespace)
+    if is_atomic:
+      self.assertEqual('projects/p/parents/parent/instances/i', req.name)
+    else:
+      self.assertEqual('i', req.instancesId)
+      self.assertEqual('parent', req.parentsId)
+
+  @parameterized.parameters(True, False)
+  def testCommandFallbackResourceArg(self, is_atomic):
+    self.MockGetListCreateMethods(('foo.projects.parents.instances', is_atomic))
+    method = registry.GetMethod('foo.projects.parents.instances', 'get')
+    resource_arg = MakeResource(collection='foo.projects.parents.instances',
+                                attributes=['parent', 'instance'])
+    resource_arg.command_level_fallthroughs = {'parent': ['--just-a-flag']}
+    gen = arg_marshalling.DeclarativeArgumentGenerator(
+        method, [yaml_command_schema.Argument(None, 'just-a-flag', 'help!')],
+        resource_arg)
+    (parser, _) = CheckArgs(gen.GenerateArgs())
+    properties.VALUES.core.project.Set('p')
+    namespace = parser.parse_args(['i', '--just-a-flag', '!'])
+    req = gen.CreateRequest(namespace)
+    if is_atomic:
+      self.assertEqual('projects/p/parents/!/instances/i', req.name)
+    else:
+      self.assertEqual('i', req.instancesId)
+      self.assertEqual('!', req.parentsId)
+
+    # Make sure fallback doesn't get called if the information is provided in
+    # the resource name
+    (parser, _) = CheckArgs(gen.GenerateArgs())
+    namespace = parser.parse_args(['projects/p/parents/parent/instances/i',
+                                   '--just-a-flag', '!'])
     req = gen.CreateRequest(namespace)
     if is_atomic:
       self.assertEqual('projects/p/parents/parent/instances/i', req.name)

@@ -17,6 +17,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import contextlib
 
+from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
@@ -64,17 +65,29 @@ class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
 
   @contextlib.contextmanager
   def _ForwardingRule(self, name, backend_service, region):
-    try:
-      yield self.RunCompute('forwarding-rules', 'create', name,
-                            '--load-balancing-scheme', 'internal',
-                            '--backend-service', backend_service,
-                            '--ports', '80-82,85',
-                            '--network', 'default',
-                            '--region', region)
-
-    finally:
-      self.CleanUpResource(['forwarding-rules'], name,
-                           '--region', region)
+    if self.track is base.ReleaseTrack.GA:
+      try:
+        yield self.RunCompute('forwarding-rules', 'create', name,
+                              '--load-balancing-scheme', 'internal',
+                              '--backend-service', backend_service,
+                              '--ports', '80-82,85',
+                              '--network', 'default',
+                              '--region', region)
+      finally:
+        self.CleanUpResource(['forwarding-rules'], name,
+                             '--region', region)
+    else:
+      try:
+        yield self.RunCompute('forwarding-rules', 'create', name,
+                              '--load-balancing-scheme', 'internal',
+                              '--backend-service', backend_service,
+                              '--service-label', 'label1',
+                              '--ports', '80-82,85',
+                              '--network', 'default',
+                              '--region', region)
+      finally:
+        self.CleanUpResource(['forwarding-rules'], name,
+                             '--region', region)
 
   @contextlib.contextmanager
   def _InstanceGroup(self, name, zone):
@@ -95,7 +108,7 @@ class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
       self.CleanUpResource(['instances'], name,
                            '--zone', zone)
 
-  def testInternalLb_WithForwardingRule(self):
+  def _TestInternalLb_WithForwardingRule(self):
     """Run common scenario of creating internal load balanced backend service.
 
     This test sets up internal regional load balancer with global health check
@@ -215,6 +228,14 @@ class InternalLoadBalancingTest(e2e_base.WithServiceAuth):
                                 'Could not fetch resource'):
       self.RunCompute('backend-services', 'describe', backend_service,
                       '--region', region)
+
+  def testInternalLb_WithForwardingRuleGA(self):
+    self.track = base.ReleaseTrack.GA
+    self._TestInternalLb_WithForwardingRule()
+
+  def testInternalLb_WithForwardingRuleBeta(self):
+    self.track = base.ReleaseTrack.BETA
+    self._TestInternalLb_WithForwardingRule()
 
 
 if __name__ == '__main__':

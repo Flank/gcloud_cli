@@ -150,7 +150,7 @@ class LoginTest(cli_test_base.CliTestBase, test_case.WithInput):
     fake_cred = self.GetFakeCred('foo@google.com')
     self.mock_webflow.return_value = fake_cred
     self.StartObjectPatch(
-        files, 'OpenForWritingPrivate').side_effect = IOError('Error')
+        files, 'PrivatizeFile').side_effect = files.Error('Error')
     with self.assertRaisesRegex(
         store.CredentialFileSaveError, 'Error saving Application'):
       self.Login()

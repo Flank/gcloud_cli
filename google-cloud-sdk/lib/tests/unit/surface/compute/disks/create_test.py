@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the disks create subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 import textwrap
 
 from googlecloudsdk.api_lib.compute import csek_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -1007,13 +1008,13 @@ class DisksCreateTestWithCsekKeysBeta(test_base.BaseTest):
               zone='central2-a'))])
 
 
-class DisksCreateTestWithKmsKeysAlpha(test_base.BaseTest):
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                          (calliope_base.ReleaseTrack.BETA, 'beta'))
+class DisksCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
 
-  def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testKmsKeyWithKeyNameArgsOk(self):
+  def testKmsKeyWithKeyNameArgsOk(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
     self.Run("""
         compute disks create wrappedkeydisk --zone central2-a \
             --kms-key=projects/key-project/locations/global/keyRings/disk-ring/cryptoKeys/disk-key
@@ -1034,7 +1035,9 @@ class DisksCreateTestWithKmsKeysAlpha(test_base.BaseTest):
               project='my-project',
               zone='central2-a'))])
 
-  def testKmsKeyWithKeyPartArgsOk(self):
+  def testKmsKeyWithKeyPartArgsOk(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
     self.Run("""
         compute disks create wrappedkeydisk --zone central2-a \
             --kms-project=key-project --kms-location=global \
@@ -1056,7 +1059,9 @@ class DisksCreateTestWithKmsKeysAlpha(test_base.BaseTest):
               project='my-project',
               zone='central2-a'))])
 
-  def testKmsKeyWithoutProjectOk(self):
+  def testKmsKeyWithoutProjectOk(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
     self.Run("""
         compute disks create wrappedkeydisk --zone central2-a \
             --kms-location=global \
@@ -1078,30 +1083,73 @@ class DisksCreateTestWithKmsKeysAlpha(test_base.BaseTest):
               project='my-project',
               zone='central2-a'))])
 
-  def testMissingLocation(self):
-    with self.assertRaises(parser_errors.RequiredError):
-      self.Run("""
-          compute disks create wrappedkeydisk --zone central2-a \
-              --kms-keyring=disk-ring --kms-key=disk-key
-          """)
+  def testKmsKeyRegionFallthrough(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+    self.make_requests.side_effect = iter([
+        [],
+        [
+            self.messages.Region(
+                name='central2',
+            ),
+        ],
+        [],
+    ])
+    self.Run("""
+        compute disks create wrappedkeydisk --region central2
+            --replica-zones central2-b,central2-c
+            --kms-keyring=disk-ring --kms-key=disk-key
+        """)
+    self.CheckRequests(
+        [],
+        [(self.compute.regions,
+          'Get',
+          self.messages.ComputeRegionsGetRequest(
+              project='my-project',
+              region='central2'
+          ))],
+        [(self.compute.regionDisks,
+          'Insert',
+          self.messages.ComputeRegionDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='wrappedkeydisk',
+                  sizeGb=500,
+                  diskEncryptionKey=self.messages.CustomerEncryptionKey(
+                      kmsKeyName='projects/my-project/locations/central2/'
+                                 'keyRings/disk-ring/cryptoKeys/disk-key'),
+                  replicaZones=[
+                      self.compute_uri+'/projects/my-project/zones/central2-b',
+                      self.compute_uri+'/projects/my-project/zones/central2-c']
+              ),
+              project='my-project',
+              region='central2'))],
+    )
 
-  def testMissingKeyRing(self):
-    with self.assertRaises(parser_errors.RequiredError):
+  def testMissingKeyRing(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'KMS cryptokey resource was not fully specified.'):
       self.Run("""
           compute disks create wrappedkeydisk --zone central2-a \
               --kms-location=global \
               --kms-key=disk-key
           """)
 
-  def testMissingKey(self):
-    with self.assertRaises(parser_errors.RequiredError):
+  def testMissingKey(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
+    with self.AssertRaisesArgumentError():
       self.Run("""
           compute disks create wrappedkeydisk --zone central2-a \
               --kms-location=global \
               --kms-keyring=disk-ring
           """)
 
-  def testConflictKmsKeyNameWithCsekKeyFile(self):
+  def testConflictKmsKeyNameWithCsekKeyFile(self, track, api_version):
+    SetUp(self, api_version)
+    self.track = track
     self.WriteInput(self.GetKeyFileContent())
     with self.assertRaises(exceptions.ConflictingArgumentsException):
       self.Run("""

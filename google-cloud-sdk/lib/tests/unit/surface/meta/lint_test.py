@@ -14,6 +14,9 @@
 
 """Tests for gcloud internal list-commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import collections
 import os
 

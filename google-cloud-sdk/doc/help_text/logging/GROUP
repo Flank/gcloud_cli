@@ -31,10 +31,10 @@ COMMANDS
     COMMAND is one of the following:
 
      read
-        Reads log entries.
+        Read log entries.
 
      write
-        Writes a log entry.
+        Write a log entry.
 
 NOTES
     This variant is also available:

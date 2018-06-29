@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise the 'gcloud dns operations list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -32,7 +34,7 @@ class OperationsListTest(base.DnsMockMultiTrackTest):
     self.client.managedZoneOperations.List.Expect(
         messages.DnsManagedZoneOperationsListRequest(project=self.Project(),
                                                      maxResults=100,
-                                                     managedZone=u'my-zone'),
+                                                     managedZone='my-zone'),
         messages.ManagedZoneOperationsListResponse(operations=[]))
     self.Run('dns operations list --zones my-zone')
     self.AssertErrContains('Listed 0 items.')
@@ -44,7 +46,7 @@ class OperationsListTest(base.DnsMockMultiTrackTest):
     self.client.managedZoneOperations.List.Expect(
         messages.DnsManagedZoneOperationsListRequest(project=self.Project(),
                                                      maxResults=100,
-                                                     managedZone=u'mz'),
+                                                     managedZone='mz'),
         messages.ManagedZoneOperationsListResponse(operations=[
             messages.Operation(
                 id='1',
@@ -58,7 +60,7 @@ class OperationsListTest(base.DnsMockMultiTrackTest):
     self.client.managedZoneOperations.List.Expect(
         messages.DnsManagedZoneOperationsListRequest(project=self.Project(),
                                                      maxResults=100,
-                                                     managedZone=u'mz1'),
+                                                     managedZone='mz1'),
         messages.ManagedZoneOperationsListResponse(operations=[
             messages.Operation(
                 id='2',

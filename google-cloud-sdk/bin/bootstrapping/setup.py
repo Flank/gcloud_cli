@@ -3,15 +3,28 @@
 """Does some initial setup and checks for all the bootstrapping scripts."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import sys
+
+
+# We don't want to import any libraries at this point so we handle py2/3
+# manually.
+SITE_PACKAGES = 'CLOUDSDK_PYTHON_SITEPACKAGES'
+VIRTUAL_ENV = 'VIRTUAL_ENV'
+if sys.version_info[0] == 2:
+  SITE_PACKAGES = SITE_PACKAGES.encode('utf-8')
+  VIRTUAL_ENV = VIRTUAL_ENV.encode('utf-8')
+
 
 # If we're in a virtualenv, always import site packages. Also, upon request.
 # We can't import anything from googlecloudsdk here so we are just going to
 # assume no one has done anything as silly as to put any unicode in either of
 # these env vars.
-import_site_packages = (os.environ.get(b'CLOUDSDK_PYTHON_SITEPACKAGES') or
-                        os.environ.get(b'VIRTUAL_ENV'))
+import_site_packages = (os.environ.get(SITE_PACKAGES) or
+                        os.environ.get(VIRTUAL_ENV))
 
 if import_site_packages:
   # pylint:disable=unused-import
@@ -37,13 +50,16 @@ if 'google' in sys.modules:
   if vendored_google_path not in google_paths:
     google_paths.append(vendored_google_path)
 
+
 # pylint: disable=g-import-not-at-top
+from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import platforms
 
 
 # Add more methods to this list for universal checks that need to be performed
 def DoAllRequiredChecks():
-  if not platforms.PythonVersion().IsCompatible(allow_py3=False):
+  if not platforms.PythonVersion().IsCompatible(
+      properties.VALUES.core.allow_py3.GetBool()):
     sys.exit(1)
 
 

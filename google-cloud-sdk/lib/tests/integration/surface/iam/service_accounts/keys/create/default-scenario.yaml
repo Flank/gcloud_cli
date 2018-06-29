@@ -50,7 +50,7 @@ response:
     x-xss-protection: 1; mode=block
 ---
 output:
-  private_files:
+  files:
   - content: |
       {
         "type": "service_account",

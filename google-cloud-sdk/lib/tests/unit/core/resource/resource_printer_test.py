@@ -127,9 +127,9 @@ class ResourcePrinterTest(resource_printer_test_base.Base):
     self.AssertOutputEquals('')
     self.AssertErrEquals("""\
 table format projection:
-   a : (2, 1, 'A', left, None, None)
-   b : (1, UNORDERED, None, left, None, None)
-     x : (2, 2, 'X', left, None, None, [reverse])
+   a : (2, 1, 'A', left, None, False, None)
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 2, 'X', left, None, False, None, [reverse])
 """)
 
   def testIsResourceMarker(self):

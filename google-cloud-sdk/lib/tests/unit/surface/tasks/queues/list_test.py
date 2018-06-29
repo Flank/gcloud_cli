@@ -13,11 +13,14 @@
 # limitations under the License.
 """Tests for `gcloud tasks queues list`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.tasks import test_base
+from six.moves import range
 
 
 class QueuesListTest(test_base.CloudTasksTestBase):

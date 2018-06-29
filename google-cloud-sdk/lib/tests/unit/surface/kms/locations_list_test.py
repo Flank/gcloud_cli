@@ -15,13 +15,19 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class LocationsListTest(base.KmsMockTest):
 
-  def testNoLocationsList(self):
+  def testNoLocationsList(self, track):
+    self.track = track
     self.kms.projects_locations.List.Expect(
         self.messages.CloudkmsProjectsLocationsListRequest(
             name='projects/'+self.Project(), pageSize=100),
@@ -30,7 +36,8 @@ class LocationsListTest(base.KmsMockTest):
     self.Run('kms locations list')
     self.AssertErrContains('Listed 0 items.')
 
-  def testRegularLocationsList(self):
+  def testRegularLocationsList(self, track):
+    self.track = track
     glbl = self.project_name.Child('global')
     east = self.project_name.Child('us-east1')
 

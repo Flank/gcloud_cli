@@ -14,6 +14,8 @@
 
 """Common helper methods for Genomics commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 import tempfile
 
@@ -31,6 +33,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core import yaml
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.util import files
+import six
 
 GCS_PREFIX = 'gs://'
 
@@ -135,7 +138,7 @@ def GetFileAsMessage(path, message, client):
     path = tf.name
 
   # Read the file.
-  in_text = files.GetFileContents(path)
+  in_text = files.ReadFileContents(path)
   if not in_text:
     raise genomics_exceptions.GenomicsInputFileError(
         'Empty file [{0}]'.format(path))
@@ -161,7 +164,7 @@ def ArgDictToAdditionalPropertiesList(argdict, message):
     return result
   # For consistent results (especially for deterministic testing), make
   # the return list ordered by key
-  for k, v in sorted(argdict.iteritems()):
+  for k, v in sorted(six.iteritems(argdict)):
     result.append(message(key=k, value=v))
   return result
 

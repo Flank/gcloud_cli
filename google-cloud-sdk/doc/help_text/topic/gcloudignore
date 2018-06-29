@@ -14,7 +14,7 @@ DESCRIPTION
 
     The following gcloud commands respect the .gcloudignore file:
 
-      o gcloud app deploy
+      o gcloud beta app deploy
       o gcloud beta functions deploy
       o gcloud container builds submit
       o gcloud beta debug source upload

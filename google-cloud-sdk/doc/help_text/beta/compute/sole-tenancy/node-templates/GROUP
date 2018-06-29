@@ -1,0 +1,37 @@
+NAME
+    gcloud beta compute sole-tenancy node-templates - read and manage Google
+        Compute Engine sole-tenancy node templates
+
+SYNOPSIS
+    gcloud beta compute sole-tenancy node-templates COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Node templates are used to create the nodes in node groups. Nodes
+    are Compute Engine servers that are dedicated to your workload. Node
+    templates define either the node type or the requirements for a node in
+    terms of vCPU, memory, and localSSD.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Creates a Google Compute Engine node template.
+
+     delete
+        (BETA) Deletes a Google Compute Engine node template.
+
+     describe
+        (BETA) Describes a Google Compute Engine node template.
+
+     list
+        (BETA) List Google Compute Engine node templates.
+
+NOTES
+    This command is currently in BETA and may change without notice.
+

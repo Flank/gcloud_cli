@@ -1,0 +1,30 @@
+title: Create a Job Trigger
+release_tracks: [ALPHA]
+actions:
+  - execute_command:
+      command: |
+        dlp job-triggers create my-test-trigger --info-types LAST_NAME,PHONE_NUMBER
+        --trigger-schedule=86401s --output-tables mytest.dlptest.table1,mytest.dlptest.table2
+        --description 'my description' --max-findings 10 --max-findings-per-item 2
+        --min-likelihood likely  --path gs://fake-project/dlp-data
+      events:
+      - api_call:
+          return_response:
+            headers:
+              status: '200'
+            body: |
+          expect_request:
+            uri: https://dlp.googleapis.com/v2/projects/fake-project/jobTriggers?alt=json
+            method: POST
+            headers:
+              content-length: '753'
+            body:
+              jobTrigger.inspectJob.actions.saveFindings.outputConfig.table.datasetId: [dlptest, dlptest]
+              jobTrigger.inspectJob.actions.saveFindings.outputConfig.table.tableId: [table1, table2]
+              jobTrigger.inspectJob.inspectConfig.excludeInfoTypes: false
+              jobTrigger.inspectJob.storageConfig.cloudStorageOptions.fileSet.url: gs://fake-project/dlp-data
+              triggerId: my-test-trigger
+      - expect_stderr: |
+          Created job_trigger [my-test-trigger].
+
+      - expect_exit_code: 0

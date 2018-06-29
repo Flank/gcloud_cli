@@ -14,14 +14,11 @@
 """Tests for gcloud app domain-mappings."""
 
 from __future__ import absolute_import
-from googlecloudsdk.calliope import base as calliope_base
+from __future__ import unicode_literals
 from tests.lib.surface.app import domain_mappings_base
 
 
 class DomainMappingsCommandTest(domain_mappings_base.DomainMappingsBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
 
   def testDeleteDomainMapping(self):
     self.ExpectDeleteDomainMapping('*.example.com')
@@ -29,13 +26,10 @@ class DomainMappingsCommandTest(domain_mappings_base.DomainMappingsBase):
     self.AssertErrContains('Deleted [*.example.com].')
 
 
-class DomainMappingsCommandBetaTest(
-    domain_mappings_base.DomainMappingsBetaBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+class DomainMappingsCommandBetaTest(domain_mappings_base.DomainMappingsBase):
+  APPENGINE_API_VERSION = 'v1beta'
 
   def testDeleteDomainMapping(self):
     self.ExpectDeleteDomainMapping('*.example.com')
-    self.Run('app domain-mappings delete *.example.com')
+    self.Run('beta app domain-mappings delete *.example.com')
     self.AssertErrContains('Deleted [*.example.com].')

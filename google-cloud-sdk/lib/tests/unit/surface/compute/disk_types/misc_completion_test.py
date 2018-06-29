@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for disk type completers for miscellaneous commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import completer_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base

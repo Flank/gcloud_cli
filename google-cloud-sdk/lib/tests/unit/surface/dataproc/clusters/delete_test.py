@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Test of the 'clusters delete' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.dataproc import exceptions

@@ -3,15 +3,17 @@ NAME
         cluster
 
 SYNOPSIS
-    gcloud container node-pools create NAME [--cluster=CLUSTER]
+    gcloud container node-pools create NAME
+        [--accelerator=[type=TYPE,[count=COUNT],...]] [--cluster=CLUSTER]
         [--disk-size=DISK_SIZE] [--enable-autorepair] [--enable-autoupgrade]
         [--image-type=IMAGE_TYPE] [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--min-cpu-platform=PLATFORM] [--node-labels=[NODE_LABEL,...]]
         [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
         [--num-nodes=NUM_NODES; default=3] [--preemptible]
-        [--tags=TAG,[TAG,...]] [--zone=ZONE, -z ZONE]
+        [--tags=TAG,[TAG,...]]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
+        [--region=REGION | --zone=ZONE, -z ZONE]
         [--service-account=SERVICE_ACCOUNT | --no-enable-cloud-endpoints
           --scopes=[SCOPE,...]; default="gke-default"] [GCLOUD_WIDE_FLAG ...]
 
@@ -25,6 +27,19 @@ POSITIONAL ARGUMENTS
         The name of the node pool to create.
 
 FLAGS
+     --accelerator=[type=TYPE,[count=COUNT],...]
+        Attaches accelerators (e.g. GPUs) to all nodes.
+
+         type
+            (Required) The specific type (e.g. nvidia-tesla-k80 for nVidia
+            Tesla K80) of accelerator to attach to the instances. Use gcloud
+            compute accelerator-types list to learn about all available
+            accelerator types.
+
+         count
+            (Optional) The number of accelerators to attach to the instances.
+            The default value is 1.
+
      --cluster=CLUSTER
         The cluster to add the node pool to. Overrides the default
         container/cluster property value for this command invocation.
@@ -116,6 +131,11 @@ FLAGS
         nodeSelectors. See http://kubernetes.io/docs/user-guide/node-selection/
         for examples.
 
+        Note that kubernetes labels, intended to associate cluster components
+        and resources with one another and manage resource lifecycles, are
+        different from Kubernetes Engine labels that are used for the purpose
+        of tracking billing and usage information.
+
      --node-taints=[NODE_TAINT,...]
         Applies the given kubernetes taints on all nodes in the new node-pool,
         which can be used with tolerations for pod scheduling. Example:
@@ -166,10 +186,6 @@ FLAGS
         https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create
         for examples.
 
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
-
      Cluster autoscaling
 
        --enable-autoscaling
@@ -191,6 +207,15 @@ FLAGS
           Minimum number of nodes to which the node pool specified by
           --node-pool (or default node pool if unspecified) can scale. Ignored
           unless --enable-autoscaling is also specified.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
      Options to specify the node identity. At most one of these may be
      specified:
@@ -223,21 +248,19 @@ FLAGS
             Enabled by default, use --no-enable-cloud-endpoints to disable.
 
          --scopes=[SCOPE,...]; default="gke-default"
-            Specifies scopes for the node instances. The project's default
-            service account is used. Examples:
+            Specifies scopes for the node instances. Examples:
 
-                $ gcloud container node-pools create node-pool-1 \
-                  --cluster=example-cluster \
-                  --scopes=https://www.googleapis.com/auth/devstorage.read_only
+            $ gcloud container node-pools create node-pool-1 \
+            --cluster=example-cluster \
+            --scopes=https://www.googleapis.com/auth/devstorage.read_only
 
-                $ gcloud container node-pools create node-pool-1 \
-                  --cluster=example-cluster \
-                  --scopes=bigquery,storage-rw,compute-ro
+            $ gcloud container node-pools create node-pool-1 \
+            --cluster=example-cluster \ --scopes=bigquery,storage-rw,compute-ro
 
-            Multiple SCOPEs can specified, separated by commas. logging-write
-            and/or monitoring are added unless Cloud Logging and/or Cloud
-            Monitoring are disabled (see --enable-cloud-logging and
-            --enable-cloud-monitoring for more info).
+            Multiple SCOPEs can be specified, separated by commas.
+            logging-write and/or monitoring are added unless Cloud Logging
+            and/or Cloud Monitoring are disabled (see --enable-cloud-logging
+            and --enable-cloud-monitoring for more information).
 
             SCOPE can be either the full URI of the scope or an alias.
             Available aliases are:

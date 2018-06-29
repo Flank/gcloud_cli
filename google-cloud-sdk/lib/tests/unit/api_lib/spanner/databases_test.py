@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Spanner databases library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.spanner import databases
 from googlecloudsdk.core import resources
 from tests.lib.surface.spanner import base
@@ -80,7 +82,7 @@ class DatabasesClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesDatabasesGetDdlRequest(
             database=ref.RelativeName()),
         response=response)
-    self.assertItemsEqual(statements, databases.GetDdl(ref))
+    self.assertCountEqual(statements, databases.GetDdl(ref))
 
   def testList(self):
     database_list = [self.msgs.Database()]
@@ -93,7 +95,7 @@ class DatabasesClientTest(base.SpannerTestBase):
         request=self.msgs.SpannerProjectsInstancesDatabasesListRequest(
             parent=ref.RelativeName(), pageSize=100),
         response=response)
-    self.assertItemsEqual(database_list, databases.List(ref))
+    self.assertCountEqual(database_list, databases.List(ref))
 
   def testUpdateDdl(self):
     statements = ['a', 'b']

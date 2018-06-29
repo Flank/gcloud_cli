@@ -14,6 +14,9 @@
 
 """Tests for gcloud meta list-cli-trees."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.meta import list_cli_trees
 from tests.lib import calliope_test_base
 

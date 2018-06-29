@@ -58,7 +58,8 @@ class RemoveIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
                 policy=self.new_policy)), self.new_policy)
     result = self.Run('alpha category-manager stores remove-iam-policy-binding '
-                      'organizations/1 --role=roles/categorymanager.admin '
+                      '--organization=organizations/1 '
+                      '--role=roles/categorymanager.admin '
                       '--member=user:admin@gmail.com')
     self.assertEqual(self.new_policy, result)
 
@@ -75,7 +76,8 @@ class RemoveIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
             setIamPolicyRequest=self.messages.SetIamPolicyRequest(
                 policy=self.new_policy)), self.new_policy)
     result = self.Run('alpha category-manager stores remove-iam-policy-binding '
-                      '1 --role=roles/categorymanager.admin '
+                      '--organization=1 '
+                      '--role=roles/categorymanager.admin '
                       '--member=user:admin@gmail.com')
     self.assertEqual(self.new_policy, result)
 

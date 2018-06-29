@@ -14,6 +14,8 @@
 # limitations under the License.
 """Tests of the util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.app import util
 from tests.lib import test_case
 import mock

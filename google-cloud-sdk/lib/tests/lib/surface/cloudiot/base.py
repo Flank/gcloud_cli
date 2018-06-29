@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Base class for all ml platform tests."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.cloudiot import devices as devices_api
@@ -20,6 +22,7 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
+from six.moves import range
 
 
 class CloudIotBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,

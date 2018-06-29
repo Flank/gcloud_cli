@@ -1,0 +1,294 @@
+# Copyright 2018 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+$schema: "http://json-schema.org/draft-06/schema#"
+
+
+definitions:
+
+  #############################################################################
+  # Assertion Primitives                                                      #
+  #############################################################################
+
+  assertions:
+
+    equals:
+      type: object
+      additionalProperties: false
+      properties:
+        equals: {type: [string, number, boolean]}
+
+    matches:
+      type: object
+      additionalProperties: false
+      properties:
+        matches: {type: [string, number, boolean]}
+
+    is_none:
+      type: object
+      additionalProperties: false
+      properties:
+        is_none: {type: boolean}
+
+    in:
+      type: object
+      additionalProperties: false
+      properties:
+        in:
+          type: array
+          items: {type: [string, number, boolean]}
+
+
+  #############################################################################
+  # Assertion Aggregates                                                      #
+  #############################################################################
+
+  value_types:
+
+    complex:
+      oneOf:
+        - {type: [string, number, boolean]}
+        - {$ref: "#/definitions/assertions/equals"}
+        - {$ref: "#/definitions/assertions/matches"}
+        - {$ref: "#/definitions/assertions/is_none"}
+        - {$ref: "#/definitions/assertions/in"}
+
+    dict:
+      patternProperties:
+        .*: {$ref: "#/definitions/value_types/complex"}
+
+    dict_substructure:
+      patternProperties:
+        .*: {}  # Anything.
+
+
+  #############################################################################
+  # Events                                                                    #
+  #############################################################################
+
+  events:
+
+    # Sets expectation that an API call is made with specific properties, and responds
+    # with a canned response payload.
+    api_call:
+      additionalProperties: false
+      properties:
+        api_call:
+          required: [expect_request, return_response]
+          additionalProperties: false
+          properties:
+
+            expect_request:
+              required: [uri, method]
+              additionalProperties: false
+              properties:
+
+                # The URI that is being requested.
+                uri: {type: string}
+
+                # The HTTP method being called (ex. GET, POST, ...)
+                method: {type: string}
+
+                # Optional expections about the headers being passed in the API
+                # call. If given, this is a mapping of header value to assertion
+                # about that value. Any header that is not included will have
+                # no assertions made against it.
+                headers: {$ref: "#/definitions/value_types/dict"}
+
+                # TODO(b/79436687): Decide on an implementation for this.
+                # Assertions on the body of the request. If not given, the
+                # implicit assertion is that the body is empty. This assumes
+                # that the body of the request is a json dictionary. The
+                # assertion is a mapping of key to json substructure. To assert
+                # something about the root of the tree, the key may be ''.
+                # To assert about nested keys, you can use a.b.c to reference
+                # those keys. For the value given, anything in that dictionary
+                # will assert that it is present under the given key. No
+                # assertions are made about any values in the body, not included
+                # in the value of the assertion.
+                body: {$ref: "#/definitions/value_types/dict_substructure"}
+
+            # This is the canned data that should be returned as the response to
+            # this API request.
+            return_response:
+              additionalProperties: false
+              properties:
+
+                headers:
+                  patternProperties:
+                    .*: {type: string}
+
+                body: {}
+
+    # Sets expectation that captured stderr matches a given value. This is always a
+    # verbatim text equality check.
+    expect_stderr:
+      additionalProperties: false
+      properties:
+        expect_stderr: {type: string}
+
+    # Sets expectation that captured stdout matches a given value. This is always a
+    # verbatim text equality check.
+    expect_stdout:
+      additionalProperties: false
+      properties:
+        expect_stdout: {type: string}
+
+    # Sets expectation that the command exited with the given code.
+    expect_exit_code:
+      additionalProperties: false
+      properties:
+        expect_exit_code: {type: number}
+
+    user_input:
+      additionalProperties: false
+      properties:
+        user_input: {type: string}
+
+    # Sets expectation that the progressbar UX is printed to stderr with given message
+    expect_progress_bar:
+      additionalProperties: false
+      properties:
+        expect_progress_bar:
+          additionalProperties: false
+          required: [message]
+          properties:
+            message: {type: string}
+
+    # Sets expectation that the progress tracker UX is printed to stderr with given message(s)/status
+    expect_progress_tracker:
+      additionalProperties: false
+      properties:
+        expect_progress_tracker:
+          additionalProperties: false
+          required: [message]
+          properties:
+            aborted_message: {type: string}
+            message: {type: string}
+            status: {type: string}
+
+    # TODO(b/80185776): Implement this.
+    expect_prompt_continue:
+      additionalProperties: false
+      properties:
+        expect_prompt_continue:
+          additionalProperties: false
+          required: [message]
+          properties:
+            message: {type: string}
+            prompt_string: {type: string}
+            cancel_string: {type: string}
+
+    # TODO(b/80185776): Implement this.
+    expect_prompt_response:
+      additionalProperties: false
+      properties:
+        expect_prompt_response:
+          additionalProperties: false
+          required: [message, choices]
+          properties:
+            message: {type: string}
+            choices:
+              type: array
+              items: {type: string}
+
+    # TODO(b/80185776): Implement this.
+    expect_prompt_choice:
+      additionalProperties: false
+      properties:
+        expect_prompt_choice:
+          additionalProperties: false
+          required: [choices]
+          properties:
+            message: {type: string}
+            prompt_string: {type: string}
+            choices:
+              type: array
+              items: {type: string}
+
+
+  #############################################################################
+  # Supporting Schema                                                         #
+  #############################################################################
+
+  set_property:
+    additionalProperties: false
+    properties:
+      set_property:
+        additionalProperties: false
+        patternProperties:
+          "\\w+/\\w+": {type: [string, number, boolean]}
+
+  # TODO(b/79436436): Implement this.
+  create_file:
+    additionalProperties: false
+    properties:
+      create_file:
+        additionalProperties: false
+        properties:
+          name: {type: string}
+          additional_temp_path: {type: boolean}
+          contents: {type: string}
+
+  execute_command:
+    additionalProperties: false
+    properties:
+      execute_command:
+        additionalProperties: false
+        required: [command, events]
+        properties:
+
+          # The full command line you want to run (excluding 'gcloud' and the
+          # release track). (ex 'iot registries describe my-registry')
+          command: {type: string}
+
+          events:
+            type: array
+            items:
+              oneOf:
+              - {$ref: "#/definitions/events/api_call"}
+              - {$ref: "#/definitions/events/expect_stderr"}
+              - {$ref: "#/definitions/events/expect_stdout"}
+              - {$ref: "#/definitions/events/expect_exit_code"}
+              - {$ref: "#/definitions/events/expect_progress_bar"}
+              - {$ref: "#/definitions/events/expect_progress_tracker"}
+              - {$ref: "#/definitions/events/expect_prompt_continue"}
+              - {$ref: "#/definitions/events/expect_prompt_response"}
+              - {$ref: "#/definitions/events/expect_prompt_choice"}
+              - {$ref: "#/definitions/events/user_input"}
+
+
+###############################################################################
+# Root Schema                                                                 #
+###############################################################################
+
+title: Scenario Test
+additionalProperties: false
+required: [title, actions]
+properties:
+
+  title:  {type: string}
+
+  description: {type: string}
+
+  release_tracks:
+    type: array
+    items: {enum: [ALPHA, BETA, GA]}
+
+  actions:
+    type: array
+    items:
+      oneOf:
+        - {$ref: "#/definitions/set_property"}
+        - {$ref: "#/definitions/create_file"}
+        - {$ref: "#/definitions/execute_command"}

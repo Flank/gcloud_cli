@@ -14,7 +14,9 @@
 
 """Tests of lib.storage_helpers methods."""
 
-import StringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 
 from apitools.base.py.testing import mock as apitools_mock
 
@@ -113,7 +115,7 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
     get_object_mock = self.StartObjectPatch(
         self.storage_client.client.objects,
         'Get')
-    stream = StringIO.StringIO()
+    stream = io.StringIO()
     object_info = self.MakeObject()
 
     self.storage_client.BuildObjectStream(stream, object_info)
@@ -156,7 +158,7 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
   # resolved, test a non-empty mocked stream here.
 
   def testReadIntoWritableEmptyStream(self):
-    stream = StringIO.StringIO()
+    stream = io.StringIO()
     object1 = self.MakeObject()
     object2 = self.MakeObject(name=self.NEXT_GCS_OBJECT_NAME)
     self.ExpectGetObject(object2, exception=self.MakeHttpError(404))
@@ -167,20 +169,20 @@ class StorageHelpersUnitTest(unit_base.DataprocUnitTestBase):
     self.assertEqual('', stream.getvalue())
 
   def testReadIntoWritableInternalError(self):
-    stream = StringIO.StringIO()
-    error = self.MakeHttpError(
-        500, message="Oops that wasn't supposed to Happen")
+    stream = io.StringIO()
+    message = "Oops that wasn't supposed to Happen"
+    error = self.MakeHttpError(500, message)
     object1 = self.MakeObject()
     object2 = self.MakeObject(name=self.NEXT_GCS_OBJECT_NAME)
     self.ExpectGetObject(object2, exception=self.MakeHttpError(404))
     self.ExpectGetObject(object1, exception=error)
     self.storage_stream.ReadIntoWritable(stream)
     self.assertTrue(self.storage_stream.open)
-    self.AssertErrContains(error.message)
+    self.AssertErrContains(message)
 
   def testReadIntoWritableClosed(self):
     self.storage_stream.Close()
-    stream = StringIO.StringIO()
+    stream = io.StringIO()
     with self.assertRaises(ValueError):
       self.storage_stream.ReadIntoWritable(stream)
 

@@ -173,58 +173,62 @@ True if \fIkey\fR does not match the RE (regular expression) pattern
 
 .SH "EXAMPLES"
 
-List all instances resources:
+List all Google Compute Engine instance resources:
 
 .RS 2m
 $ gcloud compute instances list
 .RE
 
-List instances resources that have machineType \fBf1\-micro\fR:
+List Compute Engine instance resources that have machineType \fBf1\-micro\fR:
 
 .RS 2m
-$ gcloud compute instances list \-\-filter='machineType:f1\-micro'
+$ gcloud compute instances list \-\-filter="machineType:f1\-micro"
 .RE
 
-List resources with zone prefix \fBus\fR and not MachineType \fBf1\-micro\fR:
+List Compute Engine instance resources with zone prefix \fBus\fR and not
+MachineType \fBf1\-micro\fR:
 
 .RS 2m
 $ gcloud compute instances list \e
-    \-\-filter='zone ~ ^us AND \-machineType:f1\-micro'
+    \-\-filter="zone ~ ^us AND \-machineType:f1\-micro"
 .RE
 
-List resources with tag \fBmy\-tag\fR:
+List Compute Engine instance resources with tag \fBmy\-tag\fR:
 
 .RS 2m
-$ gcloud compute instances list \-\-filter='tags.items=my\-tag'
+$ gcloud compute instances list \-\-filter="tags.items=my\-tag"
 .RE
 
-List resources with tag \fBmy\-tag\fR or \fBmy\-other\-tag\fR:
-
-.RS 2m
-$ gcloud compute instances list \e
-    \-\-filter='tags.items=(my\-tag,my\-other\-tag)'
-.RE
-
-List resources with tag \fBmy\-tag\fR and \fBmy\-other\-tag\fR:
+List Compute Engine instance resources with tag \fBmy\-tag\fR or
+\fBmy\-other\-tag\fR:
 
 .RS 2m
 $ gcloud compute instances list \e
-    \-\-filter='tags.items=my\-tag AND tags.items=my\-other\-tag'
+    \-\-filter="tags.items=(my\-tag,my\-other\-tag)"
 .RE
 
-List resources which either have tag \fBmy\-tag\fR but not \fBmy\-other\-tag\fR
-or have tag \fBalternative\-tag\fR:
+List Compute Engine instance resources with tag \fBmy\-tag\fR and
+\fBmy\-other\-tag\fR:
 
 .RS 2m
 $ gcloud compute instances list \e
-    \-\-filter='(tags.items=my\-tag AND \-tags.items=my\-other\-tag) OR
- tags.items=alternative\-tag'
+    \-\-filter="tags.items=my\-tag AND tags.items=my\-other\-tag"
 .RE
 
-List resources with label \fBmy\-label\fR with any value:
+List Compute Engine instance resources which either have tag \fBmy\-tag\fR but
+not \fBmy\-other\-tag\fR or have tag \fBalternative\-tag\fR:
 
 .RS 2m
-$ gcloud compute instances list \-\-filter='labels.my\-label:*'
+$ gcloud compute instances list \e
+    \-\-filter="(tags.items=my\-tag AND \-tags.items=my\-other\-tag) OR\e
+ tags.items=alternative\-tag"
+.RE
+
+List Compute Engine instance resources with label \fBmy\-label\fR with any
+value:
+
+.RS 2m
+$ gcloud compute instances list \-\-filter="labels.my\-label:*"
 .RE
 
 List in JSON format those projects where the labels match specific values (e.g.

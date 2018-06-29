@@ -2,8 +2,9 @@ NAME
     gcloud alpha kms keys versions list - list the versions within a key
 
 SYNOPSIS
-    gcloud alpha kms keys versions list [--key=KEY] [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+    gcloud alpha kms keys versions list [--key=KEY] [--keyring=KEYRING]
+        [--location=LOCATION] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -12,6 +13,12 @@ DESCRIPTION
 FLAGS
      --key=KEY
         The containing key.
+
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the keyring.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

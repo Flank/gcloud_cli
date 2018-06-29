@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -30,9 +32,10 @@ class BackupsListTest(base.SqlMockTestBeta):
             pageToken=None,
             project=self.Project(),
             instance='integration-test',
-            maxResults=100,),
+            maxResults=100,
+        ),
         self.messages.BackupRunsListResponse(
-            kind=u'sql#backupRunsList',
+            kind='sql#backupRunsList',
             items=[
                 self.messages.BackupRun(
                     id=1,
@@ -47,9 +50,9 @@ class BackupsListTest(base.SqlMockTestBeta):
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
                     error=None,
-                    instance=u'integration-test',
+                    instance='integration-test',
                     endTime=None,
-                    kind=u'sql#backupRun',
+                    kind='sql#backupRun',
                     startTime=None,
                     enqueuedTime=datetime.datetime(
                         2014,
@@ -61,7 +64,8 @@ class BackupsListTest(base.SqlMockTestBeta):
                         555000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    status=u'SKIPPED',),
+                    status='SKIPPED',
+                ),
                 self.messages.BackupRun(
                     id=2,
                     windowStartTime=datetime.datetime(
@@ -75,9 +79,9 @@ class BackupsListTest(base.SqlMockTestBeta):
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
                     error=None,
-                    instance=u'integration-test',
+                    instance='integration-test',
                     endTime=None,
-                    kind=u'sql#backupRun',
+                    kind='sql#backupRun',
                     startTime=None,
                     enqueuedTime=datetime.datetime(
                         2014,
@@ -89,17 +93,21 @@ class BackupsListTest(base.SqlMockTestBeta):
                         464000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    status=u'SKIPPED',),
+                    status='SKIPPED',
+                ),
             ],
-            nextPageToken=u'1396059067464',),)
+            nextPageToken='1396059067464',
+        ),
+    )
     self.mocked_client.backupRuns.List.Expect(
         self.messages.SqlBackupRunsListRequest(
             instance='integration-test',
             project=self.Project(),
             maxResults=100,
-            pageToken=u'1396059067464',),
+            pageToken='1396059067464',
+        ),
         self.messages.BackupRunsListResponse(
-            kind=u'sql#backupRunsList',
+            kind='sql#backupRunsList',
             items=[
                 self.messages.BackupRun(
                     id=3,
@@ -114,9 +122,9 @@ class BackupsListTest(base.SqlMockTestBeta):
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
                     error=None,
-                    instance=u'integration-test',
+                    instance='integration-test',
                     endTime=None,
-                    kind=u'sql#backupRun',
+                    kind='sql#backupRun',
                     startTime=datetime.datetime(
                         2015,
                         3,
@@ -137,7 +145,8 @@ class BackupsListTest(base.SqlMockTestBeta):
                         555000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    status=u'SKIPPED',),
+                    status='SKIPPED',
+                ),
                 self.messages.BackupRun(
                     id=4,
                     windowStartTime=datetime.datetime(
@@ -151,9 +160,9 @@ class BackupsListTest(base.SqlMockTestBeta):
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
                     error=None,
-                    instance=u'integration-test',
+                    instance='integration-test',
                     endTime=None,
-                    kind=u'sql#backupRun',
+                    kind='sql#backupRun',
                     startTime=None,
                     enqueuedTime=datetime.datetime(
                         2015,
@@ -165,9 +174,12 @@ class BackupsListTest(base.SqlMockTestBeta):
                         464000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    status=u'SKIPPED',),
+                    status='SKIPPED',
+                ),
             ],
-            nextPageToken=None,),)
+            nextPageToken=None,
+        ),
+    )
 
     self.Run('sql backups list --instance=integration-test')
     self.AssertOutputContains(

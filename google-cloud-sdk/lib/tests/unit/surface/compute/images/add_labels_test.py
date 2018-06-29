@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for images add-labels subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import images_labels_test_base
@@ -27,14 +29,14 @@ class AddLabelsTest(images_labels_test_base.ImagesLabelsTestBase):
     add_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     image = self._MakeImageProto(
-        image_ref, labels=(), fingerprint='fingerprint-42')
+        image_ref, labels=(), fingerprint=b'fingerprint-42')
     updated_image = self._MakeImageProto(image_ref, labels=add_labels)
     operation_ref = self._GetOperationRef('operation-1')
     operation = self._MakeOperationMessage(operation_ref, image_ref)
 
     self._ExpectGetRequest(image_ref, image)
     self._ExpectLabelsSetRequest(
-        image_ref, add_labels, 'fingerprint-42', operation)
+        image_ref, add_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(image_ref, updated_image)
 
@@ -57,7 +59,7 @@ class AddLabelsTest(images_labels_test_base.ImagesLabelsTestBase):
     ))
 
     image = self._MakeImageProto(
-        image_ref, labels=image_labels, fingerprint='fingerprint-42')
+        image_ref, labels=image_labels, fingerprint=b'fingerprint-42')
     updated_image = self._MakeImageProto(
         image_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1')
@@ -65,7 +67,7 @@ class AddLabelsTest(images_labels_test_base.ImagesLabelsTestBase):
 
     self._ExpectGetRequest(image_ref, image)
     self._ExpectLabelsSetRequest(
-        image_ref, edited_labels, 'fingerprint-42', operation)
+        image_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(image_ref, updated_image)
 
@@ -87,7 +89,7 @@ class AddLabelsTest(images_labels_test_base.ImagesLabelsTestBase):
     add_labels = (('key1', 'value1'), ('key3', 'value3'))
 
     image = self._MakeImageProto(
-        image_ref, labels=image_labels, fingerprint='fingerprint-42')
+        image_ref, labels=image_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(image_ref, image)
 
@@ -110,7 +112,7 @@ class AddLabelsTest(images_labels_test_base.ImagesLabelsTestBase):
     image_ref = self._GetImageRef('image-1')
 
     image = self._MakeImageProto(
-        image_ref, labels={}, fingerprint='fingerprint-42')
+        image_ref, labels={}, fingerprint=b'fingerprint-42')
     add_labels = (('+notvalid', 'a'),)
 
     error = http_error.MakeHttpError(
@@ -124,7 +126,7 @@ class AddLabelsTest(images_labels_test_base.ImagesLabelsTestBase):
     self._ExpectLabelsSetRequest(
         image_ref=image_ref,
         labels=add_labels,
-        fingerprint='fingerprint-42',
+        fingerprint=b'fingerprint-42',
         exception=error)
 
     with self.AssertRaisesHttpExceptionMatches(

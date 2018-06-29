@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -29,7 +31,8 @@ class InstancesResetSSLConfigTest(base.SqlMockTestBeta):
     self.mocked_client.instances.ResetSslConfig.Expect(
         self.messages.SqlInstancesResetSslConfigRequest(
             instance='reset-test',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -62,24 +65,26 @@ class InstancesResetSSLConfigTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'reset-test',
+            targetId='reset-test',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'4d5a6c5e-38fc-4ac5-9980-72ee44c621d8',
+            kind='sql#operation',
+            name='4d5a6c5e-38fc-4ac5-9980-72ee44c621d8',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/4d5a6c5e-38fc-4ac5-9980-72ee44c621d8'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/4d5a6c5e-38fc-4ac5-9980-72ee44c621d8'.
             format(self.Project()),
-            operationType=u'UPDATE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='UPDATE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'4d5a6c5e-38fc-4ac5-9980-72ee44c621d8',
-            project=self.Project(),),
+            operation='4d5a6c5e-38fc-4ac5-9980-72ee44c621d8',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -112,19 +117,20 @@ class InstancesResetSSLConfigTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'reset-test',
+            targetId='reset-test',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'4d5a6c5e-38fc-4ac5-9980-72ee44c621d8',
+            kind='sql#operation',
+            name='4d5a6c5e-38fc-4ac5-9980-72ee44c621d8',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/4d5a6c5e-38fc-4ac5-9980-72ee44c621d8'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/4d5a6c5e-38fc-4ac5-9980-72ee44c621d8'.
             format(self.Project()),
-            operationType=u'UPDATE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='UPDATE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
   def testSimpleReset(self):
     self._ExpectResetSSLConfig()

@@ -20,8 +20,8 @@ REQUIRED FLAGS
         user|group|serviceAccount:email or domain:domain.
 
         Examples: user:test-user@gmail.com, group:admins@example.com,
-        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
-        domain:example.com.
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
 
         Can also be one of the following special values:
         * allUsers - anyone who is on the internet, with or without a Google
@@ -46,13 +46,14 @@ EXAMPLES
             --member='user:test-user@gmail.com' \
             --role='roles/compute.securityAdmin'
 
-    For a service account 'my-sa' linked to project 'test-123', the following
-    command will add an IAM policy binding for the role of
+    For a service account test-proj1@example.domain.com, the following command
+    will add an IAM policy binding for the role of
     'roles/compute.securityAdmin' to the given service account:
 
-        $ gcloud alpha compute images add-iam-policy-binding test-123 \
-            --member='serviceAccount:my-sa@test-123.iam.gserviceaccount.com'\
-         --role='roles/compute.securityAdmin'
+        $ gcloud alpha compute images add-iam-policy-binding \
+            test-proj1@example.domain.com \
+            --member='serviceAccount:test-proj1@example.domain.com' \
+            --role='roles/compute.securityAdmin'
 
     The following command will add an IAM policy binding for the role of
     'roles/compute.securityAdmin' for all authenticated users on an image with

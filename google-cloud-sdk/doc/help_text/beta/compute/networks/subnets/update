@@ -49,8 +49,10 @@ FLAGS
           + RANGE - IP range in CIDR format.
 
          --[no-]enable-flow-logs
-            Enable/disable flow logging for this subnet. Use --enable-flow-logs
-            to enable and --no-enable-flow-logs to disable.
+            Enable/disable VPC flow logging for this subnet. More information
+            for VPC flow logs can be found at
+            https://cloud.google.com/vpc/docs/using-flow-logs. Use
+            --enable-flow-logs to enable and --no-enable-flow-logs to disable.
 
          --[no-]enable-private-ip-google-access
             Enable/disable access to Google Cloud APIs from this subnet for

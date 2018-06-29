@@ -14,6 +14,8 @@
 
 """Tests of the 'logs' subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 from googlecloudsdk.api_lib.logging import util
 from tests.lib import cli_test_base
@@ -32,9 +34,9 @@ class EntriesReadTest(base.LoggingTestBase):
         self.msgs.LogEntry(logName='first-log'),
         self.msgs.LogEntry(logName='second-log')]
 
-  def _setExpect(self, filter_spec, order_by=u'timestamp desc', page_size=1000):
+  def _setExpect(self, filter_spec, order_by='timestamp desc', page_size=1000):
     self.mock_client_v2.entries.List.Expect(
-        self.msgs.ListLogEntriesRequest(resourceNames=[u'projects/my-project'],
+        self.msgs.ListLogEntriesRequest(resourceNames=['projects/my-project'],
                                         filter=filter_spec,
                                         orderBy=order_by,
                                         pageSize=page_size),
@@ -78,7 +80,7 @@ class EntriesReadTest(base.LoggingTestBase):
     self.mock_client_v2.entries.List.Expect(
         self.msgs.ListLogEntriesRequest(resourceNames=['organizations/123'],
                                         filter=default_filter,
-                                        orderBy=u'timestamp desc',
+                                        orderBy='timestamp desc',
                                         pageSize=1000),
         self.msgs.ListLogEntriesResponse(entries=self._entries))
     generator = self.RunLogging('read --organization 123 --format=disable')
@@ -91,7 +93,7 @@ class EntriesReadTest(base.LoggingTestBase):
     self.mock_client_v2.entries.List.Expect(
         self.msgs.ListLogEntriesRequest(resourceNames=['folders/123'],
                                         filter=default_filter,
-                                        orderBy=u'timestamp desc',
+                                        orderBy='timestamp desc',
                                         pageSize=1000),
         self.msgs.ListLogEntriesResponse(entries=self._entries))
     generator = self.RunLogging('read --folder 123 --format=disable')
@@ -104,7 +106,7 @@ class EntriesReadTest(base.LoggingTestBase):
     self.mock_client_v2.entries.List.Expect(
         self.msgs.ListLogEntriesRequest(resourceNames=['billingAccounts/123'],
                                         filter=default_filter,
-                                        orderBy=u'timestamp desc',
+                                        orderBy='timestamp desc',
                                         pageSize=1000),
         self.msgs.ListLogEntriesResponse(entries=self._entries))
     generator = self.RunLogging('read --billing-account 123 --format=disable')
@@ -116,7 +118,7 @@ class EntriesReadTest(base.LoggingTestBase):
 
   def testReadNoPerms(self):
     self.mock_client_v2.entries.List.Expect(
-        self.msgs.ListLogEntriesRequest(resourceNames=[u'projects/my-project'],
+        self.msgs.ListLogEntriesRequest(resourceNames=['projects/my-project'],
                                         orderBy='timestamp asc',
                                         pageSize=3),
         exception=http_error.MakeHttpError(403))

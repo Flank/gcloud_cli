@@ -14,7 +14,7 @@
 """Tests for compute diagnose routes command."""
 
 from __future__ import absolute_import
-from __future__ import print_function
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.compute import ssh_utils
 from googlecloudsdk.core import log
 from tests.lib import test_case
@@ -65,7 +65,7 @@ class MockSSHCalls(object):
     elif command_list == TracerouteTest.CmdObtainSelfIp():
       tmp_file = kwargs['explicit_output_file']
       if tmp_file:
-        tmp_file.write('127.0.0.1 55555 22')
+        tmp_file.write(b'127.0.0.1 55555 22')
       return 0
     elif command_list == TracerouteTest.CmdReverseTraceroute():
       return 0

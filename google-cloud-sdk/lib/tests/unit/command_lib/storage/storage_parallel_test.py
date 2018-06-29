@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Unit tests for parallel Google Cloud Storage operations."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 
 from googlecloudsdk.api_lib.storage import storage_api
@@ -23,9 +25,10 @@ from googlecloudsdk.core.util import parallel
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import mock
+from six.moves import range
 
 
-_UNICODE_STRING = u'いろはにほへとちりぬるを'
+_UNICODE_STRING = 'いろはにほへとちりぬるを'
 
 
 class FailureException(Exception):
@@ -49,7 +52,7 @@ def MakeRepeatMock(num_tries):
     attempt = seen_args[args]
     if num_tries is None or attempt < num_tries:
       raise FailureException(
-          u'Failure, attempt [{0}/{1}].\nAlso, have some unicode: {2}'.format(
+          'Failure, attempt [{0}/{1}].\nAlso, have some unicode: {2}'.format(
               attempt, num_tries, _UNICODE_STRING))
   return RepeatMock
 

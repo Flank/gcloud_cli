@@ -3,16 +3,21 @@ NAME
         Engine clusters
 
 SYNOPSIS
-    gcloud container operations COMMAND [--zone=ZONE, -z ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud container operations COMMAND
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Get and list operations for Google Kubernetes Engine clusters.
 
 FLAGS
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

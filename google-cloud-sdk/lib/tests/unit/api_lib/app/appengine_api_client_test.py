@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests of the AppEngine API Client."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.app import appengine_api_client
@@ -69,15 +71,15 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
 
   def testDeployService(self):
     """Test service deployment using an image name."""
-    fake_image = u'fake-image'
-    fake_version = u'fake-version'
+    fake_image = 'fake-image'
+    fake_version = 'fake-version'
 
     fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
     self.mocked_client.apps_services_versions.Create.Expect(
         request=self.messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.messages.Version(
-                runtime=u'python27',
+                runtime='python27',
                 deployment=self.messages.Deployment(
                     container=self.messages.ContainerInfo(
                         image=fake_image
@@ -95,15 +97,15 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
 
   def testDeployServiceFromBuildId(self):
     """Test service deployment using an in-progress build ID."""
-    fake_build = u'fake-build'
-    fake_version = u'fake-version'
+    fake_build = 'fake-build'
+    fake_version = 'fake-version'
 
     fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
     self.mocked_beta_client.apps_services_versions.Create.Expect(
         request=self.beta_messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.beta_messages.Version(
-                runtime=u'python27',
+                runtime='python27',
                 deployment=self.beta_messages.Deployment(
                     build=self.beta_messages.BuildInfo(
                         cloudBuildId=fake_build)),
@@ -129,8 +131,8 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
 
   def testDeployServiceFromBuildOptions(self):
     """Test service deployment using server-side builds."""
-    fake_build = u'fake-build'
-    fake_version = u'fake-version'
+    fake_build = 'fake-build'
+    fake_version = 'fake-version'
     manifest = {
         'filea': {'sourceUrl': 'https://storage.googleapis.com/a/b/c.py',
                   'sha1Sum': '123'},
@@ -220,7 +222,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     fake_service = yaml_parsing.ServiceYamlInfo('app.yaml', self.appyaml)
 
     image_version_expected = self.messages.Version(
-        runtime=u'python27',
+        runtime='python27',
         deployment=self.messages.Deployment(
             container=self.messages.ContainerInfo(image='fake-image')))
 
@@ -232,7 +234,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     # buildId deployments are only supported in the v1beta and v1alpha Admin API
     # versions currently, so use the v1beta client and messages.
     build_version_expected = self.beta_messages.Version(
-        runtime=u'python27',
+        runtime='python27',
         deployment=self.beta_messages.Deployment(
             build=self.beta_messages.BuildInfo(cloudBuildId='fake-build')))
 
@@ -242,8 +244,8 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
     self.assertEqual(build_version_result, build_version_expected)
 
   def testDeployService_WithExtraConfigs(self):
-    fake_image = u'fake-image'
-    fake_version = u'fake-version'
+    fake_image = 'fake-image'
+    fake_version = 'fake-version'
 
     extra_config_settings = {
         'cloud_build_timeout': '50',
@@ -266,7 +268,7 @@ class AppEngineApiClientTests(AppEngineApiClientTestBase):
         request=self.messages.AppengineAppsServicesVersionsCreateRequest(
             parent='apps/fake-project/services/fake-service',
             version=self.messages.Version(
-                runtime=u'python27',
+                runtime='python27',
                 deployment=self.messages.Deployment(
                     container=self.messages.ContainerInfo(image=fake_image)),
                 id=fake_version,

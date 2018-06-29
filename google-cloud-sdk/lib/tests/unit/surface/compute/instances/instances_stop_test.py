@@ -13,10 +13,13 @@
 # limitations under the License.
 """Tests for the instances stop subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import utils
+from six.moves import range
 
 
 class InstancesStopTestBase(test_base.BaseTest):
@@ -113,27 +116,27 @@ class InstancesStopTest(InstancesStopTestBase):
   def testStopManyInstances(self):
     num_instances = 3
     op_refs = [
-        self._GetOperationRef('operation-%d' % i) for i in xrange(num_instances)
+        self._GetOperationRef('operation-%d' % i) for i in range(num_instances)
     ]
     stop_refs = [
         self._GetInstancesStopRef('instance-%d' % i)
-        for i in xrange(num_instances)
+        for i in range(num_instances)
     ]
 
     self.api_mock.batch_responder.ExpectBatch(
         [((self.compute.instances, 'Stop', self._CreateInstancesStopRequest(
             stop_refs[i])),
           (self._GetOperationMessage(op_refs[i], self.status_enum.PENDING)))
-         for i in xrange(num_instances)])
+         for i in range(num_instances)])
 
     self.api_mock.batch_responder.ExpectBatch([(self._GetOperationGetRequest(
         op_refs[i]), self._GetOperationMessage(op_refs[i],
                                                self.status_enum.DONE))
-                                               for i in xrange(num_instances)])
+                                               for i in range(num_instances)])
 
     self.api_mock.batch_responder.ExpectBatch([(self._GetInstancesStopRequest(
         stop_refs[i]), self._CreateInstancesStopRequest(stop_refs[i]))
-                                               for i in xrange(num_instances)])
+                                               for i in range(num_instances)])
 
     self.Run("""
         compute instances stop
@@ -192,18 +195,18 @@ class InstancesStopTest(InstancesStopTestBase):
   def testInstancesStopManyAsync(self):
     num_instances = 3
     op_refs = [
-        self._GetOperationRef('operation-%d' % i) for i in xrange(num_instances)
+        self._GetOperationRef('operation-%d' % i) for i in range(num_instances)
     ]
     stop_refs = [
         self._GetInstancesStopRef('instance-%d' % i)
-        for i in xrange(num_instances)
+        for i in range(num_instances)
     ]
 
     self.api_mock.batch_responder.ExpectBatch(
         [((self.compute.instances, 'Stop', self._CreateInstancesStopRequest(
             stop_refs[i])),
           (self._GetOperationMessage(op_refs[i], self.status_enum.PENDING)))
-         for i in xrange(num_instances)])
+         for i in range(num_instances)])
 
     self.Run("""
         compute instances stop

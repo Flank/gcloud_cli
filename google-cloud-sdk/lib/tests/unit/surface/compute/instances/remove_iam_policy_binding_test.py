@@ -14,6 +14,8 @@
 """Tests for the instances remove-iam-policy-binding subcommand."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis

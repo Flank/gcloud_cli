@@ -4,8 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud compute instance-templates create NAME
-        [--accelerator=[type=TYPE,[count=COUNT],...]]
-        [--no-boot-disk-auto-delete]
+        [--accelerator=[count=COUNT],[type=TYPE]] [--no-boot-disk-auto-delete]
         [--boot-disk-device-name=BOOT_DISK_DEVICE_NAME]
         [--boot-disk-size=BOOT_DISK_SIZE] [--boot-disk-type=BOOT_DISK_TYPE]
         [--can-ip-forward] [--create-disk=[PROPERTY=VALUE,...]]
@@ -44,7 +43,7 @@ POSITIONAL ARGUMENTS
         Name of the instance template to create.
 
 FLAGS
-     --accelerator=[type=TYPE,[count=COUNT],...]
+     --accelerator=[count=COUNT],[type=TYPE]
         Attaches accelerators (e.g. GPUs) to the instances.
 
          type
@@ -183,6 +182,11 @@ FLAGS
 
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --local-ssd=[device-name=DEVICE-NAME],[interface=INTERFACE]
         Attaches a local SSD to the instances.

@@ -328,15 +328,15 @@ Choices description. _FRIENDS_ must be one of: *rachel*, *phoebe*, *monica*."""
     self.assertEqual(result.get(lookup.COMMANDS, None),
                      [])
     self.assertEqual(result.get(lookup.SUMMARY),
-                      ('SUMMARY DESCRIPTION\n'
-                       'This is a brief description of the command.\n'
-                       'FLAGS\n'
-                       '--flag-name\n'
-                       '...part of the flag description goes here. It is a '
-                       'very long description because we\'re going to see if '
-                       'the markdown rendering works properly. It should not '
-                       'do any wrapping of the text, because the table printer '
-                       'is going to do that for us.'))
+                     ('SUMMARY DESCRIPTION\n'
+                      'This is a brief description of the command.\n'
+                      'FLAGS\n'
+                      '--flag-name\n'
+                      '...part of the flag description goes here. It is a '
+                      'very long description because we\'re going to see if '
+                      'the markdown rendering works properly. It should not '
+                      'do any wrapping of the text, because the table printer '
+                      'is going to do that for us.'))
 
   def testLocateTerms(self):
     # Test that terms are correctly located in command.

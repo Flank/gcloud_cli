@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for images vulnerabilities list subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import list_pager
 from apitools.base.py.testing import mock as apitools_mock
 
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core.resource import resource_filter
-from googlecloudsdk.core.resource import resource_projector
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 
@@ -55,7 +55,7 @@ class ListTest(
 
     image_project = image_project or self.Project()
     resource_url = (
-        'https://www.googleapis.com/compute/alpha'
+        'https://www.googleapis.com/compute/v1'
         '/projects/{}/global/images/{}').format(image_project, image)
 
     return self.messages.Occurrence(
@@ -66,77 +66,20 @@ class ListTest(
         vulnerabilityDetails=vulnerability_details)
 
   def _MakeOccurences(self, filter_):
-    kind = self.messages.Occurrence.KindValueValuesEnum
-
-    build_details = self._MakeOccurrence(
-        image='atli/id/33333', name='build_details', note_id='CVE-2018-3333',
-        image_project='other-project')
-    build_details.kind = kind.BUILD_DETAILS
-
-    max_fixed_package_issue = self.messages.PackageIssue(
-        fixedLocation=self.messages.VulnerabilityLocation(
-            package='gcc',
-            version=self.messages.Version(
-                kind=self.messages.Version.KindValueValuesEnum.MAXIMUM
-            )
-        ),
-        affectedLocation=self.messages.VulnerabilityLocation(
-            package='gcc',
-            version=self.messages.Version(
-                kind=self.messages.Version.KindValueValuesEnum.NORMAL
-            )
-        )
-    )
-    normal_fixed_package_issue = self.messages.PackageIssue(
-        fixedLocation=self.messages.VulnerabilityLocation(
-            package='g++',
-            version=self.messages.Version(
-                kind=self.messages.Version.KindValueValuesEnum.MAXIMUM
-            )
-        ),
-        affectedLocation=self.messages.VulnerabilityLocation(
-            package='g++',
-            version=self.messages.Version(
-                kind=self.messages.Version.KindValueValuesEnum.NORMAL
-            )
-        )
-    )
-    any_fixed_max_version = self._MakeOccurrence(
-        image='atli/id/44444', name='any_fixed_max_version',
-        note_id='CVE-2018-4444')
-    any_fixed_max_version.vulnerabilityDetails.packageIssue = [
-        max_fixed_package_issue, normal_fixed_package_issue
-    ]
-
-    all_fixed_max_version = self._MakeOccurrence(
-        image='atli/id/55555', name='all_fixed_max_version',
-        note_id='CVE-2018-5555')
-    all_fixed_max_version.vulnerabilityDetails.packageIssue = [
-        max_fixed_package_issue, max_fixed_package_issue
-    ]
-
-    occurrences = [
+    return [
         self._MakeOccurrence(image='atli/id/11111', name='foo',
                              note_id='CVE-2018-1111',
                              image_project='other-project'),
         self._MakeOccurrence(image='my-image', name='foo2',
                              note_id='CVE-2018-2222'),
-        build_details,
-        any_fixed_max_version,
-        all_fixed_max_version
     ]
 
-    query = resource_filter.Compile(filter_)
-    # Need to make serializable for filter to match enums
-    return [o for o in occurrences if
-            query.Evaluate(resource_projector.MakeSerializable(o))]
-
-  def _MockYieldFromList(self):
+  def _MockYieldFromList(self, filter_string):
     old_yield = list_pager.YieldFromList
     def _FakeYield(service, request, **kwargs):
       self.mock_client.projects_occurrences.List.Expect(
           self.messages.ContaineranalysisProjectsOccurrencesListRequest(
-              filter=request.filter,
+              filter=filter_string,
               pageSize=1000,
               parent='projects/fake-project'
           ),
@@ -159,7 +102,9 @@ class ListTest(
     self.messages = apis.GetMessagesModule('containeranalysis', 'v1alpha1')
 
   def testListVulnerabilities(self):
-    self._MockYieldFromList()
+    self._MockYieldFromList(
+        'kind = "PACKAGE_VULNERABILITY" AND '
+        'has_prefix(resource_url,"https://www.googleapis.com/compute/")')
 
     self.Run('compute images vulnerabilities list')
 
@@ -170,7 +115,9 @@ foo2 CVE-2018-2222 MINIMAL 2.71 foobar
 """, normalize_space=True)
 
   def testListVulnerabilities_OverrideFilter(self):
-    self._MockYieldFromList()
+    self._MockYieldFromList(
+        'kind = "PACKAGE_VULNERABILITY" AND '
+        'has_prefix(resource_url,"https://www.googleapis.com/compute/")')
 
     self.Run('compute images vulnerabilities list --filter ""')
 
@@ -178,22 +125,28 @@ foo2 CVE-2018-2222 MINIMAL 2.71 foobar
 NAME NOTE SEVERITY CVSS_SCORE PACKAGES
 foo CVE-2018-1111 MINIMAL 2.71 foobar
 foo2 CVE-2018-2222 MINIMAL 2.71 foobar
-any_fixed_max_version CVE-2018-4444 MINIMAL 2.71 gcc,g++
-all_fixed_max_version CVE-2018-5555 MINIMAL 2.71 gcc,gcc
 """, normalize_space=True)
 
   def testListVulnerabilities_SpecifyImage(self):
-    self._MockYieldFromList()
+    self._MockYieldFromList(
+        'kind = "PACKAGE_VULNERABILITY" AND '
+        'has_prefix(resource_url,"https://www.googleapis.com/compute/") AND '
+        'has_prefix(resource_url, '
+        '"https://www.googleapis.com/compute/v1/projects/fake-project/'
+        'global/images/my-image")')
 
     self.Run('compute images vulnerabilities list --image my-image')
 
     self.AssertOutputEquals("""\
 NAME NOTE SEVERITY CVSS_SCORE PACKAGES
+foo CVE-2018-1111 MINIMAL 2.71 foobar
 foo2 CVE-2018-2222 MINIMAL 2.71 foobar
 """, normalize_space=True)
 
   def testListVulnerabilities_Format(self):
-    self._MockYieldFromList()
+    self._MockYieldFromList(
+        'kind = "PACKAGE_VULNERABILITY" AND '
+        'has_prefix(resource_url,"https://www.googleapis.com/compute/")')
 
     self.Run('compute images vulnerabilities list')
 

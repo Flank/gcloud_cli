@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
     gcloud alpha ml-engine local predict --model-dir=MODEL_DIR
         (--json-instances=JSON_INSTANCES | --text-instances=TEXT_INSTANCES)
-        [GCLOUD_WIDE_FLAG ...]
+        [--framework=FRAMEWORK] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha ml-engine local predict performs prediction locally
@@ -41,6 +41,12 @@ REQUIRED FLAGS
               ...
 
           This flag accepts "-" for stdin.
+
+OPTIONAL FLAGS
+     --framework=FRAMEWORK
+        The ML framework used to train this version of the model. If not
+        specified, defaults to tensorflow. FRAMEWORK must be one of:
+        scikit-learn, tensorflow, xgboost.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

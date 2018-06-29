@@ -19,12 +19,12 @@ DESCRIPTION
     To block the command from completing until analysis is finished, run:
 
         $ gcloud beta ml speech recognize-long-running AUDIO_FILE \
-            --language LANGUAGE --sample-rate SAMPLE_RATE
+            --language-code LANGUAGE_CODE --sample-rate SAMPLE_RATE
 
     You can also receive an operation as the result of the command by running:
 
         $ gcloud beta ml speech recognize-long-running AUDIO_FILE \
-            --language LANGUAGE --sample-rate SAMPLE_RATE --async
+            --language-code LANGUAGE_CODE --sample-rate SAMPLE_RATE --async
 
     This will return information about an operation. To get information about
     the operation, run:

@@ -16,7 +16,6 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 from __future__ import unicode_literals
 import copy
 from apitools.base.py.testing import mock as apitools_mock
@@ -44,6 +43,67 @@ class CategoryManagerUnitTestBase(cli_test_base.CliTestBase,
             utils.API_NAME, utils.API_VERSION, no_http=True))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
+
+  def ExpectProjectAnnotationCreate(self, project_annotation_resource,
+                                    expected_annotation):
+    """Mock backend call to create a project annotation."""
+    # Make expected value copy to ensure that field mutations don't occur.
+    created_annotation = copy.deepcopy(expected_annotation)
+    self.mock_client.projects_taxonomies_annotations.Create.Expect(
+        self.messages.CategorymanagerProjectsTaxonomiesAnnotationsCreateRequest(
+            parent=project_annotation_resource.RelativeName(),
+            annotation=expected_annotation), created_annotation)
+
+  def ExpectProjectAnnotationsList(self, project_taxonomy_resource,
+                                   expected_annotations_list):
+    self.mock_client.projects_taxonomies_annotations.List.Expect(
+        self.messages.CategorymanagerProjectsTaxonomiesAnnotationsListRequest(
+            parent=project_taxonomy_resource.RelativeName()),
+        expected_annotations_list)
+
+  def ExpectProjectAnnotationUpdate(self, project_annotation_resource,
+                                    expected_annotation):
+    """Mocks backend call that updates an annotation's description."""
+    # Make expected value copy to ensure that field mutations don't occur.
+    created_annotation = copy.deepcopy(expected_annotation)
+    self.mock_client.projects_taxonomies_annotations.Patch.Expect(
+        self.messages.CategorymanagerProjectsTaxonomiesAnnotationsPatchRequest(
+            name=project_annotation_resource.RelativeName(),
+            annotation=expected_annotation), created_annotation)
+
+  def ExpectProjectAnnotationDelete(self, annotation_name):
+    """Mocks backend call to delete an annotation."""
+    self.mock_client.projects_taxonomies_annotations.Delete.Expect(
+        self.messages.CategorymanagerProjectsTaxonomiesDeleteRequest(
+            name=annotation_name),
+        self.messages.Empty())
+
+  def ExpectProjectTaxonomyList(self, project_id, expected_taxonomy_list):
+    """Mocks backend call to list taxonomies."""
+    # Make expected value copy to ensure that field mutations don't occur.
+    expected_taxonomy_list = copy.deepcopy(expected_taxonomy_list)
+    project_resource = resources.REGISTRY.Create(
+        collection='categorymanager.projects', projectsId=project_id)
+    self.mock_client.projects_taxonomies.List.Expect(
+        self.messages.CategorymanagerProjectsTaxonomiesListRequest(
+            parent=project_resource.RelativeName()),
+        expected_taxonomy_list)
+
+  def ExpectCreateProjectTaxonomy(self, project_resource, expected_taxonomy):
+    """Mocks backend call to create a taxonomy."""
+    # Make expected value copy to ensure that field mutations don't occur.
+    created_taxonomy = copy.deepcopy(expected_taxonomy)
+    self.mock_client.projects_taxonomies.Create.Expect(
+        self.messages.CategorymanagerProjectsTaxonomiesCreateRequest(
+            parent=project_resource.RelativeName(), taxonomy=expected_taxonomy),
+        created_taxonomy)
+
+  def ExpectDeleteProjectTaxonomy(self, project_taxonomy_name):
+    """Mocks backend call to delete a taxonomy."""
+    self.mock_client.projects_taxonomies.Delete.Expect(
+        self.messages.CategorymanagerProjectsTaxonomiesDeleteRequest(
+            name=project_taxonomy_name),
+        self.messages.Empty())
 
   def ExpectGetTaxonomyStore(self, org_id, taxonomy_store_id):
     """Fakes a request to get a taxonomy store for an organization id."""

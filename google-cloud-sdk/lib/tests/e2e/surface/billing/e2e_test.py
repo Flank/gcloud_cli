@@ -17,6 +17,8 @@ Depends on having at least one billing account in the test project. If the
 project wants to make any meaningful calls, this should already be the case.
 """
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from tests.lib import cli_test_base
 from tests.lib import e2e_base

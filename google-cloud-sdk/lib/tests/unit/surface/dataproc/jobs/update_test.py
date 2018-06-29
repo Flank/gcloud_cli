@@ -14,10 +14,13 @@
 
 """Test of the 'jobs update' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import jobs_unit_base
+import six
 
 
 class JobsUpdateUnitTest(jobs_unit_base.JobsUnitTestBase):
@@ -133,11 +136,10 @@ class JobsUpdateUnitTest(jobs_unit_base.JobsUnitTestBase):
           'jobs update {0} --update-labels=customer=acme'.format(self.JOB_ID))
 
   def labelsDictToMessage(self, labels_dict):
-    return self.messages.Job.LabelsValue(
-        additionalProperties=[
-            self.messages.Job.LabelsValue.AdditionalProperty(
-                key=key, value=value)
-            for key, value in sorted(labels_dict.iteritems())])
+    return self.messages.Job.LabelsValue(additionalProperties=[
+        self.messages.Job.LabelsValue.AdditionalProperty(key=key, value=value)
+        for key, value in sorted(six.iteritems(labels_dict))
+    ])
 
   def ExpectUpdateJob(
       self, job, field_paths, response=None, exception=None):

@@ -31,10 +31,10 @@ COMMANDS
     COMMAND is one of the following:
 
      read
-        (BETA) Reads log entries.
+        (BETA) Read log entries.
 
      write
-        (BETA) Writes a log entry.
+        (BETA) Write a log entry.
 
 NOTES
     This command is currently in BETA and may change without notice. This

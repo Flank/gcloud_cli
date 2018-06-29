@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instances delete subcommand."""
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -1159,7 +1162,7 @@ class InstancesDeleteTest(test_base.BaseTest,
     def MakeRequests(*_, **kwargs):
       if False:  # pylint: disable=using-constant-test, generator mock
         yield
-      print 'eee'
+      print('eee')
       kwargs['errors'].append((404, 'Not Found'))
 
     self.make_requests.side_effect = MakeRequests

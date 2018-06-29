@@ -44,11 +44,6 @@
       ],
       "location": "query"
     },
-    "bearer_token": {
-      "type": "string",
-      "description": "OAuth bearer token.",
-      "location": "query"
-    },
     "callback": {
       "type": "string",
       "description": "JSONP",
@@ -67,12 +62,6 @@
     "oauth_token": {
       "type": "string",
       "description": "OAuth 2.0 token for the current user.",
-      "location": "query"
-    },
-    "pp": {
-      "type": "boolean",
-      "description": "Pretty-print response.",
-      "default": "true",
       "location": "query"
     },
     "prettyPrint": {
@@ -1413,7 +1402,7 @@
                 "https://www.googleapis.com/auth/cloud-bigtable.admin.cluster",
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Gets the access control policy for an instance resource. Returns an empty\npolicy if an instance exists but does not have a policy set.\n\nNote: This is a private alpha release of Cloud Bigtable instance-level IAM.\nThis feature is not currently available to most Cloud Bigtable customers.\nThis feature might be changed in backward-incompatible ways and is not\nrecommended for production use. It is not subject to any SLA or deprecation\npolicy."
+              "description": "Gets the access control policy for an instance resource. Returns an empty\npolicy if an instance exists but does not have a policy set."
             },
             "setIamPolicy": {
               "id": "bigtableadmin.projects.instances.setIamPolicy",
@@ -1446,7 +1435,7 @@
                 "https://www.googleapis.com/auth/cloud-bigtable.admin.cluster",
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Sets the access control policy on an instance resource. Replaces any\nexisting policy.\n\nNote: This is a private alpha release of Cloud Bigtable instance-level IAM.\nThis feature is not currently available to most Cloud Bigtable customers.\nThis feature might be changed in backward-incompatible ways and is not\nrecommended for production use. It is not subject to any SLA or deprecation\npolicy."
+              "description": "Sets the access control policy on an instance resource. Replaces any\nexisting policy."
             },
             "testIamPermissions": {
               "id": "bigtableadmin.projects.instances.testIamPermissions",
@@ -1479,7 +1468,7 @@
                 "https://www.googleapis.com/auth/cloud-bigtable.admin.cluster",
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Returns permissions that the caller has on the specified instance resource.\n\nNote: This is a private alpha release of Cloud Bigtable instance-level IAM.\nThis feature is not currently available to most Cloud Bigtable customers.\nThis feature might be changed in backward-incompatible ways and is not\nrecommended for production use. It is not subject to any SLA or deprecation\npolicy."
+              "description": "Returns permissions that the caller has on the specified instance resource."
             }
           }
           ,

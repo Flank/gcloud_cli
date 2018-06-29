@@ -14,6 +14,8 @@
 
 """Integration test for all 'dataproc jobs' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import tempfile
 
@@ -103,7 +105,7 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
       # If this is bundled, gsutil is available for uploads.
       with tempfile.NamedTemporaryFile(
           dir=self.temp_path, suffix='.py', delete=False) as local_script:
-        local_script.write("print 'hello world'")
+        local_script.write(b"print 'hello world'")
       script_uri = local_script.name
     else:
       # Use script file that is known to exist.
@@ -147,7 +149,7 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
     self.assertIsNotNone(result.sparkSqlJob)
 
   def DoTestJobWaiting(self):
-    job_id = self.job_id_generator.next()
+    job_id = next(self.job_id_generator)
     result = self.RunDataproc((
         'jobs submit pig '
         '--cluster {0} '
@@ -167,7 +169,7 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
                      result.status.state)
 
   def DoTestJobFailure(self):
-    job_id = self.job_id_generator.next()
+    job_id = next(self.job_id_generator)
     with self.AssertRaisesExceptionMatches(
         exceptions.JobError,
         'Job [{0}] entered state [ERROR] while waiting for [DONE].'.format(
@@ -217,7 +219,7 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
     self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
   def DoTestGetSetIAMPolicy(self):
-    job_id = self.job_id_generator.next()
+    job_id = next(self.job_id_generator)
     self.RunDataproc((
         'jobs submit pig '
         '--cluster {0} '

@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta auth configure\-docker \- registers gcloud as a Docker credential helper
+gcloud beta auth configure\-docker \- register \f5gcloud\fR as a Docker credential helper
 
 
 
@@ -17,16 +17,17 @@ gcloud beta auth configure\-docker \- registers gcloud as a Docker credential he
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Adds Docker \f5credHelper\fR entry to Docker's configuration file,
-or creates the file if it doesn't exist, which will register gcloud as the
-credential helper for all Google supported Docker registries.
+\fB(BETA)\fR gcloud beta auth configure\-docker adds the Docker \f5credHelper\fR
+entry to Docker's configuration file, or creates the file if it doesn't exist.
+This will register \f5gcloud\fR as the credential helper for all
+Google\-supported Docker registries. If the Docker configuration already
+contains a \f5credHelper\fR entry, it will be overwritten.
 
-If Docker configuration already contains a \f5credHelper\fR entry it will be
-overwritten.
+Note, \f5docker\fR and \f5gcloud\fR need to be on the same system \f5PATH\fR to
+work correctly.
 
-See
-https://docs.docker.com/engine/reference/commandline/login/#credential\-helpers
-for more details on Docker credential helpers.
+For more details on Docker credential helpers, see
+https://docs.docker.com/engine/reference/commandline/login/#credential\-helpers.
 
 
 

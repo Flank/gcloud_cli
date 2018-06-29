@@ -18,19 +18,20 @@ REQUIRED FLAGS
      --display-name=DISPLAY_NAME
         A human-readable name for the annotation.
 
-     Project taxonomy resource - The taxonomy ID of the parent taxonomy for
-     this new annotation. This represents a Cloud resource. (NOTE) Some
-     attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: Set the property [core/project] or
-     provide the flag [--project] on the command line. This must be specified.
+     Taxonomy resource - A taxonomy reference. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the flag
+     [--taxonomy] on the command line with a fully specified name; provide the
+     flag [--project] on the command line; set the property [core/project].
+     This must be specified.
 
        --taxonomy=TAXONOMY
-          The ID of the project_taxonomy or a fully qualified identifier for
-          the project_taxonomy.
+          The ID of the taxonomy or a fully qualified identifier for the
+          taxonomy.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
-        The description of this annotation.
+        A human-readable description of the annotation.
 
      --parent-annotation=PARENT_ANNOTATION
         The ID of the parent annotation for this annotation. If not given, this
@@ -40,10 +41,6 @@ GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
-
-API REFERENCE
-    This command uses the categorymanager/v1alpha2 API. The full documentation
-    for this API can be found at: https://cloud.google.com/
 
 NOTES
     This command is an internal implementation detail and may change or

@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha compute commitments create COMMITMENT --plan=PLAN
         --resources=[RESOURCE=COMMITMENT,...] [--region=REGION]
-        [GCLOUD_WIDE_FLAG ...]
+        [--type=TYPE; default="general-purpose"] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create Google Compute Engine commitments.
@@ -47,6 +47,11 @@ OPTIONAL FLAGS
 
         Alternatively, the region can be stored in the environment variable
         CLOUDSDK_COMPUTE_REGION.
+
+     --type=TYPE; default="general-purpose"
+        Type of commitment. memory-optimized indicates that the commitment is
+        for memory-optimized VMs. TYPE must be one of: general-purpose,
+        memory-optimized.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

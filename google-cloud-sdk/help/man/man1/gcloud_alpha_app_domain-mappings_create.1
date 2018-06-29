@@ -65,12 +65,14 @@ help\fR for details.
 
 .SH "EXAMPLES"
 
-To create a new App Engine new domain mapping with an automatically managed
+To create a new App Engine domain mapping with an automatically managed
 certificate, run:
 
 .RS 2m
 $ gcloud alpha app domain\-mappings create 'example.com'
 .RE
+
+Note: managed certificates do not support wildcard domain mappings.
 
 To create a domain with a manual certificate, run:
 
@@ -78,8 +80,6 @@ To create a domain with a manual certificate, run:
 $ gcloud alpha app domain\-mappings create '*.example.com'          \e
            \-\-certificate\-management=manual \-\-certificate\-id=1234
 .RE
-
-Note: managed certificates do not support wildcard domain mappings.
 
 To create a domain with no associated certificate, run:
 

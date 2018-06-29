@@ -14,8 +14,11 @@
 
 """`billing accounts get-iam-policy` command tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core.util import http_encoding
 from tests.lib import test_case
 from tests.lib.surface.billing import base
 
@@ -29,10 +32,9 @@ class BillingAccountsSetIamPolicyTest(base.BillingMockTest):
     test_iam_policy = self.messages.Policy(
         bindings=[
             self.messages.Binding(
-                role=u'roles/billing.admin',
-                members=[u'robot@foo.com']),
+                role='roles/billing.admin', members=['robot@foo.com']),
         ],
-        etag='someUniqueEtag',
+        etag=http_encoding.Encode('someUniqueEtag'),
     )
     temp_file = self.Touch(
         self.temp_path,
@@ -51,7 +53,6 @@ class BillingAccountsSetIamPolicyTest(base.BillingMockTest):
         'billing accounts set-iam-policy {} {}'.format(
             base.BILLING_ACCOUNTS[0].name, temp_file))
     self.assertEqual(result, test_iam_policy)
-
 
 if __name__ == '__main__':
   test_case.main()

@@ -13,16 +13,19 @@
 # limitations under the License.
 """Tests for the images create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import csek_utils
 from googlecloudsdk.api_lib.compute import image_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+import six
 
 
 class ImagesCreateTest(test_base.BaseTest):
@@ -553,7 +556,8 @@ class ImagesCreateGuestOsFeaturesTest(test_base.BaseTest):
     self.CheckRequests()
 
   def testCheckGuestOsFeaturesEnum(self):
-    enums = self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys()
+    enums = list(
+        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
     enums.remove('FEATURE_TYPE_UNSPECIFIED')
     enums.sort()
 
@@ -640,7 +644,8 @@ class ImagesCreateGuestOsFeaturesBetaTest(test_base.BaseTest):
     self.CheckRequests()
 
   def testCheckGuestOsFeaturesEnum(self):
-    enums = self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys()
+    enums = list(
+        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
     enums.remove('FEATURE_TYPE_UNSPECIFIED')
     enums.sort()
 
@@ -725,7 +730,8 @@ class ImagesCreateGuestOsFeaturesAlphaTest(test_base.BaseTest):
     self.CheckRequests()
 
   def testCheckGuestOsFeaturesEnum(self):
-    enums = self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys()
+    enums = list(
+        self.messages.GuestOsFeature.TypeValueValuesEnum.to_dict().keys())
     enums.remove('FEATURE_TYPE_UNSPECIFIED')
     enums.sort()
 
@@ -823,7 +829,7 @@ class ImagesCreateWithLabelsTest(test_base.BaseTest):
                           m.Image.LabelsValue.AdditionalProperty(
                               key=key, value=value)
                           for key, value in sorted(
-                              labels_in_request.iteritems())]),
+                              six.iteritems(labels_in_request))]),
                   name='image-with-labels',
                   sourceDisk=(self.compute_uri + '/projects/'
                               'my-project/zones/us-central1-a/disks/my-disk'),
@@ -1079,13 +1085,13 @@ class ImagesCreateImageFromSnapshotTest(test_base.BaseTest):
           """)
 
 
-class ImageCreateTestWithKmsKeysAlpha(test_base.BaseTest):
+@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
+                          (calliope_base.ReleaseTrack.BETA, 'beta'))
+class ImageCreateTestWithKmsKeys(test_base.BaseTest, parameterized.TestCase):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testKmsKeyWithKeyNameArgsOk(self):
+  def testKmsKeyWithKeyNameArgsOk(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
     self.Run("""
         compute images create my-image --source-uri gs://31dd/source-image \
             --kms-key=projects/key-project/locations/global/keyRings/ring/cryptoKeys/image-key
@@ -1107,7 +1113,9 @@ class ImageCreateTestWithKmsKeysAlpha(test_base.BaseTest):
               project='my-project'))],
     )
 
-  def testKmsKeyWithKeyPartArgsOk(self):
+  def testKmsKeyWithKeyPartArgsOk(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
     self.Run("""
         compute images create my-image --source-uri gs://31dd/source-image \
             --kms-project=key-project --kms-location=global \
@@ -1130,7 +1138,9 @@ class ImageCreateTestWithKmsKeysAlpha(test_base.BaseTest):
               project='my-project'))],
     )
 
-  def testKmsKeyWithoutProjectOk(self):
+  def testKmsKeyWithoutProjectOk(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
     self.Run("""
         compute images create my-image --source-uri gs://31dd/source-image \
             --kms-location=global \
@@ -1153,30 +1163,42 @@ class ImageCreateTestWithKmsKeysAlpha(test_base.BaseTest):
               project='my-project'))],
     )
 
-  def testMissingLocation(self):
-    with self.assertRaises(parser_errors.RequiredError):
+  def testMissingLocation(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'KMS cryptokey resource was not fully specified.'):
       self.Run("""
           compute images create my-image --source-uri gs://31dd/source-image \
               --kms-keyring=ring --kms-key=key
           """)
 
-  def testMissingKeyRing(self):
-    with self.assertRaises(parser_errors.RequiredError):
+  def testMissingKeyRing(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'KMS cryptokey resource was not fully specified.'):
       self.Run("""
           compute images create my-image --source-uri gs://31dd/source-image \
               --kms-location=global \
               --kms-key=key
           """)
 
-  def testMissingKey(self):
-    with self.assertRaises(parser_errors.RequiredError):
+  def testMissingKey(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
+    with self.AssertRaisesArgumentError():
       self.Run("""
           compute images create my-image --source-uri gs://31dd/source-image \
               --kms-location=global \
               --kms-keyring=ring
           """)
 
-  def testConflictKmsKeyNameWithCsekKeyFile(self):
+  def testConflictKmsKeyNameWithCsekKeyFile(self, track, api_version):
+    self.track = track
+    self.SelectApi(api_version)
     self.WriteInput(self.GetKeyFileContent())
     with self.assertRaises(exceptions.ConflictingArgumentsException):
       self.Run("""

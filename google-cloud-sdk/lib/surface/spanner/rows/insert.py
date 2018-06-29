@@ -13,6 +13,8 @@
 # limitations under the License.
 """Command for spanner rows insert."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.spanner import database_sessions
 from googlecloudsdk.api_lib.spanner import databases
 from googlecloudsdk.calliope import base
@@ -73,7 +75,6 @@ class Insert(base.Command):
         relative_name=session_name.name,
         collection='spanner.projects.instances.databases.sessions')
     try:
-      # TODO(b/78234658).
       return database_sessions.Commit(session, [mutation])
     finally:
       database_sessions.Delete(session)

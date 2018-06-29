@@ -11,7 +11,7 @@ gcloud alpha compute os\-login remove\-profile \- remove the posix account infor
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute os\-login remove\-profile\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute os\-login remove\-profile\fR [\fB\-\-operating\-system\fR=\fIOPERATING_SYSTEM\fR;\ default="linux"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -23,6 +23,18 @@ to the current project ID. Posix account entries for G Suite users do not set
 the account ID field and can only be modified by a domain administrator.
 
 
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-operating\-system\fR=\fIOPERATING_SYSTEM\fR; default="linux"
+Specifies the profile type to remove. \fIOPERATING_SYSTEM\fR must be one of:
+\fBlinux\fR, \fBwindows\fR.
+
+
+.RE
+.sp
 
 .SH "GCLOUD WIDE FLAGS"
 

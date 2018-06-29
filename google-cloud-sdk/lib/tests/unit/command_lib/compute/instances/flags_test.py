@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Unit tests for the intances flags module."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 import collections
@@ -26,6 +28,7 @@ from googlecloudsdk.core import log
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import test_base as compute_test_base
+from six.moves import range
 
 
 class InstanceFlagsTest(test_case.TestCase):

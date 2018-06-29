@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha kms keys versions destroy VERSION [--key=KEY]
-        [GCLOUD_WIDE_FLAG ...]
+        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Schedules the given version for destruction in 24 hours.
@@ -22,6 +22,12 @@ POSITIONAL ARGUMENTS
 FLAGS
      --key=KEY
         The containing key.
+
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the keyring.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

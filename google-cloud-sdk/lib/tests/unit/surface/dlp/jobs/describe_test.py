@@ -31,7 +31,9 @@ class DescribeTest(base.DlpUnitTestBase):
     job_ref = resources.REGISTRY.Parse(
         'my_job', params={'projectsId': self.Project()},
         collection='dlp.projects.dlpJobs')
-    job = self.MakeJob(job_ref.RelativeName())
+    job = self.MakeJob(job_ref.RelativeName(),
+                       input_gcs_path='gs://my-bucket/',
+                       output_topics=['my_topic'])
     describe_request = self.msg.DlpProjectsDlpJobsGetRequest(
         name=job_ref.RelativeName())
     self.client.projects_dlpJobs.Get.Expect(request=describe_request,

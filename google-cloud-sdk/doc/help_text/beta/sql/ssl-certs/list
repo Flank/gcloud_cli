@@ -8,7 +8,10 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Lists all SSL certs for a Cloud SQL instance.
+    (BETA) (DEPRECATED) Lists all SSL certs for a Cloud SQL instance.
+
+    gcloud sql ssl-certs is deprecated. Use gcloud sql ssl client-certs
+    instead.
 
 REQUIRED FLAGS
      --instance=INSTANCE, -i INSTANCE

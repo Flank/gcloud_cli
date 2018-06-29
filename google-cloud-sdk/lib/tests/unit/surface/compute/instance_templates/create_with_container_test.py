@@ -579,7 +579,8 @@ class InstanceTemplatesCreateFromContainerTest(
 
   def testCreateMetadataKeyConflict(self):
     with self.AssertRaisesToolExceptionRegexp(
-        'Metadata key "user-data" is not allowed when running contenerized VM'):
+        'Metadata key "user-data" is not allowed when '
+        'running containerized VM'):
       self.Run("""
           compute instance-templates create-with-container it-1
             --metadata user-data=somedata

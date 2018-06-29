@@ -16,7 +16,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.container.binauthz import apis
 from googlecloudsdk.command_lib.container.binauthz import encoding
@@ -96,7 +96,7 @@ class EncodingTest(test_case.TestCase):
   def testTypeMismatch_Scalar(self):
     with self.assertRaisesRegexp(
         encoding.ScalarTypeMismatchError,
-        r'Expected type <type.* for field updateTime, found 1'):
+        r'Expected type <(type|class).* for field updateTime, found 1'):
       encoding.DictToMessageWithErrorCheck(
           {'updateTime': 1},
           self.messages.Policy)

@@ -14,11 +14,14 @@
 
 """Integration tests for the 'gcloud dns' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
 from tests.lib import test_case
 from tests.lib.surface.dns import base
+import six
 
 
 class ProjectInfoTest(base.DnsTest):
@@ -41,24 +44,25 @@ class ManagedZonesTest(base.DnsTest):
     self.track = calliope_base.ReleaseTrack.BETA
     messages = core_apis.GetMessagesModule('dns', self.beta_version)
     self.test_zone = messages.ManagedZone(
-        description=u'Zone!',
-        dnsName=unicode(
+        description='Zone!',
+        dnsName=six.text_type(
             # Random name generation that ends in .com.
             # Example: kvtqfsqro8mo5.com.
-            e2e_utils.GetResourceNameGenerator(suffix='.com.',
-                                               hash_len=13,
-                                               delimiter='',
-                                               timestamp_format=None).next()),
-        kind=u'dns#managedZone',
-        name=unicode(e2e_utils.GetResourceNameGenerator(prefix='zone').next()),
+            next(
+                e2e_utils.GetResourceNameGenerator(
+                    suffix='.com.',
+                    hash_len=13,
+                    delimiter='',
+                    timestamp_format=None))),
+        kind='dns#managedZone',
+        name=six.text_type(
+            next(e2e_utils.GetResourceNameGenerator(prefix='zone'))),
         nameServers=[])
 
-    self.Run((
-        'dns managed-zones create {0}'
-        ' --dns-name {1} --labels foo=bar --description {2}').format(
-            self.test_zone.name,
-            self.test_zone.dnsName,
-            self.test_zone.description))
+    self.Run(('dns managed-zones create {0}'
+              ' --dns-name {1} --labels foo=bar --description {2}').format(
+                  self.test_zone.name, self.test_zone.dnsName,
+                  self.test_zone.description))
     self.AssertErrContains("""\
 Created [https://www.googleapis.com/dns/{2}/projects/{0}/managedZones/{1}].
 """.format(self.Project(), self.test_zone.name, self.beta_version))

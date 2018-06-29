@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud monitoring channel-descriptors list`."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.monitoring import base
+from six.moves import range
 
 
 class ChannelDescriptorsListTest(base.MonitoringTestBase):

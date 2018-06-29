@@ -36,7 +36,7 @@ class ListTest(base.BinauthzMockedPolicyClientUnitTest):
         systemOwnedDrydockNote=None,
         updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
         userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='providers/{}/notes/{}'.format(proj, name1),
+            noteReference='projects/{}/notes/{}'.format(proj, name1),
             publicKeys=[
                 self.messages.AttestationAuthorityPublicKey(
                     asciiArmoredPgpPublicKey='',
@@ -54,7 +54,7 @@ class ListTest(base.BinauthzMockedPolicyClientUnitTest):
         systemOwnedDrydockNote=None,
         updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
         userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='providers/{}/notes/{}'.format(proj, name2),
+            noteReference='projects/{}/notes/{}'.format(proj, name2),
             publicKeys=[
                 self.messages.AttestationAuthorityPublicKey(
                     asciiArmoredPgpPublicKey='',
@@ -77,12 +77,12 @@ class ListTest(base.BinauthzMockedPolicyClientUnitTest):
     self.RunBinauthz('authorities list')
 
     expected_list = textwrap.dedent('''
-        +------+----------------------------------+-----------------+
-        | NAME |               NOTE               | NUM_PUBLIC_KEYS |
-        +------+----------------------------------+-----------------+
-        | bar  | providers/fake-project/notes/bar | 2               |
-        | baz  | providers/fake-project/notes/baz | 1               |
-        +------+----------------------------------+-----------------+
+        +------+---------------------------------+-----------------+
+        | NAME |               NOTE              | NUM_PUBLIC_KEYS |
+        +------+---------------------------------+-----------------+
+        | bar  | projects/fake-project/notes/bar | 2               |
+        | baz  | projects/fake-project/notes/baz | 1               |
+        +------+---------------------------------+-----------------+
     ''').lstrip()
 
     self.AssertOutputEquals(expected_list)

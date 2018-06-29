@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.api_lib.firebase.test import arg_validate
@@ -20,6 +22,7 @@ from tests.lib import test_case
 from tests.lib.surface.firebase.test.android import unit_base
 
 import mock
+import six
 
 
 class AndroidArgValidateTests(unit_base.AndroidUnitTestBase):
@@ -134,40 +137,42 @@ class AndroidArgValidateTests(unit_base.AndroidUnitTestBase):
     args = argparse.Namespace(robo_directives={'text:resource:name': 'value'})
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateRoboDirectivesList(args)
-    self.assertIn('robo-directives', e.exception.message)
-    self.assertIn('Invalid format for key [text:resource:name]. '
-                  'Use a colon only to separate action type and resource name.',
-                  e.exception.message)
+    self.assertIn('robo-directives', six.text_type(e.exception))
+    self.assertIn(
+        'Invalid format for key [text:resource:name]. '
+        'Use a colon only to separate action type and resource name.',
+        six.text_type(e.exception))
 
   def testValidateRoboDirectivesList_WithEmptyResourceName(self):
     args = argparse.Namespace(robo_directives={'text:': 'value'})
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateRoboDirectivesList(args)
-    self.assertIn('robo-directives', e.exception.message)
-    self.assertIn('Missing resource_name for key', e.exception.message)
+    self.assertIn('robo-directives', six.text_type(e.exception))
+    self.assertIn('Missing resource_name for key', six.text_type(e.exception))
 
   def testValidateRoboDirectivesList_WithInvalidActionType(self):
     args = argparse.Namespace(robo_directives={'badtype:resource': 'value'})
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateRoboDirectivesList(args)
-    self.assertIn('robo-directives', e.exception.message)
-    self.assertIn('Unsupported action type [badtype]', e.exception.message)
+    self.assertIn('robo-directives', six.text_type(e.exception))
+    self.assertIn('Unsupported action type [badtype]',
+                  six.text_type(e.exception))
 
   def testValidateRoboDirectivesList_WithEmptyResourceType(self):
     args = argparse.Namespace(robo_directives={':resource': 'value'})
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateRoboDirectivesList(args)
-    self.assertIn('robo-directives', e.exception.message)
-    self.assertIn('Unsupported action type []', e.exception.message)
+    self.assertIn('robo-directives', six.text_type(e.exception))
+    self.assertIn('Unsupported action type []', six.text_type(e.exception))
 
   def testValidateRoboDirectivesList_WithClickActionAndInputText(self):
     args = argparse.Namespace(robo_directives={'click:resource': 'value'})
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateRoboDirectivesList(args)
-    self.assertIn('robo-directives', e.exception.message)
+    self.assertIn('robo-directives', six.text_type(e.exception))
     self.assertIn(
         'Input value not allowed for click action: [click:resource=value]',
-        e.exception.message)
+        six.text_type(e.exception))
 
   def testValidateRoboDirectivesList_WithDuplicateResourceNames(self):
     # Default duplicate validation for maps won't catch when a directive is
@@ -177,9 +182,9 @@ class AndroidArgValidateTests(unit_base.AndroidUnitTestBase):
                          'text:resource': 'value'})
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateRoboDirectivesList(args)
-    self.assertIn('robo-directives', e.exception.message)
+    self.assertIn('robo-directives', six.text_type(e.exception))
     self.assertIn('Duplicate resource names are not allowed: [resource]',
-                  e.exception.message)
+                  six.text_type(e.exception))
 
   # Validation of environment-variables
 
@@ -233,7 +238,7 @@ class AndroidArgValidateTests(unit_base.AndroidUnitTestBase):
     ]
     dirs = dirs_orig[:]
     arg_validate.NormalizeAndValidateDirectoriesToPullList(dirs)
-    self.assertItemsEqual(dirs_orig, dirs)
+    self.assertEquals(sorted(dirs_orig), sorted(dirs))
     dirs = ['/sdcard/spam/', '//sdcard/spam/']
     arg_validate.NormalizeAndValidateDirectoriesToPullList(dirs)
     # Same as before normalization, but trailing slash is removed

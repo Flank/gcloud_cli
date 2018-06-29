@@ -2,8 +2,7 @@ NAME
     gcloud alpha kms cryptokeys - create and manage CryptoKeys
 
 SYNOPSIS
-    gcloud alpha kms cryptokeys GROUP | COMMAND [--keyring=KEYRING]
-        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms cryptokeys GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) (REMOVED) Create and manage CryptoKeys.
@@ -13,13 +12,6 @@ DESCRIPTION
 
     A CryptoKey represents a logical key that can be used for cryptographic
     operations.
-
-FLAGS
-     --keyring=KEYRING
-        The containing keyring.
-
-     --location=LOCATION
-        The location of the requested resource.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

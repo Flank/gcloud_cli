@@ -5,6 +5,269 @@ Copyright 2014-2018 Google Inc. All rights reserved.
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
 
+## 206.0.0 (2018-06-19)
+
+### Breaking Changes
+
+*   **(Container Registry)** Updated `docker-credential-gcr` to version 1.5.0.
+    *   Order of access_token sources has been reversed: by default, `gcloud`
+        will now take precedence over environmental sources when operating in
+        Kubernetes Engine, Compute Engine, or App Engine Managed VMs.
+    *   See docker-credential-gcr v1.5.0 release notes on GitHub:
+        https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/tag/v1.5.0
+
+
+### Cloud SDK
+
+* The `gcloud` CLI now has experimental support for running using a Python 3.4+
+  interpreter. (Prior versions of gcloud required Python 2.7.) All `gcloud`
+  commands are supported except for the following command groups:
+    * `gcloud app`
+    * `gcloud datastore`
+    * `gcloud scheduler`
+    * `gcloud tasks`
+* Python tools other than `gcloud` that are shipped in the Cloud SDK still
+  require a Python 2.7 interpreter.
+* For more information on how to configure your Python interpreter, run:
+  `gcloud topic startup` or visit:
+  https://cloud.google.com/sdk/gcloud/reference/topic/startup
+* Fixed issue where credentials were written with broad permissions.
+
+### App Engine
+
+* Modified `gcloud app domain-mappings create` to provision an automatically
+  managed SSL certificate by default on domain mapping creation.
+* Promoted `--certificate-management` flag of
+  `gcloud app domain-mappings <create|update>` to GA.
+
+### Cloud Dataproc
+
+* Added the `--gce-pd-kms-key` flag to `dataproc clusters create` in beta to enable protecting clusters with Google Cloud KMS encryption.
+
+### Cloud Machine Learning Engine
+
+* Promoted the `--framework` flag of `gcloud ml-engine versions create` to GA.
+
+### Compute Engine
+
+* Added the `--labels` flag to `gcloud beta compute disks snapshot` to enable setting labels on new snapshots.
+
+### Kubernetes Engine
+
+*   Promoted the `--min-cpu-platform` flag of `gcloud container create` to GA.
+*   Promoted `--accelerator` flag of `gcloud container <clusters|node-pools> create` to GA.
+
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 205.0.0 (2018-06-12)
+
+### Cloud Bigtable
+
+*   Added new flags to the `cbt` commmand-line tool:
+    *   `-user-agent` for specifying a custom User Agent
+    *   `-columns` for specifying columns to read with `read` and `lookup`
+    *   `-cells-per-column` for limiting number of cells read per column with `read` and `lookup`
+
+### Cloud Datastore
+
+*    Added `gcloud datastore indexes` command group to beta with the following commands:
+     *   `gcloud datastore indexes cleanup`
+     *   `gcloud datastore indexes create`
+
+### Cloud Interconnect
+
+*   Promoted interconnects attachments partner related commands to GA.
+
+### Cloud Storage
+
+
+* Updated gsutil component to 4.32
+
+### Cloud TPU
+
+* Added `--preemptible` flag to `gcloud beta compute tpus create`.
+
+### Compute Engine
+
+* Added the `--network` flag to `gcloud compute images export` to allow the
+  export process to use a network other than `default`.
+* Promoted `--quic-override` flag of `compute target-https-proxies
+  <create|update>` to GA.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 204.0.0 (2018-06-05)
+
+### Breaking Changes
+
+*   **(Compute Engine)** Replaced `--node-index` with `--node` for `gcloud alpha compute <instance|instance_templates> create`. Node name will replace node index in the API, and nodes can now be targeted directly by node name (as opposed to node index, which was only unique within a group).
+
+
+### App Engine
+
+
+* Updated the Java SDK to version 1.9.64.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/java/release-notes
+
+### Cloud Endpoints
+
+* Fixed an issue where attempting to deploy normalized service configuration
+  files in yaml format would error out.
+
+### Cloud Machine Learning Engine
+
+* Added `--framework` flag to `ml-engine local predict`.
+
+### Cloud Source Repositories
+
+*    Added the `gcloud source repos update` command to beta with the following flags:
+     *   `--add-topic`
+     *   `--remove-topic`
+     *   `--update-topic`
+*    Added the following flags to `gcloud source project-configs update` in beta:
+     *   `--add-topic`
+     *   `--remove-topic`
+     *   `--update-topic`
+
+### Compute Engine
+
+* Promoted `--response` flag of `gcloud compute health-checks` commands to beta.
+* Promoted the following flags to beta to support using KMS keys to protect disks, images, and snapshots:
+  *    `--kms-key-*` flags of `gcloud compute <disks|images>`
+  *    `--boot-disk-kms-*` flags of `gcloud compute instances`.
+* Promoted node affinities in instance and instance template creation to beta.
+
+### Firebase Test Lab
+
+*   Promoted `--type=game-loop` tests for Android from beta to GA.
+
+### Kubernetes Engine
+
+* Promoted `--region` flag of `gcloud container` to GA.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 203.0.0 (2018-05-30)
+
+### Breaking Changes
+
+*   **(Cloud SQL)** Deprecated `gcloud sql ssl-certs`. Use `gcloud sql ssl client-certs` instead.
+
+
+### App Engine
+
+* Fixed issue where attempting to deploy non-yaml config files would report
+  success, but silently update configuration incorrectly, e.g. `gcloud app
+  deploy cron.xml`. Note that xml-files are not supported with `gcloud app`,
+  with the exception of `appengine-web.xml`.
+
+
+### App Engine Flexible Environment
+
+* Fixed an issue where `gcloud beta app deploy` failed to respect the
+  `--image-url` argument during Flex deployments. This issue was introduced in
+  Cloud SDK version 195.0.0.
+
+### Cloud Dataproc
+
+*   Added `gcloud beta dataproc workflow-templates instantiate-from-file` to
+    enable instantiation of workflow templates directly from a YAML file.
+*   Added `gcloud beta dataproc clusters create-from-file` to enable creation
+    of clusters directly from a YAML file.
+
+### Cloud SQL
+
+*   Added the `gcloud beta sql ssl server-ca-certs` group to support certificate
+    rotation, which includes the following commands:
+    *   `gcloud beta sql ssl server-ca-certs list`
+    *   `gcloud beta sql ssl server-ca-certs create`
+    *   `gcloud beta sql ssl server-ca-certs rotate`
+    *   `gcloud beta sql ssl server-ca-certs rollback`
+
+### Cloud Source Repositories
+
+*   Added the following commands to beta:
+    *   `gcloud source project-configs describe`
+    *   `gcloud source project-configs update`
+
+### Compute Engine
+
+* Promoted `--service-label` flag of `gcloud compute forwarding-rules create`
+  to beta.
+* Promoted `--shielded-vm-*` flags to beta in `gcloud compute instances create`,
+  `gcloud compute instances update` and
+  `gcloud compute instance-templates create`.
+
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 202.0.0 (2018-05-22)
+
+### Breaking Changes
+
+*   **(Cloud Composer)** Increased minimum `--disk-size` of `gcloud beta composer environments create`
+    to 20GB.
+*   **(Compute Engine)** Deprecated `gcloud compute interconnects attachments create`. Use `gcloud
+  compute interconnects attachments dedicated create` instead.
+*   **(Firebase Test Lab)** Deprecated the following Robo test crawler-related flags:
+    *   `--max-depth`
+    *   `--max-steps`: Use the `--timeout` option instead to limit the test
+        length.
+    *   `--app-initial-activity`: Use the `--robo-script` option (in beta) to
+        guide Robo to a specific part of the app under test.
+
+
+### App Engine
+
+
+* Updated the Python SDK to version 1.9.70.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/python/release-notes
+
+### Cloud Datastore Emulator
+
+* Released Cloud Datastore Emulator version 2.0.0.
+  * Java 8 (or later) is now required to run the emulator.
+  * When the emulator is run in an App Engine local development server,
+    index.yaml parsing errors are bubbled up. Previously the emulator would
+    throw a AppEngineConfigException without responding to the development
+    server requests.
+
+### Cloud Tools For PowerShell
+
+*   Updated Cloud Tools for PowerShell to version 1.0.1.8.
+    *   Fixed a bug where `Get-GcpProject` did not enumerate collection.
+    *   Fixed a bug where local SSD option for attach disk cmdlet did not work.
+
+### Compute Engine
+
+* Added help text output upon creating interconnects/interconnect attachments.
+  To hide this output, append the `--no-user-output-enabled` flag.
+* Promoted `--enable-flow-logs` flag of
+  `gcloud compute networks subnets <create|update>` to GA.
+* Promoted `gcloud compute sole-tenancy` commands to beta.
+* Modified `--delete-nodes` of `gcloud beta compute sole-tenancy node-groups`
+  to accept node names instead of node indexes.
+
+### Kubernetes Engine
+
+* Added `--disk-type` to `gcloud beta container <clusters|node-pools> create` to allow setting of the node VM boot disk type.
+* Updated Google Kubernetes Engine's kubectl from version 1.8.6 to 1.9.7.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
 ## 201.0.0 (2018-05-15)
 
 ### Breaking Changes

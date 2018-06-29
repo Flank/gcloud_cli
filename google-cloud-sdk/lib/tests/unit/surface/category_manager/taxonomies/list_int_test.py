@@ -52,23 +52,15 @@ class TaxonomiesListIntTest(base.CategoryManagerUnitTestBase):
             parent=taxonomy_store_resource.RelativeName()),
         expected_taxonomy_list)
 
-  def _ExpectProjectTaxonomyList(self, project_id, expected_taxonomy_list):
-    project_resource = resources.REGISTRY.Create(
-        collection='categorymanager.projects', projectsId=project_id)
-    self.mock_client.projects_taxonomies.List.Expect(
-        self.messages.CategorymanagerProjectsTaxonomiesListRequest(
-            parent=project_resource.RelativeName()),
-        expected_taxonomy_list)
-
   def testListingTaxonomiesUsingProject(self):
     """Test that listing taxonomies emits the anticipated taxonomy fields."""
-    self._ExpectProjectTaxonomyList(self.Project(), self.expected_taxonomy_list)
+    self.ExpectProjectTaxonomyList(self.Project(), self.expected_taxonomy_list)
     self.Run('alpha category-manager taxonomies list')
     self._VerifyCorrectOutput()
 
   def testListingOutputFormatUsingProject(self):
     """Test that the format of listing taxonomies is correct."""
-    self._ExpectProjectTaxonomyList(self.Project(), self.expected_taxonomy_list)
+    self.ExpectProjectTaxonomyList(self.Project(), self.expected_taxonomy_list)
     self.Run('alpha category-manager taxonomies list')
     self._VerifyListingFormat()
 

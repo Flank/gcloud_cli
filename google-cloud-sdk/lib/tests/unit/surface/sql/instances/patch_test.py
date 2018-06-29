@@ -14,8 +14,8 @@
 """Tests that exercise operations listing and executing."""
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.api_lib.sql import instances as instances_util
@@ -79,12 +79,14 @@ class _BaseInstancePatchTest(object):
                     authorizedNetworks=[
                         self.messages.AclEntry(
                             expirationTime=None,
-                            kind=u'sql#aclEntry',
+                            kind='sql#aclEntry',
                             name='',
-                            value=u'0.0.0.0/0',),
+                            value='0.0.0.0/0',
+                        ),
                     ],
                     ipv4Enabled=False,
-                    requireSsl=False,)
+                    requireSsl=False,
+                )
         }
     }
     self.ExpectInstanceGet(self.GetV1Instance(), diff)
@@ -131,12 +133,14 @@ class _BaseInstancePatchTest(object):
                     authorizedNetworks=[
                         self.messages.AclEntry(
                             expirationTime=None,
-                            kind=u'sql#aclEntry',
+                            kind='sql#aclEntry',
                             name=None,
-                            value=u'0.0.0.0/0',),
+                            value='0.0.0.0/0',
+                        ),
                     ],
                     ipv4Enabled=None,
-                    requireSsl=None,)
+                    requireSsl=None,
+                )
         }
     })
     self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
@@ -306,20 +310,24 @@ class _BaseInstancePatchTest(object):
     diff = {
         'name': 'custom-instance',
         'settings': {
-            'backupConfiguration': self.messages.BackupConfiguration(
-                binaryLogEnabled=True,
-                enabled=True,
-                kind=u'sql#backupConfiguration',
-                startTime=u'23:00',)
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    binaryLogEnabled=True,
+                    enabled=True,
+                    kind='sql#backupConfiguration',
+                    startTime='23:00',
+                )
         }
     }
     self.ExpectInstanceGet(self.GetV2Instance(), diff)
     diff['settings'].update({
-        'backupConfiguration': self.messages.BackupConfiguration(
-            binaryLogEnabled=True,
-            enabled=False,
-            kind=u'sql#backupConfiguration',
-            startTime=u'23:00',)
+        'backupConfiguration':
+            self.messages.BackupConfiguration(
+                binaryLogEnabled=True,
+                enabled=False,
+                kind='sql#backupConfiguration',
+                startTime='23:00',
+            )
     })
     self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
     self.ExpectDoneUpdateOperationGet()

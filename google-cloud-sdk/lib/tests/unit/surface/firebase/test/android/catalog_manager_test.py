@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.firebase.test.android import catalog_manager
 from tests.lib import test_case
 from tests.lib.surface.firebase.test.android import fake_catalogs
 from tests.lib.surface.firebase.test.android import unit_base
+
+import six
 
 
 class AndroidCatalogManagerTests(unit_base.AndroidMockClientTest):
@@ -35,21 +40,21 @@ class AndroidCatalogManagerTests(unit_base.AndroidMockClientTest):
     mgr = catalog_manager.AndroidCatalogManager(empty_catalog)
     with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
       mgr.GetDefaultModel()
-    self.assertIn('model', ex_ctx.exception.message)
+    self.assertIn('model', six.text_type(ex_ctx.exception))
 
   def testVersionDefaultIsMissing(self):
     empty_catalog = fake_catalogs.EmptyAndroidCatalog()
     mgr = catalog_manager.AndroidCatalogManager(empty_catalog)
     with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
       mgr.GetDefaultVersion()
-    self.assertIn('version', ex_ctx.exception.message)
+    self.assertIn('version', six.text_type(ex_ctx.exception))
 
   def testLocaleDefaultIsMissing(self):
     empty_catalog = fake_catalogs.EmptyAndroidCatalog()
     mgr = catalog_manager.AndroidCatalogManager(empty_catalog)
     with self.assertRaises(exceptions.DefaultDimensionNotFoundError) as ex_ctx:
       mgr.GetDefaultLocale()
-    self.assertIn('locale', ex_ctx.exception.message)
+    self.assertIn('locale', six.text_type(ex_ctx.exception))
 
   def testValidateModels(self):
     catalog = fake_catalogs.FakeAndroidCatalog()
@@ -94,21 +99,24 @@ class AndroidCatalogManagerTests(unit_base.AndroidMockClientTest):
     mgr = catalog_manager.AndroidCatalogManager(catalog)
     with self.assertRaises(exceptions.ModelNotFoundError) as ex_ctx:
       mgr.ValidateDimensionAndValue('model', 'Sungsam')
-    self.assertIn("'Sungsam' is not a valid model", ex_ctx.exception.message)
+    self.assertIn("'Sungsam' is not a valid model",
+                  six.text_type(ex_ctx.exception))
 
   def testValidateVersion_InvalidValue(self):
     catalog = fake_catalogs.FakeAndroidCatalog()
     mgr = catalog_manager.AndroidCatalogManager(catalog)
     with self.assertRaises(exceptions.VersionNotFoundError) as ex_ctx:
       mgr.ValidateDimensionAndValue('version', '9.9')
-    self.assertIn("'9.9' is not a valid OS version", ex_ctx.exception.message)
+    self.assertIn("'9.9' is not a valid OS version",
+                  six.text_type(ex_ctx.exception))
 
   def testValidateLocale_InvalidValuel(self):
     catalog = fake_catalogs.FakeAndroidCatalog()
     mgr = catalog_manager.AndroidCatalogManager(catalog)
     with self.assertRaises(exceptions.LocaleNotFoundError) as ex_ctx:
       mgr.ValidateDimensionAndValue('locale', 'vulcan')
-    self.assertIn("'vulcan' is not a valid locale", ex_ctx.exception.message)
+    self.assertIn("'vulcan' is not a valid locale",
+                  six.text_type(ex_ctx.exception))
 
   def testValidateOrientation_InvalidValue(self):
     catalog = fake_catalogs.FakeAndroidCatalog()
@@ -116,14 +124,15 @@ class AndroidCatalogManagerTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(exceptions.OrientationNotFoundError) as ex_ctx:
       mgr.ValidateDimensionAndValue('orientation', 'diagonal')
     self.assertIn("'diagonal' is not a valid device orientation",
-                  ex_ctx.exception.message)
+                  six.text_type(ex_ctx.exception))
 
   def testValidateDimension_InvalidDimensionName(self):
     catalog = fake_catalogs.FakeAndroidCatalog()
     mgr = catalog_manager.AndroidCatalogManager(catalog)
     with self.assertRaises(exceptions.InvalidDimensionNameError) as ex_ctx:
       mgr.ValidateDimensionAndValue('brand', 'Sungsam')
-    self.assertIn("'brand' is not a valid dimension", ex_ctx.exception.message)
+    self.assertIn("'brand' is not a valid dimension",
+                  six.text_type(ex_ctx.exception))
 
 
 if __name__ == '__main__':

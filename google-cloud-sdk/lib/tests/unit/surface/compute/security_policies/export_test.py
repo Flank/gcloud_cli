@@ -19,10 +19,10 @@ import os
 import re
 
 from googlecloudsdk.calliope import base
-from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.compute.security_policies import (
     security_policies_utils)
 from googlecloudsdk.core import resources
+from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -91,8 +91,8 @@ class SecurityPoliciesExportTest(test_base.BaseTest):
 
   def testExportWithErrors(self):
     with self.AssertRaisesExceptionRegexp(
-        exceptions.BadFileException,
-        r'Unable to export security policy to file \[{0}\]: .*'.format(
+        files.Error,
+        r'Unable to write file \[{0}\]: .*'.format(
             re.escape('/'))):
       self.Run('compute security-policies export my-policy'
                ' --file-name {0} --file-format {1}'.format('/', 'json'))

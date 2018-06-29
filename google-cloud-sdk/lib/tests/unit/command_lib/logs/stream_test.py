@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the logs streaming library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 
 from googlecloudsdk.api_lib.logging import common
@@ -165,23 +167,23 @@ class LogFetcherTest(test_case.TestCase):
     # - If there are no logs, run the continue function (keeping track of the
     #   number of consecutive intervals without any logs)
     # - If the continue function returns false, break out of the loop
-    self.assertEqual(logs.next(), expected_logs[0])
+    self.assertEqual(next(logs), expected_logs[0])
     self.assertEqual(self.time_slept, 0)
     self.assertEqual(self.log_fetcher_mock.call_count, 1)
     self.assertEqual(self.continue_func_calls, [])
 
-    self.assertEqual(logs.next(), expected_logs[1])
+    self.assertEqual(next(logs), expected_logs[1])
     self.assertEqual(self.time_slept, 10)
     self.assertEqual(self.log_fetcher_mock.call_count, 2)
     self.assertEqual(self.continue_func_calls, [0])
 
-    self.assertEqual(logs.next(), expected_logs[2])
+    self.assertEqual(next(logs), expected_logs[2])
     self.assertEqual(self.time_slept, 30)
     self.assertEqual(self.log_fetcher_mock.call_count, 4)
     self.assertEqual(self.continue_func_calls, [0, 0, 1])
 
     with self.assertRaises(StopIteration):
-      logs.next()
+      next(logs)
     self.assertEqual(self.time_slept, 50)
     self.assertEqual(self.log_fetcher_mock.call_count, 6)
     self.assertEqual(self.continue_func_calls, [0, 0, 1, 0, 1, 2])
@@ -206,18 +208,18 @@ class LogFetcherTest(test_case.TestCase):
 
     logs = fetcher.YieldLogs()
 
-    self.assertEqual(logs.next(), expected_logs[0])
+    self.assertEqual(next(logs), expected_logs[0])
     self.assertEqual(self.time_slept, 0)
     self.assertEqual(self.log_fetcher_mock.call_count, 1)
     self.assertEqual(self.continue_func_calls, [])
 
-    self.assertEqual(logs.next(), expected_logs[1])
+    self.assertEqual(next(logs), expected_logs[1])
     self.assertEqual(self.time_slept, 20)
     self.assertEqual(self.log_fetcher_mock.call_count, 3)
     self.assertEqual(self.continue_func_calls, [0, 0, 1, 1])
 
     with self.assertRaises(StopIteration):
-      logs.next()
+      next(logs)
     self.assertEqual(self.time_slept, 40)
     self.assertEqual(self.log_fetcher_mock.call_count, 5)
     self.assertEqual(self.continue_func_calls,
@@ -246,23 +248,23 @@ class LogFetcherTest(test_case.TestCase):
 
     logs = fetcher.YieldLogs()
 
-    self.assertEqual(logs.next(), expected_logs[0])
+    self.assertEqual(next(logs), expected_logs[0])
     self.assertEqual(self.time_slept, 0)
     self.assertEqual(self.log_fetcher_mock.call_count, 1)
     self.assertEqual(self.continue_func_calls, [])
 
-    self.assertEqual(logs.next(), expected_logs[1])
+    self.assertEqual(next(logs), expected_logs[1])
     self.assertEqual(self.time_slept, 10)
     self.assertEqual(self.log_fetcher_mock.call_count, 2)
     self.assertEqual(self.continue_func_calls, [0])
 
-    self.assertEqual(logs.next(), expected_logs[2])
+    self.assertEqual(next(logs), expected_logs[2])
     self.assertEqual(self.time_slept, 30)
     self.assertEqual(self.log_fetcher_mock.call_count, 4)
     self.assertEqual(self.continue_func_calls, [0, 1])
 
     with self.assertRaises(StopIteration):
-      logs.next()
+      next(logs)
     self.assertEqual(self.time_slept, 60)
     self.assertEqual(self.log_fetcher_mock.call_count, 7)
     self.assertEqual(self.continue_func_calls,

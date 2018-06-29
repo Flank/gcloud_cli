@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Spanner instances describe command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import resources
 from tests.lib.surface.spanner import base
 

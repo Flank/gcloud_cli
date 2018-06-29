@@ -34,7 +34,7 @@ COMMANDS
         Authorize access to Google Cloud Platform with a service account.
 
      configure-docker
-        Registers gcloud as a Docker credential helper.
+        Register gcloud as a Docker credential helper.
 
      list
         Lists credentialed accounts.

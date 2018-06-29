@@ -23,6 +23,13 @@ App Engine Domain Mappings allow an application to be served via one or many
 custom domains, such as \f5example.com\fR, instead of the default
 \f5appspot.com\fR address. You can use a custom domain with or without SSL.
 
+App Engine Domain Mappings allow an application to be served via one or many
+custom domains, such as \f5example.com\fR, instead of the default
+\f5appspot.com\fR address. You can use a custom domain with or without SSL. Use
+the AUTOMATIC management type to automatically provision an SSL certificate for
+your domain. Use the MANUAL management type to provide your own certificate or
+omit SSL.
+
 
 
 .SH "GCLOUD WIDE FLAGS"
@@ -69,6 +76,20 @@ To list your App Engine domains, run:
 
 .RS 2m
 $ gcloud app domain\-mappings list
+.RE
+
+To create a domain with an automatically managed certiticate, run:
+
+.RS 2m
+$ gcloud app domain\-mappings create 'example.com' \e
+    \-\-certificate\-management=AUTOMATIC
+.RE
+
+To create a domain with a manual certificate, run:
+
+.RS 2m
+$ gcloud app domain\-mappings create 'example.com'                 \e
+    \-\-certificate\-management=manual \-\-certificate\-id=1234
 .RE
 
 

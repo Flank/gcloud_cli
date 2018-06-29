@@ -28,10 +28,10 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
                            cli_test_base.CliTestBase, waiter_test_base.Base):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'alpha'))
+    self.track = base.ReleaseTrack.BETA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', 'beta')
     self.client.Mock()
     self.messages = self.client.MESSAGES_MODULE
     self.addCleanup(self.client.Unmock)
@@ -44,9 +44,8 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://www.googleapis.com/compute/alpha/projects/{0}/zones/'
-                 '{1}/operations/{2}'.format(
-                     self.Project(), self.zone, operation_name),
+        selfLink='https://www.googleapis.com/compute/beta/projects/{0}/zones/'
+        '{1}/operations/{2}'.format(self.Project(), self.zone, operation_name),
         targetLink=resource_uri)
 
   def _ExpectSetNodeTemplate(self, node_template, operation_suffix='X'):
@@ -75,18 +74,16 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
             'operation-' + operation_suffix,
             self.operation_status_enum.PENDING))
 
-  def _ExpectDeleteNodes(self, node_indexes, operation_suffix='X'):
+  def _ExpectDeleteNodes(self, node_names, operation_suffix='X'):
     delete_request_class = self.messages.NodeGroupsDeleteNodesRequest
     self.client.nodeGroups.DeleteNodes.Expect(
         self.messages.ComputeNodeGroupsDeleteNodesRequest(
-            nodeGroupsDeleteNodesRequest=delete_request_class(
-                nodeIndexes=node_indexes),
+            nodeGroupsDeleteNodesRequest=delete_request_class(nodes=node_names),
             nodeGroup='my-node-group',
             project=self.Project(),
             zone=self.zone),
-        self._GetOperationMessage(
-            'operation-' + operation_suffix,
-            self.operation_status_enum.PENDING))
+        self._GetOperationMessage('operation-' + operation_suffix,
+                                  self.operation_status_enum.PENDING))
 
   def _ExpectPollAndGet(self, operation_suffix='X'):
     self.client.zoneOperations.Get.Expect(
@@ -97,9 +94,9 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
         self._GetOperationMessage(
             'operation-' + operation_suffix,
             self.messages.Operation.StatusValueValuesEnum.DONE,
-            'https://www.googleapis.com/compute/alpha/projects/{0}/zones/'
-            '{1}/nodeGroups/{2}'.format(
-                self.Project(), self.zone, 'my-node-group')))
+            'https://www.googleapis.com/compute/beta/projects/{0}/zones/'
+            '{1}/nodeGroups/{2}'.format(self.Project(), self.zone,
+                                        'my-node-group')))
     self.client.nodeGroups.Get.Expect(
         self.messages.ComputeNodeGroupsGetRequest(
             nodeGroup='my-node-group', project=self.Project(), zone=self.zone),
@@ -125,24 +122,22 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
         'Adding [2] nodes to [my-node-group].')
 
   def testUpdate_DeleteNodes(self):
-    self._ExpectDeleteNodes([2, 5])
+    self._ExpectDeleteNodes(['node-2', 'node-5'])
     self._ExpectPollAndGet()
     self.Run('compute sole-tenancy node-groups update my-node-group '
-             '--delete-nodes 2,5 --zone ' + self.zone)
-    self.AssertErrContains(
-        'Deleting nodes [2,5] in [my-node-group].')
+             '--delete-nodes node-2,node-5 --zone ' + self.zone)
+    self.AssertErrContains('Deleting nodes [node-2,node-5] in [my-node-group].')
 
   def testUpdate_SetTemplateAndDeleteNodes(self):
     self._ExpectSetNodeTemplate('new-template', 'X')
-    self._ExpectDeleteNodes([2, 5], 'Y')
+    self._ExpectDeleteNodes(['node-2', 'node-5'], 'Y')
     self._ExpectPollAndGet('X')
     self._ExpectPollAndGet('Y')
 
     self.Run('compute sole-tenancy node-groups update my-node-group '
              '--node-template new-template '
-             '--delete-nodes 2,5 --zone ' + self.zone)
-    self.AssertErrContains(
-        'Deleting nodes [2,5] in [my-node-group].')
+             '--delete-nodes node-2,node-5 --zone ' + self.zone)
+    self.AssertErrContains('Deleting nodes [node-2,node-5] in [my-node-group].')
     self.AssertErrContains(
         'Setting node template on [my-node-group] to [new-template].')
 
@@ -165,7 +160,7 @@ class NodeGroupsCreateTest(sdk_test_base.WithFakeAuth,
         'argument --add-nodes: At most one of --add-nodes | --delete-nodes '
         'may be specified.'):
       self.Run('compute sole-tenancy node-groups update my-node-group '
-               '--add-nodes 2 --delete-nodes 2,5 --zone ' + self.zone)
+               '--add-nodes 2 --delete-nodes node-2,node-5 --zone ' + self.zone)
 
 
 if __name__ == '__main__':

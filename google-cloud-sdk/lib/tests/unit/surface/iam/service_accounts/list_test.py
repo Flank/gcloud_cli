@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure deserialization of server responses work properly."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
@@ -22,7 +26,7 @@ class ListTest(unit_test_base.BaseTest):
   def testEmptyResponse(self):
     self.client.projects_serviceAccounts.List.Expect(
         request=self.msgs.IamProjectsServiceAccountsListRequest(
-            name=u'projects/test-project',
+            name='projects/test-project',
             pageSize=100),
         response=self.msgs.ListServiceAccountsResponse(accounts=[]))
 
@@ -31,7 +35,7 @@ class ListTest(unit_test_base.BaseTest):
   def testPopulatedResponse(self):
     self.client.projects_serviceAccounts.List.Expect(
         request=self.msgs.IamProjectsServiceAccountsListRequest(
-            name=u'projects/test-project',
+            name='projects/test-project',
             pageSize=100),
         response=self.msgs.ListServiceAccountsResponse(accounts=[
             self.msgs.ServiceAccount(
@@ -57,7 +61,7 @@ class ListTest(unit_test_base.BaseTest):
   def testLimitedResponse(self):
     self.client.projects_serviceAccounts.List.Expect(
         request=self.msgs.IamProjectsServiceAccountsListRequest(
-            name=u'projects/test-project',
+            name='projects/test-project',
             pageSize=1),
         response=self.msgs.ListServiceAccountsResponse(accounts=[
             self.msgs.ServiceAccount(
@@ -79,7 +83,7 @@ class ListTest(unit_test_base.BaseTest):
   def testFilteredResponse(self):
     self.client.projects_serviceAccounts.List.Expect(
         request=self.msgs.IamProjectsServiceAccountsListRequest(
-            name=u'projects/test-project',
+            name='projects/test-project',
             pageSize=100),
         response=self.msgs.ListServiceAccountsResponse(accounts=[
             self.msgs.ServiceAccount(

@@ -14,6 +14,8 @@
 
 """Tests for dev_app_server for java and python."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import glob
 import json
 import os
@@ -82,7 +84,7 @@ class DeployTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
         sleep_ms=300)
     def _TestIdAndBucketName():
       # Identifier for this test, used for service names etc.
-      self.test_id = e2e_utils.GetResourceNameGenerator('gaedeptest').next()
+      self.test_id = next(e2e_utils.GetResourceNameGenerator('gaedeptest'))
       self.bucket_name = 'gs://' + self.test_id + 'bucket'
       self.ExecuteScript('gsutil', ['mb', self.bucket_name])
     _TestIdAndBucketName()
@@ -220,7 +222,7 @@ class DeployTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
     splits_total = sum(splits.values())
 
     # Deploy multiple versions of an app.
-    self._deployStandardApp(app_name, splits.keys())
+    self._deployStandardApp(app_name, list(splits.keys()))
     service_id = self._serviceIdFromAppName(app_name)
     self.assertAlmostEqual(sum(self._getTrafficSplits(service_id).values()),
                            1,

@@ -332,6 +332,32 @@ class HealthChecksCreateHttpsBetaTest(HealthChecksCreateHttpsTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
+  def testResponseOption(self):
+    self.Run("""
+        compute health-checks create https my-health-check
+          --response new-response
+        """)
+
+    self.CheckRequests(
+        [(self.compute.healthChecks,
+          'Insert',
+          self.messages.ComputeHealthChecksInsertRequest(
+              healthCheck=self.messages.HealthCheck(
+                  name='my-health-check',
+                  type=self.messages.HealthCheck.TypeValueValuesEnum.HTTPS,
+                  httpsHealthCheck=self.messages.HTTPSHealthCheck(
+                      port=80,
+                      requestPath='/',
+                      response='new-response',
+                      proxyHeader=(self.messages.HTTPSHealthCheck
+                                   .ProxyHeaderValueValuesEnum.NONE)),
+                  checkIntervalSec=5,
+                  timeoutSec=5,
+                  healthyThreshold=2,
+                  unhealthyThreshold=2),
+              project='my-project'))],
+    )
+
 
 class HealthChecksCreateHttpsAlphaTest(HealthChecksCreateHttpsBetaTest,
                                        parameterized.TestCase):

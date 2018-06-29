@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for `gcloud scheduler jobs create-app-engine-job`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -35,7 +37,7 @@ class JobsCreateTest(base.SchedulerTestBase):
         appEngineHttpTarget=self.messages.AppEngineHttpTarget(
             httpMethod=method,
             relativeUrl='/',
-            body='my-payload',
+            body=b'my-payload',
         ),
         retryConfig=self.messages.RetryConfig(
             maxBackoffDuration='3600s',
@@ -96,7 +98,7 @@ class JobsCreateTest(base.SchedulerTestBase):
     job.retryConfig.maxBackoffDuration = '10s'
     job.retryConfig.maxDoublings = 2
     job.appEngineHttpTarget.relativeUrl = '/foo/bar'
-    job.appEngineHttpTarget.body = 'my-payload-2'
+    job.appEngineHttpTarget.body = b'my-payload-2'
     headers_value = self.messages.AppEngineHttpTarget.HeadersValue(
         additionalProperties=[
             self.messages.AppEngineHttpTarget.HeadersValue.AdditionalProperty(

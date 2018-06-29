@@ -314,7 +314,7 @@ class ScreenConsoleAttrTests(ConsoleAttrTestBase):
     self.assertEqual(len(self._TEST), self._con.DisplayWidth(s))
 
   def testDisplayWidthMiddleUnicodeScreen(self):
-    s = u'This is {0}a UÜ車 test.'.format(self._con.GetFontCode(bold=True))
+    s = 'This is {0}a UÜ車 test.'.format(self._con.GetFontCode(bold=True))
     self.assertEqual(20, self._con.DisplayWidth(s))
 
   def testColorizeRedCenterScreen(self):

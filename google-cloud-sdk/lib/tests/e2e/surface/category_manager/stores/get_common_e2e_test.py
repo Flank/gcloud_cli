@@ -13,6 +13,8 @@
 # limitations under the License.
 """E2e test for 'category-manager stores get-common' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.category_manager import utils
 from tests.lib import e2e_base
 from tests.lib import sdk_test_base

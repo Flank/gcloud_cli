@@ -13,6 +13,8 @@
 # limitations under the License.
 """Completion Tests for instance in miscellaneous subcommands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
@@ -50,9 +52,9 @@ class InstancesMiscTest(test_base.BaseTest, completer_test_base.CompleterBase):
         scope_set=self.MakeAllScopes(zonal=True),
         result=resource_projector.MakeSerializable(test_resources.INSTANCES_V1))
     self.RunCompletion('compute instances list i',
-                       ['instance-1 --zones=zone-1',
-                        'instance-2 --zones=zone-1',
-                        'instance-3 --zones=zone-1'])
+                       ['instance-1\\ --zones=zone-1',
+                        'instance-2\\ --zones=zone-1',
+                        'instance-3\\ --zones=zone-1'])
 
   def testMoveCompletion(self):
     self.runTest('move')
@@ -92,9 +94,9 @@ class InstancesMiscTest(test_base.BaseTest, completer_test_base.CompleterBase):
         scope_set=self.MakeAllScopes(zonal=True),
         result=resource_projector.MakeSerializable(test_resources.INSTANCES_V1))
     self.RunCompletion('compute instances get-serial-port-output i',
-                       ['instance-1 --zone=zone-1',
-                        'instance-2 --zone=zone-1',
-                        'instance-3 --zone=zone-1'])
+                       ['instance-1\\ --zone=zone-1',
+                        'instance-2\\ --zone=zone-1',
+                        'instance-3\\ --zone=zone-1'])
     self.RunCompletion('compute instances get-serial-port-output '
                        '--zone=zone-1 i',
                        ['instance-1',
@@ -134,9 +136,9 @@ class InstancesMiscTest(test_base.BaseTest, completer_test_base.CompleterBase):
         scope_set=self.MakeAllScopes(zonal=True),
         result=resource_projector.MakeSerializable(test_resources.INSTANCES_V1))
     self.RunCompletion('compute instances delete i',
-                       ['instance-2 --zone=zone-1',
-                        'instance-3 --zone=zone-1',
-                        'instance-1 --zone=zone-1'])
+                       ['instance-2\\ --zone=zone-1',
+                        'instance-3\\ --zone=zone-1',
+                        'instance-1\\ --zone=zone-1'])
     properties.VALUES.compute.zone.Set(prev_default)
 
   def testUseMatchingZoneFlag(self):

@@ -14,6 +14,8 @@
 
 """Tests for genomics pipelines run command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.api_lib.genomics import exceptions

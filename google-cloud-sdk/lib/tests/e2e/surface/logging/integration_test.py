@@ -14,6 +14,8 @@
 
 """Integration tests for Cloud Logging commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import retry
 from tests.lib import e2e_utils
@@ -40,7 +42,7 @@ class LoggingIntegrationTest(base.LoggingIntegrationTestBase):
         ('folders/79536718298', '--folder=79536718298')]
 
   def testLogMetrics(self):
-    metric_name = self._name_generator.next()
+    metric_name = next(self._name_generator)
 
     def FindMetric():
       """Get the list of metrics, and check if metric_name is on the list."""
@@ -73,7 +75,7 @@ class LoggingIntegrationTest(base.LoggingIntegrationTestBase):
     sink_filter = 'logName=test'
 
     for _, flag in self._parents_and_flags:
-      sink_name = self._name_generator.next()
+      sink_name = next(self._name_generator)
 
       try:
         # TODO(b/36050234): Add cleanup for non-project sinks.
@@ -101,7 +103,7 @@ class LoggingIntegrationTest(base.LoggingIntegrationTestBase):
       return any(entry)
 
     for parent, flag in self._parents_and_flags:
-      log_id = self._name_generator.next()
+      log_id = next(self._name_generator)
 
       self.RunLogging('write {0} hello {1}'.format(log_id, flag))
       self.RunLogging(

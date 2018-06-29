@@ -10,8 +10,8 @@ SYNOPSIS
 DESCRIPTION
     (DEPRECATED) Exports data from a Cloud SQL instance.
 
-    This command is deprecated and will be removed in version 205.0.0. Please
-    use gcloud sql export sql as an alternative.
+    This command is deprecated and will be removed in version 205.0.0. Use
+    gcloud sql export sql instead.
 
     Exports data from a Cloud SQL instance to a Google Cloud Storage bucket as
     a MySQL dump file.

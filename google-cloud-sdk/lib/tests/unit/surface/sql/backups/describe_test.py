@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -61,8 +63,8 @@ class BackupsDescribeTest(base.SqlMockTestBeta):
                 318000,
                 tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
             error=None,
-            instance=u'clone-instance-7',
-            kind=u'sql#backupRun',
+            instance='clone-instance-7',
+            kind='sql#backupRun',
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -72,7 +74,8 @@ class BackupsDescribeTest(base.SqlMockTestBeta):
                 12,
                 321000,
                 tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            status=u'SUCCESSFUL',))
+            status='SUCCESSFUL',
+        ))
 
     self.Run('sql backups describe --instance=clone-instance-7 42')
 

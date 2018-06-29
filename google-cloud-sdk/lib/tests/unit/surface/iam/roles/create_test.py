@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure create role command work properly."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.iam import iam_util
@@ -46,14 +50,15 @@ class CreateTest(unit_test_base.BaseTest):
             parent='organizations/1'),
         response=role_res)
 
-    in_file = self.MockFileRead(
-        'title: "Viewer"\n'
-        'description: "Access to delete GCP projects."\n'
-        'stage: "alpha"\n'
-        'includedPermissions:\n'
-        '- resourcemanager.projects.list\n'
-        '- resourcemanager.projects.get\n'
-        '- resourcemanager.projects.delete')
+    in_file = self.Touch(
+        self.temp_path,
+        contents='title: "Viewer"\n'
+                 'description: "Access to delete GCP projects."\n'
+                 'stage: "alpha"\n'
+                 'includedPermissions:\n'
+                 '- resourcemanager.projects.list\n'
+                 '- resourcemanager.projects.get\n'
+                 '- resourcemanager.projects.delete')
     result = self.Run(
         'iam roles create viewer --organization 1 --file={0} --quiet'
         .format(in_file))
@@ -186,10 +191,11 @@ class CreateTest(unit_test_base.BaseTest):
     self.AssertErrContains('Aborted by user.')
 
   def testCreateErrors(self):
-    in_file = self.MockFileRead(
-        'title: "Viewer"\n'
-        'description: "Access to delete GCP projects."\n'
-        'stage: "alpha"')
+    in_file = self.Touch(
+        self.temp_path,
+        contents='title: "Viewer"\n'
+                 'description: "Access to delete GCP projects."\n'
+                 'stage: "alpha"')
     with self.AssertRaisesArgumentErrorMatches(
         'argument --file: At most one of --file | --description --permissions '
         '--stage --title may be specified.'):

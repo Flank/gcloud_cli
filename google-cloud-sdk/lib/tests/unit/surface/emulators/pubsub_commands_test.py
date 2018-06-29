@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for Pub/Sub emulator commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.emulators import pubsub_util
 from googlecloudsdk.command_lib.emulators import util
 from googlecloudsdk.command_lib.util import java

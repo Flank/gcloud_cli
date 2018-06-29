@@ -14,7 +14,6 @@
 """Tests for 'gcloud category-manager taxonomies annotations create'."""
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import sdk_test_base
@@ -40,30 +39,17 @@ class AnnotationsCreateIntTest(base.CategoryManagerUnitTestBase):
 
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _SetupCreateExpectation(self, parent_resource, expected_annotation):
-    # Mock backend call to create a project annotation and return the expected
-    # created annotation result.
-
-    # Make expected value copy to ensure that field mutations don't occur.
-    created_annotation = copy.deepcopy(expected_annotation)
-    self.mock_client.projects_taxonomies_annotations.Create.Expect(
-        self.messages.CategorymanagerProjectsTaxonomiesAnnotationsCreateRequest(
-            parent=parent_resource.RelativeName(),
-            annotation=expected_annotation),
-        created_annotation)
-
   def testDescribeProjectTaxonomyId(self):
-    self._SetupCreateExpectation(self.project_annotation.Parent(),
-                                 self.expected_project_annotation)
+    self.ExpectProjectAnnotationCreate(self.project_annotation.Parent(),
+                                       self.expected_project_annotation)
     args = '--taxonomy {} --display-name "{}" --description "{}"'.format(
         self.taxonomy_id, self.annotation_display_name,
         self.annotation_description)
     actual_annotation = self.Run(
         'category-manager taxonomies annotations create ' + args)
     self.assertEqual(actual_annotation, self.expected_project_annotation)
-    # TODO(b/74408080): check that err contains created project annotation.
-    # self.AssertErrContains('Created projectAnnotation [{}]'.format(
-    #    self.annotation_id))
+    self.AssertOutputContains(self.annotation_display_name)
+    self.AssertOutputContains(self.annotation_description)
 
 
 if __name__ == '__main__':

@@ -25,26 +25,27 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --ciphertext-file=CIPHERTEXT_FILE
-        Path to the ciphertext file to output.
+        File path of the ciphertext file to output.
 
      --plaintext-file=PLAINTEXT_FILE
-        Path to the plaintext file to encrypt.
+        File path of the plaintext file to encrypt.
 
 OPTIONAL FLAGS
      --additional-authenticated-data-file=ADDITIONAL_AUTHENTICATED_DATA_FILE
-        Path to the optional file containing the additional authenticated data.
+        File path to the optional file containing the additional authenticated
+        data.
 
      --key=KEY
         The key to use for encryption.
 
      --keyring=KEYRING
-        The containing keyring.
+        Key ring of the key.
 
      --location=LOCATION
-        The location of the requested resource.
+        Location of the keyring.
 
      --version=VERSION
-        The version to use for encryption.
+        Version to use for encryption.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

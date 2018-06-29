@@ -14,6 +14,8 @@
 
 """Tests of the 'metrics update' subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.logging import util
@@ -131,7 +133,7 @@ class MetricsUpdateBetaTest(base.LoggingTestBase, sdk_test_base.WithTempCWD):
             labels=[
                 msgs.LabelDescriptor(
                     description=None,
-                    key=u'label1',
+                    key='label1',
                     valueType=msgs.LabelDescriptor
                     .ValueTypeValueValuesEnum.STRING)
             ],

@@ -30,6 +30,9 @@ COMMANDS
      create
         (BETA) Create a cluster.
 
+     create-from-file
+        (BETA) Create a cluster from a file.
+
      delete
         (BETA) Delete a cluster.
 

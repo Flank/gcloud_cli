@@ -24,7 +24,7 @@ from tests.lib.surface.compute import test_base
 class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     self.region = 'us-central1'
 
@@ -81,15 +81,14 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
   @parameterized.named_parameters(
       ('OmittingMemoryRequirement', 'vCPU=64,localSSD=512GB', '64', '512',
        'any'),
-      ('UnitConversion', 'localSSD=1TB,memory=16GB', 'any', '1024',
-       '16384'),
+      ('UnitConversion', 'localSSD=1TB,memory=16GB', 'any', '1024', '16384'),
       ('SettingCPUToAny', 'vCPU=any,localSSD=1TB,memory=16GB', 'any', '1024',
-       '16384'),
-      ('SettingAllToAny', 'vCPU=any,localSSD=any,memory=any', 'any', 'any',
-       'any'),
-      ('SettingAnyCaseInsensitive', 'vCPU=ANY,localSSD=Any,memory=anY',
-       'any', 'any', 'any'),
-      ('SettingAllToAnyMinimalKeys', 'localSSD=any', 'any', 'any', 'any'))
+       '16384'), ('SettingAllToAny', 'vCPU=any,localSSD=any,memory=any', 'any',
+                  'any', 'any'),
+      ('SettingAnyCaseInsensitive', 'vCPU=ANY,localSSD=Any,memory=anY', 'any',
+       'any', 'any'),
+      ('SettingAllToAnyMinimalKeys', 'localSSD=any', 'any', 'any', 'any'),
+      ('OmittingLocalSSD', 'vCPU=64,memory=128MB', '64', None, '128'))
   def testCreate_NodeRequirements(self, node_requirements, cpus, local_ssd,
                                   memory):
     affinity_labels = {'environment': 'prod', 'grouping': 'frontend'}

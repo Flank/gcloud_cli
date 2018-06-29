@@ -43,11 +43,6 @@
       ],
       "location": "query"
     },
-    "bearer_token": {
-      "type": "string",
-      "description": "OAuth bearer token.",
-      "location": "query"
-    },
     "callback": {
       "type": "string",
       "description": "JSONP",
@@ -66,12 +61,6 @@
     "oauth_token": {
       "type": "string",
       "description": "OAuth 2.0 token for the current user.",
-      "location": "query"
-    },
-    "pp": {
-      "type": "boolean",
-      "description": "Pretty-print response.",
-      "default": "true",
       "location": "query"
     },
     "prettyPrint": {
@@ -452,10 +441,7 @@
             "$ref": "ProjectConfig"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform",
-            "https://www.googleapis.com/auth/source.full_control",
-            "https://www.googleapis.com/auth/source.read_only",
-            "https://www.googleapis.com/auth/source.read_write"
+            "https://www.googleapis.com/auth/cloud-platform"
           ],
           "description": "Returns the Cloud Source Repositories configuration of the project."
         },
@@ -483,10 +469,7 @@
             "$ref": "ProjectConfig"
           },
           "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform",
-            "https://www.googleapis.com/auth/source.full_control",
-            "https://www.googleapis.com/auth/source.read_only",
-            "https://www.googleapis.com/auth/source.read_write"
+            "https://www.googleapis.com/auth/cloud-platform"
           ],
           "description": "Updates the Cloud Source Repositories configuration of the project."
         }
@@ -586,10 +569,7 @@
                 "$ref": "Repo"
               },
               "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/source.full_control",
-                "https://www.googleapis.com/auth/source.read_only",
-                "https://www.googleapis.com/auth/source.read_write"
+                "https://www.googleapis.com/auth/cloud-platform"
               ],
               "description": "Updates information about a repo."
             },
@@ -618,9 +598,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/source.full_control",
-                "https://www.googleapis.com/auth/source.read_only",
-                "https://www.googleapis.com/auth/source.read_write"
+                "https://www.googleapis.com/auth/source.full_control"
               ],
               "description": "Creates a repo in the given project with the given name.\n\nIf the named repository already exists, `CreateRepo` returns\n`ALREADY_EXISTS`."
             },
@@ -646,9 +624,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/source.full_control",
-                "https://www.googleapis.com/auth/source.read_only",
-                "https://www.googleapis.com/auth/source.read_write"
+                "https://www.googleapis.com/auth/source.full_control"
               ],
               "description": "Deletes a repo."
             },
@@ -677,9 +653,7 @@
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/source.full_control",
-                "https://www.googleapis.com/auth/source.read_only",
-                "https://www.googleapis.com/auth/source.read_write"
+                "https://www.googleapis.com/auth/source.full_control"
               ],
               "description": "Sets the access control policy on the specified resource. Replaces any\nexisting policy."
             },

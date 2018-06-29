@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the sign-url subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import base64
 import calendar
 import hashlib
@@ -21,6 +23,7 @@ import time
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import sign_url_utils
+from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import test_case
 
@@ -51,7 +54,7 @@ class SignUrlTestsBase(cli_test_base.CliTestBase):
     self.key_file_with_new_line = self.Touch(
         self.temp_path,
         'test2.key',
-        contents=base64.urlsafe_b64encode(self.KEY) + '\n\n\r\n')
+        contents=base64.urlsafe_b64encode(self.KEY) + b'\n\n\r\n')
 
   def _GetExpectedUrlToSign(self, input_url, has_query_params, expires):
     """Gets the expected URL string that will be used for signing."""
@@ -61,7 +64,8 @@ class SignUrlTestsBase(cli_test_base.CliTestBase):
 
   def _GetExpectedSignature(self, url_to_sign):
     """Gets the expected signature for the URL to sign."""
-    signature = hmac.new(self.KEY, url_to_sign, hashlib.sha1).digest()
+    signature = hmac.new(self.KEY, url_to_sign.encode('utf-8'),
+                         hashlib.sha1).digest()
     return base64.urlsafe_b64encode(signature)
 
   def _GetExpectedSignedUrl(self, input_url, has_query_params,
@@ -232,9 +236,10 @@ class SigningTestsBeta(SignUrlTestsBase):
   def testSigningFailureInvalidKeyFile(self):
     """Verifies failure when signing a URL with a non-existing key file."""
     input_url = 'https://www.example.com/foo/bar?q1=abc&q2=def'
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Could not read key from file \[non-existent-file\]: '
-        r'No such file or directory'):
+    with self.assertRaisesRegex(
+        files.Error,
+        r'Unable to read file \[non-existent-file\]: '
+        r'.*No such file or directory'):
       self._RunSignUrl([
           '--key-name', 'key1', '--key-file', 'non-existent-file',
           '--expires-in', '1234', input_url

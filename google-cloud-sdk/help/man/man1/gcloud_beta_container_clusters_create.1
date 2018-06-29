@@ -11,7 +11,7 @@ gcloud beta container clusters create \- create a cluster for running containers
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container clusters create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-allow\-route\-overlap\fR] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-no\-enable\-cloud\-logging\fR] [\fB\-\-no\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-enable\-pod\-security\-policy\fR] [\fB\-\-enable\-stackdriver\-kubernetes\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-no\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-private\-cluster\fR] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-no\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR;\ default="admin"] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container clusters create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-addons\fR=[\fIADDON\fR,...]] [\fB\-\-allow\-route\-overlap\fR] [\fB\-\-async\fR] [\fB\-\-cluster\-ipv4\-cidr\fR=\fICLUSTER_IPV4_CIDR\fR] [\fB\-\-cluster\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-create\-subnetwork\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-no\-enable\-cloud\-logging\fR] [\fB\-\-no\-enable\-cloud\-monitoring\fR] [\fB\-\-enable\-ip\-alias\fR] [\fB\-\-enable\-kubernetes\-alpha\fR] [\fB\-\-enable\-legacy\-authorization\fR] [\fB\-\-enable\-network\-policy\fR] [\fB\-\-enable\-pod\-security\-policy\fR] [\fB\-\-enable\-stackdriver\-kubernetes\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-no\-issue\-client\-certificate\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR] [\fB\-\-max\-nodes\-per\-pool\fR=\fIMAX_NODES_PER_POOL\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-services\-ipv4\-cidr\fR=\fICIDR\fR] [\fB\-\-services\-secondary\-range\-name\fR=\fINAME\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR] [\fB\-\-additional\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-enable\-master\-authorized\-networks\fR\ \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-master\-ipv4\-cidr\fR=\fIMASTER_IPV4_CIDR\fR\ \fB\-\-private\-cluster\fR] [\fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-no\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR;\ default="admin"] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -151,6 +151,11 @@ be used in conjunction with the '\-\-subnetwork' option.
 .TP 2m
 \fB\-\-disk\-size\fR=\fIDISK_SIZE\fR
 Size in GB for node VM boot disks. Defaults to 100GB.
+
+.TP 2m
+\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR
+Type of the node VM boot disk. Defaults to pd\-standard. \fIDISK_TYPE\fR must be
+one of: \fBpd\-standard\fR, \fBpd\-ssd\fR.
 
 .TP 2m
 \fB\-\-enable\-autorepair\fR
@@ -350,6 +355,11 @@ $ gcloud beta container clusters create example\-cluster \e
 New nodes, including ones created by resize or recreate, will have these labels
 on the kubernetes API node object and can be used in nodeSelectors. See
 http://kubernetes.io/docs/user\-guide/node\-selection/ for examples.
+
+Note that kubernetes labels, intended to associate cluster components and
+resources with one another and manage resource lifecycles, are different from
+Kubernetes Engine labels that are used for the purpose of tracking billing and
+usage information.
 
 .TP 2m
 \fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]
@@ -658,12 +668,12 @@ Scopes options.
 (REMOVED) Automatically enable Google Cloud Endpoints to take advantage of API
 management features by adding service\-control and service\-management scopes.
 
-If \-\-no\-enable\-cloud\-endpoints is set, remove service\-control and
+If \f5\-\-no\-enable\-cloud\-endpoints\fR is set, remove service\-control and
 service\-management scopes, even if they are implicitly (via default) or
-explicitly set via \-\-scopes.
+explicitly set via \f5\-\-scopes\fR.
 
-\-\-[no\-]enable\-cloud\-endpoints is not allowed if
-container/new_scopes_behavior property is set to true.
+\f5\-\-[no\-]enable\-cloud\-endpoints\fR is not allowed if
+\f5container/new_scopes_behavior\fR property is set to true.
 
 Flag \-\-[no\-]enable\-cloud\-endpoints has been removed.
 
@@ -671,23 +681,18 @@ Enabled by default, use \fB\-\-no\-enable\-cloud\-endpoints\fR to disable.
 
 .TP 2m
 \fB\-\-scopes\fR=[\fISCOPE\fR,...]; default="gke\-default"
-Specifies scopes for the node instances. The project's default service account
-is used. Examples:
+Specifies scopes for the node instances. Examples:
 
-.RS 2m
 $ gcloud beta container clusters create example\-cluster \e
-  \-\-scopes=https://www.googleapis.com/auth/devstorage.read_only
-.RE
+\-\-scopes=https://www.googleapis.com/auth/devstorage.read_only
 
-.RS 2m
 $ gcloud beta container clusters create example\-cluster \e
-  \-\-scopes=bigquery,storage\-rw,compute\-ro
-.RE
+\-\-scopes=bigquery,storage\-rw,compute\-ro
 
-Multiple SCOPEs can specified, separated by commas. logging\-write and/or
-monitoring are added unless Cloud Logging and/or Cloud Monitoring are disabled
-(see \-\-enable\-cloud\-logging and \-\-enable\-cloud\-monitoring for more
-info).
+Multiple SCOPEs can be specified, separated by commas. \f5logging\-write\fR
+and/or \f5monitoring\fR are added unless Cloud Logging and/or Cloud Monitoring
+are disabled (see \f5\-\-enable\-cloud\-logging\fR and
+\f5\-\-enable\-cloud\-monitoring\fR for more information).
 
 Unless container/new_scopes_behavior property is true, compute\-rw and
 storage\-ro are always added, even if not explicitly specified, and

@@ -22,6 +22,8 @@ import textwrap
 
 from googlecloudsdk.core import log
 from googlecloudsdk.core.resource import resource_printer
+from googlecloudsdk.core.resource import resource_projector
+from googlecloudsdk.core.resource import yaml_printer
 from tests.lib import sdk_test_base
 from tests.lib.core.resource import resource_printer_test_base
 
@@ -599,6 +601,27 @@ class YamlPrintTest(resource_printer_test_base.Base):
         network: default
         sourceRanges:
         - 0.0.0.0/0
+        """))
+
+  def testPrintOrderedDictPreserveOrder(self):
+    yaml_printer.YamlPrinter(
+        name='yaml',
+        projector=resource_projector.IdentityProjector(),
+    ).Print(self.ordered_dict_resource)
+    self.AssertOutputEquals(textwrap.dedent("""\
+        ---
+        allowed:
+        - IPProtocol: tcp
+          ports:
+          - '2376'
+        description: ''
+        name: allow-gae-builder
+        id: '123456789'
+        network: default
+        sourceRanges:
+        - 0.0.0.0/0
+        kind: compute#firewall
+        creationTimestamp: '2015-05-20T08:14:24.654-07:00'
         """))
 
 

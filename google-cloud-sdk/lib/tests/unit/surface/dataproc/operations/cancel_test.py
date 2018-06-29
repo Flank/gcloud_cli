@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Test of the 'operations cancel' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base

@@ -14,6 +14,8 @@
 
 """Base for all Dataproc unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 import difflib
 
@@ -28,6 +30,7 @@ from googlecloudsdk.core.resource import resource_printer_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
 from tests.lib.surface.dataproc import base
+import six
 
 
 _API_VERSION = 'v1'
@@ -174,11 +177,10 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     labels = kwargs.get('labels', None)
     labels_values = None
     if labels is not None:
-      labels_values = self.messages.Cluster.LabelsValue(
-          additionalProperties=[
-              self.messages.Cluster.LabelsValue.AdditionalProperty(
-                  key=key, value=value)
-              for key, value in labels.iteritems()])
+      labels_values = self.messages.Cluster.LabelsValue(additionalProperties=[
+          self.messages.Cluster.LabelsValue.AdditionalProperty(
+              key=key, value=value) for key, value in six.iteritems(labels)
+      ])
 
     def make_disk_config(group_name):
       if self.track == calliope.base.ReleaseTrack.BETA:
@@ -272,6 +274,11 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     cluster.config.secondaryWorkerConfig.minCpuPlatform = (
         worker_min_cpu_platform)
 
+  def AddEncryptionConfig(self, cluster, kms_key):
+    encryption_config = self.messages.EncryptionConfig()
+    encryption_config.gcePdKmsKeyName = kms_key
+    cluster.config.encryptionConfig = encryption_config
+
   def ExpectGetCluster(self, cluster=None, region=None, exception=None):
     if not region:
       region = self.REGION
@@ -345,7 +352,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
       labels_values = self.messages.WorkflowTemplate.LabelsValue(
           additionalProperties=[
               self.messages.WorkflowTemplate.LabelsValue.AdditionalProperty(
-                  key=key, value=value) for key, value in labels.iteritems()
+                  key=key, value=value) for key, value in six.iteritems(labels)
           ])
 
     return self.messages.WorkflowTemplate(
@@ -399,16 +406,14 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
         bindings=[
             self.messages.Binding(
                 members=[
-                    u'serviceAccount:123hash@developer.gserviceaccount.com'
+                    'serviceAccount:123hash@developer.gserviceaccount.com'
                 ],
-                role=u'roles/editor'),
+                role='roles/editor'),
             self.messages.Binding(
-                members=[
-                    u'user:tester@gmail.com', u'user:slick@gmail.com'
-                ],
-                role=u'roles/owner')
+                members=['user:tester@gmail.com', 'user:slick@gmail.com'],
+                role='roles/owner')
         ],
-        etag='<< Unique versioning etag bytefield >>',
+        etag=b'<< Unique versioning etag bytefield >>',
         version=0)
 
     for field in clear_fields:
@@ -473,6 +478,7 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
 
 
 class MessageEqualityAssertionError(AssertionError):
+  """Extend AssertionError with difference between two protos in message."""
 
   def __init__(self, expected, actual):
     expected_repr = encoding.MessageToRepr(expected, multiline=True)

@@ -14,7 +14,6 @@
 """Tests for 'gcloud category-manager taxonomies create'."""
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import sdk_test_base
@@ -38,23 +37,15 @@ class TaxonomiesCreateIntTest(base.CategoryManagerUnitTestBase):
 
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _ExpectCreateProjectTaxonomy(self, parent_resource, expected_taxonomy):
-    created_taxonomy = copy.deepcopy(expected_taxonomy)
-    self.mock_client.projects_taxonomies.Create.Expect(
-        self.messages.CategorymanagerProjectsTaxonomiesCreateRequest(
-            parent=parent_resource.RelativeName(), taxonomy=expected_taxonomy),
-        created_taxonomy)
-
   def testCreateProjectTaxonomyId(self):
-    self._ExpectCreateProjectTaxonomy(self.project_taxonomy.Parent(),
-                                      self.expected_project_taxonomy)
+    self.ExpectCreateProjectTaxonomy(self.project_taxonomy.Parent(),
+                                     self.expected_project_taxonomy)
     args = '--display-name "{}" --description "{}"'.format(
         self.taxonomy_display_name, self.taxonomy_description)
     actual_taxonomy = self.Run('category-manager taxonomies create ' + args)
     self.assertEqual(actual_taxonomy, self.expected_project_taxonomy)
-    # TODO(b/74408080): check that err contains created project taxonomy.
-    # self.AssertErrContains('Created projectTaxonomy [{}].'.format(
-    #    self.taxonomy_id))
+    self.AssertOutputContains(self.taxonomy_display_name)
+    self.AssertOutputContains(self.taxonomy_description)
 
 
 if __name__ == '__main__':

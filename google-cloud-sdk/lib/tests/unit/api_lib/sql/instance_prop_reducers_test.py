@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for googlecloudsdk.api_lib.sql.instances."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 from googlecloudsdk.api_lib.sql import instance_prop_reducers as reducers
 from googlecloudsdk.calliope import arg_parsers

@@ -18,12 +18,12 @@ from googlecloudsdk.calliope import base
 from tests.lib.surface.compute import test_base
 
 
-class InterconnectAttachmentsPartnerUpdateAlphaTest(test_base.BaseTest):
+class InterconnectAttachmentsPartnerUpdateGaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-    self.message_version = self.compute_alpha
+    self.track = base.ReleaseTrack.GA
+    self.SelectApi('v1')
+    self.message_version = self.compute_v1
 
   def CheckInterconnectAttachmentRequest(self, **kwargs):
     interconnect_attachment_msg = {}
@@ -75,6 +75,15 @@ class InterconnectAttachmentsPartnerUpdateAlphaTest(test_base.BaseTest):
             interconnectName='Test Update Partner Interconnect',
             partnerName='Test Update Partner Name',
             portalUrl='https://update.example.com/portal-url'))
+
+
+class InterconnectAttachmentsPartnerUpdateBetaTest(
+    InterconnectAttachmentsPartnerUpdateGaTest):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.message_version = self.compute_beta
 
   def testUpdateInterconnectAttachmentLabels(self):
     messages = self.messages
@@ -175,10 +184,10 @@ class InterconnectAttachmentsPartnerUpdateAlphaTest(test_base.BaseTest):
     )
 
 
-class InterconnectAttachmentsPartnerUpdateBetaTest(
-    InterconnectAttachmentsPartnerUpdateAlphaTest):
+class InterconnectAttachmentsPartnerUpdateAlphaTest(
+    InterconnectAttachmentsPartnerUpdateBetaTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-    self.message_version = self.compute_beta
+    self.track = base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.message_version = self.compute_alpha

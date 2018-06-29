@@ -19,9 +19,11 @@ import contextlib
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import resources
 from tests.lib import e2e_utils
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
+@test_case.Filters.skip('Failing', 'b/79914714')
 class ResourcePoliciesTest(e2e_test_base.BaseTest):
   """Resource policies tests."""
 

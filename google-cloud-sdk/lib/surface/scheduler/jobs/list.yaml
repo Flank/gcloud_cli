@@ -12,7 +12,7 @@
     resource:
       help_text: The location you want to list the devices for.
       spec: !REF googlecloudsdk.command_lib.scheduler.resources:location
-      removed_flags: [ location ]
+      removed_flags: [location]
 
   output:
       format: |
@@ -25,9 +25,10 @@
                   schedule.timeZone
               ):label="SCHEDULE (TZ)",
               format(
-                  "{0}{1}",
+                  "{0}{1}{2}",
                   pubsubTarget.yesno(yes="Pub/Sub", no=""),
-                  appEngineHttpTarget.yesno(yes="App Engine", no="")
+                  appEngineHttpTarget.yesno(yes="App Engine", no=""),
+                  httpTarget.yesno(yes="HTTP", no="")
               ):label=TARGET_TYPE,
               state:label=STATE
           )

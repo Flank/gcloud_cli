@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Module for integration test base classes."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base
 from tests.lib import e2e_base
@@ -29,7 +33,7 @@ class ServiceAccountBaseTest(e2e_base.WithServiceAuth,
   """Base class for IAM service accounts integration tests."""
 
   def PreSetUp(self):
-    self.account_name = e2e_utils.GetResourceNameGenerator(prefix='iam').next()
+    self.account_name = next(e2e_utils.GetResourceNameGenerator(prefix='iam'))
     self.email = (
         '{0}@cloud-sdk-integration-testing.iam.gserviceaccount.com'.format(
             self.account_name))
@@ -79,12 +83,12 @@ class CustomRolesBaseTest(e2e_base.WithServiceAuth,
           role=self.delete_undelete_tests_role, project=self.Project()))
 
   def SetRole(self):
-    self.role = e2e_utils.GetResourceNameGenerator(
-        prefix='iam_testing_customRole', delimiter='_').next()
+    self.role = next(e2e_utils.GetResourceNameGenerator(
+        prefix='iam_testing_customRole', delimiter='_'))
 
   def SetCopiedRole(self):
-    self.copied_role = e2e_utils.GetResourceNameGenerator(
-        prefix='iam_testing_copiedCustomRole', delimiter='_').next()
+    self.copied_role = next(e2e_utils.GetResourceNameGenerator(
+        prefix='iam_testing_copiedCustomRole', delimiter='_'))
 
   def SetPermissions(self, resource_type):
     self.permissions = ('automatedtests.{resource_type}.create,'

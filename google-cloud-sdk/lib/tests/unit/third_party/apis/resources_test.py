@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests to make sure that generated resources module is correct."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis_internal
 from tests.lib import test_case
 

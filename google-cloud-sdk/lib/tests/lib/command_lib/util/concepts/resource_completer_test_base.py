@@ -54,6 +54,7 @@ from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.command_lib.util.concepts import completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
+from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from tests.lib import completer_test_base
 
 import mock
@@ -118,13 +119,14 @@ class ResourceCompleterBase(completer_test_base.CompleterBase):
     presentation_name = presentation_name or resource_spec.name
     dest = dest or attribute_name
     expected_completions = expected_completions or []
-    presentation_spec = concept_parsers.ResourcePresentationSpec(
+    presentation_spec = presentation_specs.ResourcePresentationSpec(
         presentation_name,
         resource_spec,
         'Help text',
         prefixes=False,
         flag_name_overrides=flag_name_overrides)
-    resource_info = presentation_spec.GetInfo()
+    resource_info = concept_parsers.ConceptParser([presentation_spec]).GetInfo(
+        presentation_spec.name)
     if projects is not None:
       self._ExpectListProjects(projects)
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -27,13 +29,14 @@ class SslCertsListsTest(base.SqlMockTestBeta):
     self.mocked_client.sslCerts.List.Expect(
         self.messages.SqlSslCertsListRequest(
             instance='integration-test',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.SslCertsListResponse(
             items=[
                 self.messages.SslCert(
-                    cert=u'-----BEGIN CERTIFICATE-----\nMIIC/zCCAeegAwIBA',
-                    certSerialNumber=u'1264712781',
-                    commonName=u'cert',
+                    cert='-----BEGIN CERTIFICATE-----\nMIIC/zCCAeegAwIBA',
+                    certSerialNumber='1264712781',
+                    commonName='cert',
                     createTime=datetime.datetime(
                         2014,
                         2,
@@ -54,17 +57,22 @@ class SslCertsListsTest(base.SqlMockTestBeta):
                         402000,
                         tzinfo=protorpc_util.TimeZoneOffset(
                             datetime.timedelta(0))),
-                    instance=u'integration-test',
-                    kind=u'sql#sslCert',
-                    sha1Fingerprint=u'77299aad4c8136911c1f0b07dd9802a9a72124e8',
+                    instance='integration-test',
+                    kind='sql#sslCert',
+                    sha1Fingerprint='77299aad4c8136911c1f0b07dd9802a9a72124e8',
                 ),
             ],
-            kind=u'sql#sslCertsList',))
+            kind='sql#sslCertsList',
+        ))
     self.Run('sql ssl-certs list --instance=integration-test')
     self.AssertOutputContains("""\
 NAME  SHA1_FINGERPRINT                          EXPIRATION
 cert  77299aad4c8136911c1f0b07dd9802a9a72124e8  2024-02-02T21:10:29.402000+00:00
 """, normalize_space=True)
+
+    # Checking for deprecation warning.
+    self.AssertErrContains('`gcloud sql ssl-certs` is deprecated')
+
 
 if __name__ == '__main__':
   test_case.main()

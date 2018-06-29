@@ -3,7 +3,9 @@ NAME
         information for the current user
 
 SYNOPSIS
-    gcloud alpha compute os-login remove-profile [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha compute os-login remove-profile
+        [--operating-system=OPERATING_SYSTEM; default="linux"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute os-login remove-profile removes the posix
@@ -11,6 +13,11 @@ DESCRIPTION
     to the current project ID. Posix account entries for G Suite users do not
     set the account ID field and can only be modified by a domain
     administrator.
+
+FLAGS
+     --operating-system=OPERATING_SYSTEM; default="linux"
+        Specifies the profile type to remove. OPERATING_SYSTEM must be one of:
+        linux, windows.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise describing iOS models in the device catalog."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core.console import console_attr

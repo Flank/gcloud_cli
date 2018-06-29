@@ -129,9 +129,9 @@ class GcloudTest(sdk_test_base.WithOutputCapture):
         gcloud.main()
       self.assertEqual(1, cm.exception.code)
       self.report_error_mock.assert_not_called()
-    error = (
-        'No module named gcloud_main' if six.PY2 else
-        "import of 'gcloud_main' halted; None in sys.modules")
+    error = ('No module named gcloud_main' if six.PY2 else
+             "import of '{}.gcloud_main' halted; None in sys.modules".format(
+                 'googlecloudsdk'))
     self.assertMultiLineEqual("""\
 ERROR: gcloud failed to load: {0}
     gcloud_main = _import_gcloud_main()

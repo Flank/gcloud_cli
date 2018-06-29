@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud compute target-https-proxies update NAME
+        [--quic-override=QUIC_OVERRIDE]
         [--ssl-certificates=SSL_CERTIFICATE,[...]] [--url-map=URL_MAP]
         [--clear-ssl-policy | --ssl-policy=SSL_POLICY] [GCLOUD_WIDE_FLAG ...]
 
@@ -22,6 +23,19 @@ POSITIONAL ARGUMENTS
         Name of the target HTTPS proxy to update.
 
 FLAGS
+     --quic-override=QUIC_OVERRIDE
+        Controls whether load balancer may negotiate QUIC with clients. QUIC is
+        a new transport which reduces latency compared to that of TCP. See
+        https://www.chromium.org/quic for more details. QUIC_OVERRIDE must be
+        one of:
+
+         DISABLE
+            Disallows load balancer to negotiate QUIC with clients.
+         ENABLE
+            Allows load balancer to negotiate QUIC with clients.
+         NONE
+            Allows Google to control when QUIC is rolled out.
+
      --ssl-certificates=SSL_CERTIFICATE,[...]
         References to at most 10 SSL certificate resources that are used for
         server-side authentication. The first SSL certificate in this list is

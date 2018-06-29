@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for disks add-labels."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -36,14 +38,14 @@ class AddLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
     )
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
     updated_disk = self._MakeDiskProto(disk_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1', region='us-central')
     operation = self._MakeOperationMessage(operation_ref, disk_ref)
 
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
-        disk_ref, edited_labels, 'fingerprint-42', operation)
+        disk_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
@@ -63,7 +65,7 @@ class AddLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
     # adds existing labels. So, we only test the prompting portion.
     disk_labels = (('key1', 'value1'), ('key2', 'value2'))
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
     self._ExpectGetRequest(disk_ref, disk)
 
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
@@ -95,14 +97,14 @@ class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     add_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=(), fingerprint='fingerprint-42')
+        disk_ref, labels=(), fingerprint=b'fingerprint-42')
     updated_disk = self._MakeDiskProto(disk_ref, labels=add_labels)
     operation_ref = self._GetOperationRef('operation-1', zone='atlanta')
     operation = self._MakeOperationMessage(operation_ref, disk_ref)
 
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
-        disk_ref, add_labels, 'fingerprint-42', operation)
+        disk_ref, add_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
@@ -125,14 +127,14 @@ class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     ))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
     updated_disk = self._MakeDiskProto(disk_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1', zone='atlanta')
     operation = self._MakeOperationMessage(operation_ref, disk_ref)
 
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
-        disk_ref, edited_labels, 'fingerprint-42', operation)
+        disk_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
@@ -152,7 +154,7 @@ class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     add_labels = (('key1', 'value1'), ('key3', 'value3'))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(disk_ref, disk)
 
@@ -178,7 +180,7 @@ class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     # adds existing labels. So, we only test the prompting portion.
     disk_labels = (('key1', 'value1'), ('key2', 'value2'))
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
     self._ExpectGetRequest(disk_ref, disk)
 
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
@@ -202,7 +204,7 @@ class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
 
     disk = self._MakeDiskProto(
-        disk_ref, labels={}, fingerprint='fingerprint-42')
+        disk_ref, labels={}, fingerprint=b'fingerprint-42')
     add_labels = (('+notvalid', 'a'),)
 
     error = http_error.MakeHttpError(
@@ -216,7 +218,7 @@ class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     self._ExpectLabelsSetRequest(
         disk_ref=disk_ref,
         labels=add_labels,
-        fingerprint='fingerprint-42',
+        fingerprint=b'fingerprint-42',
         exception=error)
 
     with self.AssertRaisesHttpExceptionMatches(

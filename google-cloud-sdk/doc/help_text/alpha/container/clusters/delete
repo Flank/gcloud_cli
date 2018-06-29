@@ -7,7 +7,19 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Delete an existing cluster for running containers.
+    (ALPHA) When you delete a cluster, the following resources are deleted:
+
+      o The master resources
+      o All of the node instances in the cluster
+      o Any Pods that are running on those instances
+      o Any firewalls and routes created by Kubernetes Engine at the time of
+        cluster creation
+      o Data stored in host hostPath and emptyDir volumes
+
+    The following resources are not deleted:
+
+      o External load balancers created by the cluster
+      o Persistent disk volumes
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]

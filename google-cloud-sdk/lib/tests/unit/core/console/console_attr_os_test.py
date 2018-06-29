@@ -285,14 +285,21 @@ class ConsoleAttrOsGetRawKeyFunctionPosixTests(test_case.Base):
   def MockFileNo(self):
     return 0
 
+  def MockOsRead(self, fd, count):
+    del fd  # unused in mock
+    return self.rawin.read(count)
+
   def SetUp(self):
     self.imports = ImportMocker()
     self.imports.SetImport('msvcrt', None)
     self.imports.SetImport('termios', self.MockTermiosModule)
     self.stdin = sys.stdin
-    sys.stdin = io.StringIO('A\x1bA\x1bB\x1bD\x1bC\x1b5~\x1b6~\x1bH\x1bF'
-                            '\x1bM\x1bS\x1bT\x1b\x1b\x04\x1a/?\n')
+    self.rawin = io.BytesIO(
+        b'A\x1bA\x1bB\x1bD\x1bC\x1b5~\x1b6~\x1bH\x1bF\x1bM\x1bS\x1bT\x1b\x1b'
+        b'\x04\x1a/?\n')
+    sys.stdin = io.StringIO('')
     sys.stdin.fileno = self.MockFileNo
+    self.StartObjectPatch(os, 'read', side_effect=self.MockOsRead)
 
   def TearDown(self):
     sys.stdin = self.stdin
@@ -337,8 +344,8 @@ class ConsoleAttrOsGetRawKeyFunctionWindowsCodeTests(test_case.Base):
   class MockMsvcrtModule(object):
 
     def __init__(self):
-      self.rawin = io.StringIO(
-          'A\xe0H\xe0P\xe0K\xe0M\xe0I\xe0Q\xe0G\xe0O\x1b\x04\x1a/?\n')
+      self.rawin = io.BytesIO(
+          b'A\xe0H\xe0P\xe0K\xe0M\xe0I\xe0Q\xe0G\xe0O\x1b\x04\x1a/?\n')
 
     # pylint: disable=invalid-name
     def getch(self):
@@ -442,7 +449,7 @@ class ConsoleAttrOsGetRawKeyFunctionNativeTests(test_case.Base):
     except:  # pylint: disable=bare-except
       fun = None
     if fun or required:
-      self.assertTrue(type(fun) is types.FunctionType)
+      self.assertTrue(isinstance(fun, types.FunctionType))
 
   def testGetGetRawKeyFunctionNative(self):
     self.Run(console_attr_os.GetRawKeyFunction, required=True)

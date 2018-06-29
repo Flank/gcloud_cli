@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Shared resource flags for Cloud Monitoring commands."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope.concepts import concepts
-from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.command_lib.projects import resource_args as project_resource_args
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
-from googlecloudsdk.core import properties
+from googlecloudsdk.command_lib.util.concepts import presentation_specs
 
 
 def AlertPolicyAttributeConfig():
@@ -36,20 +38,12 @@ def NotificationChannelAttributeConfig():
       help_text='Name of the Notification Channel.')
 
 
-def ProjectAttributeConfig():
-  return concepts.ResourceParameterAttributeConfig(
-      name='project',
-      help_text='The Cloud project for the {resource}. If not set, it will '
-                'use the project set in properties.',
-      fallthroughs=[deps.PropertyFallthrough(properties.VALUES.core.project)])
-
-
 def GetAlertPolicyResourceSpec():
   return concepts.ResourceSpec(
       'monitoring.projects.alertPolicies',
       resource_name='Alert Policy',
       alertPoliciesId=AlertPolicyAttributeConfig(),
-      projectsId=ProjectAttributeConfig())
+      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG)
 
 
 def GetConditionResourceSpec():
@@ -58,7 +52,7 @@ def GetConditionResourceSpec():
       resource_name='condition',
       conditionsId=ConditionAttributeConfig(),
       alertPoliciesId=AlertPolicyAttributeConfig(),
-      projectsId=ProjectAttributeConfig())
+      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG)
 
 
 def GetNotificationChannelResourceSpec():
@@ -66,7 +60,7 @@ def GetNotificationChannelResourceSpec():
       'monitoring.projects.notificationChannels',
       resource_name='Notification Channel',
       notificationChannelsId=NotificationChannelAttributeConfig(),
-      projectsId=ProjectAttributeConfig())
+      projectsId=project_resource_args.PROJECT_ATTRIBUTE_CONFIG)
 
 
 def CreateAlertPolicyResourceArg(verb, positional=True):
@@ -76,7 +70,7 @@ def CreateAlertPolicyResourceArg(verb, positional=True):
     name = '--policy'
   help_text = 'Name of the Alert Policy ' + verb
 
-  return concept_parsers.ResourcePresentationSpec(
+  return presentation_specs.ResourcePresentationSpec(
       name,
       GetAlertPolicyResourceSpec(),
       help_text,
@@ -85,7 +79,7 @@ def CreateAlertPolicyResourceArg(verb, positional=True):
 
 def CreateConditionResourceArg(verb):
   help_text = 'The name of the Condition to {}.'.format(verb)
-  return concept_parsers.ResourcePresentationSpec(
+  return presentation_specs.ResourcePresentationSpec(
       'condition',
       GetConditionResourceSpec(),
       help_text,
@@ -112,7 +106,7 @@ def CreateNotificationChannelResourceArg(arg_name, extra_help, required=True,
   else:
     help_stem = 'Name of the Notification Channel '
 
-  return concept_parsers.ResourcePresentationSpec(
+  return presentation_specs.ResourcePresentationSpec(
       arg_name,
       GetNotificationChannelResourceSpec(),
       help_stem + extra_help,

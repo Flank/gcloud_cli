@@ -14,6 +14,8 @@
 
 """Tests for `gcloud compute copy-files`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.util.ssh import ssh
 from tests.lib import mock_matchers
 from tests.lib import test_case

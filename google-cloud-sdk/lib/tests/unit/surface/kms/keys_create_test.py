@@ -15,10 +15,15 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class KeysCreateTest(base.KmsMockTest):
 
   def SetUp(self):
@@ -51,14 +56,16 @@ class KeysCreateTest(base.KmsMockTest):
                     self.messages.CryptoKey.LabelsValue.AdditionalProperty(
                         key='smile', value='happy')])))
 
-  def testCreate(self):
+  def testCreate(self, track):
+    self.track = track
     self.Run('kms keys create '
              '--location={0} --keyring={1} {2} --purpose=encryption '
              '--labels=k1=v1,k-2=v-2 --labels=smile=happy'.format(
                  self.key_name.location_id, self.key_name.key_ring_id,
                  self.key_name.crypto_key_id))
 
-  def testCreateFullName(self):
+  def testCreateFullName(self, track):
+    self.track = track
     self.Run('kms keys create {0} --purpose=encryption --labels=k1=v1,k-2=v-2 '
              '--labels=smile=happy'.format(self.key_name.RelativeName()))
 

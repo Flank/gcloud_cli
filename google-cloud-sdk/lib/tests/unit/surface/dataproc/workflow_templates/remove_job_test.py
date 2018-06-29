@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'workflow template remove-job' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk import calliope
 
 from tests.lib.surface.dataproc import compute_base
@@ -64,4 +66,3 @@ class WorkflowTemplateRemoveJobUnitTestBeta(WorkflowTemplateRemoveJobUnitTest):
     err_msg = 'Step id [{0}] is not found in workflow template [{1}].'.format(
         12, workflow_template.id)
     self.AssertErrContains(err_msg)
-

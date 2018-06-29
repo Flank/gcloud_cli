@@ -13,6 +13,9 @@
 # limitations under the License.
 """Internal tests super-group."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 
 

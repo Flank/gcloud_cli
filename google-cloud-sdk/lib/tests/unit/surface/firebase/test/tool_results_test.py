@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.firebase.test import tool_results
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.firebase.test.android import unit_base
-
+import six
 
 TESTING_V1_MESSAGES = apis.GetMessagesModule('testing', 'v1')
 M_PENDING = TESTING_V1_MESSAGES.TestMatrix.StateValueValuesEnum.PENDING
@@ -103,7 +106,7 @@ class ToolResultsTests(unit_base.AndroidMockClientTest):
       tool_results.GetToolResultsIds(matrix, monitor, status_interval=0)
 
     self.assertIn('Matrix [matrix4] unexpectedly reached final status ERROR',
-                  ex_ctx.exception.message)
+                  six.text_type(ex_ctx.exception))
 
   def testGetToolResultsIds_MatrixInvalidDetailsUnavailable(self):
     name = 'matrix5'
@@ -116,7 +119,7 @@ class ToolResultsTests(unit_base.AndroidMockClientTest):
       tool_results.GetToolResultsIds(matrix, monitor, status_interval=0)
 
     self.assertIn('Matrix [matrix5] unexpectedly reached final status INVALID',
-                  ex_ctx.exception.message)
+                  six.text_type(ex_ctx.exception))
 
   def testGetToolResultsIds_MatrixInvalidDetailsUnset(self):
     name = 'matrix6'
@@ -129,7 +132,7 @@ class ToolResultsTests(unit_base.AndroidMockClientTest):
       tool_results.GetToolResultsIds(matrix, monitor, status_interval=0)
 
     self.assertIn('Matrix [matrix6] unexpectedly reached final status INVALID',
-                  ex_ctx.exception.message)
+                  six.text_type(ex_ctx.exception))
 
   def testGetToolResultsIds_MatrixInvalidNoManifest(self):
     name = 'matrix7'
@@ -141,7 +144,7 @@ class ToolResultsTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(exceptions.BadMatrixError) as ex_ctx:
       tool_results.GetToolResultsIds(matrix, monitor, status_interval=0)
 
-    ex_msg = ex_ctx.exception.message
+    ex_msg = six.text_type(ex_ctx.exception)
     self.assertIn('Matrix [matrix7] failed during validation', ex_msg)
     self.assertIn('APK is missing the manifest file', ex_msg)
 
@@ -155,7 +158,7 @@ class ToolResultsTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(exceptions.BadMatrixError) as ex_ctx:
       tool_results.GetToolResultsIds(matrix, monitor, status_interval=0)
 
-    ex_msg = ex_ctx.exception.message
+    ex_msg = six.text_type(ex_ctx.exception)
     self.assertIn('Matrix [matrix8] failed during validation', ex_msg)
     self.assertIn('A scenario-number was not declared', ex_msg)
 

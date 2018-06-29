@@ -14,6 +14,9 @@
 
 """Tests for the command_lib.meta.cache_util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.meta import cache_util
 from googlecloudsdk.core.resource import resource_printer
@@ -21,7 +24,10 @@ from tests.lib import calliope_test_base
 
 
 def _GetSortKey(obj):
-  return [obj.collection, obj.api_version, obj.module_path]
+  return '<{}><{}><{}>'.format(
+      obj.collection or '',
+      obj.api_version or '',
+      obj.module_path or '')
 
 
 class ListAttachedCompletersTest(calliope_test_base.CalliopeTestBase):

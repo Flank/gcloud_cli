@@ -14,6 +14,9 @@
 
 """Tests that ensure adding IAM policy bindings works properly."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import copy
 import time
 
@@ -22,10 +25,12 @@ from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
 
+from six.moves import range
+
 
 class RemoveIamPolicyBinding(unit_test_base.BaseTest):
 
-  def PostSetUp(self):
+  def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def _DoRemoveIamPolicyBinding(self, command, service_account):

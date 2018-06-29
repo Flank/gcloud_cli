@@ -2,15 +2,10 @@ NAME
     gcloud alpha kms keyrings - create and manage keyrings
 
 SYNOPSIS
-    gcloud alpha kms keyrings COMMAND [--location=LOCATION]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keyrings COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) A keyring is a toplevel logical grouping of keys.
-
-FLAGS
-     --location=LOCATION
-        The location of the requested resource.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

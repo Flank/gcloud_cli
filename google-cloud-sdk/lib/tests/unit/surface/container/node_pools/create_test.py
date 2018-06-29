@@ -210,8 +210,7 @@ This will enable the autoupgrade feature for nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-management for more
 information on node autoupgrades.
 
-<START PROGRESS TRACKER>Creating node pool my-custom-pool
-<END PROGRESS TRACKER>SUCCESS
+{{"ux": "PROGRESS_TRACKER", "message": "Creating node pool my-custom-pool", "status": "SUCCESS"}}
 Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-custom-pool].
 """.format(self.API_VERSION))
     self.AssertOutputMatches(
@@ -381,6 +380,89 @@ Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
                ' create {0} --cluster={1} --node-taints=test=ab:RandomEffect'
                .format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.AssertErrContains('argument --node-taints')
+
+  def testCreateInvalidacceleratorMissingType(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    with self.AssertRaisesArgumentErrorMatches(
+        r'argument --accelerator: Key [type] required in dict arg but not '
+        r'provided'):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --accelerator=count=2'.format(self.CLUSTER_NAME))
+
+  def testCreateWithValidAccelerators(self):
+    m = self.messages
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name':
+            'my-custom-pool',
+        'clusterId':
+            self.CLUSTER_NAME,
+        'accelerators': [
+            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
+                                acceleratorCount=int(2))
+        ],
+    }
+
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
+        ' --cluster={clusterId}'
+        ' --accelerator=type=nvidia-tesla-k80,count=2'.format(**pool_kwargs))
+    self.AssertOutputMatches(
+        (r'NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
+
+  def testAcceleratorCountDefaulting(self):
+    m = self.messages
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name':
+            'my-custom-pool',
+        'clusterId':
+            self.CLUSTER_NAME,
+        'accelerators': [
+            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
+                                acceleratorCount=int(1))
+        ],
+    }
+
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
+        ' --cluster={clusterId}'
+        ' --accelerator=type=nvidia-tesla-k80'.format(**pool_kwargs))
+    self.AssertOutputMatches(
+        (r'NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
 
 
 class CreateTestGAOnly(CreateTestGA):
@@ -760,89 +842,6 @@ class CreateTestAlphaV1API(base.AlphaTestBase, CreateTestBetaV1API):
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(True)
 
-  def testCreateInvalidacceleratorMissingType(self):
-    properties.VALUES.core.disable_prompts.Set(False)
-    with self.AssertRaisesArgumentErrorMatches(
-        r'argument --accelerator: Key [type] required in dict arg but not '
-        r'provided'):
-      self.Run(
-          self.node_pools_command_base.format(self.ZONE) +
-          ' create {0} --accelerator=count=2'.format(self.CLUSTER_NAME))
-
-  def testCreateWithValidAccelerators(self):
-    m = self.messages
-    self.assertIsNone(
-        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                  self.PROJECT_ID))
-    pool_kwargs = {
-        'name':
-            'my-custom-pool',
-        'clusterId':
-            self.CLUSTER_NAME,
-        'accelerators': [
-            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
-                                acceleratorCount=int(2))
-        ],
-    }
-
-    self.ExpectCreateNodePool(
-        self._MakeNodePool(**pool_kwargs),
-        self._MakeNodePoolOperation(**pool_kwargs))
-
-    self.ExpectGetOperation(
-        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
-
-    pool_version_kwargs = pool_kwargs.copy()
-    pool_version_kwargs.update({'nodeVersion': self.VERSION})
-    pool = self._MakeNodePool(**pool_version_kwargs)
-    self.ExpectGetNodePool(pool.name, response=pool)
-
-    self.Run(
-        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
-        ' --cluster={clusterId}'
-        ' --accelerator=type=nvidia-tesla-k80,count=2'.format(**pool_kwargs))
-    self.AssertOutputMatches(
-        (r'NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
-         '{name} {version}\\n').format(name=pool.name, version=pool.version),
-        normalize_space=True)
-
-  def testAcceleratorCountDefaulting(self):
-    m = self.messages
-    self.assertIsNone(
-        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
-                                  self.PROJECT_ID))
-    pool_kwargs = {
-        'name':
-            'my-custom-pool',
-        'clusterId':
-            self.CLUSTER_NAME,
-        'accelerators': [
-            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
-                                acceleratorCount=int(1))
-        ],
-    }
-
-    self.ExpectCreateNodePool(
-        self._MakeNodePool(**pool_kwargs),
-        self._MakeNodePoolOperation(**pool_kwargs))
-
-    self.ExpectGetOperation(
-        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
-
-    pool_version_kwargs = pool_kwargs.copy()
-    pool_version_kwargs.update({'nodeVersion': self.VERSION})
-    pool = self._MakeNodePool(**pool_version_kwargs)
-    self.ExpectGetNodePool(pool.name, response=pool)
-
-    self.Run(
-        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
-        ' --cluster={clusterId}'
-        ' --accelerator=type=nvidia-tesla-k80'.format(**pool_kwargs))
-    self.AssertOutputMatches(
-        (r'NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
-         '{name} {version}\\n').format(name=pool.name, version=pool.version),
-        normalize_space=True)
-
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API):
@@ -866,14 +865,15 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API):
             m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
                                      NodeMetadataValueValuesEnum.SECURE),
         'localSsdVolumeConfigs': [
-            m.LocalSsdVolumeConfig(count=2, type='nvme',
-                                   format=format_enum.FS),
-            m.LocalSsdVolumeConfig(count=1, type='scsi',
-                                   format=format_enum.BLOCK),
+            m.LocalSsdVolumeConfig(count=2, type='nvme', format=format_enum.FS),
+            m.LocalSsdVolumeConfig(
+                count=1, type='scsi', format=format_enum.BLOCK),
         ],
         'autoscaling':
             m.NodePoolAutoscaling(
                 enabled=True, maxNodeCount=6, autoprovisioned=True),
+        'maxPodsConstraint':
+            m.MaxPodsConstraint(maxPodsPerNode=30)
     }
 
     self.ExpectCreateNodePool(
@@ -894,7 +894,8 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API):
         ' --local-ssd-volumes count=2,type=nvme,format=fs'
         ' --local-ssd-volumes count=1,type=scsi,format=block'
         ' --enable-autoscaling --enable-autoprovisioning --max-nodes 6'
-        ' --workload-metadata-from-node=secure'.format(**pool_kwargs))
+        ' --workload-metadata-from-node=secure'
+        ' --max-pods-per-node=30'.format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),

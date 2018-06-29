@@ -11,11 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Mocked unit tests for Binary Authorization client wrapper."""
+"""Mocked unit tests for Binary Authorization ca_client wrapper."""
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
+from __future__ import unicode_literals
 
 from googlecloudsdk.core import resources
 from tests.lib import test_case
@@ -34,12 +34,12 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
     self.note_id = 'my-aa-note'
     self.note_project = 'other-' + self.Project()
     self.note_relative_name = binauthz_test_base.GetNoteRelativeName(
-        provider_id=self.note_project,
+        project_id=self.note_project,
         note_id=self.note_id,
     )
     self.note_ref = resources.REGISTRY.ParseRelativeName(
         relative_name=self.note_relative_name,
-        collection='containeranalysis.providers.notes',
+        collection='containeranalysis.projects.notes',
     )
     self.request_occurrence = self.CreateRequestOccurrence(
         artifact_url=self.artifact_url,
@@ -58,7 +58,7 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
         project_ref=self.project_ref,
         request_occurrence=self.request_occurrence,
     )
-    self.client.CreateAttestationOccurrence(
+    self.ca_client.CreateAttestationOccurrence(
         note_ref=self.note_ref,
         project_ref=self.project_ref,
         artifact_url=self.artifact_url,
@@ -74,9 +74,9 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
     # We need the list() to force-unroll the returned iterator, otherwise the
     # actual code isn't run.
     occurrences = list(
-        self.client._YieldNoteOccurrences(
+        self.ca_client._YieldNoteOccurrences(
             note_ref=self.note_ref, artifact_url=self.artifact_url))
-    self.assertItemsEqual([self.response_occurrence], occurrences)
+    self.assertEqual([self.response_occurrence], occurrences)
 
   def testYieldNoteOccurrencesFilter(self):
     # Mock a returned occurrence with the wrong kind (but matching artifact URL)
@@ -112,9 +112,9 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
     # We need the list() to force-unroll the returned iterator, otherwise the
     # actual code isn't run.
     occurrences = list(
-        self.client._YieldNoteOccurrences(
+        self.ca_client._YieldNoteOccurrences(
             note_ref=self.note_ref, artifact_url=self.artifact_url))
-    self.assertItemsEqual([self.response_occurrence], occurrences)
+    self.assertEqual([self.response_occurrence], occurrences)
 
   def testYieldPgpKeyFingerprintsAndSignatures(self):
     self.ExpectProjectsNotesOccurrencesList(
@@ -124,9 +124,9 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
     # We need the list() to force-unroll the returned iterator, otherwise the
     # actual code isn't run.
     signatures = list(
-        self.client.YieldPgpKeyFingerprintsAndSignatures(
+        self.ca_client.YieldPgpKeyFingerprintsAndSignatures(
             note_ref=self.note_ref, artifact_url=self.artifact_url))
-    self.assertItemsEqual(
+    self.assertEqual(
         [(self.pgp_key_fingerprint, self.signature)],
         signatures,
     )
@@ -137,8 +137,8 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
         occurrences_to_return=[self.response_occurrence],
     )
     resources_urls = list(
-        self.client.YieldUrlsWithOccurrences(note_ref=self.note_ref))
-    self.assertItemsEqual([self.artifact_url], resources_urls)
+        self.ca_client.YieldUrlsWithOccurrences(note_ref=self.note_ref))
+    self.assertEqual([self.artifact_url], resources_urls)
 
   def testYieldUrlsWithOccurrencesDeduplication(self):
     self.ExpectProjectsNotesOccurrencesList(
@@ -149,8 +149,8 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
         ],
     )
     resources_urls = list(
-        self.client.YieldUrlsWithOccurrences(note_ref=self.note_ref))
-    self.assertItemsEqual([self.artifact_url], resources_urls)
+        self.ca_client.YieldUrlsWithOccurrences(note_ref=self.note_ref))
+    self.assertEqual([self.artifact_url], resources_urls)
 
 
 if __name__ == '__main__':

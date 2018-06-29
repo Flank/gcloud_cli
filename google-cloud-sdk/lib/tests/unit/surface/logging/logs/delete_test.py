@@ -14,6 +14,8 @@
 
 """Tests of the 'sinks' subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
 from tests.lib.apitools import http_error

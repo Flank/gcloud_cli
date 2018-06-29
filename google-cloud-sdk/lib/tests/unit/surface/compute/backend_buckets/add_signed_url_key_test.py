@@ -16,6 +16,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.surface.compute import backend_buckets_test_base
 
@@ -98,9 +99,10 @@ class BackendBucketAddSignedUrlKeyTestBeta(
   def testKeyFileDoesNotExist(self):
     """Tests failure when key file does not exist."""
     backend_bucket_ref = self.GetBackendBucketRef('backend-bucket-1')
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Could not read key from file \[non-existent-file\]: '
-        r'No such file or directory'):
+    with self.assertRaisesRegex(
+        files.Error,
+        r'Unable to read file \[non-existent-file\]: '
+        r'.*No such file or directory'):
       self.RunBackendBuckets('add-signed-url-key ' + backend_bucket_ref.Name() +
                              ' --key-name key1 '
                              '--key-file non-existent-file')

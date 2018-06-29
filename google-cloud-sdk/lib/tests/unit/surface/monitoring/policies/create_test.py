@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud monitoring policies create`."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 
 from apitools.base.py import encoding
@@ -21,6 +23,7 @@ from googlecloudsdk.core import yaml
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.monitoring import base
+from six.moves import range
 
 
 class MonitoringCreateTest(base.MonitoringTestBase, parameterized.TestCase):

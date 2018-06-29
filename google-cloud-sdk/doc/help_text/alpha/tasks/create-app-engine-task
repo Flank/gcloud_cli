@@ -3,40 +3,42 @@ NAME
         Engine queue
 
 SYNOPSIS
-    gcloud alpha tasks create-app-engine-task
-        [--header=HEADER_FIELD: HEADER_VALUE] [--id=TASK_ID] [--method=METHOD]
-        [--queue=QUEUE] [--routing=KEY:VALUE,[...]]
-        [--schedule-time=SCHEDULE_TIME] [--url=URL]
+    gcloud alpha tasks create-app-engine-task (--id=TASK_ID --queue=QUEUE)
+        [--header=HEADER_FIELD: HEADER_VALUE] [--method=METHOD]
+        [--routing=KEY:VALUE,[...]] [--schedule-time=SCHEDULE_TIME] [--url=URL]
         [--payload-content=PAYLOAD_CONTENT | --payload-file=PAYLOAD_FILE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create and add a task to an App Engine queue.
 
-FLAGS
+REQUIRED FLAGS
+     At least one of these must be specified:
+
+       --id=TASK_ID
+          The ID of the task to create.
+
+          If not specified then the system will generate a random unique task
+          ID. Explicitly specifying a task ID enables task de-duplication. If a
+          task's ID is identical to that of an existing task or a task that was
+          deleted or completed recently then the call will fail.
+
+          Because there is an extra lookup cost to identify duplicate task
+          names, tasks created with IDs have significantly increased latency.
+          Using hashed strings for the task ID or for the prefix of the task ID
+          is recommended.
+
+       --queue=QUEUE
+          The queue the task belongs to.
+
+OPTIONAL FLAGS
      --header=HEADER_FIELD: HEADER_VALUE
         An HTTP request header. Header values can contain commas. This flag can
         be repeated. Repeated header fields will have their values overridden.
 
-     --id=TASK_ID
-        The ID of the task to create.
-
-        If not specified then the system will generate a random unique task ID.
-        Explicitly specifying a task ID enables task de-duplication. If a
-        task's ID is identical to that of an existing task or a task that was
-        deleted or completed recently then the call will fail.
-
-        Because there is an extra lookup cost to identify duplicate task names,
-        tasks created with IDs have significantly increased latency. Using
-        hashed strings for the task ID or for the prefix of the task ID is
-        recommended.
-
      --method=METHOD
         The HTTP method to use for the request. If not specified, "POST" will
         be used.
-
-     --queue=QUEUE
-        The queue the task belongs to.
 
      --routing=KEY:VALUE,[...]
         The route to be used for this task. KEY must be at least one of:

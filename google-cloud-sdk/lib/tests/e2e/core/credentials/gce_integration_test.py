@@ -13,6 +13,8 @@
 # limitations under the License.
 """Integration tests for gce properties."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.core import properties

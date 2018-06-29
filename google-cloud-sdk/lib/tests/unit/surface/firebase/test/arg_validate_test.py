@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.api_lib.firebase.test import arg_validate
@@ -19,6 +21,7 @@ from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import fake_args
 from tests.lib.surface.firebase.test import unit_base
+import six
 
 
 class CommonArgValidateTests(unit_base.TestUnitTestBase):
@@ -39,7 +42,8 @@ class CommonArgValidateTests(unit_base.TestUnitTestBase):
       self._ValidateFakeArgsForTestType(args, 'ab-negative')
     ex = e.exception
     self.assertEqual(ex.parameter_name, 'blood')
-    self.assertIn('may not be used with test type [ab-negative]', ex.message)
+    self.assertIn('may not be used with test type [ab-negative]',
+                  six.text_type(ex))
 
   def testValidateArgsForTestType_OptionalArgNotValidWithTestType(self):
     args = argparse.Namespace(donate='yes', blood='one pint', tomorrow='maybe')
@@ -47,7 +51,8 @@ class CommonArgValidateTests(unit_base.TestUnitTestBase):
       self._ValidateFakeArgsForTestType(args, 'o-positive')
     ex = e.exception
     self.assertEqual(ex.parameter_name, 'tomorrow')
-    self.assertIn('may not be used with test type [o-positive]', ex.message)
+    self.assertIn('may not be used with test type [o-positive]',
+                  six.text_type(ex))
 
   def testValidateArgsForTestType_RequiredArgIsMissing(self):
     args = argparse.Namespace(donate='yes')
@@ -55,7 +60,8 @@ class CommonArgValidateTests(unit_base.TestUnitTestBase):
       self._ValidateFakeArgsForTestType(args, 'o-positive')
     ex = e.exception
     self.assertEqual(ex.parameter_name, 'blood')
-    self.assertIn('must be specified with test type [o-positive]', ex.message)
+    self.assertIn('must be specified with test type [o-positive]',
+                  six.text_type(ex))
 
   def testValidateArgsForTestType_RequiredArgEqualsNone(self):
     args = argparse.Namespace(donate='yes', platelets=None)
@@ -63,7 +69,8 @@ class CommonArgValidateTests(unit_base.TestUnitTestBase):
       self._ValidateFakeArgsForTestType(args, 'ab-negative')
     ex = e.exception
     self.assertEqual(ex.parameter_name, 'platelets')
-    self.assertIn('must be specified with test type [ab-negative]', ex.message)
+    self.assertIn('must be specified with test type [ab-negative]',
+                  six.text_type(ex))
 
   # Validation of results-bucket
 
@@ -89,7 +96,7 @@ class CommonArgValidateTests(unit_base.TestUnitTestBase):
       arg_validate.ValidateResultsBucket(args)
     ex = e.exception
     self.assertEqual(ex.parameter_name, 'results-bucket')
-    self.assertIn('Invalid bucket name', ex.message)
+    self.assertIn('Invalid bucket name', six.text_type(ex))
 
   def testArgValidation_ResultsBucketPrefixMissingGsColon(self):
     args = argparse.Namespace(results_bucket='//bucket-with-extra-slashes')
@@ -97,7 +104,7 @@ class CommonArgValidateTests(unit_base.TestUnitTestBase):
       arg_validate.ValidateResultsBucket(args)
     ex = e.exception
     self.assertEqual(ex.parameter_name, 'results-bucket')
-    self.assertIn('Invalid bucket name', ex.message)
+    self.assertIn('Invalid bucket name', six.text_type(ex))
 
   def testArgValidation_ResultsBucketNameIncludesObject(self):
     args = argparse.Namespace(
@@ -106,7 +113,7 @@ class CommonArgValidateTests(unit_base.TestUnitTestBase):
       arg_validate.ValidateResultsBucket(args)
     ex = e.exception
     self.assertEqual(ex.parameter_name, 'results-bucket')
-    self.assertIn('Invalid bucket name', ex.message)
+    self.assertIn('Invalid bucket name', six.text_type(ex))
 
   # Validation of results-dir
 
@@ -124,22 +131,24 @@ class CommonArgValidateTests(unit_base.TestUnitTestBase):
     args = argparse.Namespace(results_dir='no_\r_allowed_in_value')
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateResultsDir(args)
-    self.assertIn('results-dir', e.exception.message)
-    self.assertIn('may not contain newline or linefeed', e.exception.message)
+    self.assertIn('results-dir', six.text_type(e.exception))
+    self.assertIn('may not contain newline or linefeed',
+                  six.text_type(e.exception))
 
   def testArgValidation_ResultsDirContainsNewline(self):
     args = argparse.Namespace(results_dir='no_\n_allowed_in_value')
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateResultsDir(args)
-    self.assertIn('results-dir', e.exception.message)
-    self.assertIn('may not contain newline or linefeed', e.exception.message)
+    self.assertIn('results-dir', six.text_type(e.exception))
+    self.assertIn('may not contain newline or linefeed',
+                  six.text_type(e.exception))
 
   def testArgValidation_ResultsDirLongerThan512Chars(self):
     args = argparse.Namespace(results_dir='x' * 513)
     with self.assertRaises(exceptions.InvalidArgumentException) as e:
       arg_validate.ValidateResultsDir(args)
-    self.assertIn('results-dir', e.exception.message)
-    self.assertIn('too long', e.exception.message)
+    self.assertIn('results-dir', six.text_type(e.exception))
+    self.assertIn('too long', six.text_type(e.exception))
 
 
 if __name__ == '__main__':

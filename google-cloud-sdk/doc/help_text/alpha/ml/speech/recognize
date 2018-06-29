@@ -4,6 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha ml speech recognize AUDIO --language-code=LANGUAGE_CODE
+        [--additional-language-codes=[LANGUAGE_CODE,...]]
         [--encoding=ENCODING; default="encoding-unspecified"]
         [--filter-profanity] [--hints=[HINTS,...]] [--include-word-confidence]
         [--include-word-time-offsets]
@@ -34,6 +35,14 @@ REQUIRED FLAGS
         of the currently supported language codes.
 
 OPTIONAL FLAGS
+     --additional-language-codes=[LANGUAGE_CODE,...]
+        The BCP-47 language tags of other languages that the speech may be in.
+        Up to 3 can be provided.
+
+        If alternative languages are listed, recognition result will contain
+        recognition in the most likely language detected including the main
+        language-code.
+
      --encoding=ENCODING; default="encoding-unspecified"
         The type of encoding of the file. Required if the file format is not
         WAV or FLAC. ENCODING must be one of: amr, amr-wb,

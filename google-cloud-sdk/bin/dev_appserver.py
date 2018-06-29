@@ -5,10 +5,11 @@
 
 """A convenience wrapper for starting dev_appserver for appengine for python."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
-import sys
 
-import bootstrapping.bootstrapping as bootstrapping
+from bootstrapping import bootstrapping
 from googlecloudsdk.api_lib.app import wrapper_util
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import metrics
@@ -18,9 +19,10 @@ from googlecloudsdk.core.util import platforms
 
 def main():
   """Launches dev_appserver.py."""
-  runtimes = wrapper_util.GetRuntimes(sys.argv[1:])
+  argv = bootstrapping.GetDecodedArgv()
+  runtimes = wrapper_util.GetRuntimes(argv[1:])
   components = wrapper_util.GetComponents(runtimes)
-  options = wrapper_util.ParseDevAppserverFlags(sys.argv[1:])
+  options = wrapper_util.ParseDevAppserverFlags(argv[1:])
   if options.support_datastore_emulator:
     components.append('cloud-datastore-emulator')
   update_manager.UpdateManager.EnsureInstalledAndRestart(
@@ -53,6 +55,7 @@ def main():
 
 
 if __name__ == '__main__':
+  bootstrapping.DisallowPython3()
   try:
     bootstrapping.CommandStart('dev_appserver', component_id='core')
     bootstrapping.CheckUpdates('dev_appserver')

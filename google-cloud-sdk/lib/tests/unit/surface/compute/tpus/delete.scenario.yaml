@@ -1,0 +1,59 @@
+title: Delete TPU
+release_tracks: [ALPHA]
+actions:
+- execute_command:
+    command: compute tpus delete dec-tpu-3 --zone us-central1-b
+    events:
+    - expect_stderr: "You are about to delete tpu [dec-tpu-3]\n\nDo you want to continue\
+        \ (Y/n)?  "
+    - user_input: Y
+    - expect_stderr: "\n"
+    - api_call:
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1-b/operations/operation-1526938596956-56cbe18aa599e-9abc1be8-69f6664d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2018-05-21T21:36:36.956601169Z",
+                "target": "projects/fake-project/locations/us-central1-b/nodes/dec-tpu-3",
+                "verb": "delete",
+                "apiVersion": "v1"
+              },
+              "done": false
+            }
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-b/nodes/dec-tpu-3?alt=json
+          method: DELETE
+          headers: {}
+          body:
+    - expect_stderr: |
+        Delete request issued for: [dec-tpu-3]
+    - api_call:
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1-b/operations/operation-1526938596956-56cbe18aa599e-9abc1be8-69f6664d",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.common.OperationMetadata",
+                "createTime": "2018-05-21T21:36:36.956601169Z",
+                "target": "projects/fake-project/locations/us-central1-b/nodes/dec-tpu-3",
+                "verb": "delete",
+                "apiVersion": "v1"
+              },
+              "done": true
+            }
+        expect_request:
+          uri: https://tpu.googleapis.com/v1/projects/fake-project/locations/us-central1-b/operations/operation-1526938596956-56cbe18aa599e-9abc1be8-69f6664d?alt=json
+          method: GET
+          headers: {}
+          body:
+    - expect_progress_tracker:
+        message: "Waiting for operation [operation-1526938596956-56cbe18aa599e-9abc1be8-69f6664d] to complete"
+        status: "SUCCESS"
+    - expect_stderr: "Deleted tpu [dec-tpu-3].\n"
+    - expect_exit_code: 0

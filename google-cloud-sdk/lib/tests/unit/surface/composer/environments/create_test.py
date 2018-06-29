@@ -108,9 +108,9 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
     self.RunEnvironments('create', '--project', self.TEST_PROJECT, '--location',
                          self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID)
     self.AssertErrMatches(
-        r'^<START PROGRESS TRACKER>Waiting for \[{}] to be created with \[{}]'
-        r'\s*^<END PROGRESS TRACKER>SUCCESS'.format(self.TEST_ENVIRONMENT_NAME,
-                                                    self.TEST_OPERATION_NAME))
+        r'^{{"ux": "PROGRESS_TRACKER", "message": "Waiting for \[{}] to '
+        r'be created with \[{}]"'.format(self.TEST_ENVIRONMENT_NAME,
+                                         self.TEST_OPERATION_NAME))
 
   def testFailedCreate_synchronous(self):
     """Tests a failed synchronous creation.
@@ -584,13 +584,13 @@ class EnvironmentsCreateTest(base.EnvironmentsUnitTest):
     self.assertEqual(self.running_op, actual_op)
 
   def testCustomDiskSizeTooSmall(self):
-    """Tests error if --disk-size is < 10GB."""
+    """Tests error if --disk-size is < 20GB."""
     with self.AssertRaisesArgumentErrorRegexp(
         'must be greater than or equal to'):
       self.RunEnvironments(
           'create', '--project',
           self.TEST_PROJECT, '--location', self.TEST_LOCATION,
-          '--disk-size', '9GB',
+          '--disk-size', '19GB',
           '--async', self.TEST_ENVIRONMENT_ID)
 
   def testCustomDiskSizeTooLarge(self):

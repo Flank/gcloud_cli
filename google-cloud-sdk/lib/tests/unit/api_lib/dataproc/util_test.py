@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests of api_lib dataproc util methods."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk import calliope

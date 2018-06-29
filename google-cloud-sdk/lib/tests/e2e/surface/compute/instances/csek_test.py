@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for customer supplied encryption keys."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 import os.path
 
@@ -38,8 +40,8 @@ class CsekTest(e2e_test_base.BaseTest):
   def GetInstanceName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up
-    self.instance_name = e2e_utils.GetResourceNameGenerator(
-        prefix='compute-csekstart').next()
+    self.instance_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='compute-csekstart'))
     self.instance_names_used.append(self.instance_name)
     self.csek_fname = os.path.join(self.CreateTempDir(), 'csek.json')
 

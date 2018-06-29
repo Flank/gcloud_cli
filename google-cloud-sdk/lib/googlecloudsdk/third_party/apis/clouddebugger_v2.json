@@ -14,7 +14,7 @@
     "x16": "http://www.google.com/images/icons/product/search-16.gif",
     "x32": "http://www.google.com/images/icons/product/search-32.gif"
    },
-  "documentationLink": "http://cloud.google.com/debugger",
+  "documentationLink": "https://cloud.google.com/debugger",
   "protocol": "rest",
   "rootUrl": "https://clouddebugger.googleapis.com/",
   "servicePath": "",
@@ -43,11 +43,6 @@
       ],
       "location": "query"
     },
-    "bearer_token": {
-      "type": "string",
-      "description": "OAuth bearer token.",
-      "location": "query"
-    },
     "callback": {
       "type": "string",
       "description": "JSONP",
@@ -66,12 +61,6 @@
     "oauth_token": {
       "type": "string",
       "description": "OAuth 2.0 token for the current user.",
-      "location": "query"
-    },
-    "pp": {
-      "type": "boolean",
-      "description": "Pretty-print response.",
-      "default": "true",
       "location": "query"
     },
     "prettyPrint": {
@@ -551,7 +540,7 @@
           "$ref": "StatusMessage"
         },
         "stackFrames": {
-          "description": "The stack at breakpoint time.",
+          "description": "The stack at breakpoint time, where stack_frames[0] represents the most\nrecently entered function.",
           "type": "array",
           "items": {
             "$ref": "StackFrame"

@@ -17,6 +17,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import textwrap
 
+from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -139,9 +140,10 @@ class SslCertificatesCreateTest(test_base.BaseTest):
     self.CheckRequests()
 
   def testWithoutCertificateFile(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Could not read certificate from file \[not-certificate.crt\]: No such'
-        ' file or directory'):
+    with self.assertRaisesRegex(
+        files.Error,
+        r'Unable to read file \[not-certificate.crt\]: '
+        r'.*No such file or directory'):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
             --certificate not-certificate.crt
@@ -151,9 +153,10 @@ class SslCertificatesCreateTest(test_base.BaseTest):
     self.CheckRequests()
 
   def testWithoutPrivateKeyFile(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Could not read private key from file \[non-existent.key\]: No such '
-        'file or directory'):
+    with self.assertRaisesRegex(
+        files.Error,
+        r'Unable to read file \[non-existent.key\]: '
+        r'.*No such file or directory'):
       self.RunVersioned("""
           compute ssl-certificates create my-cert
             --certificate {certificate_file}

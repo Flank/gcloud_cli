@@ -1259,8 +1259,8 @@ class FileOrStdoutTests(sdk_test_base.WithOutputCapture):
   def testFileWriteBinary(self):
     contents = b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n'
     path = os.path.join(self.temp_path, self.RandomFileName())
-    file_utils.WriteFileContents(path, contents, binary=True)
-    self.assertEqual(file_utils.GetFileContents(path, binary=True), contents)
+    file_utils.WriteBinaryFileContents(path, contents)
+    self.assertEqual(file_utils.ReadBinaryFileContents(path), contents)
 
 
 if __name__ == '__main__':

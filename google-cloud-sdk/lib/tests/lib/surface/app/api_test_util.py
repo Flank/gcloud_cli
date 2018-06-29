@@ -14,6 +14,8 @@
 
 """Helper class for commands which use the deployment API."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import hashlib
 import operator
 import time
@@ -32,6 +34,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.apitools import retry
+import six
 
 
 APPENGINE_API = 'appengine'
@@ -42,7 +45,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
                   test_case.WithOutputCapture):
   """Mocks the appengine API client."""
 
-  DEFAULT_SERVICE_CONFIG = {'runtime': u'python27', 'api_version': u'1'}
+  DEFAULT_SERVICE_CONFIG = {'runtime': 'python27', 'api_version': '1'}
   DEFAULT_FILES = ['app.yaml',
                    'dos.yaml',
                    'mod1.yaml',
@@ -178,16 +181,16 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
   def DefaultHandlers(self, with_static=False):
     """Helper function to create the basic handlers message."""
     handlers = [self.messages.UrlMap(
-        script=self.messages.ScriptHandler(scriptPath=u'home.app'),
+        script=self.messages.ScriptHandler(scriptPath='home.app'),
         securityLevel=self.messages.UrlMap.SecurityLevelValueValuesEnum(3),
-        urlRegex=u'/'
+        urlRegex='/'
     )]
     if with_static:
       handlers.append(self.messages.UrlMap(
           staticFiles=self.messages.StaticFilesHandler(
-              path=u'foo/\\1',
-              uploadPathRegex=u'foo/.*'),
-          urlRegex=u'/static/(.*)',
+              path='foo/\\1',
+              uploadPathRegex='foo/.*'),
+          urlRegex='/static/(.*)',
           securityLevel=self.messages.UrlMap.SecurityLevelValueValuesEnum(3)))
     return handlers
 
@@ -469,12 +472,12 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
   def GetListServicesResponse(self, project, services, with_split=True):
     """Helper function to create dummy responses for the Services.List call."""
     services_responses = []
-    for service, versions in sorted(services.iteritems()):
+    for service, versions in sorted(six.iteritems(services)):
       if with_split:
         split = self.messages.TrafficSplit(
             allocations=self.messages.TrafficSplit.AllocationsValue(
                 additionalProperties=[]))
-        for version, version_info in versions.iteritems():
+        for version, version_info in six.iteritems(versions):
           # The server only adds a version to this field if split is non-zero.
           traffic = version_info.get('traffic_split', 0)
           if traffic > 0:
@@ -513,7 +516,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     serving_status = self.messages.Version.ServingStatusValueValuesEnum.SERVING
     versions_responses = []
     service_info = existing_services.get(service, {})
-    for version, version_info in service_info.iteritems():
+    for version, version_info in six.iteritems(service_info):
       versions_responses.append(
           self.messages.Version(
               id=version,
@@ -650,11 +653,11 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
       A google.cloud.location.ListLocationsResponse message.
     """
     regions_responses = []
-    meta_type = u'type.googleapis.com/google.appengine.v1.LocationMetadata'
+    meta_type = 'type.googleapis.com/google.appengine.v1.LocationMetadata'
 
-    for region, environments in regions.iteritems():
+    for region, environments in six.iteritems(regions):
       response_type = self.messages.Location.MetadataValue.AdditionalProperty(
-          key=u'@type',
+          key='@type',
           value=extra_types.JsonValue(string_value=meta_type))
 
       env_availability = [
@@ -672,7 +675,7 @@ class ApiTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
                   additionalProperties=[
                       self.messages.Location.LabelsValue.AdditionalProperty(
                           key='cloud.googleapis.com/region',
-                          value=unicode(region)
+                          value=region
                       )]
               ),
               metadata=self.messages.Location.MetadataValue(

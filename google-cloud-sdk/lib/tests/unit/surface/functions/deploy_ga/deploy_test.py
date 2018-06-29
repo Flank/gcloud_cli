@@ -42,7 +42,7 @@ _TEST_GS_BUCKET = 'gs://fake_bucket'
 _DEFAULT_REGION = 'us-central1'
 _DEFAULT_FUNCTION_NAME = 'my-test'
 _SUCCESSFUL_DEPLOY_STDERR = """\
-Deploying function (may take a while - up to 2 minutes)
+{"ux": "PROGRESS_TRACKER", "message": "Deploying function (may take a while - up to 2 minutes)", "status": "SUCCESS"}
 """
 _NO_UPDATE_STDERR = """\
 Nothing to update.

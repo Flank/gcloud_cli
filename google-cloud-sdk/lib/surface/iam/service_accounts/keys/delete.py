@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Command for deleting user-managed service account keys."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.iam import util
 from googlecloudsdk.calliope import base
@@ -47,7 +51,7 @@ class Delete(base.Command):
     key = key_ref.keysId
     console_io.PromptContinue(
         message='You are about to delete key [{0}] for service '
-        'account [{1}].'.format(args.key, args.account),
+        'account [{1}].'.format(args.key, args.iam_account),
         cancel_on_no=True)
 
     client, messages = util.GetClientAndMessages()

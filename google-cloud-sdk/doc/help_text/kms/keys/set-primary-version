@@ -15,14 +15,14 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --version=VERSION
-        The version to make primary.
+        Version to make primary.
 
 OPTIONAL FLAGS
      --keyring=KEYRING
-        The containing keyring.
+        Key ring of the key.
 
      --location=LOCATION
-        The location of the requested resource.
+        Location of the key.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

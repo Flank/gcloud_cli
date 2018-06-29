@@ -1,0 +1,22 @@
+title: Describe Example
+description: Simple describe test example
+release_tracks: [BETA]
+actions:
+  - execute_command:
+      command: iot registries describe my-registry --region us-central1
+      events:
+        - user_input: y
+        - api_call:
+            expect_request:
+              uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/my-registry?alt=json
+              method: GET
+              headers:
+                content-length: '12'
+              body: {}
+            return_response:
+              headers:
+                status: '200'
+              body: "projects/fake-project/locations/us-central1/registries/my-registry"
+        - expect_stdout: "name: projects/fake-project/locations/us-central1/registries/my-registry\n"
+        - expect_stderr: ""
+        - expect_exit_code: 0

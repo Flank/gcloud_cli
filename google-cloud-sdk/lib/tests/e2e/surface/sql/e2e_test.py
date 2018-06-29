@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -87,9 +89,9 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
 
     # First line is a header, next lines are the actual operations.
     # If we have less than 2 lines it means we have just a header.
-    self.assertGreater(lines, 1,
-                       'No operations available for this instance {0}'.format(
-                           self.test_instance))
+    self.assertGreater(
+        len(lines), 1, 'No operations available for this instance {0}'.format(
+            self.test_instance))
 
     # Grab first listed operation and describe it.
     operation_id = lines[1].split()[0]

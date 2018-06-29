@@ -14,6 +14,7 @@
 
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.app import instances_util

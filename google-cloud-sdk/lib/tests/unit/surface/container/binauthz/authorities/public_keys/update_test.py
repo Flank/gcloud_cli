@@ -53,7 +53,7 @@ class UpdateTest(sdk_test_base.WithTempCWD,
         systemOwnedDrydockNote=None,
         updateTime=times.FormatDateTime(datetime.datetime.utcnow()),
         userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='providers/{}/notes/{}'.format(proj, self.name),
+            noteReference='projects/{}/notes/{}'.format(proj, self.name),
             publicKeys=[self.existing_pub_key],
         ))
 

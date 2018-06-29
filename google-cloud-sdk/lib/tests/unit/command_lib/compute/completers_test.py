@@ -14,6 +14,8 @@
 
 """Unit tests for the compute.completers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.command_lib.compute import completers
@@ -49,7 +51,7 @@ class ComputeCompleterTest(completer_test_base.CompleterBase):
 
   def testRegionsCompleter(self):
     completer = self.Completer(completers.RegionsCompleter)
-    self.assertItemsEqual(['asia-east1',
+    self.assertCountEqual(['asia-east1',
                            'asia-northeast1',
                            'europe-west1',
                            'us-central1',
@@ -57,19 +59,19 @@ class ComputeCompleterTest(completer_test_base.CompleterBase):
                            'us-east1',
                            'us-west1'],
                           completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['europe-west1'],
         completer.Complete('e', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['europe-west1', 'us-west1'],
         completer.Complete('*w*', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [],
         completer.Complete('q', self.parameter_info))
 
   def testZonesCompleter(self):
     completer = self.Completer(completers.ZonesCompleter)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['asia-east1-a',
          'asia-east1-b',
          'asia-east1-c',
@@ -90,17 +92,17 @@ class ComputeCompleterTest(completer_test_base.CompleterBase):
          'us-west1-a',
          'us-west1-b'],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['europe-west1-b', 'europe-west1-c', 'europe-west1-d'],
         completer.Complete('e', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['europe-west1-b',
          'europe-west1-c',
          'europe-west1-d',
          'us-west1-a',
          'us-west1-b'],
         completer.Complete('*w*', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [],
         completer.Complete('q', self.parameter_info))
 
@@ -115,7 +117,7 @@ class ComputeFlagCompleterTest(completer_test_base.FlagCompleterBase):
     self.assertEqual(
         228,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance --project=my-project --zone=asia-east1-a',
          'my_b_instance --project=my-project --zone=asia-east1-b',
          'my_b_instance --project=my-project --zone=asia-east1-c',
@@ -199,10 +201,10 @@ class ComputeFlagCompleterTest(completer_test_base.FlagCompleterBase):
                                args={'project': 'my_x_project',
                                      'zone': 'us-east1-b'},
                                command_resources=_COMMAND_RESOURCES)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance'],
         completer.Complete('my_b', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance'],
         completer.Complete('my_a', self.parameter_info))
 
@@ -214,7 +216,7 @@ class ComputeFlagCompleterTest(completer_test_base.FlagCompleterBase):
     self.assertEqual(
         228,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance --project=my-project --zone=asia-east1-a',
          'my_b_instance --project=my-project --zone=asia-east1-b',
          'my_b_instance --project=my-project --zone=asia-east1-c',
@@ -298,10 +300,10 @@ class ComputeFlagCompleterTest(completer_test_base.FlagCompleterBase):
                                args={'project': 'my_x_project',
                                      'zone': 'us-east1-b'},
                                search_resources=_SEARCH_RESOURCES)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance'],
         completer.Complete('my_b', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance'],
         completer.Complete('my_a', self.parameter_info))
 
@@ -314,7 +316,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         5,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [
             'health-check-http-1:my-project',
             'health-check-http-2:my-project',
@@ -323,7 +325,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
             'health-check-tcp:my-project',
         ],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['health-check-http-2:my-project'],
         completer.Complete('*-2', self.parameter_info))
 
@@ -333,13 +335,13 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         2,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [
             'health-check-1:my-project',
             'health-check-2:my-project',
         ],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['health-check-2:my-project'],
         completer.Complete('*-2', self.parameter_info))
 
@@ -349,13 +351,13 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         2,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [
             'https-health-check-1:my-project',
             'https-health-check-2:my-project',
         ],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['https-health-check-2:my-project'],
         completer.Complete('*-2', self.parameter_info))
 
@@ -365,14 +367,14 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         3,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [
             'instance-template-1:my-project',
             'instance-template-2:my-project',
             'instance-template-3:my-project',
         ],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['instance-template-2:my-project'],
         completer.Complete('*-2', self.parameter_info))
 
@@ -382,7 +384,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         228,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance:asia-east1-b:your_z_project',
          'my_b_instance:asia-northeast1-b:your_z_project',
          'my_b_instance:europe-west1-b:your_z_project',
@@ -396,7 +398,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
                                args={'project': 'my_x_project',
                                      'zone': 'us-east1-b'},
                                command_resources=_COMMAND_RESOURCES)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance:asia-east1-b:your_z_project',
          'my_b_instance:asia-northeast1-b:your_z_project',
          'my_b_instance:europe-west1-b:your_z_project',
@@ -404,17 +406,17 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
          'my_b_instance:us-east1-b:your_z_project',
          'my_b_instance:us-west1-b:your_z_project'],
         completer.Complete('my_b:*b:*_z_*', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance'],
         completer.Complete('my_a', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance:europe-west1-d',
          'my_a_instance:us-east1-d'],
         completer.Complete('my_a:*d', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance:us-east1-b:your_z_project'],
         completer.Complete('my_a:*:your_z', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [],
         completer.Complete('my_a:*:my_y', self.parameter_info))
 
@@ -423,7 +425,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
                                args={'project': 'your_z_project',
                                      'zone': 'us-east1-b'},
                                command_resources=_COMMAND_RESOURCES)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance:asia-east1-b',
          'my_b_instance:asia-northeast1-b',
          'my_b_instance:europe-west1-b',
@@ -431,17 +433,17 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
          'my_b_instance',
          'my_b_instance:us-west1-b'],
         completer.Complete('my_b:*b:*_z_*', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance'],
         completer.Complete('my_a', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance:europe-west1-d',
          'my_a_instance:us-east1-d'],
         completer.Complete('my_a:*d', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance'],
         completer.Complete('my_a:*:your_z', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [],
         completer.Complete('my_a:*:my_y', self.parameter_info))
 
@@ -451,7 +453,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         5,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [
             'health-check-http-1:my-project',
             'health-check-http-2:my-project',
@@ -460,7 +462,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
             'health-check-tcp:my-project',
         ],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['health-check-http-2:my-project'],
         completer.Complete('*-2', self.parameter_info))
 
@@ -470,13 +472,13 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         2,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [
             'health-check-1:my-project',
             'health-check-2:my-project',
         ],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['health-check-2:my-project'],
         completer.Complete('*-2', self.parameter_info))
 
@@ -486,13 +488,13 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         2,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [
             'https-health-check-1:my-project',
             'https-health-check-2:my-project',
         ],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['https-health-check-2:my-project'],
         completer.Complete('*-2', self.parameter_info))
 
@@ -502,14 +504,14 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         3,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [
             'instance-template-1:my-project',
             'instance-template-2:my-project',
             'instance-template-3:my-project',
         ],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['instance-template-2:my-project'],
         completer.Complete('*-2', self.parameter_info))
 
@@ -519,7 +521,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     self.assertEqual(
         228,
         len(completer.Complete('', self.parameter_info)))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance:asia-east1-b:your_z_project',
          'my_b_instance:asia-northeast1-b:your_z_project',
          'my_b_instance:europe-west1-b:your_z_project',
@@ -533,7 +535,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
                                args={'project': 'my_x_project',
                                      'zone': 'us-east1-b'},
                                search_resources=_SEARCH_RESOURCES)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance:asia-east1-b:your_z_project',
          'my_b_instance:asia-northeast1-b:your_z_project',
          'my_b_instance:europe-west1-b:your_z_project',
@@ -541,17 +543,17 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
          'my_b_instance:us-east1-b:your_z_project',
          'my_b_instance:us-west1-b:your_z_project'],
         completer.Complete('my_b:*b:*_z_*', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance'],
         completer.Complete('my_a', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance:europe-west1-d',
          'my_a_instance:us-east1-d'],
         completer.Complete('my_a:*d', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance:us-east1-b:your_z_project'],
         completer.Complete('my_a:*:your_z', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [],
         completer.Complete('my_a:*:my_y', self.parameter_info))
 
@@ -560,7 +562,7 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
                                args={'project': 'your_z_project',
                                      'zone': 'us-east1-b'},
                                search_resources=_SEARCH_RESOURCES)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_b_instance:asia-east1-b',
          'my_b_instance:asia-northeast1-b',
          'my_b_instance:europe-west1-b',
@@ -568,17 +570,17 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
          'my_b_instance',
          'my_b_instance:us-west1-b'],
         completer.Complete('my_b:*b:*_z_*', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance'],
         completer.Complete('my_a', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance:europe-west1-d',
          'my_a_instance:us-east1-d'],
         completer.Complete('my_a:*d', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['my_a_instance'],
         completer.Complete('my_a:*:your_z', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [],
         completer.Complete('my_a:*:my_y', self.parameter_info))
 
@@ -590,7 +592,7 @@ class ComputeTestCompleterTest(completer_test_base.CompleterBase):
         'collection=compute.zones,list_command=compute zones list --uri')
     completer = self.Completer(completers.TestCompleter)
     del os.environ['_ARGCOMPLETE_TEST']
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['asia-east1-a',
          'asia-east1-b',
          'asia-east1-c',
@@ -611,17 +613,17 @@ class ComputeTestCompleterTest(completer_test_base.CompleterBase):
          'us-west1-a',
          'us-west1-b'],
         completer.Complete('', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['europe-west1-b', 'europe-west1-c', 'europe-west1-d'],
         completer.Complete('e', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['europe-west1-b',
          'europe-west1-c',
          'europe-west1-d',
          'us-west1-a',
          'us-west1-b'],
         completer.Complete('*w*', self.parameter_info))
-    self.assertItemsEqual(
+    self.assertCountEqual(
         [],
         completer.Complete('q', self.parameter_info))
 

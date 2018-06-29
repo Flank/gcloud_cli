@@ -165,7 +165,7 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
     for x in [False, True]:
       http.Http(enable_resource_quota=x).request(
           'http://foo.com', 'GET', None, {})
-      self.assertNotIn(u'X-Goog-User-Project',
+      self.assertNotIn('X-Goog-User-Project',
                        self.request_mock.call_args[0][3])
       self.assertNotIn(b'X-Goog-User-Project',
                        self.request_mock.call_args[0][3])
@@ -174,7 +174,7 @@ class HttpTestUserCreds(HttpTestBase, sdk_test_base.WithFakeAuth):
     properties.VALUES.billing.quota_project.Set(None)
     http.Http(enable_resource_quota=False).request(
         'http://foo.com', 'GET', None, {})
-    self.assertNotIn(u'X-Goog-User-Project', self.request_mock.call_args[0][3])
+    self.assertNotIn('X-Goog-User-Project', self.request_mock.call_args[0][3])
     self.assertNotIn(b'X-Goog-User-Project', self.request_mock.call_args[0][3])
 
     # Use the header.
@@ -202,7 +202,7 @@ class HttpTestGCECreds(HttpTestBase, sdk_test_base.WithFakeComputeAuth):
     properties.VALUES.billing.quota_project.Set('bar')
     http.Http(enable_resource_quota=True).request(
         'http://foo.com', 'GET', None, {})
-    self.assertNotIn(u'X-Goog-User-Project', self.request_mock.call_args[0][3])
+    self.assertNotIn('X-Goog-User-Project', self.request_mock.call_args[0][3])
     self.assertNotIn(b'X-Goog-User-Project', self.request_mock.call_args[0][3])
 
 

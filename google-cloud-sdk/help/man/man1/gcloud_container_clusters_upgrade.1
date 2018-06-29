@@ -11,7 +11,7 @@ gcloud container clusters upgrade \- upgrade the Kubernetes version of an existi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters upgrade\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-master\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters upgrade\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\-version\fR=\fICLUSTER_VERSION\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-master\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -104,11 +104,21 @@ Kubernetes Engine. Nodes cannot be upgraded at the same time as the master.
 The node pool to upgrade.
 
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The compute region (e.g. us\-central1) for the cluster.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
 The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
 
+.RE
 .RE
 .sp
 

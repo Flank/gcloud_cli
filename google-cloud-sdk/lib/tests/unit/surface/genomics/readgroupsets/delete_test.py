@@ -14,6 +14,8 @@
 
 """Tests for genomics readgroupsets delete command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 from googlecloudsdk.api_lib.genomics.exceptions import GenomicsError
 from googlecloudsdk.calliope import exceptions

@@ -70,7 +70,7 @@ class ListTagsGAandBetaTest(
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags()
-    self.assertTrue('Access denied', cm.exception.message)
+    self.assertTrue('Access denied', six.text_type(cm.exception))
 
   def testDockerError_404(self):
     transform_manifests_mock = self.StartPatch(
@@ -80,7 +80,7 @@ class ListTagsGAandBetaTest(
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags()
-    self.assertTrue('Not found', cm.exception.message)
+    self.assertTrue('Not found', six.text_type(cm.exception))
 
   def testListTagsNoOccurrences(self):
     # Intercept FormatDateTime to use UTC for test portability.
@@ -203,7 +203,7 @@ class ListTagsALPHATest(
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags()
-    self.assertTrue('Access denied', cm.exception.message)
+    self.assertTrue('Access denied', six.text_type(cm.exception))
 
   def testV2DockerError_404(self):
     transform_manifests_mock = self.StartPatch(
@@ -213,7 +213,7 @@ class ListTagsALPHATest(
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.ListTags()
-    self.assertTrue('Not found', cm.exception.message)
+    self.assertTrue('Not found', six.text_type(cm.exception))
 
   def testBadStateException_CredentialRefreshError(self):
     transform_manifests_mock = self.StartPatch(
@@ -223,7 +223,7 @@ class ListTagsALPHATest(
     transform_manifests_mock.side_effect = exception
     with self.assertRaises(util.TokenRefreshError) as cm:
       self.ListTags()
-    self.assertIn(expected_message, str(cm.exception.message))
+    self.assertIn(expected_message, six.text_type(cm.exception))
 
   def testBadStateException_UnexpectedErrorsRaised(self):
     transform_manifests_mock = self.StartPatch(

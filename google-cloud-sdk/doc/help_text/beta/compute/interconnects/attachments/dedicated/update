@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud beta compute interconnects attachments dedicated update NAME
-        [--admin-enabled] [--description=DESCRIPTION] [--region=REGION]
+        [--description=DESCRIPTION] [--enable-admin] [--region=REGION]
         [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -19,13 +19,13 @@ POSITIONAL ARGUMENTS
         Name of the interconnect attachment to patch.
 
 FLAGS
-     --admin-enabled
-        Administrative status of the interconnect attachment. When this is
-        enabled, the attachment is operational and will carry traffic. Use
-        --no-admin-enabled to disable it.
-
      --description=DESCRIPTION
         Human-readable plain-text description of attachment.
+
+     --enable-admin
+        Administrative status of the interconnect attachment. When this is
+        enabled, the attachment is operational and will carry traffic. Use
+        --no-enable-admin to disable it.
 
      --region=REGION
         The region of the interconnect attachment to patch. If not specified,
@@ -50,6 +50,11 @@ FLAGS
      --update-labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to update. If a label exists its value
         is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      At most one of these may be specified:
 
@@ -77,8 +82,9 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute interconnects attachments dedicated update
         $ gcloud alpha compute interconnects attachments dedicated update
 

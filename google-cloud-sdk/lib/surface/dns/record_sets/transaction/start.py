@@ -14,6 +14,8 @@
 
 """gcloud dns record-sets transaction start command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from apitools.base.py import exceptions as apitools_exceptions
@@ -28,6 +30,7 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.dns import flags
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files
 
 
 class Start(base.Command):
@@ -94,7 +97,7 @@ class Start(base.Command):
 
     # Write change to transaction file
     try:
-      with open(args.transaction_file, 'w') as transaction_file:
+      with files.FileWriter(args.transaction_file) as transaction_file:
         transaction_util.WriteToYamlFile(transaction_file, change)
     except Exception as exp:
       msg = 'unable to write transaction [{0}] because [{1}]'

@@ -13,12 +13,18 @@
 # limitations under the License.
 """Tests for gcloud meta list-from-json."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import io
 import json
 import os
 import sys
 
 from googlecloudsdk.calliope import exceptions
 from tests.lib import cli_test_base
+
+import six
 
 
 RESOURCES = [
@@ -76,8 +82,8 @@ class ListFromJsonTest(cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.json_file = os.path.join(self.temp_path, 'test.json')
-    with open(self.json_file, 'w') as f:
-      json.dump(RESOURCES, f)
+    with io.open(self.json_file, 'w') as f:
+      f.write(six.text_type(json.dumps(RESOURCES)))
 
   def testListFromJson(self):
     self.Run(['meta', 'list-from-json', self.json_file])
@@ -220,7 +226,7 @@ test  frontend
   def testListFromJsonAggregateFormatStdin(self):
     try:
       sys_stdin = sys.stdin
-      sys.stdin = open(self.json_file, 'r')
+      sys.stdin = io.open(self.json_file, 'r')
       self.Run(['meta', 'list-from-json',
                 '--format=table(labels:format="table(env, tier)")'])
     finally:
@@ -243,16 +249,16 @@ test  frontend
   def testListFromJsonFileEmpty(self):
     with self.assertRaisesRegex(
         exceptions.BadFileException,
-        r'Cannot read \[.*]: No JSON object could be decoded'):
+        r'Cannot read \[.*]:'):
       self.Run(['meta', 'list-from-json', os.devnull])
 
   def testListFromJsonStdinEmpty(self):
     try:
       sys_stdin = sys.stdin
-      sys.stdin = open(os.devnull, 'r')
+      sys.stdin = io.open(os.devnull, 'r')
       with self.assertRaisesRegex(
           exceptions.BadFileException,
-          'Cannot read the standard input: No JSON object could be decoded'):
+          'Cannot read the standard input:'):
         self.Run(['meta', 'list-from-json'])
     finally:
       sys.stdin = sys_stdin
@@ -262,8 +268,8 @@ class ListFromJsonTestResourceNotIterable(cli_test_base.CliTestBase):
 
   def SetUp(self):
     self.json_file = os.path.join(self.temp_path, 'test.json')
-    with open(self.json_file, 'w') as f:
-      json.dump(RESOURCES[0], f)
+    with io.open(self.json_file, 'w') as f:
+      f.write(six.text_type(json.dumps(RESOURCES[0])))
 
   def testListFromJsonFilterResourceNotIterable(self):
     self.Run(['meta', 'list-from-json', self.json_file,

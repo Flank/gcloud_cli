@@ -32,19 +32,20 @@ the command will exit with a non\-zero status.
 Operation resource \- The operations to delete. The arguments in this group can
 be used to specify the attributes of this resource. (NOTE) Some attributes are
 not given arguments in this group but can be set in other ways. To set the
-[project] attribute: Set the property [core/project] or provide the flag
-[\-\-project] on the command line. This must be specified.
+[project] attribute: provide the flag [operations] on the command line with a
+fully specified name; provide the flag [\-\-project] on the command line; set
+the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
 \fIOPERATIONS\fR [\fIOPERATIONS\fR ...]
-The ID of the operation or a fully qualified identifier for the operation. This
+IDs of the operations or fully qualified identifiers for the operations. This
 positional must be specified if any of the other arguments in this group are
 specified.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-Compute Engine zone in which to create the operation.
+Compute Engine zone in which to create the operations.
 
 
 .RE

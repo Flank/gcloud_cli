@@ -330,14 +330,6 @@ class HealthChecksCreateHttpBetaTest(HealthChecksCreateHttpTest):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
-
-class HealthChecksCreateHttpAlphaTest(HealthChecksCreateHttpBetaTest,
-                                      parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi(self.track.prefix)
-
   def testResponseOption(self):
     self.Run("""
         compute health-checks create http my-health-check
@@ -363,6 +355,14 @@ class HealthChecksCreateHttpAlphaTest(HealthChecksCreateHttpBetaTest,
                   unhealthyThreshold=2),
               project='my-project'))],
     )
+
+
+class HealthChecksCreateHttpAlphaTest(HealthChecksCreateHttpBetaTest,
+                                      parameterized.TestCase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi(self.track.prefix)
 
   @parameterized.parameters(
       ('USE_FIXED_PORT', '--port 80', 80, None),

@@ -42,7 +42,7 @@ class CategoryManagerVerTest(base.CategoryManagerUnitTestBase):
   def testCategoryManagerAlpha(self):
     """Make sure category-manager is an alpha command."""
     self.ExpectGetTaxonomyStore('1', '0')
-    self.Run('alpha category-manager stores get-iam-policy 1')
+    self.Run('alpha category-manager stores get-iam-policy --organization=1')
     self.AssertErrNotContains('Invalid')
     self.get_iam_policy_mock.assert_called_once()
 

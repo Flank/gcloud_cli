@@ -357,6 +357,5 @@ response:
 ---
 output:
   stderr: |
-    <START PROGRESS TRACKER>Starting instance(s) z1
-    <END PROGRESS TRACKER>SUCCESS
+    {"ux": "PROGRESS_TRACKER", "message": "Starting instance(s) z1", "status": "SUCCESS"}
     Updated [https://www.googleapis.com/compute/beta/projects/fake-project/zones/us-east1-b/instances/z1].

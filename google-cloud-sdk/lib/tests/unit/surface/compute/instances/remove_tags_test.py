@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instances remove-tags subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -27,7 +29,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             tags=messages.Tags(
-                fingerprint='my-fingerprint'))],
+                fingerprint=b'my-fingerprint'))],
         [],
     ])
 
@@ -51,7 +53,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             tags=messages.Tags(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=['foo', 'bar']))],
         [],
     ])
@@ -75,7 +77,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
           messages.ComputeInstancesSetTagsRequest(
               instance='my-instance',
               tags=messages.Tags(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=['bar']),
               project='my-project',
               zone='us-central1-a'))],
@@ -86,7 +88,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             tags=messages.Tags(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=['foo', 'bar']))],
         []
     ])
@@ -110,7 +112,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
           messages.ComputeInstancesSetTagsRequest(
               instance='my-instance',
               tags=messages.Tags(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[]),
               project='my-project',
               zone='us-central1-a'))],
@@ -121,7 +123,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             tags=messages.Tags(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=['foo', 'bar']))],
         []
     ])
@@ -145,7 +147,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
           messages.ComputeInstancesSetTagsRequest(
               instance='my-instance',
               tags=messages.Tags(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[]),
               project='my-project',
               zone='us-central1-a'))],
@@ -156,7 +158,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             tags=messages.Tags(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=[]))],
     ])
 
@@ -180,7 +182,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             tags=messages.Tags(
-                fingerprint='my-fingerprint'))],
+                fingerprint=b'my-fingerprint'))],
         [],
     ])
 
@@ -214,7 +216,7 @@ class InstancesRemoveTagsTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             tags=messages.Tags(
-                fingerprint='my-fingerprint'))],
+                fingerprint=b'my-fingerprint'))],
 
         [],
     ])

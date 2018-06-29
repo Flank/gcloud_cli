@@ -14,6 +14,7 @@
 """Tests for runtime fingerprinting and config generation."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 import os
 import re

@@ -13,10 +13,14 @@
 # limitations under the License.
 """The command group for adding cloud dataproc jobs to workflow template."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 
+from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
+from googlecloudsdk.core import properties
 
 
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
@@ -51,3 +55,12 @@ class AddJob(base.Group):
 
     $ {command} hive --workflow-template my_template --file my_queries.q
   """
+
+  @staticmethod
+  def Args(parser):
+    region_prop = properties.VALUES.dataproc.region
+    parser.add_argument(
+        '--region',
+        help=region_prop.help_text,
+        # Don't set default, because it would override users' property setting.
+        action=actions.StoreProperty(region_prop))

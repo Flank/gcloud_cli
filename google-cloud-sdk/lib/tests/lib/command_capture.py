@@ -233,14 +233,17 @@ class WithCommandCapture(test_case.WithContentAssertions):
   def ClearCommandInput(self):
     """Resets the standard input capture."""
     self._cmd_in.truncate(0)
+    self._cmd_in.seek(0)
 
   def ClearCommandOutput(self):
     """Resets the standard output capture."""
     self._cmd_out.truncate(0)
+    self._cmd_in.seek(0)
 
   def ClearCommandErr(self):
     """Resets the standard error capture."""
     self._cmd_err.truncate(0)
+    self._cmd_in.seek(0)
 
   def AssertCommandOutputContains(
       self, expected, name=COMMAND_OUT, normalize_space=False,

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the history_picker module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 from surface.firebase.test.android import run
 from tests.lib import test_case

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Test of the 'workflow-template add-job sparksql' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from googlecloudsdk import calliope
 
@@ -66,8 +68,10 @@ class WorkflowTemplatesJobSparkSqlUnitTestBeta(
     workflow_template = self.MakeWorkflowTemplate()
     spark_sql_job = self.SPARK_SQL_JOB
     spark_sql_job.scriptVariables = encoding.PyValueToMessage(
-        self.messages.SparkSqlJob.ScriptVariablesValue,
-        {'var': 'value', 'foo': 'bar'})
+        self.messages.SparkSqlJob.ScriptVariablesValue, {
+            'foo': 'bar',
+            'var': 'value'
+        })
     ordered_job = self.MakeOrderedJob(
         sparkSqlJob=spark_sql_job, step_id='002', start_after=['001'])
     self.ExpectUpdateWorkflowTemplatesJobCalls(

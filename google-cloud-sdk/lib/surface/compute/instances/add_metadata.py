@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Command for adding metadata."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.compute import base_classes
@@ -45,6 +47,14 @@ class InstancesAddMetadata(base.UpdateCommand):
   querying custom instance or project metadata through the Cloud Platform
   Console or the API, see
   [](https://cloud.google.com/compute/docs/storing-retrieving-metadata#querying_custom_metadata)
+
+
+  If you are using this command to manage SSH keys for your project, please note
+  the
+  [risks](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys#risks)
+  of manual SSH key management as well as the required format for SSH key
+  metadata, available at
+  [](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys)
   """
   # pylint: enable=line-too-long
 

@@ -14,6 +14,8 @@
 
 """Test of the 'jobs' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 
 from apitools.base.py import encoding
@@ -21,6 +23,7 @@ from apitools.base.py import encoding
 from googlecloudsdk.api_lib.dataproc import storage_helpers
 from googlecloudsdk.api_lib.dataproc import util
 from tests.lib.surface.dataproc import unit_base
+import six
 
 
 class _FakeJobStream(object):
@@ -296,17 +299,17 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
 
   def ConvertLabels(self, labels):
     # Convert labels from Python dict to client library dict
-    return self.messages.Job.LabelsValue(
-        additionalProperties=[
-            self.messages.Job.LabelsValue.AdditionalProperty(
-                key=key, value=value)
-            for key, value in sorted(labels.iteritems())])
+    return self.messages.Job.LabelsValue(additionalProperties=[
+        self.messages.Job.LabelsValue.AdditionalProperty(key=key, value=value)
+        for key, value in sorted(six.iteritems(labels))
+    ])
 
   def ConvertOrderedJobLabels(self, labels):
     # Convert labels from Python dict to client library dict
     return self.messages.OrderedJob.LabelsValue(additionalProperties=[
         self.messages.OrderedJob.LabelsValue.AdditionalProperty(
-            key=key, value=value) for key, value in sorted(labels.iteritems())
+            key=key, value=value)
+        for key, value in sorted(six.iteritems(labels))
     ])
 
   def MakeOrderedJob(self, **kwargs):

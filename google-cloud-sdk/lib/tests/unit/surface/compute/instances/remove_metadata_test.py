@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instances remove-metadata subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -45,7 +47,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             metadata=messages.Metadata(
-                fingerprint='my-fingerprint'))],
+                fingerprint=b'my-fingerprint'))],
 
         [],
     ])
@@ -69,7 +71,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             metadata=messages.Metadata(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=[
                     messages.Metadata.ItemsValueListEntry(
                         key='a',
@@ -103,7 +105,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
           messages.ComputeInstancesSetMetadataRequest(
               instance='my-instance',
               metadata=messages.Metadata(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[
                       messages.Metadata.ItemsValueListEntry(
                           key='a',
@@ -118,7 +120,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             metadata=messages.Metadata(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=[
                     messages.Metadata.ItemsValueListEntry(
                         key='a',
@@ -152,7 +154,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
           messages.ComputeInstancesSetMetadataRequest(
               instance='my-instance',
               metadata=messages.Metadata(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[]),
               project='my-project',
               zone='us-central1-a'))],
@@ -163,7 +165,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             metadata=messages.Metadata(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=[
                     messages.Metadata.ItemsValueListEntry(
                         key='a',
@@ -198,7 +200,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
           messages.ComputeInstancesSetMetadataRequest(
               instance='my-instance',
               metadata=messages.Metadata(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[
                       messages.Metadata.ItemsValueListEntry(
                           key='a',
@@ -223,7 +225,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             metadata=messages.Metadata(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=[
                     messages.Metadata.ItemsValueListEntry(
                         key='a',
@@ -264,7 +266,7 @@ class InstancesRemoveMetadataTest(test_base.BaseTest):
           messages.ComputeInstancesSetMetadataRequest(
               instance='my-instance',
               metadata=messages.Metadata(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[
                       messages.Metadata.ItemsValueListEntry(
                           key='a',

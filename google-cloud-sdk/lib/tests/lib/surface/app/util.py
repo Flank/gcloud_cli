@@ -14,6 +14,8 @@
 
 """Module that just holds some test yaml data."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import cgi
 import json
 import os
@@ -50,7 +52,7 @@ class WithFakeRPC(sdk_test_base.SdkBase):
       self.rpcserver = appengine_rpc_test_util.TestRpcServer(
           server, lambda: ('testuser', 'testpass'),
           util.GetUserAgent(), util.GetSourceName())
-    except Exception, e:
+    except Exception as e:
       traceback.print_exc()
       raise e
     self.rpcserver.set_strict(strict=self.strict)
@@ -346,8 +348,7 @@ handlers:
   def WriteFile(self, file_name, data, directory=None):
     file_path = self.FullPath(file_name, directory=directory)
     files.MakeDir(os.path.dirname(file_path))
-    with open(file_path, 'w') as fp:
-      fp.write(data)
+    files.WriteFileContents(file_path, data)
     return file_path
 
   def WriteJSON(self, file_name, json_object):

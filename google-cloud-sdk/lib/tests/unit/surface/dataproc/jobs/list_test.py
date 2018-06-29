@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Test of the 'jobs list' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
 from surface.dataproc.jobs import list as jobs_list
@@ -140,7 +142,7 @@ class JobsListUnitTest(jobs_unit_base.JobsUnitTestBase):
     self.ExpectListJobs(exception=self.MakeHttpError(403))
     with self.AssertRaisesHttpErrorMatchesAsHttpException(
         'Permission denied API reason: Permission denied.'):
-      self.RunDataproc('jobs list').next()
+      next(self.RunDataproc('jobs list'))
 
   def testTypedJob(self):
     typed_job = jobs_list.TypedJob(self.MakeJob(pysparkJob=self.PYSPARK_JOB))

@@ -14,6 +14,9 @@
 
 """Tests of the 'gcloud meta apis methods describe' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis

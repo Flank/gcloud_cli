@@ -2,19 +2,11 @@ NAME
     gcloud beta kms keys - create and manage keys
 
 SYNOPSIS
-    gcloud beta kms keys GROUP | COMMAND [--keyring=KEYRING]
-        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta kms keys GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) A key represents a logical key that can be used for cryptographic
     operations.
-
-FLAGS
-     --keyring=KEYRING
-        The containing keyring.
-
-     --location=LOCATION
-        The location of the requested resource.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

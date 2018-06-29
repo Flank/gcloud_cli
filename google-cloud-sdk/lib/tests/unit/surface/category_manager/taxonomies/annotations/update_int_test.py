@@ -14,7 +14,6 @@
 """Tests for 'gcloud category-manager taxonomies annotations update'."""
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import sdk_test_base
@@ -42,20 +41,9 @@ class AnnotationsUpdateIntTest(base.CategoryManagerUnitTestBase):
 
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def _ExpectUpdateProjectAnnotation(self, project_annotation,
-                                     expected_annotation):
-    """Mocks backend call that updates an annotation's description."""
-
-    # Make expected value copy to ensure that field mutations don't occur.
-    created_annotation = copy.deepcopy(expected_annotation)
-    self.mock_client.projects_taxonomies_annotations.Patch.Expect(
-        self.messages.CategorymanagerProjectsTaxonomiesAnnotationsPatchRequest(
-            name=project_annotation.RelativeName(),
-            annotation=expected_annotation), created_annotation)
-
   def testUpdateProjectAnnotationDescription(self):
-    self._ExpectUpdateProjectAnnotation(self.project_annotation,
-                                        self.expected_project_annotation)
+    self.ExpectProjectAnnotationUpdate(self.project_annotation,
+                                       self.expected_project_annotation)
     args = ('{annotation_id} --taxonomy {taxonomy_id} '
             '--description "{description}"').format(
                 annotation_id=self.annotation_id,

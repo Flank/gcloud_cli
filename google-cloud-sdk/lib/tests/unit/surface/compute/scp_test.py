@@ -14,6 +14,8 @@
 
 """Tests for `gcloud beta compute scp`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import ssh_utils
 from googlecloudsdk.command_lib.util.ssh import ssh
@@ -156,7 +158,7 @@ class ScpTest(test_base.BaseSSHTest):
 
   def testDryRun(self):
     scp_build = self.StartObjectPatch(
-        ssh.SCPCommand, 'Build', autospec=True, return_value=['scp', 'cmd'])
+        ssh.SCPCommand, 'Build', return_value=['scp', 'cmd'])
     self.make_requests.side_effect = iter([
         [self.instance],
         [self.project_resource],
@@ -200,8 +202,7 @@ class ScpTest(test_base.BaseSSHTest):
         compress=False,
         options=dict(self.options, HostKeyAlias='compute.11111'))
 
-    scp_build.assert_called_once_with(
-        mock_matchers.TypeMatcher(ssh.SCPCommand), self.env)
+    scp_build.assert_called_once_with(self.env)
 
     self.scp_run.assert_not_called()
 

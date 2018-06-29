@@ -11,13 +11,38 @@ gcloud container clusters delete \- delete an existing cluster for running conta
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters delete\fR \fINAME\fR [\fINAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters delete\fR \fINAME\fR [\fINAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-Delete an existing cluster for running containers.
+When you delete a cluster, the following resources are deleted:
+
+.RS 2m
+.IP "\(bu" 2m
+The master resources
+.IP "\(bu" 2m
+All of the node instances in the cluster
+.IP "\(bu" 2m
+Any Pods that are running on those instances
+.IP "\(bu" 2m
+Any firewalls and routes created by Kubernetes Engine at the time of cluster
+creation
+.IP "\(bu" 2m
+Data stored in host hostPath and emptyDir volumes
+.RE
+.sp
+
+The following resources are not deleted:
+
+.RS 2m
+.IP "\(bu" 2m
+External load balancers created by the cluster
+.IP "\(bu" 2m
+Persistent disk volumes
+.RE
+.sp
 
 
 
@@ -40,11 +65,21 @@ The names of the clusters to delete.
 Don't wait for the operation to complete.
 
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The compute region (e.g. us\-central1) for the cluster.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
 The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
 
+.RE
 .RE
 .sp
 

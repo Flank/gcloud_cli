@@ -44,7 +44,6 @@ from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import files as file_utils
 from googlecloudsdk.core.util import retry
 import tests
-from tests.lib import command_capture
 from tests.lib import exec_utils
 from tests.lib import test_case
 
@@ -414,15 +413,6 @@ class WithOutputCapture(SdkBase, test_case.WithOutputCapture):
     log.SetUserOutputEnabled(True)
     # Disable console_io.PromptContinue long line folding.
     self.StartObjectPatch(console_io, '_DoWrap', lambda x: x)
-
-
-class WithCommandCapture(command_capture.WithCommandCapture):
-  """A module for capturing command I/O.
-
-  Attributes:
-    orig_popen: Constructor, the original `subprocess.Popen`, can be used by
-      tests.
-  """
 
 
 class WithLogCapture(WithOutputCapture):

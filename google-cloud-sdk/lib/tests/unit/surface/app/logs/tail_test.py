@@ -13,6 +13,7 @@
 # limitations under the License.
 """app logs tail tests."""
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 from dateutil import tz
 
@@ -108,11 +109,11 @@ class StreamLogsTest(logs_base.LogsTestBase):
         entries=[FLEX_LOG])
     self.v2_client.entries.List.Expect(
         self._CreateRequest(log_filter=self.log_filter, page_size=1000,
-                            order_by=u'timestamp asc'),
+                            order_by='timestamp asc'),
         response_entries)
     self.v2_client.entries.List.Expect(
         self._CreateRequest(log_filter=self.log_filter, page_size=1000,
-                            order_by=u'timestamp asc'),
+                            order_by='timestamp asc'),
         self.empty_response)
     self.Run('app logs tail')
     self.AssertErrContains('Waiting for new log entries')
@@ -124,11 +125,11 @@ class StreamLogsTest(logs_base.LogsTestBase):
         entries=[STANDARD_LOG])
     self.v2_client.entries.List.Expect(
         self._CreateRequest(log_filter=self.log_filter, page_size=1000,
-                            order_by=u'timestamp asc'),
+                            order_by='timestamp asc'),
         response_entries)
     self.v2_client.entries.List.Expect(
         self._CreateRequest(log_filter=self.log_filter, page_size=1000,
-                            order_by=u'timestamp asc'),
+                            order_by='timestamp asc'),
         self.empty_response)
     self.Run('app logs tail')
     self.AssertErrContains('Waiting for new log entries')

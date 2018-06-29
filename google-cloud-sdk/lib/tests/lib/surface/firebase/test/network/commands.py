@@ -13,6 +13,8 @@
 # limitations under the License.
 """Command strings for 'gcloud firebase test network-profiles' tests."""
 
+from __future__ import unicode_literals
+
 NETWORK_PREFIX = 'firebase test network-profiles '
 NETWORK_PROFILES_LIST = NETWORK_PREFIX + 'list '
 NETWORK_PROFILES_DESCRIBE = NETWORK_PREFIX + 'describe '

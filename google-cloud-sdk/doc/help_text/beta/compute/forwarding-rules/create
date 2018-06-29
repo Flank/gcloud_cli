@@ -13,7 +13,8 @@ SYNOPSIS
           | --target-vpn-gateway=TARGET_VPN_GATEWAY)
         [--description=DESCRIPTION] [--ip-protocol=IP_PROTOCOL]
         [--load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"]
-        [--network=NETWORK] [--network-tier=NETWORK_TIER] [--subnet=SUBNET]
+        [--network=NETWORK] [--network-tier=NETWORK_TIER]
+        [--service-label=SERVICE_LABEL] [--subnet=SUBNET]
         [--subnet-region=SUBNET_REGION]
         [--target-instance-zone=TARGET_INSTANCE_ZONE]
         [--target-pool-region=TARGET_POOL_REGION]
@@ -151,6 +152,14 @@ OPTIONAL FLAGS
      --network-tier=NETWORK_TIER
         The network tier to assign to the forwarding rules. NETWORK_TIER must
         be one of: PREMIUM, STANDARD. The default value is PREMIUM.
+
+     --service-label=SERVICE_LABEL
+        (Only for Internal Load Balancing):
+        https://cloud.google.com/compute/docs/load-balancing/internal/ The DNS
+        label to use as the prefix of the fully qualified domain name for this
+        forwarding rule. The full name will be internally generated and output
+        as dnsName. If this field is not specified, no DNS record will be
+        generated and no DNS name will be output.
 
      --subnet=SUBNET
         (Only for --load-balancing-scheme=INTERNAL) The subnetwork that this

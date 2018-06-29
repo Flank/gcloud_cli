@@ -14,6 +14,8 @@
 
 """Tests for the 'gcloud dns record-sets import' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import io
 import textwrap
 
@@ -115,15 +117,15 @@ class RecordSetsImportTest(base.DnsMockTest):
   def testComputeChangeSOASerialIncrementing(self):
     change = import_util.ComputeChange(util.GetSOASequence()[0],
                                        util.GetImportableRecord())
-    self.assertEqual(util.GetSOASequence()[0].values(), change.deletions)
-    self.assertEqual(util.GetImportableRecord().values() +
-                     util.GetSOASequence()[1].values(),
+    self.assertEqual(list(util.GetSOASequence()[0].values()), change.deletions)
+    self.assertEqual(list(util.GetImportableRecord().values()) +
+                     list(util.GetSOASequence()[1].values()),
                      change.additions)
     change = import_util.ComputeChange(util.GetSOASequence()[1],
                                        util.GetImportableRecord())
-    self.assertEqual(util.GetSOASequence()[1].values(), change.deletions)
-    self.assertEqual(util.GetImportableRecord().values() +
-                     util.GetSOASequence()[2].values(),
+    self.assertEqual(list(util.GetSOASequence()[1].values()), change.deletions)
+    self.assertEqual(list(util.GetImportableRecord().values()) +
+                     list(util.GetSOASequence()[2].values()),
                      change.additions)
 
   def _ImportFromFileHelper(self, file_path, flags=None):
@@ -317,20 +319,23 @@ class RecordSetsImportBetaTest(base.DnsMockBetaTest):
     self.assertEqual(None, change)
 
   def testComputeChangeSOASerialIncrementing(self):
-    change = import_util.ComputeChange(util_beta.GetSOASequence()[0],
-                                       util_beta.GetImportableRecord(),
-                                       api_version=self.api_version)
-    self.assertEqual(util_beta.GetSOASequence()[0].values(), change.deletions)
-    self.assertEqual(util_beta.GetImportableRecord().values() +
-                     util_beta.GetSOASequence()[1].values(),
-                     change.additions)
+    change = import_util.ComputeChange(
+        util_beta.GetSOASequence()[0],
+        util_beta.GetImportableRecord(),
+        api_version=self.api_version)
+    self.assertEqual(
+        list(util_beta.GetSOASequence()[0].values()), change.deletions)
+    self.assertEqual(
+        list(util_beta.GetImportableRecord().values()) + list(
+            util_beta.GetSOASequence()[1].values()), change.additions)
     change = import_util.ComputeChange(util_beta.GetSOASequence()[1],
                                        util_beta.GetImportableRecord(),
                                        api_version=self.api_version)
-    self.assertEqual(util_beta.GetSOASequence()[1].values(), change.deletions)
-    self.assertEqual(util_beta.GetImportableRecord().values() +
-                     util_beta.GetSOASequence()[2].values(),
-                     change.additions)
+    self.assertEqual(
+        list(util_beta.GetSOASequence()[1].values()), change.deletions)
+    self.assertEqual(
+        list(util_beta.GetImportableRecord().values()) + list(
+            util_beta.GetSOASequence()[2].values()), change.additions)
 
   def _ImportFromFileHelper(self, file_path, flags=None):
     test_zone = util_beta.GetManagedZones()[0]

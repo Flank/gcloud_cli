@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise user password changes."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import getpass
 
 from googlecloudsdk.api_lib.util import apis

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Creates an SSL certificate for a Cloud SQL instance."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.api_lib.sql import exceptions
@@ -39,7 +41,7 @@ class _BaseAddCert(object):
         help=('Location of file which the private key of the created ssl-cert'
               ' will be written to.'))
     flags.AddInstance(parser)
-    parser.display_info.AddFormat(flags.SSL_CERTS_FORMAT)
+    parser.display_info.AddFormat(flags.CLIENT_CERTS_FORMAT)
 
   def Run(self, args):
     """Creates an SSL certificate for a Cloud SQL instance.
@@ -62,8 +64,7 @@ class _BaseAddCert(object):
     # First check if args.out_file is writeable. If not, abort and don't create
     # the useless cert.
     try:
-      with files.OpenForWritingPrivate(args.cert_file) as cf:
-        cf.write('placeholder\n')
+      files.WriteFileContents(args.cert_file, 'placeholder\n', private=True)
     except (files.Error, OSError) as e:
       raise exceptions.ArgumentError('unable to write [{path}]: {error}'.format(
           path=args.cert_file, error=str(e)))
@@ -89,10 +90,7 @@ class _BaseAddCert(object):
                 commonName=args.common_name)))
 
     private_key = result.clientCert.certPrivateKey
-
-    with files.OpenForWritingPrivate(args.cert_file) as cf:
-      cf.write(private_key)
-      cf.write('\n')
+    files.WriteFileContents(args.cert_file, private_key + '\n', private=True)
 
     cert_ref = client.resource_parser.Create(
         collection='sql.sslCerts',

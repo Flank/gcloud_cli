@@ -15,6 +15,7 @@
 """Utility methods used by the deploy command."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import json
 import os
 import re
@@ -346,7 +347,7 @@ def _GetYamlPath(source_dir, service_path, skip_files, gen_files):
     rel_path = os.path.relpath(service_path, start=source_dir)
     if not util.ShouldSkip(skip_files, rel_path):
       return rel_path
-  yaml_contents = files.GetFileContents(service_path)
+  yaml_contents = files.ReadFileContents(service_path)
   # Use a checksum to ensure file uniqueness, not for security reasons.
   checksum = files.Checksum().AddContents(yaml_contents).HexDigest()
   generated_path = '_app_{}.yaml'.format(checksum)

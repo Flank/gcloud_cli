@@ -15,7 +15,6 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 from __future__ import unicode_literals
 from googlecloudsdk.api_lib.category_manager import taxonomies
 from googlecloudsdk.calliope import base
@@ -33,7 +32,7 @@ class Update(base.Command):
         [flags.CreateTaxonomyResourceArg(positional=True)]
     ).AddToParser(parser)
     update_group = parser.add_group(required=True)
-    flags.AddDescriptionFlag(update_group, required=False)
+    flags.AddDescriptionFlag(update_group, 'taxonomy', required=False)
 
   def Run(self, args):
     """This is what gets called when the user runs this command.

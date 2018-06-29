@@ -13,6 +13,11 @@
 # limitations under the License.
 """Tests for help_util."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import io
 import os
 import shutil
 
@@ -21,6 +26,7 @@ from googlecloudsdk.command_lib.meta import help_util
 from googlecloudsdk.core.util import files as file_utils
 from tests.lib import calliope_test_base
 from tests.lib import parameterized
+from six.moves import range
 
 
 class HelpTextUtilTest(calliope_test_base.CalliopeTestBase,
@@ -31,7 +37,7 @@ class HelpTextUtilTest(calliope_test_base.CalliopeTestBase,
     dir_1 = os.path.join(self.temp_path, 'help_1')
     walker_util.HelpTextGenerator(cli_1, dir_1).Walk(hidden=True)
     owners_1 = os.path.join(dir_1, 'OWNERS')
-    with open(owners_1, 'w'):
+    with io.open(owners_1, 'wt'):
       pass
 
     cli_2 = self.LoadTestCli(name_2)
@@ -89,7 +95,7 @@ class HelpTextUtilTest(calliope_test_base.CalliopeTestBase,
 
     diff = Accumulator()
     self.DiffCliHelpText('sdk1', 'sdk2', diff)
-    print '\n'.join(sorted(diff.GetChanges()))
+    print('\n'.join(sorted(diff.GetChanges())))
     expected = """\
 add arg-groups
 add bool-mutex
@@ -303,11 +309,11 @@ class HelpTextUpdaterTest(calliope_test_base.CalliopeTestBase):
     file_utils.MakeDir(self.help_dir)
     subdir = os.path.join(self.help_dir, 'sdk')
     file_utils.MakeDir(subdir)
-    with open(os.path.join(subdir, 'second-level-command-1'), 'w') as f:
+    with io.open(os.path.join(subdir, 'second-level-command-1'), 'wt') as f:
       f.write('This is old content that should be edited.\n')
     subdir = os.path.join(subdir, 'subgroup')
     file_utils.MakeDir(subdir)
-    with open(os.path.join(subdir, 'second-level-command-0'), 'w') as f:
+    with io.open(os.path.join(subdir, 'second-level-command-0'), 'wt') as f:
       f.write('This is old content that should be deleted.\n')
 
   def testUpdateHelpTextNotAbsolute(self):
@@ -328,10 +334,8 @@ class HelpTextUpdaterTest(calliope_test_base.CalliopeTestBase):
 
     changes = help_util.HelpTextUpdater(self.cli, self.help_dir).Update()
     expected = """\
-<START PROGRESS TRACKER>Loading CLI Tree
-<END PROGRESS TRACKER>SUCCESS
-<START PROGRESS BAR>Generating Help Docs
-<END PROGRESS BAR>
+{"ux": "PROGRESS_TRACKER", "message": "Loading CLI Tree", "status": "SUCCESS"}
+{"ux": "PROGRESS_BAR", "message": "Generating Help Docs"}
 add GROUP
 add alpha/GROUP
 add alpha/internal/GROUP
@@ -394,10 +398,8 @@ edit sdk/second-level-command-1
     changes = help_util.HelpTextUpdater(self.cli, self.help_dir).Update()
     self.assertEqual(0, changes)
     self.AssertErrEquals("""\
-<START PROGRESS TRACKER>Loading CLI Tree
-<END PROGRESS TRACKER>SUCCESS
-<START PROGRESS BAR>Generating Help Docs
-<END PROGRESS BAR>
+{"ux": "PROGRESS_TRACKER", "message": "Loading CLI Tree", "status": "SUCCESS"}
+{"ux": "PROGRESS_BAR", "message": "Generating Help Docs"}
 """)
 
   def testUpdateHelpTextTest(self):
@@ -405,10 +407,8 @@ edit sdk/second-level-command-1
     changes = help_util.HelpTextUpdater(
         self.cli, self.help_dir, test=True).Update()
     expected = """\
-<START PROGRESS TRACKER>Loading CLI Tree
-<END PROGRESS TRACKER>SUCCESS
-<START PROGRESS BAR>Generating Help Docs
-<END PROGRESS BAR>
+{"ux": "PROGRESS_TRACKER", "message": "Loading CLI Tree", "status": "SUCCESS"}
+{"ux": "PROGRESS_BAR", "message": "Generating Help Docs"}
 add GROUP
 add alpha/GROUP
 add alpha/internal/GROUP

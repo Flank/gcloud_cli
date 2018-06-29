@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 import re
 
 from googlecloudsdk.api_lib.util import resource as resource_util
@@ -27,6 +28,8 @@ from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.calliope.concepts import concepts_test_base
 from tests.lib.calliope.concepts import util
+
+import six
 
 
 class ConceptsTest(concepts_test_base.ConceptsTestBase,
@@ -48,13 +51,13 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
                                          help_text=None,
                                          required=True),
                       concepts.Attribute(name='name',
-                                         help_text=concepts.ANCHOR_HELP,
+                                         help_text=None,
                                          required=True)],
                      resource_spec.attributes)
     self.assertEqual(
         concepts.Attribute(
             name='name',
-            help_text=concepts.ANCHOR_HELP,
+            help_text=None,
             required=True),
         resource_spec.anchor)
     # Check that the param names for each attribute are stored correctly.
@@ -99,6 +102,24 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
           api_version='v1',
           junk=concepts.ResourceParameterAttributeConfig())
 
+  def testResourceParameterAttributeConfigDefaultValueType(self):
+    """Tests ResourceParameterAttributeConfig default value_type."""
+    config = concepts.ResourceParameterAttributeConfig(
+        name='number',
+        help_text='The number.',
+    )
+    self.assertEqual(six.text_type, config.value_type)
+
+  def testResourceParameterAttributeConfigExplicitValueType(self):
+    """Tests ResourceParameterAttributeConfig handles value_type=..."""
+    value_type = int
+    config = concepts.ResourceParameterAttributeConfig(
+        name='number',
+        help_text='The number.',
+        value_type=value_type,
+    )
+    self.assertEqual(value_type, config.value_type)
+
   def testCreateResourceSpecWithAttributeConfigs(self):
     """Tests using ResourceParameterAttributeConfig to configure resources.
     """
@@ -121,7 +142,7 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
                                required=True,
                                completer=util.MockShelfCompleter),
             concepts.Attribute(name='book',
-                               help_text=concepts.ANCHOR_HELP,
+                               help_text='The book of the {resource}.',
                                required=True,
                                completer=util.MockBookCompleter)],
         resource_spec.attributes)
@@ -153,7 +174,7 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
                                           ' hold books.'),
                                required=True),
             concepts.Attribute(name='book',
-                               help_text=concepts.ANCHOR_HELP,
+                               help_text='The book of the {resource}.',
                                required=True,
                                completion_id_field='id',
                                completion_request_params={'fieldMask': 'id'})],
@@ -260,6 +281,7 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
          'shelf': [deps.ArgFallthrough('--book-shelf', 'exampleshelf')],
          'project': [
              deps.ArgFallthrough('--book-project', None),
+             deps.ArgFallthrough('--project'),
              deps.PropertyFallthrough(properties.VALUES.core.project)]},
         parsed_args=self._GetMockNamespace(
             book='example',
@@ -274,9 +296,9 @@ class ConceptsTest(concepts_test_base.ConceptsTestBase,
         'The [book] resource is not properly specified.\n'
         'Failed to find attribute [project]. The attribute can be set in the '
         'following ways: \n'
-        '- Provide the flag [--book-project] on the command line\n'
-        '- Set the property [core/project] or provide the flag [--project] on '
-        'the command line')
+        '- provide the flag [--book-project] on the command line\n'
+        '- provide the flag [--project] on the command line\n'
+        '- set the property [core/project]')
     with self.assertRaisesRegex(concepts.InitializationError, msg):
       resource_spec.Initialize(deps_object)
 

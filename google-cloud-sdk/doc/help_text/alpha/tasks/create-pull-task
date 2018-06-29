@@ -2,7 +2,7 @@ NAME
     gcloud alpha tasks create-pull-task - create and add a task to a pull queue
 
 SYNOPSIS
-    gcloud alpha tasks create-pull-task [--id=TASK_ID] [--queue=QUEUE]
+    gcloud alpha tasks create-pull-task (--id=TASK_ID --queue=QUEUE)
         [--schedule-time=SCHEDULE_TIME] [--tag=TAG]
         [--payload-content=PAYLOAD_CONTENT | --payload-file=PAYLOAD_FILE]
         [GCLOUD_WIDE_FLAG ...]
@@ -10,23 +10,26 @@ SYNOPSIS
 DESCRIPTION
     (ALPHA) Create and add a task to a pull queue.
 
-FLAGS
-     --id=TASK_ID
-        The ID of the task to create.
+REQUIRED FLAGS
+     At least one of these must be specified:
 
-        If not specified then the system will generate a random unique task ID.
-        Explicitly specifying a task ID enables task de-duplication. If a
-        task's ID is identical to that of an existing task or a task that was
-        deleted or completed recently then the call will fail.
+       --id=TASK_ID
+          The ID of the task to create.
 
-        Because there is an extra lookup cost to identify duplicate task names,
-        tasks created with IDs have significantly increased latency. Using
-        hashed strings for the task ID or for the prefix of the task ID is
-        recommended.
+          If not specified then the system will generate a random unique task
+          ID. Explicitly specifying a task ID enables task de-duplication. If a
+          task's ID is identical to that of an existing task or a task that was
+          deleted or completed recently then the call will fail.
 
-     --queue=QUEUE
-        The queue the task belongs to.
+          Because there is an extra lookup cost to identify duplicate task
+          names, tasks created with IDs have significantly increased latency.
+          Using hashed strings for the task ID or for the prefix of the task ID
+          is recommended.
 
+       --queue=QUEUE
+          The queue the task belongs to.
+
+OPTIONAL FLAGS
      --schedule-time=SCHEDULE_TIME
         The time when the task is scheduled to be first attempted. Defaults to
         "now" if not specified.

@@ -189,6 +189,112 @@ class ProjectInfoAddMetadataTest(test_base.BaseTest):
               project='my-project'))],
     )
 
+  def testAddMetadataSshKeys_InvalidPublicKey(self):
+    self.make_requests.side_effect = iter([
+        [messages.Project(name='my-project')],
+        [],
+    ])
+
+    self.Run("""
+        compute project-info add-metadata
+          --metadata="ssh-keys=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test,sshKeys=ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA test"
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.projects, 'Get',
+          messages.ComputeProjectsGetRequest(project='my-project'))],
+        [(self.compute_v1.projects, 'SetCommonInstanceMetadata',
+          messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=messages.Metadata(items=[
+                  messages.Metadata.ItemsValueListEntry(
+                      key='ssh-keys',
+                      value=
+                      'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test'
+                  ),
+                  messages.Metadata.ItemsValueListEntry(
+                      key='sshKeys',
+                      value=
+                      'ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA test'),
+              ]),
+              project='my-project'))],
+    )
+
+    self.AssertErrEquals(
+        'WARNING: '
+        'The following key(s) are missing the <username> at the front\n'
+        'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test\n'
+        'ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA test\n\n'
+        'Format ssh keys following '
+        'https://cloud.google.com/compute/docs/'
+        'instances/adding-removing-ssh-keys\n')
+
+  def testAddMetadataSshKeys_PrivateKey(self):
+    self.make_requests.side_effect = iter([
+        [messages.Project(name='my-project')],
+        [],
+    ])
+
+    self.Run("""
+        compute project-info add-metadata
+          --metadata="ssh-keys=-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAsujygRP8ZH/iHVz0iXSqoProNu0m8aF7ZfogLiToZsvR5MaU\n-----END RSA PRIVATE KEY-----"
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.projects, 'Get',
+          messages.ComputeProjectsGetRequest(project='my-project'))],
+        [(self.compute_v1.projects, 'SetCommonInstanceMetadata',
+          messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=messages.Metadata(items=[
+                  messages.Metadata.ItemsValueListEntry(
+                      key='ssh-keys',
+                      value='-----BEGIN RSA PRIVATE KEY-----\n'
+                      'MIIEpAIBAAKCAQEAsujygRP8ZH/iHVz0'
+                      'iXSqoProNu0m8aF7ZfogLiToZsvR5MaU\n'
+                      '-----END RSA PRIVATE KEY-----'),
+              ]),
+              project='my-project'))],
+    )
+
+    self.AssertErrEquals(
+        'WARNING: '
+        'Private key(s) are detected. Note that only public keys '
+        'should be added.\n')
+
+  def testAddMetadataSshKeys_CorrectKey(self):
+    self.make_requests.side_effect = iter([
+        [messages.Project(name='my-project')],
+        [],
+    ])
+
+    self.Run("""
+        compute project-info add-metadata
+          --metadata="ssh-keys=test:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test,sshKeys=test:ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA test"
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.projects, 'Get',
+          messages.ComputeProjectsGetRequest(project='my-project'))],
+        [(self.compute_v1.projects, 'SetCommonInstanceMetadata',
+          messages.ComputeProjectsSetCommonInstanceMetadataRequest(
+              metadata=messages.Metadata(items=[
+                  messages.Metadata.ItemsValueListEntry(
+                      key='ssh-keys',
+                      value=
+                      'test:ssh-rsa '
+                      'AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test'
+                  ),
+                  messages.Metadata.ItemsValueListEntry(
+                      key='sshKeys',
+                      value=
+                      'test:ecdsa-sha2-nistp256 '
+                      'AAAAE2VjZHNhLXNoYTItbmlzdHA test'
+                  ),
+              ]),
+              project='my-project'))],
+    )
+
+    self.AssertErrNotContains('WARNING')
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -13,6 +13,7 @@
 # limitations under the License.
 """Base classes for all gcloud dlp tests."""
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.util.apis import arg_utils
@@ -20,6 +21,7 @@ from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
+from six.moves import range
 
 
 class DlpUnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
@@ -59,10 +61,11 @@ Kate Jones,Katherine k. Jones
     self.StartPatch('time.sleep')
 
   def _GetInspectConfig(self, info_types, min_likelihood, limit,
-                        include_quote=False, exclude_info_types=False):
+                        include_quote=False, exclude_info_types=False,
+                        item_limit=None):
     """Make test text DlpV2InspectConfig for text inspect request."""
     limits = self.msg.GooglePrivacyDlpV2FindingLimits(
-        maxFindingsPerRequest=limit or 1000)
+        maxFindingsPerRequest=limit or 1000, maxFindingsPerItem=item_limit)
     return self.msg.GooglePrivacyDlpV2InspectConfig(
         excludeInfoTypes=exclude_info_types or False,
         includeQuote=include_quote or False,
@@ -73,6 +76,46 @@ Kate Jones,Katherine k. Jones
         minLikelihood=arg_utils.ChoiceToEnum(
             min_likelihood, self.msg.GooglePrivacyDlpV2InspectConfig.
             MinLikelihoodValueValuesEnum))
+
+  def MakeAnalysisConfig(self, dataset, table, project, cat_stat_field=None,
+                         num_stat_field=None, quasi_ids=None,
+                         sensitive_field=None, output_topics=None,
+                         output_tables=None):
+    """Build Dlp risk analysis job config."""
+    if output_topics:
+      actions = self._MakeTopicJobTriggerActions(output_topics)
+    else:
+      actions = self._MakeTableJobTriggerActions(output_tables)
+
+    privacy_metric = self.msg.GooglePrivacyDlpV2PrivacyMetric()
+
+    if cat_stat_field:
+      field = self.msg.GooglePrivacyDlpV2FieldId(name=cat_stat_field)
+      cat_stat_config = self.msg.GooglePrivacyDlpV2CategoricalStatsConfig(
+          field=field)
+      privacy_metric.categoricalStatsConfig = cat_stat_config
+    elif num_stat_field:
+      field = self.msg.GooglePrivacyDlpV2FieldId(name=num_stat_field)
+      num_stat_config = self.msg.GooglePrivacyDlpV2NumericalStatsConfig(
+          field=field)
+      privacy_metric.numericalStatsConfig = num_stat_config
+    elif quasi_ids:
+      privacy_metric.lDiversityConfig = (
+          self.msg.GooglePrivacyDlpV2LDiversityConfig())
+      qids = [self.msg.GooglePrivacyDlpV2FieldId(name=qid) for qid in quasi_ids]
+      privacy_metric.lDiversityConfig.quasiIds = qids
+      if sensitive_field:
+        privacy_metric.lDiversityConfig.sensitiveAttribute = (
+            self.msg.GooglePrivacyDlpV2FieldId(name=sensitive_field))
+
+    big_query_table = self.msg.GooglePrivacyDlpV2BigQueryTable(
+        datasetId=dataset,
+        projectId=project,
+        tableId=table)
+
+    return self.msg.GooglePrivacyDlpV2RiskAnalysisJobConfig(
+        actions=actions, privacyMetric=privacy_metric,
+        sourceTable=big_query_table)
 
   def MakeTextInspectRequest(self, content, info_types, min_likelihood, limit,
                              include_quote=False, exclude_info_types=False):
@@ -338,18 +381,17 @@ Kate Jones,Katherine k. Jones
           self.msg.GooglePrivacyDlpV2Action(saveFindings=save_findings))
     return storage_actions or None
 
-  def _GetTriggerInput(self, input_params, input_type):
-    """Builds a GooglePrivacyDlpV2StorageConfig job trigger input.
+  def _GetJobInputConfig(self, input_params, input_type):
+    """Builds a GooglePrivacyDlpV2StorageConfig job input.
 
     Args:
      input_params: dict, dictionary of storage configuration options for
         provided input_type.
-     input_type: str, type of job trigger intput to create: gcs, datastore
+     input_type: str, type of job input to create: gcs, datastore
        or table.
 
     Returns:
-     GooglePrivacyDlpV2StorageConfig, storage config for job trigger
-     input.
+     GooglePrivacyDlpV2StorageConfig, storage config for job input.
     """
     project_id = input_params.get('project_id')
     storage_config = self.msg.GooglePrivacyDlpV2StorageConfig()
@@ -357,7 +399,7 @@ Kate Jones,Katherine k. Jones
       file_set = self.msg.GooglePrivacyDlpV2FileSet(
           url=input_params.get('gcs_bucket'))
       gcs_option = self.msg.GooglePrivacyDlpV2CloudStorageOptions(
-          fileSet=file_set)
+          fileSet=file_set, bytesLimitPerFile=input_params.get('size_limit'))
       storage_config.cloudStorageOptions = gcs_option
     elif input_type == 'table':
       table = self.msg.GooglePrivacyDlpV2BigQueryTable(
@@ -366,6 +408,11 @@ Kate Jones,Katherine k. Jones
           tableId=input_params.get('bt_table_id'))
       big_query_option = self.msg.GooglePrivacyDlpV2BigQueryOptions(
           tableReference=table)
+      if input_params.get('input_bq_fields'):
+        fields = input_params.get('input_bq_fields')
+        identifying_fields = [
+            self.msg.GooglePrivacyDlpV2FieldId(name=x) for x in fields]
+        big_query_option.identifyingFields = identifying_fields
       storage_config.bigQueryOptions = big_query_option
     else:  # datastore
       kind_exp = self.msg.GooglePrivacyDlpV2KindExpression(
@@ -401,7 +448,7 @@ Kate Jones,Katherine k. Jones
                                             request_limit, include_quote,
                                             exclude_info_types)
     inspect_config.limits.maxFindingsPerItem = item_limit
-    trigger_input_config = self._GetTriggerInput(input_params, input_type)
+    trigger_input_config = self._GetJobInputConfig(input_params, input_type)
     inspect_job = self.msg.GooglePrivacyDlpV2InspectJobConfig(
         actions=actions,
         inspectConfig=inspect_config,
@@ -457,27 +504,57 @@ Kate Jones,Katherine k. Jones
     return self.msg.GooglePrivacyDlpV2ListJobTriggersResponse(
         jobTriggers=job_triggers)
 
-  def MakeJob(self, name):
+  def MakeJob(self, name, info_types=None, input_gcs_path=None,
+              input_bq_table=None, input_bq_dataset=None, input_ds_kind=None,
+              input_ds_namespace=None, output_topics=None, output_tables=None,
+              file_size_limit=1024, exclude_info_types=False,
+              include_quote=False, max_findings=1000, min_likelihood='POSSIBLE',
+              max_findings_per_item=None, maxtime='2018-01-31T12:00:00.0000Z',
+              mintime='2018-01-01T12:00:00.0000Z', input_bq_fields=None):
     """Make test Job."""
+    info_types = info_types or ['LAST_NAME', 'EMAIL_ADDRESS']
     job = self.msg.GooglePrivacyDlpV2DlpJob()
     input_params = {
-        'gcs_bucket': 'gs://my-bucket/',
         'project_id': self.Project()
     }
-    job.createTime = '2018-01-01T00:00:00.000000Z'
+    if input_gcs_path:
+      input_params['gcs_bucket'] = input_gcs_path
+      input_params['size_limit'] = file_size_limit
+      input_type = 'gcs'
+    elif input_bq_table:
+      input_params['bt_data_set_id'] = input_bq_dataset
+      input_params['bt_table_id'] = input_bq_table
+      input_params['input_bq_fields'] = input_bq_fields
+      input_type = 'table'
+    else:
+      input_params['ds_kind'] = input_ds_kind
+      input_params['ds_namespace_id'] = input_ds_namespace
+      input_type = 'datastore'
+
+    if output_topics:
+      actions = self._MakeTopicJobTriggerActions(output_topics)
+    else:
+      actions = self._MakeTableJobTriggerActions(output_tables)
+
+    job.createTime = '2018-01-01T00:00:00.0000Z'
     job.inspectDetails = self.msg.GooglePrivacyDlpV2InspectDataSourceDetails(
         requestedOptions=self.msg.GooglePrivacyDlpV2RequestedOptions(
             jobConfig=self.msg.GooglePrivacyDlpV2InspectJobConfig(
-                actions=[self.msg.GooglePrivacyDlpV2Action(
-                    pubSub=self.msg.GooglePrivacyDlpV2PublishToPubSub(
-                        topic='TestTopic'))],
+                actions=actions,
                 inspectConfig=self._GetInspectConfig(
-                    ['LAST_NAME', 'EMAIL_ADDRESS'], 'LIKELY', None, True, None),
-                storageConfig=self._GetTriggerInput(input_params, 'gcs')
+                    info_types, min_likelihood, limit=max_findings,
+                    include_quote=include_quote,
+                    exclude_info_types=exclude_info_types,
+                    item_limit=max_findings_per_item),
+                storageConfig=self._GetJobInputConfig(input_params, input_type)
             )
         ),
         result=None,
     )
+    if mintime or maxtime:
+      (job.inspectDetails.requestedOptions.jobConfig.storageConfig.
+       timespanConfig) = self.msg.GooglePrivacyDlpV2TimespanConfig(
+           startTime=mintime, endTime=maxtime)
     job.name = name
     job.state = self.msg.GooglePrivacyDlpV2DlpJob.StateValueValuesEnum.DONE
     job.type = (
@@ -488,7 +565,9 @@ Kate Jones,Katherine k. Jones
     """Make test jobs list response."""
     jobs = []
     for i in range(count):
-      jobs.append(self.MakeJob(name='Job_{}'.format(i)))
+      jobs.append(self.MakeJob(name='Job_{}'.format(i),
+                               input_gcs_path='gs://my-bucket/',
+                               output_topics=['my_topic']))
     return self.msg.GooglePrivacyDlpV2ListDlpJobsResponse(jobs=jobs)
 
   def MakeJobListRequest(self):
@@ -497,3 +576,56 @@ Kate Jones,Katherine k. Jones
             self.msg.DlpProjectsDlpJobsListRequest.
             TypeValueValuesEnum.INSPECT_JOB),
         parent='projects/'+self.Project())
+
+  def MakeJobCreateRequest(self, job_id, inspect_config=None,
+                           risk_config=None):
+    inner_request = self.msg.GooglePrivacyDlpV2CreateDlpJobRequest(
+        inspectJob=inspect_config,
+        jobId=job_id,
+        riskJob=risk_config
+    )
+    return self.msg.DlpProjectsDlpJobsCreateRequest(
+        googlePrivacyDlpV2CreateDlpJobRequest=inner_request,
+        parent='projects/' + self.Project()
+    )
+
+  def MakeAnalysisJob(self, name, dataset, table, project, cat_stat_field=None,
+                      num_stat_field=None, quasi_ids=None,
+                      sensitive_field=None):
+    """Build Dlp risk analysis job."""
+    privacy_metric = self.msg.GooglePrivacyDlpV2PrivacyMetric()
+    if cat_stat_field:
+      field = self.msg.GooglePrivacyDlpV2FieldId(name=cat_stat_field)
+      cat_stat_config = self.msg.GooglePrivacyDlpV2CategoricalStatsConfig(
+          field=field)
+      privacy_metric.categoricalStatsConfig = cat_stat_config
+    elif num_stat_field:
+      field = self.msg.GooglePrivacyDlpV2FieldId(name=num_stat_field)
+      num_stat_config = self.msg.GooglePrivacyDlpV2NumericalStatsConfig(
+          field=field)
+      privacy_metric.numericalStatsConfig = num_stat_config
+    elif quasi_ids:
+      privacy_metric.lDiversityConfig = (
+          self.msg.GooglePrivacyDlpV2LDiversityConfig())
+      qids = [self.msg.GooglePrivacyDlpV2FieldId(name=qid) for qid in quasi_ids]
+      privacy_metric.lDiversityConfig.quasiIds = qids
+      if sensitive_field:
+        privacy_metric.lDiversityConfig.sensitiveAttribute = (
+            self.msg.GooglePrivacyDlpV2FieldId(name=sensitive_field))
+
+    big_query_table = self.msg.GooglePrivacyDlpV2BigQueryTable(
+        datasetId=dataset,
+        projectId=project,
+        tableId=table)
+
+    job = self.msg.GooglePrivacyDlpV2DlpJob()
+    job.createTime = '2018-01-01T00:00:00.0000Z'
+    job.name = name
+    job.state = self.msg.GooglePrivacyDlpV2DlpJob.StateValueValuesEnum.DONE
+    job.type = (
+        self.msg.GooglePrivacyDlpV2DlpJob.TypeValueValuesEnum.RISK_ANALYSIS_JOB)
+    job.riskDetails = self.msg.GooglePrivacyDlpV2AnalyzeDataSourceRiskDetails()
+    job.riskDetails.requestedSourceTable = big_query_table
+    job.riskDetails.requestedPrivacyMetric = privacy_metric
+
+    return job

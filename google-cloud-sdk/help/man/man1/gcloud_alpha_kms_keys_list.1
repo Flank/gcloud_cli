@@ -11,7 +11,7 @@ gcloud alpha kms keys list \- list the keys within a keyring
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys list\fR [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys list\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -20,6 +20,21 @@ gcloud alpha kms keys list \- list the keys within a keyring
 \fB(ALPHA)\fR Lists all keys within the given keyring.
 
 
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the key.
+
+
+.RE
+.sp
 
 .SH "LIST COMMAND FLAGS"
 

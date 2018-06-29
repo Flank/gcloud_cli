@@ -802,10 +802,10 @@ class HealthChecksUpdateHttpsTest(test_base.BaseTest,
           """)
 
 
-class HealthChecksCreateHttpsAlphaTest(test_base.BaseTest):
+class HealthChecksCreateHttpsBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testResponseOption(self):

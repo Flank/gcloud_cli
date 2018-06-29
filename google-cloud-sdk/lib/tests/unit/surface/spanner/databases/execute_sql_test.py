@@ -164,7 +164,7 @@ class DatabasesQueryTest(base.SpannerTestBase):
     self._ExpectSessionCreate(session)
 
     self.client.projects_instances_databases_sessions.ExecuteSql.Expect(
-        request=self._GivenExecuteRequest(u'SELECT Ṳᾔḯ¢◎ⅾℯ', 'NORMAL'),
+        request=self._GivenExecuteRequest('SELECT Ṳᾔḯ¢◎ⅾℯ', 'NORMAL'),
         response=self.msgs.ResultSet(
             metadata=self._GivenQueryMetadata(),
             rows=self._GivenQueryResults()))
@@ -172,8 +172,8 @@ class DatabasesQueryTest(base.SpannerTestBase):
     self._ExpectSessionDelete(session)
 
     self.Run(
-        u'spanner databases execute-sql mydb --instance myins --sql "SELECT '
-        u'Ṳᾔḯ¢◎ⅾℯ"'
+        'spanner databases execute-sql mydb --instance myins --sql "SELECT '
+        'Ṳᾔḯ¢◎ⅾℯ"'
     )
 
     self.AssertOutputEquals('colA  colB\n'
@@ -240,9 +240,11 @@ class DatabasesQueryTest(base.SpannerTestBase):
     self.AssertErrContains('colA  colB\n' 'A1    B1\n' 'A2    B2\n')
 
     self.AssertOutputContains(
-        'ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED')
+        'ELAPSED_TIME | CPU_TIME | ROWS_RETURNED | ROWS_SCANNED',
+        normalize_space=True)
     # 1.7 msecs         |  .3 msecs    | 9    | 2000
-    self.AssertOutputMatches(r'1\.7 msecs[\s|]+\.3 msecs[\s|]+9[\s|]+2000')
+    self.AssertOutputMatches(r'1\.7 msecs[\s|]+\.3 msecs[\s|]+9[\s|]+2000',
+                             normalize_space=True)
 
     query_plan = r""" RELATIONAL Serialize Result
     |

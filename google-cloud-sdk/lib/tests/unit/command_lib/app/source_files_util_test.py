@@ -14,6 +14,7 @@
 """Unit tests for source_files_util module."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.app import env
@@ -61,6 +62,19 @@ class SourceFileIteratorTest(sdk_test_base.SdkBase):
       mock_method.assert_called_once_with(
           self.temp_path,
           default_ignore_file=source_files_util._PHP_GCLOUDIGNORE,
+          include_gitignore=False,
+          gcloud_ignore_creation_predicate=mock.ANY,
+          write_on_disk=True)
+
+  def testPython37StandardUsesGcloudignore(self):
+    """No .gcloudignore on Py37 Standard should generate .gcloudignore."""
+    with mock.patch.object(gcloudignore, 'GetFileChooserForDir') as mock_method:
+      source_files_util.GetSourceFileIterator(self.temp_path, re.compile(r'.'),
+                                              False, 'python37',
+                                              env.STANDARD)
+      mock_method.assert_called_once_with(
+          self.temp_path,
+          default_ignore_file=gcloudignore.DEFAULT_IGNORE_FILE,
           include_gitignore=False,
           gcloud_ignore_creation_predicate=mock.ANY,
           write_on_disk=True)

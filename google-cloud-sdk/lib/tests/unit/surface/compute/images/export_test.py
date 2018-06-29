@@ -13,23 +13,21 @@
 # limitations under the License.
 """Tests for the images export subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 
 from googlecloudsdk.api_lib.util import apis as core_apis
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
+from tests.lib import sdk_test_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
 
 
-class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
+class ImagesExportTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
 
   def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
     self.mocked_cloudbuild_v1 = mock.Client(
         core_apis.GetClientClass('cloudbuild', 'v1'),
     )
@@ -222,6 +220,30 @@ class ImagesExportTest(e2e_base.WithMockHttp, test_base.BaseTest):
     self.Run("""
              compute images export --image {0}
              --destination-uri {1} --image-project debian-cloud
+             """.format(self.image_name, self.destination_uri))
+
+    self.AssertOutputContains("""\
+        Here is some streamed
+        data for you to print
+        """, normalize_space=True)
+
+  def testNetworkFlag(self):
+    export_workflow = ('../workflows/export/image_export.wf.json')
+    daisy_step = self.cloudbuild_v1_messages.BuildStep(
+        args=['-gcs_path=gs://my-project-daisy-bkt/',
+              '-default_timeout=7200s',
+              '-variables=source_image=projects/my-project/global/images/{0},'
+              'destination={1},export_network=global/networks/my-network'
+              .format(self.image_name, self.destination_uri),
+              export_workflow,],
+        name=self.daisy_builder,
+    )
+
+    self.PrepareMocks(daisy_step)
+
+    self.Run("""
+             compute images export --image {0}
+             --destination-uri {1} --network my-network
              """.format(self.image_name, self.destination_uri))
 
     self.AssertOutputContains("""\

@@ -13,11 +13,14 @@
 # limitations under the License.
 """Unit test to check sanity of grpc setup."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 
 
 class GrpcTest(test_case.TestCase):
 
+  @test_case.Filters.SkipOnPy3('Not yet modernized', 'b/80532599')
   def testCanLoadExtension(self):
     # pylint: disable=g-import-not-at-top
     from grpc._cython import cygrpc

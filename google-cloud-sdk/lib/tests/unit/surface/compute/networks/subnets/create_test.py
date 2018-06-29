@@ -23,7 +23,7 @@ from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
 
-class SubnetsCreateTest(test_base.BaseTest):
+class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
 
   def testSimple(self):
     self.Run("""
@@ -200,13 +200,6 @@ class SubnetsCreateTest(test_base.BaseTest):
               region='us-central1',
               project='my-project'))],)
 
-
-class SubnetsCreateTestBeta(SubnetsCreateTest, parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi('beta')
-
   @parameterized.named_parameters(('Enabled', '--enable-flow-logs', True),
                                   ('Disabled', '--no-enable-flow-logs', False),
                                   ('NotSpecified', '', None))
@@ -230,6 +223,13 @@ class SubnetsCreateTestBeta(SubnetsCreateTest, parameterized.TestCase):
                   enableFlowLogs=enable_flow_logs),
               region='us-central1',
               project='my-project'))],)
+
+
+class SubnetsCreateTestBeta(SubnetsCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
 
 class SubnetsCreateTestAlpha(SubnetsCreateTestBeta):

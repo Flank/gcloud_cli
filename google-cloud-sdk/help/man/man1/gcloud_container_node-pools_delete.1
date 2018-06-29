@@ -11,7 +11,7 @@ gcloud container node\-pools delete \- delete an existing node pool in a running
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container node\-pools delete\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container node\-pools delete\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -48,11 +48,21 @@ The cluster from which to delete the node pool. Overrides the default
 \fBcontainer/cluster\fR property value for this command invocation.
 
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The compute region (e.g. us\-central1) for the cluster.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
 The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
 
+.RE
 .RE
 .sp
 

@@ -14,6 +14,8 @@
 
 """Unit tests for cpanner flags module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.spanner import flags
 from googlecloudsdk.core import resources
 from tests.lib import completer_test_base

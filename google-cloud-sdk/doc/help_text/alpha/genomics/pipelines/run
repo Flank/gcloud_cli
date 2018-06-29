@@ -75,6 +75,11 @@ OTHER FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --pipeline-file=PIPELINE_FILE
         A YAML or JSON file containing a v2alpha1 or v1alpha2 Pipeline object.
         See

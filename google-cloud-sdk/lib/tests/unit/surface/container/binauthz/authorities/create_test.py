@@ -31,7 +31,7 @@ class CreateTest(base.BinauthzMockedPolicyClientUnitTest):
   def SetUp(self):
     self.name = 'bar'
     proj = self.Project()
-    self.note_ref = 'providers/{}/notes/{}'.format(proj, self.name)
+    self.note_ref = 'projects/{}/notes/{}'.format(proj, self.name)
     self.aa = self.messages.AttestationAuthority(
         name='projects/{}/attestationAuthorities/{}'.format(proj, self.name),
         updateTime=None,

@@ -11,7 +11,7 @@ gcloud alpha compute commitments create \- create Google Compute Engine commitme
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR \fB\-\-resources\fR=[\fIRESOURCE\fR=\fICOMMITMENT\fR,...] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR \fB\-\-resources\fR=[\fIRESOURCE\fR=\fICOMMITMENT\fR,...] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-type\fR=\fITYPE\fR;\ default="general\-purpose"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -87,6 +87,12 @@ $ gcloud config unset compute/region
 
 Alternatively, the region can be stored in the environment variable
 \f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-type\fR=\fITYPE\fR; default="general\-purpose"
+Type of commitment. \f5memory\-optimized\fR indicates that the commitment is for
+memory\-optimized VMs. \fITYPE\fR must be one of: \fBgeneral\-purpose\fR,
+\fBmemory\-optimized\fR.
 
 
 .RE

@@ -62,8 +62,7 @@ class PrivateFilesTest(test_case.Base):
   def testMakePrivateFile(self):
     with file_utils.TemporaryDirectory() as t:
       private_path = os.path.join(t, 'f.txt')
-      with file_utils.OpenForWritingPrivate(private_path) as f:
-        f.write('hello')
+      file_utils.WriteFileContents(private_path, 'hello', private=True)
       mode = os.stat(private_path).st_mode
       # mode & 0777 strips the higher level bits that we don't care about,
       # leaving only the three permissions octals.
@@ -72,18 +71,17 @@ class PrivateFilesTest(test_case.Base):
   def testMakePrivateFile_Binary(self):
     with file_utils.TemporaryDirectory() as t:
       private_path = os.path.join(t, 'f.txt')
-      with file_utils.OpenForWritingPrivate(private_path, binary=True) as f:
-        f.write('\nhello\n')
-      with open(private_path, 'rb') as f:
+      file_utils.WriteBinaryFileContents(private_path, b'\nhello\n',
+                                         private=True)
+      with io.open(private_path, 'rb') as f:
         self.assertEqual(b'\nhello\n', f.read())
 
   @test_case.Filters.RunOnlyOnWindows
   def testMakePrivateFile_Text(self):
     with file_utils.TemporaryDirectory() as t:
       private_path = os.path.join(t, 'f.txt')
-      with file_utils.OpenForWritingPrivate(private_path, binary=False) as f:
-        f.write('\nhello\n')
-      with open(private_path, 'rb') as f:
+      file_utils.WriteFileContents(private_path, '\nhello\n', private=True)
+      with io.open(private_path, 'rb') as f:
         self.assertEqual(b'\r\nhello\r\n', f.read())
 
 
@@ -233,6 +231,7 @@ class TemporaryDirectoryTest(test_case.Base):
     self.assertTrue(os.path.isdir(t))
     file_utils.RmTree(t)
 
+  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testWithCleanupExceptionWhileAnotherException(self):
     with self.assertRaisesRegex(
         RuntimeError,
@@ -249,6 +248,7 @@ class TemporaryDirectoryTest(test_case.Base):
     self.assertFalse(os.path.isdir(t))
 
 
+@test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
 class TemporaryDirectoryUnicodeTest(test_case.Base):
 
   def testWithCleanupExceptionWhileAnotherExceptionUnicode(self):
@@ -815,7 +815,7 @@ class ChecksumTest(test_case.Base, test_case.WithOutputCapture):
 
   def testAddFile(self):
     with file_utils.TemporaryDirectory() as t:
-      contents = 'ascii\n'
+      contents = b'ascii\n'
       f = os.path.join(t, 'foo')
       with open(f, 'wb') as fp:
         fp.write(contents)
@@ -871,6 +871,7 @@ class ChecksumTest(test_case.Base, test_case.WithOutputCapture):
     return root
 
   @test_case.Filters.DoNotRunOnWindows
+  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testDirectoryTrees(self):
     with file_utils.TemporaryDirectory() as t:
       roots = [
@@ -891,6 +892,7 @@ class ChecksumTest(test_case.Base, test_case.WithOutputCapture):
         self.assertNotEqual(digests[0], digests[i],
                             'Failed for root: ' + str(i))
 
+  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testSingleFile(self):
     """Test FromSingleFile and HashSingleFile methods."""
     with file_utils.TemporaryDirectory() as t:
@@ -1073,21 +1075,7 @@ class FileLockTest(test_case.Base):
         with self._NewFileLock(lockfile):
           raise ValueError('foo')
 
-      self.assertEqual(ctx.exception.message, 'foo')
-
-
-class OpenTest(test_case.Base):
-
-  def testOpen(self):
-    with file_utils.TemporaryDirectory() as temp_dir:
-      path = self.Touch(temp_dir, 'file.txt', contents='test contents')
-      with file_utils.Open(path) as f:
-        self.assertEqual(f.read(), 'test contents')
-
-  def testOpen_Stdin(self):
-    self.StartObjectPatch(sys, 'stdin', io.StringIO('test contents'))
-    with file_utils.Open('-') as f:
-      self.assertEqual(f.read(), 'test contents')
+      self.assertEqual(six.text_type(ctx.exception), 'foo')
 
 
 class FileInBinaryModeTest(test_case.Base):
@@ -1095,6 +1083,7 @@ class FileInBinaryModeTest(test_case.Base):
   def SetUp(self):
     self.dir = file_utils.TemporaryDirectory()
 
+  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testReading(self):
     contents = b'foo\nbar\r\nbaz\r\r'
     filename = self.Touch(self.dir.path, contents=contents)
@@ -1106,6 +1095,7 @@ class FileInBinaryModeTest(test_case.Base):
       with file_utils._FileInBinaryMode(f):
         self.assertEqual(f.read(), contents)
 
+  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testWriting(self):
     contents = b'foo\nbar\r\nbaz\r\r'
     filename = os.path.join(self.dir.path, self.RandomFileName())
@@ -1123,6 +1113,7 @@ class FileInBinaryModeTest(test_case.Base):
       self.assertEqual(f.read(), contents)
 
   @test_case.Filters.RunOnlyOnWindows('Testing platform-specific syscalls')
+  @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/72871195')
   def testCleanupOnWindows(self):
     filename = self.Touch(self.dir.path, contents='foo\nbar\r\nbaz\r\r')
 
@@ -1144,21 +1135,21 @@ class FileInBinaryModeTest(test_case.Base):
       self.assertEqual(s.read(), contents)
 
 
-class GetFileContentsTest(test_case.Base):
+class ReadFileContentsTest(test_case.Base):
 
   def SetUp(self):
     self.dir = file_utils.TemporaryDirectory()
 
   def testSuccessfulRead(self):
     filename = self.Touch(self.dir.path, contents='abc123')
-    contents = file_utils.GetFileContents(filename)
+    contents = file_utils.ReadFileContents(filename)
     self.assertEqual(contents, 'abc123')
 
   def testBinaryMode(self):
     # self.Touch writes with mode 'w+b'.
     filename = self.Touch(self.dir.path, contents=b'foo\nbar\r\nbaz\r\r')
 
-    contents = file_utils.GetFileContents(filename, binary=True)
+    contents = file_utils.ReadBinaryFileContents(filename)
     # If read in text mode, this fails on Windows due to EOL marker
     # manipulation. See the 'On Windows...' note in the docs for more info:
     # https://docs.python.org/2/tutorial/inputoutput.html#reading-and-writing-files
@@ -1167,7 +1158,7 @@ class GetFileContentsTest(test_case.Base):
   def testFileNotFound(self):
     filename = 'nonexistent'
     with self.assertRaises(file_utils.Error):
-      file_utils.GetFileContents(filename)
+      file_utils.ReadFileContents(filename)
 
 
 class GetFileOrStdinContentsTest(test_case.WithInput):
@@ -1191,34 +1182,32 @@ class WriteFileContentsTest(test_case.Base):
   def testNewFile(self):
     path = os.path.join(self.dir.path, self.RandomFileName())
     contents = 'abc123'
-    file_utils.WriteFileContents(path, contents, overwrite=False, binary=False)
+    file_utils.WriteFileContents(path, contents, overwrite=False)
     self.AssertFileEquals(contents, path)
 
   def testFileCannotBeCreated(self):
     path = os.path.join(self.dir.path, 'nonexistent-dir', self.RandomFileName())
     contents = 'abc123'
     with self.assertRaises(file_utils.Error):
-      file_utils.WriteFileContents(
-          path, contents, overwrite=False, binary=False)
+      file_utils.WriteFileContents(path, contents, overwrite=False)
 
   def testOverwrite(self):
     path = self.Touch(self.dir.path, contents='abc123')
     contents = 'def456'
-    file_utils.WriteFileContents(path, contents, overwrite=True, binary=False)
+    file_utils.WriteFileContents(path, contents, overwrite=True)
     self.AssertFileEquals(contents, path)
 
   def testCannotOverwriteByDefault(self):
     contents = 'abc123'
     path = self.Touch(self.dir.path, contents=contents)
     with self.assertRaises(file_utils.Error):
-      file_utils.WriteFileContents(
-          path, 'def456', overwrite=False, binary=False)
+      file_utils.WriteFileContents(path, 'def456', overwrite=False)
     self.AssertFileEquals(contents, path)
 
   def testBinary(self):
     path = os.path.join(self.dir.path, self.RandomFileName())
-    contents = 'foo\nbar\r\nbaz\r\r'
-    file_utils.WriteFileContents(path, contents, binary=True)
+    contents = b'foo\nbar\r\nbaz\r\r'
+    file_utils.WriteBinaryFileContents(path, contents)
     # If written in text mode, this fails on Windows due to EOL marker
     # manipulation. See the 'On Windows...' note in the docs for more info:
     # https://docs.python.org/2/tutorial/inputoutput.html#reading-and-writing-files
@@ -1242,14 +1231,28 @@ class WriteFileOrStdoutContentsTest(test_case.Base,
   def testFileWriteBinary(self):
     contents = b'\xc3\x9c\xc3\xb1\xc3\xae\xc3\xa7\xc3\xb2\xc3\x90\xc3\xa9\n'
     path = os.path.join(self.dir.path, self.RandomFileName())
-    file_utils.WriteFileContents(path, contents, binary=True)
-    self.assertEqual(file_utils.GetFileContents(path, binary=True), contents)
+    file_utils.WriteBinaryFileContents(path, contents)
+    self.assertEqual(file_utils.ReadBinaryFileContents(path), contents)
 
   def testFileWritePrivate(self):
     contents = 'abc123'
     path = os.path.join(self.dir.path, self.RandomFileName())
     file_utils.WriteFileContents(path, contents, private=True)
     self.AssertFileEquals(contents, path)
+
+    mode = os.stat(path).st_mode
+    if platforms.OperatingSystem.IsWindows():
+      self.assertEqual(mode & 0o777, 0o666)
+    else:
+      # mode & 0777 strips the higher level bits that we don't care about,
+      # leaving only the three permissions octals.
+      self.assertEqual(mode & 0o777, 0o600)
+
+  def testFileWriteBinaryPrivate(self):
+    contents = b'abc123'
+    path = os.path.join(self.dir.path, self.RandomFileName())
+    file_utils.WriteBinaryFileContents(path, contents, private=True)
+    self.AssertBinaryFileEquals(contents, path)
 
     mode = os.stat(path).st_mode
     if platforms.OperatingSystem.IsWindows():

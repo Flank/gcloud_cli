@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Spanner databases get-iam-policy command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import parameterized
@@ -38,12 +40,12 @@ class GetIamPolicyTest(base.SpannerTestBase):
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
-                role=u'roles/spanner.databaseAdmin',
-                members=[u'domain:foo.com']), self.msgs.Binding(
-                    role=u'roles/spanner.viewer',
-                    members=[u'user:admin@foo.com'])
+                role='roles/spanner.databaseAdmin',
+                members=['domain:foo.com']), self.msgs.Binding(
+                    role='roles/spanner.viewer',
+                    members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=b'someUniqueEtag',
         version=1)
     self.client.projects_instances_databases.GetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesGetIamPolicyRequest(
@@ -58,12 +60,12 @@ class GetIamPolicyTest(base.SpannerTestBase):
     test_iam_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
-                role=u'roles/spanner.databaseAdmin',
-                members=[u'domain:foo.com']), self.msgs.Binding(
-                    role=u'roles/spanner.viewer',
-                    members=[u'user:admin@foo.com'])
+                role='roles/spanner.databaseAdmin',
+                members=['domain:foo.com']), self.msgs.Binding(
+                    role='roles/spanner.viewer',
+                    members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=b'someUniqueEtag',
         version=1)
     self.client.projects_instances_databases.GetIamPolicy.Expect(
         request=self.msgs.SpannerProjectsInstancesDatabasesGetIamPolicyRequest(

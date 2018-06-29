@@ -1124,7 +1124,7 @@ class RegionalForwardingRulesCreateTest(test_base.BaseTest):
               region='us-central2'))],)
 
 
-class RegionalForwardingRulesCreateBackendServicesTest(test_base.BaseTest):
+class RegionalForwardingRulesCreateBackendServicesAlphaTest(test_base.BaseTest):
 
   def SetUp(self):
     properties.VALUES.core.check_gce_metadata.Set(False)
@@ -1326,6 +1326,37 @@ class RegionalForwardingRulesCreateBackendServicesTest(test_base.BaseTest):
                 --backend-service BS1
                 --service-label label1
                --region alaska""")
+
+    load_balancing_scheme = (self.messages.ForwardingRule
+                             .LoadBalancingSchemeValueValuesEnum.INTERNAL)
+    self.CheckRequests(
+        [(self.compute.forwardingRules, 'Insert',
+          self.messages.ComputeForwardingRulesInsertRequest(
+              forwardingRule=self.messages.ForwardingRule(
+                  name='forwarding-rule-1',
+                  loadBalancingScheme=load_balancing_scheme,
+                  backendService='https://www.googleapis.com/compute/{api}/'
+                  'projects/my-project/regions/alaska/'
+                  'backendServices/'
+                  'BS1'.format(api=self.resource_api),
+                  serviceLabel='label1',),
+              project='my-project',
+              region='alaska'))],)
+
+
+class RegionalForwardingRulesCreateBackendServicesBetaTest(test_base.BaseTest):
+
+  def SetUp(self):
+    properties.VALUES.core.check_gce_metadata.Set(False)
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testBackendServiceWithServiceLabel(self):
+    self.Run("""compute forwarding-rules create forwarding-rule-1
+                --load-balancing-scheme internal
+                --backend-service BS1
+                --service-label label1
+                --region alaska""")
 
     load_balancing_scheme = (self.messages.ForwardingRule
                              .LoadBalancingSchemeValueValuesEnum.INTERNAL)

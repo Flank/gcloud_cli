@@ -20,6 +20,7 @@ import copy
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope.concepts import deps
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
+from googlecloudsdk.command_lib.util.concepts import presentation_specs
 from googlecloudsdk.command_lib.util.concepts import resource_parameter_info
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
@@ -39,13 +40,14 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
     self.mock_client = mock.MagicMock()
     self.StartObjectPatch(apis, 'GetClientInstance',
                           return_value=self.mock_client)
-    self.presentation_spec = concept_parsers.ResourcePresentationSpec(
+    self.presentation_spec = presentation_specs.ResourcePresentationSpec(
         '--book',
         self.resource_spec,
         'a resource',
         flag_name_overrides={'project': '--book-project'},
         prefixes=False)
-    self.resource_info = self.presentation_spec.GetInfo()
+    self.resource_info = concept_parsers.ConceptParser(
+        [self.presentation_spec]).GetInfo(self.presentation_spec.name)
 
   def SetUpBookParameterInfo(self, args):
     """Creates ResourceParameterInfo for book resource.
@@ -141,13 +143,14 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
 
   def testGetFlagProject(self):
     properties.VALUES.core.project.Set(self.Project())
-    presentation_spec = concept_parsers.ResourcePresentationSpec(
+    presentation_spec = presentation_specs.ResourcePresentationSpec(
         '--book',
         self.resource_spec,
         'a resource',
         flag_name_overrides={},
         prefixes=False)
-    resource_info = presentation_spec.GetInfo()
+    resource_info = concept_parsers.ConceptParser(
+        [presentation_spec]).GetInfo(presentation_spec.name)
     ns = core_completer_test_base.MockNamespace(
         args={},
         handler_info=resource_info)
@@ -159,13 +162,14 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
 
   def testGetFlagNoFlag(self):
     properties.VALUES.core.project.Set(self.Project())
-    presentation_spec = concept_parsers.ResourcePresentationSpec(
+    presentation_spec = presentation_specs.ResourcePresentationSpec(
         '--book',
         self.resource_spec,
         'a resource',
         flag_name_overrides={'shelvesId': ''},
         prefixes=False)
-    resource_info = presentation_spec.GetInfo()
+    resource_info = concept_parsers.ConceptParser(
+        [presentation_spec]).GetInfo(presentation_spec.name)
     ns = core_completer_test_base.MockNamespace(
         args={},
         handler_info=resource_info)
@@ -177,13 +181,14 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
 
   def testGetFlagNoProject(self):
     self.UnsetProject()
-    presentation_spec = concept_parsers.ResourcePresentationSpec(
+    presentation_spec = presentation_specs.ResourcePresentationSpec(
         '--book',
         self.resource_spec,
         'a resource',
         flag_name_overrides={},
         prefixes=False)
-    resource_info = presentation_spec.GetInfo()
+    resource_info = concept_parsers.ConceptParser(
+        [presentation_spec]).GetInfo(presentation_spec.name)
     ns = core_completer_test_base.MockNamespace(
         args={},
         handler_info=resource_info)
@@ -212,13 +217,14 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
     spec = copy.deepcopy(self.resource_spec)
     spec.attributes[0].fallthroughs = [
         deps.PropertyFallthrough(properties.VALUES.core.project)]
-    presentation_spec = concept_parsers.ResourcePresentationSpec(
+    presentation_spec = presentation_specs.ResourcePresentationSpec(
         '--book',
         spec,
         'a resource',
         flag_name_overrides={'project': '--book-project'},
         prefixes=False)
-    resource_info = presentation_spec.GetInfo()
+    resource_info = concept_parsers.ConceptParser(
+        [presentation_spec]).GetInfo(presentation_spec.name)
     ns = core_completer_test_base.MockNamespace(
         args={},
         handler_info=resource_info)
@@ -241,13 +247,14 @@ class ResourceParameterInfoTest(concepts_test_base.ConceptsTestBase,
     def GetValue():
       return console_io.PromptResponse('value? >')
     spec.attributes[0].fallthroughs = [deps.Fallthrough(GetValue, 'hint')]
-    presentation_spec = concept_parsers.ResourcePresentationSpec(
+    presentation_spec = presentation_specs.ResourcePresentationSpec(
         '--book',
         spec,
         'a resource',
         flag_name_overrides={'project': '--book-project'},
         prefixes=False)
-    resource_info = presentation_spec.GetInfo()
+    resource_info = concept_parsers.ConceptParser(
+        [presentation_spec]).GetInfo(presentation_spec.name)
     ns = core_completer_test_base.MockNamespace(
         args={},
         handler_info=resource_info)

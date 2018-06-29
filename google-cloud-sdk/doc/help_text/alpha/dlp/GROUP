@@ -23,6 +23,10 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     datasources
+        (ALPHA) Cloud DLP Commands for analyzing Google Cloud data
+        repositories.
+
      images
         (ALPHA) Use Cloud DLP Image capabilities.
 

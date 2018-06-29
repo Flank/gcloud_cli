@@ -215,20 +215,6 @@ class CreateTestBase(object):
         storage_util.BucketReference.FromBucketUrl('gs://bucket/'),
         os.path.join(self.temp_path, 'file'), self._SHA256_SUM + '/file')
 
-
-class CreateGaTest(CreateTestBase, base.MlGaPlatformTestBase):
-
-  def SetUp(self):
-    super(CreateGaTest, self).SetUp()
-    self.track = calliope_base.ReleaseTrack.GA
-
-
-class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
-
-  def SetUp(self):
-    super(CreateBetaTest, self).SetUp()
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testCreateFrameworkFlag(self):
     self._ExpectCreate(framework='XGBOOST')
     self._ExpectOperationPolling()
@@ -251,6 +237,20 @@ class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
     self.Run('ml-engine versions create versionId --model modelId '
              '--config {}'.format(yaml_path))
     self.AssertErrContains('Creating version (this might take a few minutes)')
+
+
+class CreateGaTest(CreateTestBase, base.MlGaPlatformTestBase):
+
+  def SetUp(self):
+    super(CreateGaTest, self).SetUp()
+    self.track = calliope_base.ReleaseTrack.GA
+
+
+class CreateBetaTest(CreateTestBase, base.MlBetaPlatformTestBase):
+
+  def SetUp(self):
+    super(CreateBetaTest, self).SetUp()
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testythonVersionFlag(self):
     self._ExpectCreate(python_version='2.7')

@@ -3,8 +3,8 @@ NAME
         running containers
 
 SYNOPSIS
-    gcloud container clusters describe NAME [--zone=ZONE, -z ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud container clusters describe NAME
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Describe an existing cluster for running containers.
@@ -14,9 +14,14 @@ POSITIONAL ARGUMENTS
         The name of this cluster.
 
 FLAGS
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

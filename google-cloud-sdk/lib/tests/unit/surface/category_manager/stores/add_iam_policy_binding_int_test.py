@@ -67,14 +67,16 @@ class AddIamPolicyBindingIntegrationTest(base.CategoryManagerUnitTestBase):
                 policy=self.new_policy)), self.new_policy)
 
   def testAddIamPolicyBindingWithOrganizationId(self):
-    result = self.Run('alpha category-manager stores add-iam-policy-binding 246'
-                      ' --role=roles/categorymanager.admin '
+    result = self.Run('alpha category-manager stores add-iam-policy-binding '
+                      '--organization=246 '
+                      '--role=roles/categorymanager.admin '
                       '--member=user:admin2@gmail.com')
     self.assertEqual(self.new_policy, result)
 
   def testAddIamPolicyBindingWithOrganizationResourceName(self):
     result = self.Run('alpha category-manager stores add-iam-policy-binding '
-                      'organizations/246 --role=roles/categorymanager.admin '
+                      '--organization organizations/246 '
+                      '--role=roles/categorymanager.admin '
                       '--member=user:admin2@gmail.com')
     self.assertEqual(self.new_policy, result)
 

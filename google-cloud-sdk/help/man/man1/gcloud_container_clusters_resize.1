@@ -11,7 +11,7 @@ gcloud container clusters resize \- resizes an existing cluster for running cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters resize\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR [\fB\-\-async\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters resize\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR [\fB\-\-async\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,11 +72,21 @@ Don't wait for the operation to complete.
 The node pool to resize.
 
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The compute region (e.g. us\-central1) for the cluster.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
 The compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 \fBcompute/zone\fR property value for this command invocation.
 
 
+.RE
 .RE
 .sp
 

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import copy
 import os
 import uuid
@@ -182,7 +184,7 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
 
   def ExpectFileUpload(self, file_path):
     """Expect that the tests zip file is uploaded to GCS."""
-    file_obj = self.storage_msgs.Object(kind=u'storage#object', size=ZIP_SIZE)
+    file_obj = self.storage_msgs.Object(kind='storage#object', size=ZIP_SIZE)
     self.storage_client.objects.Insert.Expect(
         request=self.storage_msgs.StorageObjectsInsertRequest(
             bucket=self.results_bucket,
@@ -215,7 +217,7 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
     self.ExpectMatrixGet(matrix, M_FINISHED, [FINISHED])
     self.ExpectToolResults()
 
-    self.Run(u'{run} --test {tz}'.format(
+    self.Run('{run} --test {tz}'.format(
         run=commands.IOS_TEST_RUN, tz=TEST_PATH))
     self.AssertErrMatches(r'Upload.*bundle.zip')
     self.AssertErrContains('[matrix-ios1] has been created')
@@ -232,7 +234,7 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
     self.ExpectMatrixGet(matrix, M_FINISHED, [FINISHED])
     self.ExpectToolResults()
 
-    self.Run(u'{run} --test {tz}'.format(
+    self.Run('{run} --test {tz}'.format(
         run=commands.IOS_TEST_RUN, tz=TEST_PATH))
     self.AssertErrContains('[matrix-ios1] has been created')
     self.AssertErrContains('test on 1 device(s)')
@@ -242,8 +244,8 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
     self.ExpectFileUpload(TEST_ZIP)
     self.ExpectMatrixCreate([DEVICE_1, DEVICE_2], timeout='300s')
 
-    self.Run(u'{run} --type xctest --test {test} --timeout 5m --async '
-             u'--device model=iPencil1 --device model=iPen3,version=7.2'.format(
+    self.Run('{run} --type xctest --test {test} --timeout 5m --async '
+             '--device model=iPencil1 --device model=iPen3,version=7.2'.format(
                  run=commands.IOS_TEST_RUN, test=TEST_PATH))
     self.AssertErrContains('[matrix-ios1] has been created')
     self.AssertErrContains('test on 2 device(s)')
@@ -257,8 +259,8 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
     self.ExpectFileUpload(TEST_ZIP)
     self.ExpectMatrixCreate([DEFAULT_DEVICE])
 
-    self.Run(u'{run} --test={tz} --results-bucket=pail --results-dir=dir9 '
-             u'--async '.format(run=commands.IOS_TEST_RUN, tz=TEST_PATH))
+    self.Run('{run} --test={tz} --results-bucket=pail --results-dir=dir9 '
+             '--async '.format(run=commands.IOS_TEST_RUN, tz=TEST_PATH))
     self.AssertErrMatches(r'Upload.*bundle.zip')
     self.AssertErrMatches(r'bucket.*/storage/browser/pail/dir9/]')
     self.AssertErrContains('[matrix-ios1] has been created')
@@ -269,7 +271,7 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
     self.ExpectFileUpload(TEST_ZIP)
     self.ExpectMatrixCreate([DEVICE_2], timeout='600s')
 
-    self.Run(u'{run} {argfile}:ios-xctest --test {test}'.format(
+    self.Run('{run} {argfile}:ios-xctest --test {test}'.format(
         run=commands.IOS_TEST_RUN, argfile=GOOD_ARGS, test=TEST_PATH))
     self.AssertErrContains('[matrix-ios1] has been created')
     self.AssertErrMatches(r'--test .*bundle.zip" overrides.* my_bundle.zip')

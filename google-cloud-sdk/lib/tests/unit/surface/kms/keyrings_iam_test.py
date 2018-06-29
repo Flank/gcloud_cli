@@ -15,16 +15,22 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class KeyringsIamTest(base.KmsMockTest):
 
   def SetUp(self):
     self.kr_name = self.project_name.Descendant('global/my_kr')
 
-  def testGet(self):
+  def testGet(self, track):
+    self.track = track
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(
             resource=self.kr_name.RelativeName()),
@@ -34,7 +40,8 @@ class KeyringsIamTest(base.KmsMockTest):
         self.kr_name.location_id, self.kr_name.key_ring_id))
     self.AssertOutputContains('etag: Zm9v')  # "foo" in b64
 
-  def testListCommandFilter(self):
+  def testListCommandFilter(self, track):
+    self.track = track
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(
             resource=self.kr_name.RelativeName()),
@@ -49,7 +56,8 @@ class KeyringsIamTest(base.KmsMockTest):
 
     self.AssertOutputEquals('Zm9v\n')
 
-  def testSetBindings(self):
+  def testSetBindings(self, track):
+    self.track = track
     policy = self.messages.Policy(
         etag=b'foo',
         bindings=[
@@ -82,7 +90,8 @@ etag: Zm9v
 """)
     self.AssertErrContains('Updated IAM policy for keyring [my_kr].')
 
-  def testSetBindingsAndAuditConfig(self):
+  def testSetBindingsAndAuditConfig(self, track):
+    self.track = track
     policy = self.messages.Policy(
         etag=b'foo',
         bindings=[
@@ -127,7 +136,8 @@ etag: Zm9v
 """)
     self.AssertErrContains('Updated IAM policy for keyring [my_kr].')
 
-  def testAddBinding(self):
+  def testAddBinding(self, track):
+    self.track = track
     self.kms.projects_locations_keyRings.GetIamPolicy.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetIamPolicyRequest(
             resource=self.kr_name.RelativeName()),
@@ -153,7 +163,8 @@ etag: Zm9v
 etag: Zm9v
 """)
 
-  def testRemoveBinding(self):
+  def testRemoveBinding(self, track):
+    self.track = track
     policy_before = self.messages.Policy(
         etag=b'foo',
         bindings=[

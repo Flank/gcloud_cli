@@ -14,6 +14,8 @@
 
 """Tests for the 'gcloud dns record-sets export' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.dns import export_util

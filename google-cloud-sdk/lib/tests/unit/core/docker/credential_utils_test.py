@@ -60,8 +60,7 @@ class ConfigurationTest(sdk_test_base.WithFakeAuth):
     directory = os.path.dirname(new_cfg)
     if not os.path.exists(directory):
       os.makedirs(directory)
-    with files.OpenForWritingPrivate(new_cfg) as writer:
-      writer.write(json_str)
+    files.WriteFileContents(new_cfg, json_str, private=True)
     return new_cfg
 
   def _GetFakeConfiguration(self, json_str=_EMPTY_JSON_OBJECT_STRING):

@@ -14,6 +14,9 @@
 
 """Tests of the 'gcloud meta apis methods list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.util.apis import registry
 from tests.lib import cli_test_base
 from tests.lib.command_lib.util.apis import base

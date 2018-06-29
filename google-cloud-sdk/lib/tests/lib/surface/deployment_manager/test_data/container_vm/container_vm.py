@@ -59,7 +59,7 @@ resources:
           autoDelete: true
           initializeParams:
             diskName: %(name)s-disk
-            sourceImage: https://www.googleapis.com/compute/v1/projects/google-containers/global/images/%(containerImage)s
+            sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/family/%(containerImage)s
       networkInterfaces:
         - accessConfigs:
             - name: external-nat

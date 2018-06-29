@@ -207,6 +207,14 @@ class Collections(enum.Enum):
       [u'project', u'zone', u'machineType'],
       True
   )
+  NETWORKENDPOINTGROUPS = (
+      'networkEndpointGroups',
+      'projects/{project}/zones/{zone}/networkEndpointGroups/'
+      '{networkEndpointGroup}',
+      {},
+      [u'project', u'zone', u'networkEndpointGroup'],
+      True
+  )
   NETWORKS = (
       'networks',
       'projects/{project}/global/networks/{network}',
@@ -219,6 +227,27 @@ class Collections(enum.Enum):
       'projects/{project}/global/gateways/{nextHopGateway}',
       {},
       [u'project', u'nextHopGateway'],
+      True
+  )
+  NODEGROUPS = (
+      'nodeGroups',
+      'projects/{project}/zones/{zone}/nodeGroups/{nodeGroup}',
+      {},
+      [u'project', u'zone', u'nodeGroup'],
+      True
+  )
+  NODETEMPLATES = (
+      'nodeTemplates',
+      'projects/{project}/regions/{region}/nodeTemplates/{nodeTemplate}',
+      {},
+      [u'project', u'region', u'nodeTemplate'],
+      True
+  )
+  NODETYPES = (
+      'nodeTypes',
+      'projects/{project}/zones/{zone}/nodeTypes/{nodeType}',
+      {},
+      [u'project', u'zone', u'nodeType'],
       True
   )
   PROJECTS = (

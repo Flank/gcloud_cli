@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import e2e_base
 from tests.lib.surface.firebase.test.android import commands
@@ -27,11 +29,12 @@ class AsyncTestRunTests(e2e_base.TestIntegrationTestBase):
   @test_case.Filters.skip('Failing sporadically.', 'b/36781383')
   def testInstrumentationTest_ExplicitType_ManyDimensions_Async(self):
     self.Run(
-        u'{cmd} --type instrumentation --app {app} --test {test} --timeout 5m '
-        u'--async --device-ids=Nexus7,Nexus9,Nexus10 -v 22 -l=ru -o=landscape'
-        .format(cmd=commands.ANDROID_TEST_RUN,
-                app=e2e_base.WALKSHARE_APP,
-                test=e2e_base.WALKSHARE_TEST))
+        '{cmd} --type instrumentation --app {app} --test {test} --timeout 5m '
+        '--async --device-ids=Nexus7,Nexus9,Nexus10 -v 22 -l=ru -o=landscape'
+        .format(
+            cmd=commands.ANDROID_TEST_RUN,
+            app=e2e_base.WALKSHARE_APP,
+            test=e2e_base.WALKSHARE_TEST))
 
     self.AssertErrMatches(r'Upload.*walkshare.apk')
     self.AssertErrMatches(r'Upload.*walkshare-test.apk')
@@ -41,10 +44,8 @@ class AsyncTestRunTests(e2e_base.TestIntegrationTestBase):
 
   @test_case.Filters.skip('Failing sporadically.', 'b/36781383')
   def testRoboTest_ExplicitType_ArgFileOverridesAsync_OneInvalidDimension(self):
-    self.Run(
-        u'{cmd} {argfile}:robo-integration --timeout 65s --async'
-        .format(cmd=commands.ANDROID_TEST_RUN,
-                argfile=e2e_base.INTEGRATION_ARGS))
+    self.Run('{cmd} {argfile}:robo-integration --timeout 65s --async'.format(
+        cmd=commands.ANDROID_TEST_RUN, argfile=e2e_base.INTEGRATION_ARGS))
 
     self.AssertErrMatches(r'async True.*overrides.*async: False')
     self.AssertErrMatches(r'Upload.*notepad.apk')

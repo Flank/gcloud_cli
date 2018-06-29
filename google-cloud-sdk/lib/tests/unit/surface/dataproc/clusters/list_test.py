@@ -14,6 +14,8 @@
 
 """Test of the 'clusters list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.dataproc import constants
@@ -105,7 +107,7 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
         exception=self.MakeHttpError(403))
     with self.AssertRaisesHttpErrorMatchesAsHttpException(
         'Permission denied API reason: Permission denied.'):
-      self.RunDataproc('clusters list').next()
+      next(self.RunDataproc('clusters list'))
 
   def testListClustersPagination(self):
     self.mock_client.projects_regions_clusters.List.Expect(
@@ -130,13 +132,12 @@ class ClustersListUnitTest(unit_base.DataprocUnitTestBase):
 
   def testListClustersNonDefaultRegion(self):
     self.ExpectListClusters(self.clusters, region='us-central1')
-    self.RunDataproc(
-        'clusters list --region="us-central1"').next()
+    next(self.RunDataproc('clusters list --region="us-central1"'))
 
   def testListClustersNonDefaultRegionProperty(self):
     properties.VALUES.dataproc.region.Set('us-central1')
     self.ExpectListClusters(self.clusters, region='us-central1')
-    self.RunDataproc('clusters list').next()
+    next(self.RunDataproc('clusters list'))
 
 
 class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):

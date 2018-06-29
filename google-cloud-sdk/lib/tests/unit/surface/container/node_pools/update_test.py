@@ -75,8 +75,7 @@ nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more
 information on node autorepairs.
 
-<START PROGRESS TRACKER>Updating node pool my-pool
-<END PROGRESS TRACKER>SUCCESS
+{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/{1}/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION, location))
 
@@ -115,8 +114,7 @@ nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more
 information on node autorepairs.
 
-<START PROGRESS TRACKER>Updating node pool my-pool
-<END PROGRESS TRACKER>SUCCESS
+{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
 
@@ -151,8 +149,7 @@ nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-management for more
 information on node autoupgrades.
 
-<START PROGRESS TRACKER>Updating node pool my-pool
-<END PROGRESS TRACKER>SUCCESS
+{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
 
@@ -187,8 +184,7 @@ nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-management for more
 information on node autoupgrades.
 
-<START PROGRESS TRACKER>Updating node pool my-pool
-<END PROGRESS TRACKER>SUCCESS
+{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
 
@@ -236,8 +232,7 @@ nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-management for more
 information on node autoupgrades.
 
-<START PROGRESS TRACKER>Updating node pool my-pool
-<END PROGRESS TRACKER>SUCCESS
+{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
 Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
 

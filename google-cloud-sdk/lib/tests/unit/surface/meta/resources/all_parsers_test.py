@@ -14,6 +14,9 @@
 
 """Test all core.resources parsers by collection."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from tests.lib import cli_test_base
 
 

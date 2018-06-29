@@ -85,6 +85,11 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --package-path=PACKAGE_PATH
         Path to a Python package to build. This should point to a directory
         containing the Python source for the job. It will be built using

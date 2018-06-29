@@ -13,6 +13,10 @@
 # limitations under the License.
 
 """Tests of the 'gcloud meta apis regen' command."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import re
 import shutil
@@ -33,33 +37,33 @@ class RegenTest(cli_test_base.CliTestBase):
     config_file = os.path.join(self.temp_path, 'DOES_NOT_EXIST')
     with self.assertRaisesRegex(
         regen_utils.ConfigFileError,
-        ur'{} Not found'.format(re.escape(config_file))):
-      self.Run(u'meta apis regen compute/v1 --config {}'.format(config_file))
+        r'{} Not found'.format(re.escape(config_file))):
+      self.Run('meta apis regen compute/v1 --config {}'.format(config_file))
 
   def testBadConfig(self):
     config_file = self.Touch(self.temp_path, 'blank')
     with self.assertRaisesRegex(
         regen_utils.ConfigFileError,
-        ur'{} does not have format of gcloud api config file'
+        r'{} does not have format of gcloud api config file'
         .format(re.escape(config_file))):
-      self.Run(u'meta apis regen compute/v1 --config {}'.format(config_file))
+      self.Run('meta apis regen compute/v1 --config {}'.format(config_file))
 
   def testRegenMissingAPI(self):
     with self.assertRaisesRegex(
         regen_utils.UnknownApi,
-        ur'api \[asdfasdf/v1\] not found in "apis" section of {}. '
-        ur'Use \[gcloud meta apis list\] to see available apis.'
+        r'api \[asdfasdf/v1\] not found in "apis" section of {}. '
+        r'Use \[gcloud meta apis list\] to see available apis.'
         .format(re.escape(self.regen_config))):
-      self.Run(u'meta apis regen asdfasdf/v1 --config {}'
+      self.Run('meta apis regen asdfasdf/v1 --config {}'
                .format(self.regen_config))
 
   def testRegenExistingApi(self):
     shutil.copy(os.path.join(self.testdata_dir, 'cloudresourcemanager_v1.json'),
                 self.temp_path)
-    self.Run(u'meta apis regen cloudresourcemanager/v1 --config {} '
-             u'--base-dir {}'.format(self.regen_config, self.temp_path))
+    self.Run('meta apis regen cloudresourcemanager/v1 --config {} '
+             '--base-dir {}'.format(self.regen_config, self.temp_path))
     self.AssertOutputEquals('')
-    self.AssertErrEquals(u"""\
+    self.AssertErrEquals("""\
 Generating cloudresourcemanager v1 from cloudresourcemanager_v1.json
 WARNING: {0} does not have __init__.py file, generating ...
 WARNING: {0}cloudresourcemanager does not have __init__.py file, generating ...
@@ -83,11 +87,11 @@ WARNING: {0}cloudresourcemanager does not have __init__.py file, generating ...
     discovery_doc = os.path.join(self.testdata_dir, 'apikeys_v1.json')
     shutil.copy(os.path.join(self.testdata_dir, 'cloudresourcemanager_v1.json'),
                 self.temp_path)
-    self.Run(u'meta apis regen apikeys/v1 --config {} --base-dir {} '
-             u'--api-discovery-doc {}'
+    self.Run('meta apis regen apikeys/v1 --config {} --base-dir {} '
+             '--api-discovery-doc {}'
              .format(tmp_regen_config, self.temp_path, discovery_doc))
     self.AssertOutputEquals('')
-    self.AssertErrEquals(u"""\
+    self.AssertErrEquals("""\
 WARNING: No such api apikeys in config, adding...
 Copying in {1}
 Generating apikeys v1 from apikeys_v1.json

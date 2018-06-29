@@ -13,6 +13,9 @@
 # limitations under the License.
 """Integration tests for the emulators pubsub commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 import tempfile
 from googlecloudsdk.command_lib.util import java
@@ -68,7 +71,7 @@ class StartTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
         with proxy_util.RunEmulatorProxyClient(
             log_file=test_call_out_no, env=test_call_env) as proc:
           proc.wait()
-          output = files.GetFileContents(test_call_out)
+          output = files.ReadFileContents(test_call_out)
           self.assertIn('Created with target localhost:' + port, output)
           self.assertIn('topic created', output)
           self.assertIn('topic deleted', output)
@@ -80,7 +83,7 @@ class StartTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
             ('had exception, printing out subprocess '
              'stdout and stderr\n{line}\n{content}\n{line}').format(
                  line='='*80,
-                 content=files.GetFileContents(test_call_out)))
+                 content=files.ReadFileContents(test_call_out)))
 
 
 if __name__ == '__main__':

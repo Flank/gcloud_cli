@@ -23,6 +23,11 @@ FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --regions=REGION,[REGION,...]
         The Google Cloud region where the model will be deployed (currently
         only a single region is supported).

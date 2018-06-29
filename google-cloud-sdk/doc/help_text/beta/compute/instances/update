@@ -5,8 +5,11 @@ NAME
 SYNOPSIS
     gcloud beta compute instances update INSTANCE_NAME
         [--[no-]deletion-protection] [--min-cpu-platform=PLATFORM]
-        [--update-labels=[KEY=VALUE,...]] [--zone=ZONE]
-        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+        [--[no-]shielded-vm-integrity-monitoring]
+        [--shielded-vm-learn-integrity-policy] [--[no-]shielded-vm-secure-boot]
+        [--[no-]shielded-vm-vtpm] [--update-labels=[KEY=VALUE,...]]
+        [--zone=ZONE] [--clear-labels | --remove-labels=[KEY,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) gcloud beta compute instances update updates labels and requested
@@ -51,9 +54,44 @@ FLAGS
         You can find more information on-line:
         https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
 
+     --[no-]shielded-vm-integrity-monitoring
+        Enables monitoring and attestation of the boot integrity of the
+        instance. The attestation is performed against the integrity policy
+        baseline. This baseline is initially derived from the implicitly
+        trusted boot image when the instance is created. This baseline can be
+        updated by using --shielded-vm-learn-integrity-policy. Changes to this
+        setting (via the update command) will only take effect after stopping
+        and starting the instance. Use --shielded-vm-integrity-monitoring to
+        enable and --no-shielded-vm-integrity-monitoring to disable.
+
+     --shielded-vm-learn-integrity-policy
+        Causes the instance to re-learn the integrity policy baseline using the
+        current instance configuration. Use this flag after any planned
+        boot-specific changes in the instance configuration, like kernel
+        updates or kernel driver installation.
+
+     --[no-]shielded-vm-secure-boot
+        The instance will boot with secure boot enabled. Changes to this
+        setting (via the update command) will only take effect after stopping
+        and starting the instance. Use --shielded-vm-secure-boot to enable and
+        --no-shielded-vm-secure-boot to disable.
+
+     --[no-]shielded-vm-vtpm
+        The instance will boot with the TPM (Trusted Platform Module) enabled.
+        A TPM is a hardware module that can be used for different security
+        operations such as remote attestation, encryption and sealing of keys.
+        Changes to this setting (via the update command) will only take effect
+        after stopping and starting the instance. Use --shielded-vm-vtpm to
+        enable and --no-shielded-vm-vtpm to disable.
+
      --update-labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to update. If a label exists its value
         is modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --zone=ZONE
         The zone of the instance to update. If not specified, you may be

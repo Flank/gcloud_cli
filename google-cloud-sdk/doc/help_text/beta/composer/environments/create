@@ -23,8 +23,10 @@ POSITIONAL ARGUMENTS
      Environment resource - The environment to create. The arguments in this
      group can be used to specify the attributes of this resource. (NOTE) Some
      attributes are not given arguments in this group but can be set in other
-     ways. To set the [project] attribute: Set the property [core/project] or
-     provide the flag [--project] on the command line. This must be specified.
+     ways. To set the [project] attribute: provide the flag [environment] on
+     the command line with a fully specified name; provide the flag [--project]
+     on the command line; set the property [core/project]. This must be
+     specified.
 
        ENVIRONMENT
           The ID of the environment or a fully qualified identifier for the
@@ -46,7 +48,7 @@ FLAGS
 
      --disk-size=DISK_SIZE; default="100GB"
         The disk size for each VM node in the environment. The minimum size is
-        10GB, and the maximum is 64TB. Specified value must be an integer
+        20GB, and the maximum is 64TB. Specified value must be an integer
         multiple of gigabytes. Cannot be updated after the environment has been
         created. If units are not provided, defaults to GB.
 
@@ -60,6 +62,11 @@ FLAGS
 
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --machine-type=MACHINE_TYPE
         The Compute Engine machine type

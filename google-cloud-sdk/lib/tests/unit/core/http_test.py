@@ -17,6 +17,8 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
+import io
 import os
 import socket
 import uuid
@@ -51,16 +53,6 @@ class _UncopyableObject(object):
 
 class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
 
-  def _EncodeValue(self, value):
-    if isinstance(value, six.text_type):
-      value = value.encode('utf8')
-    return value
-
-  def _EncodeHeaders(self, headers):
-    return {
-        self._EncodeValue(k): self._EncodeValue(v)
-        for k, v in six.iteritems(headers)}
-
   def SetUp(self):
     self.old_version = config.CLOUD_SDK_VERSION
     config.CLOUD_SDK_VERSION = '10.0.0'
@@ -82,15 +74,9 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     platform = platforms.Platform.Current().UserAgentFragment()
     environment = properties.GetMetricsEnvironment()
     environment_version = properties.VALUES.metrics.environment_version.Get()
-    user_agent = template.format(version,
-                                 cmd_path,
-                                 invocation_id,
-                                 environment,
-                                 environment_version,
-                                 interactive,
-                                 python_version,
-                                 platform,
-                                 fromscript)
+    user_agent = template.format(
+        version, cmd_path, invocation_id, environment, environment_version,
+        interactive, python_version, platform, fromscript)
     return user_agent.encode('utf8')
 
   def testUserAgent(self):
@@ -107,14 +93,10 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     url = 'http://foo.com'
     request_mock.return_value = self.default_response
     http_client.request(url, headers=headers, uncopyable=_UncopyableObject())
-    expect_user_agent = self.UserAgent('10.0.0',
-                                       'None',
-                                       uuid_mock.return_value.hex,
-                                       python_version,
-                                       False)
-    expect_headers = self._EncodeHeaders({'user-agent': expect_user_agent})
+    expect_user_agent = self.UserAgent(
+        '10.0.0', 'None', uuid_mock.return_value.hex, python_version, False)
     request_mock.assert_called_once_with(
-        url, headers=expect_headers, uncopyable=mock.ANY)
+        url, headers={b'user-agent': expect_user_agent}, uncopyable=mock.ANY)
     request_mock.reset_mock()
     # Make sure our wrapping did not actually affect args we pass into request.
     # If it does, we could accidentally be modifying global state.
@@ -125,29 +107,22 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     http_client = http.Http()
     request_mock.return_value = self.default_response
     http_client.request(url)
-    expect_user_agent = self.UserAgent('10.0.0',
-                                       cmd_path,
-                                       uuid_mock.return_value.hex,
-                                       python_version,
-                                       False)
-    headers = self._EncodeHeaders({'user-agent': expect_user_agent})
+    expect_user_agent = self.UserAgent(
+        '10.0.0', cmd_path, uuid_mock.return_value.hex, python_version, False)
     request_mock.assert_called_once_with(
-        url, headers=headers)
+        url, headers={b'user-agent': expect_user_agent})
     request_mock.reset_mock()
 
     cmd_path = 'a.b.e.d'
     properties.VALUES.metrics.command_name.Set(cmd_path)
     http_client = http.Http()
-    expect_headers = self._EncodeHeaders({'user-agent': 'hello'})
+    expect_headers = {b'user-agent': b'hello'}
     request_mock.return_value = self.default_response
     http_client.request(url, headers=expect_headers)
-    expect_user_agent = b'hello ' + self.UserAgent('10.0.0',
-                                                   cmd_path,
-                                                   uuid_mock.return_value.hex,
-                                                   python_version,
-                                                   False)
+    expect_user_agent = b'hello ' + self.UserAgent(
+        '10.0.0', cmd_path, uuid_mock.return_value.hex, python_version, False)
     request_mock.assert_called_once_with(
-        url, headers=self._EncodeHeaders({'user-agent': expect_user_agent}))
+        url, headers={b'user-agent': expect_user_agent})
 
   def testUserAgent_SpacesInVersion(self):
     # This is similar to what the versions look like for some internal builds
@@ -164,13 +139,11 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     url = 'http://foo.com'
     request_mock.return_value = self.default_response
     http_client.request(url)
-    expect_user_agent = self.UserAgent('Mon_Sep_12_08:35:01_2016',
-                                       'None',
-                                       uuid_mock.return_value.hex,
-                                       python_version,
-                                       False)
+    expect_user_agent = self.UserAgent(
+        'Mon_Sep_12_08:35:01_2016', 'None', uuid_mock.return_value.hex,
+        python_version, False)
     request_mock.assert_called_once_with(
-        url, headers=self._EncodeHeaders({'user-agent': expect_user_agent}))
+        url, headers={b'user-agent': expect_user_agent})
     request_mock.reset_mock()
 
   def testTraces(self):
@@ -182,17 +155,14 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     python_version = '2.7.6'
     self.StartPatch('platform.python_version').return_value = python_version
 
-    expect_user_agent = self.UserAgent('10.0.0',
-                                       'None',
-                                       uuid_mock.return_value.hex,
-                                       python_version,
-                                       False)
-    expect_headers = self._EncodeHeaders({'user-agent': expect_user_agent})
+    expect_user_agent = self.UserAgent(
+        '10.0.0', 'None', uuid_mock.return_value.hex, python_version, False)
     http_client = http.Http()
     url = 'http://foo.com'
     request_mock.return_value = self.default_response
     http_client.request(url)
-    request_mock.assert_called_once_with(url, headers=expect_headers)
+    request_mock.assert_called_once_with(
+        url, headers={b'user-agent': expect_user_agent})
     request_mock.reset_mock()
 
     trace_token = 'hello'
@@ -201,7 +171,8 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     request_mock.return_value = self.default_response
     http_client.request(url)
     expect_url = '{0}?trace=token%3A{1}'.format(url, trace_token)
-    request_mock.assert_called_once_with(expect_url, headers=expect_headers)
+    request_mock.assert_called_once_with(
+        expect_url, headers={b'user-agent': expect_user_agent})
     request_mock.reset_mock()
     properties.VALUES.core.trace_token.Set(None)
 
@@ -211,7 +182,8 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     request_mock.return_value = self.default_response
     http_client.request(url)
     expect_url = '{0}?trace=email%3A{1}'.format(url, trace_email)
-    request_mock.assert_called_once_with(expect_url, headers=expect_headers)
+    request_mock.assert_called_once_with(
+        expect_url, headers={b'user-agent': expect_user_agent})
     request_mock.reset_mock()
     properties.VALUES.core.trace_email.Set(None)
 
@@ -220,7 +192,8 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     request_mock.return_value = self.default_response
     http_client.request(url)
     expect_url = '{0}?trace=log'.format(url)
-    request_mock.assert_called_once_with(expect_url, headers=expect_headers)
+    request_mock.assert_called_once_with(
+        expect_url, headers={b'user-agent': expect_user_agent})
     properties.VALUES.core.trace_log.Set(None)
 
   def _FormatHeaderOutput(self, headers):
@@ -229,8 +202,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
 
   def testRequestResponseDump(self):
     request_mock = self.StartObjectPatch(httplib2.Http, 'request')
-    response_headers = self._EncodeHeaders(
-        {'header1': 'value1', 'header2': 'value2'})
+    response_headers = {b'header1': b'value1', b'header2': b'value2'}
     request_mock.return_value = (response_headers, 'response content')
     uuid_mock = self.StartObjectPatch(uuid, 'uuid4')
     uuid_mock.return_value = uuid.UUID('12345678123456781234567812345678')
@@ -239,12 +211,9 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture):
     python_version = '2.7.6'
     self.StartPatch('platform.python_version').return_value = python_version
 
-    expect_user_agent = self.UserAgent('10.0.0',
-                                       'None',
-                                       uuid_mock.return_value.hex,
-                                       python_version,
-                                       False)
-    user_agent_header = self._EncodeHeaders({'user-agent': expect_user_agent})
+    expect_user_agent = self.UserAgent(
+        '10.0.0', 'None', uuid_mock.return_value.hex, python_version, False)
+    user_agent_header = {b'user-agent': expect_user_agent}
     log_mock = self.StartObjectPatch(log.status, 'Print')
     properties.VALUES.core.log_http.Set(True)
     capture_session_file = os.path.join(self.CreateTempDir(), 'session.yaml')
@@ -292,8 +261,9 @@ total round trip time (request+response): 2.000 secs
     time_mock.side_effect = [1.0, 1.1, 5.0, 5.1]
 
     # Test with positional argument list.
-    request_headers = self._EncodeHeaders({'req_header1': 'val1'})
+    request_headers = {b'req_header1': b'val1'}
     http_client.request(url, 'GET', 'Request Body', request_headers)
+    request_headers.update(user_agent_header)
 
     expected_output = """\
 =======================
@@ -319,7 +289,7 @@ total round trip time (request+response): 4.000 secs
 ----------------------""".format(self._FormatHeaderOutput(request_headers),
                                  self._FormatHeaderOutput(response_headers))
 
-    with open(capture_session_file, 'w') as fp:
+    with io.open(capture_session_file, 'wt') as fp:
       session_capturer.SessionCapturer.capturer.Print(fp)
     self.AssertFileExists(capture_session_file)
     self.AssertFileContains('uri: http://foo.com', capture_session_file)

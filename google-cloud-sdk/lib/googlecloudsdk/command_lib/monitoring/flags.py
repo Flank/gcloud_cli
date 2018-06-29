@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Shared resource flags for Cloud Monitoring commands."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.util.args import labels_util
@@ -228,7 +230,7 @@ def AddNotificationChannelSettingFlags(parser, update=False):
 
 def AddCreateLabelsFlag(parser, labels_name, resource_name, extra_message='',
                         validate_values=True):
-  extra_message += (' If the {0} was given as a JSON/YAML object from a string '
+  extra_message += ('If the {0} was given as a JSON/YAML object from a string '
                     'or file, this flag will replace the labels value '
                     'in the given {0}.'.format(resource_name))
   labels_util.GetCreateLabelsFlag(

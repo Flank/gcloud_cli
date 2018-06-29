@@ -93,14 +93,11 @@ class BackendServiceUpdateTest(UpdateTestBase):
     self.RunUpdate('backend-service-1 --description "my new description"')
 
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -130,16 +127,14 @@ class BackendServiceUpdateTest(UpdateTestBase):
     self.RunUpdate('backend-service-1 --description ""')
 
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
+                  description='',
                   backends=[],
                   healthChecks=[
                       (self.compute_uri + '/projects/'
@@ -167,26 +162,21 @@ class BackendServiceUpdateTest(UpdateTestBase):
                    'http-health-check-1,http-health-check-2')
 
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='my backend service',
-                  healthChecks=[
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/httpHealthChecks/'
-                       'http-health-check-1'),
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/httpHealthChecks/'
-                       'http-health-check-2')
-                  ],
+                  healthChecks=[(self.compute_uri + '/projects/'
+                                 'my-project/global/httpHealthChecks/'
+                                 'http-health-check-1'),
+                                (self.compute_uri + '/projects/'
+                                 'my-project/global/httpHealthChecks/'
+                                 'http-health-check-2')],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -208,23 +198,18 @@ class BackendServiceUpdateTest(UpdateTestBase):
                    '--http-health-checks my-other-health-check')
 
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='my backend service',
-                  healthChecks=[
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/httpHealthChecks/'
-                       'my-other-health-check')
-                  ],
+                  healthChecks=[(self.compute_uri + '/projects/'
+                                 'my-project/global/httpHealthChecks/'
+                                 'my-other-health-check')],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -245,14 +230,11 @@ class BackendServiceUpdateTest(UpdateTestBase):
     self.RunUpdate('backend-service-1 --timeout 10s')
 
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -281,14 +263,11 @@ class BackendServiceUpdateTest(UpdateTestBase):
     self.RunUpdate('backend-service-1 --port-name my-port-name')
 
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -320,36 +299,31 @@ class BackendServiceUpdateTest(UpdateTestBase):
         '--https-health-checks https-health-check-1,https-health-check-2')
 
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='my backend service',
-                  healthChecks=[
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/httpHealthChecks/'
-                       'http-health-check-1'),
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/httpHealthChecks/'
-                       'http-health-check-2'),
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/httpsHealthChecks/'
-                       'https-health-check-1'),
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/httpsHealthChecks/'
-                       'https-health-check-2')
-                  ],
+                  healthChecks=[(self.compute_uri + '/projects/'
+                                 'my-project/global/httpHealthChecks/'
+                                 'http-health-check-1'),
+                                (self.compute_uri + '/projects/'
+                                 'my-project/global/httpHealthChecks/'
+                                 'http-health-check-2'),
+                                (self.compute_uri + '/projects/'
+                                 'my-project/global/httpsHealthChecks/'
+                                 'https-health-check-1'),
+                                (self.compute_uri + '/projects/'
+                                 'my-project/global/httpsHealthChecks/'
+                                 'https-health-check-2')],
                   name='backend-service-1',
                   portName='https',
-                  protocol=(messages.BackendService
-                            .ProtocolValueValuesEnum.HTTPS),
+                  protocol=(
+                      messages.BackendService.ProtocolValueValuesEnum.HTTPS),
                   selfLink=(self.compute_uri + ''
                             '/projects/my-project/global/backendServices/'
                             'backend-service-1'),
@@ -386,14 +360,11 @@ class BackendServiceUpdateTest(UpdateTestBase):
     self.RunUpdate(cmd)
 
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -424,10 +395,9 @@ class BackendServiceUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           self.messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          self.messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          self.messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=self.messages.BackendService(
                   backends=[],
@@ -439,14 +409,14 @@ class BackendServiceUpdateTest(UpdateTestBase):
                   ],
                   name='backend-service-1',
                   portName='http',
-                  protocol=(
-                      self.messages.BackendService.ProtocolValueValuesEnum.HTTP
-                  ),
+                  protocol=(self.messages.BackendService.
+                            ProtocolValueValuesEnum.HTTP),
                   selfLink=(self.compute_uri + '/projects/'
                             'my-project/global/backendServices/'
                             'backend-service-1'),
                   timeoutSec=30),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testNoEnableCdn(self):
     self.make_requests.side_effect = [[self._backend_services[0]], []]
@@ -456,10 +426,9 @@ class BackendServiceUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           self.messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          self.messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          self.messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=self.messages.BackendService(
                   backends=[],
@@ -471,14 +440,14 @@ class BackendServiceUpdateTest(UpdateTestBase):
                   ],
                   name='backend-service-1',
                   portName='http',
-                  protocol=(
-                      self.messages.BackendService.ProtocolValueValuesEnum.HTTP
-                  ),
+                  protocol=(self.messages.BackendService.
+                            ProtocolValueValuesEnum.HTTP),
                   selfLink=(self.compute_uri + '/projects/'
                             'my-project/global/backendServices/'
                             'backend-service-1'),
                   timeoutSec=30),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
 
 class SessionAffinityApiUpdateTest(UpdateTestBase):
@@ -505,10 +474,9 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -524,11 +492,12 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
                             'my-project/global/backendServices/'
                             'backend-service-1'),
                   timeoutSec=30,
-                  sessionAffinity=
-                  (messages.BackendService.SessionAffinityValueValuesEnum
-                   .GENERATED_COOKIE),
+                  sessionAffinity=(
+                      messages.BackendService.SessionAffinityValueValuesEnum.
+                      GENERATED_COOKIE),
                   affinityCookieTtlSec=18),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   # Test that setting session affinity to "none" works
   def testNone(self):
@@ -543,10 +512,9 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -562,10 +530,11 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
                             'my-project/global/backendServices/'
                             'backend-service-1'),
                   timeoutSec=30,
-                  sessionAffinity=
-                  (messages.BackendService.SessionAffinityValueValuesEnum.NONE),
+                  sessionAffinity=(messages.BackendService.
+                                   SessionAffinityValueValuesEnum.NONE),
                   affinityCookieTtlSec=18),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   # Test that setting session affinity to "client_ip" works
   def testClientIp(self):
@@ -580,10 +549,9 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -599,11 +567,11 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
                             'my-project/global/backendServices/'
                             'backend-service-1'),
                   timeoutSec=30,
-                  sessionAffinity=
-                  (messages.BackendService.SessionAffinityValueValuesEnum
-                   .CLIENT_IP),
+                  sessionAffinity=(messages.BackendService.
+                                   SessionAffinityValueValuesEnum.CLIENT_IP),
                   affinityCookieTtlSec=18),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   # Test that setting session affinity to "generated_cookie" works
   def testGeneratedCookie(self):
@@ -615,10 +583,9 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -634,10 +601,11 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
                             'my-project/global/backendServices/'
                             'backend-service-1'),
                   timeoutSec=30,
-                  sessionAffinity=
-                  (messages.BackendService.SessionAffinityValueValuesEnum
-                   .GENERATED_COOKIE)),
-              project='my-project'))],)
+                  sessionAffinity=(
+                      messages.BackendService.SessionAffinityValueValuesEnum.
+                      GENERATED_COOKIE)),
+              project='my-project'))],
+    )
 
   # Test that setting session affinity cookie TTL works
   def testAffinityTtl(self):
@@ -649,10 +617,9 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -669,7 +636,8 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
                             'backend-service-1'),
                   timeoutSec=30,
                   affinityCookieTtlSec=18),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   # Test that setting session affinity and cookie TTL at the same time
   # works
@@ -684,10 +652,9 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -703,9 +670,9 @@ class SessionAffinityApiUpdateTest(UpdateTestBase):
                             'my-project/global/backendServices/'
                             'backend-service-1'),
                   timeoutSec=30,
-                  sessionAffinity=
-                  (messages.BackendService.SessionAffinityValueValuesEnum
-                   .GENERATED_COOKIE),
+                  sessionAffinity=(
+                      messages.BackendService.SessionAffinityValueValuesEnum.
+                      GENERATED_COOKIE),
                   affinityCookieTtlSec=18),
               project='my-project'))])
 
@@ -758,10 +725,9 @@ class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -778,7 +744,8 @@ class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(UpdateTestBase):
                   selfLink=(self.compute_uri + '/projects/'
                             'my-project/global/backendServices/'
                             'backend-service-1')),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testChangeConnectionDrainingTimeoutInMinutes(self):
     messages = self.messages
@@ -794,10 +761,9 @@ class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -814,7 +780,8 @@ class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(UpdateTestBase):
                   selfLink=(self.compute_uri + '/projects/'
                             'my-project/global/backendServices/'
                             'backend-service-1')),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testChangeOnlyConnectionDrainingTimeout(self):
     messages = self.messages
@@ -829,10 +796,9 @@ class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -849,7 +815,8 @@ class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(UpdateTestBase):
                   selfLink=(self.compute_uri + '/projects/'
                             'my-project/global/backendServices/'
                             'backend-service-1')),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testChangeOnlyConnectionDrainingTimeoutToZero(self):
     messages = self.messages
@@ -864,10 +831,9 @@ class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(UpdateTestBase):
     self.CheckRequests(
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
@@ -884,7 +850,8 @@ class BackendServiceWithConnectionDrainingTimeoutApiUpdateTest(UpdateTestBase):
                   selfLink=(self.compute_uri + '/projects/'
                             'my-project/global/backendServices/'
                             'backend-service-1')),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
 
 class WithHealthcheckApiTest(UpdateTestBase):
@@ -903,19 +870,18 @@ class WithHealthcheckApiTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='my backend service',
-                  healthChecks=[
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/healthChecks/'
-                       'health-check-1'), (self.compute_uri + '/projects/'
-                                           'my-project/global/healthChecks/'
-                                           'health-check-2')
-                  ],
+                  healthChecks=[(self.compute_uri + '/projects/'
+                                 'my-project/global/healthChecks/'
+                                 'health-check-1'),
+                                (self.compute_uri + '/projects/'
+                                 'my-project/global/healthChecks/'
+                                 'health-check-2')],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -923,7 +889,8 @@ class WithHealthcheckApiTest(UpdateTestBase):
                             'my-project/global/backendServices/'
                             'backend-service-1'),
                   timeoutSec=30),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testWithHttpsHealthChecksUpdatedToHealthChecks(self):
     messages = self.messages
@@ -938,16 +905,14 @@ class WithHealthcheckApiTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-3', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-3',
               backendServiceResource=messages.BackendService(
                   backends=[],
-                  healthChecks=[
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/healthChecks/'
-                       'health-check-1')
-                  ],
+                  healthChecks=[(self.compute_uri + '/projects/'
+                                 'my-project/global/healthChecks/'
+                                 'health-check-1')],
                   name='backend-service-3',
                   portName='http',
                   protocol=(
@@ -956,7 +921,8 @@ class WithHealthcheckApiTest(UpdateTestBase):
                             '/projects/my-project/global/backendServices/'
                             'backend-service-3'),
                   timeoutSec=30),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testWithHealthChecksUpdatedToHealthChecks(self):
     messages = self.messages
@@ -971,16 +937,14 @@ class WithHealthcheckApiTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-3', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-3',
               backendServiceResource=messages.BackendService(
                   backends=[],
-                  healthChecks=[
-                      (self.compute_uri + '/projects/'
-                       'my-project/global/healthChecks/'
-                       'new-health-check')
-                  ],
+                  healthChecks=[(self.compute_uri + '/projects/'
+                                 'my-project/global/healthChecks/'
+                                 'new-health-check')],
                   name='backend-service-3',
                   portName='http',
                   protocol=(
@@ -989,7 +953,8 @@ class WithHealthcheckApiTest(UpdateTestBase):
                             '/projects/my-project/global/backendServices/'
                             'backend-service-3'),
                   timeoutSec=30),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testMixingHealthCheckAndHttpHealthCheck(self):
     self.make_requests.side_effect = iter([
@@ -1045,15 +1010,13 @@ class WithHealthcheckApiTest(UpdateTestBase):
                    use_global=False)
 
     self.CheckRequests(
-        [(self.compute.regionBackendServices,
-          'Get',
+        [(self.compute.regionBackendServices, 'Get',
           messages.ComputeRegionBackendServicesGetRequest(
               backendService='backend-service-3',
               region='alaska',
               project='my-project'))],
-        [(self.compute.regionBackendServices,
-          'Update',
-          messages.ComputeRegionBackendServicesUpdateRequest(
+        [(self.compute.regionBackendServices, 'Patch',
+          messages.ComputeRegionBackendServicesPatchRequest(
               backendService='backend-service-3',
               backendServiceResource=updated_backend_service,
               region='alaska',
@@ -1110,15 +1073,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1130,7 +1094,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeHost=True,
                           includeProtocol=True,
                           includeQueryString=True))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyIncludeHost(self):
     messages = self.messages
@@ -1147,15 +1112,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1167,7 +1133,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeHost=True,
                           includeProtocol=False,
                           includeQueryString=False))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyExcludeHost(self):
     messages = self.messages
@@ -1184,15 +1151,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1204,7 +1172,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeHost=False,
                           includeProtocol=True,
                           includeQueryString=True))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyIncludeProtocol(self):
     messages = self.messages
@@ -1221,15 +1190,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1241,7 +1211,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeHost=False,
                           includeProtocol=True,
                           includeQueryString=False))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyExcludeProtocol(self):
     messages = self.messages
@@ -1258,15 +1229,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1278,7 +1250,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeHost=True,
                           includeProtocol=False,
                           includeQueryString=True))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyIncludeQueryString(self):
     messages = self.messages
@@ -1295,15 +1268,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1315,7 +1289,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeHost=False,
                           includeProtocol=False,
                           includeQueryString=True))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyExcludeQueryString(self):
     messages = self.messages
@@ -1332,15 +1307,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1352,7 +1328,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeHost=True,
                           includeProtocol=True,
                           includeQueryString=False))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyQueryStringBlacklist(self):
     messages = self.messages
@@ -1369,15 +1346,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1391,7 +1369,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeQueryString=True,
                           queryStringBlacklist=['contentid', 'language'],
                           queryStringWhitelist=[]))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyQueryStringBlacklistEmpty(self):
     messages = self.messages
@@ -1408,15 +1387,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1430,7 +1410,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeQueryString=True,
                           queryStringBlacklist=[],
                           queryStringWhitelist=[]))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testCacheKeyQueryStringWhitelist(self):
     messages = self.messages
@@ -1447,15 +1428,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1469,7 +1451,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeQueryString=True,
                           queryStringBlacklist=[],
                           queryStringWhitelist=['contentid', 'language']))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testExcludeQueryStringShouldRemoveBlacklist(self):
     messages = self.messages
@@ -1486,15 +1469,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1508,7 +1492,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeQueryString=False,
                           queryStringBlacklist=[],
                           queryStringWhitelist=[]))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testExcludeQueryStringShouldRemoveWhitelist(self):
     messages = self.messages
@@ -1525,15 +1510,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='whatever',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1547,7 +1533,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeQueryString=False,
                           queryStringBlacklist=[],
                           queryStringWhitelist=[]))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testEnableWhitelistWithExcludedQueryString(self):
     self.make_requests.side_effect = iter([
@@ -1589,15 +1576,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='my backend service',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1611,7 +1599,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeQueryString=True,
                           queryStringBlacklist=[],
                           queryStringWhitelist=['contentid', 'language']))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
   def testEnableBlacklistWithExistingExcludedQueryString(self):
     messages = self.messages
@@ -1627,15 +1616,16 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
         [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
               backendService='backend-service-1', project='my-project'))],
-        [(self.compute.backendServices, 'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],
                   description='my backend service',
-                  healthChecks=[(
-                      self.compute_uri + '/projects/'
-                      'my-project/global/httpHealthChecks/my-health-check')],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
                   name='backend-service-1',
                   portName='http',
                   protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
@@ -1649,7 +1639,8 @@ class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
                           includeQueryString=True,
                           queryStringBlacklist=['campaignid'],
                           queryStringWhitelist=[]))),
-              project='my-project'))],)
+              project='my-project'))],
+    )
 
 
 class WithIAPApiTest(UpdateTestBase):
@@ -1677,14 +1668,11 @@ class WithIAPApiTest(UpdateTestBase):
   def CheckResultsWithProtocol(self, expected_message, protocol):
     messages = self.messages
     self.CheckRequests(
-        [(self.compute.backendServices,
-          'Get',
+        [(self.compute.backendServices, 'Get',
           messages.ComputeBackendServicesGetRequest(
-              backendService='backend-service-1',
-              project='my-project'))],
-        [(self.compute.backendServices,
-          'Update',
-          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
               backendService='backend-service-1',
               backendServiceResource=messages.BackendService(
                   backends=[],

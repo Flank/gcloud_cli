@@ -278,6 +278,22 @@ class TrialCompleter(completers.ListCommandCompleter):
       raise ValueError('Catastrophic cache update failure.')
 
 
+class GenericCompleter(object):
+
+  def __init__(self):
+    pass
+
+  def __call__(self, prefix=''):
+    if prefix == 'error':
+      self.UnknownMethod()
+    options = ['aaa',
+               'aab',
+               'bbb',
+               'bbc',
+               'xyz']
+    return [option for option in options if option.startswith(prefix)]
+
+
 class MockFromString(object):
 
   PROPERTIES = {
@@ -907,6 +923,34 @@ class ParserCompleterFlagTest(completer_test_base.FlagCompleterBase):
         ],
         completer(prefix='GetParameterFlag-property-value',
                   parsed_args=parsed_args))
+
+  def testGenericCompleterClass(self):
+    self.parser.add_argument(
+        '--file', completer=GenericCompleter,
+        help='Auxilio aliis.')
+    self.parser.add_argument('--test', help='Auxilio aliis.')
+    parsed_args = self.parser.parse_args(['--file=a'])
+
+    completer = parsed_args.GetFlagArgument('file').completer
+    self.assertEqual(GenericCompleter, completer.completer_class)
+
+    self.assertEqual(
+        ['aaa', 'aab'],
+        completer(prefix='a', parsed_args=parsed_args))
+    self.assertEqual(
+        ['aaa', 'aab', 'bbb', 'bbc', 'xyz'],
+        completer(prefix='', parsed_args=parsed_args))
+    self.assertEqual(
+        [],
+        completer(prefix='c', parsed_args=parsed_args))
+    self.assertEqual(
+        [
+            'errorERROR: '
+            'GenericCompleter resource completer failed.     ',
+            'errorREASON: '
+            "'GenericCompleter' object has no attribute 'UnknownMethod'",
+        ],
+        completer(prefix='error', parsed_args=parsed_args))
 
 
 if __name__ == '__main__':

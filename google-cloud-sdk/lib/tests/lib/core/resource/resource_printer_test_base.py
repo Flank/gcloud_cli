@@ -114,6 +114,7 @@ class Base(sdk_test_base.WithOutputCapture):
         ],
     ]
     self.ordered_dict_resource = [
+        # intentionally unsorted
         collections.OrderedDict([
             ('allowed', [
                 collections.OrderedDict([
@@ -121,13 +122,13 @@ class Base(sdk_test_base.WithOutputCapture):
                     ('ports', ['2376'])
                 ])
             ]),
-            ('creationTimestamp', '2015-05-20T08:14:24.654-07:00'),
             ('description', ''),
-            ('id', '123456789'),
-            ('kind', 'compute#firewall'),
             ('name', 'allow-gae-builder'),
+            ('id', '123456789'),
             ('network', 'default'),
-            ('sourceRanges', ['0.0.0.0/0'])
+            ('sourceRanges', ['0.0.0.0/0']),
+            ('kind', 'compute#firewall'),
+            ('creationTimestamp', '2015-05-20T08:14:24.654-07:00'),
         ])
     ]
     self.repeated_resource = [

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Module for oslogin test base classes."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base

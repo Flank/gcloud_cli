@@ -14,8 +14,8 @@
 """Tests for googlecloudsdk.api_lib.sql.instances."""
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.sql import instances as instances_util
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -29,20 +29,24 @@ class DatabaseInstancesTest(base.SqlMockTestBeta):
     self.mocked_client.instances.List.Expect(
         self.messages.SqlInstancesListRequest(
             maxResults=100,
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.InstancesListResponse(
             items=data.GetDatabaseInstancesListOfOne(),
-            kind=u'sql#instancesList',
-            nextPageToken='100',))
+            kind='sql#instancesList',
+            nextPageToken='100',
+        ))
     self.mocked_client.instances.List.Expect(
         self.messages.SqlInstancesListRequest(
-            pageToken=u'100',
+            pageToken='100',
             project=self.Project(),
-            maxResults=100,),
+            maxResults=100,
+        ),
         self.messages.InstancesListResponse(
             items=data.GetDatabaseInstancesListOfTwo(),
-            kind=u'sql#instancesList',
-            nextPageToken=None,))
+            kind='sql#instancesList',
+            nextPageToken=None,
+        ))
 
     expected_instance_list = data.GetDatabaseInstancesListOfOne(
     ) + data.GetDatabaseInstancesListOfTwo()
@@ -55,20 +59,24 @@ class DatabaseInstancesTest(base.SqlMockTestBeta):
     self.mocked_client.instances.List.Expect(
         self.messages.SqlInstancesListRequest(
             maxResults=2,
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.InstancesListResponse(
             items=data.GetDatabaseInstancesListOfOne(),
-            kind=u'sql#instancesList',
-            nextPageToken='100',))
+            kind='sql#instancesList',
+            nextPageToken='100',
+        ))
     self.mocked_client.instances.List.Expect(
         self.messages.SqlInstancesListRequest(
-            pageToken=u'100',
+            pageToken='100',
             project=self.Project(),
-            maxResults=1,),
+            maxResults=1,
+        ),
         self.messages.InstancesListResponse(
             items=data.GetDatabaseInstancesListOfTwo(),
-            kind=u'sql#instancesList',
-            nextPageToken=None,))
+            kind='sql#instancesList',
+            nextPageToken=None,
+        ))
 
     expected_instance_list = data.GetDatabaseInstancesListOfOne(
     ) + data.GetDatabaseInstancesListOfTwo()
@@ -82,20 +90,24 @@ class DatabaseInstancesTest(base.SqlMockTestBeta):
     self.mocked_client.instances.List.Expect(
         self.messages.SqlInstancesListRequest(
             maxResults=10,
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.InstancesListResponse(
             items=data.GetDatabaseInstancesListOfOne(),
-            kind=u'sql#instancesList',
-            nextPageToken='10',))
+            kind='sql#instancesList',
+            nextPageToken='10',
+        ))
     self.mocked_client.instances.List.Expect(
         self.messages.SqlInstancesListRequest(
-            pageToken=u'10',
+            pageToken='10',
             project=self.Project(),
-            maxResults=10,),
+            maxResults=10,
+        ),
         self.messages.InstancesListResponse(
             items=data.GetDatabaseInstancesListOfTwo(),
-            kind=u'sql#instancesList',
-            nextPageToken=None,))
+            kind='sql#instancesList',
+            nextPageToken=None,
+        ))
 
     expected_instance_list = data.GetDatabaseInstancesListOfOne(
     ) + data.GetDatabaseInstancesListOfTwo()

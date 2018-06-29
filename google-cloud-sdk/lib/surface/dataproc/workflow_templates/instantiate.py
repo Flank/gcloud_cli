@@ -12,7 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Instantiate a workflow template."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import uuid
+
+from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.dataproc import dataproc as dp
 from googlecloudsdk.api_lib.dataproc import util
@@ -27,27 +31,32 @@ class Instantiate(base.CreateCommand):
 
   @staticmethod
   def Args(parser):
-    flags.AddTemplateFlag(parser, 'run')
+    flags.AddTemplateResourceArg(parser, 'run')
     flags.AddTimeoutFlag(parser, default='35m')
+    flags.AddParametersFlag(parser)
     base.ASYNC_FLAG.AddToParser(parser)
 
   def Run(self, args):
     dataproc = dp.Dataproc(self.ReleaseTrack())
     msgs = dataproc.messages
-    template = util.ParseWorkflowTemplates(args.template, dataproc)
+    template_ref = args.CONCEPTS.template.Parse()
 
     instantiate_request = dataproc.messages.InstantiateWorkflowTemplateRequest()
     instantiate_request.instanceId = uuid.uuid4().hex  # request UUID
+    if args.parameters:
+      instantiate_request.parameters = encoding.DictToMessage(
+          args.parameters,
+          msgs.InstantiateWorkflowTemplateRequest.ParametersValue)
 
     request = msgs.DataprocProjectsRegionsWorkflowTemplatesInstantiateRequest(
         instantiateWorkflowTemplateRequest=instantiate_request,
-        name=template.RelativeName())
+        name=template_ref.RelativeName())
 
     operation = dataproc.client.projects_regions_workflowTemplates.Instantiate(
         request)
     if args.async:
       log.status.Print('Instantiating [{0}] with operation [{1}].'.format(
-          template.Name(), operation.name))
+          template_ref.Name(), operation.name))
       return
 
     operation = util.WaitForWorkflowTemplateOperation(

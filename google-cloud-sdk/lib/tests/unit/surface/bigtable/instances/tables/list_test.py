@@ -11,29 +11,40 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Test of the 'list' command."""
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
 from googlecloudsdk.core import grpc_util
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
 import mock
+import six
 from six.moves import range  # pylint: disable=redefined-builtin
-from google.bigtable.admin.v2 import bigtable_table_admin_pb2
-from google.bigtable.admin.v2 import bigtable_table_admin_pb2_grpc
-from google.bigtable.admin.v2 import table_pb2
 
 
-class BigtableTestStub(bigtable_table_admin_pb2_grpc.BigtableTableAdminStub):
+if six.PY2:
+  # TODO(b/78118402): gRPC support on Python 3.
+  # This doesn't work on py3. We skip the import here just so tests can load
+  # and be skipped without crashing.
+  from google.bigtable.admin.v2 import bigtable_table_admin_pb2  # pylint: disable=g-import-not-at-top
+  from google.bigtable.admin.v2 import bigtable_table_admin_pb2_grpc  # pylint: disable=g-import-not-at-top
+  from google.bigtable.admin.v2 import table_pb2  # pylint: disable=g-import-not-at-top
 
-  def __init__(self, channel):
-    # pylint:disable=invalid-name
-    self.ListTables = mock.MagicMock()
+  # Can't create this class on py3 because it needs the grpc pb files.
+  class BigtableTestStub(bigtable_table_admin_pb2_grpc.BigtableTableAdminStub):
+
+    def __init__(self, channel):
+      # pylint:disable=invalid-name
+      self.ListTables = mock.MagicMock()
 
 
+@test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/78118402')
 class ListTests(sdk_test_base.WithFakeAuth,
                 cli_test_base.CliTestBase,
                 sdk_test_base.WithOutputCapture):

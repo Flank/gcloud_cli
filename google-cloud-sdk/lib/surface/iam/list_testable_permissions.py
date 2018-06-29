@@ -11,13 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Command for listing testable permissions for a given resource."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from apitools.base.py import list_pager
 
 from googlecloudsdk.api_lib.iam import exceptions
 from googlecloudsdk.api_lib.iam import util
 from googlecloudsdk.calliope import base
+from googlecloudsdk.command_lib.iam import flags
 from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.core import resources
 
@@ -42,9 +47,8 @@ class ListTestablePermissions(base.Command):
 
   @staticmethod
   def Args(parser):
-    parser.add_argument(
-        'resource',
-        help=('The full resource name to get the testable permissions for.'))
+    flags.GetResourceNameFlag(
+        'get the testable permissions for').AddToParser(parser)
     base.FILTER_FLAG.AddToParser(parser)
 
   def Run(self, args):

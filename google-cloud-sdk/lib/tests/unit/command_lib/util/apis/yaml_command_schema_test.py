@@ -21,7 +21,6 @@ import re
 
 from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema
 from googlecloudsdk.command_lib.util.apis import yaml_command_schema_util as util
 from googlecloudsdk.command_lib.util.apis import yaml_command_translator
@@ -224,7 +223,7 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(project_attr.name, 'project')
     self.assertEqual(project_attr.help_text, 'help1')
     self.assertEqual(zone_attr.name, 'zone')
-    self.assertEqual(zone_attr.help_text, concepts.ANCHOR_HELP)
+    self.assertEqual(zone_attr.help_text, 'help2')
 
     foo_flag = r.params[0]
     self.assertTrue(isinstance(foo_flag, yaml_command_schema.Argument))

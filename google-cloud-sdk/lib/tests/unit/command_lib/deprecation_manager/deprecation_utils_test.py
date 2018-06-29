@@ -15,6 +15,8 @@
 
 """Tests for error Deprecation Manager."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -66,7 +68,7 @@ Test Command Complete
     self.cli.Execute(['dep-command-withalt'])
     self.AssertLogContains('Test Command Complete\n')
     self.AssertErrContains("""\
-WARNING: This command is deprecated and will be removed in version 1.3.0. Please use alt-command as an alternative.
+WARNING: This command is deprecated and will be removed in version 1.3.0. Use `alt-command` instead.
 Test Command Complete
 """)
 

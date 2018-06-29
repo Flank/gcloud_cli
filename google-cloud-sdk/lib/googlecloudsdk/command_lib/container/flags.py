@@ -404,7 +404,7 @@ def AddEnableBinAuthzFlag(parser, hidden=True):
   )
 
 
-def AddZoneAndRegionFlags(parser, region_hidden=False):
+def AddZoneAndRegionFlags(parser):
   """Adds the --zone and --region flags to the parser."""
   # TODO(b/33343238): Remove the short form of the zone flag.
   # TODO(b/18105938): Add zone prompting
@@ -416,7 +416,6 @@ def AddZoneAndRegionFlags(parser, region_hidden=False):
       action=actions.StoreProperty(properties.VALUES.compute.zone))
   group.add_argument(
       '--region',
-      hidden=region_hidden,
       help='The compute region (e.g. us-central1) for the cluster.')
 
 
@@ -469,7 +468,12 @@ Applies the given kubernetes labels on all nodes in the new node-pool. Example:
   help_text += """
 New nodes, including ones created by resize or recreate, will have these labels
 on the kubernetes API node object and can be used in nodeSelectors.
-See http://kubernetes.io/docs/user-guide/node-selection/ for examples."""
+See [](http://kubernetes.io/docs/user-guide/node-selection/) for examples.
+
+Note that kubernetes labels, intended to associate cluster components
+and resources with one another and manage resource lifecycles, are different
+from Kubernetes Engine labels that are used for the purpose of tracking billing
+and usage information."""
 
   parser.add_argument(
       '--node-labels',
@@ -970,7 +974,7 @@ def AddDiskTypeFlag(parser, suppressed=False):
     suppressed: Whether or not to suppress help text.
   """
   help_text = """\
-Type of the node VM boot disk.
+Type of the node VM boot disk. Defaults to pd-standard.
 """
   parser.add_argument(
       '--disk-type',
@@ -1070,6 +1074,48 @@ subnetwork.
 Must be used in conjunction with '--enable-ip-alias'. Cannot be used
 with --create-subnetwork.
 """)
+
+
+def AddMaxPodsPerNodeFlag(parser, for_node_pool=False, hidden=False):
+  """Adds max pod number constraints flags to the parser.
+
+  Args:
+    parser: A given parser.
+    for_node_pool: True if it's applied to a node pool.
+                   False if it's applied to a cluster.
+    hidden: Whether or not to hide the help text.
+  """
+
+  if for_node_pool:
+    parser.add_argument(
+        '--max-pods-per-node',
+        default=None,
+        help="""\
+The max number of pods per node for this node pool.
+
+This flag sets the maximum number of pods that can be run at the same time on a
+node. This will override the value given with --default-max-pods-per-node flag
+set at the cluster level.
+
+Must be used in conjunction with '--enable-ip-alias'.
+""",
+        hidden=hidden,
+        type=int)
+  else:
+    parser.add_argument(
+        '--default-max-pods-per-node',
+        default=None,
+        help="""\
+The default max number of pods per node for node pools in the cluster.
+
+This flag sets the default max-pods-per-node for node pools in the cluster. If
+--max-pods-per-node is not specified explicitly for a node pool, this flag
+value will be used.
+
+Must be used in conjunction with '--enable-ip-alias'.
+""",
+        hidden=hidden,
+        type=int)
 
 
 def AddMinCpuPlatformFlag(parser, for_node_pool=False, hidden=False):
@@ -1248,19 +1294,19 @@ behavior.
       metavar='SCOPE',
       default='gke-default',
       help="""\
-Specifies scopes for the node instances. The project's default service account
-is used. Examples:
+Specifies scopes for the node instances. Examples:
 
-    $ {{command}} {example_target} --scopes=https://www.googleapis.com/auth/devstorage.read_only
+$ {{command}} {example_target} --scopes=https://www.googleapis.com/auth/devstorage.read_only
 
-    $ {{command}} {example_target} --scopes=bigquery,storage-rw,compute-ro
+$ {{command}} {example_target} --scopes=bigquery,storage-rw,compute-ro
 
-Multiple SCOPEs can specified, separated by commas.  logging-write and/or
-monitoring are added unless Cloud Logging and/or Cloud Monitoring are disabled
-(see --enable-cloud-logging and --enable-cloud-monitoring for more info).
+Multiple SCOPEs can be specified, separated by commas. `logging-write`
+and/or `monitoring` are added unless Cloud Logging and/or Cloud Monitoring
+are disabled (see `--enable-cloud-logging` and `--enable-cloud-monitoring`
+for more information).
 {track_help}
-SCOPE can be either the full URI of the scope or an alias. Available aliases
-are:
+SCOPE can be either the full URI of the scope or an alias. Available
+aliases are:
 
 [format="csv",options="header"]
 |========
@@ -1279,12 +1325,12 @@ Alias,URI
 Automatically enable Google Cloud Endpoints to take advantage of API management
 features by adding service-control and service-management scopes.
 
-If --no-enable-cloud-endpoints is set, remove service-control and
+If `--no-enable-cloud-endpoints` is set, remove service-control and
 service-management scopes, even if they are implicitly (via default) or
-explicitly set via --scopes.
+explicitly set via `--scopes`.
 
---[no-]enable-cloud-endpoints is not allowed if container/new_scopes_behavior
-property is set to true.
+`--[no-]enable-cloud-endpoints` is not allowed if
+`container/new_scopes_behavior` property is set to true.
 """
   scopes_group.add_argument(
       '--enable-cloud-endpoints',
@@ -1548,8 +1594,6 @@ your cluster size.'
   parser.add_argument(
       '--concurrent-node-count',
       type=arg_parsers.BoundedInt(1, api_adapter.MAX_CONCURRENT_NODE_COUNT),
-      # TODO(b/76150055): Un-hide once this is ready for release.
-      hidden=True,
       help=help_text)
 
 
@@ -1588,4 +1632,22 @@ of RAM:
 
   parser.add_argument(
       '--machine-type', '-m',
+      help=help_text)
+
+
+def AddManagedPodIdentityFlag(parser):
+  """Adds --enable-managed-pod-identity flag to the parser."""
+  help_text = """\
+Enable Managed Pod Identity on the cluster.
+
+When enabled, pods with cloud.google.com/service-account annotations will be
+able to authenticate to Google Cloud Platform APIs on behalf of service account
+specified in the annotation.
+"""
+  parser.add_argument(
+      '--enable-managed-pod-identity',
+      action='store_true',
+      default=False,
+      # TODO(b/109942548): unhide this flag for Beta
+      hidden=True,
       help=help_text)

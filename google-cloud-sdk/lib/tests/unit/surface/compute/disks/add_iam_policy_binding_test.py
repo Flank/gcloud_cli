@@ -14,6 +14,8 @@
 """Tests for the disks add-iam-policy-binding subcommand."""
 
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from apitools.base.py.testing import mock

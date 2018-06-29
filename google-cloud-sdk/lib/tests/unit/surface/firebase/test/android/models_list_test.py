@@ -14,6 +14,8 @@
 
 """Tests that exercise listing of Android models in the device catalog."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_attr
 from tests.lib import test_case

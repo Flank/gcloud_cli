@@ -11,7 +11,7 @@ gcloud compute interconnects attachments \- read and manipulate Google Compute E
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute interconnects attachments\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute interconnects attachments\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -30,6 +30,23 @@ help\fR for details.
 
 
 
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdedicated\fR
+Create or manipulate dedicated interconnect attachments.
+
+.TP 2m
+\fBpartner\fR
+Create or manipulate partner interconnect attachments.
+
+
+.RE
+.sp
+
 .SH "COMMANDS"
 
 \f5\fICOMMAND\fR\fR is one of the following:
@@ -37,7 +54,7 @@ help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\fR
-Create a Google Compute Engine interconnect attachment.
+\fB(DEPRECATED)\fR Create a Google Compute Engine interconnect attachment.
 
 .TP 2m
 \fBdelete\fR

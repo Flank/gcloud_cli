@@ -7,7 +7,7 @@
   "version": "v2beta2",
   "revision": "0",
   "title": "Cloud Tasks API",
-  "description": "Manages the execution of large numbers of distributed requests. Cloud Tasks is in Alpha.",
+  "description": "Manages the execution of large numbers of distributed requests.",
   "ownerDomain": "google.com",
   "ownerName": "Google",
   "icons": {
@@ -44,11 +44,6 @@
       ],
       "location": "query"
     },
-    "bearer_token": {
-      "type": "string",
-      "description": "OAuth bearer token.",
-      "location": "query"
-    },
     "callback": {
       "type": "string",
       "description": "JSONP",
@@ -67,12 +62,6 @@
     "oauth_token": {
       "type": "string",
       "description": "OAuth 2.0 token for the current user.",
-      "location": "query"
-    },
-    "pp": {
-      "type": "boolean",
-      "description": "Pretty-print response.",
-      "default": "true",
       "location": "query"
     },
     "prettyPrint": {
@@ -281,7 +270,7 @@
     },
     "RateLimits": {
       "id": "RateLimits",
-      "description": "Rate limits.\n\nThis message determines the maximum rate that tasks can be dispatched by a\nqueue, regardless of whether the dispatch is a first task attempt or a retry.",
+      "description": "Rate limits.\n\nThis message determines the maximum rate that tasks can be dispatched by a\nqueue, regardless of whether the dispatch is a first task attempt or a retry.\n\nNote: The debugging command, RunTask, will run a task\neven if the queue has reached its RateLimits.",
       "type": "object",
       "properties": {
         "maxTasksDispatchedPerSecond": {
@@ -295,7 +284,7 @@
           "format": "int32"
         },
         "maxConcurrentTasks": {
-          "description": "The maximum number of concurrent tasks that Cloud Tasks allows\nto be dispatched for this queue. After this threshold has been\nreached, Cloud Tasks stops dispatching tasks until the number of\nconcurrent requests decreases.\n\nIf unspecified when the queue is created, Cloud Tasks will pick the\ndefault.\n\n\nThe maximum allowed value is 5,000. -1 indicates no limit.\n\nThis field is output only for\n[pull queues](google.cloud.tasks.v2beta2.PullTarget).\n\n\nThis field has the same meaning as\n[max_concurrent_requests in queue.yaml\/xml](\/appengine\/docs\/standard\/python\/config\/queueref#max_concurrent_requests).",
+          "description": "The maximum number of concurrent tasks that Cloud Tasks allows\nto be dispatched for this queue. After this threshold has been\nreached, Cloud Tasks stops dispatching tasks until the number of\nconcurrent requests decreases.\n\nIf unspecified when the queue is created, Cloud Tasks will pick the\ndefault.\n\n\nThe maximum allowed value is 5,000.\n\nThis field is output only for\n[pull queues](google.cloud.tasks.v2beta2.PullTarget) and always -1, which\nindicates no limit. No other queue types can have `max_concurrent_tasks`\nset to -1.\n\n\nThis field has the same meaning as\n[max_concurrent_requests in queue.yaml\/xml](\/appengine\/docs\/standard\/python\/config\/queueref#max_concurrent_requests).",
           "type": "integer",
           "format": "int32"
         }
@@ -1338,7 +1327,7 @@
                       "scopes": [
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
-                      "description": "Creates a task and adds it to a queue.\n\nTo add multiple tasks at the same time, use\n[HTTP batching](\/storage\/docs\/json_api\/v1\/how-tos\/batch)\nor the batching documentation for your client library, for example\nhttps:\/\/developers.google.com\/api-client-library\/python\/guide\/batch.\n\nTasks cannot be updated after creation; there is no UpdateTask command.\n\n* For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),\n  the maximum task size is 100KB.\n* For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this\n  the maximum task size is 1MB."
+                      "description": "Creates a task and adds it to a queue.\n\nTasks cannot be updated after creation; there is no UpdateTask command.\n\n* For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),\n  the maximum task size is 100KB.\n* For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this\n  the maximum task size is 1MB."
                     },
                     "delete": {
                       "id": "cloudtasks.projects.locations.queues.tasks.delete",
@@ -1419,7 +1408,7 @@
                       "scopes": [
                         "https://www.googleapis.com/auth/cloud-platform"
                       ],
-                      "description": "Acknowledges a pull task.\n\nThe worker, that is, the entity that\nleased this task must call this method\nto indicate that the work associated with the task has finished.\n\nThe worker must acknowledge a task within the\nlease_duration or the lease\nwill expire and the task will become available to be leased\nagain. After the task is acknowledged, it will not be returned\nby a later LeaseTasks,\nGetTask, or\nListTasks.\n\nTo acknowledge multiple tasks at the same time, use\n[HTTP batching](\/storage\/docs\/json_api\/v1\/how-tos\/batch)\nor the batching documentation for your client library, for example\nhttps:\/\/developers.google.com\/api-client-library\/python\/guide\/batch."
+                      "description": "Acknowledges a pull task.\n\nThe worker, that is, the entity that\nleased this task must call this method\nto indicate that the work associated with the task has finished.\n\nThe worker must acknowledge a task within the\nlease_duration or the lease\nwill expire and the task will become available to be leased\nagain. After the task is acknowledged, it will not be returned\nby a later LeaseTasks,\nGetTask, or\nListTasks."
                     },
                     "renewLease": {
                       "id": "cloudtasks.projects.locations.queues.tasks.renewLease",

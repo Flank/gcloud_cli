@@ -16,6 +16,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from googlecloudsdk.command_lib.cloud_shell import util
 from googlecloudsdk.command_lib.util.ssh import ssh
+from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
@@ -41,9 +42,24 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         remote=ssh.Remote(host="my-host", user="my-user"),
         port="123",
         identity_file=None,
-        remote_command=None,
+        remote_command=["DEVSHELL_PROJECT_ID=fake-project", "bash -l"],
         extra_flags=None,
-        tty=None,
+        tty=True,
+        options={"StrictHostKeyChecking": "no"})
+
+  def testNoProject(self):
+    self.mockConnection(user="my-user", host="my-host", port=123)
+    prop = properties.FromString("project")
+    properties.PersistProperty(prop, None, scope=properties.Scope.USER)
+    self.Run("alpha cloud-shell ssh")
+    self.ssh_init.assert_called_once_with(
+        mock.ANY,
+        remote=ssh.Remote(host="my-host", user="my-user"),
+        port="123",
+        identity_file=None,
+        remote_command=["bash -l"],
+        extra_flags=None,
+        tty=True,
         options={"StrictHostKeyChecking": "no"})
 
   def testCommand(self):
@@ -54,9 +70,9 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         remote=ssh.Remote(host="my-host", user="my-user"),
         port="123",
         identity_file=None,
-        remote_command=["ls"],
+        remote_command=["DEVSHELL_PROJECT_ID=fake-project", "ls"],
         extra_flags=None,
-        tty=None,
+        tty=False,
         options={"StrictHostKeyChecking": "no"})
 
   def testDryRun(self):
@@ -73,9 +89,9 @@ class SshTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         remote=ssh.Remote(host="my-host", user="my-user"),
         port="123",
         identity_file=None,
-        remote_command=None,
+        remote_command=["DEVSHELL_PROJECT_ID=fake-project", "bash -l"],
         extra_flags=["-someFlag", "anotherFlag"],
-        tty=None,
+        tty=True,
         options={"StrictHostKeyChecking": "no"})
 
   def mockConnection(self, user="some-user", host="some-host", port=6000):

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -29,7 +31,8 @@ class InstancesPromoteReplicaTest(base.SqlMockTestBeta):
     self.mocked_client.instances.PromoteReplica.Expect(
         self.messages.SqlInstancesPromoteReplicaRequest(
             instance='replica-1',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -46,23 +49,25 @@ class InstancesPromoteReplicaTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'replica-1',
+            targetId='replica-1',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'56dec13c-fe47-449d-9942-921ad3bb8092',
+            kind='sql#operation',
+            name='56dec13c-fe47-449d-9942-921ad3bb8092',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56dec13c-fe47-449d-9942-921ad3bb8092'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56dec13c-fe47-449d-9942-921ad3bb8092'.
             format(self.Project()),
-            operationType=u'PROMOTE_REPLICA',
-            status=u'PENDING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='PROMOTE_REPLICA',
+            status='PENDING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'56dec13c-fe47-449d-9942-921ad3bb8092',
-            project=self.Project(),),
+            operation='56dec13c-fe47-449d-9942-921ad3bb8092',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -95,19 +100,20 @@ class InstancesPromoteReplicaTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'replica-1',
+            targetId='replica-1',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/patch-instance3'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'56dec13c-fe47-449d-9942-921ad3bb8092',
+            kind='sql#operation',
+            name='56dec13c-fe47-449d-9942-921ad3bb8092',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56dec13c-fe47-449d-9942-921ad3bb8092'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/56dec13c-fe47-449d-9942-921ad3bb8092'.
             format(self.Project()),
-            operationType=u'PROMOTE_REPLICA',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='PROMOTE_REPLICA',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
   def testSimplePromote(self):
     self._ExpectPromoteReplica()

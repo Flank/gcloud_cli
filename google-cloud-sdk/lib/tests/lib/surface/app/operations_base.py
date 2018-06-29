@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for gcloud app services."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 
 from tests.lib.surface.app import api_test_util

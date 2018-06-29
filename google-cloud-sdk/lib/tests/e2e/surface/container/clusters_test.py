@@ -16,13 +16,8 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-import datetime
-import json
 import logging
 
-from apitools.base.py import encoding
-from dateutil import parser
-from dateutil import tz
 from googlecloudsdk.calliope.base import ReleaseTrack
 from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
@@ -40,35 +35,17 @@ class ClustersTestGA(base.IntegrationTestBase):
   @sdk_test_base.Filters.RunOnlyInBundle
   def testClustersCreateListDelete(self):
     self.cluster_name = next(
-        e2e_utils.GetResourceNameGenerator(prefix='container-test'))
+        e2e_utils.GetResourceNameGenerator(prefix='test'))
     self.DoTestClusterCreation(self.ZONE, self.releasetrack)
     self.DoTestListClusters(self.releasetrack)
     self.DoTestClusterDeletion(self.ZONE, self.releasetrack)
 
   # This test will cleanup the leaked clusters.
-  # Delete clusters that are older than 1h.
+  # Delete clusters that are older than 3h.
   @sdk_test_base.Filters.RunOnlyInBundle
   def testCleanup(self):
-    self.DoTestCleanup(self.ZONE, self.releasetrack)
-    self.DoTestCleanup(self.REGION, self.releasetrack)
-
-  def DoTestCleanup(self, location, track):
-    # The minimum age for a leaked cluster is 3 hours.
-    leaked_cluster_min_age = datetime.timedelta(hours=3)
-    output = self.Run('container clusters list {0}'
-                      .format(self._GetLocationFlag(location)), track=track)
-    jsonoutput = encoding.MessageToJson(output)
-    clusters = json.loads(jsonoutput)
-    for cluster in clusters:
-      createtime = cluster['createTime']
-      dt1 = parser.parse(createtime)
-      dt2 = dt1 + leaked_cluster_min_age
-      dt3 = datetime.datetime.utcnow().replace(tzinfo=tz.tzutc())  # pylint: disable=g-tzinfo-replace
-      if dt2 < dt3:
-        self.Run('container clusters delete {0} {1} -q --async'
-                 .format(cluster['name'], self._GetLocationFlag(location)),
-                 track=track)
-        logging.warning('Deleting a leaked cluster: %s', cluster['name'])
+    self.CleanupLeakedClusters(self.ZONE, self.releasetrack)
+    self.CleanupLeakedClusters(self.REGION, self.releasetrack)
 
   def DoTestClusterCreation(self, location, track):
     logging.info('Creating %s in %s', self.cluster_name, location)
@@ -106,7 +83,7 @@ class ClustersTestGA(base.IntegrationTestBase):
   @sdk_test_base.Filters.RunOnlyInBundle
   def testRegionalClustersCreateListDelete(self):
     self.cluster_name = next(
-        e2e_utils.GetResourceNameGenerator(prefix='container-test'))
+        e2e_utils.GetResourceNameGenerator(prefix='test-region'))
     self.DoTestClusterCreation(self.REGION, self.releasetrack)
     self.DoTestListClusters(self.releasetrack)
     self.DoTestClusterDeletion(self.REGION, self.releasetrack)

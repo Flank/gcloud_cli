@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instances set-machine-type subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
@@ -72,8 +74,8 @@ class InstancesSetSchedulingTest(test_base.BaseTest):
     self.CheckRequests([self._MakeSetMachineTypeRequest()])
 
   def testInstanceNotTerminated(self):
-    error_msg = (u"The resource 'projects/cloudsdktest/zones/us-central1-f/"
-                 u"instances/zjn-win' is not ready")
+    error_msg = ("The resource 'projects/cloudsdktest/zones/us-central1-f/"
+                 "instances/zjn-win' is not ready")
     def MakeRequests(*_, **kwargs):
       yield None
       kwargs['errors'].append((400, error_msg))
@@ -89,9 +91,9 @@ class InstancesSetSchedulingTest(test_base.BaseTest):
     self.CheckRequests([self._MakeSetMachineTypeRequest()])
 
   def testBadMachineType(self):
-    error_msg = (u"Invalid value for field 'resource.machineTypes': "
-                 u"'projects/cloudsdktest/zones/us-central1-f/machineTypes/"
-                 u"bad-machine-type'.  Resource was not found.")
+    error_msg = ("Invalid value for field 'resource.machineTypes': "
+                 "'projects/cloudsdktest/zones/us-central1-f/machineTypes/"
+                 "bad-machine-type'.  Resource was not found.")
     def MakeRequests(*_, **kwargs):
       yield None
       kwargs['errors'].append((400, error_msg))

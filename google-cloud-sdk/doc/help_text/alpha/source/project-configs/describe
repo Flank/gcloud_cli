@@ -1,0 +1,28 @@
+NAME
+    gcloud alpha source project-configs describe - show details about the
+        configuration of a project
+
+SYNOPSIS
+    gcloud alpha source project-configs describe [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Show details about the configuration of a project.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+API REFERENCE
+    This command uses the sourcerepo/v1 API. The full documentation for this
+    API can be found at: https://cloud.google.com/source-repositories/docs/apis
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/. This variant is also available:
+
+        $ gcloud beta source project-configs describe
+

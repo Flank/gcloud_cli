@@ -354,6 +354,20 @@ class AlphaVisionProjectsLocationsProductsReferenceImagesListRequest(_messages.M
   parent = _messages.StringField(3, required=True)
 
 
+class AnnotateFileResponse(_messages.Message):
+  r"""Response to a single file annotation request. A file may contain one or
+  more images, which individually have their own responses.
+
+  Fields:
+    inputConfig: Information about the file for which this response is
+      generated.
+    responses: Individual responses to images found within the file.
+  """
+
+  inputConfig = _messages.MessageField('InputConfig', 1)
+  responses = _messages.MessageField('AnnotateImageResponse', 2, repeated=True)
+
+
 class AnnotateImageRequest(_messages.Message):
   r"""Request for performing Google Cloud Vision API tasks over a user-
   provided image, with user-requested features.
@@ -2436,6 +2450,126 @@ class GoogleCloudVisionV1p2beta1Word(_messages.Message):
   symbols = _messages.MessageField('GoogleCloudVisionV1p2beta1Symbol', 4, repeated=True)
 
 
+class GoogleCloudVisionV1p3beta1BatchOperationMetadata(_messages.Message):
+  r"""Metadata for the batch operations such as the current state.  This is
+  included in the `metadata` field of the `Operation` returned by the
+  `GetOperation` call of the `google::longrunning::Operations` service.
+
+  Enums:
+    StateValueValuesEnum: The current state of the batch operation.
+
+  Fields:
+    endTime: The time when the batch request is finished and
+      google.longrunning.Operation.done is set to true.
+    state: The current state of the batch operation.
+    submitTime: The time when the batch request was submitted to the server.
+  """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""The current state of the batch operation.
+
+    Values:
+      STATE_UNSPECIFIED: Invalid.
+      PROCESSING: Request is actively being processed.
+      SUCCESSFUL: The request is done and at least one item has been
+        successfully processed.
+      FAILED: The request is done and no item has been successfully processed.
+      CANCELLED: The request is done after the
+        longrunning.Operations.CancelOperation has been called by the user.
+        Any records that were processed before the cancel command are output
+        as specified in the request.
+    """
+    STATE_UNSPECIFIED = 0
+    PROCESSING = 1
+    SUCCESSFUL = 2
+    FAILED = 3
+    CANCELLED = 4
+
+  endTime = _messages.StringField(1)
+  state = _messages.EnumField('StateValueValuesEnum', 2)
+  submitTime = _messages.StringField(3)
+
+
+class GoogleCloudVisionV1p3beta1BoundingPoly(_messages.Message):
+  r"""A bounding polygon for the detected image annotation.
+
+  Fields:
+    normalizedVertices: The bounding polygon normalized vertices.
+    vertices: The bounding polygon vertices.
+  """
+
+  normalizedVertices = _messages.MessageField('GoogleCloudVisionV1p3beta1NormalizedVertex', 1, repeated=True)
+  vertices = _messages.MessageField('GoogleCloudVisionV1p3beta1Vertex', 2, repeated=True)
+
+
+class GoogleCloudVisionV1p3beta1ImportProductSetsResponse(_messages.Message):
+  r"""Response message for the `ImportProductSets` method.  This message is
+  returned by the google.longrunning.Operations.GetOperation method in the
+  returned google.longrunning.Operation.response field.
+
+  Fields:
+    referenceImages: The list of reference_images that are imported
+      successfully.
+    statuses: The rpc status for each ImportProductSet request, including both
+      successes and errors.  The number of statuses here matches the number of
+      lines in the csv file, and statuses[i] stores the success or failure
+      status of processing the i-th line of the csv, starting from line 0.
+  """
+
+  referenceImages = _messages.MessageField('GoogleCloudVisionV1p3beta1ReferenceImage', 1, repeated=True)
+  statuses = _messages.MessageField('Status', 2, repeated=True)
+
+
+class GoogleCloudVisionV1p3beta1NormalizedVertex(_messages.Message):
+  r"""A vertex represents a 2D point in the image. NOTE: the normalized vertex
+  coordinates are relative to the original image and range from 0 to 1.
+
+  Fields:
+    x: X coordinate.
+    y: Y coordinate.
+  """
+
+  x = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
+  y = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
+
+
+class GoogleCloudVisionV1p3beta1ReferenceImage(_messages.Message):
+  r"""A `ReferenceImage` represents a product image and its associated
+  metadata, such as bounding boxes.
+
+  Fields:
+    boundingPolys: Bounding polygons around the areas of interest in the
+      reference image. Optional. If this field is empty, the system will try
+      to detect regions of interest. At most 10 bounding polygons will be
+      used.  The provided shape is converted into a non-rotated rectangle.
+      Once converted, the small edge of the rectangle must be greater than or
+      equal to 300 pixels. The aspect ratio must be 1:4 or less (i.e. 1:3 is
+      ok; 1:5 is not).
+    name: The resource name of the reference image.  Format is:  `projects/PRO
+      JECT_ID/locations/LOC_ID/products/PRODUCT_ID/referenceImages/IMAGE_ID`.
+      This field is ignored when creating a reference image.
+    uri: The Google Cloud Storage URI of the reference image.  The URI must
+      start with `gs://`.  Required.
+  """
+
+  boundingPolys = _messages.MessageField('GoogleCloudVisionV1p3beta1BoundingPoly', 1, repeated=True)
+  name = _messages.StringField(2)
+  uri = _messages.StringField(3)
+
+
+class GoogleCloudVisionV1p3beta1Vertex(_messages.Message):
+  r"""A vertex represents a 2D point in the image. NOTE: the vertex
+  coordinates are in the same scale as the original image.
+
+  Fields:
+    x: X coordinate.
+    y: Y coordinate.
+  """
+
+  x = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  y = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+
+
 class Image(_messages.Message):
   r"""Client image to perform Google Cloud Vision API tasks over.
 
@@ -2535,31 +2669,37 @@ class ImportProductSetsGcsSource(_messages.Message):
   Fields:
     csvFileUri: The Google Cloud Storage URI of the input csv file.  The URI
       must start with gs://  The format of the input csv file should be one
-      image per line. In each line, there are 6 columns. 1. image_uri 2.
-      product_set_id 3. product_id 4. product_category 5, labels 6.
-      bounding_poly  Columns 1, 2, 3 and 4 are required. A new
-      ProductSet/Product with the same id will be created on the fly if the
-      ProductSet/Product specified by product_set_id/product_id does not
-      exist.  If the Product with product_id already exists, the fields
-      product_category and labels are ignored.  If a Product doesn't exist and
-      needs to be created on the fly, the product_category field refers to
+      image per line. In each line, there are 6 columns. 1. image_uri 2,
+      image_id 3. product_set_id 4. product_id 5, product_category 6,
+      product_display_name 7, labels 8. bounding_poly  Columns 1, 3, 4, and 5
+      are required, other columns are optional. A new ProductSet/Product with
+      the same id will be created on the fly if the ProductSet/Product
+      specified by product_set_id/product_id does not exist.  The image_id
+      field is optional but has to be unique if provided. If it is empty, we
+      will automatically assign an unique id to the image.  The
+      product_display_name field is optional. If it is empty, a space (" ") is
+      used as the place holder for the product display_name, which can be
+      updated later through the realtime API.  If the Product with product_id
+      already exists, the fields product_display_name, product_category and
+      labels are ignored.  If a Product doesn't exist and needs to be created
+      on the fly, the product_display_name field refers to
+      Product.display_name, the product_category field refers to
       Product.product_category, and the labels field refers to Product.labels.
-      Notice that display_name of ProductSet/Product cannot be empty. Here " "
-      is used as the place holder for the display_name, which can be updated
-      through the update API.  Labels should be a line containing a list of
-      comma-separated key-value pairs, with the format
+      Labels (optional) should be a line containing a list of comma-separated
+      key-value pairs, with the format
       "key_1=value_1,key_2=value_2,...,key_n=value_n".  The bounding_poly
-      field is used to identify one region of interest from the image in the
-      same manner as CreateReferenceImage. If no bounding_poly is specified,
-      the system will try to detect regions of interest automatically.  Note
-      that the pipeline will resize the image if the image resolution is too
-      large to process (above 50MP).  Also note that at most one bounding_poly
-      is allowed per line. If the image contains multiple regions of interest,
-      the csv should contain one line per region of interest.  The
-      bounding_poly column should contain an even number of comma-separated
-      numbers, with the format "p1_x,p1_y,p2_x,p2_y,...,pn_x,pn_y".
-      Nonnegative integers should be used for absolute bounding polygons, and
-      float values in [0, 1] should be used for normalized bounding polygons.
+      (optional) field is used to identify one region of interest from the
+      image in the same manner as CreateReferenceImage. If no bounding_poly is
+      specified, the system will try to detect regions of interest
+      automatically.  Note that the pipeline will resize the image if the
+      image resolution is too large to process (above 20MP).  Also note that
+      at most one bounding_poly is allowed per line. If the image contains
+      multiple regions of interest, the csv should contain one line per region
+      of interest.  The bounding_poly column should contain an even number of
+      comma-separated numbers, with the format
+      "p1_x,p1_y,p2_x,p2_y,...,pn_x,pn_y". Nonnegative integers should be used
+      for absolute bounding polygons, and float values in [0, 1] should be
+      used for normalized bounding polygons.
   """
 
   csvFileUri = _messages.StringField(1)
@@ -3333,14 +3473,17 @@ class Result(_messages.Message):
   r"""Information about a product.
 
   Fields:
+    image: The resource name of the image from the product that is the closest
+      match to the query.
     product: The Product.
     score: A confidence level on the match, ranging from 0 (no confidence) to
       1 (full confidence).  This field is returned only if `view` is set to
       `FULL` in the request.
   """
 
-  product = _messages.MessageField('Product', 1)
-  score = _messages.FloatField(2, variant=_messages.Variant.FLOAT)
+  image = _messages.StringField(1)
+  product = _messages.MessageField('Product', 2)
+  score = _messages.FloatField(3, variant=_messages.Variant.FLOAT)
 
 
 class SafeSearchAnnotation(_messages.Message):

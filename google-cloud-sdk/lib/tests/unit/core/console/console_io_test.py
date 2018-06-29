@@ -508,9 +508,7 @@ class ProgressBarTests(sdk_test_base.WithOutputCapture):
     pb = console_io.ProgressBar('Test Action', total_ticks=40)
     pb.Start()
     pb.Finish()
-    self.AssertErrEquals(
-        '<START PROGRESS BAR>Test Action\n'
-        '<END PROGRESS BAR>\n')
+    self.AssertErrEquals('{"ux": "PROGRESS_BAR", "message": "Test Action"}\n')
 
   def testProgressBarSingle(self):
     pb = console_io.ProgressBar('Test Action', total_ticks=40)
@@ -1014,6 +1012,51 @@ class LazyFormatTests(test_case.Base):
     actual = console_io.LazyFormat(fmt, text='TEXT', nest='{text}+{{text}}')
     self.assertEqual(expected, actual)
 
+
+class UxlementTests(sdk_test_base.WithOutputCapture):
+
+  def testJsonUXStubProgressBar(self):
+    stub_output = console_io.JsonUXStub(console_io.UXElementType.PROGRESS_BAR,
+                                        message='foo')
+    self.assertEqual(stub_output, '{"ux": "PROGRESS_BAR", "message": "foo"}')
+
+  def testJsonUXStubProgressTracker(self):
+    stub_output = console_io.JsonUXStub(
+        console_io.UXElementType.PROGRESS_TRACKER, message='foo',
+        aborted_message='bar', status='FAILED')
+    self.assertEqual(stub_output,
+                     ('{"ux": "PROGRESS_TRACKER", "message": "foo",'
+                      ' "aborted_message": "bar", "status": "FAILED"}'))
+
+  def testJsonUXStubPromptResponse(self):
+    stub_output = console_io.JsonUXStub(
+        console_io.UXElementType.PROMPT_RESPONSE, choices=['1', '2', '3'])
+    self.assertEqual(stub_output,
+                     '{"ux": "PROMPT_RESPONSE", "choices": ["1", "2", "3"]}')
+
+  def testJsonUXStubPromtpContinue(self):
+    stub_output = console_io.JsonUXStub(
+        console_io.UXElementType.PROMPT_CONTINUE,
+        message='foo', prompt_string='continue?', cancel_string='cancelled')
+    self.assertEqual(
+        stub_output,
+        ('{"ux": "PROMPT_CONTINUE", "message": "foo",'
+         ' "prompt_string": "continue?", "cancel_string": "cancelled"}'))
+
+  def testJsonUXStubPromptChoice(self):
+    stub_output = console_io.JsonUXStub(
+        console_io.UXElementType.PROMPT_CHOICE,
+        prompt_string='pickone', choices=['1', '2', '3'])
+    self.assertEqual(stub_output, (
+        '{"ux": "PROMPT_CHOICE", '
+        '"choices": ["1", "2", "3"], "prompt_string": "pickone"}'))
+
+  def testJsonUXStubExtraArgsFails(self):
+    with self.assertRaisesRegex(ValueError,
+                                (r"Extraneous args for Ux Element "
+                                 r"PROGRESS_BAR: \['not_allowed']")):
+      console_io.JsonUXStub(console_io.UXElementType.PROGRESS_BAR,
+                            message='foo', not_allowed='bar')
 
 if __name__ == '__main__':
   test_case.main()

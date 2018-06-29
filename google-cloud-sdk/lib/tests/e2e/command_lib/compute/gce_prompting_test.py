@@ -13,9 +13,10 @@
 # limitations under the License.
 """Integration tests for differences between running on GCE and locally."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 import contextlib
-import logging
 import re
 import textwrap
 
@@ -31,22 +32,22 @@ import mock
 class GCloudComputeOnGCE(e2e_test_base.BaseTest):
   """End-to-end for resolving GCE zone/region properties on GCP."""
 
-  def SetUp(self):
-    self.instance_names_used = []
-
-  def TearDown(self):
-    logging.info('Starting TearDown (will delete resources if test fails).')
-    for name in self.instance_names_used:
-      self.CleanUpResource(name, 'instances')
-
   def GetInstanceName(self):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up
-    name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-on-gce').next()
-    self.instance_name = name
-    self.instance_names_used.append(name)
+    name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-compute-on-gce'))
     return name
+
+  @contextlib.contextmanager
+  def CreateInstanceWithoutZone(self, zone_for_deletion):
+    instance_name = self.GetInstanceName()
+    try:
+      self.Run('compute instances create ' + instance_name)
+      yield instance_name
+    finally:
+      self.Run('compute instances delete {0} --zone {1} --quiet'.format(
+          instance_name, zone_for_deletion))
 
   @contextlib.contextmanager
   def AnswerPromptForZone(self, zone):
@@ -81,22 +82,22 @@ class GCloudComputeOnGCE(e2e_test_base.BaseTest):
     # ResourceArgument checks if this is true before attempting to prompt.
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
                     return_value=True)
-    self.GetInstanceName()
+    instance_name = self.GetInstanceName()
     with self.AssertRaisesToolExceptionRegexp(
         re.compile(
             ('.*Could not fetch.*projects/cloud-sdk-integration-testing/zones/'
              'us-central1-f/instances/{0}.*').
-            format(self.instance_name), re.S)):
+            format(instance_name), re.S)):
       with self.AnswerPromptForZone('us-central1-f'):
-        self.Run('compute instances describe {0}'.format(self.instance_name))
+        self.Run('compute instances describe {0}'.format(instance_name))
     self.AssertNewErrContains(textwrap.dedent("""
         For the following instance:
          - [{0}]
         choose a zone:
-         [1]""".format(self.instance_name)))
+         [1]""".format(instance_name)))
 
     self.Run('compute instances list')
-    self.AssertNewOutputNotContains(self.instance_name)
+    self.AssertNewOutputNotContains(instance_name)
 
   @sdk_test_base.Filters.RunOnlyOnGCE
   def testInstanceDescriptionOnGCE(self):
@@ -104,7 +105,7 @@ class GCloudComputeOnGCE(e2e_test_base.BaseTest):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
                     return_value=True)
     properties.VALUES.core.check_gce_metadata.Set(True)
-    self.GetInstanceName()
+    instance_name = self.GetInstanceName()
     current_zone = c_gce.Metadata().Zone()
     self.assertNotEqual(current_zone, None)
 
@@ -112,15 +113,15 @@ class GCloudComputeOnGCE(e2e_test_base.BaseTest):
         re.compile(
             ('.*Could not fetch.*projects/cloud-sdk-integration-testing/zones/'
              '{0}/instances/{1}.*').
-            format(current_zone, self.instance_name), re.S)):
+            format(current_zone, instance_name), re.S)):
       self.WriteInput('y\n')
-      self.Run('compute instances describe {0}'.format(self.instance_name))
+      self.Run('compute instances describe {0}'.format(instance_name))
     self.AssertNewErrContains(
         'Did you mean zone [{0}] for instance: [{1}]'.format(
-            current_zone, self.instance_name))
+            current_zone, instance_name))
 
     self.Run('compute instances list')
-    self.AssertNewOutputNotContains(self.instance_name)
+    self.AssertNewOutputNotContains(instance_name)
 
   @sdk_test_base.Filters.RunOnlyOnGCE
   def testInstanceCreationOnGCE(self):
@@ -128,18 +129,17 @@ class GCloudComputeOnGCE(e2e_test_base.BaseTest):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
                     return_value=True)
     properties.VALUES.core.check_gce_metadata.Set(True)
-    self.GetInstanceName()
     current_zone = c_gce.Metadata().Zone()
     self.assertNotEqual(current_zone, None)
 
     self.WriteInput('y\n')
-    self.Run('compute instances create {0}'.format(self.instance_name))
-    self.AssertNewErrContains(
-        'Did you mean zone [{0}] for instance: [{1}]'.format(
-            current_zone, self.instance_name))
-
-    self.Run('compute instances list')
-    self.AssertNewOutputContains(self.instance_name)
+    with self.CreateInstanceWithoutZone(
+        zone_for_deletion=current_zone) as instance_name:
+      self.AssertNewErrContains(
+          'Did you mean zone [{0}] for instance: [{1}]'.format(
+              current_zone, instance_name))
+      self.Run('compute instances list')
+      self.AssertNewOutputContains(instance_name)
 
 
 if __name__ == '__main__':

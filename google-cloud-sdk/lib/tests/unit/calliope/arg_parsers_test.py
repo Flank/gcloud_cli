@@ -304,6 +304,23 @@ class DurationTest(subtests.Base):
                  'value must be less than or equal to 1m; received: 2m'))
 
 
+class GetBinarySizePerUnit(subtests.Base):
+  """Unit tests for the GetBinarySizePerUnit()."""
+
+  def RunSubTest(self, suffix, **kwargs):
+    return arg_parsers.GetBinarySizePerUnit(suffix, **kwargs)
+
+  def testGetBinarySizePerUnit(self):
+    self.Run(None, None, exception=ValueError)
+    self.Run(1, 'B')
+    self.Run(1, '')
+    self.Run(1024, 'kb')
+    self.Run(1024, 'kb/s', type_abbr='b/s')
+    self.Run(1024, 'Kb/s', type_abbr='b/s')
+    self.Run(1048576, 'm')
+    self.Run(1073741824, 'GB')
+
+
 class DiskSizeTest(subtests.Base):
   """Unit tests for the DiskSize() parser."""
 
@@ -366,6 +383,20 @@ class DiskSizeTest(subtests.Base):
     self.Run(1125899906842624, '1PiB')
     self.Run(28147497671065600, '25PiB')
     self.Run(112589990684262400, '100PiB')
+
+  def testTypeAbbr(self):
+    self.Run(1, '1B')
+    self.Run(1024, '1k')
+    self.Run(1048576, '1Mi')
+
+    self.Run(10240, '10', type_abbr='b/s', default_unit='Kb/s')
+    self.Run(10240, '10', type_abbr='b/s', default_unit='Kbs')
+    self.Run(10240, '10', type_abbr='b/s', default_unit='k')
+    self.Run(20480, '20k', type_abbr='b/s', default_unit='k')
+    self.Run(31457280, '30Mb', type_abbr='b/s', default_unit='k')
+    self.Run(42949672960, '40Gbs', type_abbr='b/s', default_unit='k')
+    self.Run(53687091200, '50Gib/', type_abbr='b/s', default_unit='k')
+    self.Run(67553994410557440, '60Pb/s', type_abbr='b/s', default_unit='k')
 
   def testMalformedInput(self):
     self.Run(None, '1GB1KB',
@@ -1601,47 +1632,36 @@ class MultiCompleterTest(util.WithTestTool, sdk_test_base.WithOutputCapture):
 
 class BufferedFileInputTest(sdk_test_base.SdkBase, test_case.WithInput):
 
-  def FileTest(self, data, max_bytes=None):
+  def FileTest(self, data, binary=False):
     filename = os.path.join(self.temp_path, 'test.txt')
     with open(filename, 'w') as f:
       f.write(data)
-    fun = arg_parsers.BufferedFileInput(max_bytes=max_bytes, chunk_size=10)
-    self.assertEqual(data, fun(filename))
+    fun = arg_parsers.BufferedFileInput(binary=binary)
+    expected_data = data
+    if binary:
+      expected_data = expected_data.encode('utf-8')
+    self.assertEqual(expected_data, fun(filename))
 
-  def StdinTest(self, lines, max_bytes=None):
+  def StdinTest(self, lines, binary=True):
     # Each line has an implicit '\n' added by WriteInput.
     self.WriteInput(*lines)
-    fun = arg_parsers.BufferedFileInput(max_bytes=max_bytes, chunk_size=10)
-    self.assertEqual('\n'.join(lines) + '\n', fun('-'))
+    fun = arg_parsers.BufferedFileInput(binary=binary)
+    expected_data = '\n'.join(lines) + '\n'
+    if binary:
+      expected_data = expected_data.encode('utf-8')
+    self.assertEqual(expected_data, fun('-'))
 
-  def testReadFileNoMaxSize(self):
+  def testReadFileBytes(self):
+    self.FileTest('abcdefg' * 100, binary=True)
+
+  def testReadStdinBytes(self):
+    self.StdinTest(['abcdefg'] * 100, binary=True)
+
+  def testReadFile(self):
     self.FileTest('abcdefg' * 100)
 
-  def testReadStdinNoMaxSize(self):
+  def testReadStdin(self):
     self.StdinTest(['abcdefg'] * 100)
-
-  def testReadFileSmallerThanMaxSize(self):
-    self.FileTest('abcdefg' * 100, max_bytes=701)
-
-  def testReadStdinSmallerThanMaxSize(self):
-    # 801 since each line gets an implicit '\n'.
-    self.StdinTest(['abcdefg'] * 100, max_bytes=801)
-
-  def testReadFileEqualToMaxSize(self):
-    self.FileTest('abcdefg' * 100, max_bytes=700)
-
-  def testReadStdinEqualToMaxSize(self):
-    # 800 since each line gets an implicit '\n'.
-    self.StdinTest(['abcdefg'] * 100, max_bytes=800)
-
-  def testFileTooLarge(self):
-    with self.assertRaises(arg_parsers.ArgumentTypeError):
-      self.FileTest('abcdefg' * 100, max_bytes=699)
-
-  def testStdinTooLarge(self):
-    # 799 since each line gets an implicit '\n'.
-    with self.assertRaises(arg_parsers.ArgumentTypeError):
-      self.StdinTest(['abcdefg'] * 100, max_bytes=799)
 
   def testFileMissing(self):
     filename = os.path.join(self.temp_path, 'FileMissing.txt')

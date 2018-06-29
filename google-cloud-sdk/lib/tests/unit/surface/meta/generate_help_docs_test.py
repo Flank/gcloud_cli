@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for gcloud meta generatehelp-docs."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.calliope import walker

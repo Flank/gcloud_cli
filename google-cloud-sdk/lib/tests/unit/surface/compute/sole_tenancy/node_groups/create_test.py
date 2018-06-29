@@ -22,7 +22,7 @@ from tests.lib.surface.compute import test_base
 class NodeGroupsCreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     self.region = 'us-central1'
     self.zone = 'us-central1-a'
@@ -38,7 +38,7 @@ class NodeGroupsCreateTest(test_base.BaseTest):
 
   def _CreateNodeGroup(self, name, description, node_template):
     node_template_self_link = (
-        'https://www.googleapis.com/compute/alpha/projects/{project}/regions/'
+        'https://www.googleapis.com/compute/beta/projects/{project}/regions/'
         '{region}/nodeTemplates/{name}'.format(
             project=self.Project(), region=self.region, name=node_template))
     node_group = self.messages.NodeGroup(

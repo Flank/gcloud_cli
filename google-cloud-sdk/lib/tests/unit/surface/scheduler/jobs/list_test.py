@@ -12,11 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for `gcloud scheduler jobs list`."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.scheduler import base
+from six.moves import range
 
 
 @parameterized.parameters((calliope_base.ReleaseTrack.ALPHA,))
@@ -27,12 +30,16 @@ class JobsListTest(base.SchedulerTestBase):
     for i in range(n):
       app_engine_http_target = None
       pubsub_target = None
-      if i % 2 == 0:
+      http_target = None
+      if i % 3 == 0:
         app_engine_http_target = self.messages.AppEngineHttpTarget(
             relativeUrl='/')
-      else:
+      elif i % 3 == 1:
         pubsub_target = self.messages.PubsubTarget(
             topicName='projects/other-project/topic/my-topic')
+      else:
+        http_target = self.messages.HttpTarget(
+            url='http://www.example.com/endpoint')
       job_name = ('projects/{}/'
                   'locations/us-central1/'
                   'jobs/j{}').format(self.Project(), i)
@@ -42,6 +49,7 @@ class JobsListTest(base.SchedulerTestBase):
                                           timeZone='utc'),
           pubsubTarget=pubsub_target,
           appEngineHttpTarget=app_engine_http_target,
+          httpTarget=http_target,
           state=self.messages.Job.StateValueValuesEnum.ENABLED,
           userUpdateTime='2017-01-01T00:00:00Z'
       )
@@ -84,7 +92,7 @@ class JobsListTest(base.SchedulerTestBase):
         ID  LOCATION     SCHEDULE (TZ)        TARGET_TYPE  STATE
         j0  us-central1  every tuesday (utc)  App Engine   ENABLED
         j1  us-central1  every tuesday (utc)  Pub/Sub      ENABLED
-        j2  us-central1  every tuesday (utc)  App Engine   ENABLED
+        j2  us-central1  every tuesday (utc)  HTTP         ENABLED
         """, normalize_space=True)
 
   def testList_Uri(self, track):

@@ -1,5 +1,5 @@
 NAME
-    gcloud kms decrypt - decrypt a ciphertext file using a key
+    gcloud kms decrypt - decrypt a ciphertext file using a Cloud KMS key
 
 SYNOPSIS
     gcloud kms decrypt --ciphertext-file=CIPHERTEXT_FILE
@@ -9,36 +9,45 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Decrypts the given ciphertext file using the given CryptoKey and writes the
-    result to the named plaintext file.
+    gcloud kms decrypt decrypts the given ciphertext file using the given Cloud
+    KMS key and writes the result to the named plaintext file. Note that to
+    permit users to decrypt using a key, they must be have at least one of the
+    following IAM roles for that key: roles/cloudkms.cryptoKeyDecrypter,
+    roles/cloudkms.cryptoKeyEncrypterDecrypter.
 
-    If an additional authenticated data file is provided, its contents must
-    match the additional authenticated data provided during encryption. The
-    file must not be larger than 64KiB.
+    Additional authenticated data (AAD) is used as an additional check by Cloud
+    KMS to authenticate a decryption request. If an additional authenticated
+    data file is provided, its contents must match the additional authenticated
+    data provided during encryption and must not be larger than 64KiB. If you
+    don't provide a value for --additional-authenticated-data-file, an empty
+    string is used. For a thorough explanation of AAD, refer to this guide:
+    https://cloud.google.com/kms/docs/additional-authenticated-data
 
     If --ciphertext-file or --additional-authenticated-data-file is set to '-',
-    that file is read from stdin. Similarly, if --plaintext-file is set to '-',
-    the decrypted plaintext is written to stdout.
+    that file is read from stdin. Note that both files cannot be read from
+    stdin. Similarly, if --plaintext-file is set to '-', the decrypted
+    plaintext is written to stdout.
 
 REQUIRED FLAGS
      --ciphertext-file=CIPHERTEXT_FILE
-        Path to the ciphertext file to decrypt.
+        File path of the ciphertext file to decrypt.
 
      --plaintext-file=PLAINTEXT_FILE
-        Path to the plaintext file to output.
+        File path of the plaintext file to output.
 
 OPTIONAL FLAGS
      --additional-authenticated-data-file=ADDITIONAL_AUTHENTICATED_DATA_FILE
-        Path to the optional file containing the additional authenticated data.
+        File path to the optional file containing the additional authenticated
+        data.
 
      --key=KEY
-        The key to use for decryption.
+        Cloud KMS key to use for decryption.
 
      --keyring=KEYRING
-        The containing keyring.
+        Key ring of the key.
 
      --location=LOCATION
-        The location of the requested resource.
+        Location of the keyring.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -46,16 +55,28 @@ GCLOUD WIDE FLAGS
     --user-output-enabled, --verbosity. Run $ gcloud help for details.
 
 EXAMPLES
-    The following command will read the file 'path/to/ciphertext', decrypt it
-    using the CryptoKey frodo with the KeyRing fellowship and Location global,
-    and write the plaintext to 'path/to/plaintext'.
+    To decrypt the file 'path/to/ciphertext' using the key frodo with key ring
+    fellowship and location global and write the plaintext to
+    'path/to/plaintext.dec', run:
 
         $ gcloud kms decrypt \
-            --key frodo \
-            --keyring fellowship \
-            --location global \
-            --ciphertext-file path/to/input/ciphertext \
-            --plaintext-file path/to/output/plaintext
+            --key=frodo \
+            --keyring=fellowship \
+            --location=global \
+            --ciphertext-file=path/to/input/ciphertext \
+            --plaintext-file=path/to/output/plaintext.dec
+
+    To decrypt the file 'path/to/ciphertext' using the key frodo and the
+    additional authenticated data that was used to encrypt the ciphertext, and
+    write the decrypted plaintext to stdout, run:
+
+        $ gcloud kms decrypt \
+            --key=frodo \
+            --keyring=fellowship \
+            --location=global \
+            --additional-authenticated-data-file=path/to/aad \
+            --ciphertext-file=path/to/input/ciphertext \
+            --plaintext-file='-'
 
 NOTES
     These variants are also available:

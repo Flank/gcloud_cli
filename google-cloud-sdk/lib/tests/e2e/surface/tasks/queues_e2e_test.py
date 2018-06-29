@@ -13,6 +13,8 @@
 # limitations under the License.
 """End-to-end tests for the `gcloud tasks` commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core.util import retry
 from tests.lib import e2e_base
 from tests.lib import e2e_utils

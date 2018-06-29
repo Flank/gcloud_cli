@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -35,9 +37,11 @@ class InstancesCloneTest(base.SqlMockTestBeta):
                 cloneContext=self.messages.CloneContext(
                     binLogCoordinates=None,
                     destinationInstanceName='clone-instance-7a',
-                    kind=u'sql#cloneContext',),),
+                    kind='sql#cloneContext',
+                ),),
             instance='clone-instance-7',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -70,24 +74,26 @@ class InstancesCloneTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7a',
+            targetId='clone-instance-7a',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'd930826e-80a5-4477-8218-fb7fb55aa250',
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
             format(self.Project()),
-            operationType=u'CLONE',
-            status=u'RUNNING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CLONE',
+            status='RUNNING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'd930826e-80a5-4477-8218-fb7fb55aa250',
-            project=self.Project(),),
+            operation='d930826e-80a5-4477-8218-fb7fb55aa250',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -120,24 +126,26 @@ class InstancesCloneTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7a',
+            targetId='clone-instance-7a',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'd930826e-80a5-4477-8218-fb7fb55aa250',
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
             format(self.Project()),
-            operationType=u'CLONE',
-            status=u'RUNNING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CLONE',
+            status='RUNNING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'd930826e-80a5-4477-8218-fb7fb55aa250',
-            project=self.Project(),),
+            operation='d930826e-80a5-4477-8218-fb7fb55aa250',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -170,38 +178,40 @@ class InstancesCloneTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7a',
+            targetId='clone-instance-7a',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'd930826e-80a5-4477-8218-fb7fb55aa250',
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
             format(self.Project()),
-            operationType=u'CLONE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CLONE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance='clone-instance-7a',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.DatabaseInstance(
             currentDiskSize=287592789,
-            databaseVersion=u'MYSQL_5_5',
-            etag=u'"DExdZ69FktjWMJ-ohD1vLZW9pnk/Mw"',
-            name=u'clone-instance-7a',
+            databaseVersion='MYSQL_5_5',
+            etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/Mw"',
+            name='clone-instance-7a',
             ipAddresses=[],
-            ipv6Address=u'2001:4860:4864:1:df7c:6a7a:d107:ab9d',
-            kind=u'sql#instance',
+            ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:ab9d',
+            kind='sql#instance',
             maxDiskSize=268435456000,
             project=self.Project(),
-            region=u'us-central',
+            region='us-central',
             serverCaCert=self.messages.SslCert(
-                cert=u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
-                certSerialNumber=u'0',
-                commonName=u'C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
+                cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
+                certSerialNumber='0',
+                commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
                 createTime=datetime.datetime(
                     2014,
                     8,
@@ -220,30 +230,34 @@ class InstancesCloneTest(base.SqlMockTestBeta):
                     29,
                     512000,
                     tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-                instance=u'clone-instance-7a',
-                kind=u'sql#sslCert',
-                sha1Fingerprint=u'2dbfcefd3c962a284035ffb06dccdd2055d32b46',),
+                instance='clone-instance-7a',
+                kind='sql#sslCert',
+                sha1Fingerprint='2dbfcefd3c962a284035ffb06dccdd2055d32b46',
+            ),
             settings=self.messages.Settings(
-                activationPolicy=u'ON_DEMAND',
+                activationPolicy='ON_DEMAND',
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=True,
                     enabled=True,
-                    kind=u'sql#backupConfiguration',
-                    startTime=u'23:00'),
+                    kind='sql#backupConfiguration',
+                    startTime='23:00'),
                 databaseFlags=[],
                 ipConfiguration=self.messages.IpConfiguration(
                     authorizedNetworks=[],
                     ipv4Enabled=False,
-                    requireSsl=None,),
-                kind=u'sql#settings',
+                    requireSsl=None,
+                ),
+                kind='sql#settings',
                 locationPreference=None,
-                pricingPlan=u'PER_USE',
-                replicationType=u'SYNCHRONOUS',
+                pricingPlan='PER_USE',
+                replicationType='SYNCHRONOUS',
                 settingsVersion=3,
-                tier=u'D1',),
-            state=u'RUNNABLE',
-            instanceType=u'CLOUD_SQL_INSTANCE',))
+                tier='D1',
+            ),
+            state='RUNNABLE',
+            instanceType='CLOUD_SQL_INSTANCE',
+        ))
 
     self.Run('sql instances clone clone-instance-7 clone-instance-7a')
     self.AssertOutputContains(
@@ -260,9 +274,11 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -        RUNNABLE
                 cloneContext=self.messages.CloneContext(
                     binLogCoordinates=None,
                     destinationInstanceName='clone-instance-7a',
-                    kind=u'sql#cloneContext',),),
+                    kind='sql#cloneContext',
+                ),),
             instance='clone-instance-7',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -295,24 +311,26 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -        RUNNABLE
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7a',
+            targetId='clone-instance-7a',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'd930826e-80a5-4477-8218-fb7fb55cc250',
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55cc250',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55cc250'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55cc250'.
             format(self.Project()),
-            operationType=u'CLONE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CLONE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'd930826e-80a5-4477-8218-fb7fb55cc250',
-            project=self.Project(),),
+            operation='d930826e-80a5-4477-8218-fb7fb55cc250',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -345,19 +363,20 @@ clone-instance-7a  MYSQL_5_5         us-central  D1    -        RUNNABLE
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7a',
+            targetId='clone-instance-7a',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'd930826e-80a5-4477-8218-fb7fb55cc250',
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55cc250',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55cc250'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55cc250'.
             format(self.Project()),
-            operationType=u'CLONE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CLONE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.Run('sql instances clone clone-instance-7 clone-instance-7a --async')
     self.AssertOutputEquals("""\
@@ -383,9 +402,11 @@ user: 170350250316@developer.gserviceaccount.com
                     binLogCoordinates=self.messages.BinLogCoordinates(
                         binLogFileName='bin.log', binLogPosition=1111),
                     destinationInstanceName='clone-instance-7a',
-                    kind=u'sql#cloneContext',),),
+                    kind='sql#cloneContext',
+                ),),
             instance='clone-instance-7',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -418,24 +439,26 @@ user: 170350250316@developer.gserviceaccount.com
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7a',
+            targetId='clone-instance-7a',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'd930826e-80a5-4477-8218-fb7fb55aa250',
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
             format(self.Project()),
-            operationType=u'CLONE',
-            status=u'RUNNING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CLONE',
+            status='RUNNING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'd930826e-80a5-4477-8218-fb7fb55aa250',
-            project=self.Project(),),
+            operation='d930826e-80a5-4477-8218-fb7fb55aa250',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -468,24 +491,26 @@ user: 170350250316@developer.gserviceaccount.com
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7a',
+            targetId='clone-instance-7a',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'd930826e-80a5-4477-8218-fb7fb55aa250',
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
             format(self.Project()),
-            operationType=u'CLONE',
-            status=u'RUNNING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CLONE',
+            status='RUNNING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'd930826e-80a5-4477-8218-fb7fb55aa250',
-            project=self.Project(),),
+            operation='d930826e-80a5-4477-8218-fb7fb55aa250',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -518,38 +543,40 @@ user: 170350250316@developer.gserviceaccount.com
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7a',
+            targetId='clone-instance-7a',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7a'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'd930826e-80a5-4477-8218-fb7fb55aa250',
+            kind='sql#operation',
+            name='d930826e-80a5-4477-8218-fb7fb55aa250',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/d930826e-80a5-4477-8218-fb7fb55aa250'.
             format(self.Project()),
-            operationType=u'CLONE',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='CLONE',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance='clone-instance-7a',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.DatabaseInstance(
             currentDiskSize=287592789,
-            databaseVersion=u'MYSQL_5_5',
-            etag=u'"DExdZ69FktjWMJ-ohD1vLZW9pnk/Mw"',
-            name=u'clone-instance-7a',
+            databaseVersion='MYSQL_5_5',
+            etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/Mw"',
+            name='clone-instance-7a',
             ipAddresses=[],
-            ipv6Address=u'2001:4860:4864:1:df7c:6a7a:d107:ab9d',
-            kind=u'sql#instance',
+            ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:ab9d',
+            kind='sql#instance',
             maxDiskSize=268435456000,
             project=self.Project(),
-            region=u'us-central',
+            region='us-central',
             serverCaCert=self.messages.SslCert(
-                cert=u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
-                certSerialNumber=u'0',
-                commonName=u'C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
+                cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
+                certSerialNumber='0',
+                commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
                 createTime=datetime.datetime(
                     2014,
                     8,
@@ -568,30 +595,34 @@ user: 170350250316@developer.gserviceaccount.com
                     29,
                     512000,
                     tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-                instance=u'clone-instance-7a',
-                kind=u'sql#sslCert',
-                sha1Fingerprint=u'2dbfcefd3c962a284035ffb06dccdd2055d32b46',),
+                instance='clone-instance-7a',
+                kind='sql#sslCert',
+                sha1Fingerprint='2dbfcefd3c962a284035ffb06dccdd2055d32b46',
+            ),
             settings=self.messages.Settings(
-                activationPolicy=u'ON_DEMAND',
+                activationPolicy='ON_DEMAND',
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=True,
                     enabled=True,
-                    kind=u'sql#backupConfiguration',
-                    startTime=u'23:00'),
+                    kind='sql#backupConfiguration',
+                    startTime='23:00'),
                 databaseFlags=[],
                 ipConfiguration=self.messages.IpConfiguration(
                     authorizedNetworks=[],
                     ipv4Enabled=False,
-                    requireSsl=None,),
-                kind=u'sql#settings',
+                    requireSsl=None,
+                ),
+                kind='sql#settings',
                 locationPreference=None,
-                pricingPlan=u'PER_USE',
-                replicationType=u'SYNCHRONOUS',
+                pricingPlan='PER_USE',
+                replicationType='SYNCHRONOUS',
                 settingsVersion=3,
-                tier=u'D1',),
-            state=u'RUNNABLE',
-            instanceType=u'CLOUD_SQL_INSTANCE',))
+                tier='D1',
+            ),
+            state='RUNNABLE',
+            instanceType='CLOUD_SQL_INSTANCE',
+        ))
 
     self.Run('sql instances clone --bin-log-file-name bin.log '
              '--bin-log-position 1111 clone-instance-7 clone-instance-7a')

@@ -14,8 +14,8 @@
 """Tests that exercise operations listing and executing."""
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 import argparse
 import getpass
 
@@ -104,12 +104,15 @@ user: test@sample.gserviceaccount.com
     diff = {
         'name': 'clone-instance-7',
         'settings': {
-            'backupConfiguration': self.messages.BackupConfiguration(
-                binaryLogEnabled=True,
-                enabled=True,
-                kind=u'sql#backupConfiguration',
-                startTime=u'23:00',),
-            'tier': 'D1'
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    binaryLogEnabled=True,
+                    enabled=True,
+                    kind='sql#backupConfiguration',
+                    startTime='23:00',
+                ),
+            'tier':
+                'D1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
@@ -128,12 +131,15 @@ clone-instance-7  MYSQL_5_6         us-central  D1    -        RUNNABLE
     diff = {
         'name': 'backupless-instance1',
         'settings': {
-            'backupConfiguration': self.messages.BackupConfiguration(
-                binaryLogEnabled=None,
-                enabled=False,
-                kind=u'sql#backupConfiguration',
-                startTime=u'00:00',),
-            'tier': 'D1'
+            'backupConfiguration':
+                self.messages.BackupConfiguration(
+                    binaryLogEnabled=None,
+                    enabled=False,
+                    kind='sql#backupConfiguration',
+                    startTime='00:00',
+                ),
+            'tier':
+                'D1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
@@ -242,13 +248,16 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0  RUNNABLE
     diff = {
         'name': 'create-secondgen1',
         'settings': {
-            'dataDiskSizeGb': 15,
-            'maintenanceWindow': self.messages.MaintenanceWindow(
-                day=1,
-                hour=5,
-                updateTrack='canary',
-                kind=u'sql#maintenanceWindow'),
-            'tier': 'db-n1-standard-1'
+            'dataDiskSizeGb':
+                15,
+            'maintenanceWindow':
+                self.messages.MaintenanceWindow(
+                    day=1,
+                    hour=5,
+                    updateTrack='canary',
+                    kind='sql#maintenanceWindow'),
+            'tier':
+                'db-n1-standard-1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
@@ -267,14 +276,16 @@ create-replica1  MYSQL_5_7         us-west1 db-n1-standard-4  0.0.0.0  RUNNABLE
     diff = {
         'name': 'create-instance1',
         'settings': {
-            'ipConfiguration': self.messages.IpConfiguration(
-                authorizedNetworks=[
-                    self.messages.AclEntry(
-                        kind=u'sql#aclEntry', value='10.10.10.1/16')
-                ],
-                ipv4Enabled=None,
-                requireSsl=None),
-            'tier': 'D1'
+            'ipConfiguration':
+                self.messages.IpConfiguration(
+                    authorizedNetworks=[
+                        self.messages.AclEntry(
+                            kind='sql#aclEntry', value='10.10.10.1/16')
+                    ],
+                    ipv4Enabled=None,
+                    requireSsl=None),
+            'tier':
+                'D1'
         }
     }
     self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
@@ -322,7 +333,7 @@ custom-instance1 POSTGRES_9_6     us-central db-custom-1-1024 0.0.0.0 RUNNABLE
             etag=None,
             name='create-instance1',
             ipAddresses=[],
-            kind=u'sql#instance',
+            kind='sql#instance',
             maxDiskSize=None,
             project=self.Project(),
             region='us-central',
@@ -333,17 +344,20 @@ custom-instance1 POSTGRES_9_6     us-central db-custom-1-1024 0.0.0.0 RUNNABLE
                 backupConfiguration=None,
                 databaseFlags=[],
                 ipConfiguration=None,
-                kind=u'sql#settings',
+                kind='sql#settings',
                 locationPreference=None,
                 pricingPlan='PER_USE',
                 replicationType='SYNCHRONOUS',
                 settingsVersion=None,
-                tier='D1',),
-            state=None,),
+                tier='D1',
+            ),
+            state=None,
+        ),
         exception=http_error.MakeHttpError(
             code=409,
             message=msg,
-            reason='errorMaxInstancePerLabel',))
+            reason='errorMaxInstancePerLabel',
+        ))
 
     with self.AssertRaisesHttpExceptionRegexp(r'Failed to create instance '
                                               'because the project or creator '
@@ -656,7 +670,7 @@ class InstancesCreateBetaTest(_BaseInstancesCreateTest, base.SqlMockTestBeta):
   def testCreateExternalMasterReplicaWithCACert(self):
     # Need file read mock to get cert file contents.
     read_file_mock = self.StartObjectPatch(
-        files, 'GetFileContents', return_value='file_data')
+        files, 'ReadFileContents', return_value='file_data')
     master_diff = {
         'name': 'xm-instance',
         'databaseVersion': 'MYSQL_5_7',
@@ -693,13 +707,14 @@ class InstancesCreateBetaTest(_BaseInstancesCreateTest, base.SqlMockTestBeta):
              '--master-instance-name=xm-instance '
              '--master-ca-certificate-path=/path/to/ca_cert.pem')
 
-    # File contents should be read once, for the CA Cert.
-    self.assertEqual(read_file_mock.call_count, 1)
+    # File contents should be read once, for the CA Cert
+    # (plus one for the properties framework).
+    self.assertEqual(read_file_mock.call_count, 2)
 
   def testCreateExternalMasterWithCAAndClientCerts(self):
     # Need file read mock to get cert file contents.
     read_file_mock = self.StartObjectPatch(
-        files, 'GetFileContents', return_value='file_data')
+        files, 'ReadFileContents', return_value='file_data')
     master_diff = {
         'name': 'xm-instance',
         'databaseVersion': 'MYSQL_5_7',
@@ -740,8 +755,9 @@ class InstancesCreateBetaTest(_BaseInstancesCreateTest, base.SqlMockTestBeta):
              '--client-key-path=/path/to/client_key.pem '
              '--master-ca-certificate-path=/path/to/ca_cert.pem')
 
-    # File contents should be read three times, one for each cert.
-    self.assertEqual(read_file_mock.call_count, 3)
+    # File contents should be read three times, one for each cert
+    # (plus one for the properties framework).
+    self.assertEqual(read_file_mock.call_count, 4)
 
   def testCreateExternalMasterReplicaWithoutMasterId(self):
     with self.AssertRaisesExceptionRegexp(

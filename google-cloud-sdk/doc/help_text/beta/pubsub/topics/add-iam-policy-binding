@@ -13,8 +13,9 @@ POSITIONAL ARGUMENTS
      Topic resource - Name of the topic to add an IAM policy binding to. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
-     attribute: Set the property [core/project] or provide the flag [--project]
-     on the command line. This must be specified.
+     attribute: provide the flag [topic] on the command line with a fully
+     specified name; provide the flag [--project] on the command line; set the
+     property [core/project]. This must be specified.
 
        TOPIC
           The ID of the topic or a fully qualified identifier for the topic.
@@ -25,8 +26,8 @@ REQUIRED FLAGS
         user|group|serviceAccount:email or domain:domain.
 
         Examples: user:test-user@gmail.com, group:admins@example.com,
-        serviceAccount:my-sa@test-123.iam.gserviceaccount.com, or
-        domain:example.com.
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
 
         Can also be one of the following special values:
         * allUsers - anyone who is on the internet, with or without a Google
@@ -50,13 +51,14 @@ EXAMPLES
         $ gcloud beta pubsub topics add-iam-policy-binding my-topic \
             --member='user:test-user@gmail.com' --role='roles/editor'
 
-    For a service account 'my-sa' linked to project 'test-123', the following
-    command will add an IAM policy binding for the role of 'roles/editor' to
-    the given service account:
+    For a service account test-proj1@example.domain.com, the following command
+    will add an IAM policy binding for the role of 'roles/editor' to the given
+    service account:
 
-        $ gcloud beta pubsub topics add-iam-policy-binding test-123 \
-            --member='serviceAccount:my-sa@test-123.iam.gserviceaccount.com'\
-         --role='roles/editor'
+        $ gcloud beta pubsub topics add-iam-policy-binding \
+            test-proj1@example.domain.com \
+            --member='serviceAccount:test-proj1@example.domain.com' \
+            --role='roles/editor'
 
     The following command will add an IAM policy binding for the role of
     'roles/editor' for all authenticated users on a topic with identifier

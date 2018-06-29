@@ -8,6 +8,10 @@ SYNOPSIS
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
+    (DEPRECATED) Create a Google Compute Engine interconnect attachment.
+
+        `create` is deprecated. Please use `gcloud compute interconnects attachments dedicated create` instead.
+
     gcloud compute interconnects attachments create is used to create
     interconnect attachments. An interconnect attachment is what binds the
     underlying connectivity of an Interconnect to a path into and out of the

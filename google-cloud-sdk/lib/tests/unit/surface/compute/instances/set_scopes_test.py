@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instances set-iam-policy subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case

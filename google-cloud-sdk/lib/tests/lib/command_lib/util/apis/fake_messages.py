@@ -30,6 +30,7 @@ class FakeMessage(_messages.Message):
     bool1: a boolean
     int1: an int
     float1: a float
+    bytes1: a byte string
     message1: an InnerMessage message
     message2: an InnerMessage2 message
     repeated_message: a repeated InnerMessage message.
@@ -89,6 +90,7 @@ class FakeMessage(_messages.Message):
   bool1 = _messages.BooleanField(5)
   int1 = _messages.IntegerField(6)
   float1 = _messages.FloatField(7)
-  message1 = _messages.MessageField('InnerMessage', 8)
-  message2 = _messages.MessageField('InnerMessage2', 9)
-  repeated_message = _messages.MessageField('InnerMessage', 10, repeated=True)
+  bytes1 = _messages.BytesField(8)
+  message1 = _messages.MessageField('InnerMessage', 9)
+  message2 = _messages.MessageField('InnerMessage2', 10)
+  repeated_message = _messages.MessageField('InnerMessage', 11, repeated=True)

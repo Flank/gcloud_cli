@@ -13,7 +13,8 @@
 # limitations under the License.
 """Tests for container images untag commands."""
 
-from containerregistry.client import docker_name
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from containerregistry.client.v2_2 import docker_http
 from containerregistry.client.v2_2 import docker_session
 from googlecloudsdk.api_lib.container.images import util
@@ -23,6 +24,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 import httplib2
 import mock
+import six
 
 _REPOSITORY = 'gcr.io/project/repository'
 _DIGEST_SUFFIX = 'sha256:' + 'a' * 64
@@ -58,7 +60,7 @@ class UntagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def _AssertNamesInResult(self, result, names):
     result_names = [i['name'] for i in result]
-    self.assertItemsEqual(names, result_names)
+    self.assertCountEqual(names, result_names)
 
   def testUntag_Digest(self):
     with self.assertRaises(util.InvalidImageNameError):
@@ -78,12 +80,12 @@ class UntagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def testUntag_BadInput(self):
     image_name = 'badi$mage'
-    with self.assertRaises(docker_name.BadNameException):
+    with self.assertRaises(util.InvalidImageNameError):
       self.Untag([image_name])
 
   def testUntag_UnsupportedInputTag(self):
     image_name = 'myregistry.io/badimage:'
-    with self.assertRaises(docker_name.BadNameException):
+    with self.assertRaises(util.InvalidImageNameError):
       self.Untag([image_name])
 
   def testUntag_Registry403(self):
@@ -92,7 +94,7 @@ class UntagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.mock_delete.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.Untag([_TAG_V1])
-    self.assertIn('Access denied:', str(cm.exception.message))
+    self.assertIn('Access denied:', six.text_type(cm.exception))
 
   def testUntag_Registry404(self):
     response = httplib2.Response({'status': 404, 'body': 'some body'})
@@ -100,7 +102,7 @@ class UntagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.mock_delete.side_effect = exception
     with self.assertRaises(util.UserRecoverableV2Error) as cm:
       self.Untag([_TAG_V1])
-    self.assertIn('Not found:', str(cm.exception.message))
+    self.assertIn('Not found:', six.text_type(cm.exception))
 
   def testUntag_TokenRefresh403(self):
     expected_message = 'Bad status during token exchange: 403'
@@ -108,7 +110,7 @@ class UntagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
     self.mock_delete.side_effect = exception
     with self.assertRaises(util.TokenRefreshError) as cm:
       self.Untag([_TAG_V1])
-    self.assertIn(expected_message, str(cm.exception.message))
+    self.assertIn(expected_message, six.text_type(cm.exception))
 
   def testUntag(self):
     result = resource_projector.MakeSerializable(self.Untag([_TAG_V1]))

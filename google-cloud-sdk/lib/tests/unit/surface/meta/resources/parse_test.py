@@ -14,6 +14,9 @@
 
 """Tests for the `gcloud meta complete` command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.core import resources
 from tests.lib import calliope_test_base
 

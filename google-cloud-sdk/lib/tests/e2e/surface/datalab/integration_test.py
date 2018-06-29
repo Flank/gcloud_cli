@@ -15,6 +15,8 @@
 
 # TODO(b/64032647): Move this under //cloud/sdk/component_build/bundle_tests/
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 
 from tests.lib import e2e_utils
@@ -26,9 +28,9 @@ from tests.lib.surface.compute import e2e_instances_test_base
 @test_case.Filters.SkipOnWindows(
     'DatalabIntegrationTest.testCreateConnectDelete frequently timing out on '
     'windows', 'b/76138853')
+@test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/91357877')
 class DatalabIntegrationTest(sdk_test_base.BundledBase,
-                             e2e_instances_test_base.InstancesTestBase,
-                             sdk_test_base.WithCommandCapture):
+                             e2e_instances_test_base.InstancesTestBase):
   """Integration tests for the datalab command.
 
   This inherits from the BundledBase class because it relies on the full SDK
@@ -40,8 +42,8 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
   _SUCCESS_MSG = 'The connection to Datalab is now open'
 
   def SetUp(self):
-    self.network_name = e2e_utils.GetResourceNameGenerator(
-        prefix='datalab-test-network').next()
+    self.network_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix='datalab-test-network'))
 
   def TearDown(self):
     # Once we get to the teardown method, all we have to do is make

@@ -490,7 +490,7 @@
       "type": "object",
       "properties": {
         "csvFileUri": {
-          "description": "The Google Cloud Storage URI of the input csv file.\n\nThe URI must start with gs:\/\/\n\nThe format of the input csv file should be one image per line.\nIn each line, there are 6 columns.\n1. image_uri\n2. product_set_id\n3. product_id\n4. product_category\n5, labels\n6. bounding_poly\n\nColumns 1, 2, 3 and 4 are required. A new ProductSet\/Product with the same\nid will be created on the fly if the ProductSet\/Product specified by\nproduct_set_id\/product_id does not exist.\n\nIf the Product with product_id already exists, the fields product_category\nand labels are ignored.\n\nIf a Product doesn't exist and needs to be created on the fly, the\nproduct_category field refers to Product.product_category, and the\nlabels field refers to Product.labels. Notice that display_name of\nProductSet\/Product cannot be empty. Here \" \" is used as the place holder\nfor the display_name, which can be updated through the update API.\n\nLabels should be a line containing a list of comma-separated key-value\npairs, with the format \"key_1=value_1,key_2=value_2,...,key_n=value_n\".\n\nThe bounding_poly field is used to identify one region of interest\nfrom the image in the same manner as CreateReferenceImage. If no\nbounding_poly is specified, the system will try to detect regions of\ninterest automatically.\n\nNote that the pipeline will resize the image if the image resolution is too\nlarge to process (above 50MP).\n\nAlso note that at most one bounding_poly is allowed per line. If the image\ncontains multiple regions of interest, the csv should contain one line per\nregion of interest.\n\nThe bounding_poly column should contain an even number of comma-separated\nnumbers, with the format \"p1_x,p1_y,p2_x,p2_y,...,pn_x,pn_y\". Nonnegative\nintegers should be used for absolute bounding polygons, and float values\nin [0, 1] should be used for normalized bounding polygons.",
+          "description": "The Google Cloud Storage URI of the input csv file.\n\nThe URI must start with gs:\/\/\n\nThe format of the input csv file should be one image per line.\nIn each line, there are 6 columns.\n1. image_uri\n2, image_id\n3. product_set_id\n4. product_id\n5, product_category\n6, product_display_name\n7, labels\n8. bounding_poly\n\nColumns 1, 3, 4, and 5 are required, other columns are optional. A new\nProductSet\/Product with the same id will be created on the fly\nif the ProductSet\/Product specified by product_set_id\/product_id does not\nexist.\n\nThe image_id field is optional but has to be unique if provided. If it is\nempty, we will automatically assign an unique id to the image.\n\nThe product_display_name field is optional. If it is empty, a space (\" \")\nis used as the place holder for the product display_name, which can\nbe updated later through the realtime API.\n\nIf the Product with product_id already exists, the fields\nproduct_display_name, product_category and labels are ignored.\n\nIf a Product doesn't exist and needs to be created on the fly, the\nproduct_display_name field refers to Product.display_name, the\nproduct_category field refers to Product.product_category, and the\nlabels field refers to Product.labels.\n\nLabels (optional) should be a line containing a list of comma-separated\nkey-value pairs, with the format\n    \"key_1=value_1,key_2=value_2,...,key_n=value_n\".\n\nThe bounding_poly (optional) field is used to identify one region of\ninterest from the image in the same manner as CreateReferenceImage. If no\nbounding_poly is specified, the system will try to detect regions of\ninterest automatically.\n\nNote that the pipeline will resize the image if the image resolution is too\nlarge to process (above 20MP).\n\nAlso note that at most one bounding_poly is allowed per line. If the image\ncontains multiple regions of interest, the csv should contain one line per\nregion of interest.\n\nThe bounding_poly column should contain an even number of comma-separated\nnumbers, with the format \"p1_x,p1_y,p2_x,p2_y,...,pn_x,pn_y\". Nonnegative\nintegers should be used for absolute bounding polygons, and float values\nin [0, 1] should be used for normalized bounding polygons.",
           "type": "string"
         }
       }
@@ -1985,6 +1985,10 @@
           "description": "A confidence level on the match, ranging from 0 (no confidence) to\n1 (full confidence).\n\nThis field is returned only if `view` is set to `FULL` in\nthe request.",
           "type": "number",
           "format": "float"
+        },
+        "image": {
+          "description": "The resource name of the image from the product that is the closest match\nto the query.",
+          "type": "string"
         }
       }
     },
@@ -2094,6 +2098,84 @@
         "uri": {
           "description": "Google Cloud Storage URI where the results will be stored. Results will\nbe in JSON format and preceded by its corresponding input URI. This field\ncan either represent a single file, or a prefix for multiple outputs.\nPrefixes must end in a `\/`.\n\nExamples:\n\n*    File: gs:\/\/bucket-name\/filename.json\n*    Prefix: gs:\/\/bucket-name\/prefix\/here\/\n*    File: gs:\/\/bucket-name\/prefix\/here\n\nIf multiple outputs, each response is still AnnotateFileResponse, each of\nwhich contains some subset of the full list of AnnotateImageResponse.\nMultiple outputs can happen if, for example, the output JSON is too large\nand overflows into multiple sharded files.",
           "type": "string"
+        }
+      }
+    },
+    "AnnotateFileResponse": {
+      "id": "AnnotateFileResponse",
+      "description": "Response to a single file annotation request. A file may contain one or more\nimages, which individually have their own responses.",
+      "type": "object",
+      "properties": {
+        "inputConfig": {
+          "description": "Information about the file for which this response is generated.",
+          "$ref": "InputConfig"
+        },
+        "responses": {
+          "description": "Individual responses to images found within the file.",
+          "type": "array",
+          "items": {
+            "$ref": "AnnotateImageResponse"
+          }
+        }
+      }
+    },
+    "AsyncBatchAnnotateFilesResponse": {
+      "id": "AsyncBatchAnnotateFilesResponse",
+      "description": "Response to an async batch file annotation request.",
+      "type": "object",
+      "properties": {
+        "responses": {
+          "description": "The list of file annotation responses, one for each request in\nAsyncBatchAnnotateFilesRequest.",
+          "type": "array",
+          "items": {
+            "$ref": "AsyncAnnotateFileResponse"
+          }
+        }
+      }
+    },
+    "AsyncAnnotateFileResponse": {
+      "id": "AsyncAnnotateFileResponse",
+      "description": "The response for a single offline file annotation request.",
+      "type": "object",
+      "properties": {
+        "outputConfig": {
+          "description": "The output location and metadata from AsyncAnnotateFileRequest.",
+          "$ref": "OutputConfig"
+        }
+      }
+    },
+    "OperationMetadata": {
+      "id": "OperationMetadata",
+      "description": "Contains metadata for the BatchAnnotateImages operation.",
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "Current state of the batch operation.",
+          "enumDescriptions": [
+            "Invalid.",
+            "Request is received.",
+            "Request is actively being processed.",
+            "The batch processing is done.",
+            "The batch processing was cancelled."
+          ],
+          "type": "string",
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "CREATED",
+            "RUNNING",
+            "DONE",
+            "CANCELLED"
+          ]
+        },
+        "createTime": {
+          "description": "The time when the batch request was received.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "updateTime": {
+          "description": "The time when the operation result was last updated.",
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     },
@@ -3313,68 +3395,8 @@
         }
       }
     },
-    "OperationMetadata": {
-      "id": "OperationMetadata",
-      "description": "Contains metadata for the BatchAnnotateImages operation.",
-      "type": "object",
-      "properties": {
-        "state": {
-          "description": "Current state of the batch operation.",
-          "enumDescriptions": [
-            "Invalid.",
-            "Request is received.",
-            "Request is actively being processed.",
-            "The batch processing is done.",
-            "The batch processing was cancelled."
-          ],
-          "type": "string",
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "CREATED",
-            "RUNNING",
-            "DONE",
-            "CANCELLED"
-          ]
-        },
-        "createTime": {
-          "description": "The time when the batch request was received.",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "updateTime": {
-          "description": "The time when the operation result was last updated.",
-          "type": "string",
-          "format": "google-datetime"
-        }
-      }
-    },
-    "AsyncBatchAnnotateFilesResponse": {
-      "id": "AsyncBatchAnnotateFilesResponse",
-      "description": "Response to an async batch file annotation request.",
-      "type": "object",
-      "properties": {
-        "responses": {
-          "description": "The list of file annotation responses, one for each request in\nAsyncBatchAnnotateFilesRequest.",
-          "type": "array",
-          "items": {
-            "$ref": "AsyncAnnotateFileResponse"
-          }
-        }
-      }
-    },
-    "AsyncAnnotateFileResponse": {
-      "id": "AsyncAnnotateFileResponse",
-      "description": "The response for a single offline file annotation request.",
-      "type": "object",
-      "properties": {
-        "outputConfig": {
-          "description": "The output location and metadata from AsyncAnnotateFileRequest.",
-          "$ref": "OutputConfig"
-        }
-      }
-    },
-    "BatchOperationMetadata": {
-      "id": "BatchOperationMetadata",
+    "GoogleCloudVisionV1p3beta1BatchOperationMetadata": {
+      "id": "GoogleCloudVisionV1p3beta1BatchOperationMetadata",
       "description": "Metadata for the batch operations such as the current state.\n\nThis is included in the `metadata` field of the `Operation` returned by the\n`GetOperation` call of the `google::longrunning::Operations` service.",
       "type": "object",
       "properties": {
@@ -3408,8 +3430,8 @@
         }
       }
     },
-    "ImportProductSetsResponse": {
-      "id": "ImportProductSetsResponse",
+    "GoogleCloudVisionV1p3beta1ImportProductSetsResponse": {
+      "id": "GoogleCloudVisionV1p3beta1ImportProductSetsResponse",
       "description": "Response message for the `ImportProductSets` method.\n\nThis message is returned by the\ngoogle.longrunning.Operations.GetOperation method in the returned\ngoogle.longrunning.Operation.response field.",
       "type": "object",
       "properties": {
@@ -3417,7 +3439,7 @@
           "description": "The list of reference_images that are imported successfully.",
           "type": "array",
           "items": {
-            "$ref": "ReferenceImage"
+            "$ref": "GoogleCloudVisionV1p3beta1ReferenceImage"
           }
         },
         "statuses": {
@@ -3426,6 +3448,83 @@
           "items": {
             "$ref": "Status"
           }
+        }
+      }
+    },
+    "GoogleCloudVisionV1p3beta1ReferenceImage": {
+      "id": "GoogleCloudVisionV1p3beta1ReferenceImage",
+      "description": "A `ReferenceImage` represents a product image and its associated metadata,\nsuch as bounding boxes.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The resource name of the reference image.\n\nFormat is:\n\n`projects\/PROJECT_ID\/locations\/LOC_ID\/products\/PRODUCT_ID\/referenceImages\/IMAGE_ID`.\n\nThis field is ignored when creating a reference image.",
+          "type": "string"
+        },
+        "uri": {
+          "description": "The Google Cloud Storage URI of the reference image.\n\nThe URI must start with `gs:\/\/`.\n\nRequired.",
+          "type": "string"
+        },
+        "boundingPolys": {
+          "description": "Bounding polygons around the areas of interest in the reference image.\nOptional. If this field is empty, the system will try to detect regions of\ninterest. At most 10 bounding polygons will be used.\n\nThe provided shape is converted into a non-rotated rectangle. Once\nconverted, the small edge of the rectangle must be greater than or equal\nto 300 pixels. The aspect ratio must be 1:4 or less (i.e. 1:3 is ok; 1:5\nis not).",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVisionV1p3beta1BoundingPoly"
+          }
+        }
+      }
+    },
+    "GoogleCloudVisionV1p3beta1BoundingPoly": {
+      "id": "GoogleCloudVisionV1p3beta1BoundingPoly",
+      "description": "A bounding polygon for the detected image annotation.",
+      "type": "object",
+      "properties": {
+        "vertices": {
+          "description": "The bounding polygon vertices.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVisionV1p3beta1Vertex"
+          }
+        },
+        "normalizedVertices": {
+          "description": "The bounding polygon normalized vertices.",
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudVisionV1p3beta1NormalizedVertex"
+          }
+        }
+      }
+    },
+    "GoogleCloudVisionV1p3beta1Vertex": {
+      "id": "GoogleCloudVisionV1p3beta1Vertex",
+      "description": "A vertex represents a 2D point in the image.\nNOTE: the vertex coordinates are in the same scale as the original image.",
+      "type": "object",
+      "properties": {
+        "x": {
+          "description": "X coordinate.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "y": {
+          "description": "Y coordinate.",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "GoogleCloudVisionV1p3beta1NormalizedVertex": {
+      "id": "GoogleCloudVisionV1p3beta1NormalizedVertex",
+      "description": "A vertex represents a 2D point in the image.\nNOTE: the normalized vertex coordinates are relative to the original image\nand range from 0 to 1.",
+      "type": "object",
+      "properties": {
+        "x": {
+          "description": "X coordinate.",
+          "type": "number",
+          "format": "float"
+        },
+        "y": {
+          "description": "Y coordinate.",
+          "type": "number",
+          "format": "float"
         }
       }
     },
@@ -3533,6 +3632,62 @@
           "description": "Resource deletion timestamp.\n\nThis timestamp indicates when the resource was marked for deletion.\nResources marked for deletion will continue to show up in product search\nresults until the index is rebuilt (currently daily).\n\nThe value of this field is 0 for resources that have NOT been deleted.\n\nOutput only.",
           "type": "string",
           "format": "google-datetime"
+        }
+      }
+    },
+    "BatchOperationMetadata": {
+      "id": "BatchOperationMetadata",
+      "description": "Metadata for the batch operations such as the current state.\n\nThis is included in the `metadata` field of the `Operation` returned by the\n`GetOperation` call of the `google::longrunning::Operations` service.",
+      "type": "object",
+      "properties": {
+        "state": {
+          "description": "The current state of the batch operation.",
+          "enumDescriptions": [
+            "Invalid.",
+            "Request is actively being processed.",
+            "The request is done and at least one item has been successfully\nprocessed.",
+            "The request is done and no item has been successfully processed.",
+            "The request is done after the longrunning.Operations.CancelOperation has\nbeen called by the user.  Any records that were processed before the\ncancel command are output as specified in the request."
+          ],
+          "type": "string",
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "PROCESSING",
+            "SUCCESSFUL",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "submitTime": {
+          "description": "The time when the batch request was submitted to the server.",
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "endTime": {
+          "description": "The time when the batch request is finished and\ngoogle.longrunning.Operation.done is set to true.",
+          "type": "string",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "ImportProductSetsResponse": {
+      "id": "ImportProductSetsResponse",
+      "description": "Response message for the `ImportProductSets` method.\n\nThis message is returned by the\ngoogle.longrunning.Operations.GetOperation method in the returned\ngoogle.longrunning.Operation.response field.",
+      "type": "object",
+      "properties": {
+        "referenceImages": {
+          "description": "The list of reference_images that are imported successfully.",
+          "type": "array",
+          "items": {
+            "$ref": "ReferenceImage"
+          }
+        },
+        "statuses": {
+          "description": "The rpc status for each ImportProductSet request, including both successes\nand errors.\n\nThe number of statuses here matches the number of lines in the csv file,\nand statuses[i] stores the success or failure status of processing the i-th\nline of the csv, starting from line 0.",
+          "type": "array",
+          "items": {
+            "$ref": "Status"
+          }
         }
       }
     }
@@ -4338,7 +4493,7 @@
             "https://www.googleapis.com/auth/cloud-platform",
             "https://www.googleapis.com/auth/cloud-vision"
           ],
-          "description": "Run async image detection and annotation for a list of generic files (e.g.\nPDF) which may contain multiple pages and multiple images per page.\nProgress and results can be retrieved through the\n`google.longrunning.Operations` interface.\n`Operation.metadata` contains `OperationMetadata` (metadata).\n`Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results)."
+          "description": "Run asynchronous image detection and annotation for a list of generic\nfiles, such as PDF files, which may contain multiple pages and multiple\nimages per page. Progress and results can be retrieved through the\n`google.longrunning.Operations` interface.\n`Operation.metadata` contains `OperationMetadata` (metadata).\n`Operation.response` contains `AsyncBatchAnnotateFilesResponse` (results)."
         }
       }
     }

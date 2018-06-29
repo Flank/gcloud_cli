@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Spanner instances set-iam-policy command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import re
 
@@ -35,12 +37,12 @@ class SetIamPolicyTest(base.SpannerTestBase):
     self.policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
-                role=u'roles/spanner.databaseAdmin',
-                members=[u'domain:foo.com']), self.msgs.Binding(
-                    role=u'roles/spanner.viewer',
-                    members=[u'user:admin@foo.com'])
+                role='roles/spanner.databaseAdmin',
+                members=['domain:foo.com']), self.msgs.Binding(
+                    role='roles/spanner.viewer',
+                    members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=b'someUniqueEtag',
         version=1)
     json = encoding.MessageToJson(self.policy)
     self.temp_file = self.Touch(self.temp_path, contents=json)

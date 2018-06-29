@@ -68,6 +68,11 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --origin=ORIGIN
         Location of model/ "directory" (as output by
         https://www.tensorflow.org/versions/r0.12/api_docs/python/state_ops.html#Saver).

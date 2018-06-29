@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 import datetime
 
@@ -22,6 +24,7 @@ from googlecloudsdk.calliope import exceptions as core_exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import fake_args
 from tests.lib.surface.firebase.test.android import unit_base
+import six
 
 
 class AndroidArgsTests(unit_base.AndroidMockClientTest):
@@ -32,11 +35,11 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
   def testGetSetOfAllTestArgs_OnActualRules(self):
     all_args = arg_manager.AllArgsSet()
     # arg_manager tests include GA and beta args
-    self.assertItemsEqual(set(unit_base.ALL_TEST_RUN_ARGS['beta']), all_args)
+    self.assertEquals(set(unit_base.ALL_TEST_RUN_ARGS['beta']), all_args)
 
   def testArgNamesInRulesAreInternalNames(self):
     # Verify that ArgRules use internal arg names with underscores, not hyphens
-    for arg_rules in arg_manager.TypedArgRules().itervalues():
+    for arg_rules in six.itervalues(arg_manager.TypedArgRules()):
       self.CheckArgNamesForHyphens(arg_rules)
     self.CheckArgNamesForHyphens(arg_manager.SharedArgRules())
 
@@ -183,28 +186,31 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
     arg_mgr = _AndroidArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.ModelNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    self.assertIn("'NexusBad' is not a valid model", ex_ctx.exception.message)
+    self.assertIn("'NexusBad' is not a valid model",
+                  six.text_type(ex_ctx.exception))
 
   def testPrepareArgs_SparseMatrix_InvalidVersion(self):
     args = self.NewTestArgs(app='a', device=[{'version': 'v9.9'}])
     arg_mgr = _AndroidArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.VersionNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    self.assertIn("'v9.9' is not a valid OS version", ex_ctx.exception.message)
+    self.assertIn("'v9.9' is not a valid OS version",
+                  six.text_type(ex_ctx.exception))
 
   def testPrepareArgs_SparseMatrix_InvalidLocale(self):
     args = self.NewTestArgs(app='a', device=[{'locale': 'here'}])
     arg_mgr = _AndroidArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.LocaleNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    self.assertIn("'here' is not a valid locale", ex_ctx.exception.message)
+    self.assertIn("'here' is not a valid locale",
+                  six.text_type(ex_ctx.exception))
 
   def testPrepareArgs_SparseMatrix_InvalidOrientation(self):
     args = self.NewTestArgs(app='a', device=[{'orientation': 'down'}])
     arg_mgr = _AndroidArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.OrientationNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    msg = ex_ctx.exception.message
+    msg = six.text_type(ex_ctx.exception)
     self.assertIn("'down' is not a valid device orientation", msg)
 
   def testPrepareArgs_SparseMatrix_InvalidDimensionName(self):
@@ -212,7 +218,7 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
     arg_mgr = _AndroidArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.InvalidDimensionNameError) as ex_ctx:
       arg_mgr.Prepare(args)
-    msg = ex_ctx.exception.message
+    msg = six.text_type(ex_ctx.exception)
     self.assertIn("'fourth' is not a valid dimension name", msg)
 
   def testPrepareArgs_StripsOffResultsBucketGcsPrefix(self):
@@ -244,14 +250,16 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
     arg_mgr = _AndroidArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.VersionNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    self.assertIn("'4.321' is not a valid OS version", ex_ctx.exception.message)
+    self.assertIn("'4.321' is not a valid OS version",
+                  six.text_type(ex_ctx.exception))
 
   def testPrepareArgs_InvalidOsVersionIdRaisesIllegalArgument(self):
     args = self.NewTestArgs(os_version_ids=['k', 'z'], app='a')
     arg_mgr = _AndroidArgManagerWithFakeCatalog()
     with self.assertRaises(exceptions.VersionNotFoundError) as ex_ctx:
       arg_mgr.Prepare(args)
-    self.assertIn("'z' is not a valid OS version", ex_ctx.exception.message)
+    self.assertIn("'z' is not a valid OS version",
+                  six.text_type(ex_ctx.exception))
 
   def testPrepareArgs_CatchesInvalidObbFilename(self):
     args = self.NewTestArgs(
@@ -263,7 +271,7 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(core_exceptions.InvalidArgumentException) as ex_ctx:
       arg_mgr.Prepare(args)
     self.assertEqual(ex_ctx.exception.parameter_name, 'obb-files')
-    self.assertIn('oops', ex_ctx.exception.message)
+    self.assertIn('oops', six.text_type(ex_ctx.exception))
 
   def testPrepareArgs_GameLoopArgDefaults(self):
     args = self.NewTestArgs(
@@ -292,7 +300,7 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(core_exceptions.InvalidArgumentException) as e:
       arg_mgr.Prepare(args)
     self.assertIn('greater than or equal to 1; received: -3',
-                  e.exception.message)
+                  six.text_type(e.exception))
 
   def testValidateScenarioNumbers_InvalidString(self):
     args = self.NewTestArgs(app='a', type='game-loop', scenario_numbers='uno')
@@ -300,7 +308,7 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(core_exceptions.InvalidArgumentException) as e:
       arg_mgr.Prepare(args)
     self.assertIn('Invalid value for [scenario-numbers]',
-                  e.exception.message)
+                  six.text_type(e.exception))
 
   def testValidateScenarioNumbers_InvalidIntString(self):
     args = self.NewTestArgs(
@@ -309,7 +317,7 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(core_exceptions.InvalidArgumentException) as e:
       arg_mgr.Prepare(args)
     self.assertIn('Invalid value for [scenario-numbers]: 5',
-                  e.exception.message)
+                  six.text_type(e.exception))
 
   def testValidateScenarioNumbers_InvalidLetter(self):
     args = self.NewTestArgs(
@@ -318,7 +326,7 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
     with self.assertRaises(core_exceptions.InvalidArgumentException) as e:
       arg_mgr.Prepare(args)
     self.assertIn('Invalid value for [scenario-numbers]: z',
-                  e.exception.message)
+                  six.text_type(e.exception))
 
 
 def _AndroidArgManagerWithFakeCatalog():

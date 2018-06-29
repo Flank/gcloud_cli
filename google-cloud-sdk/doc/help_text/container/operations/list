@@ -2,7 +2,7 @@ NAME
     gcloud container operations list - list operations for container clusters
 
 SYNOPSIS
-    gcloud container operations list [--zone=ZONE, -z ZONE]
+    gcloud container operations list [--region=REGION | --zone=ZONE, -z ZONE]
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -10,9 +10,14 @@ DESCRIPTION
     List operations for container clusters.
 
 FLAGS
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

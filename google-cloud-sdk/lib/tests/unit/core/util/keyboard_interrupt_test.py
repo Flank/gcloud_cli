@@ -14,6 +14,8 @@
 
 """Tests for the core.util.keyboard_interrupt module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import subprocess
 import sys
@@ -22,6 +24,7 @@ import googlecloudsdk
 from googlecloudsdk.core.util import encoding
 from tests.lib import cli_test_base
 from tests.lib import test_case
+from six.moves import range
 
 
 @test_case.Filters.DoNotRunOnWindows(
@@ -43,6 +46,7 @@ class KeyboardInterruptTests(cli_test_base.CliTestBase):
     # Make sure the gcloud main imports are visible.
     env = os.environ.copy()
     encoding.SetEncodedValue(env, 'PYTHONPATH', os.pathsep.join(sys.path))
+    encoding.SetEncodedValue(env, 'CLOUDSDK_CORE_ALLOW_PY3', 'true')
 
     # Subprocess stderr=X redirection requires file streams, not buffers.
     # stderr=subprocess.PIPE only works resliably with p=subprocess.Popen() and

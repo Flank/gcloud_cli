@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the accelerator types list subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute.accelerator_types import flags
 from tests.lib import completer_test_base

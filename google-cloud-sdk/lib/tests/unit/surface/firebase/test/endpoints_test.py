@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import endpoints
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import unit_base
+import six
 
 # Note: Testing is a Google API platform, ToolResults uses older API endpoints.
 PROD_TESTING = 'https://testing.googleapis.com/'
@@ -58,16 +62,16 @@ class EndpointTests(unit_base.TestMockClientTest):
 
     with self.assertRaises(exceptions.IncompatibleApiEndpointsError) as ex_ctx:
       endpoints.ValidateTestServiceEndpoints()
-    self.assertIn('not compatible', ex_ctx.exception.message)
+    self.assertIn('not compatible', six.text_type(ex_ctx.exception))
 
   def testEmptyEndpointsAreInvalid(self):
     with self.assertRaises(properties.InvalidValueError) as ex_ctx:
       properties.VALUES.api_endpoint_overrides.testing.Set('')
-    self.assertIn('not a valid endpoint', ex_ctx.exception.message)
+    self.assertIn('not a valid endpoint', six.text_type(ex_ctx.exception))
 
     with self.assertRaises(properties.InvalidValueError) as ex_ctx:
       properties.VALUES.api_endpoint_overrides.toolresults.Set('')
-    self.assertIn('not a valid endpoint', ex_ctx.exception.message)
+    self.assertIn('not a valid endpoint', six.text_type(ex_ctx.exception))
 
 
 if __name__ == '__main__':

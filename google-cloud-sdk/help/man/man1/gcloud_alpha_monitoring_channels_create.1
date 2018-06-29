@@ -55,10 +55,14 @@ Notification channel settings
 .RS 2m
 .TP 2m
 \fB\-\-channel\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add.These are configuration fields that
-define the channel and its behavior. If the channel was given as a JSON/YAML
-object from a string or file, this flag will replace the labels value in the
-given channel.
+A list of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers.
+
+These are configuration fields that define the channel and its behavior.If the
+channel was given as a JSON/YAML object from a string or file, this flag will
+replace the labels value in the given channel.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -80,9 +84,15 @@ NotificationChannelDescriptor type field.
 
 .TP 2m
 \fB\-\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
-A list of label KEY=VALUE pairs to add. If the channel was given as a JSON/YAML
-object from a string or file, this flag will replace the labels value in the
-given channel.
+A list of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+If the channel was given as a JSON/YAML object from a string or file, this flag
+will replace the labels value in the given channel.
 
 
 .RE

@@ -18,152 +18,224 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from tests.lib.scenario import assertions
-from tests.lib.scenario import events as events_lib
+import abc
+import io
+import os
+import sys
 
+from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import properties
+from googlecloudsdk.core import yaml
+from googlecloudsdk.core.util import pkg_resources
+from tests.lib.scenario import assertions
+from tests.lib.scenario import events
+from tests.lib.scenario import session
+from tests.lib.scenario import updates
+
+import jsonschema
 import six
 
 
+_SCENARIO_SCHEMA_FILE_NAME = 'scenario_schema.yaml'
+_SCENARIO_SCHEMA_PATH = (os.path.join(os.path.dirname(__file__),
+                                      _SCENARIO_SCHEMA_FILE_NAME))
+
+
+class Error(Exception):
+  """Base exception for the module."""
+  pass
+
+
+class ScenarioContext(object):
+  """A holder for things from a test_base that the scenario needs to run.
+
+  Attributes:
+    full_spec_path: str, The absolute path to the file that the spec was loaded
+      from.
+    spec_data: The parsed spec data.
+    update_modes: [updates.Mode], The list of enabled update modes for this
+      scenario run.
+    stream_mocker: session.StreamMocker, The holder for mock streams to event
+      handling.
+    command_executor: f([str]), The function to call to execute a command.
+  """
+
+  def __init__(self, full_spec_path, spec_data, update_modes, stream_mocker,
+               command_executor):
+    self.full_spec_path = full_spec_path
+    self.spec_data = spec_data
+    self.update_modes = update_modes
+    self.stream_mocker = stream_mocker
+    self.command_executor = command_executor
+
+
 class Scenario(object):
-  """Holds the entire scneario spec."""
+  """Holds the entire scenario spec."""
 
   @classmethod
   def FromData(cls, data):
     """Build the object from spec data."""
-    response_assertions = {
-        key: assertions.ResponsePayloadAssertion(
-            assertions.Context.Empty(
-                custom_update_hook=_ResponseUpdateHook(response)),
-            headers=response.get('headers', {'status': 200}),
-            payload=response.get('body', ''))
-        for key, response in six.iteritems(data['responses'])}
+
+    scenario_actions = []
+    for a in data.get('actions') or []:
+      if 'set_property' in a:
+        scenario_actions.append(SetPropertyAction.FromData(a))
+      elif 'execute_command' in a:
+        scenario_actions.append(CommandExecutionAction.FromData(a))
+      else:
+        # This will never happen if schema passes validation.
+        raise ValueError('Unknown action type: {}'.format(a))
+
     return cls(
-        [CommandExecution.FromData(c, response_assertions)
-         for c in data.get('commands') or []],
-        response_assertions
+        title=data.get('title'),
+        description=data.get('description'),
+        actions=scenario_actions,
     )
 
-  def __init__(self, command_executions, response_payloads):
-    self.command_executions = command_executions
-    self.response_payloads = response_payloads
+  def __init__(self, title, description, actions):
+    self.title = title
+    self.description = description
+    self.actions = actions
 
 
-def _ResponseUpdateHook(data):
-  def _Update(actual):
-    response, payload = actual
-    data['headers'] = {
-        key: value for key, value in sorted(six.iteritems(response))}
-    data['body'] = payload
+class Action(six.with_metaclass(abc.ABCMeta, object)):
+  """Base class for all actions."""
 
-  return assertions.UpdateHook(_Update, assertions.UpdateMode.API_RESPONSES)
+  @abc.abstractmethod
+  def Execute(self, scenario_context):
+    pass
 
 
-class CommandExecution(object):
-  """Holds the spec for a single command execution."""
+class SetPropertyAction(Action):
+  """Action that sets properties."""
 
   @classmethod
-  def FromData(cls, data, response_assertions):
-    """Build the object from spec data."""
+  def FromData(cls, data):
+    return cls(data.get('set_property', {}))
 
-    event = []
-    for e in data['events']:
-      if 'request' in e:
-        event.append(_BuildRequestEvent(e, response_assertions))
-      elif 'stdout' in e:
-        event.append(_BuildStdoutEvent(e))
-      elif 'stderr' in e:
-        event.append(_BuildStderrEvent(e))
-      elif 'stdin' in e:
-        event.append(_BuildStdinEvent(e))
-      elif 'exit_code' in e:
-        event.append(_BuildExitCodeEvent(e))
+  def __init__(self, props):
+    self.properties = props
+
+  def Execute(self, scenario_context):
+    del scenario_context
+    for p, v in six.iteritems(self.properties):
+      properties.FromString(p).Set(v)
+
+
+class CommandExecutionAction(Action):
+  """Action that runs a command and validates assertions about its execution."""
+
+  @classmethod
+  def FromData(cls, data):
+    """Build the object from spec data."""
+    command_execution_data = data.get('execute_command')
+
+    command_events = []
+    for e in command_execution_data.get('events') or []:
+      if 'api_call' in e:
+        command_events.append(events.ApiCallEvent.FromData(e))
+      elif 'expect_stdout' in e:
+        command_events.append(events.StdoutEvent.FromData(e))
+      elif 'expect_stderr' in e:
+        command_events.append(events.StderrEvent.FromData(e))
+      elif 'user_input' in e:
+        command_events.append(events.UserInputEvent.FromData(e))
+      elif 'expect_exit_code' in e:
+        command_events.append(events.ExitEvent.FromData(e))
+      elif 'expect_progress_bar' in e:
+        command_events.append(events.ProgressBarEvent.FromData(e))
+      elif 'expect_progress_tracker' in e:
+        command_events.append(events.ProgressTrackerEvent.FromData(e))
+      else:
+        # This will never happen if schema passes validation.
+        raise ValueError('Unknown event type: {}'.format(e))
 
     return cls(
-        data['command'],
-        event,
-        data['events']
+        command_execution_data['command'],
+        command_events,
+        command_execution_data,
     )
 
-  def __init__(self, command, events, original_event_data):
+  def __init__(self, command, command_events, original_event_data):
     self.command = command
-    self.events = events
-    self.original_event_data = original_event_data
+    self.events = command_events
+    self._original_data = original_event_data
+
+  def Execute(self, scenario_context):
+    update_modes = scenario_context.update_modes
+    stream_mocker = scenario_context.stream_mocker
+
+    event_data = None
+    try:
+      with assertions.FailureCollector(update_modes=update_modes) as failures:
+        with session.Session(self.events, failures, stream_mocker) as s:
+          code = 0
+          try:
+            # TODO(b/78588819): Fix the error handling here. We want the later
+            # assertions to trigger even if there are errors here, but we also
+            # need to make sure we do all the updates correctly.
+            scenario_context.command_executor(self.command)
+          except exceptions.Error:
+            code = 1
+
+          s.HandleExit(code)
+          event_data = s.GetEventSequence()
+    finally:
+      # Update spec file
+      if update_modes or (update_modes is None and updates.Mode.Current()):
+        if event_data is not None:
+          self._SetEventData(scenario_context, event_data)
+
+    remaining_stdin = sys.stdin.read()
+    if remaining_stdin:
+      raise Error('Not all stdin was consumed: [{}]'.format(remaining_stdin))
+
+  def _SetEventData(self, scenario_context, new_event_data):
+    event_data = [e for e in new_event_data if e]
+    self._original_data['events'] = event_data
+    with io.open(scenario_context.full_spec_path, 'wt') as f:
+      yaml.dump(scenario_context.spec_data, f, round_trip=True)
 
 
-def _BuildExitCodeEvent(data):
-  code = data.get('exit_code', 0)
-  return events_lib.ExitEvent(
-      assertions.ScalarAssertion(
-          assertions.Context(data, 'exit_code', assertions.UpdateMode.RESULT),
-          code),
-      backing_data=data
-  )
+class Validator(object):
+  """Validates an individual scenario instance."""
 
+  def __init__(self, test_data):
+    self.schema = yaml.load(pkg_resources.GetResourceFromFile(
+        _SCENARIO_SCHEMA_PATH))
+    self.test_data = test_data
 
-def _BuildStdoutEvent(data):
-  return events_lib.StdoutEvent(
-      assertions.ScalarAssertion(
-          assertions.Context(data, 'stdout', assertions.UpdateMode.RESULT),
-          data.get('stdout') or ''),
-      backing_data=data
-  )
+  def ValidateSchema(self):
+    """Validate scenario against scenario language schema."""
+    try:
+      jsonschema.validate(self.test_data, self.schema)
+      return True
+    except jsonschema.exceptions.ValidationError as ve:
+      sys.__stderr__.write(
+          'ERROR: Schema validation failed: {}\n\n'.format(ve))
 
+      if ve.cause:
+        additional_exception = 'Root Exception: {}'.format(ve.cause)
+      else:
+        additional_exception = ''
 
-def _BuildStderrEvent(data):
-  return events_lib.StderrEvent(
-      assertions.ScalarAssertion(
-          assertions.Context(data, 'stderr', assertions.UpdateMode.UX),
-          data.get('stderr') or ''),
-      backing_data=data
-  )
+      root_error = ve.context[-1]
+      error_path = ''.join(
+          ('[{}]'.format(elem) for elem in root_error.absolute_path))
 
+      sys.__stderr__.write(
+          'Additional Details:\n'
+          'Error Message: {msg}\n\n'
+          'Failing Validation Schema: {schema}\n\n'
+          'Failing Element: {instance}\n\n'
+          'Failing Element Path: {path}\n\n'
+          '{additional_cause}\n'.format(
+              msg=root_error.message,
+              instance=root_error.instance,
+              schema=root_error.schema,
+              path=error_path,
+              additional_cause=additional_exception))
+      return False
 
-def _BuildStdinEvent(data):
-  return events_lib.StdinEvent(
-      data.get('stdin') or [],
-      assertions.Context(data, 'stdin', assertions.UpdateMode.UX),
-      backing_data=data
-  )
-
-
-def _BuildRequestEvent(data, response_assertions):
-  """Builds a request event handler from yaml data."""
-  request_data = data['request']
-  uri_assertion = assertions.ScalarAssertion(
-      assertions.Context(
-          request_data, 'uri', assertions.UpdateMode.API_REQUESTS),
-      request_data.get('uri', ''))
-
-  method_assertion = assertions.ScalarAssertion(
-      assertions.Context(
-          request_data, 'method', assertions.UpdateMode.API_REQUESTS),
-      request_data.get('method', 'GET'))
-
-  header_assertion = assertions.DictAssertion(
-      assertions.Context(
-          request_data, 'headers', assertions.UpdateMode.API_REQUESTS))
-  for header, value in six.iteritems(request_data.get('headers', {})):
-    header_assertion.KeyEquals(header, value)
-
-  body = request_data.get('body') or {}
-  if 'json' not in body:
-    body['json'] = {}
-  payload_assertion = assertions.JsonAssertion(
-      assertions.Context(
-          body, 'json', assertions.UpdateMode.API_REQUESTS))
-  if body['json'] is None:
-    payload_assertion.Matches('', None)
-  elif not body['json']:
-    payload_assertion.Matches('', {})
-  else:
-    for field, struct in six.iteritems(body['json']):
-      payload_assertion.Matches(field, struct)
-
-  response_id = request_data['response_id']
-  response_assertion = response_assertions[response_id]
-
-  return events_lib.RequestEvent(
-      uri_assertion, method_assertion, header_assertion, payload_assertion,
-      response_assertion,
-      backing_data=data
-  )
+  def Validate(self):
+    return self.ValidateSchema()

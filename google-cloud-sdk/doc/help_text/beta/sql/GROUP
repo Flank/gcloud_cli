@@ -46,9 +46,13 @@ GROUPS
      operations
         (BETA) Provide commands for working with Cloud SQL instance operations.
 
-     ssl-certs
+     ssl
         (BETA) Provide commands for managing SSL certificates of Cloud SQL
         instances.
+
+     ssl-certs
+        (BETA) (DEPRECATED) Provide commands for managing SSL certificates of
+        Cloud SQL instances.
 
      tiers
         (BETA) Provide a command to list tiers.

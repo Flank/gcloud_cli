@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for gcloud meta list-gcloud."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import cli_tree
 from tests.lib import calliope_test_base
 

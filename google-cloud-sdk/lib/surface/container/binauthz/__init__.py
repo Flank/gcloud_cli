@@ -13,6 +13,9 @@
 # limitations under the License.
 """The base surface for Binary Authorization signatures."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
 
@@ -38,6 +41,7 @@ class Binauthz(base.Group):
     ATTESTING_USER="attesting_user@example.com"
     DIGEST="000000000000000000000000000000000000000000000000000000000000abcd"
     ARTIFACT_URL="gcr.io/example-project/example-image@sha256:${DIGEST}"
+    AUTHORITY_NAME="projects/example-project/attestationAuthorities/canary"
     ```
 
     Export your key's fingerprint (note this may differ based on version and
@@ -75,14 +79,14 @@ class Binauthz(base.Group):
           example_payload.txt
         ```
 
-    Upload the attestation to Container Analysis:
+    Upload the attestation:
 
         ```sh
         {command} attestations create \
           --pgp-key-fingerprint=${KEY_FINGERPRINT} \
           --signature-file=example_signature.pgp \
           --artifact-url="${ARTIFACT_URL}" \
-          --attestation-authority-note=providers/example-prj/notes/note-id
+          --attestation-authority=${AUTHORITY_NAME}
         ```
 
     List the attestation by artifact URL.  `--format` can be passed to
@@ -127,7 +131,7 @@ class Binauthz(base.Group):
         ```sh
         {command} attestations list \
           --artifact-url="${ARTIFACT_URL}" \
-          --attestation-authority-note=providers/exmple-prj/notes/note-id \
+          --attestation-authority=${AUTHORITY_NAME} \
           --format=yaml
 
           ...

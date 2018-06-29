@@ -14,7 +14,9 @@
 
 """Tests that exercise the 'gcloud dns record-sets changes describe' command."""
 
-import StringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import io
 
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core.resource import resource_printer
@@ -41,7 +43,7 @@ class ChangesDescribeTest(base.DnsMockTest):
         test_zone.name, test_change.id))
     self.assertEqual(test_change, result)
 
-    expected_output = StringIO.StringIO()
+    expected_output = io.StringIO()
     resource_printer.Print(
         test_change, 'yaml', out=expected_output, single=True)
     self.AssertOutputContains(expected_output.getvalue())

@@ -14,6 +14,8 @@
 
 """Tests of the 'sinks' subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.logging import base

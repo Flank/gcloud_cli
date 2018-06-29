@@ -86,6 +86,54 @@ class InterconnectAttachmentsCreateTest(test_base.BaseTest):
             partnerName='Example Partner Name',
             portalUrl='https://example.com/portal-url-login'))
 
+  def testCreateInterconnectAttachmentWithNewBandWidthEnum(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='',
+                region='us-central1',
+                interconnect=self.compute_uri +
+                '/projects/my-project/global/interconnects/'
+                'my-interconnect',
+                router=self.compute_uri + '/projects/my-project/regions/'
+                'us-central1/routers/my-router',
+                type=messages.InterconnectAttachment.TypeValueValuesEnum(
+                    'PARTNER_PROVIDER'),
+                bandwidth=messages.InterconnectAttachment.
+                BandwidthValueValuesEnum('BPS_1G'),
+                pairingKey='sample-pairing-key',
+                partnerMetadata=messages.InterconnectAttachmentPartnerMetadata(
+                    interconnectName='Test Interconnect 1',
+                    partnerName='Example Partner Name',
+                    portalUrl='https://example.com/portal-url-login'))
+        ],
+    ])
+
+    self.Run(
+        'compute interconnects attachments provider create my-attachment '
+        '--region us-central1 --interconnect my-interconnect --description '
+        '"this is my attachment" --bandwidth 1g --pairing-key '
+        'sample-pairing-key --partner-interconnect-name "Test Interconnect 1" '
+        '--partner-name "Example Partner Name" --partner-portal-url '
+        'https://example.com/portal-url-login')
+
+    self.CheckInterconnectAttachmentRequest(
+        name='my-attachment',
+        description='this is my attachment',
+        interconnect=self.compute_uri +
+        '/projects/my-project/global/interconnects/my-interconnect',
+        type=messages.InterconnectAttachment.TypeValueValuesEnum(
+            'PARTNER_PROVIDER'),
+        bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(
+            'BPS_1G'),
+        pairingKey='sample-pairing-key',
+        partnerMetadata=messages.InterconnectAttachmentPartnerMetadata(
+            interconnectName='Test Interconnect 1',
+            partnerName='Example Partner Name',
+            portalUrl='https://example.com/portal-url-login'))
+
   def testCreateInterconnectAttachmentWithUri(self):
     messages = self.messages
     self.make_requests.side_effect = iter([
@@ -216,3 +264,12 @@ class InterconnectAttachmentsCreateBetaTest(InterconnectAttachmentsCreateTest):
     self.track = base.ReleaseTrack.BETA
     self.SelectApi('beta')
     self.message_version = self.compute_beta
+
+
+class InterconnectAttachmentsCreateGaTest(
+    InterconnectAttachmentsCreateBetaTest):
+
+  def SetUp(self):
+    self.track = base.ReleaseTrack.GA
+    self.SelectApi('v1')
+    self.message_version = self.compute_v1

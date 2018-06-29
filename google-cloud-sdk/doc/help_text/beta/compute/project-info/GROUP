@@ -30,7 +30,7 @@ COMMANDS
         (BETA) Remove project-wide metadata entries.
 
      set-usage-bucket
-        (BETA) Set the usage reporting bucket for a project.
+        (BETA) Set usage reporting bucket for a project.
 
      update
         (BETA) Update a Google Compute Engine project resource.

@@ -227,6 +227,30 @@ class RecognizeSpecificTrackTest(speech_base.MlSpeechTestBase,
                '    --enable-speaker-diarization '
                '    --diarization-speaker-count hugsandkittens')
 
+  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
+  def testAdditionalLanguagesRequest(self, track):
+    """Test additional_language_codes flag mapped in recognize request."""
+    self.SetUpForTrack(track)
+    transcript = 'what do you think you are doing dave'
+    self._ExpectRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=None,
+        max_alternatives=1,
+        results=[transcript],
+        additional_language_codes=['en-TZ', 'en-CA'])
+
+    actual = self.Run('ml speech recognize gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --additional-language-codes en-TZ,en-CA')
+    expected = self.messages.RecognizeResponse(results=[
+        self.messages.SpeechRecognitionResult(alternatives=[
+            self.messages.SpeechRecognitionAlternative(
+                confidence=0.8, transcript=transcript)
+        ])
+    ])
+    self.assertEqual(expected, actual)
+
 
 if __name__ == '__main__':
   test_case.main()

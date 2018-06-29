@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright 2017 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +15,10 @@
 
 """Tests for coshell module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import io
 import os
 import signal
 import subprocess
@@ -23,6 +28,8 @@ from googlecloudsdk.command_lib.interactive import coshell
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+import six
+from six.moves import range
 
 
 def _GetOpenFds():
@@ -56,26 +63,34 @@ class _CoshellTestBase(sdk_test_base.SdkBase, test_case.WithContentAssertions):
     if self.coshell:
       self.coshell.Close()
 
-    sys.stdout.flush()
-    sys.stderr.flush()
+    if six.PY3:
+      stdout = os.open(self.output_file, os.O_CREAT | os.O_WRONLY)
+      stderr = os.open(self.error_file, os.O_CREAT | os.O_WRONLY)
+      self.coshell = coshell.Coshell(stdout=stdout, stderr=stdout)
+      os.close(stdout)
+      os.close(stderr)
+    else:
+      # py3 test framework can't suffer these fd shenanigans
+      sys.stdout.flush()
+      sys.stderr.flush()
 
-    old_out_fd = os.dup(1)
-    new_out_fd = os.open(self.output_file, os.O_CREAT | os.O_WRONLY)
-    os.dup2(new_out_fd, 1)
-    os.close(new_out_fd)
+      old_out_fd = os.dup(1)
+      new_out_fd = os.open(self.output_file, os.O_CREAT | os.O_WRONLY)
+      os.dup2(new_out_fd, 1)
+      os.close(new_out_fd)
 
-    old_err_fd = os.dup(2)
-    new_err_fd = os.open(self.error_file, os.O_CREAT | os.O_WRONLY)
-    os.dup2(new_err_fd, 2)
-    os.close(new_err_fd)
+      old_err_fd = os.dup(2)
+      new_err_fd = os.open(self.error_file, os.O_CREAT | os.O_WRONLY)
+      os.dup2(new_err_fd, 2)
+      os.close(new_err_fd)
 
-    self.coshell = coshell.Coshell()
+      self.coshell = coshell.Coshell()
 
-    os.dup2(old_out_fd, 1)
-    os.close(old_out_fd)
+      os.dup2(old_out_fd, 1)
+      os.close(old_out_fd)
 
-    os.dup2(old_err_fd, 2)
-    os.close(old_err_fd)
+      os.dup2(old_err_fd, 2)
+      os.close(old_err_fd)
 
   def CoClose(self):
     if self.coshell:
@@ -83,11 +98,11 @@ class _CoshellTestBase(sdk_test_base.SdkBase, test_case.WithContentAssertions):
       self.coshell = None
 
   def GetOutput(self):
-    with open(self.output_file, 'r') as f:
+    with io.open(self.output_file, 'r', encoding='utf-8') as f:
       return f.read()
 
   def GetErr(self):
-    with open(self.error_file, 'r') as f:
+    with io.open(self.error_file, 'r', encoding='utf-8') as f:
       return f.read()
 
   def AssertOutputEquals(self, expected, normalize_space=False):
@@ -118,6 +133,7 @@ class _CoshellTestBase(sdk_test_base.SdkBase, test_case.WithContentAssertions):
 @test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
 @test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
 @sdk_test_base.Filters.DoNotRunOnGCE  # Config based output capture flakes?
+@test_case.Filters.SkipOnPy3('test framework fd 0 interaction', 'b/80533542')
 class UnixCoshellTest(_CoshellTestBase):
 
   def testUnixCoshellEditMode(self):
@@ -183,6 +199,11 @@ class UnixCoshellTest(_CoshellTestBase):
     self.CoClose()
     self.AssertOutputContains('original ::\n')
     self.AssertOutputContains('updated :bar:\n')
+
+  def testUnixCoshellUnicode(self):
+    self.coshell._encoding = 'utf-8'
+    self.coshell.Run('echo Ṳᾔḯ¢◎ⅾℯ')
+    self.AssertOutputContains('Ṳᾔḯ¢◎ⅾℯ\n')
 
   def testUnixCoshellCreateDelete(self):
     with files.TemporaryDirectory(change_to=True):
@@ -309,13 +330,13 @@ class UnixCoshellTest(_CoshellTestBase):
 
     shell_status_contents = os.read(
         coshell._UnixCoshellBase.SHELL_STATUS_FD, 1024)
-    self.assertEqual('SHELL_STATUS_FD', shell_status_contents)
+    self.assertEqual(b'SHELL_STATUS_FD', shell_status_contents)
     if old_shell_status_fd >= 0:
       os.dup2(old_shell_status_fd, coshell._UnixCoshellBase.SHELL_STATUS_FD)
 
     shell_stdin_contents = os.read(
         coshell._UnixCoshellBase.SHELL_STDIN_FD, 1024)
-    self.assertEqual('SHELL_STDIN_FD', shell_stdin_contents)
+    self.assertEqual(b'SHELL_STDIN_FD', shell_stdin_contents)
     if old_shell_stdin_fd >= 0:
       os.dup2(old_shell_stdin_fd, coshell._UnixCoshellBase.SHELL_STDIN_FD)
 
@@ -323,6 +344,7 @@ class UnixCoshellTest(_CoshellTestBase):
 @test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
 @test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
 @sdk_test_base.Filters.DoNotRunOnGCE  # Config based output capture flakes?
+@test_case.Filters.SkipOnPy3('test framework fd 0 interaction', 'b/80533542')
 class UnixCoshellInteractiveTest(_CoshellTestBase):
 
   def _RawInput(self, prompt):
@@ -432,6 +454,7 @@ class UnixCoshellInteractiveTest(_CoshellTestBase):
 @test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
 @test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
 @sdk_test_base.Filters.DoNotRunOnGCE  # Config based output capture flakes?
+@test_case.Filters.SkipOnPy3('test framework fd 0 interaction', 'b/80533542')
 class MingWCoshellOnUnixTest(_CoshellTestBase):
 
   def _Popen(self):

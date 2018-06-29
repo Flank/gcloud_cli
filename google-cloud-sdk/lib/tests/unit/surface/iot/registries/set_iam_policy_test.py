@@ -40,7 +40,7 @@ _ETAG_CONFIRM_PROMPT = textwrap.dedent("""\
                           calliope_base.ReleaseTrack.GA)
 class SetIamPolicy(base.CloudIotBase):
 
-  def PostSetUp(self):
+  def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
 
   def _CreatePolicyAndFile(self, include_etag=False):

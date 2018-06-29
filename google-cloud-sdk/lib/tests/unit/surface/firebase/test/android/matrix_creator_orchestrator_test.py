@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 import uuid
 from googlecloudsdk.api_lib.util import apis
@@ -154,28 +156,28 @@ class MatrixCreatorOrchestratorTests(unit_base.AndroidMockClientTest):
   def testMatrixCreatorOrchestrator_UseOrchestrator(self):
     self.ExpectMatrixOrchestratorOption(
         ORCHESTRATOR_OPTION_ENUMS.USE_ORCHESTRATOR)
-    self.Run(u'{cmd} --use-orchestrator --app {app} --test {test} '
-             u'--device-ids=Nexus5'.format(
+    self.Run('{cmd} --use-orchestrator --app {app} --test {test} '
+             '--device-ids=Nexus5'.format(
                  cmd=commands.ANDROID_TEST_RUN, app=APP, test=TEST))
 
   def testMatrixCreatorOrchestrator_NoUseOrchestrator(self):
     self.ExpectMatrixOrchestratorOption(
         ORCHESTRATOR_OPTION_ENUMS.DO_NOT_USE_ORCHESTRATOR)
-    self.Run(u'{cmd} --no-use-orchestrator --app {app} --test {test} '
-             u'--device-ids=Nexus5'.format(
+    self.Run('{cmd} --no-use-orchestrator --app {app} --test {test} '
+             '--device-ids=Nexus5'.format(
                  cmd=commands.ANDROID_TEST_RUN, app=APP, test=TEST))
 
   def testMatrixCreatorOrchestrator_Unspecified(self):
     self.ExpectMatrixOrchestratorOption(
         ORCHESTRATOR_OPTION_ENUMS.ORCHESTRATOR_OPTION_UNSPECIFIED)
-    self.Run(u'{cmd} --app {app} --test {test} --device-ids=Nexus5'.format(
+    self.Run('{cmd} --app {app} --test {test} --device-ids=Nexus5'.format(
         cmd=commands.ANDROID_TEST_RUN, app=APP, test=TEST))
 
   def testMatrixCreatorOrchestrator_UseOrchestratorTrueFromArgFile(self):
     self.ExpectMatrixOrchestratorOption(
         ORCHESTRATOR_OPTION_ENUMS.USE_ORCHESTRATOR)
-    self.Run(u'{cmd} {argfile}:use-orchestrator-true --app {app} --test {test} '
-             u'--device-ids=Nexus5'.format(
+    self.Run('{cmd} {argfile}:use-orchestrator-true --app {app} --test {test} '
+             '--device-ids=Nexus5'.format(
                  cmd=commands.ANDROID_TEST_RUN,
                  argfile=GOOD_ARGS,
                  app=APP,
@@ -184,19 +186,18 @@ class MatrixCreatorOrchestratorTests(unit_base.AndroidMockClientTest):
   def testMatrixCreatorOrchestrator_UseOrchestratorFalseFromArgFile(self):
     self.ExpectMatrixOrchestratorOption(
         ORCHESTRATOR_OPTION_ENUMS.DO_NOT_USE_ORCHESTRATOR)
-    self.Run(
-        u'{cmd} {argfile}:use-orchestrator-false --app {app} --test {test} '
-        u'--device-ids=Nexus5'.format(
-            cmd=commands.ANDROID_TEST_RUN,
-            argfile=GOOD_ARGS,
-            app=APP,
-            test=TEST))
+    self.Run('{cmd} {argfile}:use-orchestrator-false --app {app} --test {test} '
+             '--device-ids=Nexus5'.format(
+                 cmd=commands.ANDROID_TEST_RUN,
+                 argfile=GOOD_ARGS,
+                 app=APP,
+                 test=TEST))
 
   def testMatrixCreatorOrchestrator_UnspecifiedFromArgFile(self):
     self.ExpectMatrixOrchestratorOption(
         ORCHESTRATOR_OPTION_ENUMS.ORCHESTRATOR_OPTION_UNSPECIFIED)
-    self.Run(u'{cmd} {argfile}:use-orchestrator-unspecified --app {app} --test '
-             u'{test} --device-ids=Nexus5'.format(
+    self.Run('{cmd} {argfile}:use-orchestrator-unspecified --app {app} --test '
+             '{test} --device-ids=Nexus5'.format(
                  cmd=commands.ANDROID_TEST_RUN,
                  argfile=GOOD_ARGS,
                  app=APP,

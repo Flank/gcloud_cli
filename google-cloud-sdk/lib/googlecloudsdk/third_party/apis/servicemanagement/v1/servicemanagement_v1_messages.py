@@ -251,7 +251,6 @@ class AuthenticationRule(_messages.Message):
   Fields:
     allowWithoutCredential: If true, the service accepts API keys without any
       other credential.
-    customAuth: Configuration for custom authentication.
     oauth: The requirements for OAuth credentials.
     requirements: Requirements for additional authentication providers.
     selector: Selects the methods to which this rule applies.  Refer to
@@ -259,10 +258,9 @@ class AuthenticationRule(_messages.Message):
   """
 
   allowWithoutCredential = _messages.BooleanField(1)
-  customAuth = _messages.MessageField('CustomAuthRequirements', 2)
-  oauth = _messages.MessageField('OAuthRequirements', 3)
-  requirements = _messages.MessageField('AuthRequirement', 4, repeated=True)
-  selector = _messages.StringField(5)
+  oauth = _messages.MessageField('OAuthRequirements', 2)
+  requirements = _messages.MessageField('AuthRequirement', 3, repeated=True)
+  selector = _messages.StringField(4)
 
 
 class AuthorizationConfig(_messages.Message):
@@ -610,8 +608,8 @@ class Context(_messages.Message):
   `google.rpc.context.ProjectContext` and `google.rpc.context.OriginContext`.
   Available context types are defined in package `google.rpc.context`.  This
   also provides mechanism to whitelist any protobuf message extension that can
-  be sent in grpc metadata using \u201cx-goog-ext-<extension_id>-bin\u201d and \u201cx-goog-
-  ext-<extension_id>-jspb\u201d format. For example, list any service specific
+  be sent in grpc metadata using "x-goog-ext-<extension_id>-bin" and "x-goog-
+  ext-<extension_id>-jspb" format. For example, list any service specific
   protobuf types that can appear in grpc metadata as follows in your yaml
   file:  Example:      context:       rules:        - selector:
   "google.example.library.v1.LibraryService.CreateBook"
@@ -722,18 +720,6 @@ class ConvertConfigResponse(_messages.Message):
 
   diagnostics = _messages.MessageField('Diagnostic', 1, repeated=True)
   serviceConfig = _messages.MessageField('Service', 2)
-
-
-class CustomAuthRequirements(_messages.Message):
-  r"""Configuration for a custom authentication provider.
-
-  Fields:
-    provider: A configuration string containing connection information for the
-      authentication provider, typically formatted as a SmartService string
-      (go/smartservice).
-  """
-
-  provider = _messages.StringField(1)
 
 
 class CustomError(_messages.Message):
@@ -3590,11 +3576,6 @@ class ServicemanagementServicesListRequest(_messages.Message):
       project_settings is expanded, then this field controls which project
       project_settings is populated for. This field is deprecated. See details
       go/deprecate-listservices-expand.
-    expand: Fields to expand in any results. By default, the following fields
-      are not fully included in list results, but they will if you specify
-      them in this field: - `project_settings` - `quota_usage` (It requires
-      `project_settings`) This field is deprecated. See details go/deprecate-
-      listservices-expand.
     pageSize: Requested size of the next page of data.
     pageToken: Token identifying which result to start with; returned by a
       previous list call.
@@ -3604,10 +3585,9 @@ class ServicemanagementServicesListRequest(_messages.Message):
   category = _messages.StringField(1)
   consumerId = _messages.StringField(2)
   consumerProjectId = _messages.StringField(3)
-  expand = _messages.StringField(4)
-  pageSize = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(6)
-  producerProjectId = _messages.StringField(7)
+  pageSize = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(5)
+  producerProjectId = _messages.StringField(6)
 
 
 class ServicemanagementServicesPatchRequest(_messages.Message):
@@ -3895,14 +3875,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -3938,17 +3916,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 class Status(_messages.Message):

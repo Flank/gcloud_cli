@@ -80,6 +80,7 @@ class InitTest(sdk_test_base.BundledBase,
     results = self.Run(['auth', 'list', '--no-user-output-enabled'])
     return [resource.account for resource in results]
 
+  @test_case.Filters.SkipOnPy3('gsutil does not work on py3', 'b/109931498')
   def testProjects_EnterProject(self):
     projects = self.GetProjects()
     project_idx = projects.index(self.Project())

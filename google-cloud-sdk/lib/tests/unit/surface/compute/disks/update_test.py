@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for disks update."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import parameterized
@@ -43,14 +45,14 @@ class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
         ('key2', 'update2'), ('key3', 'value3'), ('key4', 'value4'))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
     updated_disk = self._MakeDiskProto(disk_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1', zone='atlanta')
     operation = self._MakeOperationMessage(operation_ref, disk_ref)
 
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
-        disk_ref, edited_labels, 'fingerprint-42', operation)
+        disk_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
@@ -70,14 +72,14 @@ class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     edited_labels = ()
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
     updated_disk = self._MakeDiskProto(disk_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1', zone='atlanta')
     operation = self._MakeOperationMessage(operation_ref, disk_ref)
 
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
-        disk_ref, edited_labels, 'fingerprint-42', operation)
+        disk_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
@@ -91,14 +93,14 @@ class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
     update_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=(), fingerprint='fingerprint-42')
+        disk_ref, labels=(), fingerprint=b'fingerprint-42')
     updated_disk = self._MakeDiskProto(disk_ref, labels=update_labels)
     operation_ref = self._GetOperationRef('operation-1', zone='atlanta')
     operation = self._MakeOperationMessage(operation_ref, disk_ref)
 
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
-        disk_ref, update_labels, 'fingerprint-42', operation)
+        disk_ref, update_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
@@ -114,7 +116,7 @@ class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
   def testRemoveWithNoLabelsOnDisk(self):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
     disk = self._MakeDiskProto(
-        disk_ref, labels={}, fingerprint='fingerprint-42')
+        disk_ref, labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(disk_ref, disk)
 
@@ -131,7 +133,7 @@ class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
         ('key1', 'value1'), ('key3', 'value3'), ('key4', 'value4'))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(disk_ref, disk)
 
@@ -182,14 +184,14 @@ class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
         ('key2', 'update2'), ('key3', 'value3'), ('key4', 'value4'))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
     updated_disk = self._MakeDiskProto(disk_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1', zone='atlanta')
     operation = self._MakeOperationMessage(operation_ref, disk_ref)
 
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
-        disk_ref, edited_labels, 'fingerprint-42', operation)
+        disk_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 
@@ -209,7 +211,7 @@ class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(disk_ref, disk)
 
@@ -231,14 +233,14 @@ class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
         ('key2', 'update2'), ('key3', 'value3'), ('key4', 'value4'))
 
     disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint='fingerprint-42')
+        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
     updated_disk = self._MakeDiskProto(disk_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1', region='us-central')
     operation = self._MakeOperationMessage(operation_ref, disk_ref)
 
     self._ExpectGetRequest(disk_ref, disk)
     self._ExpectLabelsSetRequest(
-        disk_ref, edited_labels, 'fingerprint-42', operation)
+        disk_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(disk_ref, updated_disk)
 

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
@@ -25,47 +27,42 @@ class ArgDimensionConflictsIntegrationTests(e2e_base.TestIntegrationTestBase):
   def testArgConflicts_DeviceIdsWithDevice(self):
     with self.assertRaises(calliope_exceptions.ConflictingArgumentsException):
       self.Run(
-          u'{cmd} --app {app} --device-ids=Nexus7 --device model=NexusLowRes'
+          '{cmd} --app {app} --device-ids=Nexus7 --device model=NexusLowRes'
           .format(cmd=commands.ANDROID_TEST_RUN, app=e2e_base.WALKSHARE_APP))
 
     self.AssertErrContains('not allowed simultaneously: --device-ids, --device')
 
   def testArgConflicts_OsVersionIdsWithDevice(self):
     with self.assertRaises(calliope_exceptions.ConflictingArgumentsException):
-      self.Run(
-          u'{cmd} {argfile}:arg-conflict-1 --app {app} '
-          .format(cmd=commands.ANDROID_TEST_RUN,
-                  argfile=e2e_base.INTEGRATION_ARGS,
-                  app=e2e_base.WALKSHARE_APP))
+      self.Run('{cmd} {argfile}:arg-conflict-1 --app {app} '.format(
+          cmd=commands.ANDROID_TEST_RUN,
+          argfile=e2e_base.INTEGRATION_ARGS,
+          app=e2e_base.WALKSHARE_APP))
 
     self.AssertErrContains('allowed simultaneously: --os-version-ids, --device')
 
   def testArgConflicts_LocalesWithDevice(self):
     with self.assertRaises(calliope_exceptions.ConflictingArgumentsException):
-      self.Run(
-          u'{cmd} {argfile}:arg-conflict-2 --app {app} '
-          .format(cmd=commands.ANDROID_TEST_RUN,
-                  argfile=e2e_base.INTEGRATION_ARGS,
-                  app=e2e_base.WALKSHARE_APP))
+      self.Run('{cmd} {argfile}:arg-conflict-2 --app {app} '.format(
+          cmd=commands.ANDROID_TEST_RUN,
+          argfile=e2e_base.INTEGRATION_ARGS,
+          app=e2e_base.WALKSHARE_APP))
 
     self.AssertErrContains('allowed simultaneously: --locales, --device')
 
   def testArgConflicts_OrientationsWithDevice(self):
     with self.assertRaises(calliope_exceptions.ConflictingArgumentsException):
-      self.Run(
-          u'{cmd} {argfile}:arg-conflict-3 --app {app} '
-          .format(cmd=commands.ANDROID_TEST_RUN,
-                  argfile=e2e_base.INTEGRATION_ARGS,
-                  app=e2e_base.WALKSHARE_APP))
+      self.Run('{cmd} {argfile}:arg-conflict-3 --app {app} '.format(
+          cmd=commands.ANDROID_TEST_RUN,
+          argfile=e2e_base.INTEGRATION_ARGS,
+          app=e2e_base.WALKSHARE_APP))
 
     self.AssertErrContains('allowed simultaneously: --orientations, --device')
 
   def testArgConflicts_BadDimensionNameInArgFile(self):
     with self.assertRaises(exceptions.InvalidDimensionNameError):
-      self.Run(
-          u'{cmd} {argfile}:bad-dimension '
-          .format(cmd=commands.ANDROID_TEST_RUN,
-                  argfile=e2e_base.INTEGRATION_ARGS))
+      self.Run('{cmd} {argfile}:bad-dimension '.format(
+          cmd=commands.ANDROID_TEST_RUN, argfile=e2e_base.INTEGRATION_ARGS))
 
     self.AssertErrContains("'brand' is not a valid dimension name.")
 

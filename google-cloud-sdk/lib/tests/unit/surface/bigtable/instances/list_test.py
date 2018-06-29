@@ -51,7 +51,7 @@ class ListCommandTest(base.BigtableV2TestBase, cli_test_base.CliTestBase):
             displayName='thedisplayname',
             state=self.msgs.Instance.StateValueValuesEnum.READY)]))
     self.RunCompletion('beta bigtable instances update t',
-                       ['theinstance --project=theprojects'])
+                       ['theinstance\\ --project=theprojects'])
 
 
 if __name__ == '__main__':

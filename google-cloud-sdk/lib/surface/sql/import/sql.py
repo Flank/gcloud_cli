@@ -19,8 +19,8 @@ Storage.
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.sql import flags
@@ -44,7 +44,7 @@ class Sql(base.Command):
           on the command line after this command. Positional arguments are
           allowed.
     """
-    import_util.AddBaseImportFlags(parser)
+    import_util.AddBaseImportFlags(parser, filetype='MySQL dump')
     flags.AddDatabase(
         parser,
         'The database (for example, guestbook) to which the import is'

@@ -15,18 +15,24 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class KeyringsDescribeTest(base.KmsMockTest):
 
   def SetUp(self):
     self.location_name = self.project_name.Descendant('global')
     self.kr_name = self.location_name.Descendant('my_kr')
 
-  def testDescribe(self):
+  def testDescribe(self, track):
+    self.track = track
 
     self.kms.projects_locations_keyRings.Get.Expect(
         self.messages.CloudkmsProjectsLocationsKeyRingsGetRequest(
@@ -39,7 +45,8 @@ class KeyringsDescribeTest(base.KmsMockTest):
     self.AssertOutputContains('name: {0}'.format(self.kr_name.RelativeName()),
                               normalize_space=True)
 
-  def testMissingId(self):
+  def testMissingId(self, track):
+    self.track = track
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         'Invalid value for [keyring]: keyring id must be non-empty.'):

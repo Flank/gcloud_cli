@@ -13,6 +13,7 @@
 # limitations under the License.
 """Tests for deployable services and configs."""
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.app import build
@@ -79,7 +80,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
 
   def SetUp(self):
     self.service_mock = mock.MagicMock()
-    self.fake_image = u'appengine.gcr.io/gcloud/1.default'
+    self.fake_image = 'appengine.gcr.io/gcloud/1.default'
     fake_image_artifact = build.BuildArtifact.MakeImageArtifact(self.fake_image)
     self.fake_image_artifact = fake_image_artifact
     self.fake_version = version_util.Version(self.Project(), 'default', '1')
@@ -107,13 +108,26 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
     self.assertEqual(result.identifier, self.fake_image)
 
-  def testRequiresImageAndImageExists(self):
+  def testRequiresImageAndImageExists_onClient(self):
     self.service_mock.RequiresImage.return_value = True
     self.service_mock.parsed.skip_files.regex.return_value = True
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
         self.fake_version, self.service_mock, None, self.fake_image, None, None,
         deploy_util.FlexImageBuildOptions.ON_CLIENT)
+    self.AssertErrContains(
+        'WARNING: Deployment of service [default] will ignore the skip_files '
+        'field in the configuration file, because the image has already been '
+        'built.')
+    self.assertEqual(result.identifier, self.fake_image)
+
+  def testRequiresImageAndImageExists_onServer(self):
+    self.service_mock.RequiresImage.return_value = True
+    self.service_mock.parsed.skip_files.regex.return_value = True
+    self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
+    result = self.deployer._PossiblyBuildAndPush(
+        self.fake_version, self.service_mock, None, self.fake_image, None, None,
+        deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.AssertErrContains(
         'WARNING: Deployment of service [default] will ignore the skip_files '
         'field in the configuration file, because the image has already been '
@@ -134,7 +148,7 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     self.service_mock.GetAppYamlBasename.return_value = 'zap.yaml'
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
-        self.fake_version, self.service_mock, None, self.fake_image, None, None,
+        self.fake_version, self.service_mock, None, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.assertEqual(result.identifier, {'appYamlPath': 'zap.yaml'})
 
@@ -144,13 +158,39 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     properties.VALUES.app.cloud_build_timeout.Set('333')
     self.StartObjectPatch(deploy_command_util, 'BuildAndPushDockerImage')
     result = self.deployer._PossiblyBuildAndPush(
-        self.fake_version, self.service_mock, None, self.fake_image, None, None,
+        self.fake_version, self.service_mock, None, None, None, None,
         deploy_util.FlexImageBuildOptions.ON_SERVER)
     self.assertEqual(result.identifier,
                      {'appYamlPath': 'zap.yaml',
                       'cloudBuildTimeout': '333'})
 
-  def testPossiblyUploadFiles_BuildOnClient(self):
+  def testPossiblyUploadFiles_imageUrl(self):
+    """If image-url on client, and hermetic service, don't upload files."""
+    mock_service_info = mock.MagicMock()
+    mock_service_info.is_hermetic = True
+    mock_service_info.env = env.FLEX
+    copy_files_mock = self.StartObjectPatch(deploy_app_command_util,
+                                            'CopyFilesToCodeBucket')
+    result = self.deployer._PossiblyUploadFiles(
+        self.fake_image, mock_service_info, None, None,
+        deploy_util.FlexImageBuildOptions.ON_CLIENT)
+    self.assertIsNone(result)
+    copy_files_mock.assert_not_called()
+
+  def testPossiblyUploadFiles_BuildOnClient_hermetic(self):
+    """If image-url on client, and hermetic service, don't upload files."""
+    mock_service_info = mock.MagicMock()
+    mock_service_info.is_hermetic = True
+    mock_service_info.env = env.FLEX
+    copy_files_mock = self.StartObjectPatch(deploy_app_command_util,
+                                            'CopyFilesToCodeBucket')
+    result = self.deployer._PossiblyUploadFiles(
+        self.fake_image, mock_service_info, None, None,
+        deploy_util.FlexImageBuildOptions.ON_CLIENT)
+    self.assertIsNone(result)
+    copy_files_mock.assert_not_called()
+
+  def testPossiblyUploadFiles_BuildOnClient_nonHermetic(self):
     """If build image on client, and non-hermetic service, upload files."""
     mock_service_info = mock.MagicMock()
     mock_service_info.is_hermetic = False
@@ -165,9 +205,9 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
         mock_service_info, None, None, max_file_size=None)
 
   def testPossiblyUploadFiles_BuildOnServer(self):
-    """If build image on server, and non-hermetic service, upload files."""
+    """If build image on server, and hermetic service, upload files."""
     mock_service_info = mock.MagicMock()
-    mock_service_info.is_hermetic = False
+    mock_service_info.is_hermetic = True
     mock_service_info.env = env.FLEX
     copy_files_mock = self.StartObjectPatch(
         deploy_app_command_util, 'CopyFilesToCodeBucket')
@@ -225,6 +265,37 @@ def _MakeDeployer(use_runtime_builders=True):
       False, False, strategy,
       deploy_util.FlexImageBuildOptions.ON_CLIENT)
   return deploy_util.ServiceDeployer(None, deploy_options)
+
+
+class FlexBuildOptionTest(sdk_test_base.SdkBase):
+  """Tests GetFlexImageBuildOption, which determines where the build occurs.
+
+  The method lets you specify a default build strategy in the argument (whose
+  default is ON_CLIENT), and then a property `app/trigger_build_server_side`
+  to override that behavior. Here we exhaustively test the relevant
+  combinations of those.
+  """
+
+  ON_CLIENT = deploy_util.FlexImageBuildOptions.ON_CLIENT  # Simple short cuts
+  ON_SERVER = deploy_util.FlexImageBuildOptions.ON_SERVER
+
+  def testVanilla(self):
+    actual = deploy_util.GetFlexImageBuildOption()
+    self.assertEqual(actual, self.ON_CLIENT)
+
+  def testChangeDefault(self):
+    actual = deploy_util.GetFlexImageBuildOption(self.ON_SERVER)
+    self.assertEqual(actual, self.ON_SERVER)
+
+  def testOverrideWithProperty_OnServer(self):
+    properties.VALUES.app.trigger_build_server_side.Set('true')
+    actual = deploy_util.GetFlexImageBuildOption()
+    self.assertEqual(actual, self.ON_SERVER)
+
+  def testOverrideWithProperty_OnClient(self):
+    properties.VALUES.app.trigger_build_server_side.Set('false')
+    actual = deploy_util.GetFlexImageBuildOption(self.ON_SERVER)
+    self.assertEqual(actual, self.ON_CLIENT)
 
 
 if __name__ == '__main__':

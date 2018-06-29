@@ -1,5 +1,5 @@
 NAME
-    gcloud app instances disable-debug - disables debug mode for an instance
+    gcloud app instances disable-debug - disable debug mode for an instance
 
 SYNOPSIS
     gcloud app instances disable-debug [INSTANCE]
@@ -10,9 +10,9 @@ DESCRIPTION
     When not in debug mode, SSH will be disabled on the VMs. They will be
     included in the health checking pools.
 
-    Note that any local changes to an instance will be **lost** if debug mode
-    is disabled on the instance. New instance(s) may spawn depending on the
-    app's scaling settings.
+    Note that any local changes to an instance will be lost if debug mode is
+    disabled on the instance. New instance(s) may spawn depending on the app's
+    scaling settings.
 
 POSITIONAL ARGUMENTS
      [INSTANCE]

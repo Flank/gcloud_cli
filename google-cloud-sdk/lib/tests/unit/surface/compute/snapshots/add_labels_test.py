@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the snapshots add-labels subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import snapshots_labels_test_base
@@ -27,14 +29,14 @@ class AddLabelsTest(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     add_labels = (('key2', 'update2'), ('key4', 'value4'))
 
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels=(), fingerprint='fingerprint-42')
+        snapshot_ref, labels=(), fingerprint=b'fingerprint-42')
     updated_snapshot = self._MakeSnapshotProto(snapshot_ref, labels=add_labels)
     operation_ref = self._GetOperationRef('operation-1')
     operation = self._MakeOperationMessage(operation_ref, snapshot_ref)
 
     self._ExpectGetRequest(snapshot_ref, snapshot)
     self._ExpectLabelsSetRequest(
-        snapshot_ref, add_labels, 'fingerprint-42', operation)
+        snapshot_ref, add_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(snapshot_ref, updated_snapshot)
 
@@ -57,7 +59,7 @@ class AddLabelsTest(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     ))
 
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels=snapshot_labels, fingerprint='fingerprint-42')
+        snapshot_ref, labels=snapshot_labels, fingerprint=b'fingerprint-42')
     updated_snapshot = self._MakeSnapshotProto(
         snapshot_ref, labels=edited_labels)
     operation_ref = self._GetOperationRef('operation-1')
@@ -65,7 +67,7 @@ class AddLabelsTest(snapshots_labels_test_base.SnapshotsLabelsTestBase):
 
     self._ExpectGetRequest(snapshot_ref, snapshot)
     self._ExpectLabelsSetRequest(
-        snapshot_ref, edited_labels, 'fingerprint-42', operation)
+        snapshot_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(snapshot_ref, updated_snapshot)
 
@@ -87,7 +89,7 @@ class AddLabelsTest(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     add_labels = (('key1', 'value1'), ('key3', 'value3'))
 
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels=snapshot_labels, fingerprint='fingerprint-42')
+        snapshot_ref, labels=snapshot_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(snapshot_ref, snapshot)
 
@@ -109,7 +111,7 @@ class AddLabelsTest(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     snapshot_ref = self._GetSnapshotRef('snapshot-1')
 
     snapshot = self._MakeSnapshotProto(
-        snapshot_ref, labels={}, fingerprint='fingerprint-42')
+        snapshot_ref, labels={}, fingerprint=b'fingerprint-42')
     add_labels = (('+notvalid', 'a'),)
 
     error = http_error.MakeHttpError(
@@ -123,7 +125,7 @@ class AddLabelsTest(snapshots_labels_test_base.SnapshotsLabelsTestBase):
     self._ExpectLabelsSetRequest(
         snapshot_ref=snapshot_ref,
         labels=add_labels,
-        fingerprint='fingerprint-42',
+        fingerprint=b'fingerprint-42',
         exception=error)
 
     with self.AssertRaisesHttpExceptionMatches(

@@ -14,6 +14,8 @@
 
 """Unit tests for the compute flags module wrt scope_prompter."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import client_adapter
 from googlecloudsdk.api_lib.compute import scope_prompter
 from googlecloudsdk.calliope import actions
@@ -26,6 +28,7 @@ from googlecloudsdk.core.credentials import gce as c_gce
 from tests.lib import test_case
 from tests.lib.calliope import util
 from tests.lib.surface.compute import test_base
+from six.moves import zip
 
 
 class MockComputeCommand(scope_prompter.ScopePrompter):

@@ -14,6 +14,8 @@
 
 """Tests that exercise operations on remote completion."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.dns import base

@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure list testable permissions works properly."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.iam import exceptions
 from googlecloudsdk.core import properties
@@ -35,7 +39,7 @@ class ListTestablePermissionsTest(unit_test_base.BaseTest):
   def testListPermissionsByFullResource(self):
     self.client.permissions.QueryTestablePermissions.Expect(
         request=self.msgs.QueryTestablePermissionsRequest(
-            fullResourceName=(u'//compute.googleapis.com/projects/dummy_project'
+            fullResourceName=('//compute.googleapis.com/projects/dummy_project'
                               '/zones/us-central1-f/instances/dummy_instance'),
             pageSize=100),
         response=self.response,)
@@ -48,7 +52,7 @@ class ListTestablePermissionsTest(unit_test_base.BaseTest):
   def testListPermissionsByURI(self):
     self.client.permissions.QueryTestablePermissions.Expect(
         request=self.msgs.QueryTestablePermissionsRequest(
-            fullResourceName=(u'//compute.googleapis.com/projects/dummy_project'
+            fullResourceName=('//compute.googleapis.com/projects/dummy_project'
                               '/zones/us-central1-f/instances/dummy_instance'),
             pageSize=100),
         response=self.response,)
@@ -63,7 +67,7 @@ class ListTestablePermissionsTest(unit_test_base.BaseTest):
     self.client.permissions.QueryTestablePermissions.Expect(
         request=self.msgs.QueryTestablePermissionsRequest(
             fullResourceName=(
-                u'//cloudresourcemanager.googleapis.com/projects/foo'),
+                '//cloudresourcemanager.googleapis.com/projects/foo'),
             pageSize=100),
         response=self.response,)
     result = self.Run(

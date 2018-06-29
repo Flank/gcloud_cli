@@ -2,7 +2,7 @@ NAME
     gcloud beta dataproc clusters set-iam-policy - set IAM policy for a cluster
 
 SYNOPSIS
-    gcloud beta dataproc clusters set-iam-policy NAME POLICY_FILE
+    gcloud beta dataproc clusters set-iam-policy CLUSTER POLICY_FILE
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -10,8 +10,8 @@ DESCRIPTION
     policy.
 
 POSITIONAL ARGUMENTS
-     NAME
-        The name of the cluster to set the policy on.
+     CLUSTER
+        The ID of the cluster to set the policy on.
 
      POLICY_FILE
         Path to a local JSON or YAML formatted file containing a valid policy.

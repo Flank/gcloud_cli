@@ -12,19 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import time
 
 from googlecloudsdk.core.util import retry
 from tests.lib import test_case
 
 import mock
+from six.moves import range
 
 
 class RetryTest(test_case.TestCase):
 
   def SetUp(self):
     self.time_mock = self.StartObjectPatch(time, 'time')
-    self.time_mock.side_effect = xrange(10)
+    self.time_mock.side_effect = range(10)
     self.sleep_mock = self.StartObjectPatch(time, 'sleep')
 
   def testNoRetryOnResultWhenMaxRetriesIsNotSet(self):

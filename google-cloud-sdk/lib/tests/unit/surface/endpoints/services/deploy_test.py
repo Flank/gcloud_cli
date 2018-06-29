@@ -141,6 +141,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
 
     self._config_file_path = self.Touch(
         self.temp_path, name='service.json', contents=TEST_CONFIG)
+    self._config_yaml_file_path = self.Touch(
+        self.temp_path, name='service.yaml',
+        contents=TEST_SERVICE_CONFIG_NO_TYPE_YAML)
     self._swagger_file_path = self.Touch(
         self.temp_path, name='swagger.json', contents=TEST_SWAGGER)
     self._swagger_yaml_file_path = self.Touch(
@@ -168,13 +171,13 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
             service=six.moves.urllib.parse.quote(service),
             project=six.moves.urllib.parse.quote(project)))
 
-  def _MockServiceGetCall(self, service_name):
+  def _MockServiceGetCall(self, service_name, project_name=None):
     self.mocked_client.services.Get.Expect(
         request=self.services_messages.ServicemanagementServicesGetRequest(
             serviceName=service_name
         ),
         response=(self.services_messages.ManagedService(
-            serviceName=service_name)))
+            serviceName=service_name, producerProjectId=project_name)))
 
   def _MockServiceRolloutCreate(self, service_name, service_version):
     traffic = self.services_messages.TrafficPercentStrategy
@@ -341,6 +344,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     )
     self.MockOperationWait(self.operation_name)
 
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
     self.Run('{0} {1} {2}'.format(self.base_cmd,
                                   self._swagger_yaml_file_path,
                                   self._swagger_yaml_file_path))
@@ -442,6 +448,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     )
     self.MockOperationWait(self.operation_name)
 
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
     self.Run('{0} {1} {2} {3}'.format(
         self.base_cmd, proto_file, yaml_file, yaml_file_2))
     self.AssertErrContains('WARNING: foo: diagnostic warning message bar')
@@ -535,6 +544,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     )
     self.MockOperationWait(self.operation_name)
 
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
     self.Run('{0} {1} {2}'.format(
         self.base_cmd, yaml_file, raw_proto_file))
     self.AssertErrContains('WARNING: foo: diagnostic warning message bar')
@@ -614,6 +626,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     )
     self.MockOperationWait(self.operation_name)
 
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
     self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
 
     # Assert that we had to auto-enable the service, since it was not yet
@@ -679,7 +694,78 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     )
     self.MockOperationWait(self.operation_name)
 
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
     self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
+
+    # Assert that we had to auto-enable the service, since it was not yet
+    # enabled.
+    self.AssertLogContains('Enabling service {0} on project {1}...'.format(
+        SERVICE_NAME, self.PROJECT_NAME))
+
+    self.AssertErrContains(
+        ('Service Configuration [{0}] uploaded for service [{1}]').format(
+            SERVICE_VERSION, SERVICE_NAME))
+
+    self._AssertManagementUrlDisplayed()
+
+  def testServicesDeployGoogleServiceConfigYaml(self):
+    config_to_deploy = self.services_messages.Service(
+        name=SERVICE_NAME,
+        producerProjectId=self.PROJECT_NAME,
+        title=TITLE)
+
+    # The Endpoints service is already enabled, so no further action is taken
+    # to enable it.
+    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
+
+    # The service already exists, so it is not created again.
+    self._MockServiceGetCall(SERVICE_NAME)
+
+    # The service configuration resource is created.
+    self.mocked_client.services_configs.Create.Expect(
+        request=CONFIG_CREATE_REQUEST(
+            serviceName=SERVICE_NAME,
+            service=config_to_deploy,
+        ),
+        response=self.services_messages.Service(
+            name=SERVICE_NAME,
+            producerProjectId=self.PROJECT_NAME,
+            title=TITLE,
+            id=SERVICE_VERSION,  # this id is set by the server
+        ),
+    )
+
+    # Wait for Push Advisor report (no warnings)
+    self._WaitForBlankPushAdvisorReport(SERVICE_NAME, SERVICE_VERSION)
+
+    # Mock the Service Rollout creation.
+    self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
+    self.MockOperationWait(self.operation_name)
+
+    # Check to see if the service is already enabled
+    # (In this case, it is NOT already enabled)
+    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
+    # The produced service is thus enabled here.
+    self.mocked_client.services.Enable.Expect(
+        request=self.services_messages.ServicemanagementServicesEnableRequest(
+            serviceName=SERVICE_NAME,
+            enableServiceRequest=self.services_messages.EnableServiceRequest(
+                consumerId='project:' + self.PROJECT_NAME
+            )
+        ),
+        response=self.services_messages.Operation(
+            name=self.operation_name,
+            done=False,
+        )
+    )
+    self.MockOperationWait(self.operation_name)
+
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
+    self.Run('{0} {1}'.format(self.base_cmd, self._config_yaml_file_path))
 
     # Assert that we had to auto-enable the service, since it was not yet
     # enabled.
@@ -729,6 +815,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     # Check to see if the service is already enabled
     # (In this case, it IS already enabled)
     self._WaitForEnabledCheck(ENABLED, SERVICE_NAME)
+
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
     self.Run('{0} {1}'.format(self.base_cmd, self._config_file_path))
 
@@ -792,6 +881,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
             done=False,
         )
     )
+
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
     self.Run('{0} --async {1}'.format(self.base_cmd,
                                       self._config_file_path))
@@ -888,6 +980,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     )
     self.MockOperationWait(self.operation_name)
 
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
     self.Run('{0} {1}'.format(
         self.base_cmd, self._swagger_yaml_file_path))
     self.AssertErrContains('WARNING: foo: diagnostic warning message bar')
@@ -947,6 +1042,9 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
     )
     self.MockOperationWait(self.operation_name)
 
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
+
     self.Run('{0} {1}'.format(self.base_cmd, self._swagger_file_path))
 
     self.AssertErrContains(
@@ -965,6 +1063,84 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase):
         'the Operation details:\n {0}'.format(expected_cmd))
 
     self._AssertManagementUrlDisplayed()
+
+  def testServicesDeployCrossProject(self):
+    # This test covers deploying to a service in another project, which is
+    # permitted when the service already exists. However, we want to display
+    # the correct Management URL when we do this.
+
+    project_name = 'one-' + self.PROJECT_NAME + '-another'
+
+    # The Endpoints service is already enabled, so no further action is taken
+    # to enable it.
+    self._WaitForEnabledCheck(ENABLED, ENDPOINTS_SERVICE)
+
+    # The service already exists, so it is not created again.
+    self._MockServiceGetCall(SERVICE_NAME)
+
+    # Mock the SubmitSourceConfig API call.
+    self.mocked_client.services_configs.Submit.Expect(
+        request=(SUBMIT_REQUEST(
+            serviceName=SERVICE_NAME,
+            submitConfigSourceRequest=(
+                self.services_messages.SubmitConfigSourceRequest(
+                    configSource=self.services_messages.ConfigSource(
+                        files=[self.services_messages.ConfigFile(
+                            fileContents=six.binary_type(TEST_SWAGGER),
+                            filePath=os.path.basename(
+                                self._swagger_file_path),
+                            fileType=FILE_TYPES.OPEN_API_YAML)]),
+                    validateOnly=False)))),
+        response=self.operation
+    )
+    submit_response = {'serviceConfig': {
+        'id': SERVICE_VERSION, 'name': SERVICE_NAME}}
+    self.MockOperationWait(self.operation_name, submit_response)
+
+    # Wait for Push Advisor report (no warnings)
+    self._WaitForBlankPushAdvisorReport(SERVICE_NAME, SERVICE_VERSION)
+
+    # Mock the Service Rollout creation.
+    self._MockServiceRolloutCreate(SERVICE_NAME, SERVICE_VERSION)
+    self.MockOperationWait(self.operation_name)
+
+    self._WaitForEnabledCheck(DISABLED, SERVICE_NAME)
+    # The service auto-enables
+    self.mocked_client.services.Enable.Expect(
+        request=self.services_messages.ServicemanagementServicesEnableRequest(
+            serviceName=SERVICE_NAME,
+            enableServiceRequest=self.services_messages.EnableServiceRequest(
+                consumerId='project:' + self.PROJECT_NAME
+            )
+        ),
+        response=self.services_messages.Operation(
+            name=self.operation_name,
+            done=False,
+        )
+    )
+    self.MockOperationWait(self.operation_name)
+
+    # A Get call is required to generate the management url
+    self._MockServiceGetCall(SERVICE_NAME, project_name)
+
+    self.Run('{0} {1}'.format(self.base_cmd, self._swagger_file_path))
+
+    self.AssertErrContains(
+        ('Service Configuration [{0}] uploaded for service [{1}]').format(
+            SERVICE_VERSION, SERVICE_NAME))
+
+    self.AssertErrContains(
+        'Waiting for async operation {0} to complete...'.format(
+            self.operation_name))
+
+    expected_cmd = ('gcloud endpoints operations describe '
+                    '{0}'.format(self.operation_name))
+    self.AssertErrContains(
+        'Operation finished successfully. '
+        'The following command can describe '
+        'the Operation details:\n {0}'.format(expected_cmd))
+
+    self._AssertManagementUrlDisplayed(project=project_name)
 
   def testServicesDeployNoServiceVersion(self):
     # The Endpoints service is already enabled, so no further action is taken
@@ -1274,6 +1450,9 @@ class EndpointsBetaDeployTest(EndpointsDeployTest):
           )
       )
       self.MockOperationWait(self.operation_name)
+
+      # A Get call is required to generate the management url
+      self._MockServiceGetCall(SERVICE_NAME, self.PROJECT_NAME)
 
     cmd = '{0} {1}'.format(self.base_cmd, self._config_file_path)
     if force:

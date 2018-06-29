@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instances simulate-maintenance-event subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base
@@ -22,6 +24,7 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.compute import utils
+from six.moves import range
 
 
 class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
@@ -143,25 +146,25 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     n_instances = 3
     instance_refs = [
         self._GetInstanceRef('instance-{}'.format(c))
-        for c in xrange(n_instances)
+        for c in range(n_instances)
     ]
     operation_refs = [
         self._GetOperationRef('operation-{}'.format(c))
-        for c in xrange(n_instances)
+        for c in range(n_instances)
     ]
 
     self.api_mock.batch_responder.ExpectBatch([(
         self._GetSimulateMaintenanceEventRequest(instance_refs[c]),
         self._GetOperationMessage(operation_refs[c], self.status_enum.PENDING))
-                                               for c in xrange(n_instances)])
+                                               for c in range(n_instances)])
     self.api_mock.batch_responder.ExpectBatch(
         [(self._GetOperationGetRequest(operation_refs[c]),
           self._GetOperationMessage(operation_refs[c], self.status_enum.DONE))
-         for c in xrange(n_instances)])
+         for c in range(n_instances)])
     self.api_mock.batch_responder.ExpectBatch(
         [(self._GetInstanceGetRequest(instance_refs[c]),
           self._GetInstanceMessage(instance_refs[c]))
-         for c in xrange(n_instances)])
+         for c in range(n_instances)])
 
     self.Run('compute instances simulate-maintenance-event {instances} '
              '--zone zone-2'.format(instances=' '.join(r.Name()
@@ -186,17 +189,17 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
     n_instances = 3
     instance_refs = [
         self._GetInstanceRef('instance-{}'.format(c))
-        for c in xrange(n_instances)
+        for c in range(n_instances)
     ]
     operation_refs = [
         self._GetOperationRef('operation-{}'.format(c))
-        for c in xrange(n_instances)
+        for c in range(n_instances)
     ]
 
     self.api_mock.batch_responder.ExpectBatch([(
         self._GetSimulateMaintenanceEventRequest(instance_refs[c]),
         self._GetOperationMessage(operation_refs[c], self.status_enum.PENDING))
-                                               for c in xrange(n_instances)])
+                                               for c in range(n_instances)])
 
     self.Run('compute instances simulate-maintenance-event {instances} '
              '--zone zone-2 --async --format=disable'.format(
@@ -204,7 +207,7 @@ class SimulateMaintenanceEventTest(sdk_test_base.WithFakeAuth,
 
     self.AssertOutputEquals('')
     expected_err = ''
-    for c in xrange(n_instances):
+    for c in range(n_instances):
       expected_err += ('Update in progress for gce instance [instance-{inum}] '
                        '[https://www.googleapis.com/compute/{track}/projects/'
                        'fake-project/zones/zone-2/operations/operation-{onum}]'

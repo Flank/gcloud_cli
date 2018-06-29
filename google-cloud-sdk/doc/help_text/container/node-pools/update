@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud container node-pools update NAME
         (--enable-autorepair --enable-autoupgrade) [--cluster=CLUSTER]
-        [--zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud container node-pools update updates a node pool in a Google
@@ -41,9 +41,14 @@ OPTIONAL FLAGS
         The name of the cluster. Overrides the default container/cluster
         property value for this command invocation.
 
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

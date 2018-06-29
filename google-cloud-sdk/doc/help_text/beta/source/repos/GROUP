@@ -36,6 +36,9 @@ COMMANDS
      set-iam-policy
         (BETA) Set the IAM policy for the named repository.
 
+     update
+        (BETA) Update the configuration of a Cloud Source Repository.
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

@@ -14,6 +14,8 @@
 
 """Tests of the 'metrics' subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.logging import util
 from tests.lib import test_case
 from tests.lib.apitools import http_error

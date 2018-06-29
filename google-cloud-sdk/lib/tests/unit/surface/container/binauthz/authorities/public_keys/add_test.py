@@ -54,7 +54,7 @@ class AddTest(sdk_test_base.WithTempCWD,
         systemOwnedDrydockNote=None,
         updateTime=None,
         userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='providers/{}/notes/{}'.format(proj, name),
+            noteReference='projects/{}/notes/{}'.format(proj, name),
             publicKeys=[],
         ))
 
@@ -98,7 +98,7 @@ class AddTest(sdk_test_base.WithTempCWD,
         systemOwnedDrydockNote=None,
         updateTime=None,
         userOwnedDrydockNote=self.messages.UserOwnedDrydockNote(
-            noteReference='providers/{}/notes/{}'.format(proj, name),
+            noteReference='projects/{}/notes/{}'.format(proj, name),
             publicKeys=[new_pub_key],
         ))
 

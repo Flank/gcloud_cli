@@ -14,6 +14,8 @@
 
 """Test commands for running DeprecationUtils Tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import config
 from googlecloudsdk.core import log

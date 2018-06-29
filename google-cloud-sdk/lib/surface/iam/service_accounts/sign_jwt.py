@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Command for signing jwts for service accounts."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.iam import util
 from googlecloudsdk.calliope import base
@@ -61,7 +65,7 @@ class SignJwt(base.Command):
         messages.IamProjectsServiceAccountsSignJwtRequest(
             name=iam_util.EmailToAccountResourceName(args.iam_account),
             signJwtRequest=messages.SignJwtRequest(
-                payload=files.GetFileContents(args.input, binary=False))))
+                payload=files.ReadFileContents(args.input,))))
 
     log.WriteToFileOrStdout(
         args.output, content=response.signedJwt, binary=True)

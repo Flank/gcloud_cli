@@ -56,11 +56,11 @@ Name of the key to update.
 .RS 2m
 .TP 2m
 \fB\-\-keyring\fR=\fIKEYRING\fR
-The containing keyring.
+Key ring of the key.
 
 .TP 2m
 \fB\-\-location\fR=\fILOCATION\fR
-The location of the requested resource.
+Location of the key.
 
 .TP 2m
 \fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR
@@ -69,7 +69,7 @@ information on time formats.
 
 .TP 2m
 \fB\-\-primary\-version\fR=\fIPRIMARY_VERSION\fR
-The primary version to make primary.
+Primary version to make primary.
 
 .TP 2m
 \fB\-\-remove\-rotation\-schedule\fR
@@ -84,6 +84,11 @@ information on duration formats.
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to update. If a label exists its value is
 modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 
@@ -186,10 +191,11 @@ $ gcloud beta kms keys update frodo \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud kms keys update
+$ gcloud alpha kms keys update
 .RE
 

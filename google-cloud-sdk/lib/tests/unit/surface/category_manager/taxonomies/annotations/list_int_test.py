@@ -62,14 +62,8 @@ class AnnotationsListIntTest(base.CategoryManagerUnitTestBase):
 
     self.expected_annotations_list = self.messages.ListAnnotationsResponse(
         annotations=self.annotations)
-    self._ExpectAnnotationsList()
-
-  def _ExpectAnnotationsList(self):
-    m = self.messages
-    self.mock_client.projects_taxonomies_annotations.List.Expect(
-        m.CategorymanagerProjectsTaxonomiesAnnotationsListRequest(
-            parent=self.project_taxonomy_resource.RelativeName()),
-        self.expected_annotations_list)
+    self.ExpectProjectAnnotationsList(self.project_taxonomy_resource,
+                                      self.expected_annotations_list)
 
   def testListingAnnotations(self):
     args = '--taxonomy {}'.format(self.taxonomy_id)

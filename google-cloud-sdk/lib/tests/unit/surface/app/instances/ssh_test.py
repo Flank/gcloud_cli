@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.util.ssh import ssh
 from tests.lib import cli_test_base

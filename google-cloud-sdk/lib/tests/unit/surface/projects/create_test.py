@@ -93,12 +93,14 @@ class ProjectsCreateTest(base.ProjectsUnitTestBase):
         )
     )
 
+  _PROGRESS_TRACKER_OUT = (
+      '{{"ux": "PROGRESS_TRACKER", "message": "Waiting for '
+      '[operations/pc.1234] to finish", "status": "SUCCESS"}}')
+
   _CREATE_STDERR_FMT = (
       """Create in progress for """
       """[https://cloudresourcemanager.googleapis.com/v1/projects/{}].
-<START PROGRESS TRACKER>Waiting for [operations/pc.1234] to finish
-<END PROGRESS TRACKER>SUCCESS
-""")
+""") + _PROGRESS_TRACKER_OUT + '\n'
 
   _MISSING_ID_STDERR = ("""ERROR: (gcloud.projects.create) """
                         """Missing required argument [PROJECT_ID]: """
@@ -196,8 +198,9 @@ Use [{}] as project id (Y/n)?  """
                          """
 Create in progress for [https://cloudresourcemanager.googleapis.com"""
                          """/v1/projects/abcdefghijklmnopqrstuvwxyz].
-<START PROGRESS TRACKER>Waiting for [operations/pc.1234] to finish
-<END PROGRESS TRACKER>SUCCESS
+{{"ux": "PROGRESS_TRACKER", """
+                         """"message": "Waiting for [operations/pc.1234] """
+                         """to finish", "status": "SUCCESS"}}
 """.format(test_project.projectId))
 
   def createProjectWithBothFolderAndOrganizationSpecifiedHelper(

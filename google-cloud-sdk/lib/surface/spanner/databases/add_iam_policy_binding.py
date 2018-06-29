@@ -13,12 +13,15 @@
 # limitations under the License.
 """Command for spanner databases add-iam-policy-binding."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.command_lib.spanner import iam
 from googlecloudsdk.command_lib.spanner import resource_args
 
 
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 class AddIamPolicyBinding(base.Command):
   """Add an IAM policy binding to a Cloud Spanner database."""
 

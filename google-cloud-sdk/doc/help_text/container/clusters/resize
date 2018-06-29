@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud container clusters resize NAME --size=SIZE [--async]
-        [--node-pool=NODE_POOL] [--zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--node-pool=NODE_POOL] [--region=REGION | --zone=ZONE, -z ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Resize an existing cluster to a provided size.
@@ -42,9 +43,14 @@ OPTIONAL FLAGS
      --node-pool=NODE_POOL
         The node pool to resize.
 
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

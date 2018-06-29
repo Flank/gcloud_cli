@@ -14,8 +14,8 @@
 """Deletes a backup run for a Cloud SQL instance."""
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 import sys
 
 from googlecloudsdk.api_lib.sql import api_util
@@ -45,7 +45,7 @@ class Delete(base.DeleteCommand):
     base.ASYNC_FLAG.AddToParser(parser)
     parser.add_argument(
         'id',
-        type=arg_parsers.BoundedInt(1, sys.maxint),
+        type=arg_parsers.BoundedInt(1, sys.maxsize),
         help="""The ID of the backup run. You can find the ID by running
             $ gcloud beta sql backups list.""")
     flags.AddInstance(parser)

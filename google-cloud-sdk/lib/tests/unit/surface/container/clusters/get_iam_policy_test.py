@@ -36,9 +36,9 @@ class GetIamPolicyTestAlphaV1Alpha1API(parameterized.TestCase,
     self.api_mismatch = False
 
   @parameterized.named_parameters(
-      ('Zonal', 'us-central1-f'),
-      ('Regional', 'us-central1'))
-  def testGetIamPolicy(self, location):
+      ('Zonal', '--zone', 'us-central1-f'),
+      ('Regional', '--region', 'us-central1'))
+  def testGetIamPolicy(self, location_flag, location):
     policy = self.messages.GoogleIamV1Policy(
         # u'?
         bindings=[
@@ -51,9 +51,8 @@ class GetIamPolicyTestAlphaV1Alpha1API(parameterized.TestCase,
             resource=api_adapter.ProjectLocationCluster(
                 self.PROJECT_ID, location, self.CLUSTER_NAME)),
         policy)
-    self.Run(
-        self.clusters_command_base.format(location) +
-        ' get-iam-policy {0}'.format(self.CLUSTER_NAME))
+    self.Run('container clusters get-iam-policy {} {} {}'.format(
+        self.CLUSTER_NAME, location_flag, location))
 
 
 if __name__ == '__main__':

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Spanner remove-iam-policy-binding."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import resources
 from tests.lib.surface.spanner import base
 
@@ -33,23 +35,23 @@ class AddIamPolicyBindingTest(base.SpannerTestBase):
     self.start_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
-                role=u'roles/spanner.databaseAdmin',
-                members=[u'domain:foo.com', self.user_to_remove]),
+                role='roles/spanner.databaseAdmin',
+                members=['domain:foo.com', self.user_to_remove]),
             self.msgs.Binding(
-                role=u'roles/spanner.viewer', members=[u'user:admin@foo.com'])
+                role='roles/spanner.viewer', members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=b'someUniqueEtag',
         version=1)
 
     self.new_policy = self.msgs.Policy(
         bindings=[
             self.msgs.Binding(
-                role=u'roles/spanner.databaseAdmin',
-                members=[u'domain:foo.com']), self.msgs.Binding(
-                    role=u'roles/spanner.viewer',
-                    members=[u'user:admin@foo.com'])
+                role='roles/spanner.databaseAdmin',
+                members=['domain:foo.com']), self.msgs.Binding(
+                    role='roles/spanner.viewer',
+                    members=['user:admin@foo.com'])
         ],
-        etag='someUniqueEtag',
+        etag=b'someUniqueEtag',
         version=1)
 
   def testAddIamPolicyBinding(self):

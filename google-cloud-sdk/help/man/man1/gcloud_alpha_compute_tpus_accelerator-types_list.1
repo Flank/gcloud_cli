@@ -28,8 +28,10 @@ gcloud alpha compute tpus accelerator\-types list \- list available accelerator 
 
 Location resource \- The zone to list accelerator types versions for. This
 represents a Cloud resource. (NOTE) Some attributes are not given arguments in
-this group but can be set in other ways. To set the [project] attribute: Set the
-property [core/project] or provide the flag [\-\-project] on the command line.
+this group but can be set in other ways. To set the [project] attribute: provide
+the flag [\-\-zone] on the command line with a fully specified name; set the
+property [compute/zone] with a fully specified name; provide the flag
+[\-\-project] on the command line; set the property [core/project].
 
 .RS 2m
 .TP 2m
@@ -88,8 +90,8 @@ help\fR for details.
 
 .SH "API REFERENCE"
 
-This command uses the \fBtpu/v1alpha1\fR API. The full documentation for this
-API can be found at: https://cloud.google.com/tpu/
+This command uses the \fBtpu/v1\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/tpu/
 
 
 

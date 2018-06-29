@@ -1596,16 +1596,16 @@ class ExecutionTests(sdk_test_base.SdkBase):
     # for consistency
     self.current_os_mock.return_value = platforms.OperatingSystem.LINUX
     self.StartObjectPatch(encoding, '_GetEncoding', return_value='utf-8')
-    self.old_executable = sys.executable
-    sys.executable = 'current/python'
+    get_python_mock = self.StartObjectPatch(execution_utils,
+                                            'GetPythonExecutable')
+    get_python_mock.return_value = 'current/python'
 
   def TearDown(self):
     sys.argv = self.old_args
-    sys.executable = self.old_executable
 
   def _MakeSureArgsOk(self, args, python_path=None,
                       command='gcloud.py', expected_args=None):
-    self.assertEqual(args[0], python_path or sys.executable)
+    self.assertEqual(args[0], python_path or 'current/python')
     self.assertTrue(args[1].endswith(command))
     expected_args = expected_args or self.DEFAULT_EXPECTED_ARGS
     expected_args = [encoding.Encode(a) for a in expected_args]

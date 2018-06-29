@@ -13,12 +13,15 @@
 # limitations under the License.
 
 """Test of the 'clusters update' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import unit_base
+import six
 
 
 class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
@@ -313,11 +316,11 @@ class ClustersUpdateUnitTest(unit_base.DataprocUnitTestBase):
       ).format(self.CLUSTER_NAME))
 
   def labelsDictToMessage(self, labels_dict):
-    return self.messages.Cluster.LabelsValue(
-        additionalProperties=[
-            self.messages.Cluster.LabelsValue.AdditionalProperty(
-                key=key, value=value)
-            for key, value in sorted(labels_dict.iteritems())])
+    return self.messages.Cluster.LabelsValue(additionalProperties=[
+        self.messages.Cluster.LabelsValue.AdditionalProperty(
+            key=key, value=value)
+        for key, value in sorted(six.iteritems(labels_dict))
+    ])
 
   def testUpdateCluster_withGracefulDecommissionTimeout(self):
     cluster = self.messages.Cluster(

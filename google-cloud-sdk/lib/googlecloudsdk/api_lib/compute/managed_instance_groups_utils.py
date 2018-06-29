@@ -29,6 +29,7 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.console import console_io
 import six
 from six.moves import range  # pylint: disable=redefined-builtin
 
@@ -61,6 +62,9 @@ _MAX_AUTOSCALER_NAME_LENGTH = 63
 _NUM_RANDOM_CHARACTERS_IN_AS_NAME = 4
 
 CLOUD_PUB_SUB_VALID_RESOURCE_RE = r'^[A-Za-z][A-Za-z0-9-_.~+%]{2,}$'
+
+
+# TODO(b/110191362): resign from passing whole args to functions in this file
 
 
 class ResourceNotFoundException(exceptions.ToolException):
@@ -931,6 +935,23 @@ def CreateAutohealingPolicies(messages, health_check, initial_delay):
   return [policy]
 
 
+def ValidateAutohealingPolicies(auto_healing_policies):
+  """Validates autohealing policies.
+
+  Args:
+    auto_healing_policies: list of AutoHealingPolicies to validate
+  """
+  if not auto_healing_policies:
+    return
+  # Only a single auto_healing_policy is allowed. Displaying warnings for any
+  # additional entries is unnecessary as an error will be returned.
+  policy = auto_healing_policies[0]
+  if not policy.healthCheck and policy.initialDelaySec:
+    message = ('WARNING: Health check should be provided when specifying '
+               'initial delay.')
+    console_io.PromptContinue(message=message, cancel_on_no=True)
+
+
 def _GetInstanceTemplatesSet(*versions_lists):
   versions_set = set()
   for versions_list in versions_lists:
@@ -1140,3 +1161,15 @@ def GetDeviceNamesFromStatefulPolicy(stateful_policy):
 
 def IsAutoscalerNew(autoscaler):
   return getattr(autoscaler, 'name', None) is None
+
+
+def ApplyInstanceRedistributionTypeToUpdatePolicy(
+    client, instance_redistribution_type, update_policy):
+  if instance_redistribution_type:
+    if update_policy is None:
+      update_policy = client.messages.InstanceGroupManagerUpdatePolicy()
+    update_policy.instanceRedistributionType = (
+        client.messages.InstanceGroupManagerUpdatePolicy.
+        InstanceRedistributionTypeValueValuesEnum)(
+            instance_redistribution_type)
+  return update_policy

@@ -32,7 +32,7 @@ class ExportTest(base.BinauthzMockedPolicyClientUnitTest):
         self.messages.AdmissionRule.NonConformanceActionValueValuesEnum)
     cluster_rules = [
         self.messages.Policy.ClusterAdmissionRulesValue.AdditionalProperty(
-            key=u'us-east1-b.my-cluster-1',
+            key='us-east1-b.my-cluster-1',
             value=self.messages.AdmissionRule(
                 evaluationMode=EvaluationModeEnum.REQUIRE_ATTESTATION,
                 nonConformanceAction=(
@@ -47,7 +47,7 @@ class ExportTest(base.BinauthzMockedPolicyClientUnitTest):
         name='projects/{}/policy'.format(self.Project()),
         admissionWhitelistPatterns=[
             self.messages.AdmissionWhitelistPattern(
-                namePattern=u'gcr.io/{}/*'.format(self.Project()),
+                namePattern='gcr.io/{}/*'.format(self.Project()),
             ),
         ],
         clusterAdmissionRules=self.messages.Policy.ClusterAdmissionRulesValue(

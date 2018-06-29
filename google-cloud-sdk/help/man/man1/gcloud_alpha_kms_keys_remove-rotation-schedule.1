@@ -11,7 +11,7 @@ gcloud alpha kms keys remove\-rotation\-schedule \- remove the rotation schedule
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys remove\-rotation\-schedule\fR \fIKEY\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys remove\-rotation\-schedule\fR \fIKEY\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -27,6 +27,21 @@ gcloud alpha kms keys remove\-rotation\-schedule \- remove the rotation schedule
 .TP 2m
 \fIKEY\fR
 Name of the key from which to clear the rotation schedule.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the key.
 
 
 .RE

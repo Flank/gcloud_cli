@@ -14,6 +14,8 @@
 
 """Unit tests for the iOS MatrixCreator."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
@@ -53,7 +55,8 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
         results_bucket='kfc',
         results_dir='2018-02-24',
         results_history_name='darkages.1',
-        timeout=321)
+        timeout=321,
+        xctestrun_file='myxctestrun')
 
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('request-id-123')
@@ -77,6 +80,7 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
 
     test = spec.iosXcTest
     self.assertEqual(test.testsZip.gcsPath, 'gs://kfc/2018-02-24/ios-test.zip')
+    self.assertEqual(test.xctestrun.gcsPath, 'gs://kfc/2018-02-24/myxctestrun')
 
   def testMatrixCreator_CreateIosTestMatrix_GetsHttpError(self):
     creator = self.CreateMatrixCreator(self.args)

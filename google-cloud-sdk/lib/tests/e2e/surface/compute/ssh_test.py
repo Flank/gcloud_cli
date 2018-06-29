@@ -13,15 +13,18 @@
 # limitations under the License.
 """Integration tests for connecting to instances with ssh."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
+from tests.lib import command_capture
 from tests.lib import sdk_test_base
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
 class SSHTest(e2e_instances_test_base.InstancesTestBase,
-              sdk_test_base.WithCommandCapture):
+              command_capture.WithCommandCapture):
 
   def testSSH(self):
     self._TestInstanceCreation()

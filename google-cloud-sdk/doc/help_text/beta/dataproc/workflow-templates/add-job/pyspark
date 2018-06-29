@@ -16,10 +16,10 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      PY_FILE
-        The main .py file to run as the driver.
+        Main .py file to run as the driver.
 
      [-- JOB_ARGS ...]
-        The arguments to pass to the driver.
+        Arguments to pass to the driver.
 
         The '--' argument must be specified between gcloud specific args on the
         left and JOB_ARGS on the right.
@@ -37,8 +37,9 @@ OPTIONAL FLAGS
         of the following file formats: .zip, .tar, .tar.gz, or .tgz.
 
      --driver-log-levels=[PACKAGE=LEVEL,...]
-        A list of package to log4j log level pairs to configure driver logging.
-        For example: root=FATAL,com.example=INFO
+        List of key value pairs to configure driver logging, where key is a
+        package and value is the log4j log level. For example:
+        root=FATAL,com.example=INFO
 
      --files=[FILE,...]
         Comma separated list of files to be provided to the job.
@@ -50,11 +51,21 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --properties=[PROPERTY=VALUE,...]
-        A list of key value pairs to configure PySpark.
+        List of key value pairs to configure PySpark. For a list of available
+        properties, see:
+        https://spark.apache.org/docs/latest/configuration.html#available-properties.
+        Alternatively, to see examples of how to use the --properties flag,
+        see:
+        https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties#how_the_properties_flag_works
 
      --py-files=[PY_FILE,...]
-        Comma separated list of Python files to be provided to the job.Must be
+        Comma separated list of Python files to be provided to the job. Must be
         one of the following file formats" .py, ,.zip, or .egg
 
      --region=REGION

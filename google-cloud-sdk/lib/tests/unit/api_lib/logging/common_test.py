@@ -14,6 +14,8 @@
 
 """Tests for googlecloudsdk.api_lib.logging.common library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.logging import common
 from tests.lib import test_case
 from tests.lib.surface.logging import base
@@ -21,9 +23,9 @@ from tests.lib.surface.logging import base
 
 class ApiLibCommonTest(base.LoggingTestBase):
 
-  def _setExpect(self, filter_spec, order_by=u'timestamp desc', page_size=1000):
+  def _setExpect(self, filter_spec, order_by='timestamp desc', page_size=1000):
     self.mock_client_v2.entries.List.Expect(
-        self.msgs.ListLogEntriesRequest(resourceNames=[u'projects/my-project'],
+        self.msgs.ListLogEntriesRequest(resourceNames=['projects/my-project'],
                                         filter=filter_spec,
                                         orderBy=order_by,
                                         pageSize=page_size),
@@ -34,7 +36,7 @@ class ApiLibCommonTest(base.LoggingTestBase):
     self._setExpect(filter_spec=None)
     list(common.FetchLogs())
 
-    self._setExpect(filter_spec=u'myField=hello')
+    self._setExpect(filter_spec='myField=hello')
     list(common.FetchLogs(log_filter='myField=hello'))
 
   def testOrdering(self):

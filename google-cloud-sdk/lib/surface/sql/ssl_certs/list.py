@@ -13,6 +13,8 @@
 # limitations under the License.
 """Lists all SSL certs for a Cloud SQL instance."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.api_lib.sql import validate
 from googlecloudsdk.calliope import base
@@ -26,7 +28,7 @@ class _BaseList(object):
   @staticmethod
   def Args(parser):
     flags.AddInstance(parser)
-    parser.display_info.AddFormat(flags.SSL_CERTS_FORMAT)
+    parser.display_info.AddFormat(flags.CLIENT_CERTS_FORMAT)
 
   def Run(self, args):
     """Lists all SSL certs for a Cloud SQL instance.

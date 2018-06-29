@@ -14,6 +14,9 @@
 
 """Tests that ensure deserialization of server responses work properly."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.core.util import files
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
@@ -30,10 +33,10 @@ class SignJwtTest(unit_test_base.BaseTest):
             signJwtRequest=self.msgs.SignJwtRequest(
                 payload='{"jwt" : "to_sign"}')),
         response=self.msgs.SignJwtResponse(
-            keyId=test_key, signedJwt='signed jwt'))
+            keyId=test_key, signedJwt=b'signed jwt'))
 
-    in_file = self.MockFileRead('{"jwt" : "to_sign"}')
-    out_file = self.MockFileWrite('signed jwt')
+    in_file = self.Touch(self.temp_path, contents=b'{"jwt" : "to_sign"}')
+    out_file = self.Touch(self.temp_path)
     self.Run('beta iam service-accounts sign-jwt '
              '--iam-account test@test-project.iam.gserviceaccount.com '
              '{0} {1}'.format(in_file, out_file))
@@ -42,6 +45,7 @@ class SignJwtTest(unit_test_base.BaseTest):
                             '[test@test-project.iam.gserviceaccount.com] '
                             'using key [{2}]').format(in_file, out_file,
                                                       test_key))
+    self.AssertBinaryFileEquals(b'signed jwt', out_file)
 
   def testMissingInputFile(self):
     with self.assertRaises(files.Error):

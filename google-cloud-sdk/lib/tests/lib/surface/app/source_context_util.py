@@ -14,6 +14,7 @@
 
 """Test data for source contexts in `gcloud app`."""
 
+from __future__ import unicode_literals
 PROJECT = 'fakeproject'
 
 REMOTE_CONTEXT = {

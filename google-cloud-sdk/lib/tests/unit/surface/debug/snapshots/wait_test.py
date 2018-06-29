@@ -20,6 +20,7 @@ from googlecloudsdk.api_lib.debug import debug
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.debug import base
+from six.moves import range
 
 
 class WaitTest(base.DebugSdkTest, sdk_test_base.WithOutputCapture):

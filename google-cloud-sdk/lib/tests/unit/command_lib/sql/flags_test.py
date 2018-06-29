@@ -14,6 +14,8 @@
 
 """Unit tests for SQL flags module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.sql import instances
 from googlecloudsdk.command_lib.sql import flags
 from tests.lib import cli_test_base
@@ -31,7 +33,7 @@ class CompleterTest(base.SqlMockTestBeta, completer_test_base.CompleterBase):
         self.messages.SqlDatabasesListRequest(
             project=self.Project(), instance='mock-instance'),
         self.messages.DatabasesListResponse(
-            kind=u'sql#databasesList',
+            kind='sql#databasesList',
             items=[
                 self.messages.Database(
                     # pylint:disable=line-too-long
@@ -41,11 +43,11 @@ class CompleterTest(base.SqlMockTestBeta, completer_test_base.CompleterBase):
                     charset='utf-8',
                     collation='some-collation',
                     selfLink=
-                    u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db-1'.
+                    'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db-1'.
                     format(self.Project()),
                     etag=
                     '\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
-                    kind=u'sql#database'),
+                    kind='sql#database'),
                 self.messages.Database(
                     # pylint:disable=line-too-long
                     project=self.Project(),
@@ -54,19 +56,19 @@ class CompleterTest(base.SqlMockTestBeta, completer_test_base.CompleterBase):
                     charset='utf-8',
                     collation='some-collation',
                     selfLink=
-                    u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db-2'.
+                    'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db-2'.
                     format(self.Project()),
                     etag=
                     '\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahe\"',
-                    kind=u'sql#database'),
-            ]),)
+                    kind='sql#database'),
+            ]),
+    )
     completer = self.Completer(
         flags.DatabaseCompleter,
         args={'--instance': 'mock-instance'},
         cli=self.cli)
-    self.assertItemsEqual(
-        ['mock-db-1', 'mock-db-2'],
-        completer.Complete('', self.parameter_info))
+    self.assertCountEqual(['mock-db-1', 'mock-db-2'],
+                          completer.Complete('', self.parameter_info))
 
   def testInstanceCompletion(self):
     instances_list = data.GetDatabaseInstancesListOfTwo(
@@ -78,7 +80,7 @@ class CompleterTest(base.SqlMockTestBeta, completer_test_base.CompleterBase):
     completer = self.Completer(
         flags.InstanceCompleter,
         cli=self.cli)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['backupless-instance1', 'backupless-instance2', 'testinstance'],
         completer.Complete('', self.parameter_info))
 
@@ -97,9 +99,8 @@ class CompleterTest(base.SqlMockTestBeta, completer_test_base.CompleterBase):
         flags.UserCompleter,
         args={'--instance': 'my_instance'},
         cli=self.cli)
-    self.assertItemsEqual(
-        ['my_username'],
-        completer.Complete('', self.parameter_info))
+    self.assertCountEqual(['my_username'],
+                          completer.Complete('', self.parameter_info))
 
 
 class FlagsTest(cli_test_base.CliTestBase, parameterized.TestCase):

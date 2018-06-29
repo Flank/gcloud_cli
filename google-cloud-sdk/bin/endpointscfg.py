@@ -5,9 +5,11 @@
 
 """A convenience wrapper for endpointscfg.py for appengine for python."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
-import bootstrapping.bootstrapping as bootstrapping
+from bootstrapping import bootstrapping
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.updater import update_manager
 
@@ -23,6 +25,7 @@ def main():
 
 
 if __name__ == '__main__':
+  bootstrapping.DisallowPython3()
   try:
     bootstrapping.CommandStart('endpointscfg', component_id='core')
     bootstrapping.CheckUpdates('endpointscfg')

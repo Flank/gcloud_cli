@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for `gcloud tasks queues` create commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import constants
 from googlecloudsdk.command_lib.tasks import parsers

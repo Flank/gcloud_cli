@@ -1233,16 +1233,16 @@ class CliDisplayTest(calliope_test_base.CalliopeTestBase,
                      ])
     self.AssertErrEquals("""\
 table format projection:
-   a : (2, 4, 'A', left, None, None)
-   b : (1, UNORDERED, None, left, None, None)
-     x : (2, 3, 'X', left, None, None, [reverse])
-   c : (1, UNORDERED, None, left, None, None)
-     y : (1, UNORDERED, None, left, None, None)
-       z : (2, 2, 'Z', left, None, None)
-   d : (2, 1, 'D', left, None, None, [reverse])
+   a : (2, 4, 'A', left, None, False, None)
+   b : (1, UNORDERED, None, left, None, None, None)
+     x : (2, 3, 'X', left, None, False, None, [reverse])
+   c : (1, UNORDERED, None, left, None, None, None)
+     y : (1, UNORDERED, None, left, None, None, None)
+       z : (2, 2, 'Z', left, None, False, None)
+   d : (2, 1, 'D', left, None, False, None, [reverse])
 """)
 
-  def testCliDisplayGoodAsyncDebugImplictSortBy(self):
+  def testCliDisplayGoodAsyncDebugImplicitSortBy(self):
     self.cli.Execute(['sdk',
                       'collection-good-async',
                       '--format='
@@ -1260,13 +1260,13 @@ table format projection:
                      ])
     self.AssertErrEquals("""\
 table format projection:
-   a : (2, 6, 'A', left, None, None)
-   b : (2, 1, 'B', left, None, None, [reverse])
-   c : (2, 2, 'C', left, None, None, [reverse])
-   d : (2, 3, 'D', left, None, None, [reverse])
+   a : (2, 6, 'A', left, None, False, None)
+   b : (2, 1, 'B', left, None, False, None, [reverse])
+   c : (2, 2, 'C', left, None, False, None, [reverse])
+   d : (2, 3, 'D', left, None, False, None, [reverse])
 """)
 
-  def testCliDisplayGoodAsyncDebugTwoImplictSortBy(self):
+  def testCliDisplayGoodAsyncDebugTwoImplicitSortBy(self):
     self.cli.Execute(['sdk',
                       'collection-good-async',
                       '--format='
@@ -1288,10 +1288,10 @@ table format projection:
                      ])
     self.AssertErrEquals("""\
 table format projection:
-   a : (2, 1, 'A', left, None, None)
-   b : (2, 3, 'B', left, None, None, [reverse])
-   c : (2, 4, 'C', left, None, None, [reverse])
-   d : (2, 2, 'D', left, None, None, [reverse])
+   a : (2, 1, 'A', left, None, False, None)
+   b : (2, 3, 'B', left, None, False, None, [reverse])
+   c : (2, 4, 'C', left, None, False, None, [reverse])
+   d : (2, 2, 'D', left, None, False, None, [reverse])
 """)
 
   def testCliDisplayGoodAsyncDebugImplicitAndExplicitSortBy(self):
@@ -1313,10 +1313,10 @@ table format projection:
                      ])
     self.AssertErrEquals("""\
 table format projection:
-   a : (2, 1, 'A', left, None, None)
-   b : (2, 3, 'B', left, None, None, [reverse])
-   c : (2, 4, 'C', left, None, None, [reverse])
-   d : (2, 2, 'D', left, None, None, [reverse])
+   a : (2, 1, 'A', left, None, False, None)
+   b : (2, 3, 'B', left, None, False, None, [reverse])
+   c : (2, 4, 'C', left, None, False, None, [reverse])
+   d : (2, 2, 'D', left, None, False, None, [reverse])
 """)
 
   def testCliDisplayGetUriUriFlagOffOutputDisabled(self):

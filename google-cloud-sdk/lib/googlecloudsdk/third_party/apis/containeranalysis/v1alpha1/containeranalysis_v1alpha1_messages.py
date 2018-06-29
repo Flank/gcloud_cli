@@ -715,7 +715,7 @@ class ContaineranalysisProjectsScanConfigsGetRequest(_messages.Message):
 
   Fields:
     name: The name of the ScanConfig in the form
-      projects/{project_id}/scan_configs/{ScanConfig_id} instead.
+      projects/{project_id}/scanConfigs/{scan_config_id} instead.
   """
 
   name = _messages.StringField(1, required=True)
@@ -743,7 +743,7 @@ class ContaineranalysisProjectsScanConfigsPatchRequest(_messages.Message):
 
   Fields:
     name: The scan config to update of the form
-      projects/{project_id}/scan_configs/{ScanConfig_id} instead.
+      projects/{project_id}/scanConfigs/{scan_config_id}. instead.
     scanConfig: A ScanConfig resource to be passed as the request body.
     updateMask: A string attribute.
   """
@@ -1017,12 +1017,15 @@ class Discovered(_messages.Message):
 
   Enums:
     AnalysisStatusValueValuesEnum: The status of discovery for the resource.
+    ContinuousAnalysisValueValuesEnum: Whether the resource is continuously
+      analyzed.
 
   Fields:
     analysisStatus: The status of discovery for the resource.
     analysisStatusError: When an error is encountered this will contain a
       LocalizedMessage under details to show to the user. The LocalizedMessage
       output only and populated by the API.
+    continuousAnalysis: Whether the resource is continuously analyzed.
     operation: Output only. An operation that indicates the status of the
       current scan.
   """
@@ -1037,16 +1040,31 @@ class Discovered(_messages.Message):
       FINISHED_SUCCESS: Analysis has finished successfully.
       FINISHED_FAILED: Analysis has finished unsuccessfully, the analysis
         itself is in a bad state.
+      FINISHED_UNSUPPORTED: The resource is known not to be supported.
     """
     ANALYSIS_STATUS_UNSPECIFIED = 0
     PENDING = 1
     SCANNING = 2
     FINISHED_SUCCESS = 3
     FINISHED_FAILED = 4
+    FINISHED_UNSUPPORTED = 5
+
+  class ContinuousAnalysisValueValuesEnum(_messages.Enum):
+    r"""Whether the resource is continuously analyzed.
+
+    Values:
+      CONTINUOUS_ANALYSIS_UNSPECIFIED: Unknown
+      ACTIVE: The resource is continuously analyzed.
+      INACTIVE: The resource is ignored for continuous analysis.
+    """
+    CONTINUOUS_ANALYSIS_UNSPECIFIED = 0
+    ACTIVE = 1
+    INACTIVE = 2
 
   analysisStatus = _messages.EnumField('AnalysisStatusValueValuesEnum', 1)
   analysisStatusError = _messages.MessageField('Status', 2)
-  operation = _messages.MessageField('Operation', 3)
+  continuousAnalysis = _messages.EnumField('ContinuousAnalysisValueValuesEnum', 3)
+  operation = _messages.MessageField('Operation', 4)
 
 
 class Discovery(_messages.Message):
@@ -1501,11 +1519,11 @@ class ListOccurrencesResponse(_messages.Message):
 
 
 class ListScanConfigsResponse(_messages.Message):
-  r"""A list of ScanConfigs for the project.
+  r"""A list of scan configs for the project.
 
   Fields:
-    nextPageToken: A page token to pass in order to get more scans.
-    scanConfigs: The set of scan configs
+    nextPageToken: A page token to pass in order to get more scan configs.
+    scanConfigs: The set of scan configs.
   """
 
   nextPageToken = _messages.StringField(1)
@@ -1977,16 +1995,20 @@ class ScanConfig(_messages.Message):
   r"""Indicates various scans and whether they are turned on or off.
 
   Fields:
+    createTime: Output only. The time this scan config was created.
     description: Output only. A human-readable description of what the
       `ScanConfig` does.
     enabled: Indicates whether the Scan is enabled.
     name: Output only. The name of the ScanConfig in the form
-      \u201cprojects/{project_id}/ScanConfigs/{ScanConfig_id}".
+      "projects/{project_id}/scanConfigs/{scan_config_id}".
+    updateTime: Output only. The time this scan config was last updated.
   """
 
-  description = _messages.StringField(1)
-  enabled = _messages.BooleanField(2)
-  name = _messages.StringField(3)
+  createTime = _messages.StringField(1)
+  description = _messages.StringField(2)
+  enabled = _messages.BooleanField(3)
+  name = _messages.StringField(4)
+  updateTime = _messages.StringField(5)
 
 
 class SetIamPolicyRequest(_messages.Message):
@@ -2119,14 +2141,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -2162,17 +2182,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 class Status(_messages.Message):

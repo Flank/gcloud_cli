@@ -14,6 +14,8 @@
 
 """Bundle tests for the lookup module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import gcloud
 from googlecloudsdk.command_lib.static_completion import lookup
 from tests.lib import sdk_test_base

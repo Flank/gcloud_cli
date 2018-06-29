@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.firebase.test import arg_file
@@ -22,6 +24,7 @@ from googlecloudsdk.core import yaml
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import test_utils
 from tests.lib.surface.firebase.test import unit_base
+import six
 
 MALFORMED1 = os.path.join(unit_base.TEST_DATA_PATH, 'malformed1')
 MALFORMED2 = os.path.join(unit_base.TEST_DATA_PATH, 'malformed2')
@@ -52,46 +55,48 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile('file;group', COMMON_ARGS)
     self.assertEqual(e.exception.parameter_name, 'arg-spec')
-    self.assertIn('ARG_FILE:ARG_GROUP_NAME', unicode(e.exception))
+    self.assertIn('ARG_FILE:ARG_GROUP_NAME', six.text_type(e.exception))
 
   def testArgspec_OnlyColonIsInGcsPrefix(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile('gs://file;group', COMMON_ARGS)
     self.assertEqual(e.exception.parameter_name, 'arg-spec')
-    self.assertIn('ARG_FILE:ARG_GROUP_NAME', unicode(e.exception))
+    self.assertIn('ARG_FILE:ARG_GROUP_NAME', six.text_type(e.exception))
 
   def testArgspec_FileDoesNotExist(self):
     with self.assertRaises(yaml.Error) as e:
       arg_file.GetArgsFromArgFile('missing-file:group', COMMON_ARGS)
-    self.assertIn('No such file', unicode(e.exception))
-    self.assertIn('missing-file', unicode(e.exception))
+    self.assertIn('No such file', six.text_type(e.exception))
+    self.assertIn('missing-file', six.text_type(e.exception))
 
   # Tests on malformed YAML files
 
   def testYamlParsing_Malformed1(self):
     with self.assertRaises(calliope_exceptions.BadFileException) as e:
       arg_file.GetArgsFromArgFile(MALFORMED1 + ':foo', COMMON_ARGS)
-    self.assertIn('Failed to parse YAML', unicode(e.exception))
+    self.assertIn('Failed to parse YAML', six.text_type(e.exception))
 
   def testYamlParsing_Malformed2(self):
     with self.assertRaises(calliope_exceptions.BadFileException) as e:
       arg_file.GetArgsFromArgFile(MALFORMED2 + ':foo', COMMON_ARGS)
-    self.assertIn('Failed to parse YAML', unicode(e.exception))
+    self.assertIn('Failed to parse YAML', six.text_type(e.exception))
 
   def testYamlParsing_Malformed3(self):
     with self.assertRaises(yaml.YAMLParseError) as e:
       arg_file.GetArgsFromArgFile(MALFORMED3 + ':xxx', COMMON_ARGS)
-    self.assertIn('Failed to parse YAML', unicode(e.exception))
+    self.assertIn('Failed to parse YAML', six.text_type(e.exception))
 
   def testYamlParsing_Malformed4_GroupNameContainsInvalidChar(self):
     with self.assertRaises(calliope_exceptions.BadFileException) as e:
       arg_file.GetArgsFromArgFile(MALFORMED4 + '://xyz', COMMON_ARGS)
-    self.assertIn('Invalid argument group name [//xyz]', unicode(e.exception))
+    self.assertIn('Invalid argument group name [//xyz]',
+                  six.text_type(e.exception))
 
   def testYamlParsing_EmptyFile(self):
     with self.assertRaises(calliope_exceptions.BadFileException) as e:
       arg_file.GetArgsFromArgFile(EMPTY_FILE + ':xxx', COMMON_ARGS)
-    self.assertIn('Could not find argument group [xxx]', unicode(e.exception))
+    self.assertIn('Could not find argument group [xxx]',
+                  six.text_type(e.exception))
 
   def testYamlParsing_EmptyYamlDoc(self):
     arg_file.GetArgsFromArgFile(EMPTY_DOC + ':xxx', COMMON_ARGS)
@@ -106,17 +111,19 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
   def testBadArgFile_GroupDoesNotExist(self):
     with self.assertRaises(calliope_exceptions.BadFileException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':ghost', COMMON_ARGS)
-    self.assertIn('Could not find argument group [ghost]', unicode(e.exception))
+    self.assertIn('Could not find argument group [ghost]',
+                  six.text_type(e.exception))
 
   def testBadArgFile_ArgNameIsInvalid(self):
     with self.assertRaises(exceptions.InvalidTestArgError) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':bad-arg-name', COMMON_ARGS)
-    self.assertIn('[appp] is not a valid argument name', unicode(e.exception))
+    self.assertIn('[appp] is not a valid argument name',
+                  six.text_type(e.exception))
 
   def testBadArgFile_ArgValueIsMissing(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BAD_ARGS + ':missing-arg-value', COMMON_ARGS)
-    self.assertIn('[type]: no argument value found', unicode(e.exception))
+    self.assertIn('[type]: no argument value found', six.text_type(e.exception))
 
   def testBadArgFile_ArgIsDuplicated(self):
     args = arg_file.GetArgsFromArgFile(BAD_ARGS + ':dup-arg-name', COMMON_ARGS)
@@ -162,42 +169,43 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
   def testDurations_InvalidString(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-abcd', COMMON_ARGS)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [timeout]', msg)
     self.assertIn('given value must be of the form INTEGER[UNIT]', msg)
 
   def testDurations_InvalidUnits(self):
     with self.assertRaises(exceptions.InvalidArgException) as e:
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-10e', COMMON_ARGS)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [timeout]', msg)
     self.assertIn('unit must be one of s, m, h, d; received: e', msg)
 
   def testDurations_InvalidFloatValue(self):
     with self.assertRaises(exceptions.InvalidArgException) as e:
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-1.1h', COMMON_ARGS)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [timeout]', msg)
     self.assertIn('given value must be of the form INTEGER[UNIT]', msg)
 
   def testDurations_TimeoutBelowLowerBound(self):
     with self.assertRaises(exceptions.InvalidArgException) as e:
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-lower', COMMON_ARGS)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [timeout]', msg)
     self.assertIn('must be greater than or equal to 1m; received: 59s', msg)
 
   def testDurations_TimeoutAboveUpperBound(self):
     with self.assertRaises(exceptions.InvalidArgException) as e:
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-upper', COMMON_ARGS)
-    msg = unicode(e.exception)
+    msg = six.text_type(e.exception)
     self.assertIn('Invalid value for [timeout]', msg)
     self.assertIn('must be less than or equal to 6h; received: 7h', msg)
 
   def testDurations_TimeoutIsList(self):
     with self.assertRaises(exceptions.InvalidArgException) as e:
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-list', COMMON_ARGS)
-    self.assertIn("Invalid value for [timeout]: ['15m',", unicode(e.exception))
+    self.assertIn("Invalid value for [timeout]: ['15m',",
+                  six.text_type(e.exception))
 
   # Boolean arg validation tests
 
@@ -240,22 +248,24 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
   def testBooleans_InvalidString(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-xyz', COMMON_ARGS)
-    self.assertEqual('Invalid value for [async]: xyz', unicode(e.exception))
+    self.assertEqual('Invalid value for [async]: xyz',
+                     six.text_type(e.exception))
 
   def testBooleans_InvalidStringMisspelled(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-misspell', COMMON_ARGS)
-    self.assertEqual('Invalid value for [async]: fals', unicode(e.exception))
+    self.assertEqual('Invalid value for [async]: fals',
+                     six.text_type(e.exception))
 
   def testBooleans_InvalidIntegerType(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-int', COMMON_ARGS)
-    self.assertEqual('Invalid value for [async]: 0', unicode(e.exception))
+    self.assertEqual('Invalid value for [async]: 0', six.text_type(e.exception))
 
   def testBooleans_InvalidListType(self):
     with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
       arg_file.GetArgsFromArgFile(BOOLEANS + ':bool-list', COMMON_ARGS)
-    self.assertIn('Invalid value for [async]: [', unicode(e.exception))
+    self.assertIn('Invalid value for [async]: [', six.text_type(e.exception))
 
   # Tests for tab-completion of ARGSPECs
 
@@ -269,12 +279,13 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
 
   def testArgSpecCompleter_WithFilenameAndGroupPrefix_MatchOne(self):
     completions = arg_file.ArgSpecCompleter(INCLUDES + ':t', None)
-    self.assertItemsEqual([INCLUDES + ':top-group'], completions)
+    self.assertEquals([INCLUDES + ':top-group'], completions)
 
   def testArgSpecCompleter_WithFilenameAndGroupPrefix_MatchMany(self):
     completions = arg_file.ArgSpecCompleter(INCLUDES + ':gr', None)
-    self.assertItemsEqual(
-        [INCLUDES + g for g in [':group2', ':group3', ':group4']], completions)
+    self.assertEquals(
+        sorted([INCLUDES + g for g in [':group2', ':group3', ':group4']]),
+        sorted(completions))
 
 
 if __name__ == '__main__':

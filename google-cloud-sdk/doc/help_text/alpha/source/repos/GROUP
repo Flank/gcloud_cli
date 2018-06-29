@@ -36,6 +36,9 @@ COMMANDS
      set-iam-policy
         (ALPHA) Set the IAM policy for the named repository.
 
+     update
+        (ALPHA) Update the configuration of a Cloud Source Repository.
+
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,
     users of ALPHA commands and flags need to apply for access, agree to

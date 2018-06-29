@@ -26,8 +26,8 @@ def AddFlagName(parser):
 """
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.util import completers
@@ -144,16 +144,17 @@ def AddPromptForPassword(parser):
 
 
 def AddActivationPolicy(parser):
-  parser.add_argument(
+  base.ChoiceArgument(
       '--activation-policy',
       required=False,
-      choices=['ALWAYS', 'NEVER', 'ON_DEMAND'],
+      choices=['always', 'never', 'on-demand'],
       default=None,
-      help=('The activation policy for this instance. This specifies when '
-            'the instance should be activated and is applicable only when '
-            'the instance state is RUNNABLE. The default is ON_DEMAND. '
-            'More information on activation policies can be found here: '
-            'https://cloud.google.com/sql/faq#activation_policy'))
+      help_str=('The activation policy for this instance. This specifies when '
+                'the instance should be activated and is applicable only when '
+                'the instance state is `RUNNABLE`. The default is `on-demand`. '
+                'More information on activation policies can be found here: '
+                'https://cloud.google.com/sql/faq#activation_policy')
+  ).AddToParser(parser)
 
 
 def AddAssignIp(parser, show_negated_in_help=False):
@@ -163,30 +164,40 @@ def AddAssignIp(parser, show_negated_in_help=False):
       help='The instance must be assigned an IP address.', **kwargs)
 
 
-def AddAuthorizedGAEApps(parser):
+def AddAuthorizedGAEApps(parser, update=False):
+  help_ = (
+      'First Generation instances only. List of project IDs for App Engine '
+      'applications running in the Standard environment that '
+      'can access this instance.')
+  if update:
+    help_ += (
+        '\n\nThe value given for this argument *replaces* the existing list.')
   parser.add_argument(
       '--authorized-gae-apps',
       type=arg_parsers.ArgList(min_length=1),
       metavar='APP',
       required=False,
-      help=('First Generation instances only. List of IDs for App Engine '
-            'applications running in the Standard environment that '
-            'can access this instance.'))
+      help=help_)
 
 
-def AddAuthorizedNetworks(parser):
+def AddAuthorizedNetworks(parser, update=False):
+  """Adds the `--authorized-networks` flag."""
   cidr_validator = arg_parsers.RegexpValidator(
       _CIDR_REGEX, ('Must be specified in CIDR notation, also known as '
                     '\'slash\' notation (e.g. 192.168.100.0/24).'))
+  help_ = ('The list of external networks that are allowed to connect to '
+           'the instance. Specified in CIDR notation, also known as '
+           '\'slash\' notation (e.g. 192.168.100.0/24).')
+  if update:
+    help_ += (
+        '\n\nThe value given for this argument *replaces* the existing list.')
   parser.add_argument(
       '--authorized-networks',
       type=arg_parsers.ArgList(min_length=1, element_type=cidr_validator),
       metavar='NETWORK',
       required=False,
       default=[],
-      help=('The list of external networks that are allowed to connect to '
-            'the instance. Specified in CIDR notation, also known as '
-            '\'slash\' notation (e.g. 192.168.100.0/24).'))
+      help=help_)
 
 
 def AddBackupStartTime(parser):
@@ -197,19 +208,24 @@ def AddBackupStartTime(parser):
             'format - HH:MM, in the UTC timezone.'))
 
 
-def AddDatabaseFlags(parser):
+def AddDatabaseFlags(parser, update=False):
+  """Adds the `--database-flags` flag."""
+  help_ = ('A comma-separated list of database flags to set on the '
+           'instance. Use an equals sign to separate flag name and value. '
+           'Flags without values, like skip_grant_tables, can be written '
+           'out without a value after, e.g., `skip_grant_tables=`. Use '
+           'on/off for booleans. View the Instance Resource API for allowed '
+           'flags. (e.g., `--database-flags max_allowed_packet=55555,'
+           'skip_grant_tables=,log_output=1`)')
+  if update:
+    help_ += (
+        '\n\nThe value given for this argument *replaces* the existing list.')
   parser.add_argument(
       '--database-flags',
       type=arg_parsers.ArgDict(min_length=1),
       metavar='FLAG=VALUE',
       required=False,
-      help=('A comma-separated list of database flags to set on the '
-            'instance. Use an equals sign to separate flag name and value. '
-            'Flags without values, like skip_grant_tables, can be written '
-            'out without a value after, e.g., `skip_grant_tables=`. Use '
-            'on/off for booleans. View the Instance Resource API for allowed '
-            'flags. (e.g., `--database-flags max_allowed_packet=55555,'
-            'skip_grant_tables=,log_output=1`)'))
+      help=help_)
 
 
 def AddCPU(parser):
@@ -256,7 +272,7 @@ def AddFollowGAEApp(parser):
 
 
 def AddMaintenanceReleaseChannel(parser):
-  parser.add_argument(
+  base.ChoiceArgument(
       '--maintenance-release-channel',
       choices={
           'production': 'Production updates are stable and recommended '
@@ -267,13 +283,14 @@ def AddMaintenanceReleaseChannel(parser):
                      'their compatibility with your application prior '
                      'to the production release.'
       },
-      type=lambda val: val.lower(),
-      help="Which channel's updates to apply during the maintenance window. "
-           "If not specified, Cloud SQL chooses the timing of updates to your "
-           "instance.")
+
+      help_str=("Which channel's updates to apply during the maintenance "
+                "window. If not specified, Cloud SQL chooses the timing of "
+                "updates to your instance.")).AddToParser(parser)
 
 
 def AddMaintenanceWindowDay(parser):
+  # TODO(b/79740068) Convert to ChoiceArgument when resolved.
   parser.add_argument(
       '--maintenance-window-day',
       choices=arg_parsers.DayOfWeek.DAYS,
@@ -301,13 +318,13 @@ def AddMemory(parser):
 
 
 def AddReplication(parser):
-  parser.add_argument(
+  base.ChoiceArgument(
       '--replication',
       required=False,
-      choices=['SYNCHRONOUS', 'ASYNCHRONOUS'],
+      choices=['synchronous', 'asynchronous'],
       default=None,
-      help='The type of replication this instance uses. The default is '
-           'SYNCHRONOUS.')
+      help_str='The type of replication this instance uses. The default is '
+      'synchronous.').AddToParser(parser)
 
 
 def AddStorageAutoIncrease(parser):
@@ -452,9 +469,16 @@ OPERATION_FORMAT_BETA = """
   )
 """
 
-SSL_CERTS_FORMAT = """
+CLIENT_CERTS_FORMAT = """
   table(
     commonName:label=NAME,
+    sha1Fingerprint,
+    expirationTime.yesno(no="-"):label=EXPIRATION
+  )
+"""
+
+SERVER_CA_CERTS_FORMAT = """
+  table(
     sha1Fingerprint,
     expirationTime.yesno(no="-"):label=EXPIRATION
   )

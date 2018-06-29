@@ -337,6 +337,30 @@ class RecognizeLongRunningSpecificTrackTest(speech_base.MlSpeechTestBase,
                '    --enable-speaker-diarization '
                '    --diarization-speaker-count catsanddogs')
 
+  @parameterized.named_parameters(('Alpha', calliope_base.ReleaseTrack.ALPHA))
+  def testAdditionalLanguages_Async(self, track):
+    """Test additional_language_codes flag."""
+    self.SetUpForTrack(track)
+    self._ExpectLongRunningRecognizeRequest(
+        uri='gs://bucket/object',
+        language='en-US',
+        sample_rate=16000,
+        max_alternatives=1,
+        result='12345',
+        encoding=None,
+        additional_language_codes=['en-TZ', 'en-CA'])
+
+    actual = self.Run('ml speech recognize-long-running gs://bucket/object '
+                      '    --language-code en-US '
+                      '    --sample-rate 16000 '
+                      '    --async '
+                      '    --additional-language-codes en-TZ,en-CA')
+
+    expected = self.messages.Operation(name='12345')
+    self.assertEqual(expected, actual)
+    self.assertEqual(
+        json.loads(self.GetOutput()), encoding.MessageToPyValue(expected))
+
 
 if __name__ == '__main__':
   test_case.main()

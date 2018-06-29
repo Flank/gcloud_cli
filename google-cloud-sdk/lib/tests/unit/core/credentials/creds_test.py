@@ -218,6 +218,46 @@ class StoreTests(sdk_test_base.SdkBase):
   def testCredentialStoreWithCache(self):
     self.checkCredentialStore(creds.CredentialStoreWithCache)
 
+  @test_case.Filters.DoNotRunOnWindows(
+      'Checking file permissions in the Windows test env is non-trivial')
+  def testCredentialStoreCreatedPrivate(self):
+    """Tests that reading credentials creates the credential files private."""
+    store_file = os.path.join(self.temp_path, 'credentials.db')
+    access_token_file = os.path.join(self.temp_path, 'access_token.db')
+    for path in (store_file, access_token_file):
+      self.assertFalse(
+          os.path.exists(path),
+          'File [{}] should not exist already (test error)'.format(
+              os.path.basename(path)))
+
+    creds.GetCredentialStore(store_file, access_token_file)
+
+    for path in (store_file, access_token_file):
+      self.assertEqual(
+          os.stat(store_file).st_mode & 0o777, 0o600,
+          'File [{}] file should be created with 0o600 permissions'.format(
+              os.path.basename(path)))
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Checking file permissions in the Windows test env is non-trivial')
+  def testCredentialStoreChangesToPrivate(self):
+    """Tests that reading credentials turns the credential files private."""
+    store_file = os.path.join(self.temp_path, 'credentials.db')
+    access_token_file = os.path.join(self.temp_path, 'access_token.db')
+    creds.GetCredentialStore(store_file, access_token_file)
+
+    for path in (store_file, access_token_file):
+      # Open up the permissions to verify that they get changed back
+      os.chmod(path, 0o777)
+
+    creds.GetCredentialStore(store_file, access_token_file)
+
+    for path in (store_file, access_token_file):
+      self.assertEqual(
+          os.stat(store_file).st_mode & 0o777, 0o600,
+          'File [{}] should be changed back to 0o600 permissions'.format(
+              os.path.basename(path)))
+
   def testMigrateMultistore2Sqlite(self):
     store = creds.Oauth2ClientCredentialStore(config.Paths().credentials_path)
     credentials = self._MakeCredentials()

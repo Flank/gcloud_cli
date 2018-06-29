@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """E2E tests for `gcloud monitoring` commands."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import base

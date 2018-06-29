@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for `gcloud tasks locations describe`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources

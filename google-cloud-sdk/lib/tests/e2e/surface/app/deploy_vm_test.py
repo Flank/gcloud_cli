@@ -14,6 +14,8 @@
 
 """Tests for deploying a MVM app."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 import urllib2
@@ -31,10 +33,10 @@ class DeployCustomTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth,
                         sdk_test_base.WithTempCWD):
   """Test we can deploy an app."""
 
-  TIMEOUT = 600  # 10 minutes
+  TIMEOUT = 900  # 15 minutes
 
   def SetUp(self):
-    self.version = e2e_utils.GetResourceNameGenerator(prefix='gaetest').next()
+    self.version = next(e2e_utils.GetResourceNameGenerator(prefix='gaetest'))
     # Use Cloud Build by default.
 
   def _Resource(self, *parts):

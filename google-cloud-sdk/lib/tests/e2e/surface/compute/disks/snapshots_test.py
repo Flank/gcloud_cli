@@ -13,164 +13,128 @@
 # limitations under the License.
 """Integration tests for creating/using/deleting snapshots."""
 
-import logging
+from __future__ import absolute_import
+from __future__ import unicode_literals
+import contextlib
 
 from googlecloudsdk.calliope import base
-from googlecloudsdk.core import resources
-from tests.lib import e2e_resource_managers
 from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_test_base
-from tests.lib.surface.compute import resource_managers
 
 
 class _SnapshotsTestBase(e2e_test_base.BaseTest):
 
-  def SetUp(self):
-    self.disk_names_used = []
-    self.snapshot_names_used = []
-
-  def TearDown(self):
-    logging.info('Starting TearDown (will delete resources if test fails).')
-    for name in self.disk_names_used:
-      self.CleanUpResource(name, 'disks')
-    for name in self.snapshot_names_used:
-      self.CleanUpResource(self.snapshot_name, 'snapshots',
-                           scope=e2e_test_base.GLOBAL)
-
-  def _GetInstanceRef(self, prefix=None, zone=None, project=None):
-    prefix = prefix or 'gcloud-compute-test-instance'
-    zone = zone or self.zone
-    project = project or self.Project()
-    return resources.REGISTRY.Create(
-        'compute.instances', instance=prefix, zone=zone, project=project)
-
   def GetResourceName(self):
-    # Make sure the name used is different on each retry, and make sure all
-    # names used are cleaned up
-    g = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-disk', sequence_start=1)
-    self.disk1_name = g.next()
-    self.disk2_name = g.next()
-    self.disk_names_used.extend(
-        [self.disk1_name, self.disk2_name])
-    self.snapshot_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-snapshot').next()
-    self.snapshot_names_used.append(self.snapshot_name)
+    return next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-compute-test-snapshot', sequence_start=1))
 
-  def _TestCreateSnapshot(self, use_storage_location=False):
-    # Create disk first
-    self.Run('compute disks create {0} --image debian-8 --zone {1}'
-             .format(self.disk1_name, self.zone))
-    if use_storage_location:
-      self.Run('compute disks snapshot {0} --snapshot-names {1} --zone {2} '
-               '--storage-location {3}'.format(self.disk1_name,
-                                               self.snapshot_name, self.zone,
-                                               self.storage_location))
-    else:
-      self.Run('compute disks snapshot {0} --snapshot-names {1} --zone {2}'
-               .format(self.disk1_name, self.snapshot_name, self.zone))
+  @contextlib.contextmanager
+  def _CreateDisk(self):
+    disk_name = self.GetResourceName()
+    try:
+      self.Run('compute disks create {0} --image debian-8 --zone {1}'
+               .format(disk_name, self.zone))
+      yield disk_name
+    finally:
+      self.Run('compute disks delete {0} --zone {1} --quiet'
+               .format(disk_name, self.zone))
 
-    self.Run('compute snapshots describe {0}'.format(self.snapshot_name))
-    self.AssertNewOutputContains('name: {0}'.format(self.snapshot_name),
-                                 reset=False)
-    if use_storage_location:
-      self.AssertNewOutputContains("""storageLocations:
-                                   - {0}""".format(self.storage_location),
-                                   reset=False, normalize_space=True)
-    self.AssertNewOutputContains('status: READY')
+  @contextlib.contextmanager
+  def _CreateSnapshot(self, disk_name, use_storage_location=False,
+                      guest_flush=False):
+    snapshot_name = self.GetResourceName()
+    extra_flags = ''
+    if guest_flush:
+      extra_flags = '--guest-flush'
+    try:
+      if use_storage_location:
+        self.Run('compute disks snapshot {0} --snapshot-names {1} --zone {2} '
+                 '--storage-location {3} {4}'.format(
+                     disk_name, snapshot_name, self.zone,
+                     self.storage_location, extra_flags))
+      else:
+        self.Run('compute disks snapshot {0} --snapshot-names {1} --zone {2} '
+                 '{3}'.format(
+                     disk_name, snapshot_name, self.zone, extra_flags))
+      yield snapshot_name
+    finally:
+      self.Run('compute snapshots delete {0} --quiet'.format(snapshot_name))
 
-  def _TestCreateDiskFromSnapshot(self):
-    self.Run('compute disks create {0} --source-snapshot {1} --zone {2}'
-             .format(self.disk2_name, self.snapshot_name, self.zone))
-    self.Run('compute disks describe {0} --zone {1}'
-             .format(self.disk2_name, self.zone))
-    self.AssertNewOutputContains('global/snapshots/{0}'
-                                 .format(self.snapshot_name),
-                                 reset=False)
-    self.AssertNewOutputContains('name: {0}'.format(self.disk2_name))
+  @contextlib.contextmanager
+  def _CreateDiskFromSnapshot(self, snapshot_name):
+    disk_name = self.GetResourceName()
+    try:
+      self.Run('compute disks create {0} --source-snapshot {1} --zone {2}'
+               .format(disk_name, snapshot_name, self.zone))
+      yield disk_name
+    finally:
+      self.Run('compute disks delete {0} --zone {1} --quiet'
+               .format(disk_name, self.zone))
 
-  def _TestCreateInstanceFromDisk(self):
-    instance_ref = self._GetInstanceRef()
-    extra_creation_flags = [
-        ('--disk', 'name={},boot=yes'.format(self.disk2_name)),
-    ]
-    instance_parameters = e2e_resource_managers.ResourceParameters(
-        prefix_ref=instance_ref, extra_creation_flags=extra_creation_flags)
-    with resource_managers.Instance(self.Run, instance_parameters) as instance:
-      self.Run('compute instances describe {0} --zone {1}'
-               .format(instance.ref.Name(), self.zone))
-      self.AssertNewOutputContains('zones/{0}/disks/{1}'
-                                   .format(self.zone, self.disk2_name),
-                                   reset=False)
-      self.AssertNewOutputContains('status: RUNNING')
-
-  def _TestDeleteSnapshot(self):
-    self.Run('compute snapshots list')
-    self.AssertNewOutputContains(self.snapshot_name)
-    self.WriteInput('y\n')
-    self.Run('compute snapshots delete {0}'.format(self.snapshot_name))
-    self.ClearInput()
-    self.AssertNewErrContains(
-        'The following snapshots will be deleted', reset=False)
-    self.AssertNewErrContains(self.snapshot_name)
-    self.Run('compute snapshots list')
-    self.AssertNewOutputNotContains(self.snapshot_name)
-
-  def _TestDeleteDisks(self):
-    self.Run('compute disks list')
-    self.AssertNewOutputContains(self.disk1_name, reset=False)
-    self.AssertNewOutputContains(self.disk2_name)
-    self.WriteInput('y\n')
-    self.Run('compute disks delete {0} {1} --zone {2}'
-             .format(self.disk1_name, self.disk2_name, self.zone))
-    self.ClearInput()
-    self.AssertNewErrContains(
-        'The following disks will be deleted', reset=False)
-    self.AssertNewErrContains(self.disk1_name, reset=False)
-    self.AssertNewErrContains(self.disk2_name)
-    self.Run('compute disks list')
-    self.AssertNewOutputNotContains(self.disk1_name, reset=False)
-    self.AssertNewOutputNotContains(self.disk2_name)
+  @contextlib.contextmanager
+  def _CreateInstance(self, extra_flags=''):
+    instance_name = self.GetResourceName()
+    try:
+      self.Run('compute instances create {0} --zone {1} {2}'
+               .format(instance_name, self.zone, extra_flags))
+      yield instance_name
+    finally:
+      self.Run('compute instances delete {0} --zone {1} --quiet'.format(
+          instance_name, self.zone))
 
 
 class SnapshotsTestGA(_SnapshotsTestBase):
 
   def testSnapshots(self):
-    instance_parameters = e2e_resource_managers.ResourceParameters(
-        prefix_ref=self._GetInstanceRef())
-    with resource_managers.Instance(self.Run, instance_parameters):
-      self.GetResourceName()
-      self._TestCreateSnapshot()
-      self._TestCreateDiskFromSnapshot()
-      self._TestCreateInstanceFromDisk()
-      self._TestDeleteSnapshot()
-    self._TestDeleteDisks()
+    with self._CreateDisk() as disk_name, \
+         self._CreateSnapshot(disk_name) as snapshot_name, \
+         self._CreateDiskFromSnapshot(snapshot_name) as disk_name2, \
+         self._CreateInstance('--disk name={},boot=yes'
+                              .format(disk_name2)) as instance_name:
+      # Check snapshot properties
+      self.Run('compute snapshots describe {0}'.format(snapshot_name))
+      self.AssertNewOutputContains('name: {0}'.format(snapshot_name),
+                                   reset=False)
+      self.AssertNewOutputContains('status: READY')
+
+      # Check disk from snapshot properties
+      self.Run('compute disks describe {0} --zone {1}'
+               .format(disk_name2, self.zone))
+      self.AssertNewOutputContains('global/snapshots/{0}'
+                                   .format(snapshot_name),
+                                   reset=False)
+      self.AssertNewOutputContains('name: {0}'.format(disk_name2))
+
+      # Check instance properties
+      self.Run('compute instances describe {0} --zone {1}'
+               .format(instance_name, self.zone))
+      self.AssertNewOutputContains('zones/{0}/disks/{1}'
+                                   .format(self.zone, disk_name2),
+                                   reset=False)
+      self.AssertNewOutputContains('status: RUNNING')
+    # Check resources were cleaned up.
+    self.Run('compute snapshots list')
+    self.AssertNewOutputNotContains(snapshot_name)
+    self.Run('compute disks list')
+    self.AssertNewOutputNotContains(disk_name, reset=False)
+    self.AssertNewOutputNotContains(disk_name2)
 
   def testWindowsVssSnapshot(self):
-    instance_ref = self._GetInstanceRef()
-    extra_creation_flags = [
-        ('--image-project', 'windows-cloud'),
-        ('--image-family', 'windows-2012-r2'),
-    ]
-    instance_parameters = e2e_resource_managers.ResourceParameters(
-        prefix_ref=instance_ref, extra_creation_flags=extra_creation_flags)
-    with resource_managers.Instance(self.Run, instance_parameters) as instance:
-      instance_name = instance.ref.Name()
-      self.GetResourceName()
+    extra_flags = '--image-project windows-cloud --image-family windows-2012-r2'
+    with self._CreateInstance(extra_flags) as instance_name:
       # Create Windows Instance and wait for it to boot
       message = 'Instance setup finished.'
       booted = self.WaitForBoot(instance_name, message, retries=10,
                                 polling_interval=60)
       self.assertTrue(booted, msg='Timed out waiting for Windows to boot.')
       # Snapshot Instance with VSS
-      self.Run('compute disks snapshot {0} --snapshot-names {1}'
-               ' --zone {2} --guest-flush'
-               .format(instance_name, self.snapshot_name, self.zone))
-      # Check that snapshot exists
-      self.Run('compute snapshots describe {0}'.format(self.snapshot_name))
-      self.AssertNewOutputContains('name: {0}'.format(self.snapshot_name),
-                                   reset=False)
-      self.AssertNewOutputContains('status: READY')
+      with self._CreateSnapshot(
+          instance_name, guest_flush=True) as snapshot_name:
+        # Check that snapshot exists
+        self.Run('compute snapshots describe {0}'.format(snapshot_name))
+        self.AssertNewOutputContains('name: {0}'.format(snapshot_name),
+                                     reset=False)
+        self.AssertNewOutputContains('status: READY')
 
 
 class SnapshotsTestAlpha(_SnapshotsTestBase):
@@ -180,105 +144,78 @@ class SnapshotsTestAlpha(_SnapshotsTestBase):
     self.storage_location = 'us-west1'
 
   def testStorageLocation(self):
-    instance_parameters = e2e_resource_managers.ResourceParameters(
-        prefix_ref=self._GetInstanceRef())
-    with resource_managers.Instance(self.Run, instance_parameters):
-      self.GetResourceName()
-      self._TestCreateSnapshot(use_storage_location=True)
+    with self._CreateDisk() as disk_name, \
+         self._CreateSnapshot(
+             disk_name, use_storage_location=True) as snapshot_name:
+      self.Run('compute snapshots describe {0}'.format(snapshot_name))
+      self.AssertNewOutputContains('name: {0}'.format(snapshot_name),
+                                   reset=False)
+      self.AssertNewOutputContains("""storageLocations:
+                                     - {0}""".format(self.storage_location),
+                                   reset=False, normalize_space=True)
+      self.AssertNewOutputContains('status: READY')
 
 
-class SnapshotsLabelsTest(e2e_test_base.BaseTest):
+class SnapshotsLabelsTest(_SnapshotsTestBase):
 
   def SetUp(self):
-    self.disk_names_used = []
-    self.snapshot_names_used = []
     self.track = base.ReleaseTrack.GA
 
-  def TearDown(self):
-    logging.info('Starting TearDown (will delete resources if test fails).')
-    for name in self.disk_names_used:
-      self.CleanUpResource(name, 'disks')
-    for name in self.snapshot_names_used:
-      self.CleanUpResource(name, 'snapshots', scope=e2e_test_base.GLOBAL)
-
-  def _GetSnapshotName(self):
-    # Make sure the name used is different on each retry, and make sure all
-    # names used are cleaned up
-    snapshot_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-snapshot').next()
-    self.snapshot_names_used.append(snapshot_name)
-    return snapshot_name
-
-  def _GetDiskName(self):
-    # Make sure the name used is different on each retry, and make sure all
-    # names used are cleaned up
-    disk_name = e2e_utils.GetResourceNameGenerator(
-        prefix='gcloud-compute-test-disk').next()
-    self.disk_names_used.append(disk_name)
-    return disk_name
+  def GetResourceName(self):
+    return next(e2e_utils.GetResourceNameGenerator(
+        prefix='gcloud-compute-test-snapshot-labels'))
 
   def testAddRemoveLabels(self):
-    snapshot_name = self._CreateSnapshot()
-    add_labels = (('x', 'y'), ('abc', 'xyz'))
-    self.Run('compute snapshots add-labels {0} --labels {1}'
-             .format(snapshot_name,
-                     ','.join(['{0}={1}'.format(pair[0], pair[1])
-                               for pair in add_labels])))
-    self.Run('compute snapshots describe {0}'.format(snapshot_name))
-    self.AssertNewOutputContainsAll(['abc: xyz', 'x: y'])
+    with self._CreateDisk() as disk_name, \
+         self._CreateSnapshot(disk_name) as snapshot_name:
+      add_labels = (('x', 'y'), ('abc', 'xyz'))
+      self.Run('compute snapshots add-labels {0} --labels {1}'
+               .format(snapshot_name,
+                       ','.join(['{0}={1}'.format(pair[0], pair[1])
+                                 for pair in add_labels])))
+      self.Run('compute snapshots describe {0}'.format(snapshot_name))
+      self.AssertNewOutputContainsAll(['abc: xyz', 'x: y'])
 
-    remove_labels = ('abc',)
-    self.Run('compute snapshots remove-labels {0} --labels {1}'
-             .format(snapshot_name,
-                     ','.join(['{0}'.format(k)
-                               for k in remove_labels])))
-    self.Run('compute snapshots describe {0}'
-             .format(snapshot_name))
-    self.AssertNewOutputContains('x: y', reset=False)
-    self.AssertNewOutputNotContains('abc: xyz')
+      remove_labels = ('abc',)
+      self.Run('compute snapshots remove-labels {0} --labels {1}'
+               .format(snapshot_name,
+                       ','.join(['{0}'.format(k)
+                                 for k in remove_labels])))
+      self.Run('compute snapshots describe {0}'
+               .format(snapshot_name))
+      self.AssertNewOutputContains('x: y', reset=False)
+      self.AssertNewOutputNotContains('abc: xyz')
 
-    self.Run('compute snapshots remove-labels {0} --all '
-             .format(snapshot_name))
-    self.Run('compute snapshots describe {0}'.format(snapshot_name))
-    self.AssertNewOutputNotContains('labels')
+      self.Run('compute snapshots remove-labels {0} --all '
+               .format(snapshot_name))
+      self.Run('compute snapshots describe {0}'.format(snapshot_name))
+      self.AssertNewOutputNotContains('labels:')
 
   def testUpdateLabels(self):
-    snapshot_name = self._CreateSnapshot()
+    with self._CreateDisk() as disk_name, \
+         self._CreateSnapshot(disk_name) as snapshot_name:
+      add_labels = (('x', 'y'), ('abc', 'xyz'))
+      self.Run('compute snapshots update {0} --update-labels {1}'
+               .format(snapshot_name,
+                       ','.join(['{0}={1}'.format(pair[0], pair[1])
+                                 for pair in add_labels])))
+      self.Run('compute snapshots describe {0}'.format(snapshot_name))
+      self.AssertNewOutputContainsAll(['abc: xyz', 'x: y'])
 
-    add_labels = (('x', 'y'), ('abc', 'xyz'))
-    self.Run('compute snapshots update {0} --update-labels {1}'
-             .format(snapshot_name,
-                     ','.join(['{0}={1}'.format(pair[0], pair[1])
-                               for pair in add_labels])))
-    self.Run('compute snapshots describe {0}'.format(snapshot_name))
-    self.AssertNewOutputContainsAll(['abc: xyz', 'x: y'])
+      update_labels = (('x', 'a'), ('abc', 'xyz'), ('t123', 't7890'))
+      remove_labels = ('abc',)
+      self.Run(
+          'compute snapshots update {0} --update-labels {1} --remove-labels {2}'
+          .format(snapshot_name,
+                  ','.join(['{0}={1}'.format(pair[0], pair[1])
+                            for pair in update_labels]),
+                  ','.join(['{0}'.format(k)
+                            for k in remove_labels])))
 
-    update_labels = (('x', 'a'), ('abc', 'xyz'), ('t123', 't7890'))
-    remove_labels = ('abc',)
-    self.Run(
-        'compute snapshots update {0} --update-labels {1} --remove-labels {2}'
-        .format(snapshot_name,
-                ','.join(['{0}={1}'.format(pair[0], pair[1])
-                          for pair in update_labels]),
-                ','.join(['{0}'.format(k)
-                          for k in remove_labels])))
-
-    self.Run('compute snapshots describe {0}'.format(snapshot_name))
-    self.AssertNewOutputContains('t123: t7890', reset=False)
-    self.AssertNewOutputContains('x: a', reset=False)
-    self.AssertNewOutputNotContains('abc: xyz')
-
-  def _CreateSnapshot(self):
-    """Creates a disk first, then create a snapshot out of it."""
-    snapshot_name = self._GetSnapshotName()
-    disk_name = self._GetDiskName()
-    self.Run('compute disks create {0} --image debian-8 --zone {1}'
-             .format(disk_name, self.zone))
-    self.Run('compute disks snapshot {0} --snapshot-names {1} --zone {2}'
-             .format(disk_name, snapshot_name, self.zone))
-    self.Run('compute snapshots describe {0}'.format(snapshot_name))
-    self.AssertNewOutputContains('name: {0}'.format(snapshot_name))
-    return snapshot_name
+      self.Run('compute snapshots describe {0}'.format(snapshot_name))
+      self.AssertNewOutputContains('t123: t7890', reset=False)
+      self.AssertNewOutputContains('x: a', reset=False)
+      self.AssertNewOutputNotContains('abc: xyz')
 
 
 if __name__ == '__main__':

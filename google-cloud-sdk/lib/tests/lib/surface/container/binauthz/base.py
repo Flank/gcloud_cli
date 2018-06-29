@@ -15,7 +15,7 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
+from __future__ import unicode_literals
 
 import datetime
 import random
@@ -33,9 +33,9 @@ from tests.lib import sdk_test_base
 import six
 
 
-def GetNoteRelativeName(provider_id, note_id):
-  return 'providers/{provider_id}/notes/{note_id}'.format(
-      provider_id=provider_id,
+def GetNoteRelativeName(project_id, note_id):
+  return 'projects/{project_id}/notes/{note_id}'.format(
+      project_id=project_id,
       note_id=note_id,
   )
 
@@ -95,9 +95,9 @@ class BinauthzUnitTestBase(sdk_test_base.SdkBase):
     self.SIMPLE_SIGNING_JSON = (
         self.PgpSignedAttestation.ContentTypeValueValuesEnum.SIMPLE_SIGNING_JSON
     )
-    self.ProvidersNotesCreateRequest = (
+    self.ProjectsNotesCreateRequest = (
         self.containeranalysis_messages.
-        ContaineranalysisProvidersNotesCreateRequest)
+        ContaineranalysisProjectsNotesCreateRequest)
     self.ProjectsOccurrencesCreateRequest = (
         self.containeranalysis_messages.
         ContaineranalysisProjectsOccurrencesCreateRequest)
@@ -159,7 +159,7 @@ class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
 
   def CreateGenericResponseOccurrence(self, kind, note_name, resource_url,
                                       project_ref, **kwargs):
-    """Create an Occurrence as expected from a call to providers_notes.Create.
+    """Create an Occurrence as expected from a call to projects_notes.Create.
 
     All arguments are just threaded through to the resulting occurrence.  This
       method is a utility for the common operation of generating a UUID and
@@ -179,7 +179,7 @@ class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
     Returns:
       Occurrence.
     """
-    # The resulting name is the provider occurrences directory followed by a
+    # The resulting name is the projects occurrences directory followed by a
     # UUID for this new Occurrence.
     # e.g.
     # 'projects/cloud-sdk-integration-testing/occurrences/'
@@ -266,7 +266,7 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
   """Base class for BinAuthz unit tests with mocked CA client."""
 
   def SetUp(self):
-    self.client = binauthz_api_util.ContainerAnalysisClient()
+    self.ca_client = binauthz_api_util.ContainerAnalysisClient()
 
   def CreateRequestOccurrence(
       self,
@@ -280,7 +280,7 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
 
     Args:
       note_ref: The Note reference that the created Occurrence will be
-        bound to. (containeranalysis.providers.notes Resource)
+        bound to. (containeranalysis.projects.notes Resource)
       pgp_key_fingerprint: The ID of the public key that will be used to verify
         the signature (string).
       signature: The content artifact's signature (string), in the gpg
@@ -315,7 +315,7 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
     )
 
   def CreateResponseOccurrence(self, request_occurrence, project_ref):
-    """Create an Occurrence as expected from a call to providers_notes.Create.
+    """Create an Occurrence as expected from a call to projects_notes.Create.
 
     Args:
       request_occurrence: The Occurrence (as returned by

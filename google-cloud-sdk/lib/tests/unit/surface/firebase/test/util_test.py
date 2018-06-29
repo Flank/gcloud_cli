@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.firebase.test import util
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import unit_base
+import six
 
 
 class UtilTests(unit_base.TestMockClientTest):
@@ -30,8 +34,8 @@ class UtilTests(unit_base.TestMockClientTest):
 
     with self.assertRaises(exceptions.MissingProjectError) as ex_ctx:
       util.GetProject()
-    self.assertIn('No project specified', ex_ctx.exception.message)
-    self.assertIn('gcloud config set project', ex_ctx.exception.message)
+    self.assertIn('No project specified', six.text_type(ex_ctx.exception))
+    self.assertIn('gcloud config set project', six.text_type(ex_ctx.exception))
 
   def testGetProject_ProjectSet(self):
     properties.VALUES.core.project.Set(self.PROJECT_ID)

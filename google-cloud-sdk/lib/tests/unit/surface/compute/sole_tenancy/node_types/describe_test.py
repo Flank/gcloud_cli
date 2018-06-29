@@ -24,7 +24,7 @@ from tests.lib.surface.compute import test_resources
 class NodeTypesDescribeTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
 
   def testSimpleCase(self):
@@ -35,14 +35,11 @@ class NodeTypesDescribeTest(test_base.BaseTest):
              '--zone zone-1')
 
     self.CheckRequests(
-        [(self.compute_alpha.nodeTypes,
-          'Get',
+        [(self.compute_beta.nodeTypes, 'Get',
           self.messages.ComputeNodeTypesGetRequest(
-              nodeType='iAPX-286',
-              project='my-project',
-              zone='zone-1'))],
-    )
-    self.AssertOutputEquals("""\
+              nodeType='iAPX-286', project='my-project', zone='zone-1'))],)
+    self.AssertOutputEquals(
+        """\
     cpuPlatform: '80286'
     creationTimestamp: '1982-02-01T10:00:00.0Z'
     deprecated:
@@ -54,9 +51,10 @@ class NodeTypesDescribeTest(test_base.BaseTest):
     localSsdGb: 0
     memoryMb: 256
     name: iAPX-286
-    selfLink: https://www.googleapis.com/compute/alpha/projects/my-project/zones/zone-1/nodeTypes/iAPX-286
+    selfLink: https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/nodeTypes/iAPX-286
     zone: zone-1
-    """, normalize_space=True)
+    """,
+        normalize_space=True)
 
 
 if __name__ == '__main__':

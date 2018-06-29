@@ -19,10 +19,12 @@ import contextlib
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import retry
 from tests.lib import e2e_utils
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_instances_test_base
 from tests.lib.surface.compute import e2e_test_base
 
 
+@test_case.Filters.skip('Flaky', 'b/80548799')
 class NodeSoleTenantTest(e2e_instances_test_base.InstancesTestBase):
 
   def SetUp(self):
@@ -31,7 +33,7 @@ class NodeSoleTenantTest(e2e_instances_test_base.InstancesTestBase):
 
     # We have the most CPU quota in us-central1
     self.region = 'us-central1'
-    self.zone = 'us-central1-b'
+    self.zone = 'us-central1-c'
     self.node_type = 'n1-node-96-624'
 
   def _GetResourceName(self):
@@ -42,8 +44,7 @@ class NodeSoleTenantTest(e2e_instances_test_base.InstancesTestBase):
   def _CreateInstance(self, node_group_name):
     instance_name = self._GetResourceName()
     try:
-      self.Run('compute instances create {0} --zone {1} --node-group {2} '
-               '--node-index 0'
+      self.Run('compute instances create {0} --zone {1} --node-group {2}'
                .format(instance_name, self.zone, node_group_name))
       yield instance_name
     finally:

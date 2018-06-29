@@ -14,59 +14,30 @@
 """Tests for gcloud app domain-mappings."""
 
 from __future__ import absolute_import
-from googlecloudsdk.calliope import base as calliope_base
+from __future__ import unicode_literals
 from tests.lib.surface.app import domain_mappings_base
 
 
 class DomainMappingsCommandTest(domain_mappings_base.DomainMappingsBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-
-  def ExpectGetDomainMapping(self, domain, certificate_id):
-    """Adds expected domain-mappings describe request and response.
-
-    Args:
-      domain: str, the custom domain string.
-      certificate_id: str, a certificate id for the new domain.
-    """
-    request = self.messages.AppengineAppsDomainMappingsGetRequest(
-        name=self._FormatDomainMappings(domain))
-    response = self.MakeDomainMapping(domain, certificate_id)
-    self.mock_client.AppsDomainMappingsService.Get.Expect(
-        request, response=response)
-
-  def testDescribeDomainMapping(self):
-    self.ExpectGetDomainMapping('*.example.com', '1234')
-    result = self.Run('app domain-mappings describe *.example.com')
-    self.assertEqual('*.example.com', result.id)
-    self.assertEqual('1234', result.sslSettings.certificateId)
-
-
-class DomainMappingsCommandBetaTest(
-    domain_mappings_base.DomainMappingsBetaBase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def ExpectGetDomainMapping(self, domain, certificate_id, management_type):
-    """Adds expected domain-mappings describe request and response.
-
-    Args:
-      domain: str, the custom domain string.
-      certificate_id: str, a certificate id for the new domain.
-      management_type: SslSettings.SslManagementTypeValueValuesEnum,
-                       AUTOMATIC or MANUAL certificate provisioning.
-    """
-    request = self.messages.AppengineAppsDomainMappingsGetRequest(
-        name=self._FormatDomainMappings(domain))
-    ssl_management = self._ManagementTypeFromString(management_type)
-    response = self.MakeDomainMapping(domain, certificate_id, ssl_management)
-    self.mock_client.AppsDomainMappingsService.Get.Expect(
-        request, response=response)
 
   def testDescribeDomainMapping(self):
     self.ExpectGetDomainMapping('*.example.com', '1234', 'MANUAL')
     result = self.Run('app domain-mappings describe *.example.com')
     self.assertEqual('*.example.com', result.id)
     self.assertEqual('1234', result.sslSettings.certificateId)
+    self.assertEqual(
+        self._ManagementTypeFromString('MANUAL'),
+        result.sslSettings.sslManagementType)
+
+
+class DomainMappingsCommandBetaTest(domain_mappings_base.DomainMappingsBase):
+  APPENGINE_API_VERSION = 'v1beta'
+
+  def testDescribeDomainMapping(self):
+    self.ExpectGetDomainMapping('*.example.com', '1234', 'MANUAL')
+    result = self.Run('beta app domain-mappings describe *.example.com')
+    self.assertEqual('*.example.com', result.id)
+    self.assertEqual('1234', result.sslSettings.certificateId)
+    self.assertEqual(
+        self._ManagementTypeFromString('MANUAL'),
+        result.sslSettings.sslManagementType)

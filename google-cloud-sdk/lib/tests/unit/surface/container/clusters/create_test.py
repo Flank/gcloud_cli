@@ -323,8 +323,7 @@ This will enable the autoupgrade feature for nodes. Please see
 https://cloud.google.com/kubernetes-engine/docs/node-management for more
 information on node autoupgrades.
 
-<START PROGRESS TRACKER>Creating cluster my-little-cluster-kubernetes-is-magic
-<END PROGRESS TRACKER>SUCCESS
+{{"ux": "PROGRESS_TRACKER", "message": "Creating cluster my-little-cluster-kubernetes-is-magic", "status": "SUCCESS"}}
 Created [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-little-cluster-kubernetes-is-magic].
 To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/us-central1-f/my-little-cluster-kubernetes-is-magic?project=fake-project-id
 kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
@@ -722,6 +721,115 @@ kubeconfig entry generated for my-little-cluster-kubernetes-is-magic.
                  base=self.clusters_command_base.format(self.ZONE),
                  name=self.CLUSTER_NAME,
                  flags=flags))
+
+  def testCreateInvalidAcceleratorMissingType(self):
+    properties.VALUES.core.disable_prompts.Set(False)
+    with self.AssertRaisesArgumentErrorMatches(
+        r'argument --accelerator: Key [type] required in dict arg but not '
+        r'provided'):
+      self.Run(self.clusters_command_base.format(self.ZONE) +
+               ' create {0} --accelerator=count=2'.format(self.CLUSTER_NAME))
+
+  def testCreateWithValidAccelerators(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name': 'my-gpu-cluster',
+        'accelerators': [
+            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
+                                acceleratorCount=int(2))
+        ],
+    }
+    cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
+        nodePoolName='default-pool',
+        initialNodeCount=500, **cluster_kwargs)]
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(targetLink=self.TARGET_LINK.format(
+            self.API_VERSION,
+            self.PROJECT_NUM,
+            self.ZONE,
+            cluster_kwargs['name'])))
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(
+        status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    return_args.update({
+        'currentNodeCount': 500,
+        'status': self.running,
+        'endpoint': self.ENDPOINT,
+        'statusMessage': 'Running',
+        'zone': self.ZONE,
+    })
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create my-gpu-cluster --num-nodes=500 '
+        '--accelerator=type=nvidia-tesla-k80,count=2')
+    self.AssertOutputMatches(
+        (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
+         'NUM_NODES STATUS\n'
+         '{name} {zone} {endpoint} '
+         '{num_nodes} {status}\\n')
+        .format(name=return_cluster.name,
+                num_nodes=return_cluster.currentNodeCount,
+                zone=return_cluster.zone,
+                endpoint=return_cluster.endpoint,
+                status=return_cluster.status,),
+        normalize_space=True)
+
+  def testAcceleratorCountDefaulting(self):
+    m = self.messages
+    cluster_kwargs = {
+        'name': 'my-gpu-cluster',
+        'accelerators': [
+            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
+                                acceleratorCount=int(1))
+        ],
+    }
+    cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
+        nodePoolName='default-pool',
+        initialNodeCount=500, **cluster_kwargs)]
+    # Cluster create returns operation pending
+    self.ExpectCreateCluster(
+        self._MakeCluster(**cluster_kwargs),
+        self._MakeOperation(targetLink=self.TARGET_LINK.format(
+            self.API_VERSION,
+            self.PROJECT_NUM,
+            self.ZONE,
+            cluster_kwargs['name'])))
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    return_args.update({
+        'currentNodeCount': 500,
+        'status': self.running,
+        'endpoint': self.ENDPOINT,
+        'statusMessage': 'Running',
+        'zone': self.ZONE,
+    })
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' create my-gpu-cluster --num-nodes=500 '
+        '--accelerator=type=nvidia-tesla-k80')
+    self.AssertOutputMatches(
+        (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
+         'NUM_NODES STATUS\n'
+         '{name} {zone} {endpoint} '
+         '{num_nodes} {status}\\n')
+        .format(name=return_cluster.name,
+                num_nodes=return_cluster.currentNodeCount,
+                zone=return_cluster.zone,
+                endpoint=return_cluster.endpoint,
+                status=return_cluster.status,),
+        normalize_space=True)
 
 
 class CreateTestGAOnly(CreateTestGA):
@@ -1159,6 +1267,8 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
     cluster_kwargs = {
         'name':
             'my-cluster',
+        'binaryAuthorization':
+            m.BinaryAuthorization(enabled=True),
         'workloadMetadataConfig':
             m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig.
                                      NodeMetadataValueValuesEnum.SECURE),
@@ -1192,6 +1302,7 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
     self.Run(
         self.clusters_command_base.format(self.ZONE) +
         ' create my-cluster --num-nodes=500 '
+        '--enable-binauthz '
         '--workload-metadata-from-node=secure')
     self.AssertOutputMatches(
         (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
@@ -1336,6 +1447,53 @@ class CreateTestBetaV1Beta1API(base.TestBaseV1Beta1, CreateTestBetaV1API):
     self.AssertOutputContains('RUNNING')
     self.AssertErrContains('Created')
 
+  def testEnableTpu(self):
+    cluster_kwargs = {
+        'enableTpu': True,
+    }
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        useIpAliases=True,
+        createSubnetwork=False,
+        tpuIpv4Cidr='10.1.0.0/20',
+    )
+    expected_cluster.ipAllocationPolicy = policy
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(return_args)
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
+        '--enable-tpu '
+        '--tpu-ipv4-cidr 10.1.0.0/20 '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  @parameterized.parameters(
+      ('--enable-tpu',
+       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
+           prerequisite='enable-ip-alias', opt='enable-tpu')),
+      ('--enable-ip-alias --tpu-ipv4-cidr=10.1.0.0/20',
+       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
+           prerequisite='enable-tpu', opt='tpu-ipv4-cidr')),
+      ('--tpu-ipv4-cidr=10.1.0.0/20',
+       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
+           prerequisite='enable-tpu', opt='tpu-ipv4-cidr')),
+  )
+  def testEnableTpuBadArgs(self, flags, expected_msg):
+    command = (
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {name} --quiet '.format(name=self.CLUSTER_NAME) + flags)
+    self.AssertRaisesExceptionMatches(c_util.Error, expected_msg, self.Run,
+                                      command)
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class CreateTestAlphaV1API(base.AlphaTestBase, CreateTestBetaV1API):
@@ -1344,115 +1502,6 @@ class CreateTestAlphaV1API(base.AlphaTestBase, CreateTestBetaV1API):
   def SetUp(self):
     properties.VALUES.container.use_v1_api.Set(True)
     self.api_mismatch = True
-
-  def testCreateInvalidAcceleratorMissingType(self):
-    properties.VALUES.core.disable_prompts.Set(False)
-    with self.AssertRaisesArgumentErrorMatches(
-        r'argument --accelerator: Key [type] required in dict arg but not '
-        r'provided'):
-      self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' create {0} --accelerator=count=2'.format(self.CLUSTER_NAME))
-
-  def testCreateWithValidAccelerators(self):
-    m = self.messages
-    cluster_kwargs = {
-        'name': 'my-gpu-cluster',
-        'accelerators': [
-            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
-                                acceleratorCount=int(2))
-        ],
-    }
-    cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
-        nodePoolName='default-pool',
-        initialNodeCount=500, **cluster_kwargs)]
-    # Cluster create returns operation pending
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs),
-        self._MakeOperation(targetLink=self.TARGET_LINK.format(
-            self.API_VERSION,
-            self.PROJECT_NUM,
-            self.ZONE,
-            cluster_kwargs['name'])))
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(
-        status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs.copy()
-    return_args.update({
-        'currentNodeCount': 500,
-        'status': self.running,
-        'endpoint': self.ENDPOINT,
-        'statusMessage': 'Running',
-        'zone': self.ZONE,
-    })
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create my-gpu-cluster --num-nodes=500 '
-        '--accelerator=type=nvidia-tesla-k80,count=2')
-    self.AssertOutputMatches(
-        (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
-         'NUM_NODES STATUS\n'
-         '{name} {zone} {endpoint} '
-         '{num_nodes} {status}\\n')
-        .format(name=return_cluster.name,
-                num_nodes=return_cluster.currentNodeCount,
-                zone=return_cluster.zone,
-                endpoint=return_cluster.endpoint,
-                status=return_cluster.status,),
-        normalize_space=True)
-
-  def testAcceleratorCountDefaulting(self):
-    m = self.messages
-    cluster_kwargs = {
-        'name': 'my-gpu-cluster',
-        'accelerators': [
-            m.AcceleratorConfig(acceleratorType='nvidia-tesla-k80',
-                                acceleratorCount=int(1))
-        ],
-    }
-    cluster_kwargs['nodePools'] = [self._MakeDefaultNodePool(
-        nodePoolName='default-pool',
-        initialNodeCount=500, **cluster_kwargs)]
-    # Cluster create returns operation pending
-    self.ExpectCreateCluster(
-        self._MakeCluster(**cluster_kwargs),
-        self._MakeOperation(targetLink=self.TARGET_LINK.format(
-            self.API_VERSION,
-            self.PROJECT_NUM,
-            self.ZONE,
-            cluster_kwargs['name'])))
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs.copy()
-    return_args.update({
-        'currentNodeCount': 500,
-        'status': self.running,
-        'endpoint': self.ENDPOINT,
-        'statusMessage': 'Running',
-        'zone': self.ZONE,
-    })
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) +
-        ' create my-gpu-cluster --num-nodes=500 '
-        '--accelerator=type=nvidia-tesla-k80')
-    self.AssertOutputMatches(
-        (r'NAME LOCATION MASTER_VERSION MASTER_IP MACHINE_TYPE NODE_VERSION '
-         'NUM_NODES STATUS\n'
-         '{name} {zone} {endpoint} '
-         '{num_nodes} {status}\\n')
-        .format(name=return_cluster.name,
-                num_nodes=return_cluster.currentNodeCount,
-                zone=return_cluster.zone,
-                endpoint=return_cluster.endpoint,
-                status=return_cluster.status,),
-        normalize_space=True)
 
   def testCreateMaintenanceWindow(self):
     m = self.messages
@@ -1760,61 +1809,6 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
           ' create {0} --local-ssd-volumes'.format(self.CLUSTER_NAME))
     self.AssertErrContains('argument --local-ssd-volumes')
 
-  def testEnableTpu(self):
-    cluster_kwargs = {
-        'enableKubernetesAlpha': True,
-        'enableTpu': True,
-    }
-    # Cluster create returns operation pending
-    expected_cluster = self._MakeCluster(**cluster_kwargs)
-    policy = self._MakeIPAllocationPolicy(
-        useIpAliases=True,
-        createSubnetwork=False,
-        tpuIpv4Cidr='10.1.0.0/20',
-    )
-    expected_cluster.ipAllocationPolicy = policy
-    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
-    # Get operation returns done
-    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
-    # Get returns valid cluster
-    return_args = cluster_kwargs.copy()
-    self.updateResponse(return_args)
-    return_cluster = self._MakeCluster(**return_args)
-    self.ExpectGetCluster(return_cluster)
-    self.Run(
-        self.clusters_command_base.format(self.ZONE) + ' create {name} '
-        '--enable-kubernetes-alpha '
-        '--enable-ip-alias '
-        '--enable-tpu '
-        '--tpu-ipv4-cidr 10.1.0.0/20 '
-        '--quiet'.format(name=self.CLUSTER_NAME))
-    self.AssertOutputContains('RUNNING')
-    self.AssertErrContains('Created')
-
-  @parameterized.parameters(
-      ('--enable-tpu',
-       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
-           prerequisite='enable-kubernetes-alpha', opt='enable-tpu')),
-      ('--enable-ip-alias --enable-tpu',
-       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
-           prerequisite='enable-kubernetes-alpha', opt='enable-tpu')),
-      ('--enable-kubernetes-alpha --enable-tpu',
-       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
-           prerequisite='enable-ip-alias', opt='enable-tpu')),
-      ('--enable-ip-alias --tpu-ipv4-cidr=10.1.0.0/20',
-       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
-           prerequisite='enable-tpu', opt='tpu-ipv4-cidr')),
-      ('--tpu-ipv4-cidr=10.1.0.0/20',
-       api_adapter.PREREQUISITE_OPTION_ERROR_MSG.format(
-           prerequisite='enable-tpu', opt='tpu-ipv4-cidr')),
-  )
-  def testEnableTpuBadArgs(self, flags, expected_msg):
-    command = (
-        self.clusters_command_base.format(self.ZONE) +
-        ' create {name} --quiet '.format(name=self.CLUSTER_NAME) + flags)
-    self.AssertRaisesExceptionMatches(c_util.Error, expected_msg, self.Run,
-                                      command)
-
   def testCreateEnableAddonsIstio(self):
     mtls = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_MUTUAL_TLS
     cluster_kwargs = {
@@ -1904,6 +1898,68 @@ class CreateTestAlphaV1Alpha1API(base.TestBaseV1Alpha1, CreateTestAlphaV1API,
           ' --istio-config=auth=mutual_tls'
           .format(self.CLUSTER_NAME))
     self.AssertErrContains('--addon=Istio must be specified')
+
+  def testDefaultMaxPodsConstraint(self):
+    cluster_kwargs = {
+        'defaultMaxPodsConstraint':
+            self.msgs.MaxPodsConstraint(maxPodsPerNode=30)
+    }
+    # Cluster create returns operation pending
+    expected_cluster = self._MakeCluster(**cluster_kwargs)
+    policy = self._MakeIPAllocationPolicy(
+        clusterIpv4Cidr=None, createSubnetwork=False, useIpAliases=True)
+    expected_cluster.ipAllocationPolicy = policy
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns valid cluster
+    return_args = cluster_kwargs.copy()
+    self.updateResponse(
+        return_args,
+        ipAllocationPolicy=policy,
+        maxPodsConstraint=cluster_kwargs.get('maxPodsConstraint'))
+    return_cluster = self._MakeCluster(**return_args)
+    self.ExpectGetCluster(return_cluster)
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' create {name} '
+        '--enable-ip-alias '
+        '--default-max-pods-per-node=30 '
+        '--quiet'.format(name=self.CLUSTER_NAME))
+    self.AssertOutputContains('RUNNING')
+    self.AssertErrContains('Created')
+
+  def testDefaultMaxPodsConstraintBadArgs(self):
+    command = (
+        self.clusters_command_base.format(self.ZONE) +
+        ' create {name} --quiet --default-max-pods-per-node=30'.format(
+            name=self.CLUSTER_NAME))
+    self.AssertRaisesExceptionMatches(
+        c_util.Error,
+        api_adapter.DEFAULT_MAX_PODS_PER_NODE_WITHOUT_IP_ALIAS_ERROR_MSG,
+        self.Run, command)
+
+  @parameterized.parameters(
+      ('--no-enable-managed-pod-identity', False),
+      ('--enable-managed-pod-identity', True),
+  )
+  def testEnableManagedPodIdentity(self, flags, expect_enable):
+    cluster_kwargs = {}
+    expected_cluster, return_cluster = self.makeExpectedAndReturnClusters(
+        cluster_kwargs)
+    if expect_enable:
+      expected_cluster.managedPodIdentityConfig = \
+              self.messages.ManagedPodIdentityConfig(enabled=True)
+    # Create cluster expects cluster and returns pending operation.
+    self.ExpectCreateCluster(expected_cluster, self._MakeOperation())
+    # Get operation returns done operation.
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    # Get returns expected cluster, populated with other fields by server.
+    self.ExpectGetCluster(return_cluster)
+    self.Run('{base} create {name} {flags} '
+             '--quiet'.format(
+                 base=self.clusters_command_base.format(self.ZONE),
+                 name=self.CLUSTER_NAME,
+                 flags=flags))
 
 
 if __name__ == '__main__':

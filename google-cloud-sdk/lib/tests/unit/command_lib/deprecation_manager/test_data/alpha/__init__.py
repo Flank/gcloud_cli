@@ -13,6 +13,8 @@
 # limitations under the License.
 """The super-group for the cloud CLI."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import log
 

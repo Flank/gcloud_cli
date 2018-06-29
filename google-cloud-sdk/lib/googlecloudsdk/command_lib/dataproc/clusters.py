@@ -14,17 +14,22 @@
 
 """Utilities for building the dataproc clusters CLI."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.compute import constants as compute_constants
 from googlecloudsdk.api_lib.compute import utils as api_utils
 from googlecloudsdk.api_lib.dataproc import compute_helpers
 from googlecloudsdk.api_lib.dataproc import constants
+from googlecloudsdk.api_lib.dataproc import exceptions
+from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.command_lib.compute.instances import flags as instances_flags
 from googlecloudsdk.command_lib.dataproc import flags
 from googlecloudsdk.command_lib.util.args import labels_util
+from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import times
 
@@ -210,23 +215,24 @@ for more information.
       type=arg_parsers.ArgList(min_length=1),
       metavar='SCOPE',
       help="""\
-Specifies scopes for the node instances. The project's default service account
-is used. Multiple SCOPEs can specified, separated by commas.
+Specifies scopes for the node instances. Multiple SCOPEs can be specified,
+separated by commas.
 Examples:
 
   $ {{command}} example-cluster --scopes https://www.googleapis.com/auth/bigtable.admin
 
   $ {{command}} example-cluster --scopes sqlservice,bigquery
 
-The following scopes necessary for the cluster to function properly are always
-added, even if not explicitly specified:
+The following *minimum scopes* are necessary for the cluster to function
+properly and are always added, even if not explicitly specified:
 
 [format="csv"]
 |========
 {minimum_scopes}
 |========
 
-If this flag is not specified the following default scopes are also included:
+If the `--scopes` flag is not specified, the following *default scopes*
+are also included:
 
 [format="csv"]
 |========
@@ -479,6 +485,22 @@ def GetClusterConfig(args, dataproc, project_id, compute_resources, beta=False):
     if changed_config:
       cluster_config.lifecycleConfig = lifecycle_config
 
+  if beta and hasattr(args.CONCEPTS, 'kms_key'):
+    kms_ref = args.CONCEPTS.kms_key.Parse()
+    if kms_ref:
+      encryption_config = dataproc.messages.EncryptionConfig()
+      encryption_config.gcePdKmsKeyName = kms_ref.RelativeName()
+      cluster_config.encryptionConfig = encryption_config
+    else:
+      # Did user use any gce-pd-kms-key flags?
+      for keyword in [
+          'gce-pd-kms-key', 'gce-pd-kms-key-project', 'gce-pd-kms-key-location',
+          'gce-pd-kms-key-keyring'
+      ]:
+        if getattr(args, keyword.replace('-', '_'), None):
+          raise exceptions.ArgumentError(
+              '--gce-pd-kms-key was not fully specified.')
+
   # Secondary worker group is optional. However, users may specify
   # future pVMs configuration at creation time.
   if (args.num_preemptible_workers is not None or
@@ -528,3 +550,60 @@ def GetDiskConfig(dataproc,
 
   return dataproc.messages.DiskConfig(
       bootDiskSizeGb=boot_disk_size, numLocalSsds=num_local_ssds)
+
+
+def CreateCluster(dataproc, cluster, is_async, timeout):
+  """Create a cluster.
+
+  Args:
+    dataproc: Dataproc object that contains client, messages, and resources
+    cluster: Cluster to create
+    is_async: Whether to wait for the operation to complete
+    timeout: Timeout used when waiting for the operation to complete
+
+  Returns:
+    Created cluster, or None if async
+  """
+  # Get project id and region.
+  cluster_ref = util.ParseCluster(cluster.clusterName, dataproc)
+  request_id = util.GetUniqueId()
+  request = dataproc.messages.DataprocProjectsRegionsClustersCreateRequest(
+      cluster=cluster,
+      projectId=cluster_ref.projectId,
+      region=cluster_ref.region,
+      requestId=request_id)
+  operation = dataproc.client.projects_regions_clusters.Create(request)
+
+  if is_async:
+    log.status.write('Creating [{0}] with operation [{1}].'.format(
+        cluster_ref, operation.name))
+    return
+
+  operation = util.WaitForOperation(
+      dataproc,
+      operation,
+      message='Waiting for cluster creation operation',
+      timeout_s=timeout)
+
+  get_request = dataproc.messages.DataprocProjectsRegionsClustersGetRequest(
+      projectId=cluster_ref.projectId,
+      region=cluster_ref.region,
+      clusterName=cluster_ref.clusterName)
+  cluster = dataproc.client.projects_regions_clusters.Get(get_request)
+  if cluster.status.state == (
+      dataproc.messages.ClusterStatus.StateValueValuesEnum.RUNNING):
+
+    zone_uri = cluster.config.gceClusterConfig.zoneUri
+    zone_short_name = zone_uri.split('/')[-1]
+
+    # Log the URL of the cluster
+    log.CreatedResource(
+        cluster_ref,
+        # Also indicate which zone the cluster was placed in. This is helpful
+        # if the server picked a zone (auto zone)
+        details='Cluster placed in zone [{0}]'.format(zone_short_name))
+  else:
+    log.error('Create cluster failed!')
+    if operation.details:
+      log.error('Details:\n' + operation.details)
+  return cluster

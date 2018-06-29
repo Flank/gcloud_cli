@@ -1846,19 +1846,22 @@ def MakeNodeGroups(msgs, api):
                         'regions/region-1/nodeTemplates/template-1'),
           nodes=[
               msgs.NodeGroupNode(
-                  index=1,
+                  name='node-1',
                   instances=[
                       prefix + '/projects/my-project/zones/zone-1/'
                       'instances/instance-1',
                       prefix + '/projects/my-project/zones/zone-1/'
-                      'instances/instance-2'],
+                      'instances/instance-2'
+                  ],
                   nodeType='iAPX-286'),
               msgs.NodeGroupNode(
-                  index=2,
+                  name='node-2',
                   instances=[
                       prefix + '/projects/my-project/zones/zone-1/'
-                      'instances/instance-3'],
-                  nodeType='iAPX-286')],
+                      'instances/instance-3'
+                  ],
+                  nodeType='iAPX-286')
+          ],
           selfLink=(prefix + '/projects/my-project/'
                     'zones/zone-1/nodeGroups/group-1'),
           zone='zone-1'),
@@ -1871,21 +1874,23 @@ def MakeNodeGroups(msgs, api):
                         'regions/region-1/nodeTemplates/template-2'),
           nodes=[
               msgs.NodeGroupNode(
-                  index=1,
+                  name='node-123',
                   instances=[
                       prefix + '/projects/my-project/zones/zone-1/'
                       'instances/instance-4',
                       prefix + '/projects/my-project/zones/zone-1/'
-                      'instances/instance-5'],
-                  nodeType='n1-node-96-624')],
+                      'instances/instance-5'
+                  ],
+                  nodeType='n1-node-96-624')
+          ],
           selfLink=(prefix + '/projects/my-project/'
                     'zones/zone-1/nodeGroups/group-2'),
           zone='zone-1'),
   ]
 
 
-NODE_GROUPS_ALPHA = MakeNodeGroups(alpha_messages, 'alpha')
-NODE_GROUPS = NODE_GROUPS_ALPHA
+NODE_GROUPS_BETA = MakeNodeGroups(beta_messages, 'beta')
+NODE_GROUPS = NODE_GROUPS_BETA
 
 
 def MakeNodeTemplates(msgs, api):
@@ -1938,19 +1943,19 @@ def MakeNodeTemplates(msgs, api):
   ]
 
 
-NODE_TEMPLATES_ALPHA = MakeNodeTemplates(alpha_messages, 'alpha')
-NODE_TEMPLATES = NODE_TEMPLATES_ALPHA
+NODE_TEMPLATES_BETA = MakeNodeTemplates(beta_messages, 'beta')
+NODE_TEMPLATES = NODE_TEMPLATES_BETA
 
 
 def MakeNodeTypes(msgs, api):
-  """Creates a set of Host Type messages for the given API version.
+  """Creates a set of Node Type messages for the given API version.
 
   Args:
     msgs: The compute messages API handle.
     api: The API version for which to create the instances.
 
   Returns:
-    A list of message objects representing sole tenancy host types.
+    A list of message objects representing sole tenancy node types.
   """
   prefix = _COMPUTE_PATH + '/' + api
   return [
@@ -1985,8 +1990,8 @@ def MakeNodeTypes(msgs, api):
   ]
 
 
-NODE_TYPES_ALPHA = MakeNodeTypes(alpha_messages, 'alpha')
-NODE_TYPES = NODE_TYPES_ALPHA
+NODE_TYPES_BETA = MakeNodeTypes(beta_messages, 'beta')
+NODE_TYPES = NODE_TYPES_BETA
 
 
 def MakeNetworkEndpointGroups(msgs, api):

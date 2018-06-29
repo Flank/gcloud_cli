@@ -14,6 +14,8 @@
 
 """Integration test for 'genomics pipelines' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib import e2e_utils
 from tests.lib import test_case
@@ -46,7 +48,7 @@ class PipelinesIntegrationTest(base.GenomicsIntegrationTest):
     pipeline_path = self.Touch(self.temp_path, contents=PIPELINE_JSON)
 
     log_dir = 'gs://do-not-delete-genomics-pipelines-test/{0}/'.format(
-        e2e_utils.GetResourceNameGenerator(prefix='e2e').next())
+        next(e2e_utils.GetResourceNameGenerator(prefix='e2e')))
 
     op = self.RunGenomics(
         ['pipelines', 'run', '--pipeline-file', pipeline_path,

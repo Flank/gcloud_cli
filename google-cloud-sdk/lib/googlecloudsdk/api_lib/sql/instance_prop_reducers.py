@@ -13,6 +13,8 @@
 # limitations under the License.
 """Reducer functions to generate instance props from prior state and flags."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import argparse
 from googlecloudsdk.api_lib.sql import constants
 from googlecloudsdk.api_lib.sql import instances as api_util
@@ -270,13 +272,13 @@ def ReplicaConfiguration(sql_messages,
       password=master_password,
       dumpFilePath=master_dump_file_path.ToUrl())
   if master_ca_certificate_path:
-    mysql_replica_configuration.caCertificate = files.GetFileContents(
+    mysql_replica_configuration.caCertificate = files.ReadFileContents(
         master_ca_certificate_path)
   if client_certificate_path:
-    mysql_replica_configuration.clientCertificate = files.GetFileContents(
+    mysql_replica_configuration.clientCertificate = files.ReadFileContents(
         client_certificate_path)
   if client_key_path:
-    mysql_replica_configuration.clientKey = files.GetFileContents(
+    mysql_replica_configuration.clientKey = files.ReadFileContents(
         client_key_path)
   return sql_messages.ReplicaConfiguration(
       mysqlReplicaConfiguration=mysql_replica_configuration)

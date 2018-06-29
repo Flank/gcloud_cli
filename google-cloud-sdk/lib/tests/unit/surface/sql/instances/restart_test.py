@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -29,7 +31,8 @@ class InstancesRestartTest(base.SqlMockTestBeta):
     self.mocked_client.instances.Restart.Expect(
         self.messages.SqlInstancesRestartRequest(
             instance='reset-test',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -62,23 +65,25 @@ class InstancesRestartTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'reset-test',
+            targetId='reset-test',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/reset-test'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/reset-test'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'3c4bb339-858a-4225-aa21-43caa613cc62',
+            kind='sql#operation',
+            name='3c4bb339-858a-4225-aa21-43caa613cc62',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/3c4bb339-858a-4225-aa21-43caa613cc62'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/3c4bb339-858a-4225-aa21-43caa613cc62'.
             format(self.Project()),
-            operationType=u'RESTART',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='RESTART',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'3c4bb339-858a-4225-aa21-43caa613cc62',
-            project=self.Project(),),
+            operation='3c4bb339-858a-4225-aa21-43caa613cc62',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -111,19 +116,20 @@ class InstancesRestartTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'reset-test',
+            targetId='reset-test',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/reset-test'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/reset-test'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'3c4bb339-858a-4225-aa21-43caa613cc62',
+            kind='sql#operation',
+            name='3c4bb339-858a-4225-aa21-43caa613cc62',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/3c4bb339-858a-4225-aa21-43caa613cc62'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/3c4bb339-858a-4225-aa21-43caa613cc62'.
             format(self.Project()),
-            operationType=u'RESTART',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='RESTART',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
   def testRestart(self):
     self._ExpectRestart()

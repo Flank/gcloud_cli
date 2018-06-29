@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for `gcloud scheduler jobs create-http-job`."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -35,7 +37,7 @@ class JobsCreateTest(base.SchedulerTestBase):
         httpTarget=self.messages.HttpTarget(
             httpMethod=method,
             url='http://www.example.com/endpoint',
-            body='my-payload',
+            body=b'my-payload',
         ),
         retryConfig=self.messages.RetryConfig(
             maxBackoffDuration='3600s',
@@ -122,7 +124,7 @@ class JobsCreateTest(base.SchedulerTestBase):
     job.retryConfig.minBackoffDuration = '0.2s'
     job.retryConfig.maxBackoffDuration = '10s'
     job.retryConfig.maxDoublings = 2
-    job.httpTarget.body = 'my-payload-2'
+    job.httpTarget.body = b'my-payload-2'
     headers_value = self.messages.HttpTarget.HeadersValue(
         additionalProperties=[
             self.messages.HttpTarget.HeadersValue.AdditionalProperty(

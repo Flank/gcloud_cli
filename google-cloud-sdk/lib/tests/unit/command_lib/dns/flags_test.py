@@ -14,6 +14,8 @@
 
 """Unit tests for cpanner flags module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.dns import flags
 from tests.lib import completer_test_base
 from tests.lib.surface.dns import base
@@ -26,7 +28,7 @@ class CompletionTest(base.DnsMockBetaTest, completer_test_base.CompleterBase):
     self.mocked_dns_client.dnsKeys.List.Expect(
         messages.DnsDnsKeysListRequest(project=self.Project(),
                                        maxResults=100,
-                                       managedZone=u'my-zone'),
+                                       managedZone='my-zone'),
         messages.DnsKeysListResponse(dnsKeys=[
             messages.DnsKey(id='1',
                             keyTag=1234,

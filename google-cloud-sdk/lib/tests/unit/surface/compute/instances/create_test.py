@@ -14,6 +14,10 @@
 
 """Tests for the instances create subcommand."""
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import random
 import re
 import textwrap
@@ -22,11 +26,11 @@ from googlecloudsdk.api_lib.compute import csek_utils
 from googlecloudsdk.api_lib.compute import instance_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
-from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.command_lib.compute import flags as compute_flags
 from googlecloudsdk.command_lib.compute.sole_tenancy import util as sole_tenancy_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
+from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
@@ -35,7 +39,10 @@ from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 from tests.lib.surface.compute import utils
+
 import mock
+from six.moves import range
+
 
 _DEFAULT_SCOPES = sorted([
     'https://www.googleapis.com/auth/devstorage.read_only',
@@ -609,7 +616,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
     m = self.messages
 
     def MakeRequests(*_, **kwargs):
-      print kwargs
+      print(kwargs)
       if kwargs['requests'][0][0] == self.compute.zones:
         yield m.Zone(name='central2-a')
       else:
@@ -1752,9 +1759,9 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
   def testWithMetadataFromNonExistentFile(self):
     metdata_file = self.Touch(self.temp_path, 'file-1', contents='hello')
 
-    with self.AssertRaisesToolExceptionRegexp(
-        r'Could not read metadata key \[y\] from file '
-        r'\[garbage\]: No such file or directory'):
+    with self.assertRaisesRegex(
+        files.Error,
+        r'Unable to read file \[garbage\]: .*No such file or directory'):
       self.Run("""
           compute instances create instance-1
             --metadata-from-file x={},y=garbage
@@ -1956,7 +1963,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
                                   instance='instance-{}'.format(i),
                                   zone='central2-a',
                                   project=self.Project())
-        for i in xrange(3)]
+        for i in range(3)]
 
     self.Run('compute instances create {} --zone central2-a'.format(
         ' '.join(i.instance for i in instance_refs)
@@ -1966,7 +1973,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
         self.zone_get_request,
         self.project_get_request,
         [(self.compute.instances, 'Insert',
-          self._MakeInsertRequest(instance_refs[i])) for i in xrange(3)],
+          self._MakeInsertRequest(instance_refs[i])) for i in range(3)],
     )
 
   def testManyInstances_ViaUri(self):
@@ -1976,7 +1983,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
                                   instance='instance-{}'.format(i),
                                   zone='central2-a',
                                   project=self.Project())
-        for i in xrange(3)]
+        for i in range(3)]
 
     self.Run('compute instances create {}'.format(
         ' '.join(i.SelfLink() for i in instance_refs)
@@ -1986,7 +1993,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
         self.zone_get_request,
         self.project_get_request,
         [(self.compute.instances, 'Insert',
-          self._MakeInsertRequest(instance_refs[i])) for i in xrange(3)],
+          self._MakeInsertRequest(instance_refs[i])) for i in range(3)],
     )
 
   def testDefaultOutput(self):
@@ -6434,8 +6441,8 @@ class InstancesCreateWithNodeAffinity(InstancesCreateTestsMixin,
   """Test creation of VM instances on sole tenant host."""
 
   def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
     self.node_affinity = self.messages.SchedulingNodeAffinity
     self.operator_enum = self.node_affinity.OperatorValueValuesEnum
 
@@ -6592,10 +6599,10 @@ class InstancesCreateWithNodeAffinity(InstancesCreateTestsMixin,
     """
     node_affinity_file = self.Touch(
         self.temp_path, 'affinity_config.json', contents=contents)
-    with self.AssertRaisesExceptionMatches(
+    with self.assertRaisesRegexp(
         sole_tenancy_util.NodeAffinityFileParseError,
-        "Expected type <type 'unicode'> for field values, found 3 "
-        "(type <type 'int'>)"):
+        r"Expected type <(type|class) '(str|unicode)'> for field values, "
+        r"found 3 \(type <(class|type) 'int'>\)"):
       self.Run("""
           compute instances create instance-1 --zone central2-a
             --node-affinity-file {}
@@ -6639,42 +6646,19 @@ class InstancesCreateWithNodeAffinity(InstancesCreateTestsMixin,
 
     self._CheckCreateRequests(node_affinities)
 
-  def testCreate_NodeGroupAndNodeIndex(self):
+  def testCreate_Node(self):
     node_affinities = [
         self.node_affinity(
-            key='compute.googleapis.com/node-group-name',
+            key='compute.googleapis.com/node-name',
             operator=self.operator_enum.IN,
-            values=['my-node-group']),
-        self.node_affinity(
-            key='compute.googleapis.com/node-index',
-            operator=self.operator_enum.IN,
-            values=['2'])]
+            values=['my-node'])
+    ]
     self.Run("""
         compute instances create instance-1 --zone central2-a
-          --node-group my-node-group --node-index 2
+          --node my-node
         """)
 
     self._CheckCreateRequests(node_affinities)
-
-  def testCreate_OnlyNodeIndex(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'argument --node-index: --node-group must be specified.'):
-      self.Run("""
-          compute instances create instance-1 --zone central2-a
-            --node-index 2
-          """)
-
-  def testCreate_DeprecatedSoleTenancyHostFlag(self):
-    with self.AssertRaisesArgumentErrorMatches(
-        'Instance creation on sole tenancy hosts is deprecated. Use '
-        '--node-affinity-file, --node-group, --node-index flags '
-        'instead. See `alpha compute sole-tenancy node-groups` for '
-        'more information.'):
-      self.Run("""
-          compute instances create instance-1
-            --sole-tenancy-host=fortress-of-solitude
-            --zone central2-a
-          """)
 
 
 @parameterized.parameters(
@@ -8127,6 +8111,22 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
     self.global_kms_key_in_same_project = self.messages.CustomerEncryptionKey(
         kmsKeyName=self.GLOBAL_KMS_KEY_SAME_PROJECT)
 
+  def assertBootDiskWithKmsKey(self, expected_key=None):
+    if not expected_key:
+      expected_key = self.global_kms_key
+    m = self.messages
+    self.assertDefaultRequestWithAttachedDisks(m.AttachedDisk(
+        autoDelete=True,
+        boot=True,
+        diskEncryptionKey=expected_key,
+        initializeParams=m.AttachedDiskInitializeParams(
+            sourceImage=_DefaultImageOf('alpha'),
+        ),
+        mode=(m.AttachedDisk
+              .ModeValueValuesEnum.READ_WRITE),
+        type=(m.AttachedDisk
+              .TypeValueValuesEnum.PERSISTENT)))
+
   def testBootDiskWithKmsKey(self):
     self.Run("""
         compute instances create instance
@@ -8157,24 +8157,10 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
     self.assertBootDiskWithKmsKey(
         expected_key=self.global_kms_key_in_same_project)
 
-  def assertBootDiskWithKmsKey(self, expected_key=None):
-    if not expected_key:
-      expected_key = self.global_kms_key
-    m = self.messages
-    self.assertDefaultRequestWithAttachedDisks(m.AttachedDisk(
-        autoDelete=True,
-        boot=True,
-        diskEncryptionKey=expected_key,
-        initializeParams=m.AttachedDiskInitializeParams(
-            sourceImage=_DefaultImageOf('alpha'),
-        ),
-        mode=(m.AttachedDisk
-              .ModeValueValuesEnum.READ_WRITE),
-        type=(m.AttachedDisk
-              .TypeValueValuesEnum.PERSISTENT)))
-
   def testBootDiskWithKmsKeyAsPartsNoKeyRing(self):
-    with self.assertRaises(parser_errors.RequiredError):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'KMS cryptokey resource was not fully specified.'):
       self.Run("""
           compute instances create instance
             --zone central2-a
@@ -8182,17 +8168,10 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
             --boot-disk-kms-location global
           """)
 
-  def testBootDiskWithKmsKeyAsPartsNoLocation(self):
-    with self.assertRaises(parser_errors.RequiredError):
-      self.Run("""
-          compute instances create instance
-            --zone central2-a
-            --boot-disk-kms-key my-key
-            --boot-disk-kms-keyring my-keyring
-          """)
-
   def testBootDiskWithKmsKeyAsPartsUnqualifiedKey(self):
-    with self.assertRaises(parser_errors.RequiredError):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'KMS cryptokey resource was not fully specified.'):
       self.Run("""
           compute instances create instance
             --zone central2-a
@@ -8200,7 +8179,7 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
           """)
 
   def testBootDiskWithKmsKeyAsPartsLocationOnly(self):
-    with self.assertRaises(parser_errors.RequiredError):
+    with self.AssertRaisesArgumentError():
       self.Run("""
           compute instances create instance
             --zone central2-a
@@ -8244,7 +8223,9 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
         expected_key=self.global_kms_key_in_same_project)
 
   def testCreateNonBootDiskWithKmsKeyAsPartsLocationOnly(self):
-    with self.assertRaises(parser_errors.RequiredError):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'KMS cryptokey resource was not fully specified.'):
       self.Run("""
           compute instances create instance
             --zone central2-a
@@ -8259,45 +8240,6 @@ class InstancesCreateWithKmsTestAlpha(InstancesCreateTestsMixin):
           compute instances create instance-1
             --disk boot=yes,name=my-disk
             --boot-disk-kms-key projects/key-project/locations/global/keyRings/my-ring/cryptoKeys/my-key
-            --zone central2-a
-          """)
-
-    self.CheckRequests()
-
-  def testWithNoImageAndBootDiskKmsLocationOverride(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'\[--boot-disk-kms-location\] can only be used when creating a new '
-        r'boot disk.'):
-      self.Run("""
-          compute instances create instance-1
-            --disk boot=yes,name=my-disk
-            --boot-disk-kms-location global
-            --zone central2-a
-          """)
-
-    self.CheckRequests()
-
-  def testWithNoImageAndBootDiskKmsProjectOverride(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'\[--boot-disk-kms-project\] can only be used when creating a new '
-        r'boot disk.'):
-      self.Run("""
-          compute instances create instance-1
-            --disk boot=yes,name=my-disk
-            --boot-disk-kms-project other-project
-            --zone central2-a
-          """)
-
-    self.CheckRequests()
-
-  def testWithNoImageAndBootDiskKmsKeyringOverride(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'\[--boot-disk-kms-keyring\] can only be used when creating a new '
-        r'boot disk.'):
-      self.Run("""
-          compute instances create instance-1
-            --disk boot=yes,name=my-disk
-            --boot-disk-kms-keyring some-ring
             --zone central2-a
           """)
 
@@ -8427,9 +8369,9 @@ class InstancesCreateDeletionProtection(InstancesCreateTestsMixin,
             zone='central2-a',))],)
 
 
-class InstancesCreateShieldedVMConfigTest(InstancesCreateTestsMixin,
-                                          parameterized.TestCase):
-  """Test creation of VM instances with shielded VM config."""
+class InstancesCreateShieldedVMConfigAlphaTest(InstancesCreateTestsMixin,
+                                               parameterized.TestCase):
+  """Test creation of VM instances with shielded VM config for Alpha API."""
 
   def SetUp(self):
     SetUp(self, 'alpha')
@@ -8503,6 +8445,16 @@ class InstancesCreateShieldedVMConfigTest(InstancesCreateTestsMixin,
             ),
             project='my-project',
             zone='central2-a',))],)
+
+
+class InstancesCreateShieldedVMConfigBetaTest(
+    InstancesCreateShieldedVMConfigAlphaTest):
+  """Test creation of VM instances with shielded VM config for Beta API."""
+
+  def SetUp(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
 
 if __name__ == '__main__':
   test_case.main()

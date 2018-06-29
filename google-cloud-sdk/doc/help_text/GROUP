@@ -187,8 +187,7 @@ COMMANDS
     COMMAND is one of the following:
 
      docker
-        (DEPRECATED) Provides the docker CLI access to the Google Container
-        Registry.
+        (DEPRECATED) Enable Docker CLI access to Google Container Registry.
 
      feedback
         Provide feedback to the Google Cloud SDK team.

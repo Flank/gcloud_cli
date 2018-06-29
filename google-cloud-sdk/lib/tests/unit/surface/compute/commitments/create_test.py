@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
@@ -171,6 +172,64 @@ class CommitmentsCreateTest(test_base.BaseTest, test_case.WithOutputCapture):
         --resources VCPU=12,MEMORY=3
         --region erech-stone
         """)
+
+
+class CommitmentsCreateAlphaTest(CommitmentsCreateTest,
+                                 parameterized.TestCase):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+
+  def MakeCommitment(self):
+    return self.messages.Commitment(
+        name='pledge',
+        plan=self.messages.Commitment.PlanValueValuesEnum.TWELVE_MONTH,
+        resources=[
+            self.messages.ResourceCommitment(
+                amount=500,
+                type=(self.messages.ResourceCommitment.
+                      TypeValueValuesEnum.VCPU),
+            ),
+            self.messages.ResourceCommitment(
+                amount=12*1024,
+                type=(self.messages.ResourceCommitment.
+                      TypeValueValuesEnum.MEMORY),
+            ),
+        ],
+        type=self.messages.Commitment.TypeValueValuesEnum.GENERAL_PURPOSE
+    )
+
+  @parameterized.named_parameters(
+      ('DefaultSpecified', '--type general-purpose', 'GENERAL_PURPOSE'),
+      ('Default', '', 'GENERAL_PURPOSE'),
+      ('MemoryOptimizedSpecified', '--type memory-optimized',
+       'MEMORY_OPTIMIZED'))
+  def testCreateWithTypeSpecified(self, flag_string, expected_type):
+    self.make_requests.side_effect = iter([
+        []
+    ])
+
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources VCPU=500,MEMORY=12
+        --region erech-stone
+        {}
+        """.format(flag_string))
+    commitment = self.MakeCommitment()
+    commitment.type = self.messages.Commitment.TypeValueValuesEnum(
+        expected_type)
+    self.CheckRequests(
+        [(self.compute.regionCommitments,
+          'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=commitment,
+              project='my-project',
+              region='erech-stone',
+          )
+         )],
+    )
 
 if __name__ == '__main__':
   test_case.main()

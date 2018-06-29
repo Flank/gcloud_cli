@@ -57,7 +57,7 @@ class ServiceAuthTestJSON(cli_test_base.CliTestBase):
 
   def testJSONFromStdin(self):
     json_key_file = self._GetTestDataPathFor('inactive_service_account.json')
-    contents = files.GetFileContents(json_key_file)
+    contents = files.ReadFileContents(json_key_file)
     self.WriteInput(contents)
     self.Run('auth activate-service-account {0} --key-file=-'
              .format(self.Account()))

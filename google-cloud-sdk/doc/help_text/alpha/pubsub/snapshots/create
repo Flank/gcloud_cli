@@ -31,6 +31,11 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --subscription-project=SUBSCRIPTION_PROJECT
         The name of the project the provided subscription belongs to. If not
         set, it defaults to the currently selected cloud project.

@@ -14,6 +14,9 @@
 
 """Tests for the IAM completers module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.iam import completers
 from tests.lib import completer_test_base
 from tests.lib import completer_test_data
@@ -80,7 +83,7 @@ class IamServiceAccountsCompleterTest(unit_test_base.BaseTest,
   def testIamServiceAccountCompleter(self):
     self.client.projects_serviceAccounts.List.Expect(
         request=self.msgs.IamProjectsServiceAccountsListRequest(
-            name=u'projects/test-project',
+            name='projects/test-project',
             pageSize=100),
         response=self.msgs.ListServiceAccountsResponse(accounts=[
             self.msgs.ServiceAccount(

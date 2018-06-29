@@ -16,10 +16,15 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+import datetime
+import json
 import logging
 import os
 
+from apitools.base.py import encoding
 from apitools.base.py.testing import mock
+from dateutil import parser
+from dateutil import tz
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import kubeconfig as kconfig
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -828,6 +833,8 @@ class TestBaseV1Beta1(TestBaseV1):
   def _MakeCluster(self, **kwargs):
     cluster = TestBaseV1._MakeCluster(self, **kwargs)
     cluster.auditConfig = kwargs.get('auditConfig')
+    cluster.binaryAuthorization = kwargs.get('binaryAuthorization')
+    cluster.enableTpu = kwargs.get('enableTpu')
     return cluster
 
   def _MakeNodePool(self, **kwargs):
@@ -849,9 +856,9 @@ class TestBaseV1Alpha1(TestBaseV1Beta1):
 
   def _MakeCluster(self, **kwargs):
     cluster = super(TestBaseV1Alpha1, self)._MakeCluster(**kwargs)
-    cluster.binaryAuthorization = kwargs.get('binaryAuthorization')
     cluster.autoscaling = kwargs.get('clusterAutoscaling')
     cluster.enableTpu = kwargs.get('enableTpu')
+    cluster.defaultMaxPodsConstraint = kwargs.get('defaultMaxPodsConstraint')
     return cluster
 
   def _MakeNodePool(self, **kwargs):
@@ -859,6 +866,7 @@ class TestBaseV1Alpha1(TestBaseV1Beta1):
     if kwargs.get('localSsdVolumeConfigs') is not None:
       node_pool.config.localSsdVolumeConfigs = kwargs.get(
           'localSsdVolumeConfigs')
+    node_pool.maxPodsConstraint = kwargs.get('maxPodsConstraint')
     return node_pool
 
   def _MakeUsableSubnet(self, **kwargs):
@@ -948,7 +956,7 @@ class IntegrationTestBase(e2e_base.WithServiceAuth):
   # you will also want to change the minmum age of a leaked cluster,
   # i.e. leaked_cluster_min_age
   # LINT.IfChange
-  TIMEOUT = 900  # 900s timeout for create/delete operations
+  TIMEOUT = 1080  # 1080s timeout for create/delete operations
 
   # LINT.ThenChange(../../../e2e/surface/container/clusters_test.py)
 
@@ -961,6 +969,12 @@ class IntegrationTestBase(e2e_base.WithServiceAuth):
                .format(self.cluster_name, self.ZONE))
     except core_exceptions.Error as error:
       logging.warning('Failed to delete %s:\n%s', self.cluster_name, error)
+    try:
+      logging.info('Attempting to cleaning up %s', self.cluster_name)
+      self.Run('container clusters delete {0} --region={1} -q'
+               .format(self.cluster_name, self.REGION))
+    except core_exceptions.Error as error:
+      logging.warning('Failed to delete %s:\n%s', self.cluster_name, error)
 
   def _GetLocationFlag(self, location):
     """Produce location flag for a given location."""
@@ -969,6 +983,32 @@ class IntegrationTestBase(e2e_base.WithServiceAuth):
     elif location == self.REGION:
       return '--region={0}'.format(self.REGION)
     raise ValueError('Broken test - location unknown to the test util.')
+
+  def CleanupLeakedClusters(self, location, track):
+    """Cleanup leaked clusters that are older than 3 hours."""
+    # TODO(b/109872728): improve how we handle leaked clusters.
+    # Creating a cluster may timeout in the test, but the creation may
+    # eventually succeed. This causes the cluster leaked. Too many leaked
+    # clusters will prevent future cluster creation due to lack of quota.
+    # When there are no leaked clusters, that cleanup operations are just NOOP.
+    # We cleanup leaked clusters that are older than 3 hours.
+    leaked_cluster_min_age = datetime.timedelta(hours=3)
+    output = self.Run(
+        'container clusters list {0}'.format(self._GetLocationFlag(location)),
+        track=track)
+    jsonoutput = encoding.MessageToJson(output)
+    clusters = json.loads(jsonoutput)
+    for cluster in clusters:
+      createtime = cluster['createTime']
+      dt1 = parser.parse(createtime)
+      dt2 = dt1 + leaked_cluster_min_age
+      dt3 = datetime.datetime.utcnow().replace(tzinfo=tz.tzutc())  # pylint: disable=g-tzinfo-replace
+      if dt2 < dt3:
+        self.Run(
+            'container clusters delete {0} {1} -q --async'.format(
+                cluster['name'], self._GetLocationFlag(location)),
+            track=track)
+        logging.warning('Deleting a leaked cluster: %s', cluster['name'])
 
 
 class ClustersTestBase(UnitTestBase):

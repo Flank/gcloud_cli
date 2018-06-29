@@ -11,15 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests that ensure deserialization of server responses work properly."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import cli_test_base
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class DeleteTest(unit_test_base.BaseTest):
 
-  def testDeleteServiceAccountKey(self):
+  def testDeleteServiceAccountKey(self, track):
+    self.track = track
     self.client.projects_serviceAccounts_keys.Delete.Expect(
         request=self.msgs.IamProjectsServiceAccountsKeysDeleteRequest(
             name=('projects/-/serviceAccounts/'
@@ -31,13 +42,19 @@ class DeleteTest(unit_test_base.BaseTest):
              '--iam-account test@test-project.iam.gserviceaccount.com '
              'deadbeefdeafbeef')
 
+    self.AssertErrContains(
+        'You are about to delete key [deadbeefdeafbeef] for service account '
+        '[test@test-project.iam.gserviceaccount.com]'
+    )
+
     self.AssertErrContains('deleted key [deadbeefdeafbeef] for service account '
                            '[test@test-project.iam.gserviceaccount.com]')
     self.AssertErrNotContains(
         'Not found: key [deadbeefdeafbeef] for service account '
         '[test@test-project.iam.gserviceaccount.com]')
 
-  def testDeleteServiceAccountKeyWithName(self):
+  def testDeleteServiceAccountKeyWithName(self, track):
+    self.track = track
     key_name = ('projects/-/serviceAccounts/'
                 'test@test-project.iam.gserviceaccount.com'
                 '/keys/deadbeefdeafbeef')
@@ -50,13 +67,18 @@ class DeleteTest(unit_test_base.BaseTest):
              '--iam-account test@test-project.iam.gserviceaccount.com '
              '%s' % key_name)
 
+    self.AssertErrContains(
+        'You are about to delete key [{}] for service account '
+        '[test@test-project.iam.gserviceaccount.com]'.format(key_name))
+
     self.AssertErrContains('deleted key [deadbeefdeafbeef] for service account '
                            '[test@test-project.iam.gserviceaccount.com]')
     self.AssertErrNotContains(
         'Not found: key [deadbeefdeafbeef] for service account '
         '[test@test-project.iam.gserviceaccount.com]')
 
-  def testDeleteServiceAccountKeyInvalidAccount(self):
+  def testDeleteServiceAccountKeyInvalidAccount(self, track):
+    self.track = track
     with self.assertRaisesRegex(
         cli_test_base.MockArgumentError,
         r'Not a valid service account identifier. It should be either a '
@@ -66,7 +88,8 @@ class DeleteTest(unit_test_base.BaseTest):
       self.Run('iam service-accounts keys delete --iam-account testfoo '
                'deadbeefdeafbeef')
 
-  def testDeleteServiceAccountKeyValidUniqueId(self):
+  def testDeleteServiceAccountKeyValidUniqueId(self, track):
+    self.track = track
     self.client.projects_serviceAccounts_keys.Delete.Expect(
         request=self.msgs.IamProjectsServiceAccountsKeysDeleteRequest(
             name=('projects/-/serviceAccounts/%s/keys/deadbeefdeafbeef' %

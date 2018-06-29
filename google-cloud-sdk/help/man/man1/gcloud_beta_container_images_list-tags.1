@@ -96,6 +96,13 @@ $ gcloud beta container images list\-tags gcr.io/myproject/myimage \e
     \-\-format=json
 .RE
 
+To list digests without corresponding tags:
+
+.RS 2m
+$ gcloud beta container images list\-tags gcr.io/myproject/myimage \e
+    \-\-filter="NOT tags:*"
+.RE
+
 
 
 .SH "NOTES"

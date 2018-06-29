@@ -36,8 +36,12 @@ GROUPS
      operations
         Provide commands for working with Cloud SQL instance operations.
 
-     ssl-certs
+     ssl
         Provide commands for managing SSL certificates of Cloud SQL instances.
+
+     ssl-certs
+        (DEPRECATED) Provide commands for managing SSL certificates of Cloud
+        SQL instances.
 
      tiers
         Provide a command to list tiers.

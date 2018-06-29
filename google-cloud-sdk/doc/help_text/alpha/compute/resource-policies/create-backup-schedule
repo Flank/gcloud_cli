@@ -8,7 +8,8 @@ SYNOPSIS
         (--weekly-schedule-from-file=WEEKLY_CYCLE_FROM_FILE
           | --start-time=START_TIME (--daily-schedule | --hourly-schedule=HOURS
           | --weekly-schedule=WEEKLY_CYCLE)) [--description=DESCRIPTION]
-        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+        [--region=REGION] [--guest-flush --snapshot-labels=[KEY=VALUE,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute resource-policies create-backup-schedule
@@ -33,19 +34,16 @@ REQUIRED FLAGS
             times. The format is a JSON/YAML file containing a list of objects
             with the following fields:
 
-            day: Day of the week with the same choices as --weekly-window.
+            day: Day of the week with the same choices as --weekly-schedule.
             startTime: Start time of the snapshot schedule with the same format
             as --start-time.
 
        From flags
 
          --start-time=START_TIME
-            Start time for the disk snapshot schedule to start.. Valid choices
-            are 00:00, 04:00, 08:00,12:00, 16:00 and 20:00 UTC. See $ gcloud
-            topic datetimes for information on time formats. For example,
-            --start-time="03:00-05" (which gets converted to 08:00 UTC). This
-            flag must be specified if any of the other arguments in this group
-            are specified.
+            Start time for the disk snapshot schedule to start. This flag must
+            be specified if any of the other arguments in this group are
+            specified.
 
          Exactly one of these must be specified:
 
@@ -56,7 +54,7 @@ REQUIRED FLAGS
               Snapshot schedule occurs every n hours starting at START_TIME.
 
            --weekly-schedule=WEEKLY_CYCLE
-              Snapshot schedule occurs weekly on WEEKLY_WINDOW at START_TIME.
+              Snapshot schedule occurs weekly on WEEKLY_SCHEDULE at START_TIME.
               WEEKLY_CYCLE must be one of: monday, tuesday, wednesday,
               thursday, friday, saturday, sunday.
 
@@ -83,6 +81,22 @@ OPTIONAL FLAGS
 
         Alternatively, the region can be stored in the environment variable
         CLOUDSDK_COMPUTE_REGION.
+
+     Snapshot properties
+
+       --guest-flush
+          Create an application consistent snapshot by informing the OS to
+          prepare for the snapshot process.
+
+       --snapshot-labels=[KEY=VALUE,...]
+          A list of label KEY=VALUE pairs to add.
+
+          Keys must start with a lowercase character and contain only hyphens
+          (-), underscores (_), lowercase characters, and numbers. Values must
+          contain only hyphens (-), underscores (_), lowercase characters, and
+          numbers.
+
+          These will be added to the disk snapshots on creation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

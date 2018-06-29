@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """`gcloud monitoring channels update` command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.monitoring import channels
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.monitoring import flags
@@ -38,7 +40,7 @@ class Create(base.CreateCommand):
           the flags from the notification channel settings group.
 
           For information about the JSON/YAML format of a notification channel:
-          https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects/projects.notificationChannels
+          https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.notificationChannels
 
           *Note:* When specifying the Channel as a YAML/JSON, the use of
           `channelLabels` as an alternative name for `labels` is supported.

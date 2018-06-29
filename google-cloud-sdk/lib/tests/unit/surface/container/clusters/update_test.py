@@ -17,6 +17,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import os
 
+from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.calliope import exceptions
@@ -27,6 +28,7 @@ from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.container import base
+from six.moves import range
 
 
 class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
@@ -988,6 +990,31 @@ class UpdateTestGA(parameterized.TestCase, base.TestBaseV1, base.GATestBase,
   def testRemoveFromClusterWithNoLabels(self):
     self._TestRemoveFromClusterWithNoLabels()
 
+  def testCanUpdateAfterFailedGet(self):
+    # Updating monitoring as example.
+    update = self.msgs.ClusterUpdate(desiredMonitoringService='none')
+    flags = '--monitoring-service=none'
+    name = 'tobeupdated'
+    cluster = self._RunningCluster(name=name)
+    self.ExpectGetCluster(
+        cluster, exception=
+        apitools_exceptions.HttpForbiddenError(
+            {'status': 403, 'reason': 'missing update permission'},
+            'forbidden', 'foo.com/bar'))
+    self.ExpectUpdateCluster(
+        cluster_name=name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, flags))
+    self.AssertErrContains('Updating {cluster}'.format(cluster=name))
+    self.AssertErrContains(
+        ('go to: https://console.cloud.google.com/kubernetes/'
+         'workload_/gcloud/{zone}/{cluster}?project={project}').format(
+             cluster=name, zone=self.ZONE, project=self.PROJECT_ID))
+
 
 # TODO(b/64575339): switch to use parameterized testing.
 # Mixin class must come in first to have the correct multi-inheritance behavior.
@@ -1043,6 +1070,16 @@ class UpdateTestBetaV1Beta1API(base.TestBaseV1Beta1, UpdateTestBetaV1API):
             desiredPodSecurityPolicyConfig=self.msgs.PodSecurityPolicyConfig(
                 enabled=True)),
         flags='--enable-pod-security-policy')
+
+  def testEnableBinaryAuthorization(self):
+    self._TestEnableBinaryAuthorization(
+        enabled=True,
+        flags='--enable-binauthz')
+
+  def _TestEnableBinaryAuthorization(self, enabled, flags):
+    binauthz = self.msgs.BinaryAuthorization(enabled=enabled)
+    update = self.msgs.ClusterUpdate(desiredBinaryAuthorization=binauthz)
+    self._TestUpdate(update=update, flags=flags)
 
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.

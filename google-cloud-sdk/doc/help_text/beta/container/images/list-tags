@@ -59,6 +59,11 @@ EXAMPLES
         $ gcloud beta container images list-tags gcr.io/myproject/myimage \
             --format=json
 
+    To list digests without corresponding tags:
+
+        $ gcloud beta container images list-tags gcr.io/myproject/myimage \
+            --filter="NOT tags:*"
+
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

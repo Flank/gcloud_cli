@@ -14,6 +14,7 @@
 """Tests for deployable services and configs."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import os
 
 from googlecloudsdk.api_lib.app import deploy_command_util

@@ -14,6 +14,8 @@
 
 """e2e tests for the 'dataproc workflow-templates' commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from tests.lib import e2e_utils
@@ -31,7 +33,7 @@ class WorkflowTemplatesE2ETest(e2e_base.DataprocIntegrationTestBase,
         prefix='workflow_templates_test')
 
   def testWorkflowTemplateGetSetIAMPolicy(self):
-    name = self.name_generator.next()
+    name = next(self.name_generator)
     with self.CreateWorkflowTemplate(name) as _:
       self.GetSetIAMPolicy('workflow-templates', name)
 

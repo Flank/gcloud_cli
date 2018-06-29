@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for the table module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.calliope import cli_tree
@@ -151,7 +154,7 @@ class LookupCompletionTest(calliope_test_base.CalliopeTestBase):
     find_completions_mock.return_value = ['internal']
     lookup.Complete()
     self.assertTrue(self.completions_closed)
-    self.assertEqual('internal', self.completions_value)
+    self.assertEqual(b'internal', self.completions_value)
 
   def testFindCompletionsPartialCommandCompletion(self):
     cmd_line = 'gcloud alpha int'

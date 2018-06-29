@@ -23,7 +23,9 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      PRIORITY
-        The priority of the rule to update.
+        The priority of the rule to update. Rules are evaluated in order from
+        highest priority to lowest priority where 0 is the highest priority and
+        2147483647 is the lowest priority.
 
 FLAGS
      --action=ACTION

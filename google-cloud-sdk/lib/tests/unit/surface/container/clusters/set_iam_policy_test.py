@@ -36,9 +36,9 @@ class SetIamPolicyTestAlphaV1Alpha1API(parameterized.TestCase,
     self.api_mismatch = False
 
   @parameterized.named_parameters(
-      ('Zonal', 'us-central1-f'),
-      ('Regional', 'us-central1'))
-  def testSetIamPolicy(self, location):
+      ('Zonal', '--zone', 'us-central1-f'),
+      ('Regional', '--region', 'us-central1'))
+  def testSetIamPolicy(self, location_flag, location):
     policy = self.messages.GoogleIamV1Policy(
         bindings=[
             self.messages.GoogleIamV1Binding(
@@ -62,9 +62,8 @@ class SetIamPolicyTestAlphaV1Alpha1API(parameterized.TestCase,
                 self.PROJECT_ID, location, self.CLUSTER_NAME),
             googleIamV1SetIamPolicyRequest=self.messages.
             GoogleIamV1SetIamPolicyRequest(policy=policy)), policy)
-    self.Run(
-        self.clusters_command_base.format(location) +
-        ' set-iam-policy {0} {1}'.format(self.CLUSTER_NAME, f))
+    self.Run('container clusters set-iam-policy {} {} {} {}'.format(
+        self.CLUSTER_NAME, f, location_flag, location))
 
 
 if __name__ == '__main__':

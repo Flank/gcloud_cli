@@ -26,12 +26,13 @@ gcloud alpha spanner databases add\-iam\-policy\-binding \- add an IAM policy bi
 .RS 2m
 .TP 2m
 
-Database resource \- The Cloud Spanner database to add IAM policy binding to.
-The arguments in this group can be used to specify the attributes of this
-resource. (NOTE) Some attributes are not given arguments in this group but can
-be set in other ways. To set the [project] attribute: Set the property
-[core/project] or provide the flag [\-\-project] on the command line. This must
-be specified.
+Database resource \- The Cloud Spanner database for which to add IAM policy
+binding to. The arguments in this group can be used to specify the attributes of
+this resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the flag
+[database] on the command line with a fully specified name; provide the flag
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
 
 .RS 2m
 .TP 2m
@@ -42,7 +43,7 @@ specified.
 
 .TP 2m
 \fB\-\-instance\fR=\fIINSTANCE\fR
-The Cloud Spanner instance for the database.
+The name of the Cloud Spanner instance.
 
 
 .RE
@@ -58,8 +59,8 @@ The member to add the binding for. Should be of the form
 \f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
 
 Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
-\f5serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com\fR, or
-\f5domain:example.com\fR.
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
 
 Can also be one of the following special values:
 .RS 2m
@@ -88,6 +89,13 @@ These flags are available to all commands: \-\-account, \-\-configuration,
 \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
 \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
 help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBspanner/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/spanner/
 
 
 

@@ -14,6 +14,8 @@
 
 """Unit tests for the compute.images.flags module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.command_lib.compute.images import flags
 from tests.lib import completer_test_base
 from tests.lib.surface.compute import test_resources

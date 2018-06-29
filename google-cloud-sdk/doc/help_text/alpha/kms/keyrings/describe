@@ -10,11 +10,11 @@ DESCRIPTION
 
 POSITIONAL ARGUMENTS
      KEYRING
-        Name of the keyring to describe.
+        Name of the key ring to describe.
 
 FLAGS
      --location=LOCATION
-        The location of the requested resource.
+        Location of the keyring.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

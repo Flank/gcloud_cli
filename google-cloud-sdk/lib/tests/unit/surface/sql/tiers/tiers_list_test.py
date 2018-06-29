@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.surface.sql import base
 
@@ -21,80 +23,87 @@ class TiersListsTest(base.SqlMockTestBeta):
 
   def testTiersList(self):
     self.mocked_client.tiers.List.Expect(
-        self.messages.SqlTiersListRequest(
-            project=self.Project(),),
+        self.messages.SqlTiersListRequest(project=self.Project(),),
         self.messages.TiersListResponse(
             items=[
                 self.messages.Tier(
                     DiskQuota=268435456000,
                     RAM=134217728,
-                    kind=u'sql#tier',
+                    kind='sql#tier',
                     region=[
-                        u'us-central',
-                        u'europe-west1',
-                        u'asia-east1',
+                        'us-central',
+                        'europe-west1',
+                        'asia-east1',
                     ],
-                    tier=u'D0',),
+                    tier='D0',
+                ),
                 self.messages.Tier(
                     DiskQuota=268435456000,
                     RAM=536870912,
-                    kind=u'sql#tier',
+                    kind='sql#tier',
                     region=[
-                        u'us-central',
-                        u'europe-west1',
-                        u'asia-east1',
+                        'us-central',
+                        'europe-west1',
+                        'asia-east1',
                     ],
-                    tier=u'D1',),
+                    tier='D1',
+                ),
                 self.messages.Tier(
                     DiskQuota=268435456000,
                     RAM=1073741824,
-                    kind=u'sql#tier',
+                    kind='sql#tier',
                     region=[
-                        u'us-central',
-                        u'europe-west1',
-                        u'asia-east1',
+                        'us-central',
+                        'europe-west1',
+                        'asia-east1',
                     ],
-                    tier=u'D2',),
+                    tier='D2',
+                ),
                 self.messages.Tier(
                     DiskQuota=268435456000,
                     RAM=2147483648,
-                    kind=u'sql#tier',
+                    kind='sql#tier',
                     region=[
-                        u'us-central',
-                        u'europe-west1',
-                        u'asia-east1',
+                        'us-central',
+                        'europe-west1',
+                        'asia-east1',
                     ],
-                    tier=u'D4',),
+                    tier='D4',
+                ),
                 self.messages.Tier(
                     DiskQuota=268435456000,
                     RAM=4294967296,
-                    kind=u'sql#tier',
+                    kind='sql#tier',
                     region=[
-                        u'us-central',
-                        u'europe-west1',
-                        u'asia-east1',
+                        'us-central',
+                        'europe-west1',
+                        'asia-east1',
                     ],
-                    tier=u'D8',),
+                    tier='D8',
+                ),
                 self.messages.Tier(
                     DiskQuota=268435456000,
                     RAM=8589934592,
-                    kind=u'sql#tier',
+                    kind='sql#tier',
                     region=[
-                        u'us-central',
-                        u'europe-west1',
-                        u'asia-east1',
+                        'us-central',
+                        'europe-west1',
+                        'asia-east1',
                     ],
-                    tier=u'D16',),
+                    tier='D16',
+                ),
                 self.messages.Tier(
                     DiskQuota=268435456000,
                     RAM=17179869184,
-                    kind=u'sql#tier',
+                    kind='sql#tier',
                     region=[
-                        u'us-central',
+                        'us-central',
                     ],
-                    tier=u'D32',),
+                    tier='D32',
+                ),
             ],
-            kind=u'sql#tiersList',))
+            kind='sql#tiersList',
+        ))
 
     self.Run('sql tiers list')
     self.AssertOutputContains("""\

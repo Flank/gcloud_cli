@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """End-to-end tests for the `gcloud scheduler` commands."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.calliope import base

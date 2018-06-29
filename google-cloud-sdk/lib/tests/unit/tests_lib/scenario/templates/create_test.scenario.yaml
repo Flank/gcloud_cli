@@ -1,0 +1,94 @@
+title: Create Example
+description: Create test example
+release_tracks: [ALPHA]
+actions:
+  - execute_command:
+      command: compute tpus create mytpu --range 10.20.10.0/29 --network my-tf-network --version 1.6
+      events:
+        - api_call:
+            expect_request:
+              uri: https://tpu.googleapis.com/v1alpha1/projects/fakeproject/locations/us-central1-b/nodes?alt=json&nodeId=dec-tpu-3
+              method: GET
+              headers:
+                content-length: '115'
+              body:
+                acceleratorType: v2-8
+                cidrBlock: 10.143.0.0/29
+                network: datalab-network
+                tensorflowVersion: 1.6
+            return_response:
+              headers:
+                status: '200'
+              body:
+                name: projects/fakepproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887
+                metadata:
+                  "@type": type.googleapis.com/google.cloud.common.OperationMetadata
+                  createTime: 2018-05-02T16:29:03.417293676Z
+                  target: projects/cloudsdktest/locations/us-central1-b/nodes/dec-tpu-3
+                  verb: create
+                  apiVersion: v1alpha1
+                done: false
+        - expect_progress_bar:
+            message: Waiting for operation [projects/fakepproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887] to complete.
+        - api_call:
+            expect_request:
+              uri: https://tpu.googleapis.com/v1alpha1/projects/fakeproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887?alt=json
+              method: GET
+              body: {}
+            return_response:
+              headers:
+                status: '200'
+              body:
+                name: projects/fakepproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887
+                metadata:
+                  "@type": type.googleapis.com/google.cloud.common.OperationMetadata
+                  createTime: 2018-05-02T16:29:03.417293676Z
+                  target: projects/cloudsdktest/locations/us-central1-b/nodes/dec-tpu-3
+                  verb: create
+                  apiVersion: v1alpha1
+                done: false
+        - expect_progress_bar:
+            message: Waiting for operation [projects/fakepproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887] to complete.
+        - api_call:
+            expect_request:
+              uri: https://tpu.googleapis.com/v1alpha1/projects/fakeproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887?alt=json
+              method: GET
+            return_response:
+              headers:
+                status: '200'
+                content-length: '1580'
+              body:
+                name: projects/fakepproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887
+                metadata:
+                  "@type": type.googleapis.com/google.cloud.common.OperationMetadata
+                  createTime: 2018-05-02T16:29:03.417293676Z
+                  target: projects/cloudsdktest/locations/us-central1-b/nodes/dec-tpu-3
+                  verb: create
+                  apiVersion: v1alpha1
+                done: true
+                response:
+                  "@type": type.googleapis.com/google.cloud.tpu.v1alpha1.Node
+                  name: projects/fakeproject/locations/us-central1-b/nodes/dec-tpu-3
+                  acceleratorType: v2-8
+                  machineType: projects/695311740377/zones/us-central1-b/machineTypes/n1-356-96-tpu
+                  ipAddress: 10.143.0.2
+                  state: READY
+                  tensorflowVersion: 1.6
+                  network: global/networks/datalab-network
+                  cidrBlock: 10.143.0.0/29
+                  port: 8470
+                  serviceAccount: 695311740377-compute@developer.gserviceaccount.com
+                  createTime: 2018-05-02T16:29:04.181523Z
+                  greenVmSelflink: https://www.googleapis.com/compute/v1/projects/vf93a4a324c653cc3-tp/zones/us-central1-b/instances/n-ff0a1bac-w-0
+                  greenVmInstanceId: 8864118958434048393
+                  networkEndpoints:
+                    - ipAddress: 10.143.0.2
+                      port: 8470
+                      greenVmSelflink: https://www.googleapis.com/compute/v1/projects/vf93a4a324c653cc3-tp/zones/us-central1-b/instances/n-ff0a1bac-w-0
+                      greenVmInstanceId: 8864118958434048393
+                  health: HEALTHY
+        - expect_progress_tracker:
+            message: Waiting for operation [projects/fakepproject/locations/us-central1-b/operations/operation-1525278543417-56b3b95c38fba-c2c19330-cd123887] to complete.
+            status: SUCCESS
+        - expect_stderr: Created [dec-tpu-3].
+        - expect_exit_code: 0

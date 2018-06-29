@@ -14,6 +14,8 @@
 
 """Unit tests for the core.module_util module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from argcomplete import completers as argcomplete_completers
 
 from googlecloudsdk.command_lib.util import completers

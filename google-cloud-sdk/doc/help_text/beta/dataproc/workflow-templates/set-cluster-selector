@@ -3,29 +3,41 @@ NAME
         selector for the workflow template
 
 SYNOPSIS
-    gcloud beta dataproc workflow-templates set-cluster-selector TEMPLATE
-        [--cluster-labels=KEY=VALUE,[KEY=VALUE,...]] [--region=REGION]
-        [--zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+    gcloud beta dataproc workflow-templates set-cluster-selector
+        (TEMPLATE : --region=REGION)
+        [--cluster-labels=KEY=VALUE,[KEY=VALUE,...]] [--zone=ZONE, -z ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Set cluster selector for the workflow template.
 
 POSITIONAL ARGUMENTS
-     TEMPLATE
-        The ID of the workflow template to set cluster selector.
+     Template resource - The name of the workflow template to set cluster
+     selector. The arguments in this group can be used to specify the
+     attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the flag [TEMPLATE] on the command line with a fully
+     specified name; provide the flag [--project] on the command line; set the
+     property [core/project]. This must be specified.
+
+       TEMPLATE
+          The ID of the template or a fully qualified identifier for the
+          template. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --region=REGION
+          The Cloud DataProc region for the template. Each Cloud Dataproc
+          region constitutes an independent resource namespace constrained to
+          deploying instances into Google Compute Engine zones inside the
+          region. The default value of "global" is a special multi-region
+          namespace which is capable of deploying instances into all Google
+          Compute Engine zones globally, and is disjoint from other Cloud
+          Dataproc regions. Overrides the default dataproc/region property
+          value for this command invocation.
 
 FLAGS
      --cluster-labels=KEY=VALUE,[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
-
-     --region=REGION
-        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-        independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
 
      --zone=ZONE, -z ZONE
         The compute zone (e.g. us-central1-a) for the cluster. If empty, and

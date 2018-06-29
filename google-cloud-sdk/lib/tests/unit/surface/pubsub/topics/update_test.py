@@ -109,6 +109,21 @@ class TopicsUpdateTest(base.CloudPubsubTestBase):
         [('bar', 'value2'), ('baz', 'newvalue3'), ('foo', 'newvalue1')],
         '--update-labels foo=newvalue1,baz=newvalue3')
 
+  def testUpdateRecomputeMessageStoragePolicy(self):
+    topic_ref = util.ParseTopic('topic', self.Project())
+    update_req = self.msgs.PubsubProjectsTopicsPatchRequest(
+        updateTopicRequest=self.msgs.UpdateTopicRequest(
+            topic=self.msgs.Topic(
+                name=topic_ref.RelativeName(),
+                messageStoragePolicy=None),
+            updateMask=('messageStoragePolicy')),
+        name=topic_ref.RelativeName())
+    self.svc.Expect(request=update_req,
+                    response=self.msgs.Topic())  # Ignore
+    self.Run('pubsub topics update topic --recompute-message-storage-policy')
+    self.AssertErrEquals('Updated topic [{0}].\n'
+                         .format(topic_ref.RelativeName()))
+
   def testUpdateNoFieldsSpecified(self):
     with self.assertRaises(topics.NoFieldsSpecifiedError):
       self.Run('pubsub topics update non-existent')

@@ -14,6 +14,8 @@
 
 """Base class for tests of SSH or SCP in gcloud app."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.app import appengine_api_client
 from googlecloudsdk.command_lib.app import ssh_common
 from googlecloudsdk.command_lib.util.ssh import ssh

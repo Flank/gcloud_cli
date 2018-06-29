@@ -13,6 +13,8 @@
 # limitations under the License.
 """Common component for images labels testing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 
@@ -69,8 +71,7 @@ class ImagesLabelsTestBase(sdk_test_base.WithFakeAuth,
       msg.labels = labels_value(additionalProperties=[
           labels_value.AdditionalProperty(key=pair[0], value=pair[1])
           for pair in labels])
-    if fingerprint:
-      msg.labelFingerprint = fingerprint
+    msg.labelFingerprint = fingerprint
     return msg
 
   def _MakeLabelsProto(self, labels):
@@ -102,8 +103,7 @@ class ImagesLabelsTestBase(sdk_test_base.WithFakeAuth,
         resource=image_ref.image,
         globalSetLabelsRequest=
         self.messages.GlobalSetLabelsRequest(
-            labelFingerprint=fingerprint,
-            labels=labels_value)
+            labelFingerprint=fingerprint, labels=labels_value)
     )
 
     self.service.SetLabels.Expect(

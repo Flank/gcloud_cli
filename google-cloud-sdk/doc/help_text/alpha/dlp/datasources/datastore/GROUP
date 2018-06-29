@@ -1,0 +1,29 @@
+NAME
+    gcloud alpha dlp datasources datastore - cloud DLP Commands for analyzing
+        data in Cloud Datastore repositories
+
+SYNOPSIS
+    gcloud alpha dlp datasources datastore COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Cloud DLP commands for inspecting and analyzing content in Cloud
+    Datastore repositories.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --configuration,
+    --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
+    --user-output-enabled, --verbosity. Run $ gcloud help for details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     inspect
+        (ALPHA) Schedules a job to inspect content in a Cloud Datastore.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. Usually,
+    users of ALPHA commands and flags need to apply for access, agree to
+    applicable terms, and have their projects whitelisted. Contact Google or
+    sign up on a product's page for ALPHA access. Product pages can be found at
+    https://cloud.google.com/products/.
+

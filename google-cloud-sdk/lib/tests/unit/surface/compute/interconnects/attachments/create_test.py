@@ -66,6 +66,10 @@ class InterconnectAttachmentsCreateTest(test_base.BaseTest):
         '/projects/my-project/global/interconnects/my-interconnect',
         router=self.compute_uri + '/projects/my-project/regions/us-central1/'
         'routers/my-router')
+    self.AssertOutputEquals('')
+    self.AssertErrContains('`create` is deprecated. Please use `gcloud compute '
+                           'interconnects attachments dedicated create` '
+                           'instead.')
 
   def testCreateInterconnectAttachmentWithUri(self):
     messages = self.messages

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Helper functions for all 'gcloud firebase test' unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from googlecloudsdk.calliope import parser_extensions

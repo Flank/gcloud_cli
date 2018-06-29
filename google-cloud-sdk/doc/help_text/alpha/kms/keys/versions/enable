@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha kms keys versions enable VERSION [--key=KEY]
-        [GCLOUD_WIDE_FLAG ...]
+        [--keyring=KEYRING] [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Enables the specified version within the given key.
@@ -17,6 +17,12 @@ POSITIONAL ARGUMENTS
 FLAGS
      --key=KEY
         The containing key.
+
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the keyring.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

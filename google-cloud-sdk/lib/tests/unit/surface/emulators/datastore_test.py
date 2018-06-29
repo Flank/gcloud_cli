@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for the machine-types list subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.emulators import datastore_util
 from googlecloudsdk.command_lib.emulators import util
 from googlecloudsdk.command_lib.util import java

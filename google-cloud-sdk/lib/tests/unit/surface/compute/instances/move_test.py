@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instances move subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 
 from apitools.base.py.testing import mock as api_mock
@@ -103,17 +105,15 @@ class InstancesMoveTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         'of this operation.\n')
 
   def testZonePrompt_NonInteractive(self):
-    with self.Client() as client:
-      self.ExpectMoveInstance(client)
-      with self.assertRaisesRegex(
-          compute_flags.UnderSpecifiedResourceError,
-          r'Underspecified resource \[instance-1\]. '
-          r'Specify the \[--zone\] flag.'):
-        self.Run("""
-            compute instances move instance-1
-              --destination-zone=europe-west1-d
-              --async
-            """)
+    with self.assertRaisesRegex(
+        compute_flags.UnderSpecifiedResourceError,
+        r'Underspecified resource \[instance-1\]. '
+        r'Specify the \[--zone\] flag.'):
+      self.Run("""
+          compute instances move instance-1
+            --destination-zone=europe-west1-d
+            --async
+          """)
 
   def testZonePrompt_Interactive(self):
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',

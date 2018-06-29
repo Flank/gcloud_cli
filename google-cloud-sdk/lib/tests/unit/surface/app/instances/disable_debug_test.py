@@ -15,6 +15,7 @@
 """Tests for gcloud app instances disable-debug."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.app import instances_util
 from tests.lib.surface.app import api_test_util
 from tests.lib.surface.app import instances_base

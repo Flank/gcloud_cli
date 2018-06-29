@@ -5,8 +5,8 @@ SYNOPSIS
     gcloud compute images export --destination-uri=DESTINATION_URI
         (--image=IMAGE | --image-family=IMAGE_FAMILY) [--async]
         [--export-format=EXPORT_FORMAT] [--image-project=IMAGE_PROJECT]
-        [--log-location=LOG_LOCATION] [--timeout=TIMEOUT; default="2h"]
-        [GCLOUD_WIDE_FLAG ...]
+        [--log-location=LOG_LOCATION] [--network=NETWORK]
+        [--timeout=TIMEOUT; default="2h"] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute images export exports Virtual Disk images from Google
@@ -56,6 +56,11 @@ OPTIONAL FLAGS
         Directory in Google Cloud Storage to hold build logs. If not set,
         gs://<project num>.cloudbuild-logs.googleusercontent.com/ will be
         created and used.
+
+     --network=NETWORK
+        The name of the network in your project to use for the image export.
+        The network must have access to Google Cloud Storage. If not specified,
+        the network named default is used.
 
      --timeout=TIMEOUT; default="2h"
         Maximum time a build can last before it is failed as "TIMEOUT". For

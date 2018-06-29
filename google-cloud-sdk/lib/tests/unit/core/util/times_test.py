@@ -1239,5 +1239,65 @@ class DurationForJsonTest(test_case.TestCase, parameterized.TestCase):
     self.assertEqual(times.FormatDurationForJson(duration), expected)
 
 
+class GetWeekdayInTimezoneTest(test_case.TestCase, parameterized.TestCase):
+
+  @parameterized.parameters('Monday', 'MoNdAy', 'monday', 'MONDAY')
+  def testWeekdayAccessor(self, value):
+    self.assertEqual(times.Weekday.MONDAY, times.Weekday.Get(value))
+
+  def testWeekdayAccessorFails(self):
+    with self.assertRaisesRegexp(
+        KeyError, r'\[CATURDAY\] is not a valid Weekday'):
+      times.Weekday.Get('caturday')
+
+  def testWeekdayStaysSame(self):
+    tzinfo = times.TzOffset(-5 * 60)
+    dt = datetime.datetime(2017, 5, 24, 16, tzinfo=tzinfo)
+    current_weekday = times.Weekday.MONDAY
+
+    self.assertEqual(times.Weekday.MONDAY,
+                     times.GetWeekdayInTimezone(dt, current_weekday, times.UTC))
+
+  def testWeekdayMidnightSameDay(self):
+    tzinfo = times.TzOffset(5 * 60)
+    dt = datetime.datetime(2017, 5, 24, 5, tzinfo=tzinfo)
+    current_weekday = times.Weekday.MONDAY
+
+    self.assertEqual(times.Weekday.MONDAY,
+                     times.GetWeekdayInTimezone(dt, current_weekday, times.UTC))
+
+  def testWeekdayMidnightNextDay(self):
+    tzinfo = times.TzOffset(-5 * 60)
+    dt = datetime.datetime(2017, 5, 24, 19, tzinfo=tzinfo)
+    current_weekday = times.Weekday.MONDAY
+
+    self.assertEqual(times.Weekday.TUESDAY,
+                     times.GetWeekdayInTimezone(dt, current_weekday, times.UTC))
+
+  def testWeekdayNextDayWraps(self):
+    tzinfo = times.TzOffset(-5 * 60)
+    dt = datetime.datetime(2017, 5, 24, 23, tzinfo=tzinfo)
+    current_weekday = times.Weekday.SUNDAY
+
+    self.assertEqual(times.Weekday.MONDAY,
+                     times.GetWeekdayInTimezone(dt, current_weekday, times.UTC))
+
+  def testWeekdayPreviousDayWraps(self):
+    tzinfo = times.TzOffset(5 * 60)
+    dt = datetime.datetime(2017, 5, 24, 3, tzinfo=tzinfo)
+    current_weekday = times.Weekday.MONDAY
+
+    self.assertEqual(times.Weekday.SUNDAY,
+                     times.GetWeekdayInTimezone(dt, current_weekday, times.UTC))
+
+  def testWeekdayNonUtc(self):
+    tzinfo = times.TzOffset(5 * 60)
+    dt = datetime.datetime(2017, 5, 24, 20, tzinfo=times.UTC)
+    current_weekday = times.Weekday.MONDAY
+
+    self.assertEqual(times.Weekday.TUESDAY,
+                     times.GetWeekdayInTimezone(dt, current_weekday, tzinfo))
+
+
 if __name__ == '__main__':
   test_case.main()

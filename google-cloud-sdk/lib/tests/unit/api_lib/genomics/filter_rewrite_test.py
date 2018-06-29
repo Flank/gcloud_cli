@@ -14,8 +14,9 @@
 
 """Unit tests for the genomics filter expression rewrite module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.genomics import filter_rewrite
-from googlecloudsdk.api_lib.genomics import genomics_util
 from googlecloudsdk.core.util import times
 from tests.lib import subtests
 from tests.lib import test_case
@@ -24,10 +25,8 @@ from tests.lib import test_case
 class GenomicsFilterRewriteTest(subtests.Base):
 
   def SetUp(self):
-    self.rewrite = filter_rewrite.Backend().Rewrite
-    now = times.ParseDateTime('2016-09-26T23:31:29-0400')
-    self.StartObjectPatch(genomics_util, 'GetProjectId',
-                          side_effect=lambda: 'genomics-test-project')
+    self.rewrite = filter_rewrite.OperationsBackend().Rewrite
+    now = times.ParseDateTime('2016-09-26T23:31:29.000Z')
     self.StartObjectPatch(times, 'Now', side_effect=lambda tzinfo=None: now)
 
   def RunSubTest(self, expression):
@@ -38,44 +37,40 @@ class GenomicsFilterRewriteTest(subtests.Base):
     def T(expected, expression, exception=None):
       self.Run(expected, expression, depth=2, exception=exception)
 
-    T((None, 'projectId=genomics-test-project'),
-      '')
+    T((None, None), '')
+    T(('error.message = "test"', None),
+      'error.message = "test"')
 
-    T((None, 'createTime <= 1474947088 AND projectId=genomics-test-project'),
-      'createTime < 2016-09-26T23:31:29-0400')
-    T((None, 'createTime <= 1474947089 AND projectId=genomics-test-project'),
-      'createTime <= 2016-09-26T23:31:29-0400')
-    T((None, 'createTime = 1474947089 AND projectId=genomics-test-project'),
-      'createTime = 2016-09-26T23:31:29-0400')
-    T((None, 'createTime = 1474947089 AND projectId=genomics-test-project'),
-      'createTime:2016-09-26T23:31:29-0400')
-    T((None, 'createTime >= 1474947089 AND projectId=genomics-test-project'),
-      'createTime >= 2016-09-26T23:31:29-0400')
-    T((None, 'createTime >= 1474947090 AND projectId=genomics-test-project'),
-      'createTime > 2016-09-26T23:31:29-0400')
+    T((None, 'metadata.createTime <= "2016-09-26T23:31:29.000Z"'),
+      'metadata.createTime <= 2016-09-26T23:31:29.000Z')
+    T((None, 'metadata.createTime <= "2016-09-26T23:31:29.000Z"'),
+      'metadata.createTime <= "2016-09-26T23:31:29.000Z"')
+    T((('metadata.createTime > "2016-09-26T23:31:29.000Z"'
+        ' AND error.message = ""'),
+       'metadata.createTime > "2016-09-26T23:31:29.000Z"'),
+      'metadata.createTime > "2016-09-26T23:31:29.000Z" AND error.message = ""')
+    T((None, 'error.code = 9'),
+      'error.code = 9')
+    T((None,
+       'metadata.createTime <= "2016-09-26T23:31:29.000Z" AND error.code = 9'),
+      'metadata.createTime <= "2016-09-26T23:31:29.000Z" AND error.code = 9')
+    T((None,
+       'metadata.create_time <= "2016-09-26T23:31:29.000Z" AND error.code = 9'),
+      'metadata.create_time <= "2016-09-26T23:31:29.000Z" AND error.code = 9')
+    T((None, 'done = true'),
+      'done = true')
+    T((None, 'metadata.events : "WorkerReleasedEvent"'),
+      'metadata.events : "WorkerReleasedEvent"')
+    T((None, 'metadata.labels.key = "value"'),
+      'metadata.labels.key = "value"')
+    T((None, 'metadata.labels.key : "*"'),
+      'metadata.labels.key:*')
 
-    T((None, 'createTime <= 1443324688 AND projectId=genomics-test-project'),
-      'createTime<-P1Y')
-    T((None, 'createTime <= 1473737489 AND projectId=genomics-test-project'),
-      'createTime<=-P14D')
-    T((None, 'createTime >= 1482809489 AND projectId=genomics-test-project'),
-      'createTime>=P3M')
-    T((None, 'createTime >= 1506483090 AND projectId=genomics-test-project'),
-      'createTime>P1Y')
-
-    T(('createTime>=2016-09-26T23:31:29-0400 AND status:RUNNING',
-       'createTime >= 1474947089 AND projectId=genomics-test-project'),
-      'createTime>=2016-09-26T23:31:29-0400 AND status:RUNNING')
-
-    T(('createTime>=2016-09-26T23:31:29-0400 status:RUNNING',
-       'createTime >= 1474947089 AND projectId=genomics-test-project'),
-      'createTime>=2016-09-26T23:31:29-0400 status:RUNNING')
-
-    T(('createTime!=P1Y', 'projectId=genomics-test-project'),
-      'createTime!=P1Y')
+    T((None, 'metadata.createTime < "2015-09-26T23:31:29.000Z"'),
+      'metadata.createTime < -P1Y')
 
     T((None, ''),
-      'createTime >= aint-nobody-got-time-for-this',
+      'metadata.createTime >= aint-nobody-got-time-for-this',
       exception=times.DateTimeSyntaxError)
 
 

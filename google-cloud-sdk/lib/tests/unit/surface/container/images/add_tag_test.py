@@ -17,7 +17,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from containerregistry.client import docker_name
 from containerregistry.client.v2 import docker_http as v2_docker_http
 from containerregistry.client.v2 import docker_image as v2_image
 from containerregistry.client.v2 import docker_session as v2_session
@@ -256,12 +255,12 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def testInvalidSourceName(self):
     image_name = 'badi$mage'
-    with self.assertRaises(docker_name.BadNameException):
+    with self.assertRaises(util.InvalidImageNameError):
       self.AddTag(image_name, _GetImageName('tag3'))
 
   def testInvalidDestName(self):
     image_name = 'badi$mage'
-    with self.assertRaises(docker_name.BadNameException):
+    with self.assertRaises(util.InvalidImageNameError):
       self.AddTag(_GetImageName('tag1'), image_name)
 
   def testNonExistentSourceDigest(self):
@@ -271,12 +270,12 @@ class AddTagTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
 
   def testInvalidSourceRepo(self):
     image_name = 'myrepository.com/blah:'
-    with self.assertRaises(docker_name.BadNameException):
+    with self.assertRaises(util.InvalidImageNameError):
       self.AddTag(image_name, _GetImageName('tag3'))
 
   def testInvalidDestRepo(self):
     image_name = 'myrepository.com/blah:'
-    with self.assertRaises(docker_name.BadNameException):
+    with self.assertRaises(util.InvalidImageNameError):
       self.AddTag(_GetImageName('tag1'), image_name)
 
   def testManifestSchema1NonUniqueDigest(self):

@@ -13,6 +13,13 @@ DESCRIPTION
     many custom domains, such as example.com, instead of the default
     appspot.com address. You can use a custom domain with or without SSL.
 
+    App Engine Domain Mappings allow an application to be served via one or
+    many custom domains, such as example.com, instead of the default
+    appspot.com address. You can use a custom domain with or without SSL. Use
+    the AUTOMATIC management type to automatically provision an SSL certificate
+    for your domain. Use the MANUAL management type to provide your own
+    certificate or omit SSL.
+
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
     --flatten, --format, --help, --log-http, --project, --quiet, --trace-token,
@@ -40,6 +47,16 @@ EXAMPLES
     To list your App Engine domains, run:
 
         $ gcloud app domain-mappings list
+
+    To create a domain with an automatically managed certiticate, run:
+
+        $ gcloud app domain-mappings create 'example.com' \
+            --certificate-management=AUTOMATIC
+
+    To create a domain with a manual certificate, run:
+
+        $ gcloud app domain-mappings create 'example.com'                 \
+            --certificate-management=manual --certificate-id=1234
 
 NOTES
     These variants are also available:

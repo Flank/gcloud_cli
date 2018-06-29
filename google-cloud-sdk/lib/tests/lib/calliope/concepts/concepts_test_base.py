@@ -21,6 +21,7 @@ from googlecloudsdk.calliope import parser_arguments
 from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.calliope.concepts import concepts
 from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.calliope.concepts import multitype
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
@@ -124,3 +125,79 @@ class ConceptsTestBase(sdk_test_base.WithFakeAuth,
         booksId=concepts.ResourceParameterAttributeConfig(
             name='book', help_text='Auxilio aliis.',
             fallthroughs=[deps.Fallthrough(Fallthrough, hint='hint')]))
+
+
+class MultitypeTestBase(ConceptsTestBase):
+  """Test base for testing with multitype concepts."""
+
+  def SetUp(self):
+    registry = resources.REGISTRY
+    self.proj_case_book_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'projects.cases.books',
+        'projects/{projectsId}/cases/{casesId}/books/{booksId}',
+        {'': 'projects/{projectsId}/cases/{casesId}/books/{booksId}'},
+        ['projectsId', 'casesId', 'booksId'])
+    self.proj_case_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'projects.cases',
+        'projects/{projectsId}/cases/{casesId}',
+        {'': 'projects/{projectsId}/cases/{casesId}'},
+        ['projectsId', 'casesId'])
+    self.org_shelf_book_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'organizations.shelves.books',
+        'organizations/{organizationsId}/shelves/{shelvesId}/books/{booksId}',
+        {'':
+         'organizations/{organizationsId}/shelves/{shelvesId}/books/{booksId}'},
+        ['organizationsId', 'shelvesId', 'booksId'])
+    self.org_shelf_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'organizations.shelves',
+        'organizations/{organizationsId}/shelves/{shelvesId}',
+        {'': 'organizations/{organizationsId}/shelves/{shelvesId}'},
+        ['organizationsId', 'shelvesId'])
+    self.organization_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'organizations', 'organizations/{organizationsId}',
+        {'': 'organizations/{organizationsId}'},
+        ['organizationsId'])
+    self.org_case_book_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'organizations.cases.books',
+        'organizations/{organizationsId}/cases/{casesId}/books/{booksId}',
+        {'': 'organizations/{organizationsId}/cases/{casesId}/books/{booksId}'},
+        ['organizationsId', 'casesId', 'booksId'])
+    self.org_case_collection = resource_util.CollectionInfo(
+        'example', 'v1', 'https://example.googleapis.com/v1/', '',
+        'organizations.cases',
+        'organizations/{organizationsId}/cases/{casesId}',
+        {'': 'organizations/{organizationsId}/cases/{casesId}'},
+        ['organizationsId', 'casesId'])
+
+    for collection in [
+        self.proj_case_book_collection,
+        self.proj_case_collection,
+        self.org_shelf_book_collection,
+        self.org_shelf_collection,
+        self.organization_collection,
+        self.org_case_book_collection,
+        self.org_case_collection]:
+      registry._RegisterCollection(collection)  # pylint:disable=protected-access
+
+  @property
+  def four_way_resource(self):
+    """A multitype concept spec with four types."""
+    project_shelf_book_resource = util.GetBookResource(name='projectbook')
+    organization_shelf_book_resource = util.GetOrgShelfBookResource(
+        name='orgshelfbook')
+    project_case_book_resource = util.GetProjCaseBookResource(
+        name='projcasebook')
+    organization_case_book_resource = util.GetOrgCaseBookResource(
+        name='orgcasebook')
+    return multitype.MultitypeConceptSpec(
+        'book',
+        project_shelf_book_resource,
+        organization_shelf_book_resource,
+        project_case_book_resource,
+        organization_case_book_resource)

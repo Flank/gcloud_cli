@@ -48,11 +48,6 @@ EXAMPLES
         $ gcloud beta app domain-mappings update '*.example.com'           \
                   --no-certificate-id
 
-    To configure a new managed certificate:
-
-        $ gcloud beta app domain-mappings update '*.example.com'           \
-                  --certificate-management=automatic
-
 NOTES
     This command is currently in BETA and may change without notice. These
     variants are also available:

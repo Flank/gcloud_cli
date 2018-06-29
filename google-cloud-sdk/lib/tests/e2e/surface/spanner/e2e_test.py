@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Integration tests for Cloud Spanner."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from googlecloudsdk.api_lib.spanner import database_sessions
@@ -28,12 +30,12 @@ class SpannerIntegrationTest(e2e_base.WithServiceAuth):
 
   def SetUp(self):
     id_gen = e2e_utils.GetResourceNameGenerator(prefix='spanner')
-    self.instance = id_gen.next()
-    self.instance_name = id_gen.next()
-    self.database = id_gen.next()
-    self.table = id_gen.next()
-    self.column1 = id_gen.next()
-    self.column2 = id_gen.next()
+    self.instance = next(id_gen)
+    self.instance_name = next(id_gen)
+    self.database = next(id_gen)
+    self.table = next(id_gen)
+    self.column1 = next(id_gen)
+    self.column2 = next(id_gen)
     self.messages = core_apis.GetMessagesModule('spanner', 'v1')
 
     self.retryer = retry.Retryer(max_wait_ms=60000)

@@ -561,8 +561,7 @@ response:
 ---
 output:
   stderr: |
-    <START PROGRESS TRACKER>Resuming instance(s) z1, z2, z3
-    <END PROGRESS TRACKER>SUCCESS
+    {"ux": "PROGRESS_TRACKER", "message": "Resuming instance(s) z1, z2, z3", "status": "SUCCESS"}
     Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z1].
     Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z2].
     Updated [https://www.googleapis.com/compute/alpha/projects/fake-project/zones/us-central1-a/instances/z3].

@@ -11,7 +11,7 @@ gcloud beta compute images export \- export a Google Compute Engine image
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute images export\fR \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR) [\fB\-\-async\fR] [\fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute images export\fR \fB\-\-destination\-uri\fR=\fIDESTINATION_URI\fR (\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR) [\fB\-\-async\fR] [\fB\-\-export\-format\fR=\fIEXPORT_FORMAT\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR] [\fB\-\-log\-location\fR=\fILOG_LOCATION\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="2h"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -91,6 +91,12 @@ default project is used.
 Directory in Google Cloud Storage to hold build logs. If not set,
 \f5gs://<project num>.cloudbuild\-logs.googleusercontent.com/\fR will be created
 and used.
+
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The name of the network in your project to use for the image export. The network
+must have access to Google Cloud Storage. If not specified, the network named
+\f5default\fR is used.
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR; default="2h"

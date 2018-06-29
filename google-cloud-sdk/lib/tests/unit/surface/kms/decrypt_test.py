@@ -17,17 +17,23 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import os
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class KeysDecryptTest(base.KmsMockTest):
 
   def SetUp(self):
     self.key_name = self.project_name.Descendant('global/my_kr/my_key')
 
-  def testDecrypt(self):
+  def testDecrypt(self, track):
+    self.track = track
     ct_path = self.Touch(self.temp_path, name='ciphertext', contents='foo bar')
     pt_path = self.Touch(self.temp_path, name='plaintext')
 
@@ -44,7 +50,8 @@ class KeysDecryptTest(base.KmsMockTest):
 
     self.AssertBinaryFileEquals(b'decrypted foo bar', pt_path)
 
-  def testDecryptWithAad(self):
+  def testDecryptWithAad(self, track):
+    self.track = track
     ct_path = self.Touch(self.temp_path, name='ciphertext', contents=b'foo bar')
     aad_path = self.Touch(self.temp_path, name='aad', contents=b'authed data')
     pt_path = self.Touch(self.temp_path, name='plaintext')
@@ -65,7 +72,8 @@ class KeysDecryptTest(base.KmsMockTest):
 
     self.AssertBinaryFileEquals(b'decrypted foo bar', pt_path)
 
-  def testDecryptStdio(self):
+  def testDecryptStdio(self, track):
+    self.track = track
     self.WriteBinaryInput(b'foo bar')
 
     self.kms.projects_locations_keyRings_cryptoKeys.Decrypt.Expect(
@@ -82,7 +90,8 @@ class KeysDecryptTest(base.KmsMockTest):
 
     self.AssertOutputBytesEquals(b'decrypted foo bar')
 
-  def testDecryptMissingCiphertextFile(self):
+  def testDecryptMissingCiphertextFile(self, track):
+    self.track = track
     ct_path = os.path.join(self.temp_path, 'file-that-does-not-exist')
     pt_path = self.Touch(self.temp_path, name='plaintext')
 
@@ -94,7 +103,8 @@ class KeysDecryptTest(base.KmsMockTest):
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id, pt_path, ct_path))
 
-  def testDecryptMissingAadFile(self):
+  def testDecryptMissingAadFile(self, track):
+    self.track = track
     ct_path = self.Touch(self.temp_path, name='ciphertext', contents=b'foo bar')
     aad_path = os.path.join(self.temp_path, 'file-that-does-not-exist')
     pt_path = self.Touch(self.temp_path, name='plaintext')
@@ -108,7 +118,8 @@ class KeysDecryptTest(base.KmsMockTest):
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id, pt_path, ct_path, aad_path))
 
-  def testDecryptUnwritableOutput(self):
+  def testDecryptUnwritableOutput(self, track):
+    self.track = track
     ct_path = self.Touch(self.temp_path, name='plaintext', contents='foo bar')
     pt_path = os.path.join(self.temp_path, 'nested', 'nonexistent', 'file')
 
@@ -124,7 +135,8 @@ class KeysDecryptTest(base.KmsMockTest):
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id, pt_path, ct_path))
 
-  def testDecryptMissingCiphertext(self):
+  def testDecryptMissingCiphertext(self, track):
+    self.track = track
     file_path = self.Touch(self.temp_path, name='foo')
     with self.AssertRaisesArgumentErrorMatches(
         'argument --ciphertext-file: Must be specified.'):
@@ -133,7 +145,8 @@ class KeysDecryptTest(base.KmsMockTest):
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id, file_path))
 
-  def testDecryptMissingPlaintext(self):
+  def testDecryptMissingPlaintext(self, track):
+    self.track = track
     file_path = self.Touch(self.temp_path, name='foo')
     with self.AssertRaisesArgumentErrorMatches(
         'argument --plaintext-file: Must be specified.'):
@@ -142,7 +155,8 @@ class KeysDecryptTest(base.KmsMockTest):
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id, file_path))
 
-  def testDecryptTooLarge(self):
+  def testDecryptTooLarge(self, track):
+    self.track = track
     contents = b'a' * 3 * 65536  # arbitrarily selected limit is 2*65536
     ct_path = self.Touch(self.temp_path, name='ciphertext', contents=contents)
     pt_path = self.Touch(self.temp_path, name='plaintext')
@@ -155,7 +169,8 @@ class KeysDecryptTest(base.KmsMockTest):
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id, pt_path, ct_path))
 
-  def testRejectCiphertextAndAadFromStdin(self):
+  def testRejectCiphertextAndAadFromStdin(self, track):
+    self.track = track
     pt_path = self.Touch(self.temp_path, name='plaintext')
 
     with self.assertRaisesRegex(

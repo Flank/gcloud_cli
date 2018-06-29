@@ -1,0 +1,95 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_SNAPSHOTS_SET\-IAM\-POLICY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute snapshots set\-iam\-policy \- set the IAM policy for a Google Compute Engine snapshot
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute snapshots set\-iam\-policy\fR \fISNAPSHOT_NAME\fR \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Sets the IAM policy for the given snapshot as defined in a JSON or
+YAML file.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Snapshot resource \- The snapshot to set the IAM policy for. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the flag
+[snapshot_name] on the command line with a fully specified name; provide the
+flag [\-\-project] on the command line; set the property [core/project]. This
+must be specified.
+
+.RS 2m
+.TP 2m
+\fISNAPSHOT_NAME\fR
+The ID of the snapshot or a fully qualified identifier for the snapshot.
+
+.RE
+.sp
+.TP 2m
+\fIPOLICY_FILE\fR
+Path to a local JSON or YAML formatted file containing a valid policy.
+
+The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
+or YAML file conforming to the structure of a Policy
+(https://cloud.google.com/iam/reference/rest/v1/Policy).
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/alpha\fR API. The full documentation for this
+API can be found at:
+https://developers.google.com/compute/docs/reference/latest/
+
+
+
+.SH "EXAMPLES"
+
+The following command will read am IAM policy defined in a JSON file
+\'policy.json' and set it for the snapshot \f5my_snapshot\fR:
+
+$ gcloud alpha compute snapshots set\-iam\-policy my_snapshot \e.RS 2m
+policy.json
+
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of the
+policy file format and contents.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

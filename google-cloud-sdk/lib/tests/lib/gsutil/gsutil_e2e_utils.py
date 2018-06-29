@@ -14,6 +14,8 @@
 
 """Set of utilities used in e2e tests involving gsutil."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 import os
 

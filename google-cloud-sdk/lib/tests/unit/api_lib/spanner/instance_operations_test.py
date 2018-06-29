@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for Spanner instance operations library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from apitools.base.py import extra_types
 from googlecloudsdk.api_lib.spanner import instance_operations
 from googlecloudsdk.core import resources
@@ -98,5 +100,5 @@ class InstanceOperationsClientTest(base.SpannerTestBase):
         self.msgs.SpannerProjectsInstancesOperationsListRequest(
             name=ref.RelativeName()+'/operations', pageSize=100),
         response=response)
-    self.assertItemsEqual(
+    self.assertCountEqual(
         instance_operations.List('insId'), [operation])

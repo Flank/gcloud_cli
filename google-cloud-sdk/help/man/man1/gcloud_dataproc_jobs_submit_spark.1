@@ -26,7 +26,7 @@ Submit a Spark job to a cluster.
 .RS 2m
 .TP 2m
 [\-\- \fIJOB_ARGS\fR ...]
-The arguments to pass to the driver.
+Arguments to pass to the driver.
 
 The '\-\-' argument must be specified between gcloud specific args on the left
 and JOB_ARGS on the right.
@@ -80,7 +80,7 @@ bucket.
 
 .TP 2m
 \fB\-\-driver\-log\-levels\fR=[\fIPACKAGE\fR=\fILEVEL\fR,...]
-A list of package to log4j log level pairs to configure driver logging. For
+List of package to log4j log level pairs to configure driver logging. For
 example: root=FATAL,com.example=INFO
 
 .TP 2m
@@ -96,6 +96,11 @@ classpaths.
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
 
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
 .TP 2m
 \fB\-\-max\-failures\-per\-hour\fR=\fIMAX_FAILURES_PER_HOUR\fR
 Specifies maximum number of times a job can be restarted in event of failure.
@@ -103,7 +108,11 @@ Expressed as a per\-hour rate. Default is 0 (no failure retries).
 
 .TP 2m
 \fB\-\-properties\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
-A list of key value pairs to configure Spark.
+List of key value pairs to configure Spark. For a list of available properties,
+see:
+https://spark.apache.org/docs/latest/configuration.html#available\-properties.
+Alternatively, to see examples of how to use the properties flag, see:
+https://cloud.google.com/dataproc/docs/concepts/configuring\-clusters/cluster\-properties#how_the_properties_flag_works
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR

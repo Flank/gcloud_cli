@@ -73,6 +73,11 @@ EXAMPLES
         $ gcloud alpha container images list-tags gcr.io/myproject/myimage \
             --format=json
 
+    To list digests without corresponding tags:
+
+        $ gcloud alpha container images list-tags gcr.io/myproject/myimage \
+            --filter="NOT tags:*"
+
 NOTES
     This command is currently in ALPHA and may change without notice. Usually,
     users of ALPHA commands and flags need to apply for access, agree to

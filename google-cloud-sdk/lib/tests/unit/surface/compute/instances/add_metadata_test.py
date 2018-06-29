@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instances add-metadata subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -77,7 +79,7 @@ class InstancesAddMetadataTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             metadata=messages.Metadata(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=[
                     messages.Metadata.ItemsValueListEntry(
                         key='a',
@@ -112,7 +114,7 @@ class InstancesAddMetadataTest(test_base.BaseTest):
           messages.ComputeInstancesSetMetadataRequest(
               instance='my-instance',
               metadata=messages.Metadata(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[
                       messages.Metadata.ItemsValueListEntry(
                           key='a',
@@ -137,7 +139,7 @@ class InstancesAddMetadataTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             metadata=messages.Metadata(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=[
                     messages.Metadata.ItemsValueListEntry(
                         key='a',
@@ -170,7 +172,7 @@ class InstancesAddMetadataTest(test_base.BaseTest):
         [messages.Instance(
             name='my-instance',
             metadata=messages.Metadata(
-                fingerprint='my-fingerprint',
+                fingerprint=b'my-fingerprint',
                 items=[
                     messages.Metadata.ItemsValueListEntry(
                         key='a',
@@ -210,7 +212,7 @@ class InstancesAddMetadataTest(test_base.BaseTest):
           messages.ComputeInstancesSetMetadataRequest(
               instance='my-instance',
               metadata=messages.Metadata(
-                  fingerprint='my-fingerprint',
+                  fingerprint=b'my-fingerprint',
                   items=[
                       messages.Metadata.ItemsValueListEntry(
                           key='a',
@@ -324,6 +326,126 @@ class InstancesAddMetadataTest(test_base.BaseTest):
               project='my-project',
               zone='us-central1-a'))],
     )
+
+  def testAddMetadataSshKeys_InvalidPublicKey(self):
+    self.make_requests.side_effect = iter([
+        [messages.Instance(name='my-instance')],
+        [],
+    ])
+
+    self.Run("""
+        compute instances add-metadata my-instance
+          --metadata="ssh-keys=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test,sshKeys=ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA test"
+          --zone us-central1-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances, 'Get',
+          messages.ComputeInstancesGetRequest(
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+        [(self.compute_v1.instances, 'SetMetadata',
+          messages.ComputeInstancesSetMetadataRequest(
+              instance='my-instance',
+              metadata=messages.Metadata(items=[
+                  messages.Metadata.ItemsValueListEntry(
+                      key='ssh-keys',
+                      value=
+                      'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test'
+                  ),
+                  messages.Metadata.ItemsValueListEntry(
+                      key='sshKeys',
+                      value=
+                      'ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA test'),
+              ]),
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
+    self.AssertErrEquals(
+        'WARNING: '
+        'The following key(s) are missing the <username> at the front\n'
+        'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test\n'
+        'ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA test\n\n'
+        'Format ssh keys following '
+        'https://cloud.google.com/compute/docs/'
+        'instances/adding-removing-ssh-keys\n')
+
+  def testAddMetadataSshKeys_PrivateKey(self):
+    self.make_requests.side_effect = iter([
+        [messages.Instance(name='my-instance')],
+        [],
+    ])
+
+    self.Run("""
+        compute instances add-metadata my-instance
+          --metadata="ssh-keys=-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAsujygRP8ZH/iHVz0iXSqoProNu0m8aF7ZfogLiToZsvR5MaU\n-----END RSA PRIVATE KEY-----"
+          --zone us-central1-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances, 'Get',
+          messages.ComputeInstancesGetRequest(
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+        [(self.compute_v1.instances, 'SetMetadata',
+          messages.ComputeInstancesSetMetadataRequest(
+              instance='my-instance',
+              metadata=messages.Metadata(items=[
+                  messages.Metadata.ItemsValueListEntry(
+                      key='ssh-keys',
+                      value='-----BEGIN RSA PRIVATE KEY-----\n'
+                      'MIIEpAIBAAKCAQEAsujygRP8ZH/iHVz0'
+                      'iXSqoProNu0m8aF7ZfogLiToZsvR5MaU\n'
+                      '-----END RSA PRIVATE KEY-----'),
+              ]),
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
+    self.AssertErrEquals(
+        'WARNING: '
+        'Private key(s) are detected. Note that only public keys '
+        'should be added.\n')
+
+  def testAddMetadataSshKeys_CorrectKey(self):
+    self.make_requests.side_effect = iter([
+        [messages.Instance(name='my-instance')],
+        [],
+    ])
+
+    self.Run("""
+        compute instances add-metadata my-instance
+          --metadata="ssh-keys=test:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test,sshKeys=test:ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHA test"
+          --zone us-central1-a
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.instances, 'Get',
+          messages.ComputeInstancesGetRequest(
+              instance='my-instance',
+              project='my-project',
+              zone='us-central1-a'))],
+        [(self.compute_v1.instances, 'SetMetadata',
+          messages.ComputeInstancesSetMetadataRequest(
+              instance='my-instance',
+              metadata=messages.Metadata(items=[
+                  messages.Metadata.ItemsValueListEntry(
+                      key='ssh-keys',
+                      value='test:ssh-rsa '
+                      'AAAAB3NzaC1yc2EAAAADAQABAAABAQCy6PKBE/xkf+I test'),
+                  messages.Metadata.ItemsValueListEntry(
+                      key='sshKeys',
+                      value='test:ecdsa-sha2-nistp256 '
+                      'AAAAE2VjZHNhLXNoYTItbmlzdHA test'),
+              ]),
+              project='my-project',
+              zone='us-central1-a'))],
+    )
+
+    self.AssertErrNotContains('WARNING')
 
 
 if __name__ == '__main__':

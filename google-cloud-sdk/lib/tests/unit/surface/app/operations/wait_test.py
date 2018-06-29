@@ -14,6 +14,7 @@
 
 """Tests for gcloud app services."""
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from tests.lib.surface.app import operations_base
 

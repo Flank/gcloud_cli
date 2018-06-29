@@ -13,13 +13,14 @@
 # limitations under the License.
 """Integration tests for devshell credentials."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import devshell
 from googlecloudsdk.core.credentials import store as c_store
 from tests.lib import e2e_base
 from tests.lib import test_case
 from tests.lib.core.credentials import devshell_test_base
-import httplib2
 
 
 @test_case.Filters.RunOnlyOnLinux
@@ -28,7 +29,7 @@ class ProxiedAuthIntegration(e2e_base.WithServiceAuth):
   def SetUp(self):
     # get some real credentials so we can feed tests something that works.
     real_creds = c_store.Load()
-    real_creds.refresh(httplib2.Http())
+    c_store.Refresh(real_creds)
     self.devshell_proxy = devshell_test_base.AuthReferenceServer(
         self.GetPort(),
         response=devshell.CredentialInfoResponse(

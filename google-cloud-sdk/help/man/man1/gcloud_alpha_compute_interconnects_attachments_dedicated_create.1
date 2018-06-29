@@ -11,7 +11,7 @@ gcloud alpha compute interconnects attachments dedicated create \- create a Goog
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute interconnects attachments dedicated create\fR \fINAME\fR \fB\-\-interconnect\fR=\fIINTERCONNECT\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-admin\-enabled\fR] [\fB\-\-candidate\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-vlan\fR=\fIVLAN\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute interconnects attachments dedicated create\fR \fINAME\fR \fB\-\-interconnect\fR=\fIINTERCONNECT\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-candidate\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-admin\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-vlan\fR=\fIVLAN\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,12 +54,6 @@ The Google Cloud Router to use for dynamic routing.
 
 .RS 2m
 .TP 2m
-\fB\-\-admin\-enabled\fR
-Administrative status of the interconnect attachment. If not provided on
-creation, defaults to enabled. When this is enabled, the attachment is
-operational and will carry traffic. Use \-\-no\-admin\-enabled to disable it.
-
-.TP 2m
 \fB\-\-candidate\-subnets\fR=[\fISUBNET\fR,...]
 Up to 16 candidate prefixes that can be used to restrict the allocation of
 \f5cloudRouterIpAddress\fR and \f5customerRouterIpAddress\fR for this
@@ -73,6 +67,12 @@ Google's edge.
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Human\-readable plain\-text description of attachment.
+
+.TP 2m
+\fB\-\-enable\-admin\fR
+Administrative status of the interconnect attachment. If not provided on
+creation, defaults to enabled. When this is enabled, the attachment is
+operational and will carry traffic. Use \-\-no\-enable\-admin to disable it.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -125,9 +125,10 @@ This command is currently in ALPHA and may change without notice. Usually, users
 of ALPHA commands and flags need to apply for access, agree to applicable terms,
 and have their projects whitelisted. Contact Google or sign up on a product's
 page for ALPHA access. Product pages can be found at
-https://cloud.google.com/products/. This variant is also available:
+https://cloud.google.com/products/. These variants are also available:
 
 .RS 2m
+$ gcloud compute interconnects attachments dedicated create
 $ gcloud beta compute interconnects attachments dedicated create
 .RE
 

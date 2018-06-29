@@ -15,7 +15,6 @@
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 from __future__ import unicode_literals
 import copy
 from apitools.base.py import encoding
@@ -25,6 +24,7 @@ from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.category_manager import base
+from six.moves import range
 
 
 class AssetsTest(base.CategoryManagerUnitTestBase):

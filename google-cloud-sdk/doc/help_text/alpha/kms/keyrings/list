@@ -11,7 +11,7 @@ DESCRIPTION
 
 FLAGS
      --location=LOCATION
-        The location of the requested resource.
+        Location of the keyring.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

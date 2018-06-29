@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed update \- update Google Compute En
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-add\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-names\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-add\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-names\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -65,6 +65,34 @@ managed instance group deletes disks when deleting instances; however, in the
 case of stateful disks, these disks are detached from the deleted instance and
 attached to new instances the managed instance group creates.
 
+.TP 2m
+\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR
+Specify type of instance redistribution policy. Instance redistribution type
+gives possibility to enable or disable automatic instance redistribution between
+zones to its target distribution. Target distribution is a state of regional
+managed instance group where all instances are spread out equally between all
+target zones.
+
+Instance redistribution type may be specified for non\-autoscaled regional
+managed instance group only. By default it is set to PROACTIVE.
+
+The following types are available:
+
+.RS 2m
+.IP "\(em" 2m
+NONE \- managed instance group will not take any action to bring instances to
+its target distribution.
+
+.IP "\(em" 2m
+PROACTIVE \- managed instance group will actively converge all instances between
+zones to its target distribution.
+
+.RE
+.RE
+.sp
+\fITYPE\fR must be one of: \fBNONE\fR, \fBPROACTIVE\fR.
+
+.RS 2m
 .TP 2m
 \fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]
 Stop considering the disks stateful by the instance group.

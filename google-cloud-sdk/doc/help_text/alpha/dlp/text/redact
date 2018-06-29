@@ -46,10 +46,8 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --min-likelihood=MIN_LIKELIHOOD; default="possible"
-        Only return findings equal to or above this threshold. One of:
-        very-unlikely, unlikely, possible, likely, very-likely. The default
-        value is possible. MIN_LIKELIHOOD must be one of: likely, possible,
-        unlikely, very-likely, very-unlikely.
+        Only return findings equal to or above this threshold. MIN_LIKELIHOOD
+        must be one of: likely, possible, unlikely, very-likely, very-unlikely.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

@@ -29,7 +29,7 @@ class NodeTypesListTest(test_base.BaseTest,
                         completer_test_base.CompleterBase):
 
   def SetUp(self):
-    self.track = base.ReleaseTrack.ALPHA
+    self.track = base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
@@ -61,7 +61,7 @@ class NodeTypesListTest(test_base.BaseTest,
     self.RunCompleter(
         flags.NodeTypesCompleter,
         expected_command=[
-            'alpha',
+            'beta',
             'compute',
             'sole-tenancy',
             'node-types',

@@ -3,21 +3,11 @@ NAME
         Dataproc workflow templates
 
 SYNOPSIS
-    gcloud beta dataproc workflow-templates GROUP | COMMAND [--region=REGION]
+    gcloud beta dataproc workflow-templates GROUP | COMMAND
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create and manage Google Cloud Dataproc workflow templates.
-
-FLAGS
-     --region=REGION
-        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-        independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,
@@ -47,6 +37,9 @@ COMMANDS
 
      instantiate
         (BETA) Instantiate a workflow template.
+
+     instantiate-from-file
+        (BETA) Instantiate a workflow template from a file.
 
      list
         (BETA) List workflow templates.

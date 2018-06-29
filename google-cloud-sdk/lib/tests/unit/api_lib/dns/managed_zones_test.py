@@ -42,12 +42,12 @@ class ManagedZonesTest(base.DnsMockMultiTrackTest):
         dnssecConfig=self.messages.ManagedZoneDnsSecConfig(
             defaultKeySpecs=[
             ],
-            kind=u'dns#managedZoneDnsSecConfig',
+            kind='dns#managedZoneDnsSecConfig',
             nonExistence=None,
             state=states_enum.off,
         ),
         id=None,
-        kind=u'dns#managedZone',
+        kind='dns#managedZone',
         name='mz',
         nameServerSet=None,
         nameServers=[

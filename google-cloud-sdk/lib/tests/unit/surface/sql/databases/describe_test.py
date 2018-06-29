@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.util import apis as core_apis
 from tests.lib import test_case
 from tests.lib.surface.sql import base
@@ -36,10 +38,10 @@ class DatabasesDescribeTest(base.SqlMockTestBeta):
             charset='utf8',
             collation='some-collation',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/mock-instance/databases/mock-db'.
             format(self.Project()),
             etag='\"cO45wbpDRrmLAoMK32AI7It1bHE/kawIL3mk4XzLj-zNOtoR5bf2Ahg\"',
-            kind=u'sql#database'))
+            kind='sql#database'))
 
     self.Run('sql databases describe mock-db --instance=mock-instance')
     self.AssertOutputContains(

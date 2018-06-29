@@ -480,6 +480,21 @@ class BuildPackagesUnitTest(base.MlBetaPlatformTestBase):
            'source directory [{}]').format(other_temp_dir, self.package_root)):
         jobs_prep.BuildPackages(self.package_dir, self.output_path)
 
+  def testBuildPackages_SourceDirDoesNotExist(self):
+    bad_dir = 'junk/junk'
+    with self.AssertRaisesExceptionMatches(
+        jobs_prep.InvalidSourceDirError,
+        'junk'):
+      jobs_prep.BuildPackages(bad_dir, self.output_path)
+
+  def testBuildPackages_ErrorVerifyingWriteAccess(self):
+    self.StartObjectPatch(files, 'HasWriteAccessInDir',
+                          side_effect=ValueError)
+    with self.AssertRaisesExceptionMatches(
+        jobs_prep.InvalidSourceDirError,
+        os.path.dirname(self.package_dir)):
+      jobs_prep.BuildPackages(self.package_dir, self.output_path)
+
 
 def _FakeUploadFiles(paths, bucket, gs_prefix=None):
   uploaded_files = []

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for the instances remove-labels subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import instances_labels_test_base
@@ -30,7 +32,7 @@ class RemoveLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     edited_labels = (('key2', 'value2'), ('key3', 'value3'))
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=instance_labels, fingerprint='fingerprint-42')
+        instance_ref, labels=instance_labels, fingerprint=b'fingerprint-42')
     updated_instance = self._MakeInstanceProto(
         instance_ref, labels=edited_labels)
 
@@ -39,7 +41,7 @@ class RemoveLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
 
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
-        instance_ref, edited_labels, 'fingerprint-42', operation)
+        instance_ref, edited_labels, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
@@ -56,7 +58,7 @@ class RemoveLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
     )
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=instance_labels, fingerprint='fingerprint-42')
+        instance_ref, labels=instance_labels, fingerprint=b'fingerprint-42')
     updated_instance = self._MakeInstanceProto(instance_ref, labels={})
 
     operation_ref = self._GetOperationRef('operation-1', 'atlanta')
@@ -64,7 +66,7 @@ class RemoveLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
 
     self._ExpectGetRequest(instance_ref, instance)
     self._ExpectLabelsSetRequest(
-        instance_ref, {}, 'fingerprint-42', operation)
+        instance_ref, {}, b'fingerprint-42', operation)
     self._ExpectOperationGetRequest(operation_ref, operation)
     self._ExpectGetRequest(instance_ref, updated_instance)
 
@@ -80,7 +82,7 @@ class RemoveLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
         ('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
 
     instance = self._MakeInstanceProto(
-        instance_ref, labels=instance_labels, fingerprint='fingerprint-42')
+        instance_ref, labels=instance_labels, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(instance_ref, instance)
 
@@ -92,7 +94,7 @@ class RemoveLabelsTest(instances_labels_test_base.InstancesLabelsTestBase):
   def testRemoveWithNoLabelsOnInstance(self):
     instance_ref = self._GetInstanceRef('instance-1', zone='atlanta')
     instance = self._MakeInstanceProto(
-        instance_ref, labels={}, fingerprint='fingerprint-42')
+        instance_ref, labels={}, fingerprint=b'fingerprint-42')
 
     self._ExpectGetRequest(instance_ref, instance)
 

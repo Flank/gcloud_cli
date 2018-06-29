@@ -78,6 +78,11 @@ class InterconnectsCreateGATest(test_base.BaseTest):
 
     self.CheckInterconnectRequest()
     self.AssertOutputEquals('')
+    self.AssertErrContains(
+        'Please check the provided contact email for further instructions on '
+        'how to activate your Interconnect. See also https://cloud.google.com/'
+        'interconnect/docs/how-to/dedicated/retrieving-loas for more detailed '
+        'help.')
 
   def testDescription(self):
     self.ExpectInterconnectRequest(description='this is my interconnect')
@@ -171,9 +176,10 @@ class InterconnectsCreateBetaTest(test_base.BaseTest):
              '--customer-name customer-name')
 
     self.CheckInterconnectRequest()
+    # This command does not print to stdout.
     self.AssertOutputEquals('')
-    self.AssertErrEquals('WARNING: IT_PRIVATE will be deprecated for '
-                         'interconnect-type. Please use DEDICATED instead.\n')
+    self.AssertErrContains('WARNING: IT_PRIVATE will be deprecated for '
+                           'interconnect-type. Please use DEDICATED instead.\n')
 
   def testCreateInterconnect_dedicated(self):
     self.ExpectInterconnectRequest(interconnectType=self.messages.Interconnect.
@@ -188,7 +194,11 @@ class InterconnectsCreateBetaTest(test_base.BaseTest):
     self.CheckInterconnectRequest(interconnectType=self.messages.Interconnect.
                                   InterconnectTypeValueValuesEnum.DEDICATED)
     self.AssertOutputEquals('')
-    self.AssertErrEquals('')
+    self.AssertErrContains(
+        'Please check the provided contact email for further instructions on '
+        'how to activate your Interconnect. See also https://cloud.google.com/'
+        'interconnect/docs/how-to/dedicated/retrieving-loas for more detailed '
+        'help.')
 
   def testDescription(self):
     self.ExpectInterconnectRequest(description='this is my interconnect')
@@ -201,8 +211,8 @@ class InterconnectsCreateBetaTest(test_base.BaseTest):
 
     self.CheckInterconnectRequest(description='this is my interconnect')
     self.AssertOutputEquals('')
-    self.AssertErrEquals('WARNING: IT_PRIVATE will be deprecated for '
-                         'interconnect-type. Please use DEDICATED instead.\n')
+    self.AssertErrContains('WARNING: IT_PRIVATE will be deprecated for '
+                           'interconnect-type. Please use DEDICATED instead.\n')
 
   def testCreateWithUri(self):
     self.ExpectInterconnectRequest(description='this is my interconnect')
@@ -245,8 +255,8 @@ class InterconnectsCreateBetaTest(test_base.BaseTest):
 
     self.CheckInterconnectRequest()
     self.AssertOutputEquals('')
-    self.AssertErrEquals('WARNING: IT_PRIVATE will be deprecated for '
-                         'interconnect-type. Please use DEDICATED instead.\n')
+    self.AssertErrContains('WARNING: IT_PRIVATE will be deprecated for '
+                           'interconnect-type. Please use DEDICATED instead.\n')
 
 
 class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):
@@ -281,7 +291,11 @@ class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):
     self.CheckInterconnectRequest(interconnectType=self.messages.Interconnect.
                                   InterconnectTypeValueValuesEnum.DEDICATED)
     self.AssertOutputEquals('')
-    self.AssertErrEquals('')
+    self.AssertErrContains(
+        'Please check the provided contact email for further instructions on '
+        'how to activate your Interconnect. See also https://cloud.google.com/'
+        'interconnect/docs/how-to/dedicated/retrieving-loas for more detailed '
+        'help.')
 
 
 if __name__ == '__main__':

@@ -13,7 +13,8 @@
 # limitations under the License.
 """Integration tests for the emulators datastore commands."""
 
-import urllib2
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.emulators import datastore_util
 from googlecloudsdk.command_lib.emulators import util
@@ -21,6 +22,10 @@ from googlecloudsdk.command_lib.util import java
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 
 
 def IsGCDComponentInstalled():
@@ -88,7 +93,7 @@ class DatastoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
         match_strings=[match_text],
         timeout=60):
 
-      data = urllib2.urlopen('http://localhost:' + port).read()
+      data = six.moves.urllib.request.urlopen('http://localhost:' + port).read()
       if legacy:
         self.assertTrue('Cloud Datastore service' in data,
                         'Datastore was not started')

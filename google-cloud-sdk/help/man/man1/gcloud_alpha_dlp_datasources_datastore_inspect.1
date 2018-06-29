@@ -1,0 +1,177 @@
+
+.TH "GCLOUD_ALPHA_DLP_DATASOURCES_DATASTORE_INSPECT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dlp datasources datastore inspect \- schedules a job to inspect content in a Cloud Datastore
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dlp datasources datastore inspect\fR \fIDATASTORE_KIND\fR \fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...] (\fB\-\-output\-tables\fR=[\fIOUTPUT_TABLES\fR,...]\ |\ \fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]) [\fB\-\-exclude\-info\-types\fR] [\fB\-\-include\-quote\fR] [\fB\-\-job\-id\fR=\fIJOB_ID\fR] [\fB\-\-max\-findings\fR=\fIMAX_FINDINGS\fR;\ default=1000] [\fB\-\-max\-findings\-per\-item\fR=\fIMAX_FINDINGS_PER_ITEM\fR] [\fB\-\-max\-time\fR=\fIMAX_TIME\fR] [\fB\-\-min\-likelihood\fR=\fIMIN_LIKELIHOOD\fR;\ default="possible"] [\fB\-\-min\-time\fR=\fIMIN_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Schedules a job to inspect content in a Cloud Datastore for
+sensitive data.
+
+.RS 2m
+See Inspecting Storage and Databases for Sensitive Data (https://cloud.google.com/dlp/docs/inspecting\-storage)
+for more details.
+.RE
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIDATASTORE_KIND\fR
+The Cloud Datastore kind or table to scan. The kind can optionally be prefixed
+with the Cloud Datastore namespace ID \- for example
+\f5namespace:example\-kind\fR or simply \f5example\-kind\fR
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-info\-types\fR=[\fIINFOTYPE\fR,...]
+Which infoTypes to scan input for. The values must correspond to infoType values
+found in documentation. For more information about valid infoTypes, see
+infoTypes Reference (https://cloud.google.com/dlp/docs/infotypes\-reference)
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-output\-tables\fR=[\fIOUTPUT_TABLES\fR,...]
+Publishes results of a Cloud DLP job to one or more BigQuery tables. BigQuery
+tables are uniquely identified by their project_id, dataset_id, and table_id in
+the format \f5<project_id>.<dataset_id>.<table_id>\fR.
+
+.TP 2m
+\fB\-\-output\-topics\fR=[\fIOUTPUT_TOPICS\fR,...]
+Publishes the results of a Cloud DLP job to one or more Cloud Pub/Sub topics.
+
+Note: The topic must have given publishing access rights to the DLP API service
+account executing the Cloud DLP job.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-exclude\-info\-types\fR
+Whether or not to exclude type information of the findings. Type information is
+included by default.
+
+.TP 2m
+\fB\-\-include\-quote\fR
+If True, the server will attempt to filter out profanities, replacing all but
+the initial character in each filtered word with asterisks, e.g. "f**\fB".
+
+.TP 2m
+\fR\-\-job\-id\fB=\fIJOB_ID\fR
+Optional job ID to use for the created job. If not provided, a job ID will
+automatically be generated. Must be unique within the project. The job ID can
+contain uppercase and lowercase letters, numbers, and hyphens; that is, it must
+match the regular expression: \f5[a\-zA\-Z\e\ed\-]+\fR. The maximum length is
+100 characters. Can be empty to allow the system to generate one.
+
+.TP 2m
+\fR\-\-max\-findings\fB=\fIMAX_FINDINGS\fR; default=1000
+Maximum number of findings that will be returned per execution.
+
+If not specified, will return up to the system maximum of 1000 findings.
+
+.TP 2m
+\fR\-\-max\-findings\-per\-item\fB=\fIMAX_FINDINGS_PER_ITEM\fR
+Maximum number of findings that will be returned for each item scanned.
+
+If not specified, no limits are applied.
+
+.TP 2m
+\fR\-\-max\-time\fB=\fIMAX_TIME\fR
+Scan will include items in repository whose age is >= min\-time and <=
+max\-time.
+
+If max\-time is omitted then there is no maximum time limit.
+
+See $ gcloud topic datetimes for information on time formats.
+
+.TP 2m
+\fR\-\-min\-likelihood\fB=\fIMIN_LIKELIHOOD\fR; default="possible"
+Only return findings equal to or above this threshold. \fIMIN_LIKELIHOOD\fR must
+be one of: \fRlikely\fB, \fRpossible\fB, \fRunlikely\fB, \fRvery\-likely\fB,
+\fRvery\-unlikely\fB.
+
+.TP 2m
+\fR\-\-min\-time\fB=\fIMIN_TIME\fR
+Scan will include items in repository whose age is >= min\-time and <=
+max\-time.
+
+If max\-time is omitted then there is no maximum time limit.
+
+See $ gcloud topic datetimes for information on time formats.
+
+
+\fR
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-configuration,
+\-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdlp/v2\fR API. The full documentation for this API can
+be found at: https://cloud.google.com/dlp/docs/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a job \f5my\-ds\-job\fR to scan records in Cloud
+Datastore table \f5myds:mykind\fR:
+
+.RS 2m
+$ gcloud alpha dlp datasources datastore inspect  `myds:mykind` \e
+    \-\-job\-id my\-ds\-job \-\-min\-time '2018\-01\-01T12:00:00Z' \e
+    \-\-max\-time '2018\-01\-31T12:00:00Z' \-\-output\-topics my\-topic \e
+    \-\-max\-findings\-per\-item 3 \-\-max\-findings 1000 \e
+    \-\-info\-types PHONE_NUMBER,EMAIL_ADDRESS \e
+    \-\-min\-likelihood very\-likely \-\-include\-quote \e
+    \-\-exclude\-info\-types
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. Usually, users
+of ALPHA commands and flags need to apply for access, agree to applicable terms,
+and have their projects whitelisted. Contact Google or sign up on a product's
+page for ALPHA access. Product pages can be found at
+https://cloud.google.com/products/.
+

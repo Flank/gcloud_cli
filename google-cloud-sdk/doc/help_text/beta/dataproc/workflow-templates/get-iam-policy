@@ -3,26 +3,36 @@ NAME
         a workflow template
 
 SYNOPSIS
-    gcloud beta dataproc workflow-templates get-iam-policy TEMPLATE
-        [--region=REGION] [--filter=EXPRESSION] [--limit=LIMIT]
+    gcloud beta dataproc workflow-templates get-iam-policy
+        (TEMPLATE : --region=REGION) [--filter=EXPRESSION] [--limit=LIMIT]
         [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Gets the IAM policy for a workflow template, given a template ID.
 
 POSITIONAL ARGUMENTS
-     TEMPLATE
-        The ID of the workflow template to retrieve the policy for.
+     Template resource - The name of the workflow template to retrieve the
+     policy for. The arguments in this group can be used to specify the
+     attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the flag [TEMPLATE] on the command line with a fully
+     specified name; provide the flag [--project] on the command line; set the
+     property [core/project]. This must be specified.
 
-FLAGS
-     --region=REGION
-        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-        independent resource namespace constrained to deploying instances into
-        Compute Engine zones inside the region. The default value of global is
-        a special multi-region namespace which is capable of deploying
-        instances into all Compute Engine zones globally, and is disjoint from
-        other Cloud Dataproc regions. Overrides the default dataproc/region
-        property value for this command invocation.
+       TEMPLATE
+          The ID of the template or a fully qualified identifier for the
+          template. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --region=REGION
+          The Cloud DataProc region for the template. Each Cloud Dataproc
+          region constitutes an independent resource namespace constrained to
+          deploying instances into Google Compute Engine zones inside the
+          region. The default value of "global" is a special multi-region
+          namespace which is capable of deploying instances into all Google
+          Compute Engine zones globally, and is disjoint from other Cloud
+          Dataproc regions. Overrides the default dataproc/region property
+          value for this command invocation.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION

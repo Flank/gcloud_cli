@@ -11,7 +11,7 @@ gcloud beta dataproc workflow\-templates set\-managed\-cluster \- set a managed 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dataproc workflow\-templates set\-managed\-cluster\fR \fITEMPLATE\fR [\fB\-\-no\-address\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-cluster\-name\fR=\fICLUSTER_NAME\fR] [\fB\-\-initialization\-action\-timeout\fR=\fITIMEOUT\fR;\ default="10m"] [\fB\-\-initialization\-actions\fR=\fICLOUD_STORAGE_URI\fR,[...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-master\-boot\-disk\-size\fR=\fIMASTER_BOOT_DISK_SIZE\fR] [\fB\-\-master\-boot\-disk\-type\fR=\fIMASTER_BOOT_DISK_TYPE\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-master\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-master\-local\-ssds\fR=\fINUM_MASTER_LOCAL_SSDS\fR] [\fB\-\-num\-masters\fR=\fINUM_MASTERS\fR] [\fB\-\-num\-worker\-local\-ssds\fR=\fINUM_WORKER_LOCAL_SSDS\fR] [\fB\-\-preemptible\-worker\-boot\-disk\-size\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_SIZE\fR] [\fB\-\-preemptible\-worker\-boot\-disk\-type\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_TYPE\fR] [\fB\-\-properties\fR=[\fIPREFIX\fR:\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-scopes\fR=\fISCOPE\fR,[\fISCOPE\fR,...]] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-worker\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-worker\-boot\-disk\-size\fR=\fIWORKER_BOOT_DISK_SIZE\fR] [\fB\-\-worker\-boot\-disk\-type\fR=\fIWORKER_BOOT_DISK_TYPE\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-worker\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR\ |\ \fB\-\-max\-age\fR=\fIMAX_AGE\fR] [\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-version\fR=\fIVERSION\fR] [\fB\-\-network\fR=\fINETWORK\fR\ |\ \fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-single\-node\fR\ |\ \fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR\ \fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dataproc workflow\-templates set\-managed\-cluster\fR (\fITEMPLATE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-no\-address\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-cluster\-name\fR=\fICLUSTER_NAME\fR] [\fB\-\-initialization\-action\-timeout\fR=\fITIMEOUT\fR;\ default="10m"] [\fB\-\-initialization\-actions\fR=\fICLOUD_STORAGE_URI\fR,[...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-master\-boot\-disk\-size\fR=\fIMASTER_BOOT_DISK_SIZE\fR] [\fB\-\-master\-boot\-disk\-type\fR=\fIMASTER_BOOT_DISK_TYPE\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-master\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-master\-local\-ssds\fR=\fINUM_MASTER_LOCAL_SSDS\fR] [\fB\-\-num\-masters\fR=\fINUM_MASTERS\fR] [\fB\-\-num\-worker\-local\-ssds\fR=\fINUM_WORKER_LOCAL_SSDS\fR] [\fB\-\-preemptible\-worker\-boot\-disk\-size\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_SIZE\fR] [\fB\-\-preemptible\-worker\-boot\-disk\-type\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_TYPE\fR] [\fB\-\-properties\fR=[\fIPREFIX\fR:\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-scopes\fR=\fISCOPE\fR,[\fISCOPE\fR,...]] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-worker\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-worker\-boot\-disk\-size\fR=\fIWORKER_BOOT_DISK_SIZE\fR] [\fB\-\-worker\-boot\-disk\-type\fR=\fIWORKER_BOOT_DISK_TYPE\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-worker\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR\ |\ \fB\-\-max\-age\fR=\fIMAX_AGE\fR] [\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-version\fR=\fIVERSION\fR] [\fB\-\-network\fR=\fINETWORK\fR\ |\ \fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-single\-node\fR\ |\ \fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR\ \fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -25,10 +25,34 @@ gcloud beta dataproc workflow\-templates set\-managed\-cluster \- set a managed 
 
 .RS 2m
 .TP 2m
+
+Template resource \- The name of the workflow template to set managed cluster.
+The arguments in this group can be used to specify the attributes of this
+resource. (NOTE) Some attributes are not given arguments in this group but can
+be set in other ways. To set the [project] attribute: provide the flag
+[TEMPLATE] on the command line with a fully specified name; provide the flag
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
+
+.RS 2m
+.TP 2m
 \fITEMPLATE\fR
-The ID of the workflow template to set managed cluster.
+The ID of the template or a fully qualified identifier for the template. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The Cloud DataProc region for the template. Each Cloud Dataproc region
+constitutes an independent resource namespace constrained to deploying instances
+into Google Compute Engine zones inside the region. The default value of
+"global" is a special multi\-region namespace which is capable of deploying
+instances into all Google Compute Engine zones globally, and is disjoint from
+other Cloud Dataproc regions. Overrides the default \f5dataproc/region\fR
+property value for this command invocation.
 
 
+.RE
 .RE
 .sp
 
@@ -66,6 +90,11 @@ cluster.
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 \fB\-\-master\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]
@@ -199,19 +228,9 @@ for more information.
 
 
 .TP 2m
-\fB\-\-region\fR=\fIREGION\fR
-Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
-independent resource namespace constrained to deploying instances into Compute
-Engine zones inside the region. The default value of \f5global\fR is a special
-multi\-region namespace which is capable of deploying instances into all Compute
-Engine zones globally, and is disjoint from other Cloud Dataproc regions.
-Overrides the default \fBdataproc/region\fR property value for this command
-invocation.
-
-.TP 2m
 \fB\-\-scopes\fR=\fISCOPE\fR,[\fISCOPE\fR,...]
-Specifies scopes for the node instances. The project's default service account
-is used. Multiple SCOPEs can specified, separated by commas. Examples:
+Specifies scopes for the node instances. Multiple SCOPEs can be specified,
+separated by commas. Examples:
 
 .RS 2m
 $ gcloud beta dataproc workflow\-templates set\-managed\-cluster \e
@@ -224,8 +243,8 @@ $ gcloud beta dataproc workflow\-templates set\-managed\-cluster \e
     example\-cluster \-\-scopes sqlservice,bigquery
 .RE
 
-The following scopes necessary for the cluster to function properly are always
-added, even if not explicitly specified:
+The following \fBminimum scopes\fR are necessary for the cluster to function
+properly and are always added, even if not explicitly specified:
 
 
 .TS
@@ -236,7 +255,8 @@ https://www.googleapis.com/auth/devstorage.read_write
 https://www.googleapis.com/auth/logging.write
 .TE
 
-If this flag is not specified the following default scopes are also included:
+If the \f5\-\-scopes\fR flag is not specified, the following \fBdefault
+scopes\fR are also included:
 
 
 .TS

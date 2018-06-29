@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
     gcloud app domain-mappings update DOMAIN
+        [--certificate-management=CERTIFICATE_MANAGEMENT]
         [--certificate-id=CERTIFICATE_ID | --no-certificate-id]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -15,6 +16,12 @@ POSITIONAL ARGUMENTS
         .example.com
 
 FLAGS
+     --certificate-management=CERTIFICATE_MANAGEMENT
+        Type of certificate management. 'automatic' will provision an SSL
+        certificate automatically while 'manual' requires the user to provide a
+        certificate id to provision. CERTIFICATE_MANAGEMENT must be one of:
+        automatic, manual.
+
      At most one of these may be specified:
 
        --certificate-id=CERTIFICATE_ID

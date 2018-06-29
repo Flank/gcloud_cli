@@ -110,8 +110,8 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
     self.AssertErrMatches(r'Failed to delete environment \[{}\]'.format(
         self.TEST_ENVIRONMENT_NAME))
     self.AssertErrMatches(
-        r'^<START PROGRESS TRACKER>Waiting for \[{}] to be deleted'.format(
-            self.TEST_ENVIRONMENT_NAME2))
+        r'^{{"ux": "PROGRESS_TRACKER", "message": "Waiting for \[{}] to '
+        r'be deleted'.format(self.TEST_ENVIRONMENT_NAME2))
 
   def testSuccessfulDeleteMultipleWithSingleSlowFailure_synchronous(self):
     failed_op_metadata = self.messages.OperationMetadata(
@@ -150,8 +150,8 @@ class EnvironmentsDeleteTest(base.EnvironmentsUnitTest):
     self.AssertErrMatches(r'Failed to delete environment \[{}\]'.format(
         self.TEST_ENVIRONMENT_NAME))
     self.AssertErrMatches(
-        r'^<START PROGRESS TRACKER>Waiting for \[{}] to be deleted\s*^<END '
-        'PROGRESS TRACKER>SUCCESS$'.format(self.TEST_ENVIRONMENT_NAME2))
+        r'^{{"ux": "PROGRESS_TRACKER", "message": "Waiting for \[{}] to be '
+        'deleted"'.format(self.TEST_ENVIRONMENT_NAME2))
 
   def testSuccessfulDeleteMultipleWithSingleFastFailure_asynchronous(self):
     self.WriteInput('y\n')

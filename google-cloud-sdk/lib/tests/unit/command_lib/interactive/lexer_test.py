@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for the gcloud interactive lexer module."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.interactive import lexer
 from tests.lib import subtests
 

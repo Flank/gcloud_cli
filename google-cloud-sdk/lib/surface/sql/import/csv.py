@@ -19,8 +19,8 @@ Cloud Storage bucket with one line per row and comma-separated fields.
 
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.sql import api_util
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
@@ -45,7 +45,7 @@ class Sql(base.Command):
           on the command line after this command. Positional arguments are
           allowed.
     """
-    import_util.AddBaseImportFlags(parser)
+    import_util.AddBaseImportFlags(parser, filetype='CSV')
     flags.AddDatabase(
         parser,
         'The database (for example, guestbook) to which the import is made.',

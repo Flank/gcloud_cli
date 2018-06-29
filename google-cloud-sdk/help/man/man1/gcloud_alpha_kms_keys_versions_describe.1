@@ -11,7 +11,7 @@ gcloud alpha kms keys versions describe \- get metadata for a given version
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys versions describe\fR \fIVERSION\fR [\fB\-\-key\fR=\fIKEY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys versions describe\fR \fIVERSION\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,6 +38,14 @@ Name of the version to describe.
 .TP 2m
 \fB\-\-key\fR=\fIKEY\fR
 The containing key.
+
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the keyring.
 
 
 .RE

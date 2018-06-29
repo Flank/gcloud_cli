@@ -6,6 +6,7 @@ SYNOPSIS
     gcloud alpha compute instance-groups managed create NAME --size=SIZE
         --template=TEMPLATE [--base-instance-name=BASE_INSTANCE_NAME]
         [--description=DESCRIPTION] [--initial-delay=INITIAL_DELAY]
+        [--instance-redistribution-type=TYPE]
         [--stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]] [--stateful-names]
         [--target-pool=[TARGET_POOL,...]] [--zones=ZONE,[ZONE,...]]
         [--health-check=HEALTH_CHECK | --http-health-check=HTTP_HEALTH_CHECK
@@ -50,6 +51,27 @@ OPTIONAL FLAGS
         to be initializing and should not be autohealed even if unhealthy. This
         value cannot be greater than 1 hour. See $ gcloud topic datetimes for
         information on duration formats.
+
+     --instance-redistribution-type=TYPE
+        Specify type of instance redistribution policy. Instance redistribution
+        type gives possibility to enable or disable automatic instance
+        redistribution between zones to its target distribution. Target
+        distribution is a state of regional managed instance group where all
+        instances are spread out equally between all target zones.
+
+        Instance redistribution type may be specified for non-autoscaled
+        regional managed instance group only. By default it is set to
+        PROACTIVE.
+
+        The following types are available:
+
+        * NONE - managed instance group will not take any action to bring
+          instances to its target distribution.
+
+        * PROACTIVE - managed instance group will actively converge all
+          instances between zones to its target distribution.
+
+    TYPE must be one of: NONE, PROACTIVE.
 
      --stateful-disks=DEVICE_NAME,[DEVICE_NAME,...]
         Disks considered stateful by the instance group. Usually, the managed

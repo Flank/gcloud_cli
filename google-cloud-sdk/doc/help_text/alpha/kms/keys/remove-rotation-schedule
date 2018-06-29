@@ -3,7 +3,8 @@ NAME
         schedule for a key
 
 SYNOPSIS
-    gcloud alpha kms keys remove-rotation-schedule KEY [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha kms keys remove-rotation-schedule KEY [--keyring=KEYRING]
+        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Removes the rotation schedule for the given key.
@@ -11,6 +12,13 @@ DESCRIPTION
 POSITIONAL ARGUMENTS
      KEY
         Name of the key from which to clear the rotation schedule.
+
+FLAGS
+     --keyring=KEYRING
+        Key ring of the key.
+
+     --location=LOCATION
+        Location of the key.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

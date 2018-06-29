@@ -205,34 +205,6 @@ class StreamCapturerTest(sdk_test_base.SdkBase):
 
 class FileIoCapturerTest(sdk_test_base.SdkBase):
 
-  def testWrite(self):
-    def _SideEffect(*unused_args, **unused_kwargs):
-      return io.StringIO()
-    with self.StartObjectPatch(
-        six.moves.builtins, 'open', side_effect=_SideEffect):
-      file_io_capturer = session_capturer.FileIoCapturer()
-    with open('some_file', 'w') as f:
-      f.write('some text')
-    self.assertEqual(file_io_capturer.GetOutputs(), [{
-        'name': 'some_file',
-        'content': 'some text'
-    }])
-    file_io_capturer.Unmock()
-
-  def testRead(self):
-    def _SideEffect(*unused_args, **unused_kwargs):
-      return io.StringIO('some text')
-    with self.StartObjectPatch(
-        six.moves.builtins, 'open', side_effect=_SideEffect):
-      file_io_capturer = session_capturer.FileIoCapturer()
-    with open('some_file', 'r') as f:
-      self.assertEqual(f.read(), 'some text')
-    self.assertEqual(file_io_capturer.GetInputs(), [{
-        'name': 'some_file',
-        'content': 'some text'
-    }])
-    file_io_capturer.Unmock()
-
   def testFilesToCapture(self):
     def _SideEffect(*unused_args, **unused_kwargs):
       return io.StringIO()

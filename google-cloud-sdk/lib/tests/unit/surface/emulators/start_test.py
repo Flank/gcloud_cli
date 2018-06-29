@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for surface.emulators.start."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.command_lib.emulators import pubsub_util
 from googlecloudsdk.command_lib.emulators import util
 from googlecloudsdk.command_lib.util import java
@@ -35,6 +38,15 @@ class StartTest(cli_test_base.CliTestBase):
     self.pubsub_prefix_output_mock = mock.MagicMock()
     self.proxy_exec_mock = mock.MagicMock()
     self.proxy_prefix_output_mock = mock.MagicMock()
+
+    class _ContextManager(object):
+
+      def __enter__(self):
+        pass
+
+      def __exit__(self, *a):
+        pass
+
     self.StartObjectPatch(java, 'RequireJavaInstalled')
     self.StartObjectPatch(util, 'EnsureComponentIsInstalled')
     # Note that if we want to do testing around default ports etc, can't set
@@ -49,19 +61,20 @@ class StartTest(cli_test_base.CliTestBase):
     self.StartObjectPatch(util, 'GetEmulatorRoot',
                           return_value=PUBSUB_ROOT)
 
-    self.StartObjectPatch(pubsub_util.util, 'Exec',
-                          self.pubsub_exec_mock).return_value = 'proc'
+    self.StartObjectPatch(
+        pubsub_util.util,
+        'Exec',
+        self.pubsub_exec_mock).return_value = _ContextManager()
 
     start_emulator_mock = self.StartObjectPatch(
         start.proxy_util, 'StartEmulatorProxy', self.proxy_exec_mock)
     start_emulator_mock.return_value.__enter__.return_value = 'proc'
 
+    self.StartObjectPatch(start.contextlib.ExitStack, 'enter_context',
+                          mock.MagicMock())
+
     self.StartObjectPatch(start.util, 'PrefixOutput',
                           self.proxy_prefix_output_mock)
-
-    nested_mock = self.StartObjectPatch(start.contextlib, 'nested',
-                                        mock.MagicMock())
-    nested_mock.return_value.__enter__.return_value = 'proc'
 
     self.StartObjectPatch(util, 'GetEmulatorProxyPath',
                           return_value=PROXY_PATH)

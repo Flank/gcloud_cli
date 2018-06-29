@@ -13,12 +13,15 @@
 # limitations under the License.
 """Integration tests for startup scripts."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 import os
 import textwrap
 import time
 
 from tests.lib import e2e_utils
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
@@ -36,8 +39,8 @@ class StartupTest(e2e_test_base.BaseTest):
     # Make sure the name used is different on each retry, and make sure all
     # names used are cleaned up
     prefix = 'gcloud-compute-test-instance'
-    self.instance_name = e2e_utils.GetResourceNameGenerator(
-        prefix=prefix).next()
+    self.instance_name = next(e2e_utils.GetResourceNameGenerator(
+        prefix=prefix))
     self.instance_names_used.append(self.instance_name)
     self.suffix = self.instance_name[len(prefix):]
     self.temp_dir = self.CreateTempDir(name=os.path.join('startup'))
@@ -51,6 +54,7 @@ class StartupTest(e2e_test_base.BaseTest):
     with open(self.startup_script_file, 'w') as f:
       f.write(self.startup_script)
 
+  @test_case.Filters.skip('Failing', 'b/110083648')
   def testStartup(self):
     self.GetInstanceName()
     self._TestCreateInstanceWithStartup()

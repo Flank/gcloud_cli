@@ -14,6 +14,9 @@
 
 """Tests for command_lib.iam.iam_util."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import argparse
 import json
 import pickle
@@ -92,16 +95,16 @@ class IAMUtilTest(test_case.WithInput):
   TEST_IAM_POLICY = messages.Policy(
       bindings=[
           messages.Binding(
-              members=[u'user:tester@gmail.com', u'user:slick@gmail.com'],
-              role=u'roles/owner')],
+              members=['user:tester@gmail.com', 'user:slick@gmail.com'],
+              role='roles/owner')],
       version=0)
 
   def _GetTestIAMPolicy(self, etag=None):
     policy_msg = self.messages.Policy(
         bindings=[
             self.messages.Binding(
-                members=[u'user:tester@gmail.com', u'user:slick@gmail.com'],
-                role=u'roles/owner')
+                members=['user:tester@gmail.com', 'user:slick@gmail.com'],
+                role='roles/owner')
         ],
         version=0)
 
@@ -213,7 +216,7 @@ class IAMUtilTest(test_case.WithInput):
     expected_policy = pickle.loads(pickle.dumps(self.TEST_IAM_POLICY))
     expected_policy.bindings.append(self.messages.Binding(
         members=['user:etest@gmail.com'],
-        role=u'roles/editor'))
+        role='roles/editor'))
 
     actual_policy = pickle.loads(pickle.dumps(self.TEST_IAM_POLICY))
     iam_util.AddBindingToIamPolicy(self.messages.Binding, actual_policy,
@@ -246,15 +249,15 @@ class IAMUtilTest(test_case.WithInput):
                                           'roles/owner')
 
   def testSetIamPolicyJson(self):
-    policy_file = self._CreateIAMPolicyFile(etag='abcd', as_json=True)
-    expected_policy = self._GetTestIAMPolicy(etag='abcd')
+    policy_file = self._CreateIAMPolicyFile(etag=b'abcd', as_json=True)
+    expected_policy = self._GetTestIAMPolicy(etag=b'abcd')
     policy = iam_util.ParsePolicyFile(policy_file, self.messages.Policy)
 
     self.assertEqual(policy, expected_policy)
 
   def testParseIamPolicyYaml(self):
-    policy_file = self._CreateIAMPolicyFile(etag='abcd')
-    expected_policy = self._GetTestIAMPolicy(etag='abcd')
+    policy_file = self._CreateIAMPolicyFile(etag=b'abcd')
+    expected_policy = self._GetTestIAMPolicy(etag=b'abcd')
     policy = iam_util.ParsePolicyFile(policy_file, self.messages.Policy)
 
     self.assertEqual(policy, expected_policy)
@@ -303,13 +306,12 @@ class IAMUtilTest(test_case.WithInput):
                           contents=bad_contents)
     with self.assertRaisesRegex(iam_util.IamEtagReadError,
                                 r'The etag of policy file \[.*\] is not '
-                                'properly formatted. Base64 decoding error: '
-                                'Incorrect padding'):
+                                'properly formatted. .*Incorrect padding'):
       iam_util.ParsePolicyFile(bad_file, self.messages.Policy)
 
   def testParseIamPolicyWithMask(self):
-    policy_file = self._CreateIAMPolicyFile(etag='abcd')
-    expected_policy = self._GetTestIAMPolicy(etag='abcd')
+    policy_file = self._CreateIAMPolicyFile(etag=b'abcd')
+    expected_policy = self._GetTestIAMPolicy(etag=b'abcd')
     policy, update_mask = iam_util.ParsePolicyFileWithUpdateMask(
         policy_file, self.messages.Policy)
 

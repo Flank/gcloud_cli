@@ -592,9 +592,11 @@ class Address(_messages.Message):
     Values:
       IN_USE: <no description>
       RESERVED: <no description>
+      RESERVING: <no description>
     """
     IN_USE = 0
     RESERVED = 1
+    RESERVING = 2
 
   address = _messages.StringField(1)
   addressType = _messages.EnumField('AddressTypeValueValuesEnum', 2)
@@ -1949,6 +1951,7 @@ class BackendBucket(_messages.Message):
 
   Fields:
     bucketName: Cloud Storage bucket name.
+    cdnPolicy: Cloud CDN Coniguration for this BackendBucket.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
     description: An optional textual description of the resource; provided by
@@ -1968,13 +1971,33 @@ class BackendBucket(_messages.Message):
   """
 
   bucketName = _messages.StringField(1)
-  creationTimestamp = _messages.StringField(2)
-  description = _messages.StringField(3)
-  enableCdn = _messages.BooleanField(4)
-  id = _messages.IntegerField(5, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(6, default=u'compute#backendBucket')
-  name = _messages.StringField(7)
-  selfLink = _messages.StringField(8)
+  cdnPolicy = _messages.MessageField('BackendBucketCdnPolicy', 2)
+  creationTimestamp = _messages.StringField(3)
+  description = _messages.StringField(4)
+  enableCdn = _messages.BooleanField(5)
+  id = _messages.IntegerField(6, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(7, default=u'compute#backendBucket')
+  name = _messages.StringField(8)
+  selfLink = _messages.StringField(9)
+
+
+class BackendBucketCdnPolicy(_messages.Message):
+  r"""Message containing Cloud CDN configuration for a backend bucket.
+
+  Fields:
+    signedUrlCacheMaxAgeSec: Number of seconds up to which the response to a
+      signed URL request will be cached in the CDN. After this time period,
+      the Signed URL will be revalidated before being served. Defaults to 1hr
+      (3600s). If this field is set, Cloud CDN will internally act as though
+      all responses from this bucket had a ?Cache-Control: public, max-
+      age=[TTL]? header, regardless of any existing Cache-Control header. The
+      actual headers served in responses will not be altered.
+    signedUrlKeyNames: [Output Only] Names of the keys currently configured
+      for Cloud CDN Signed URL on this backend bucket.
+  """
+
+  signedUrlCacheMaxAgeSec = _messages.IntegerField(1)
+  signedUrlKeyNames = _messages.StringField(2, repeated=True)
 
 
 class BackendBucketList(_messages.Message):
@@ -2139,7 +2162,9 @@ class BackendService(_messages.Message):
     fingerprint: Fingerprint of this resource. A hash of the contents stored
       in this object. This field is used in optimistic locking. This field
       will be ignored when inserting a BackendService. An up-to-date
-      fingerprint must be provided in order to update the BackendService.
+      fingerprint must be provided in order to update the BackendService.  To
+      see the latest fingerprint, make a get() request to retrieve a
+      BackendService.
     healthChecks: The list of URLs to the HttpHealthCheck or HttpsHealthCheck
       resource for health checking this BackendService. Currently at most one
       health check can be specified, and a health check is required for
@@ -2419,9 +2444,20 @@ class BackendServiceCdnPolicy(_messages.Message):
 
   Fields:
     cacheKeyPolicy: The CacheKeyPolicy for this CdnPolicy.
+    signedUrlCacheMaxAgeSec: Number of seconds up to which the response to a
+      signed URL request will be cached in the CDN. After this time period,
+      the Signed URL will be revalidated before being served. Defaults to 1hr
+      (3600s). If this field is set, Cloud CDN will internally act as though
+      all responses from this backend had a ?Cache-Control: public, max-
+      age=[TTL]? header, regardless of any existing Cache-Control header. The
+      actual headers served in responses will not be altered.
+    signedUrlKeyNames: [Output Only] Names of the keys currently configured
+      for Cloud CDN Signed URL on this backend service.
   """
 
   cacheKeyPolicy = _messages.MessageField('CacheKeyPolicy', 1)
+  signedUrlCacheMaxAgeSec = _messages.IntegerField(2)
+  signedUrlKeyNames = _messages.StringField(3, repeated=True)
 
 
 class BackendServiceGroupHealth(_messages.Message):
@@ -3703,6 +3739,32 @@ class ComputeAutoscalersUpdateRequest(_messages.Message):
   zone = _messages.StringField(5, required=True)
 
 
+class ComputeBackendBucketsAddSignedUrlKeyRequest(_messages.Message):
+  r"""A ComputeBackendBucketsAddSignedUrlKeyRequest object.
+
+  Fields:
+    backendBucket: Name of the BackendBucket resource to which the Signed URL
+      Key should be added. The name should conform to RFC1035.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    signedUrlKey: A SignedUrlKey resource to be passed as the request body.
+  """
+
+  backendBucket = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  signedUrlKey = _messages.MessageField('SignedUrlKey', 4)
+
+
 class ComputeBackendBucketsDeleteRequest(_messages.Message):
   r"""A ComputeBackendBucketsDeleteRequest object.
 
@@ -3724,6 +3786,32 @@ class ComputeBackendBucketsDeleteRequest(_messages.Message):
   backendBucket = _messages.StringField(1, required=True)
   project = _messages.StringField(2, required=True)
   requestId = _messages.StringField(3)
+
+
+class ComputeBackendBucketsDeleteSignedUrlKeyRequest(_messages.Message):
+  r"""A ComputeBackendBucketsDeleteSignedUrlKeyRequest object.
+
+  Fields:
+    backendBucket: Name of the BackendBucket resource to which the Signed URL
+      Key should be added. The name should conform to RFC1035.
+    keyName: The name of the Signed URL Key to delete.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  backendBucket = _messages.StringField(1, required=True)
+  keyName = _messages.StringField(2, required=True)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
 
 
 class ComputeBackendBucketsGetRequest(_messages.Message):
@@ -3859,6 +3947,32 @@ class ComputeBackendBucketsUpdateRequest(_messages.Message):
   requestId = _messages.StringField(4)
 
 
+class ComputeBackendServicesAddSignedUrlKeyRequest(_messages.Message):
+  r"""A ComputeBackendServicesAddSignedUrlKeyRequest object.
+
+  Fields:
+    backendService: Name of the BackendService resource to which the Signed
+      URL Key should be added. The name should conform to RFC1035.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    signedUrlKey: A SignedUrlKey resource to be passed as the request body.
+  """
+
+  backendService = _messages.StringField(1, required=True)
+  project = _messages.StringField(2, required=True)
+  requestId = _messages.StringField(3)
+  signedUrlKey = _messages.MessageField('SignedUrlKey', 4)
+
+
 class ComputeBackendServicesAggregatedListRequest(_messages.Message):
   r"""A ComputeBackendServicesAggregatedListRequest object.
 
@@ -3926,6 +4040,32 @@ class ComputeBackendServicesDeleteRequest(_messages.Message):
   backendService = _messages.StringField(1, required=True)
   project = _messages.StringField(2, required=True)
   requestId = _messages.StringField(3)
+
+
+class ComputeBackendServicesDeleteSignedUrlKeyRequest(_messages.Message):
+  r"""A ComputeBackendServicesDeleteSignedUrlKeyRequest object.
+
+  Fields:
+    backendService: Name of the BackendService resource to which the Signed
+      URL Key should be added. The name should conform to RFC1035.
+    keyName: The name of the Signed URL Key to delete.
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+  """
+
+  backendService = _messages.StringField(1, required=True)
+  keyName = _messages.StringField(2, required=True)
+  project = _messages.StringField(3, required=True)
+  requestId = _messages.StringField(4)
 
 
 class ComputeBackendServicesGetHealthRequest(_messages.Message):
@@ -10955,6 +11095,34 @@ class ComputeTargetHttpsProxiesListRequest(_messages.Message):
   project = _messages.StringField(5, required=True)
 
 
+class ComputeTargetHttpsProxiesSetQuicOverrideRequest(_messages.Message):
+  r"""A ComputeTargetHttpsProxiesSetQuicOverrideRequest object.
+
+  Fields:
+    project: Project ID for this request.
+    requestId: An optional request ID to identify requests. Specify a unique
+      request ID so that if you must retry your request, the server will know
+      to ignore the request if it has already been completed.  For example,
+      consider a situation where you make an initial request and the request
+      times out. If you make the request again with the same request ID, the
+      server can check if original operation with the same request ID was
+      received, and if so, will ignore the second request. This prevents
+      clients from accidentally creating duplicate commitments.  The request
+      ID must be a valid UUID with the exception that zero UUID is not
+      supported (00000000-0000-0000-0000-000000000000).
+    targetHttpsProxiesSetQuicOverrideRequest: A
+      TargetHttpsProxiesSetQuicOverrideRequest resource to be passed as the
+      request body.
+    targetHttpsProxy: Name of the TargetHttpsProxy resource to set the QUIC
+      override policy for. The name should conform to RFC1035.
+  """
+
+  project = _messages.StringField(1, required=True)
+  requestId = _messages.StringField(2)
+  targetHttpsProxiesSetQuicOverrideRequest = _messages.MessageField('TargetHttpsProxiesSetQuicOverrideRequest', 3)
+  targetHttpsProxy = _messages.StringField(4, required=True)
+
+
 class ComputeTargetHttpsProxiesSetSslCertificatesRequest(_messages.Message):
   r"""A ComputeTargetHttpsProxiesSetSslCertificatesRequest object.
 
@@ -12974,6 +13142,82 @@ class DiskAggregatedList(_messages.Message):
   warning = _messages.MessageField('WarningValue', 6)
 
 
+class DiskInstantiationConfig(_messages.Message):
+  r"""A specification of the desired way to instantiate a disk in the instance
+  template when its created from a source instance.
+
+  Enums:
+    InstantiateFromValueValuesEnum: Specifies whether to include the disk and
+      what image to use. Possible values are:   - source-image: to use the
+      same image that was used to create the source instance's corresponding
+      disk. Applicable to the boot disk and additional read-write disks.  -
+      source-image-family: to use the same image family that was used to
+      create the source instance's corresponding disk. Applicable to the boot
+      disk and additional read-write disks.  - custom-image: to use a user-
+      provided image url for disk creation. Applicable to the boot disk and
+      additional read-write disks.  - attach-read-only: to attach a read-only
+      disk. Applicable to read-only disks.  - do-not-include: to exclude a
+      disk from the template. Applicable to additional read-write disks, local
+      SSDs, and read-only disks.
+
+  Fields:
+    autoDelete: Specifies whether the disk will be auto-deleted when the
+      instance is deleted (but not when the disk is detached from the
+      instance).
+    customImage: The custom source image to be used to restore this disk when
+      instantiating this instance template.
+    deviceName: Specifies the device name of the disk to which the
+      configurations apply to.
+    instantiateFrom: Specifies whether to include the disk and what image to
+      use. Possible values are:   - source-image: to use the same image that
+      was used to create the source instance's corresponding disk. Applicable
+      to the boot disk and additional read-write disks.  - source-image-
+      family: to use the same image family that was used to create the source
+      instance's corresponding disk. Applicable to the boot disk and
+      additional read-write disks.  - custom-image: to use a user-provided
+      image url for disk creation. Applicable to the boot disk and additional
+      read-write disks.  - attach-read-only: to attach a read-only disk.
+      Applicable to read-only disks.  - do-not-include: to exclude a disk from
+      the template. Applicable to additional read-write disks, local SSDs, and
+      read-only disks.
+  """
+
+  class InstantiateFromValueValuesEnum(_messages.Enum):
+    r"""Specifies whether to include the disk and what image to use. Possible
+    values are:   - source-image: to use the same image that was used to
+    create the source instance's corresponding disk. Applicable to the boot
+    disk and additional read-write disks.  - source-image-family: to use the
+    same image family that was used to create the source instance's
+    corresponding disk. Applicable to the boot disk and additional read-write
+    disks.  - custom-image: to use a user-provided image url for disk
+    creation. Applicable to the boot disk and additional read-write disks.  -
+    attach-read-only: to attach a read-only disk. Applicable to read-only
+    disks.  - do-not-include: to exclude a disk from the template. Applicable
+    to additional read-write disks, local SSDs, and read-only disks.
+
+    Values:
+      ATTACH_READ_ONLY: <no description>
+      BLANK: <no description>
+      CUSTOM_IMAGE: <no description>
+      DEFAULT: <no description>
+      DO_NOT_INCLUDE: <no description>
+      SOURCE_IMAGE: <no description>
+      SOURCE_IMAGE_FAMILY: <no description>
+    """
+    ATTACH_READ_ONLY = 0
+    BLANK = 1
+    CUSTOM_IMAGE = 2
+    DEFAULT = 3
+    DO_NOT_INCLUDE = 4
+    SOURCE_IMAGE = 5
+    SOURCE_IMAGE_FAMILY = 6
+
+  autoDelete = _messages.BooleanField(1)
+  customImage = _messages.StringField(2)
+  deviceName = _messages.StringField(3)
+  instantiateFrom = _messages.EnumField('InstantiateFromValueValuesEnum', 4)
+
+
 class DiskList(_messages.Message):
   r"""A list of Disk resources.
 
@@ -13674,6 +13918,28 @@ class DisksScopedList(_messages.Message):
   warning = _messages.MessageField('WarningValue', 2)
 
 
+class DistributionPolicy(_messages.Message):
+  r"""A DistributionPolicy object.
+
+  Fields:
+    zones: Zones where the regional managed instance group will create and
+      manage instances.
+  """
+
+  zones = _messages.MessageField('DistributionPolicyZoneConfiguration', 1, repeated=True)
+
+
+class DistributionPolicyZoneConfiguration(_messages.Message):
+  r"""A DistributionPolicyZoneConfiguration object.
+
+  Fields:
+    zone: The URL of the zone. The zone must exist in the region where the
+      managed instance group is located.
+  """
+
+  zone = _messages.StringField(1)
+
+
 class Firewall(_messages.Message):
   r"""Represents a Firewall resource.
 
@@ -13980,16 +14246,18 @@ class ForwardingRule(_messages.Message):
   Enums:
     IPProtocolValueValuesEnum: The IP protocol to which this rule applies.
       Valid options are TCP, UDP, ESP, AH, SCTP or ICMP.  When the load
-      balancing scheme is INTERNAL, only TCP and UDP are valid.
+      balancing scheme is INTERNAL, only TCP and UDP are valid. When the load
+      balancing scheme is INTERNAL_SELF_MANAGED, only TCPis valid.
     IpVersionValueValuesEnum: The IP Version that will be used by this
       forwarding rule. Valid options are IPV4 or IPV6. This can only be
-      specified for a global forwarding rule.
+      specified for an external global forwarding rule.
     LoadBalancingSchemeValueValuesEnum: This signifies what the ForwardingRule
       will be used for and can only take the following values: INTERNAL,
-      EXTERNAL The value of INTERNAL means that this will be used for Internal
-      Network Load Balancing (TCP, UDP). The value of EXTERNAL means that this
-      will be used for External Load Balancing (HTTP(S) LB, External TCP/UDP
-      LB, SSL Proxy)
+      INTERNAL_SELF_MANAGED, EXTERNAL. The value of INTERNAL means that this
+      will be used for Internal Network Load Balancing (TCP, UDP). The value
+      of INTERNAL_SELF_MANAGED means that this will be used for Internal
+      Global HTTP(S) LB. The value of EXTERNAL means that this will be used
+      for External Load Balancing (HTTP(S) LB, External TCP/UDP LB, SSL Proxy)
 
   Fields:
     IPAddress: The IP address that this forwarding rule is serving on behalf
@@ -14001,12 +14269,14 @@ class ForwardingRule(_messages.Message):
       field is empty, an ephemeral IPv4 address from the same scope (global or
       regional) will be assigned. A regional forwarding rule supports IPv4
       only. A global forwarding rule supports either IPv4 or IPv6.  When the
-      load balancing scheme is INTERNAL, this can only be an RFC 1918 IP
-      address belonging to the network/subnet configured for the forwarding
-      rule. By default, if this field is empty, an ephemeral internal IP
-      address will be automatically allocated from the IP range of the subnet
-      or network configured for this forwarding rule.  An address can be
-      specified either by a literal IP address or a URL reference to an
+      load balancing scheme is INTERNAL_SELF_MANAGED, this must be a URL
+      reference to an existing Address resource ( internal regional static IP
+      address).  When the load balancing scheme is INTERNAL, this can only be
+      an RFC 1918 IP address belonging to the network/subnet configured for
+      the forwarding rule. By default, if this field is empty, an ephemeral
+      internal IP address will be automatically allocated from the IP range of
+      the subnet or network configured for this forwarding rule.  An address
+      can be specified either by a literal IP address or a URL reference to an
       existing Address resource. The following examples are all valid:   -
       100.1.2.3  - https://www.googleapis.com/compute/v1/projects/project/regi
       ons/region/addresses/address  -
@@ -14014,8 +14284,9 @@ class ForwardingRule(_messages.Message):
       regions/region/addresses/address  - global/addresses/address  - address
     IPProtocol: The IP protocol to which this rule applies. Valid options are
       TCP, UDP, ESP, AH, SCTP or ICMP.  When the load balancing scheme is
-      INTERNAL, only TCP and UDP are valid.
-    backendService: This field is not used for external load balancing.  For
+      INTERNAL, only TCP and UDP are valid. When the load balancing scheme is
+      INTERNAL_SELF_MANAGED, only TCPis valid.
+    backendService: This field is only used for INTERNAL load balancing.  For
       internal load balancing, this field identifies the BackendService
       resource to receive the matched traffic.
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
@@ -14025,14 +14296,16 @@ class ForwardingRule(_messages.Message):
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     ipVersion: The IP Version that will be used by this forwarding rule. Valid
-      options are IPV4 or IPV6. This can only be specified for a global
-      forwarding rule.
+      options are IPV4 or IPV6. This can only be specified for an external
+      global forwarding rule.
     kind: [Output Only] Type of the resource. Always compute#forwardingRule
       for Forwarding Rule resources.
     loadBalancingScheme: This signifies what the ForwardingRule will be used
-      for and can only take the following values: INTERNAL, EXTERNAL The value
-      of INTERNAL means that this will be used for Internal Network Load
-      Balancing (TCP, UDP). The value of EXTERNAL means that this will be used
+      for and can only take the following values: INTERNAL,
+      INTERNAL_SELF_MANAGED, EXTERNAL. The value of INTERNAL means that this
+      will be used for Internal Network Load Balancing (TCP, UDP). The value
+      of INTERNAL_SELF_MANAGED means that this will be used for Internal
+      Global HTTP(S) LB. The value of EXTERNAL means that this will be used
       for External Load Balancing (HTTP(S) LB, External TCP/UDP LB, SSL Proxy)
     name: Name of the resource; provided by the client when the resource is
       created. The name must be 1-63 characters long, and comply with RFC1035.
@@ -14041,10 +14314,10 @@ class ForwardingRule(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
-    network: This field is not used for external load balancing.  For internal
-      load balancing, this field identifies the network that the load balanced
-      IP should belong to for this Forwarding Rule. If this field is not
-      specified, the default network will be used.
+    network: This field is not used for external load balancing.  For INTERNAL
+      and INTERNAL_SELF_MANAGED load balancing, this field identifies the
+      network that the load balanced IP should belong to for this Forwarding
+      Rule. If this field is not specified, the default network will be used.
     portRange: This field is used along with the target field for
       TargetHttpProxy, TargetHttpsProxy, TargetSslProxy, TargetTcpProxy,
       TargetVpnGateway, TargetPool, TargetInstance.  Applicable only when
@@ -14067,7 +14340,7 @@ class ForwardingRule(_messages.Message):
       must specify this field as part of the HTTP request URL. It is not
       settable as a field in the request body.
     selfLink: [Output Only] Server-defined URL for the resource.
-    subnetwork: This field is not used for external load balancing.  For
+    subnetwork: This field is only used for INTERNAL load balancing.  For
       internal load balancing, this field identifies the subnetwork that the
       load balanced IP should belong to for this Forwarding Rule.  If the
       network specified is in auto subnet mode, this field is optional.
@@ -14077,13 +14350,15 @@ class ForwardingRule(_messages.Message):
       regional forwarding rules, this target must live in the same region as
       the forwarding rule. For global forwarding rules, this target must be a
       global load balancing resource. The forwarded traffic must be of a type
-      appropriate to the target object.
+      appropriate to the target object. For INTERNAL_SELF_MANAGED" load
+      balancing, only HTTP and HTTPS targets are valid.
   """
 
   class IPProtocolValueValuesEnum(_messages.Enum):
     r"""The IP protocol to which this rule applies. Valid options are TCP,
     UDP, ESP, AH, SCTP or ICMP.  When the load balancing scheme is INTERNAL,
-    only TCP and UDP are valid.
+    only TCP and UDP are valid. When the load balancing scheme is
+    INTERNAL_SELF_MANAGED, only TCPis valid.
 
     Values:
       AH: <no description>
@@ -14102,8 +14377,8 @@ class ForwardingRule(_messages.Message):
 
   class IpVersionValueValuesEnum(_messages.Enum):
     r"""The IP Version that will be used by this forwarding rule. Valid
-    options are IPV4 or IPV6. This can only be specified for a global
-    forwarding rule.
+    options are IPV4 or IPV6. This can only be specified for an external
+    global forwarding rule.
 
     Values:
       IPV4: <no description>
@@ -14116,10 +14391,12 @@ class ForwardingRule(_messages.Message):
 
   class LoadBalancingSchemeValueValuesEnum(_messages.Enum):
     r"""This signifies what the ForwardingRule will be used for and can only
-    take the following values: INTERNAL, EXTERNAL The value of INTERNAL means
-    that this will be used for Internal Network Load Balancing (TCP, UDP). The
-    value of EXTERNAL means that this will be used for External Load Balancing
-    (HTTP(S) LB, External TCP/UDP LB, SSL Proxy)
+    take the following values: INTERNAL, INTERNAL_SELF_MANAGED, EXTERNAL. The
+    value of INTERNAL means that this will be used for Internal Network Load
+    Balancing (TCP, UDP). The value of INTERNAL_SELF_MANAGED means that this
+    will be used for Internal Global HTTP(S) LB. The value of EXTERNAL means
+    that this will be used for External Load Balancing (HTTP(S) LB, External
+    TCP/UDP LB, SSL Proxy)
 
     Values:
       EXTERNAL: <no description>
@@ -15414,9 +15691,9 @@ class Image(_messages.Message):
     sourceDiskEncryptionKey: The customer-supplied encryption key of the
       source disk. Required if the source disk is protected by a customer-
       supplied encryption key.
-    sourceDiskId: The ID value of the disk used to create this image. This
-      value may be used to determine whether the image was taken from the
-      current or a previous instance of a given disk name.
+    sourceDiskId: [Output Only] The ID value of the disk used to create this
+      image. This value may be used to determine whether the image was taken
+      from the current or a previous instance of a given disk name.
     sourceImage: URL of the source image used to create this image. This can
       be a full or valid partial URL. You must provide exactly one of:   -
       this property, or   - the rawDisk.source property, or   - the sourceDisk
@@ -16351,10 +16628,13 @@ class InstanceGroupManager(_messages.Message):
       of those actions.
     description: An optional description of this resource. Provide this
       property when you create the resource.
+    distributionPolicy: Policy specifying intended distribution of instances
+      in regional managed instance group.
     fingerprint: Fingerprint of this resource. This field may be used in
       optimistic locking. It will be ignored when inserting an
       InstanceGroupManager. An up-to-date fingerprint must be provided in
-      order to update the InstanceGroupManager or the field need to be unset.
+      order to update the InstanceGroupManager.  To see the latest
+      fingerprint, make a get() request to retrieve an InstanceGroupManager.
     id: [Output Only] A unique identifier for this resource type. The server
       generates this identifier.
     instanceGroup: [Output Only] The URL of the Instance Group resource.
@@ -16385,18 +16665,19 @@ class InstanceGroupManager(_messages.Message):
   creationTimestamp = _messages.StringField(2)
   currentActions = _messages.MessageField('InstanceGroupManagerActionsSummary', 3)
   description = _messages.StringField(4)
-  fingerprint = _messages.BytesField(5)
-  id = _messages.IntegerField(6, variant=_messages.Variant.UINT64)
-  instanceGroup = _messages.StringField(7)
-  instanceTemplate = _messages.StringField(8)
-  kind = _messages.StringField(9, default=u'compute#instanceGroupManager')
-  name = _messages.StringField(10)
-  namedPorts = _messages.MessageField('NamedPort', 11, repeated=True)
-  region = _messages.StringField(12)
-  selfLink = _messages.StringField(13)
-  targetPools = _messages.StringField(14, repeated=True)
-  targetSize = _messages.IntegerField(15, variant=_messages.Variant.INT32)
-  zone = _messages.StringField(16)
+  distributionPolicy = _messages.MessageField('DistributionPolicy', 5)
+  fingerprint = _messages.BytesField(6)
+  id = _messages.IntegerField(7, variant=_messages.Variant.UINT64)
+  instanceGroup = _messages.StringField(8)
+  instanceTemplate = _messages.StringField(9)
+  kind = _messages.StringField(10, default=u'compute#instanceGroupManager')
+  name = _messages.StringField(11)
+  namedPorts = _messages.MessageField('NamedPort', 12, repeated=True)
+  region = _messages.StringField(13)
+  selfLink = _messages.StringField(14)
+  targetPools = _messages.StringField(15, repeated=True)
+  targetSize = _messages.IntegerField(16, variant=_messages.Variant.INT32)
+  zone = _messages.StringField(17)
 
 
 class InstanceGroupManagerActionsSummary(_messages.Message):
@@ -17610,6 +17891,13 @@ class InstanceTemplate(_messages.Message):
     properties: The instance properties for this instance template.
     selfLink: [Output Only] The URL for this instance template. The server
       defines this URL.
+    sourceInstance: The source instance used to create the template. You can
+      provide this as a partial or full URL to the resource. For example, the
+      following are valid values:   - https://www.googleapis.com/compute/v1/pr
+      ojects/project/zones/zone/instances/instance  -
+      projects/project/zones/zone/instances/instance
+    sourceInstanceParams: The source instance params to use to create this
+      instance template.
   """
 
   creationTimestamp = _messages.StringField(1)
@@ -17619,6 +17907,8 @@ class InstanceTemplate(_messages.Message):
   name = _messages.StringField(5)
   properties = _messages.MessageField('InstanceProperties', 6)
   selfLink = _messages.StringField(7)
+  sourceInstance = _messages.StringField(8)
+  sourceInstanceParams = _messages.MessageField('SourceInstanceParams', 9)
 
 
 class InstanceTemplateList(_messages.Message):
@@ -19951,7 +20241,7 @@ class MachineTypesScopedList(_messages.Message):
 
 
 class ManagedInstance(_messages.Message):
-  r"""Next available tag: 12
+  r"""A Managed Instance resource.
 
   Enums:
     CurrentActionValueValuesEnum: [Output Only] The current action that the
@@ -20133,7 +20423,8 @@ class Metadata(_messages.Message):
       locking. The fingerprint is initially generated by Compute Engine and
       changes after every request to modify or update metadata. You must
       always provide an up-to-date fingerprint hash in order to update or
-      change metadata.
+      change metadata.  To see the latest fingerprint, make a get() request to
+      retrieve the resource.
     items: Array of key/value pairs. The total size of all keys and values
       must be less than 512 KB.
     kind: [Output Only] Type of the resource. Always compute#metadata for
@@ -21329,6 +21620,8 @@ class Quota(_messages.Message):
       INSTANCE_GROUP_MANAGERS: <no description>
       INSTANCE_TEMPLATES: <no description>
       INTERCONNECTS: <no description>
+      INTERCONNECT_ATTACHMENTS_PER_REGION: <no description>
+      INTERCONNECT_ATTACHMENTS_TOTAL_MBPS: <no description>
       INTERNAL_ADDRESSES: <no description>
       IN_USE_ADDRESSES: <no description>
       LOCAL_SSD_TOTAL_GB: <no description>
@@ -21378,38 +21671,40 @@ class Quota(_messages.Message):
     INSTANCE_GROUP_MANAGERS = 13
     INSTANCE_TEMPLATES = 14
     INTERCONNECTS = 15
-    INTERNAL_ADDRESSES = 16
-    IN_USE_ADDRESSES = 17
-    LOCAL_SSD_TOTAL_GB = 18
-    NETWORKS = 19
-    NVIDIA_K80_GPUS = 20
-    NVIDIA_P100_GPUS = 21
-    NVIDIA_V100_GPUS = 22
-    PREEMPTIBLE_CPUS = 23
-    PREEMPTIBLE_LOCAL_SSD_GB = 24
-    PREEMPTIBLE_NVIDIA_K80_GPUS = 25
-    PREEMPTIBLE_NVIDIA_P100_GPUS = 26
-    PREEMPTIBLE_NVIDIA_V100_GPUS = 27
-    REGIONAL_AUTOSCALERS = 28
-    REGIONAL_INSTANCE_GROUP_MANAGERS = 29
-    ROUTERS = 30
-    ROUTES = 31
-    SECURITY_POLICIES = 32
-    SECURITY_POLICY_RULES = 33
-    SNAPSHOTS = 34
-    SSD_TOTAL_GB = 35
-    SSL_CERTIFICATES = 36
-    STATIC_ADDRESSES = 37
-    SUBNETWORKS = 38
-    TARGET_HTTPS_PROXIES = 39
-    TARGET_HTTP_PROXIES = 40
-    TARGET_INSTANCES = 41
-    TARGET_POOLS = 42
-    TARGET_SSL_PROXIES = 43
-    TARGET_TCP_PROXIES = 44
-    TARGET_VPN_GATEWAYS = 45
-    URL_MAPS = 46
-    VPN_TUNNELS = 47
+    INTERCONNECT_ATTACHMENTS_PER_REGION = 16
+    INTERCONNECT_ATTACHMENTS_TOTAL_MBPS = 17
+    INTERNAL_ADDRESSES = 18
+    IN_USE_ADDRESSES = 19
+    LOCAL_SSD_TOTAL_GB = 20
+    NETWORKS = 21
+    NVIDIA_K80_GPUS = 22
+    NVIDIA_P100_GPUS = 23
+    NVIDIA_V100_GPUS = 24
+    PREEMPTIBLE_CPUS = 25
+    PREEMPTIBLE_LOCAL_SSD_GB = 26
+    PREEMPTIBLE_NVIDIA_K80_GPUS = 27
+    PREEMPTIBLE_NVIDIA_P100_GPUS = 28
+    PREEMPTIBLE_NVIDIA_V100_GPUS = 29
+    REGIONAL_AUTOSCALERS = 30
+    REGIONAL_INSTANCE_GROUP_MANAGERS = 31
+    ROUTERS = 32
+    ROUTES = 33
+    SECURITY_POLICIES = 34
+    SECURITY_POLICY_RULES = 35
+    SNAPSHOTS = 36
+    SSD_TOTAL_GB = 37
+    SSL_CERTIFICATES = 38
+    STATIC_ADDRESSES = 39
+    SUBNETWORKS = 40
+    TARGET_HTTPS_PROXIES = 41
+    TARGET_HTTP_PROXIES = 42
+    TARGET_INSTANCES = 43
+    TARGET_POOLS = 44
+    TARGET_SSL_PROXIES = 45
+    TARGET_TCP_PROXIES = 46
+    TARGET_VPN_GATEWAYS = 47
+    URL_MAPS = 48
+    VPN_TUNNELS = 49
 
   limit = _messages.FloatField(1)
   metric = _messages.EnumField('MetricValueValuesEnum', 2)
@@ -23601,6 +23896,24 @@ class ServiceAccount(_messages.Message):
   scopes = _messages.StringField(2, repeated=True)
 
 
+class SignedUrlKey(_messages.Message):
+  r"""Represents a customer-supplied Signing Key used by Cloud CDN Signed URLs
+
+  Fields:
+    keyName: Name of the key. The name must be 1-63 characters long, and
+      comply with RFC1035. Specifically, the name must be 1-63 characters long
+      and match the regular expression `[a-z]([-a-z0-9]*[a-z0-9])?` which
+      means the first character must be a lowercase letter, and all following
+      characters must be a dash, lowercase letter, or digit, except the last
+      character, which cannot be a dash.
+    keyValue: 128-bit key value used for signing the URL. The key value must
+      be a valid RFC 4648 Section 5 base64url encoded string.
+  """
+
+  keyName = _messages.StringField(1)
+  keyValue = _messages.StringField(2)
+
+
 class Snapshot(_messages.Message):
   r"""A persistent disk snapshot resource. (== resource_for beta.snapshots ==)
   (== resource_for v1.snapshots ==)
@@ -23637,8 +23950,8 @@ class Snapshot(_messages.Message):
       retrieve a snapshot.
     labels: Labels to apply to this snapshot. These can be later modified by
       the setLabels method. Label values may be empty.
-    licenseCodes: Integer license codes indicating which licenses are attached
-      to this snapshot.
+    licenseCodes: [Output Only] Integer license codes indicating which
+      licenses are attached to this snapshot.
     licenses: [Output Only] A list of public visible licenses that apply to
       this snapshot. This can be because the original image had licenses
       attached (such as a Windows image).
@@ -23875,6 +24188,20 @@ class SnapshotList(_messages.Message):
   nextPageToken = _messages.StringField(4)
   selfLink = _messages.StringField(5)
   warning = _messages.MessageField('WarningValue', 6)
+
+
+class SourceInstanceParams(_messages.Message):
+  r"""A specification of the parameters to use when creating the instance
+  template from a source instance.
+
+  Fields:
+    diskConfigs: Attached disks configuration. If not provided, defaults are
+      applied: For boot disk and any other R/W disks, new custom images will
+      be created from each disk. For read-only disks, they will be attached in
+      read-only mode. Local SSD disks will be created as blank volumes.
+  """
+
+  diskConfigs = _messages.MessageField('DiskInstantiationConfig', 1, repeated=True)
 
 
 class SslCertificate(_messages.Message):
@@ -24208,7 +24535,8 @@ class SslPolicy(_messages.Message):
     fingerprint: Fingerprint of this resource. A hash of the contents stored
       in this object. This field is used in optimistic locking. This field
       will be ignored when inserting a SslPolicy. An up-to-date fingerprint
-      must be provided in order to update the SslPolicy.
+      must be provided in order to update the SslPolicy.  To see the latest
+      fingerprint, make a get() request to retrieve an SslPolicy.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.
     kind: [Output only] Type of the resource. Always compute#sslPolicyfor SSL
@@ -24436,7 +24764,8 @@ class Subnetwork(_messages.Message):
     fingerprint: Fingerprint of this resource. A hash of the contents stored
       in this object. This field is used in optimistic locking. This field
       will be ignored when inserting a Subnetwork. An up-to-date fingerprint
-      must be provided in order to update the Subnetwork.
+      must be provided in order to update the Subnetwork.  To see the latest
+      fingerprint, make a get() request to retrieve a Subnetwork.
     gatewayAddress: [Output Only] The gateway address for default routes to
       reach destination addresses outside this subnetwork.
     id: [Output Only] The unique identifier for the resource. This identifier
@@ -25140,6 +25469,32 @@ class TargetHttpProxyList(_messages.Message):
   warning = _messages.MessageField('WarningValue', 6)
 
 
+class TargetHttpsProxiesSetQuicOverrideRequest(_messages.Message):
+  r"""A TargetHttpsProxiesSetQuicOverrideRequest object.
+
+  Enums:
+    QuicOverrideValueValuesEnum: QUIC policy for the TargetHttpsProxy
+      resource.
+
+  Fields:
+    quicOverride: QUIC policy for the TargetHttpsProxy resource.
+  """
+
+  class QuicOverrideValueValuesEnum(_messages.Enum):
+    r"""QUIC policy for the TargetHttpsProxy resource.
+
+    Values:
+      DISABLE: <no description>
+      ENABLE: <no description>
+      NONE: <no description>
+    """
+    DISABLE = 0
+    ENABLE = 1
+    NONE = 2
+
+  quicOverride = _messages.EnumField('QuicOverrideValueValuesEnum', 1)
+
+
 class TargetHttpsProxiesSetSslCertificatesRequest(_messages.Message):
   r"""A TargetHttpsProxiesSetSslCertificatesRequest object.
 
@@ -25157,6 +25512,16 @@ class TargetHttpsProxy(_messages.Message):
   resource_for beta.targetHttpsProxies ==) (== resource_for
   v1.targetHttpsProxies ==)
 
+  Enums:
+    QuicOverrideValueValuesEnum: Specifies the QUIC override policy for this
+      TargetHttpsProxy resource. This determines whether the load balancer
+      will attempt to negotiate QUIC with clients or not. Can specify one of
+      NONE, ENABLE, or DISABLE. Specify ENABLE to always enable QUIC, Enables
+      QUIC when set to ENABLE, and disables QUIC when set to DISABLE. If NONE
+      is specified, uses the QUIC policy with no user overrides, which is
+      equivalent to DISABLE. Not specifying this field is equivalent to
+      specifying NONE.
+
   Fields:
     creationTimestamp: [Output Only] Creation timestamp in RFC3339 text
       format.
@@ -25173,6 +25538,13 @@ class TargetHttpsProxy(_messages.Message):
       character must be a lowercase letter, and all following characters must
       be a dash, lowercase letter, or digit, except the last character, which
       cannot be a dash.
+    quicOverride: Specifies the QUIC override policy for this TargetHttpsProxy
+      resource. This determines whether the load balancer will attempt to
+      negotiate QUIC with clients or not. Can specify one of NONE, ENABLE, or
+      DISABLE. Specify ENABLE to always enable QUIC, Enables QUIC when set to
+      ENABLE, and disables QUIC when set to DISABLE. If NONE is specified,
+      uses the QUIC policy with no user overrides, which is equivalent to
+      DISABLE. Not specifying this field is equivalent to specifying NONE.
     selfLink: [Output Only] Server-defined URL for the resource.
     sslCertificates: URLs to SslCertificate resources that are used to
       authenticate connections between users and the load balancer. Currently,
@@ -25187,15 +25559,34 @@ class TargetHttpsProxy(_messages.Message):
       map  - projects/project/global/urlMaps/url-map  - global/urlMaps/url-map
   """
 
+  class QuicOverrideValueValuesEnum(_messages.Enum):
+    r"""Specifies the QUIC override policy for this TargetHttpsProxy resource.
+    This determines whether the load balancer will attempt to negotiate QUIC
+    with clients or not. Can specify one of NONE, ENABLE, or DISABLE. Specify
+    ENABLE to always enable QUIC, Enables QUIC when set to ENABLE, and
+    disables QUIC when set to DISABLE. If NONE is specified, uses the QUIC
+    policy with no user overrides, which is equivalent to DISABLE. Not
+    specifying this field is equivalent to specifying NONE.
+
+    Values:
+      DISABLE: <no description>
+      ENABLE: <no description>
+      NONE: <no description>
+    """
+    DISABLE = 0
+    ENABLE = 1
+    NONE = 2
+
   creationTimestamp = _messages.StringField(1)
   description = _messages.StringField(2)
   id = _messages.IntegerField(3, variant=_messages.Variant.UINT64)
   kind = _messages.StringField(4, default=u'compute#targetHttpsProxy')
   name = _messages.StringField(5)
-  selfLink = _messages.StringField(6)
-  sslCertificates = _messages.StringField(7, repeated=True)
-  sslPolicy = _messages.StringField(8)
-  urlMap = _messages.StringField(9)
+  quicOverride = _messages.EnumField('QuicOverrideValueValuesEnum', 6)
+  selfLink = _messages.StringField(7)
+  sslCertificates = _messages.StringField(8, repeated=True)
+  sslPolicy = _messages.StringField(9)
+  urlMap = _messages.StringField(10)
 
 
 class TargetHttpsProxyList(_messages.Message):
@@ -27298,7 +27689,8 @@ class UrlMap(_messages.Message):
     fingerprint: Fingerprint of this resource. A hash of the contents stored
       in this object. This field is used in optimistic locking. This field
       will be ignored when inserting a UrlMap. An up-to-date fingerprint must
-      be provided in order to update the UrlMap.
+      be provided in order to update the UrlMap.  To see the latest
+      fingerprint, make a get() request to retrieve a UrlMap.
     hostRules: The list of HostRules to use against the URL.
     id: [Output Only] The unique identifier for the resource. This identifier
       is defined by the server.

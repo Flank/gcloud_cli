@@ -4,7 +4,7 @@ NAME
 SYNOPSIS
     gcloud beta deployment-manager types list [--provider=PROVIDER]
         [--provider-project=PROVIDER_PROJECT] [--filter=EXPRESSION]
-        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -43,9 +43,6 @@ LIST COMMAND FLAGS
         default order is ascending. Prefix a field with ``~'' for descending
         order on that field. This flag interacts with other flags that are
         applied in this order: --flatten, --sort-by, --filter, --limit.
-
-     --uri
-        Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

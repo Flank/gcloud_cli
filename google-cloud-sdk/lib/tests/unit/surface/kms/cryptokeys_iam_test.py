@@ -15,31 +15,39 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope.base import DeprecationException
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.kms import base
 
 
+@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
+                          calliope_base.ReleaseTrack.BETA,
+                          calliope_base.ReleaseTrack.GA)
 class CryptokeysIamTest(base.KmsMockTest):
 
   def SetUp(self):
     self.key_name = self.project_name.Descendant('global/my_kr/my_key')
 
-  def testGet(self):
+  def testGet(self, track):
+    self.track = track
     with self.assertRaises(DeprecationException):
       self.Run('kms cryptokeys get-iam-policy '
                '--location={0} --keyring={1} {2}'.format(
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id))
 
-  def testSet(self):
+  def testSet(self, track):
+    self.track = track
     with self.assertRaises(DeprecationException):
       self.Run('kms cryptokeys set-iam-policy '
                '--location={0} --keyring={1} {2} {3}'.format(
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id, 'fakefilename'))
 
-  def testAddBinding(self):
+  def testAddBinding(self, track):
+    self.track = track
     with self.assertRaises(DeprecationException):
       self.Run('kms cryptokeys add-iam-policy-binding '
                '--location={0} --keyring={1} {2} '
@@ -47,7 +55,8 @@ class CryptokeysIamTest(base.KmsMockTest):
                    self.key_name.location_id, self.key_name.key_ring_id,
                    self.key_name.crypto_key_id))
 
-  def testRemoveBinding(self):
+  def testRemoveBinding(self, track):
+    self.track = track
     with self.assertRaises(DeprecationException):
       self.Run('kms cryptokeys remove-iam-policy-binding '
                '--location={0} --keyring={1} {2} '

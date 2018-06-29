@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import datetime
 import sys
 
 from googlecloudsdk.calliope import base
@@ -47,13 +48,15 @@ class DockerHelper(base.Command):
           # This tells Docker that the secret will be an access token, not a
           # username/password.
           # Docker normally expects a prefixed 'https://' for auth configs.
-          ('https://' + url): 'oauth2accesstoken'
+          ('https://' + url): '_dcgcloud_token'
           for url in credential_utils.DefaultAuthenticatedRegistries()
       }
 
     elif args.method == DockerHelper.GET:
       cred = c_store.Load()
-      c_store.Refresh(cred)
+      if (not cred.token_expiry or cred.token_expiry.utcnow() >
+          cred.token_expiry - datetime.timedelta(minutes=55)):
+        c_store.Refresh(cred)
       url = sys.stdin.read().strip()
       if (url.replace('https://', '',
                       1) not in credential_utils.SupportedRegistries()):
@@ -63,7 +66,7 @@ class DockerHelper(base.Command):
       # then prompt for a password instead of using the access token.
       return {
           'Secret': cred.access_token,
-          'Username': 'oauth2accesstoken',
+          'Username': '_dcgcloud_token',
       }
 
     # Don't print anything if we are not supporting the given action.

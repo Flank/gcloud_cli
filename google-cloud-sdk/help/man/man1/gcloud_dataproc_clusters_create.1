@@ -63,6 +63,11 @@ cluster.
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
 
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
 .TP 2m
 \fB\-\-master\-boot\-disk\-size\fR=\fIMASTER_BOOT_DISK_SIZE\fR
 The size of the boot disk. The value must be a whole number followed by a size
@@ -157,8 +162,8 @@ invocation.
 
 .TP 2m
 \fB\-\-scopes\fR=\fISCOPE\fR,[\fISCOPE\fR,...]
-Specifies scopes for the node instances. The project's default service account
-is used. Multiple SCOPEs can specified, separated by commas. Examples:
+Specifies scopes for the node instances. Multiple SCOPEs can be specified,
+separated by commas. Examples:
 
 .RS 2m
 $ gcloud dataproc clusters create example\-cluster \e
@@ -170,8 +175,8 @@ $ gcloud dataproc clusters create example\-cluster \e
     \-\-scopes sqlservice,bigquery
 .RE
 
-The following scopes necessary for the cluster to function properly are always
-added, even if not explicitly specified:
+The following \fBminimum scopes\fR are necessary for the cluster to function
+properly and are always added, even if not explicitly specified:
 
 
 .TS
@@ -182,7 +187,8 @@ https://www.googleapis.com/auth/devstorage.read_write
 https://www.googleapis.com/auth/logging.write
 .TE
 
-If this flag is not specified the following default scopes are also included:
+If the \f5\-\-scopes\fR flag is not specified, the following \fBdefault
+scopes\fR are also included:
 
 
 .TS

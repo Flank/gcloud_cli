@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
     gcloud beta container node-pools create NAME
         [--accelerator=[type=TYPE,[count=COUNT],...]] [--cluster=CLUSTER]
-        [--disk-size=DISK_SIZE] [--enable-autorepair] [--enable-autoupgrade]
-        [--image-type=IMAGE_TYPE] [--local-ssd-count=LOCAL_SSD_COUNT]
+        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
+        [--enable-autoupgrade] [--image-type=IMAGE_TYPE]
+        [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--min-cpu-platform=PLATFORM] [--node-labels=[NODE_LABEL,...]]
         [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
@@ -47,6 +48,10 @@ FLAGS
 
      --disk-size=DISK_SIZE
         Size in GB for node VM boot disks. Defaults to 100GB.
+
+     --disk-type=DISK_TYPE
+        Type of the node VM boot disk. Defaults to pd-standard. DISK_TYPE must
+        be one of: pd-standard, pd-ssd.
 
      --enable-autorepair
         Sets autorepair feature for a node-pool.
@@ -131,6 +136,11 @@ FLAGS
         these labels on the kubernetes API node object and can be used in
         nodeSelectors. See http://kubernetes.io/docs/user-guide/node-selection/
         for examples.
+
+        Note that kubernetes labels, intended to associate cluster components
+        and resources with one another and manage resource lifecycles, are
+        different from Kubernetes Engine labels that are used for the purpose
+        of tracking billing and usage information.
 
      --node-taints=[NODE_TAINT,...]
         Applies the given kubernetes taints on all nodes in the new node-pool,
@@ -258,21 +268,19 @@ FLAGS
             Enabled by default, use --no-enable-cloud-endpoints to disable.
 
          --scopes=[SCOPE,...]; default="gke-default"
-            Specifies scopes for the node instances. The project's default
-            service account is used. Examples:
+            Specifies scopes for the node instances. Examples:
 
-                $ gcloud beta container node-pools create node-pool-1 \
-                  --cluster=example-cluster \
-                  --scopes=https://www.googleapis.com/auth/devstorage.read_only
+            $ gcloud beta container node-pools create node-pool-1 \
+            --cluster=example-cluster \
+            --scopes=https://www.googleapis.com/auth/devstorage.read_only
 
-                $ gcloud beta container node-pools create node-pool-1 \
-                  --cluster=example-cluster \
-                  --scopes=bigquery,storage-rw,compute-ro
+            $ gcloud beta container node-pools create node-pool-1 \
+            --cluster=example-cluster \ --scopes=bigquery,storage-rw,compute-ro
 
-            Multiple SCOPEs can specified, separated by commas. logging-write
-            and/or monitoring are added unless Cloud Logging and/or Cloud
-            Monitoring are disabled (see --enable-cloud-logging and
-            --enable-cloud-monitoring for more info).
+            Multiple SCOPEs can be specified, separated by commas.
+            logging-write and/or monitoring are added unless Cloud Logging
+            and/or Cloud Monitoring are disabled (see --enable-cloud-logging
+            and --enable-cloud-monitoring for more information).
 
             Unless container/new_scopes_behavior property is true, compute-rw
             and storage-ro are always added, even if not explicitly specified,

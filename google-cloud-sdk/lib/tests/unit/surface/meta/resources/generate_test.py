@@ -14,6 +14,9 @@
 
 """Tests for the `gcloud meta resources generate` command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from googlecloudsdk.api_lib.util import apis_util
 from googlecloudsdk.core import resources
 from tests.lib import calliope_test_base

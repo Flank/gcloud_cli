@@ -36,8 +36,9 @@ an etag value will replace any existing policy for the subscription.
 
 Subscription resource \- The subscription for which to set the IAM policy. This
 represents a Cloud resource. (NOTE) Some attributes are not given arguments in
-this group but can be set in other ways. To set the [project] attribute: Set the
-property [core/project] or provide the flag [\-\-project] on the command line.
+this group but can be set in other ways. To set the [project] attribute: provide
+the flag [subscription] on the command line with a fully specified name; provide
+the flag [\-\-project] on the command line; set the property [core/project].
 This must be specified.
 
 .RS 2m
@@ -50,6 +51,10 @@ The ID of the subscription or a fully qualified identifier for the subscription.
 .TP 2m
 \fIPOLICY_FILE\fR
 Path to a local JSON or YAML formatted file containing a valid policy.
+
+The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
+or YAML file conforming to the structure of a Policy
+(https://cloud.google.com/iam/reference/rest/v1/Policy).
 
 
 .RE

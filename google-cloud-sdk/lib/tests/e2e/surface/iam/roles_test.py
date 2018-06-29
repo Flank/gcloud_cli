@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Integration tests for manipulating IAM custom roles."""
+
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from tests.lib.surface.iam import e2e_test_base
 

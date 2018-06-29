@@ -113,6 +113,11 @@ records in memory before invoking TensorFlow. Defaults to 64 if not specified.
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of label KEY=VALUE pairs to add.
 
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
 .TP 2m
 \fB\-\-max\-worker\-count\fR=\fIMAX_WORKER_COUNT\fR
 The maximum number of workers to be used for parallel processing. Defaults to 10

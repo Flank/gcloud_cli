@@ -221,6 +221,31 @@ class TargetPoolsCreateTest(test_base.BaseTest):
               region='us-central2'))],
     )
 
+  def testFailoverRatioZero(self):
+    self.Run("""
+        compute target-pools create
+          https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/target-pool-1
+          --backup-pool https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central2/targetPools/backup-pool
+          --failover-ratio 0.0
+        """)
+
+    self.CheckRequests(
+        [(self.compute_v1.targetPools,
+          'Insert',
+          messages.ComputeTargetPoolsInsertRequest(
+              targetPool=messages.TargetPool(
+                  name='target-pool-1',
+                  backupPool=('https://www.googleapis.com/compute/v1/projects/'
+                              'my-project/regions/us-central2/targetPools/'
+                              'backup-pool'),
+                  failoverRatio=0.0,
+                  sessionAffinity=(
+                      messages.TargetPool.SessionAffinityValueValuesEnum.NONE),
+              ),
+              project='my-project',
+              region='us-central2'))],
+    )
+
   def testUriSupport(self):
     self.Run("""
         compute target-pools create

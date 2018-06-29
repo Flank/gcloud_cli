@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.protorpclite import util as protorpc_util
@@ -38,7 +40,9 @@ class InstancesRestoreBackupTest(base.SqlMockTestBeta):
             InstancesRestoreBackupRequest(
                 restoreBackupContext=self.messages.RestoreBackupContext(
                     backupRunId=1438876800422,
-                    instanceId='clone-instance-7',),),),
+                    instanceId='clone-instance-7',
+                ),),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -55,23 +59,25 @@ class InstancesRestoreBackupTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7',
+            targetId='clone-instance-7',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'1178746b-14d4-4258-bbdd-52856882c213',
+            kind='sql#operation',
+            name='1178746b-14d4-4258-bbdd-52856882c213',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1178746b-14d4-4258-bbdd-52856882c213'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1178746b-14d4-4258-bbdd-52856882c213'.
             format(self.Project()),
-            operationType=u'RESTORE_VOLUME',
-            status=u'PENDING',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='RESTORE_VOLUME',
+            status='PENDING',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
     self.mocked_client.operations.Get.Expect(
         self.messages.SqlOperationsGetRequest(
-            operation=u'1178746b-14d4-4258-bbdd-52856882c213',
-            project=self.Project(),),
+            operation='1178746b-14d4-4258-bbdd-52856882c213',
+            project=self.Project(),
+        ),
         self.messages.Operation(
             # pylint:disable=line-too-long
             insertTime=datetime.datetime(
@@ -104,19 +110,20 @@ class InstancesRestoreBackupTest(base.SqlMockTestBeta):
             error=None,
             exportContext=None,
             importContext=None,
-            targetId=u'clone-instance-7',
+            targetId='clone-instance-7',
             targetLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/clone-instance-7'.
             format(self.Project()),
             targetProject=self.Project(),
-            kind=u'sql#operation',
-            name=u'1178746b-14d4-4258-bbdd-52856882c213',
+            kind='sql#operation',
+            name='1178746b-14d4-4258-bbdd-52856882c213',
             selfLink=
-            u'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1178746b-14d4-4258-bbdd-52856882c213'.
+            'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/1178746b-14d4-4258-bbdd-52856882c213'.
             format(self.Project()),
-            operationType=u'RESTORE_VOLUME',
-            status=u'DONE',
-            user=u'170350250316@developer.gserviceaccount.com',))
+            operationType='RESTORE_VOLUME',
+            status='DONE',
+            user='170350250316@developer.gserviceaccount.com',
+        ))
 
   def testRestoreBackup(self):
     self._ExpectRestoreBackup()
@@ -144,21 +151,22 @@ class InstancesRestoreBackupTest(base.SqlMockTestBeta):
     self.mocked_client_v1beta3.instances.Get.Expect(
         sqladmin_v1beta3.SqlInstancesGetRequest(
             instance='clone-instance-7',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         sqladmin_v1beta3.DatabaseInstance(
             currentDiskSize=287592724,
-            databaseVersion=u'MYSQL_5_5',
-            etag=u'"DExdZ69FktjWMJ-ohD1vLZW9pnk/NA"',
-            instance=u'clone-instance-7',
+            databaseVersion='MYSQL_5_5',
+            etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/NA"',
+            instance='clone-instance-7',
             ipAddresses=[],
-            kind=u'sql#instance',
+            kind='sql#instance',
             maxDiskSize=268435456000,
             project=self.Project(),
-            region=u'us-central',
+            region='us-central',
             serverCaCert=sqladmin_v1beta3.SslCert(
-                cert=u'-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
-                certSerialNumber=u'0',
-                commonName=u'C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
+                cert='-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBg',
+                certSerialNumber='0',
+                commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server C',
                 createTime=datetime.datetime(
                     2014,
                     8,
@@ -177,46 +185,54 @@ class InstancesRestoreBackupTest(base.SqlMockTestBeta):
                     29,
                     512000,
                     tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-                instance=u'clone-instance-7',
-                kind=u'sql#sslCert',
-                sha1Fingerprint=u'2dbfcefd3c962a284035ffb06dccdd2055d32b46',),
+                instance='clone-instance-7',
+                kind='sql#sslCert',
+                sha1Fingerprint='2dbfcefd3c962a284035ffb06dccdd2055d32b46',
+            ),
             settings=sqladmin_v1beta3.Settings(
-                activationPolicy=u'ON_DEMAND',
+                activationPolicy='ON_DEMAND',
                 authorizedGaeApplications=[],
                 backupConfiguration=[
                     sqladmin_v1beta3.BackupConfiguration(
                         binaryLogEnabled=True,
                         enabled=True,
-                        id=u'43ee7461-d2d8-4c5b-8d8e-98fa3f9d2ecc',
-                        kind=u'sql#backupConfiguration',
-                        startTime=u'23:00',),
+                        id='43ee7461-d2d8-4c5b-8d8e-98fa3f9d2ecc',
+                        kind='sql#backupConfiguration',
+                        startTime='23:00',
+                    ),
                 ],
                 databaseFlags=[],
                 ipConfiguration=sqladmin_v1beta3.IpConfiguration(
                     authorizedNetworks=[],
                     enabled=False,
-                    requireSsl=None,),
-                kind=u'sql#settings',
+                    requireSsl=None,
+                ),
+                kind='sql#settings',
                 locationPreference=None,
-                pricingPlan=u'PER_USE',
-                replicationType=u'SYNCHRONOUS',
+                pricingPlan='PER_USE',
+                replicationType='SYNCHRONOUS',
                 settingsVersion=4,
-                tier=u'D1',),
-            state=u'RUNNABLE',))
+                tier='D1',
+            ),
+            state='RUNNABLE',
+        ))
     self.mocked_client_v1beta3.instances.RestoreBackup.Expect(
         sqladmin_v1beta3.SqlInstancesRestoreBackupRequest(
-            backupConfiguration=u'43ee7461-d2d8-4c5b-8d8e-98fa3f9d2ecc',
+            backupConfiguration='43ee7461-d2d8-4c5b-8d8e-98fa3f9d2ecc',
             dueTime='2014-08-13T23:00:00.802000+00:00',
             instance='clone-instance-7',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         sqladmin_v1beta3.InstancesRestoreBackupResponse(
-            kind=u'sql#instancesRestoreBackup',
-            operation=u'7e3d8e00-9300-4baa-8f58-5b429b9b5fd1',))
+            kind='sql#instancesRestoreBackup',
+            operation='7e3d8e00-9300-4baa-8f58-5b429b9b5fd1',
+        ))
     self.mocked_client_v1beta3.operations.Get.Expect(
         sqladmin_v1beta3.SqlOperationsGetRequest(
             instance='clone-instance-7',
-            operation=u'7e3d8e00-9300-4baa-8f58-5b429b9b5fd1',
-            project=self.Project(),),
+            operation='7e3d8e00-9300-4baa-8f58-5b429b9b5fd1',
+            project=self.Project(),
+        ),
         sqladmin_v1beta3.InstanceOperation(
             endTime=datetime.datetime(
                 2014,
@@ -239,10 +255,10 @@ class InstancesRestoreBackupTest(base.SqlMockTestBeta):
             error=[],
             exportContext=None,
             importContext=None,
-            instance=u'clone-instance-7',
-            kind=u'sql#instanceOperation',
-            operation=u'7e3d8e00-9300-4baa-8f58-5b429b9b5fd1',
-            operationType=u'RESTORE_VOLUME',
+            instance='clone-instance-7',
+            kind='sql#instanceOperation',
+            operation='7e3d8e00-9300-4baa-8f58-5b429b9b5fd1',
+            operationType='RESTORE_VOLUME',
             startTime=datetime.datetime(
                 2014,
                 8,
@@ -252,8 +268,9 @@ class InstancesRestoreBackupTest(base.SqlMockTestBeta):
                 35,
                 195000,
                 tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-            state=u'DONE',
-            userEmailAddress=u'170350250316@developer.gserviceaccount.com',))
+            state='DONE',
+            userEmailAddress='170350250316@developer.gserviceaccount.com',
+        ))
 
 
 if __name__ == '__main__':

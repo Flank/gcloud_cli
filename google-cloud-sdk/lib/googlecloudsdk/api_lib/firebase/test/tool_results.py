@@ -13,15 +13,17 @@
 # limitations under the License.
 """A utility library to support interaction with the Tool Results service."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import collections
 import time
-import urlparse
 
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import progress_tracker
 
+from six.moves.urllib import parse
 import uritemplate
 
 _STATUS_INTERVAL_SECS = 3
@@ -57,7 +59,7 @@ def CreateToolResultsUiUrl(project_id, tool_results_ids):
           'history': tool_results_ids.history_id,
           'execution': tool_results_ids.execution_id
       })
-  return urlparse.urljoin(url_base, url_end)
+  return parse.urljoin(url_base, url_end)
 
 
 def GetToolResultsIds(matrix,
@@ -147,8 +149,8 @@ def _ErrorFromInvalidMatrix(matrix):
           'Device administrator applications are not allowed',
       enum_values.MALFORMED_XC_TEST_ZIP:
           'The XCTest zip file was malformed. The zip did not contain a single '
-          '.xctestrun file alongside a Debug-iphoneos directory containing the '
-          'compiled artifacts for the test.',
+          '.xctestrun file and the contents of the DerivedData/Build/Products '
+          'directory.',
       enum_values.BUILT_FOR_IOS_SIMULATOR:
           'The provided XCTest was built for the iOS simulator rather than for '
           'a physical device',

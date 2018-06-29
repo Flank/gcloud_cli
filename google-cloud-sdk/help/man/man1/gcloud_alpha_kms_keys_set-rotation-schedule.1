@@ -11,7 +11,7 @@ gcloud alpha kms keys set\-rotation\-schedule \- update the rotation schedule fo
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys set\-rotation\-schedule\fR \fIKEY\fR [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys set\-rotation\-schedule\fR \fIKEY\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR] [\fB\-\-rotation\-period\fR=\fIROTATION_PERIOD\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -44,6 +44,14 @@ Name of the key to update the schedule of.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the key.
+
 .TP 2m
 \fB\-\-next\-rotation\-time\fR=\fINEXT_ROTATION_TIME\fR
 Next automatic rotation time of the key. See $ gcloud topic datetimes for

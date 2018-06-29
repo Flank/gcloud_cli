@@ -14,6 +14,8 @@
 
 """Tests of the 'metrics list' subcommand."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.api_lib.logging import util
@@ -88,7 +90,7 @@ class MetricsListTest(base.LoggingTestBase):
             labels=[
                 msgs.LabelDescriptor(
                     description=None,
-                    key=u'label1',
+                    key='label1',
                     valueType=msgs.LabelDescriptor
                     .ValueTypeValueValuesEnum.STRING)
             ],

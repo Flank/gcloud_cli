@@ -12,3 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """This file is a placeholder to allow importing its subpackages."""
+
+from __future__ import unicode_literals

@@ -14,8 +14,8 @@
 """Common utility functions for sql instance commands."""
 from __future__ import absolute_import
 from __future__ import division
-from __future__ import print_function
 
+from __future__ import unicode_literals
 import getpass
 
 from googlecloudsdk.api_lib.sql import constants
@@ -30,6 +30,10 @@ DEFAULT_RELEASE_TRACK = base.ReleaseTrack.GA
 
 # PD = Persistent Disk. This is prefixed to all storage type payloads.
 STORAGE_TYPE_PREFIX = 'PD_'
+
+
+def _ParseActivationPolicy(policy):
+  return policy.replace('-', '_').upper() if policy else None
 
 
 def ShowZoneDeprecationWarnings(args):
@@ -54,7 +58,7 @@ def ShowZoneDeprecationWarnings(args):
 
 
 class _BaseInstances(object):
-  """Common utility functions for sql instance commands."""
+  """Common utility functions for sql instance commands."""\
 
   @classmethod
   def _ConstructBaseSettingsFromArgs(cls,
@@ -84,7 +88,7 @@ class _BaseInstances(object):
         tier=reducers.MachineType(instance, args.tier, args.memory, args.cpu),
         pricingPlan=args.pricing_plan,
         replicationType=args.replication,
-        activationPolicy=args.activation_policy)
+        activationPolicy=_ParseActivationPolicy(args.activation_policy))
 
     if args.authorized_gae_apps:
       settings.authorizedGaeApplications = args.authorized_gae_apps

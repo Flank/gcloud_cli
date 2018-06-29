@@ -5,7 +5,7 @@ NAME
 SYNOPSIS
     gcloud alpha compute interconnects attachments partner create NAME
         --edge-availability-domain=AVAILABILITY_DOMAIN --router=ROUTER
-        [--admin-enabled] [--description=DESCRIPTION] [--region=REGION]
+        [--description=DESCRIPTION] [--enable-admin] [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -44,14 +44,14 @@ REQUIRED FLAGS
         The Google Cloud Router to use for dynamic routing.
 
 OPTIONAL FLAGS
-     --admin-enabled
-        Administrative status of the interconnect attachment. If not provided
-        on creation, defaults to disabled. When this is enabled, the attachment
-        is operational and will carry traffic. Use --no-admin-enabled to
-        disable it.
-
      --description=DESCRIPTION
         Human-readable plain-text description of attachment.
+
+     --enable-admin
+        Administrative status of the interconnect attachment. If not provided
+        on creation, defaults to disabled. When this is enabled, the attachment
+        is operational and will carry traffic. Use --no-enable-admin to disable
+        it.
 
      --region=REGION
         The region of the interconnect attachment to create. If not specified,
@@ -83,7 +83,8 @@ NOTES
     users of ALPHA commands and flags need to apply for access, agree to
     applicable terms, and have their projects whitelisted. Contact Google or
     sign up on a product's page for ALPHA access. Product pages can be found at
-    https://cloud.google.com/products/. This variant is also available:
+    https://cloud.google.com/products/. These variants are also available:
 
+        $ gcloud compute interconnects attachments partner create
         $ gcloud beta compute interconnects attachments partner create
 

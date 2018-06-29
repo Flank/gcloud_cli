@@ -11,7 +11,7 @@ gcloud app domain\-mappings create \- creates a domain mapping
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud app domain\-mappings create\fR \fIDOMAIN\fR [\fB\-\-certificate\-id\fR=\fICERTIFICATE_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud app domain\-mappings create\fR \fIDOMAIN\fR [\fB\-\-certificate\-id\fR=\fICERTIFICATE_ID\fR] [\fB\-\-certificate\-management\fR=\fICERTIFICATE_MANAGEMENT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -43,6 +43,13 @@ A certificate id to use for this domain. May not be used on a domain mapping
 with automatically managed certificates. Use the \f5gcloud app ssl\-certificates
 list\fR to see available certificates for this app.
 
+.TP 2m
+\fB\-\-certificate\-management\fR=\fICERTIFICATE_MANAGEMENT\fR
+Type of certificate management. 'automatic' will provision an SSL certificate
+automatically while 'manual' requires the user to provide a certificate id to
+provision. \fICERTIFICATE_MANAGEMENT\fR must be one of: \fBautomatic\fR,
+\fBmanual\fR.
+
 
 .RE
 .sp
@@ -58,11 +65,27 @@ help\fR for details.
 
 .SH "EXAMPLES"
 
-To create a new App Engine new domain mapping, run:
+To create a new App Engine domain mapping with an automatically managed
+certificate, run:
+
+.RS 2m
+$ gcloud app domain\-mappings create 'example.com'
+.RE
+
+Note: managed certificates do not support wildcard domain mappings.
+
+To create a domain with a manual certificate, run:
 
 .RS 2m
 $ gcloud app domain\-mappings create '*.example.com'                \e
-       \-\-certificate\-id=1234
+     \-\-certificate\-management=manual \-\-certificate\-id=1234
+.RE
+
+To create a domain with no associated certificate, run:
+
+.RS 2m
+$ gcloud app domain\-mappings create '*.example.com'                \e
+     \-\-certificate\-management=manual
 .RE
 
 

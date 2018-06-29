@@ -16,6 +16,9 @@ GCLOUD WIDE FLAGS
 GROUPS
     GROUP is one of the following:
 
+     project-configs
+        (BETA) Manage Cloud Source Repositories configuration of a project.
+
      repos
         (BETA) Manage cloud source repositories.
 

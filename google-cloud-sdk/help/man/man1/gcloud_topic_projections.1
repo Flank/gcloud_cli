@@ -1418,9 +1418,11 @@ with same sort order are sorted left to right. Columns are sorted based on
 displayed value alone, irrespective of the type of value(date, time, etc.).
 
 .TP 2m
-\fBwrap\fR
+\fBwrap\fR[=\fIMIN\-WIDTH\fR]
 Enables the column text to be wrapped if the table would otherwise be too wide
-for the display.
+for the display. The column will be wrapped in the available space with a
+minimum width of either the default or of \fIMIN\-WIDTH\fR if specified. The
+default is 10 characters.
 
 
 .RE
@@ -1435,20 +1437,29 @@ format with column heading \fBSTART\fR):
 
 .RS 2m
 $ gcloud compute instances list \e
-    \-\-format='table(name:sort=2:align=center:label=INSTANCE,
- zone:sort=1:reverse,
- creationTimestamp.date("%Y\-%m\-%d"):label=START)'
+    \-\-format="table(name:sort=2:align=center:label=INSTANCE,\e
+ zone:sort=1:reverse, creationTimestamp.date("%Y\-%m\-%d"):label=START\e
+)"
 .RE
 
 List only the \fBname\fR, \fBstatus\fR and \fBzone\fR instance resource keys in
 YAML format:
 
 .RS 2m
-$ gcloud compute instances list \-\-format='yaml(name, status, zone)'
+$ gcloud compute instances list \-\-format="yaml(name, status, zone)"
 .RE
 
 List only the \fBconfig.account\fR key value(s) in the \fBinfo\fR resource:
 
 .RS 2m
-$ gcloud info \-\-format='value(config.account)'
+$ gcloud info \-\-format="value(config.account)"
+.RE
+
+List the \fBname\fR, \fBid\fR, and \fBdescription\fR of an imaginary \fBfoo\fR
+resource, wrapping the \fBid\fR column with the default minimum width and the
+\fBdescription\fR column with a minimum width of 20 characters:
+
+.RS 2m
+$ gcloud example foo list \e
+    \-\-format="table(name, id:wrap, description:wrap=20)"
 .RE

@@ -16,6 +16,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 import textwrap
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -184,7 +185,8 @@ class RoutesCreateTest(test_base.BaseTest):
   def testWithNoNextHop(self):
     with self.AssertRaisesArgumentErrorMatches(
         'Exactly one of (--next-hop-address | --next-hop-gateway | '
-        '--next-hop-instance | --next-hop-vpn-tunnel) must be specified.'):
+        '--next-hop-instance | --next-hop-vpn-tunnel) '
+        'must be specified.'):
       self.Run("""
           compute routes create my-route
             --destination-range 10.0.0.0/8
@@ -434,6 +436,121 @@ class RoutesCreateTest(test_base.BaseTest):
             --next-hop-address 10.240.0.2
             --next-hop-vpn-tunnel-region us-central1-a
           """)
+
+
+class RoutesCreateAlphaTest(RoutesCreateTest):
+
+  def SetUp(self):
+    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testWithNextHopIlb(self):
+    messages = self.messages
+    self.Run("""
+       compute routes create my-route
+          --destination-range 20.0.0.0/8
+          --next-hop-ilb my-forwarding-rule
+          --next-hop-ilb-region us-central1
+        """)
+
+    self.CheckRequests([
+        (self.compute.routes, 'Insert',
+         messages.ComputeRoutesInsertRequest(
+             route=messages.Route(
+                 name='my-route',
+                 destRange='20.0.0.0/8',
+                 network=(self.compute_uri +
+                          '/projects/my-project/global/networks/default'),
+                 nextHopIlb=(
+                     self.compute_uri + '/projects/my-project'
+                     '/regions/us-central1/forwardingRules/my-forwarding-rule'),
+                 priority=1000,
+             ),
+             project='my-project'))
+    ],)
+
+  def testWithNextHopIlbWithoutNextHopIlbRegion(self):
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
+    self.make_requests.side_effect = iter([
+        [
+            self.messages.Region(name='region-1'),
+            self.messages.Region(name='region-2'),
+            self.messages.Region(name='region-3'),
+        ],
+        [],
+    ])
+    self.WriteInput('1\n')
+
+    self.Run("""
+        compute routes create my-route
+          --destination-range 20.0.0.0/8
+          --next-hop-ilb my-forwarding-rule
+        """)
+    self.AssertErrContains(
+        textwrap.dedent("""\
+        For the following forwarding rule:
+         - [my-forwarding-rule]
+        choose a region:
+         [1] region-1
+         [2] region-2
+         [3] region-3
+        Please enter your numeric choice:  \n"""))
+    self.CheckRequests(
+        self.regions_list_request,
+        [(self.compute.routes, 'Insert',
+          self.messages.ComputeRoutesInsertRequest(
+              route=self.messages.Route(
+                  name='my-route',
+                  destRange='20.0.0.0/8',
+                  network=(self.compute_uri +
+                           '/projects/my-project/global/networks/default'),
+                  nextHopIlb=(
+                      self.compute_uri + '/projects/my-project'
+                      '/regions/region-1/forwardingRules/my-forwarding-rule'),
+                  priority=1000,
+              ),
+              project='my-project'))],
+    )
+
+  def testWithNextHopIlbRegionWithoutNextHopIlb(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'\[--next-hop-ilb-region\] can only be specified in '
+        r'conjunction with \[--next-hop-ilb\].'):
+      self.Run("""
+          compute routes create my-route
+            --destination-range 20.0.0.0/8
+            --next-hop-address 10.240.0.2
+            --next-hop-ilb-region us-central1-a
+          """)
+
+  def testWithNoNextHop(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--next-hop-address | --next-hop-gateway | '
+        '--next-hop-ilb | --next-hop-instance | --next-hop-vpn-tunnel) '
+        'must be specified.'):
+      self.Run("""
+          compute routes create my-route
+            --destination-range 10.0.0.0/8
+          """)
+
+    self.CheckRequests()
+
+  def testWithManyNextHops(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --next-hop-gateway: Exactly one of (--next-hop-address | '
+        '--next-hop-gateway | --next-hop-ilb | --next-hop-instance | '
+        '--next-hop-vpn-tunnel) '
+        'must be specified.'):
+      self.Run("""
+          compute routes create my-route
+            --destination-range 10.0.0.0/8
+            --next-hop-instance my-instance
+            --next-hop-instance-zone us-central1-a
+            --next-hop-gateway default-internet-gateway
+          """)
+
+    self.CheckRequests()
 
 
 if __name__ == '__main__':

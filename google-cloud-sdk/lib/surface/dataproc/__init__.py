@@ -14,6 +14,8 @@
 
 """The main command group for cloud dataproc."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import properties
@@ -53,8 +55,10 @@ class Dataproc(base.Group):
   """Create and manage Google Cloud Dataproc clusters and jobs."""
   detailed_help = DETAILED_HELP
 
-  @staticmethod
-  def Args(parser):
+  @classmethod
+  def Args(cls, parser):
+    if cls.ReleaseTrack() == base.ReleaseTrack.BETA:
+      return
     region_prop = properties.VALUES.dataproc.region
     parser.add_argument(
         '--region',

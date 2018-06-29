@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """e2e tests for compute project-info command group."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import contextlib
 
 from tests.lib import e2e_base

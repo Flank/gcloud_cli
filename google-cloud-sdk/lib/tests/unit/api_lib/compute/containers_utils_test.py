@@ -18,6 +18,7 @@ from googlecloudsdk.api_lib.compute import containers_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -138,7 +139,7 @@ _MY_ENV_= asdf  # Not a comment
     file_content = 'asdf'
 
     # File doesn't exist
-    with self.assertRaisesRegex(exceptions.BadFileException,
+    with self.assertRaisesRegex(files.Error,
                                 '.*env_vars.corrupted.*'):
       containers_utils._ReadDictionary(file_name)
 

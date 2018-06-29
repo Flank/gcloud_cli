@@ -24,6 +24,9 @@ COMMANDS
      get-common
         (ALPHA) Get common taxonomy store of Google-defined taxonomies.
 
+     get-default
+        (ALPHA) Get default taxonomy store.
+
      get-iam-policy
         (ALPHA) Get iam policy of a taxonomy store.
 

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Base classes for all 'gcloud firebase test ios' unit tests."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import matrix_ops
 from googlecloudsdk.api_lib.firebase.test.ios import matrix_creator
 from googlecloudsdk.api_lib.util import apis as core_apis
@@ -35,7 +37,8 @@ IOS_CATALOG_GET = (
 
 ALL_BETA_TEST_RUN_ARGS = [
     'async', 'device', 'network_profile', 'record_video', 'results_bucket',
-    'results_dir', 'results_history_name', 'test', 'timeout', 'type'
+    'results_dir', 'results_history_name', 'test', 'timeout', 'type',
+    'xctestrun_file'
 ]
 
 ALL_TEST_RUN_ARGS = {'ga': [], 'beta': ALL_BETA_TEST_RUN_ARGS}

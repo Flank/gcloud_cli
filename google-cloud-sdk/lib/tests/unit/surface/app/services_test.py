@@ -15,6 +15,7 @@
 """Tests for gcloud app services."""
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.api_lib.app import service_util

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instances create-with-container subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.compute import containers_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
@@ -755,7 +757,8 @@ class InstancesCreateWithContainerTest(InstancesCreateWithContainerTestBase,
 
   def testCreateMetadataKeyConflict(self):
     with self.AssertRaisesToolExceptionRegexp(
-        'Metadata key "user-data" is not allowed when running contenerized VM'):
+        'Metadata key "user-data" is not allowed when '
+        'running containerized VM'):
       self.Run("""
           compute instances create-with-container instance-1
             --zone central2-a

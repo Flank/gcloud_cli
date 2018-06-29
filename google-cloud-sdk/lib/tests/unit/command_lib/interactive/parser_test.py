@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for the parser used by gcloud interactive."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.calliope import cli_tree

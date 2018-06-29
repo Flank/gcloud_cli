@@ -13,9 +13,12 @@
 # limitations under the License.
 """Unit tests for Cloud Tasks API locations service in gcloud."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.tasks import test_base
+from six.moves import range
 
 
 class LocationsTest(test_base.CloudTasksTestBase):

@@ -14,6 +14,8 @@
 
 """Unit tests for deploy_command_util."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import io
 import json
 import logging
@@ -509,7 +511,7 @@ class PushTest(PushTestBase, test_case.WithOutputCapture):
         python_compat.PythonConfigurator, 'GenerateConfigData', return_value=[])
     self.context_mock.side_effect = context_util.GenerateSourceContextError
     self.fake_image = mock.MagicMock()
-    self.fake_image.tagged_repo = (u'blah.gcr.io/fakeproject/appengine'
+    self.fake_image.tagged_repo = ('blah.gcr.io/fakeproject/appengine'
                                    '/foo.1.2:latest')
     self.fake_build = self.messages.Build(
         images=['blah.gcr.io/fakeproject/appengine/foo.1.2:latest'],

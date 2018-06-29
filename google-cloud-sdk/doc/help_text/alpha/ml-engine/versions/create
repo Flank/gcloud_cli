@@ -69,6 +69,11 @@ OPTIONAL FLAGS
      --labels=[KEY=VALUE,...]
         A list of label KEY=VALUE pairs to add.
 
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
      --machine-type=MACHINE_TYPE
         The type of machine on which to serve the model. Currently only applies
         to online prediction. Currently supported machine_types are:

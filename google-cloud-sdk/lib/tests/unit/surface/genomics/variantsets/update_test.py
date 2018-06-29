@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for genomics tests variantsets update command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case

@@ -30,7 +30,7 @@ COMMANDS
         Remove project-wide metadata entries.
 
      set-usage-bucket
-        Set the usage reporting bucket for a project.
+        Set usage reporting bucket for a project.
 
 NOTES
     These variants are also available:

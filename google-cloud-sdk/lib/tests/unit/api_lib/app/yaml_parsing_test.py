@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests of our yaml parsing logic."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 
 from googlecloudsdk.api_lib.app import env as app_env
@@ -53,11 +56,21 @@ class YamlParsingTests(util.WithAppData, sdk_test_base.SdkBase):
     self.assertFalse(mod.is_ti_runtime)
 
   def testDefaultTiModule(self):
-    f = self.WriteApp('app.yaml', runtime='nodejs8')
+    f = self.WriteApp('app.yaml', data='', runtime='nodejs8')
     mod = yaml_parsing.ServiceYamlInfo.FromFile(f)
     self.AssertModule(mod, 'default')
     self.assertIs(mod.env, app_env.STANDARD)
     self.assertTrue(mod.is_ti_runtime)
+
+  def testDefaultTiModuleThreadsafeTrue(self):
+    f = self.WriteApp('app.yaml', data='threadsafe: true\n', runtime='nodejs8')
+    with self.assertRaises(yaml_parsing.YamlValidationError):
+      yaml_parsing.ServiceYamlInfo.FromFile(f)
+
+  def testDefaultTiModuleThreadsafeFalse(self):
+    f = self.WriteApp('app.yaml', data='threadsafe: false\n', runtime='nodejs8')
+    with self.assertRaises(yaml_parsing.YamlValidationError):
+      yaml_parsing.ServiceYamlInfo.FromFile(f)
 
   def testRuntimeField(self):
     good = [
@@ -359,9 +372,8 @@ handlers:
       yaml_parsing.ConfigYamlInfo.FromFile(f2)
 
   def testBadAppParse(self):
-    app_file = os.path.join(self.temp_path, 'app.yaml')
-    with open(app_file, 'w') as fp:
-      fp.write('project: one\napp: two')
+    app_file = self.Touch(self.temp_path, name='app.yaml',
+                          contents='project: one\napp: two')
     # Need to escape the path for Windows.
     app_file = app_file.replace('\\', r'\\')
     with self.assertRaisesRegex(
@@ -406,11 +418,16 @@ handlers:
     self.assertEqual(mod.parsed.vm_settings['module_yaml_path'], 'app.yaml')
 
   def testAppDirNames(self):
-    yamls = yaml_parsing.ConfigYamlInfo.CONFIG_YAML_PARSERS.keys()
+    yamls = list(yaml_parsing.ConfigYamlInfo.CONFIG_YAML_PARSERS.keys())
     for yaml in yamls:
       yaml_dir = os.path.join(self.temp_path, yaml)
       files.MakeDir(yaml_dir)
       self.assertIsNone(yaml_parsing.ConfigYamlInfo.FromFile(yaml_dir))
+
+  def testConfigNonYaml(self):
+    """Ensure that an unknown file ending is rejected."""
+    f = self.WriteConfig(('cron.xml', self.CRON_DATA[1]), project='foo')
+    self.assertIsNone(yaml_parsing.ConfigYamlInfo.FromFile(f))
 
 if __name__ == '__main__':
   test_case.main()

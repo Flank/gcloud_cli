@@ -69,12 +69,12 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           ])
     return self.messages.StatefulPolicy(preservedResources=preserved_resources)
 
-  def _checkGetAndPatchRequests(self, *disks):
+  def _checkGetAndPatchRequests(self, disks):
     self.CheckRequests([(self.compute.instanceGroupManagers, 'Get',
                          self._getGetRequestStub())],
                        [(self.compute.instanceGroupManagers, 'Patch',
                          self._getPatchRequestStub(
-                             self._getStatefulPolicyWithDisks(list(disks))))])
+                             self._getStatefulPolicyWithDisks(disks)))])
 
   def _checkGetAndUpdateRequests(self, with_empty_stateful_policy=False):
     stateful_policy = None
@@ -121,7 +121,7 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           --add-stateful-disks disk-1
         """.format(*self.scope_params))
 
-    self._checkGetAndPatchRequests('disk-1')
+    self._checkGetAndPatchRequests(['disk-1'])
 
   def testUpdateAddStatefulMultipleDisks(self):
     self._setInitialIgmNoStatefulPolicy()
@@ -132,7 +132,7 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           --add-stateful-disks disk-1,disk-2,disk-3
         """.format(*self.scope_params))
 
-    self._checkGetAndPatchRequests('disk-1', 'disk-2', 'disk-3')
+    self._checkGetAndPatchRequests(['disk-1', 'disk-2', 'disk-3'])
 
   def testUpdateAddStatefulMultipleDisks_userProvidesDuplicates(self):
     self._setInitialIgmNoStatefulPolicy()
@@ -156,7 +156,7 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           --add-stateful-disks disk-2
         """.format(*self.scope_params))
 
-    self._checkGetAndPatchRequests('disk-1', 'disk-2')
+    self._checkGetAndPatchRequests(['disk-1', 'disk-2'])
 
   def testUpdateAddStatefulDiskToExistingPolicy_sameDisk(self):
     self._setInitialIgmWithStatefulPolicy('disk-1')
@@ -193,7 +193,7 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           --remove-stateful-disks disk-1
         """.format(*self.scope_params))
 
-    self._checkGetAndPatchRequests('disk-2')
+    self._checkGetAndPatchRequests(['disk-2'])
 
   def testUpdateRemoveStatefulDiskWithStatefulPolicy_diskNotInPolicy_throws(
       self):
@@ -218,7 +218,7 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           --remove-stateful-disks disk-1,disk-2,disk-3
         """.format(*self.scope_params))
 
-    self._checkGetAndPatchRequests('disk-4')
+    self._checkGetAndPatchRequests(['disk-4'])
 
   def testUpdateRemoveStatefulDisksFromStatefulPolicy_userProvidesDuplicates(
       self):
@@ -318,7 +318,7 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           --stateful-names
         """.format(*self.scope_params))
 
-    self._checkGetAndPatchRequests('disk-1')
+    self._checkGetAndPatchRequests(['disk-1'])
 
   def testUpdateWhenIgmDoesNotExist_throws(self):
     self._setNoInitialIgm()
@@ -330,19 +330,6 @@ class InstanceGroupManagersUpdateZonalTest(test_base.BaseTest):
           compute instance-groups managed update group-1
             --{} {}
             --add-stateful-disks disk-1
-          """.format(*self.scope_params))
-
-  def testUpdateNoChanges_throws(self):
-    self._setInitialIgmWithStatefulPolicy()
-
-    with self.AssertRaisesExceptionMatches(
-        calliope_exceptions.InvalidArgumentException,
-        'No update specified, you need to use at least one flag from:'
-        ' --add-stateful-disks, --remove-stateful-disks, --stateful-names,'
-        ' --no-stateful-names'):
-      self.Run("""
-          compute instance-groups managed update group-1
-            --{} {}
           """.format(*self.scope_params))
 
 
@@ -364,39 +351,45 @@ class InstanceGroupManagersUpdateRegionalTest(
         project=self.project_name,
         region=self.region_name)
 
-  def _getPatchRequestStub(self, stateful_policy=None):
+  def _getPatchRequestStub(self, stateful_policy=None, update_policy=None):
     return self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
         instanceGroupManager=self.igm_name,
-        instanceGroupManagerResource=(
-            self.messages.InstanceGroupManager(statefulPolicy=stateful_policy)),
+        instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+            statefulPolicy=stateful_policy, updatePolicy=update_policy)),
         project=self.project_name,
         region=self.region_name)
 
-  def _getUpdateRequestStub(self, stateful_policy=None):
+  def _getUpdateRequestStub(self, stateful_policy=None, update_policy=None):
     return self.messages.ComputeRegionInstanceGroupManagersUpdateRequest(
         instanceGroupManager=self.igm_name,
         instanceGroupManagerResource=(self.messages.InstanceGroupManager(
             name=self.igm_name,
             region=self.region_name,
-            statefulPolicy=stateful_policy)),
+            statefulPolicy=stateful_policy,
+            updatePolicy=update_policy)),
         project=self.project_name,
         region=self.region_name)
 
-  def _checkGetAndPatchRequests(self, *disks):
-    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Get',
-                         self._getGetRequestStub())],
-                       [(self.compute.regionInstanceGroupManagers, 'Patch',
-                         self._getPatchRequestStub(
-                             self._getStatefulPolicyWithDisks(list(disks))))])
+  def _checkGetAndPatchRequests(self, disks, update_policy=None):
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Get',
+          self._getGetRequestStub())],
+        [(self.compute.regionInstanceGroupManagers, 'Patch',
+          self._getPatchRequestStub(
+              stateful_policy=self._getStatefulPolicyWithDisks(disks),
+              update_policy=update_policy))])
 
-  def _checkGetAndUpdateRequests(self, with_empty_stateful_policy=False):
+  def _checkGetAndUpdateRequests(self,
+                                 with_empty_stateful_policy=False,
+                                 update_policy=None):
     stateful_policy = None
     if with_empty_stateful_policy:
       stateful_policy = self._getStatefulPolicyWithDisks()
-    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Get',
-                         self._getGetRequestStub())],
-                       [(self.compute.regionInstanceGroupManagers, 'Update',
-                         self._getUpdateRequestStub(stateful_policy))])
+    self.CheckRequests(
+        [(self.compute.regionInstanceGroupManagers, 'Get',
+          self._getGetRequestStub())],
+        [(self.compute.regionInstanceGroupManagers, 'Update',
+          self._getUpdateRequestStub(stateful_policy, update_policy))])
 
   def _setInitialIgmNoStatefulPolicy(self):
     igm = self.messages.InstanceGroupManager(
@@ -416,6 +409,52 @@ class InstanceGroupManagersUpdateRegionalTest(
     self.make_requests.side_effect = iter([[
         igm,
     ], []])
+
+  def testUpdateAddStatefulDiskAndChangeInstanceRedistributionType(self):
+    self._setInitialIgmNoStatefulPolicy()
+
+    self.Run("""
+        compute instance-groups managed update group-1
+          --{} {}
+          --add-stateful-disks disk-1
+          --instance-redistribution-type none
+        """.format(*self.scope_params))
+
+    self._checkGetAndPatchRequests(
+        ['disk-1'],
+        update_policy=self.messages.InstanceGroupManagerUpdatePolicy(
+            instanceRedistributionType=self.messages.
+            InstanceGroupManagerUpdatePolicy.
+            InstanceRedistributionTypeValueValuesEnum.NONE))
+
+  def testUpdateInstanceRedistributionType_createsUpdateRequest(self):
+    # TODO(b/70314588): Fix this test to expect Patch instead of Update.
+    self._setInitialIgmNoStatefulPolicy()
+
+    self.Run("""
+        compute instance-groups managed update group-1
+          --{} {}
+          --no-stateful-names
+          --instance-redistribution-type none
+        """.format(*self.scope_params))
+
+    self._checkGetAndUpdateRequests(
+        with_empty_stateful_policy=False,
+        update_policy=self.messages.InstanceGroupManagerUpdatePolicy(
+            instanceRedistributionType=self.messages.
+            InstanceGroupManagerUpdatePolicy.
+            InstanceRedistributionTypeValueValuesEnum.NONE))
+
+  def testUpdateInstanceRedistributionTypeForZonalScope_throws(self):
+    with self.assertRaisesRegex(
+        calliope_exceptions.InvalidArgumentException,
+        'Flag --instance-redistribution-type may be specified for regional '
+        'managed instance groups only.'):
+      self.Run("""
+          compute instance-groups managed update group-1
+            --zone us-central2-a
+            --instance-redistribution-type proactive
+          """)
 
 
 if __name__ == '__main__':

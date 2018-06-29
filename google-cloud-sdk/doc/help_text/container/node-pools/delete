@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud container node-pools delete NAME [--async] [--cluster=CLUSTER]
-        [--zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud container node-pools delete deletes a node pool from a Google
@@ -24,9 +24,14 @@ FLAGS
         The cluster from which to delete the node pool. Overrides the default
         container/cluster property value for this command invocation.
 
-     --zone=ZONE, -z ZONE
-        The compute zone (e.g. us-central1-a) for the cluster. Overrides the
-        default compute/zone property value for this command invocation.
+     At most one of these may be specified:
+
+       --region=REGION
+          The compute region (e.g. us-central1) for the cluster.
+
+       --zone=ZONE, -z ZONE
+          The compute zone (e.g. us-central1-a) for the cluster. Overrides the
+          default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
     These flags are available to all commands: --account, --configuration,

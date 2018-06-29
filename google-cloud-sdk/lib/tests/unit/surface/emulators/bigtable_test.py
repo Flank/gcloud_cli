@@ -13,6 +13,9 @@
 # limitations under the License.
 """Tests for Bigtable emulator commands."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import os
 from googlecloudsdk.command_lib.emulators import bigtable_util
 from googlecloudsdk.command_lib.emulators import util

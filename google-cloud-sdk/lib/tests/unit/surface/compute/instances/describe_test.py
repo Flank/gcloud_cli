@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tests for the instances describe subcommand."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -305,11 +307,11 @@ class InstancesNoZoneDescribeTest(test_base.BaseTest,
         result=resource_projector.MakeSerializable(test_resources.INSTANCES_V1))
 
     self.RunCompletion('compute instances describe instance-3',
-                       ['instance-3 --zone=zone-1'])
+                       ['instance-3\\ --zone=zone-1'])
     self.RunCompletion('compute instances describe instance',
-                       ['instance-1 --zone=zone-1',
-                        'instance-2 --zone=zone-1',
-                        'instance-3 --zone=zone-1'])
+                       ['instance-1\\ --zone=zone-1',
+                        'instance-2\\ --zone=zone-1',
+                        'instance-3\\ --zone=zone-1'])
 
 
 class InstancesCustomDescribeTest(test_base.BaseTest):

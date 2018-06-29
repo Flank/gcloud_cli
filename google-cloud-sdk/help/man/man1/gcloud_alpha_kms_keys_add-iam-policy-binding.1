@@ -11,7 +11,7 @@ gcloud alpha kms keys add\-iam\-policy\-binding \- add IAM policy binding to a k
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms keys add\-iam\-policy\-binding\fR \fIKEY\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms keys add\-iam\-policy\-binding\fR \fIKEY\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -44,8 +44,8 @@ The member to add the binding for. Should be of the form
 \f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
 
 Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
-\f5serviceAccount:my\-sa@test\-123.iam.gserviceaccount.com\fR, or
-\f5domain:example.com\fR.
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
 
 Can also be one of the following special values:
 .RS 2m
@@ -63,6 +63,21 @@ or a service account.
 .TP 2m
 \fB\-\-role\fR=\fIROLE\fR
 Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-keyring\fR=\fIKEYRING\fR
+Key ring of the key.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the key.
 
 
 .RE

@@ -48,6 +48,7 @@ if 'google' in sys.modules:
     google_paths.append(vendored_google_path)
 
 # pylint:disable=g-import-not-at-top
+from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.util import encoding as enc
 from googlecloudsdk.core.util import files as files_util
@@ -122,6 +123,11 @@ class FakeStd(io.BytesIO):
   reading and writing. On Python 3 we encode and decode automatically so it
   works with reading and writing text.
   """
+
+  def __init__(self, *args, **kwargs):
+    super(FakeStd, self).__init__(*args, **kwargs)
+    self.errors = None
+    self.encoding = 'ascii'
 
   @property
   def buffer(self):
@@ -221,9 +227,16 @@ class TestCase(unittest.TestCase, object):
       # deprecation warning.
       self.assertRaisesRegex = self._assertRaisesRegex  # pylint: disable=invalid-name
 
+      # Backporting assertCountEqual to py2 to get python2 tests to pass.
+      self.assertCountEqual = self._assertCountEqual  # pylint: disable=invalid-name
+
   def _assertRaisesRegex(self, *args, **kwargs):  # pylint: disable=invalid-name
     """python3 really hates that trailing p."""
     return six.assertRaisesRegex(self, *args, **kwargs)
+
+  def _assertCountEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
+    """Accounts for the removal of assertItemsEqual in Python 3."""
+    return six.assertCountEqual(self, *args, **kwargs)
 
   @classmethod
   def __Subclasses(cls):
@@ -286,25 +299,23 @@ class TestCase(unittest.TestCase, object):
         cls.SetUp(self)
 
   def tearDown(self):
-    # stdout and stderr gets logged only in the base class's TearDown method.
-    # So we need to let that get executed
-    exception_type = None
-    exception_message = None
+    # stdout and stderr get logged only in the base class's TearDown method,
+    # so we need to let that get executed
+    exception_context = None
     for cls in self.__Subclasses():
       if 'TearDown' in cls.__dict__:
         try:
           cls.TearDown(self)
-        # pylint:disable=broad-except, we will be reraising the exception
-        # anyway
+        # pylint:disable=broad-except, we will be reraising one of these
+        # exceptions anyway
         except Exception as e:
-          exception_type = type(e)
-          exception_message = six.text_type(e)
-    if exception_type:
-      raise exception_type(exception_message)
+          exception_context = exceptions.ExceptionContext(e)
+    if exception_context:
+      exception_context.Reraise()
 
   @contextlib.contextmanager
   def _VerifyTestCleanup(self, name, target):
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     self.assertEqual(self._originals[name], target,
                      '{name} was left in an altered state'.format(name=name))
     yield
@@ -362,7 +373,7 @@ class TestCase(unittest.TestCase, object):
 
     # Mock signal.signal to put the signal handlers in our own list.
     def _StoreSignalHandler(*args, **unused_kwargs):
-      signal_type, signal_handler = args[:2]
+      signal_type, signal_handler = args[:2]  # pylint: disable=unbalanced-tuple-unpacking
       old_handler = self._registered_signal_handlers.get(signal_type)
       if not signal_handler:
         self._registered_signal_handlers.pop(signal_type, None)
@@ -380,7 +391,7 @@ class TestCase(unittest.TestCase, object):
     # Mock os.kill to manually call the handler we have mocked.
     backup_kill = os.kill
     def _PropagateSignal(*args, **kwargs):
-      pid, sig = args[:2]
+      pid, sig = args[:2]  # pylint: disable=unbalanced-tuple-unpacking
       if pid != os.getpid():
         # Behave normally if it's not for us. Just in case.
         return backup_kill(*args, **kwargs)
@@ -396,7 +407,7 @@ class TestCase(unittest.TestCase, object):
           0, len(self._registered_signal_handlers),
           'Test registers signal handler without restoring the old handler '
           'before test ends. Registered signal handlers for following signals: '
-          + str(list(six.iterkeys(self._registered_signal_handlers))))
+          + six.text_type(list(six.iterkeys(self._registered_signal_handlers))))
     self.addCleanup(_CheckSignalHandler)
 
   def _CatchThreadCreation(self):
@@ -771,21 +782,16 @@ class Base(WithContentAssertions):
 
     # TODO(b/73165575): Don't do this once we update all the tests to use text
     # strings by default.
-    mode = 'wt' if isinstance(contents, six.text_type) else 'wb'
     path = os.path.join(directory, name)
-    with io.open(path, mode) as f:
-      f.write(contents)
+    if isinstance(contents, six.text_type):
+      files_util.WriteFileContents(path, contents)
+    else:
+      files_util.WriteBinaryFileContents(path, contents)
 
     return path
 
   def RandomFileName(self):
     return uuid.uuid4().hex
-
-  def GetFileContents(self, path, encoding=None):
-    """Gets and returns the contents of path."""
-    with io.open(path, encoding=encoding) as f:
-      contents = f.read()
-    return contents
 
   def AssertDirectoryExists(self, *path_parts):
     """Asserts that the given directory exists.
@@ -826,19 +832,19 @@ class Base(WithContentAssertions):
 
   def AssertFileContains(self, expected, path, normalize_space=False,
                          actual_filter=None, success=True):
-    self._AssertContains(expected, self.GetFileContents(path), path,
+    self._AssertContains(expected, files_util.ReadFileContents(path), path,
                          normalize_space=normalize_space,
                          actual_filter=actual_filter, success=success)
 
   def AssertFileNotContains(self, expected, path, normalize_space=False,
                             actual_filter=None, success=False):
-    self._AssertContains(expected, self.GetFileContents(path), path,
+    self._AssertContains(expected, files_util.ReadFileContents(path), path,
                          normalize_space=normalize_space,
                          actual_filter=actual_filter, success=success)
 
   def AssertFileEquals(self, expected, path, normalize_space=False,
                        actual_filter=None, success=True):
-    self._AssertEquals(expected, self.GetFileContents(path), path,
+    self._AssertEquals(expected, files_util.ReadFileContents(path), path,
                        normalize_space=normalize_space,
                        actual_filter=actual_filter, success=success)
 
@@ -850,19 +856,19 @@ class Base(WithContentAssertions):
 
   def AssertFileNotEquals(self, expected, path, normalize_space=False,
                           actual_filter=None, success=False):
-    self._AssertEquals(expected, self.GetFileContents(path), path,
+    self._AssertEquals(expected, files_util.ReadFileContents(path), path,
                        normalize_space=normalize_space,
                        actual_filter=actual_filter, success=success)
 
   def AssertFileMatches(self, expected, path, normalize_space=False,
                         actual_filter=None, success=True):
-    self._AssertMatches(expected, self.GetFileContents(path), path,
+    self._AssertMatches(expected, files_util.ReadFileContents(path), path,
                         normalize_space=normalize_space,
                         actual_filter=actual_filter, success=success)
 
   def AssertFileNotMatches(self, expected, path, normalize_space=False,
                            actual_filter=None, success=False):
-    self._AssertMatches(expected, self.GetFileContents(path), path,
+    self._AssertMatches(expected, files_util.ReadFileContents(path), path,
                         normalize_space=normalize_space,
                         actual_filter=actual_filter, success=success)
 
@@ -873,7 +879,7 @@ class Base(WithContentAssertions):
     Returns:
       A valid port not used by another test.
     """
-    return str(portpicker.PickUnusedPort())
+    return six.text_type(portpicker.PickUnusedPort())
 
 
 class InvalidFilterError(Exception):
@@ -1104,6 +1110,23 @@ class Filters(object):
     return Filters._CannedSkip(
         Filters._skipUnless, six.PY2, reason_or_function,
         'This test requires features only available on Python 2.')
+
+  @staticmethod
+  def SkipOnPy3(reason, issue):
+    """A decorator that skips a test if running under Python 3.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will skip a test in Windows.
+    """
+    return Filters.skipIf(six.PY3, reason, issue)
 
   @staticmethod
   def SkipOnWindows(reason, issue):
@@ -1888,7 +1911,7 @@ class WithOutputCapture(WithContentAssertions):
           # Binary -- avoid '\n' <=> '\r\n' morphing on some systems.
           text_size = os.stat(path).st_size
         else:
-          with open(path) as f:
+          with io.open(path, 'rt') as f:
             text_size = sum(len(line) for line in f)
         relative_path = os.path.relpath(path, directory)
         if os.path.sep != '/':

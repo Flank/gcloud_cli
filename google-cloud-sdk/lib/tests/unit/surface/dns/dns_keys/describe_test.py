@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise the 'gcloud dns dns-keys describe' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case

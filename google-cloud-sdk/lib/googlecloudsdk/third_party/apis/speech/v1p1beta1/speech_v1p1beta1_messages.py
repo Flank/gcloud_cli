@@ -166,6 +166,17 @@ class RecognitionConfig(_messages.Message):
       AudioEncoding.
 
   Fields:
+    alternativeLanguageCodes: *Optional* A list of up to 3 additional
+      [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tags,
+      listing possible alternative languages of the supplied audio. See
+      [Language Support](https://cloud.google.com/speech/docs/languages) for a
+      list of the currently supported language codes. If alternative languages
+      are listed, recognition result will contain recognition in the most
+      likely language detected including the main language_code. The
+      recognition result will include the language tag of the language
+      detected in the audio. NOTE: This feature is only supported for Voice
+      Command and Voice Search use cases and performance may vary for other
+      use cases (e.g., phone call transcription).
     diarizationSpeakerCount: *Optional* If set, specifies the estimated number
       of speakers in the conversation. If not set, defaults to '2'. Ignored
       unless enable_speaker_diarization is set to true."
@@ -292,20 +303,21 @@ class RecognitionConfig(_messages.Message):
     OGG_OPUS = 6
     SPEEX_WITH_HEADER_BYTE = 7
 
-  diarizationSpeakerCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  enableAutomaticPunctuation = _messages.BooleanField(2)
-  enableSpeakerDiarization = _messages.BooleanField(3)
-  enableWordConfidence = _messages.BooleanField(4)
-  enableWordTimeOffsets = _messages.BooleanField(5)
-  encoding = _messages.EnumField('EncodingValueValuesEnum', 6)
-  languageCode = _messages.StringField(7)
-  maxAlternatives = _messages.IntegerField(8, variant=_messages.Variant.INT32)
-  metadata = _messages.MessageField('RecognitionMetadata', 9)
-  model = _messages.StringField(10)
-  profanityFilter = _messages.BooleanField(11)
-  sampleRateHertz = _messages.IntegerField(12, variant=_messages.Variant.INT32)
-  speechContexts = _messages.MessageField('SpeechContext', 13, repeated=True)
-  useEnhanced = _messages.BooleanField(14)
+  alternativeLanguageCodes = _messages.StringField(1, repeated=True)
+  diarizationSpeakerCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  enableAutomaticPunctuation = _messages.BooleanField(3)
+  enableSpeakerDiarization = _messages.BooleanField(4)
+  enableWordConfidence = _messages.BooleanField(5)
+  enableWordTimeOffsets = _messages.BooleanField(6)
+  encoding = _messages.EnumField('EncodingValueValuesEnum', 7)
+  languageCode = _messages.StringField(8)
+  maxAlternatives = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  metadata = _messages.MessageField('RecognitionMetadata', 10)
+  model = _messages.StringField(11)
+  profanityFilter = _messages.BooleanField(12)
+  sampleRateHertz = _messages.IntegerField(13, variant=_messages.Variant.INT32)
+  speechContexts = _messages.MessageField('SpeechContext', 14, repeated=True)
+  useEnhanced = _messages.BooleanField(15)
 
 
 class RecognitionMetadata(_messages.Message):
@@ -468,7 +480,20 @@ class SpeechContext(_messages.Message):
   r"""Provides "hints" to the speech recognizer to favor specific words and
   phrases in the results.
 
+  Enums:
+    BiasingStrengthValueValuesEnum: Strength of biasing to use (strong, medium
+      or weak). If you use strong biasing option then more likely to see those
+      phrases in the results. If biasing strength is not specified then by
+      default medium biasing would be used. If you'd like different phrases to
+      have different biasing strengths, you can specify multiple
+      speech_contexts.
+
   Fields:
+    biasingStrength: Strength of biasing to use (strong, medium or weak). If
+      you use strong biasing option then more likely to see those phrases in
+      the results. If biasing strength is not specified then by default medium
+      biasing would be used. If you'd like different phrases to have different
+      biasing strengths, you can specify multiple speech_contexts.
     phrases: *Optional* A list of strings containing words and phrases "hints"
       so that the speech recognition is more likely to recognize them. This
       can be used to improve the accuracy for specific words and phrases, for
@@ -478,7 +503,26 @@ class SpeechContext(_messages.Message):
       limits](https://cloud.google.com/speech/limits#content).
   """
 
-  phrases = _messages.StringField(1, repeated=True)
+  class BiasingStrengthValueValuesEnum(_messages.Enum):
+    r"""Strength of biasing to use (strong, medium or weak). If you use strong
+    biasing option then more likely to see those phrases in the results. If
+    biasing strength is not specified then by default medium biasing would be
+    used. If you'd like different phrases to have different biasing strengths,
+    you can specify multiple speech_contexts.
+
+    Values:
+      BIASING_STRENGTH_UNSPECIFIED: <no description>
+      LOW: Low bias
+      MEDIUM: Medium bias
+      HIGH: High bias
+    """
+    BIASING_STRENGTH_UNSPECIFIED = 0
+    LOW = 1
+    MEDIUM = 2
+    HIGH = 3
+
+  biasingStrength = _messages.EnumField('BiasingStrengthValueValuesEnum', 1)
+  phrases = _messages.StringField(2, repeated=True)
 
 
 class SpeechOperationsGetRequest(_messages.Message):
@@ -538,14 +582,12 @@ class StandardQueryParameters(_messages.Message):
     f__xgafv: V1 error format.
     access_token: OAuth access token.
     alt: Data format for response.
-    bearer_token: OAuth bearer token.
     callback: JSONP
     fields: Selector specifying which fields to include in a partial response.
     key: API key. Your API key identifies your project and provides you with
       API access, quota, and reports. Required unless you provide an OAuth 2.0
       token.
     oauth_token: OAuth 2.0 token for the current user.
-    pp: Pretty-print response.
     prettyPrint: Returns response with indentations and line breaks.
     quotaUser: Available to use for quota purposes for server-side
       applications. Can be any arbitrary string assigned to a user, but should
@@ -581,17 +623,15 @@ class StandardQueryParameters(_messages.Message):
   f__xgafv = _messages.EnumField('FXgafvValueValuesEnum', 1)
   access_token = _messages.StringField(2)
   alt = _messages.EnumField('AltValueValuesEnum', 3, default=u'json')
-  bearer_token = _messages.StringField(4)
-  callback = _messages.StringField(5)
-  fields = _messages.StringField(6)
-  key = _messages.StringField(7)
-  oauth_token = _messages.StringField(8)
-  pp = _messages.BooleanField(9, default=True)
-  prettyPrint = _messages.BooleanField(10, default=True)
-  quotaUser = _messages.StringField(11)
-  trace = _messages.StringField(12)
-  uploadType = _messages.StringField(13)
-  upload_protocol = _messages.StringField(14)
+  callback = _messages.StringField(4)
+  fields = _messages.StringField(5)
+  key = _messages.StringField(6)
+  oauth_token = _messages.StringField(7)
+  prettyPrint = _messages.BooleanField(8, default=True)
+  quotaUser = _messages.StringField(9)
+  trace = _messages.StringField(10)
+  uploadType = _messages.StringField(11)
+  upload_protocol = _messages.StringField(12)
 
 
 class Status(_messages.Message):

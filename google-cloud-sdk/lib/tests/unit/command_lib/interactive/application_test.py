@@ -14,6 +14,7 @@
 
 """Unit tests for the gcloud interactive application module."""
 
+from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import os
@@ -99,7 +100,7 @@ class Vt100Output(vt100_output.Output):
     self._buffer.append(data.replace('\x1b', '?'))
 
   def set_title(self, title):
-    self.write(u'<TITLE>{}</TITLE>'.format(
+    self.write('<TITLE>{}</TITLE>'.format(
         title.replace('\x1b', '').replace('\x07', '')))
 
   def clear_title(self):
@@ -189,6 +190,15 @@ class ApplicationTests(cli_test_base.CliTestBase):
     return self._input.pop(0) if self._input else None
 
   def SetUp(self):
+    # Mock a pollable/selectable sys.stdin for py3 prompt toolkit.
+    self.sys_stdin = sys.stdin
+    r, w = os.pipe()
+    sys.stdin = os.fdopen(r, 'r')
+    os.close(w)
+
+    self.StartDictPatch(os.environ)
+    if 'ENV' in os.environ:
+      del os.environ['ENV']
     self._return_value_index = 0
     cli_tree_dir = os.path.join(os.path.dirname(__file__), 'testdata')
     self.StartObjectPatch(
@@ -211,6 +221,10 @@ class ApplicationTests(cli_test_base.CliTestBase):
         generate_cli_trees.CliTreeGenerator,
         'MemoizeFailures',
         return_value=None)
+
+  def TearDown(self):
+    sys.stdin.close()
+    sys.stdin = self.sys_stdin
 
   def testInteractiveLayout(self):
     self.SetInput([

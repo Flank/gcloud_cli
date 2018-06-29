@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests for api_lib.container.images.container_data_util."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from containerregistry.client import docker_name
 
 from googlecloudsdk.api_lib.container.images import container_data_util

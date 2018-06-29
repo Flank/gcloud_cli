@@ -14,6 +14,8 @@
 #
 """Tests that exercise the 'gcloud dns dns-keys list' command."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -32,7 +34,7 @@ class DnskeysListTest(base.DnsMockMultiTrackTest):
     self.client.dnsKeys.List.Expect(
         messages.DnsDnsKeysListRequest(project=self.Project(),
                                        maxResults=100,
-                                       managedZone=u'my-zone'),
+                                       managedZone='my-zone'),
         messages.DnsKeysListResponse(dnsKeys=[]))
     self.Run('dns dns-keys list --zone my-zone')
     self.AssertErrContains('Listed 0 items.')
@@ -43,7 +45,7 @@ class DnskeysListTest(base.DnsMockMultiTrackTest):
     self.client.dnsKeys.List.Expect(
         messages.DnsDnsKeysListRequest(project=self.Project(),
                                        maxResults=100,
-                                       managedZone=u'my-zone'),
+                                       managedZone='my-zone'),
         messages.DnsKeysListResponse(dnsKeys=[
             messages.DnsKey(id='1',
                             keyTag=1234,
@@ -70,7 +72,7 @@ ID  KEY_TAG  TYPE          IS_ACTIVE  DESCRIPTION
     self.client.dnsKeys.List.Expect(
         messages.DnsDnsKeysListRequest(project=self.Project(),
                                        maxResults=100,
-                                       managedZone=u'my-zone'),
+                                       managedZone='my-zone'),
         messages.DnsKeysListResponse(dnsKeys=[
             messages.DnsKey(
                 id='1',

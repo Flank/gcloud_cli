@@ -11,9 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Tests for the config-ssh subcommand."""
 
-import cStringIO
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import io
 import os
 import re
 import textwrap
@@ -22,7 +26,10 @@ from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.util.ssh import ssh
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
+
 import mock
+import six
+
 
 messages = apis.GetMessagesModule('compute', 'v1')
 
@@ -255,7 +262,7 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
         """)
 
     self.assertMultiLineEqual(
-        self.stdout.getvalue(),
+        self.GetOutput(),
         textwrap.dedent("""\
             You should now be able to use ssh/scp with your instances.
             For example, try running:
@@ -321,10 +328,10 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
     # We want to ensure that the new config file is created with the appropriate
     # permissions, so we change our umask to something that would result in bad
     # permissions.
-    old_umask = os.umask(011)
+    old_umask = os.umask(0o11)
     self.addCleanup(os.umask, old_umask)
     self._DoTestNewConfigFile()
-    self.assertTrue(os.stat(self.config_path).st_mode & 0777 == 0600)
+    self.assertTrue(os.stat(self.config_path).st_mode & 0o777 == 0o600)
 
   def _DoTestExistingFile(self, perms=None):
     """Run a test with an existing key file with the given permissions."""
@@ -406,7 +413,7 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
     )
 
   def testWithExistingConfigFile(self):
-    self._DoTestExistingFile(0600)
+    self._DoTestExistingFile(0o600)
 
   @test_case.Filters.RunOnlyOnWindows
   def testWithExistingConfigFileNoPermissionChanges(self):
@@ -416,25 +423,25 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
   # Windows doesn't support file permissions in the same model
   @test_case.Filters.DoNotRunOnWindows
   def testWithExistingConfigFile_OkayPerms(self):
-    self._DoTestExistingFile(0600)
+    self._DoTestExistingFile(0o600)
     self.AssertErrNotContains('Invalid permissions')
     self.AssertErrNotContains('Please change to match ssh requirements')
 
   @test_case.Filters.DoNotRunOnWindows
   def testWithExistingConfigFile_BadUserPerms(self):
-    self._DoTestExistingFile(0700)
+    self._DoTestExistingFile(0o700)
     self.AssertErrContains('Invalid permissions')
     self.AssertErrContains('Please change to match ssh requirements')
 
   @test_case.Filters.DoNotRunOnWindows
   def testWithExistingConfigFile_BadGroupPerms(self):
-    self._DoTestExistingFile(0620)
+    self._DoTestExistingFile(0o620)
     self.AssertErrContains('Invalid permissions')
     self.AssertErrContains('Please change to match ssh requirements')
 
   @test_case.Filters.DoNotRunOnWindows
   def testWithExistingConfigFile_BadOtherPerms(self):
-    self._DoTestExistingFile(0602)
+    self._DoTestExistingFile(0o602)
     self.AssertErrContains('Invalid permissions')
     self.AssertErrContains('Please change to match ssh requirements')
 
@@ -1556,11 +1563,11 @@ class ConfigSSHTest(test_base.BaseSSHTest, test_case.WithInput):
 
     # Fills up a buffer with enough test_keys until we go just over
     # the max size allowed.
-    buf = cStringIO.StringIO()
+    buf = io.StringIO()
     i = 0
     while len(buf.getvalue()) < self.max_metadata_value_size_in_bytes:
       buf.write('user-')
-      buf.write(str(i))
+      buf.write(six.text_type(i))
       buf.write(':')
       buf.write(test_key)
       buf.write('\n')

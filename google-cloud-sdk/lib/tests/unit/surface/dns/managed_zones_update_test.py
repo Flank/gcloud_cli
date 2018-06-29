@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests that exercise the 'gcloud dns managed-zones create' command."""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -34,12 +36,12 @@ class ManagedZonesUpdateTest(base.DnsMockMultiTrackTest):
         dnssecConfig=self.messages.ManagedZoneDnsSecConfig(
             defaultKeySpecs=[
             ],
-            kind=u'dns#managedZoneDnsSecConfig',
+            kind='dns#managedZoneDnsSecConfig',
             nonExistence=None,
             state=states_enum.off,
         ),
         id=None,
-        kind=u'dns#managedZone',
+        kind='dns#managedZone',
         name='mz',
         nameServerSet=None,
         nameServers=[

@@ -13,12 +13,14 @@
 # limitations under the License.
 """Integration tests for the broker library."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 import datetime
 import errno
-import httplib
+import io
 import logging
 import os
-import StringIO
 import subprocess
 import tempfile
 import time
@@ -32,6 +34,8 @@ from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from mock import patch
+
+import six.moves.http_client
 
 
 def Remove(path, wait_secs=3):
@@ -67,7 +71,7 @@ class BrokerTestBase(sdk_test_base.BundledBase,
 
   def _WriteThreadDump(self):
     """Writes the dump of current thread stacks to the system temp dir."""
-    stacks = StringIO.StringIO()
+    stacks = io.StringIO()
     e2e_utils.PrintAllThreadStacks(out=stacks)
 
     prefix = ThreadDumpPrefix()
@@ -145,11 +149,11 @@ class BrokerTestBase(sdk_test_base.BundledBase,
 
   def _HttpGet(self, host, url):
     """Returns the GET content, or raises an exception."""
-    conn = httplib.HTTPConnection(host)
+    conn = six.moves.http_client.HTTPConnection(host)
     try:
       conn.request('GET', url)
       resp = conn.getresponse()
-      if resp.status != httplib.OK:
+      if resp.status != six.moves.http_client.OK:
         raise Exception('GET {0} failed: {1}'.format(url, resp.reason))
       data = resp.read()
       return data

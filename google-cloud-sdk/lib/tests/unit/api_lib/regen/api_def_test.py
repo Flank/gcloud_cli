@@ -14,6 +14,8 @@
 
 """Unit tests for template.py."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.regen import api_def
 from tests.lib import test_case
 

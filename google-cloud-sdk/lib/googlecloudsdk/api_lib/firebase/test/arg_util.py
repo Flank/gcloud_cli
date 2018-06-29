@@ -13,9 +13,12 @@
 # limitations under the License.
 """A shared library for processing and validating test arguments."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.firebase.test import arg_file
 from googlecloudsdk.api_lib.firebase.test import arg_validate
 from googlecloudsdk.api_lib.firebase.test import exceptions
+from googlecloudsdk.calliope import actions
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.core import log
@@ -150,6 +153,11 @@ def AddAndroidTestArgs(parser):
       'default: the application\'s label from the APK manifest). All tests '
       'which use the same history name will have their results grouped '
       'together in the Firebase console in a time-ordered test history list.')
+  parser.add_argument(
+      '--type',
+      category=base.COMMONLY_USED_FLAGS,
+      choices=['instrumentation', 'robo', 'game-loop'],
+      help='The type of test to run.')
 
   # The following args are specific to Android instrumentation tests.
 
@@ -197,23 +205,38 @@ def AddAndroidTestArgs(parser):
 
   parser.add_argument(
       '--max-steps',
+      action=actions.DeprecationAction(
+          '--max-steps',
+          warn=('The `--max-steps` flag is deprecated and no longer has any '
+                'effect on the Robo crawler. The `--timeout` flag may be '
+                'optionally used to limit the maximum length of a Robo test.')),
       metavar='int',
       category=ANDROID_ROBO_TEST,
       type=arg_validate.NONNEGATIVE_INT_PARSER,
-      help='The maximum number of steps/actions a robo test can execute '
+      help='The maximum number of steps/actions a Robo test can execute '
       '(default: no limit).')
   parser.add_argument(
       '--max-depth',
+      action=actions.DeprecationAction(
+          '--max-depth',
+          warn=('The `--max-depth` flag is deprecated and no longer has any '
+                'effect on the actions of the Robo crawler.')),
       metavar='int',
       category=ANDROID_ROBO_TEST,
       type=arg_validate.POSITIVE_INT_PARSER,
-      help='The maximum depth of the traversal stack a robo test can explore. '
+      help='The maximum depth of the traversal stack a Robo test can explore. '
       'Needs to be at least 2 to make Robo explore the app beyond the first '
       'activity (default: 50).')
   parser.add_argument(
       '--app-initial-activity',
+      action=actions.DeprecationAction(
+          '--app-initial-activity',
+          warn=('The `--app-initial-activity` flag is deprecated and no longer '
+                'has any effect on the Robo crawler. Alternatively, the '
+                '`--robo-script` flag (in beta) can be used to guide Robo to a '
+                'specific part of your app before the Robo test begins.')),
       category=ANDROID_ROBO_TEST,
-      help='The initial activity used to start the app during a robo test.')
+      help='The initial activity used to start the app during a Robo test.')
   parser.add_argument(
       '--robo-directives',
       metavar='TYPE:RESOURCE_NAME=INPUT',
@@ -243,6 +266,32 @@ def AddAndroidTestArgs(parser):
       'Caution: You should only use credentials for test accounts that are not '
       'associated with real users.')
 
+  # The following args are specific to Android game-loop tests.
+
+  parser.add_argument(
+      '--scenario-numbers',
+      metavar='int',
+      type=arg_parsers.ArgList(element_type=int, min_length=1, max_length=1024),
+      category=ANDROID_GAME_LOOP_TEST,
+      help='A list of game-loop scenario numbers which will be run as part of '
+      'the test (default: all scenarios). A maximum of 1024 scenarios may be '
+      'specified in one test matrix, but the maximum number may also be '
+      'limited by the overall test *--timeout* setting.')
+
+  parser.add_argument(
+      '--scenario-labels',
+      metavar='LABEL',
+      type=arg_parsers.ArgList(min_length=1),
+      category=ANDROID_GAME_LOOP_TEST,
+      help='A list of game-loop scenario labels (default: None). '
+      'Each game-loop scenario may be labeled in the APK manifest file with '
+      'one or more arbitrary strings, creating logical groupings (e.g. '
+      'GPU_COMPATIBILITY_TESTS). If *--scenario-numbers* and '
+      '*--scenario-labels* are specified together, Firebase Test Lab will '
+      'first execute each scenario from *--scenario-numbers*. It will then '
+      'expand each given scenario label into a list of scenario numbers marked '
+      'with that label, and execute those scenarios.')
+
 
 def AddIosTestArgs(parser):
   """Register args which are specific to iOS test commands.
@@ -263,7 +312,19 @@ def AddIosTestArgs(parser):
       metavar='XCTEST_ZIP',
       help='The path to the test package (a zip file containing the iOS app '
       'and XCTest files). The given path may be in the local filesystem or in '
-      'Google Cloud Storage using a URL beginning with `gs://`.')
+      'Google Cloud Storage using a URL beginning with `gs://`. Note: any '
+      '.xctestrun file in this zip file will be ignored if *--xctestrun-file* '
+      'is specified.')
+  parser.add_argument(
+      '--xctestrun-file',
+      category=base.COMMONLY_USED_FLAGS,
+      metavar='XCTESTRUN_FILE',
+      help='The path to an .xctestrun file that will override any .xctestrun '
+      'file contained in the *--test* package. Because the .xctestrun file '
+      'contains environment variables along with test methods to run and/or '
+      'ignore, this can be useful for customizing or sharding test suites. The '
+      'given path may be in the local filesystem or in Google Cloud Storage '
+      'using a URL beginning with `gs://`.')
   parser.add_argument(
       '--device',
       category=base.COMMONLY_USED_FLAGS,
@@ -300,11 +361,7 @@ def AddGaArgs(parser):
   Args:
     parser: An argparse parser used to add args that follow a command.
   """
-  parser.add_argument(
-      '--type',
-      category=base.COMMONLY_USED_FLAGS,
-      choices=['instrumentation', 'robo'],
-      help='The type of test to run.')
+  del parser  # Unused by AddGaArgs
 
 
 def AddBetaArgs(parser):
@@ -314,39 +371,9 @@ def AddBetaArgs(parser):
     parser: An argparse parser used to add args that follow a command.
   """
   parser.add_argument(
-      '--type',
-      category=base.COMMONLY_USED_FLAGS,
-      choices=['instrumentation', 'robo', 'game-loop'],
-      help='The type of test to run.')
-
-  parser.add_argument(
-      '--scenario-numbers',
-      metavar='int',
-      type=arg_parsers.ArgList(element_type=int, min_length=1, max_length=1024),
-      category=ANDROID_GAME_LOOP_TEST,
-      help='A list of game-loop scenario numbers which will be run as part of '
-      'the test (default: all scenarios). A maximum of 1024 scenarios may be '
-      'specified in one test matrix, but the maximum number may also be '
-      'limited by the overall test *--timeout* setting.')
-
-  parser.add_argument(
-      '--scenario-labels',
-      metavar='LABEL',
-      type=arg_parsers.ArgList(min_length=1),
-      category=ANDROID_GAME_LOOP_TEST,
-      help='A list of game-loop scenario labels (default: None). '
-      'Each game-loop scenario may be labeled in the APK manifest file with '
-      'one or more arbitrary strings, creating logical groupings (e.g. '
-      'GPU_COMPATIBILITY_TESTS). If *--scenario-numbers* and '
-      '*--scenario-labels* are specified together, Firebase Test Lab will '
-      'first execute each scenario from *--scenario-numbers*. It will then '
-      'expand each given scenario label into a list of scenario numbers marked '
-      'with that label, and execute those scenarios.')
-
-  # TODO(b/36366322): use {grandparent_command} once available
-  parser.add_argument(
       '--network-profile',
       metavar='PROFILE_ID',
+      # TODO(b/36366322): use {grandparent_command} once available
       help='The name of the network traffic profile, for example '
       '--network-profile=LTE, which consists of a set of parameters to emulate '
       'network conditions when running the test (default: no network shaping; '
@@ -481,13 +508,13 @@ def GetSetOfAllTestArgs(type_rules, shared_rules):
   Returns:
     A set of strings for every gcloud-test argument.
   """
-  all_test_args_list = (shared_rules['required'] +
-                        shared_rules['optional'] +
-                        shared_rules['defaults'].keys())
+  all_test_args_list = (
+      shared_rules['required'] + shared_rules['optional'] + list(
+          shared_rules['defaults'].keys()))
   for type_dict in type_rules.values():
-    all_test_args_list += (type_dict['required'] +
-                           type_dict['optional'] +
-                           type_dict['defaults'].keys())
+    all_test_args_list += (
+        type_dict['required'] + type_dict['optional'] + list(
+            type_dict['defaults'].keys()))
   return set(all_test_args_list)
 
 

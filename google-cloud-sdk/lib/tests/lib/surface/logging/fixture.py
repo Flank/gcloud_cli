@@ -14,6 +14,8 @@
 
 """Testing resources for logging."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import datetime
 
 from apitools.base.py import extra_types

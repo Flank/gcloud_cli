@@ -25,7 +25,7 @@ from tests.lib.surface.debug import base
 
 
 def _load_json(path):
-  return json.loads(file_utils.GetFileContents(path))
+  return json.loads(file_utils.ReadFileContents(path))
 
 
 class UploadTest(base.DebugSdkTest):

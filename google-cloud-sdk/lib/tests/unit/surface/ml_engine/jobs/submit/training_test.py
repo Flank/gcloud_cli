@@ -897,6 +897,19 @@ if __name__ == '__main__':
     self.exec_mock.assert_not_called()
     self.copy_to_gcs.assert_not_called()
 
+  def testSubmit_PackagePathDoesNotExist(self):
+    with self.assertRaisesRegexp(jobs_prep.InvalidSourceDirError,
+                                 'junk'):
+      self.Run(
+          'ml-engine jobs submit training my-job'
+          '    --package-path={} '
+          '    --module-name=trainer.task '
+          '    --staging-bucket=gs://train-bucket/ '
+          '    --job-dir gs://job-bucket/job-prefix '
+          '    --region=us-central1 '
+          '    -- '
+          '    --train_dir=gs://train-bucket/my-job/train'.format('junk/junk'))
+
 
 class TrainGaTest(TrainTestBase, base.MlGaPlatformTestBase):
 

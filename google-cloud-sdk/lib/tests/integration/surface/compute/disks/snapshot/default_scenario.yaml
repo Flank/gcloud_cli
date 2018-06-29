@@ -347,5 +347,4 @@ response:
 output:
   stderr: |
     No zone specified. Using zone [us-central1-f] for disk: [foo].
-    <START PROGRESS TRACKER>Creating snapshot(s) t8noiqdm038v
-    <END PROGRESS TRACKER>SUCCESS
+    {"ux": "PROGRESS_TRACKER", "message": "Creating snapshot(s) t8noiqdm038v", "status": "SUCCESS"}

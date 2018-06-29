@@ -41,7 +41,7 @@ COMMANDS
     COMMAND is one of the following:
 
      decrypt
-        Decrypt a ciphertext file using a key.
+        Decrypt a ciphertext file using a Cloud KMS key.
 
      encrypt
         Encrypt a plaintext file using a key.

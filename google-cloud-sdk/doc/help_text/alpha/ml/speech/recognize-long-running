@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha ml speech recognize-long-running AUDIO
-        --language-code=LANGUAGE_CODE [--async]
+        --language-code=LANGUAGE_CODE
+        [--additional-language-codes=[LANGUAGE_CODE,...]] [--async]
         [--encoding=ENCODING; default="encoding-unspecified"]
         [--filter-profanity] [--hints=[HINTS,...]] [--include-word-confidence]
         [--include-word-time-offsets]
@@ -22,12 +23,12 @@ DESCRIPTION
     To block the command from completing until analysis is finished, run:
 
         $ gcloud alpha ml speech recognize-long-running AUDIO_FILE \
-            --language LANGUAGE --sample-rate SAMPLE_RATE
+            --language-code LANGUAGE_CODE --sample-rate SAMPLE_RATE
 
     You can also receive an operation as the result of the command by running:
 
         $ gcloud alpha ml speech recognize-long-running AUDIO_FILE \
-            --language LANGUAGE --sample-rate SAMPLE_RATE --async
+            --language-code LANGUAGE_CODE --sample-rate SAMPLE_RATE --async
 
     This will return information about an operation. To get information about
     the operation, run:
@@ -51,6 +52,14 @@ REQUIRED FLAGS
         of the currently supported language codes.
 
 OPTIONAL FLAGS
+     --additional-language-codes=[LANGUAGE_CODE,...]
+        The BCP-47 language tags of other languages that the speech may be in.
+        Up to 3 can be provided.
+
+        If alternative languages are listed, recognition result will contain
+        recognition in the most likely language detected including the main
+        language-code.
+
      --async
         Display information about the operation in progress, without waiting
         for the operation to complete.

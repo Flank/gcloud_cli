@@ -13,6 +13,8 @@
 # limitations under the License.
 """Tests that exercise operations listing and executing."""
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 from googlecloudsdk.api_lib.sql import exceptions
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -25,40 +27,44 @@ class InstancesDescribeTest(base.SqlMockTestBeta):
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance='testinstance',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.DatabaseInstance(
             currentDiskSize=52690837,
-            databaseVersion=u'MYSQL_5_5',
-            etag=u'"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
-            name=u'testinstance',
+            databaseVersion='MYSQL_5_5',
+            etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
+            name='testinstance',
             ipAddresses=[],
-            ipv6Address=u'2001:4860:4864:1:df7c:6a7a:d107:ab9d',
-            kind=u'sql#instance',
+            ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:ab9d',
+            kind='sql#instance',
             maxDiskSize=268435456000,
             project=self.Project(),
-            region=u'us-central',
+            region='us-central',
             serverCaCert=None,
             settings=self.messages.Settings(
-                activationPolicy=u'ON_DEMAND',
+                activationPolicy='ON_DEMAND',
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=False,
                     enabled=True,
-                    kind=u'sql#backupConfiguration',
-                    startTime=u'11:54'),
+                    kind='sql#backupConfiguration',
+                    startTime='11:54'),
                 databaseFlags=[],
                 ipConfiguration=self.messages.IpConfiguration(
                     authorizedNetworks=[],
                     ipv4Enabled=False,
-                    requireSsl=None,),
-                kind=u'sql#settings',
+                    requireSsl=None,
+                ),
+                kind='sql#settings',
                 locationPreference=None,
-                pricingPlan=u'PER_USE',
-                replicationType=u'SYNCHRONOUS',
+                pricingPlan='PER_USE',
+                replicationType='SYNCHRONOUS',
                 settingsVersion=1,
-                tier=u'D0',),
-            state=u'RUNNABLE',
-            instanceType=u'CLOUD_SQL_INSTANCE',))
+                tier='D0',
+            ),
+            state='RUNNABLE',
+            instanceType='CLOUD_SQL_INSTANCE',
+        ))
 
     self.Run('sql instances describe testinstance')
     self.AssertOutputContains(
@@ -95,55 +101,62 @@ state: RUNNABLE
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
             instance='testinstance',
-            project=self.Project(),),
+            project=self.Project(),
+        ),
         self.messages.DatabaseInstance(
             currentDiskSize=52690837,
-            databaseVersion=u'MYSQL_5_5',
-            etag=u'"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
-            name=u'testinstance',
+            databaseVersion='MYSQL_5_5',
+            etag='"DExdZ69FktjWMJ-ohD1vLZW9pnk/MQ"',
+            name='testinstance',
             ipAddresses=[],
-            ipv6Address=u'2001:4860:4864:1:df7c:6a7a:d107:ab9d',
-            kind=u'sql#instance',
+            ipv6Address='2001:4860:4864:1:df7c:6a7a:d107:ab9d',
+            kind='sql#instance',
             maxDiskSize=268435456000,
             project=self.Project(),
-            region=u'us-central',
+            region='us-central',
             serverCaCert=None,
             settings=self.messages.Settings(
-                activationPolicy=u'ON_DEMAND',
+                activationPolicy='ON_DEMAND',
                 authorizedGaeApplications=[],
                 backupConfiguration=self.messages.BackupConfiguration(
                     binaryLogEnabled=False,
                     enabled=True,
-                    kind=u'sql#backupConfiguration',
-                    startTime=u'11:54'),
+                    kind='sql#backupConfiguration',
+                    startTime='11:54'),
                 databaseFlags=[],
                 ipConfiguration=self.messages.IpConfiguration(
                     authorizedNetworks=[],
                     ipv4Enabled=False,
-                    requireSsl=None,),
-                kind=u'sql#settings',
+                    requireSsl=None,
+                ),
+                kind='sql#settings',
                 userLabels=self.messages.Settings.UserLabelsValue(
                     additionalProperties=[
                         self.messages.Settings.UserLabelsValue.
                         AdditionalProperty(
                             key='bar',
-                            value='value',),
+                            value='value',
+                        ),
                         self.messages.Settings.UserLabelsValue.
                         AdditionalProperty(
                             key='baz',
-                            value='qux',),
+                            value='qux',
+                        ),
                         self.messages.Settings.UserLabelsValue.
                         AdditionalProperty(
                             key='foo',
-                            value='bar',),
+                            value='bar',
+                        ),
                     ],),
                 locationPreference=None,
-                pricingPlan=u'PER_USE',
-                replicationType=u'SYNCHRONOUS',
+                pricingPlan='PER_USE',
+                replicationType='SYNCHRONOUS',
                 settingsVersion=1,
-                tier=u'D0',),
-            state=u'RUNNABLE',
-            instanceType=u'CLOUD_SQL_INSTANCE',))
+                tier='D0',
+            ),
+            state='RUNNABLE',
+            instanceType='CLOUD_SQL_INSTANCE',
+        ))
 
     self.Run('sql instances describe testinstance --format="default(labels)"')
     self.AssertOutputContains(
